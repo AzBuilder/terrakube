@@ -15,7 +15,7 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
-		<elide.version>4.5.16</elide.version>
+		<elide.version>4.6.11</elide.version>
 	</properties>
 	<dependencies>
 		<dependency>

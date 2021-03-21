@@ -22,8 +22,8 @@ public class Organization {
     private String description;
 
     @OneToMany(mappedBy = "organization")
-    private List<Workspace> workspaces;
+    private List<Workspace> workspace;
 
     @OneToMany(mappedBy = "organization")
-    private List<Module> modules;
+    private List<Module> module;
 }

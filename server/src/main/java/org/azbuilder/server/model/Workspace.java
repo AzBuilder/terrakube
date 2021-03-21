@@ -3,11 +3,8 @@ package org.azbuilder.server.model;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,13 +24,13 @@ public class Workspace {
     private Organization organization;
 
     @OneToMany(mappedBy = "workspace")
-    private List<Variable> variables;
+    private List<Variable> variable;
 
     @OneToMany(mappedBy = "workspace")
-    private List<Secret> secrets;
+    private List<Secret> secret;
 
     @OneToMany(mappedBy = "workspace")
-    private List<Job> jobs;
+    private List<Job> job;
 
     @OneToOne
     private Module module;
