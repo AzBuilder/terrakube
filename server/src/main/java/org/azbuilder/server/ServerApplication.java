@@ -1,4 +1,4 @@
-package org.azbuilder.api.server;
+package org.azbuilder.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

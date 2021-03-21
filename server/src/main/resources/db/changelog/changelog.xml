@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="admin" id="1539122071">
+        <sql>
+            CREATE TABLE ArtifactGroup (
+            name varchar(255) NOT NULL,
+            commonName varchar(255) DEFAULT NULL,
+            description varchar(255) DEFAULT NULL,
+            PRIMARY KEY (name)
+            );
+
+            CREATE TABLE ArtifactProduct (
+            name varchar(255) NOT NULL,
+            commonName varchar(255) DEFAULT NULL,
+            description varchar(255) DEFAULT NULL,
+            group_name varchar(255) DEFAULT NULL,
+            PRIMARY KEY (name),
+            FOREIGN KEY (group_name) REFERENCES ArtifactGroup(name)
+            );
+
+            CREATE TABLE ArtifactVersion (
+            name varchar(255) NOT NULL,
+            createdAt timestamp DEFAULT NULL,
+            artifact_name varchar(255) DEFAULT NULL,
+            PRIMARY KEY (name),
+            FOREIGN KEY (artifact_name) REFERENCES ArtifactProduct(name)
+            );
+        </sql>
+    </changeSet>
+    <changeSet author="admin" id="1539122270">
+        <sql>
+            INSERT INTO ArtifactGroup (name, commonName, description) VALUES
+            ('com.example.repository','Example Repository','The code for this project'),
+            ('com.yahoo.elide','Elide','The magical library powering this project');
+
+            INSERT INTO ArtifactProduct (name, commonName, description, group_name) VALUES
+            ('elide-core','Core','The guts of Elide','com.yahoo.elide'),
+            ('elide-datastore-hibernate5','Hibernate5 Datastore','A datastore that uses Hibernate 5 to communicate with the database','com.yahoo.elide'),
+            ('elide-standalone','Standalone','A pre-configured, standalone Elide webservice','com.yahoo.elide');
+        </sql>
+    </changeSet>
+</databaseChangeLog>
