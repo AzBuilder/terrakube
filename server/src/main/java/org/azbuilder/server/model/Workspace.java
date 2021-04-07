@@ -1,6 +1,7 @@
 package org.azbuilder.server.model;
 
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.SharePermission;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@SharePermission
 public class Workspace {
 
     @Id
@@ -29,9 +31,9 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace")
     private List<Secret> secret;
 
-    @OneToMany(mappedBy = "workspace")
-    private List<Job> job;
-
     @OneToOne
     private Module module;
+
+    @OneToMany(mappedBy = "workspace")
+    private List<Job> job;
 }

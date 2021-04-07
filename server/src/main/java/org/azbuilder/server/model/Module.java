@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,12 +19,13 @@ public class Module {
     private UUID id;
 
     private String name;
-    private String description;
-    private String source;
 
     @ManyToOne
     private Organization organization;
 
     @OneToMany(mappedBy = "module")
-    private List<Workspace> workspaces;
+    private List<Workspace> workspace;
+
+    @OneToMany(mappedBy = "module")
+    private List<Version> version;
 }

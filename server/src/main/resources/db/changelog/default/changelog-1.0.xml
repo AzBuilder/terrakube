@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="1" author="alfespa17@gmail.com">
+        <createTable tableName="organization">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="job">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="workspace">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="variable">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="key" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="varchar(512)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="secret">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="dept" type="varchar(${dep.size})">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emp_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="secret">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="dept" type="varchar(${dep.size})">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emp_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="variable">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="dept" type="varchar(${dep.size})">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emp_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

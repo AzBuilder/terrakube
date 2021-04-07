@@ -4,11 +4,7 @@ import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import java.sql.Timestamp;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Include(type = "job")
@@ -22,5 +18,9 @@ public class Job {
     private UUID id;
 
     @ManyToOne
+    private Organization organization;
+
+    @ManyToOne
     private Workspace workspace;
 }
+

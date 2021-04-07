@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<elide.version>4.6.11</elide.version>
+		<liquibase-core.version>4.3.2</liquibase-core.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -45,6 +46,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>${liquibase-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

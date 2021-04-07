@@ -19,11 +19,13 @@ public class Organization {
     private UUID id;
 
     private String name;
-    private String description;
 
     @OneToMany(mappedBy = "organization")
     private List<Workspace> workspace;
 
     @OneToMany(mappedBy = "organization")
     private List<Module> module;
+
+    @OneToMany(mappedBy = "organization")
+    private List<Job> job;
 }
