@@ -29,6 +29,39 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <createTable tableName="secret">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="dept" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emp_id" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="variable">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="key" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="environment">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="key" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
         <createTable tableName="variable">
             <column name="id" type="varchar(32)">
                 <constraints primaryKey="true"/>
@@ -41,28 +74,6 @@
             </column>
         </createTable>
         <createTable tableName="secret">
-            <column name="id" type="varchar(32)">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="dept" type="varchar(${dep.size})">
-                <constraints nullable="false"/>
-            </column>
-            <column name="emp_id" type="int">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <createTable tableName="secret">
-            <column name="id" type="varchar(32)">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="dept" type="varchar(${dep.size})">
-                <constraints nullable="false"/>
-            </column>
-            <column name="emp_id" type="int">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <createTable tableName="variable">
             <column name="id" type="varchar(32)">
                 <constraints primaryKey="true"/>
             </column>

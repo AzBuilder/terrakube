@@ -1,5 +1,4 @@
-package org.azbuilder.server.model;
-
+package org.azbuilder.server.rs.module;
 
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
@@ -9,31 +8,30 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import java.util.Map;
 import java.util.UUID;
 
-@Include(type = "version")
+@Include(type = "parameter")
 @Getter
 @Setter
 @Entity
-public class Version {
+public class Parameter {
+
     @Id
     @GeneratedValue
     private UUID id;
 
-    private String name;
+    private ParameterType parameterType;
 
-    private Status status;
+    private String key;
+
+    private String value;
 
     @ManyToOne
-    private Module module;
+    private Version version;
 }
 
-enum Status{
-    preAlpha,
-    alpha,
-    beta,
-    releaseCandidate,
-    releaseToManufacturing,
-    generalAvailability
+enum ParameterType{
+    SECRET,
+    VARIABLE,
+    ENVIRONMENT
 }

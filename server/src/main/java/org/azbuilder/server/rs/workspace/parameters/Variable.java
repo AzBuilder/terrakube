@@ -1,8 +1,9 @@
-package org.azbuilder.server.model;
+package org.azbuilder.server.rs.workspace.parameters;
 
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.azbuilder.server.rs.workspace.Workspace;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

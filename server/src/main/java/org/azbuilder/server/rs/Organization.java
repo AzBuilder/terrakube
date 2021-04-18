@@ -1,8 +1,11 @@
-package org.azbuilder.server.model;
+package org.azbuilder.server.rs;
 
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.azbuilder.server.rs.job.Job;
+import org.azbuilder.server.rs.module.Module;
+import org.azbuilder.server.rs.workspace.Workspace;
 
 import javax.persistence.*;
 import java.util.List;

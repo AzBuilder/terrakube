@@ -1,9 +1,15 @@
-package org.azbuilder.server.model;
+package org.azbuilder.server.rs.workspace;
 
 import com.yahoo.elide.annotation.Include;
 import com.yahoo.elide.annotation.SharePermission;
 import lombok.Getter;
 import lombok.Setter;
+import org.azbuilder.server.rs.*;
+import org.azbuilder.server.rs.job.Job;
+import org.azbuilder.server.rs.module.Module;
+import org.azbuilder.server.rs.workspace.parameters.Environment;
+import org.azbuilder.server.rs.workspace.parameters.Secret;
+import org.azbuilder.server.rs.workspace.parameters.Variable;
 
 import javax.persistence.*;
 import java.util.List;
@@ -30,6 +36,9 @@ public class Workspace {
 
     @OneToMany(mappedBy = "workspace")
     private List<Secret> secret;
+
+    @OneToMany(mappedBy = "workspace")
+    private List<Environment> environment;
 
     @OneToOne
     private Module module;
