@@ -1,6 +1,5 @@
 package org.azbuilder.server.rs.job;
 
-import com.yahoo.elide.annotation.Exclude;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
