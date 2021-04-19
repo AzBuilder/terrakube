@@ -26,8 +26,5 @@ public class Module {
     private Organization organization;
 
     @OneToMany(mappedBy = "module")
-    private List<Workspace> workspace;
-
-    @OneToMany(mappedBy = "module")
     private List<Version> version;
 }

@@ -15,18 +15,19 @@ import javax.persistence.*;
 public class Job {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private Command command;
 
-    private Status status;
+    private Status status = Status.pending;
 
     @ManyToOne
     private Organization organization;
 
     @ManyToOne
     private Workspace workspace;
+
 }
 
 enum Status{

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.server.rs.*;
 import org.azbuilder.server.rs.job.Job;
-import org.azbuilder.server.rs.module.Module;
+import org.azbuilder.server.rs.module.Version;
 import org.azbuilder.server.rs.workspace.parameters.Environment;
 import org.azbuilder.server.rs.workspace.parameters.Secret;
 import org.azbuilder.server.rs.workspace.parameters.Variable;
@@ -41,7 +41,7 @@ public class Workspace {
     private List<Environment> environment;
 
     @OneToOne
-    private Module module;
+    private Version version;
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;

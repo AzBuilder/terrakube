@@ -3,7 +3,7 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <changeSet id="1" author="alfespa17@gmail.com">
         <createTable tableName="organization">
             <column name="id" type="varchar(36)">
@@ -13,15 +13,32 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <createTable tableName="job">
-            <column name="id" type="int">
+        <createTable tableName="module">
+            <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="organization_id" type="varchar(36)">
-                <constraints nullable="false" foreignKeyName="fk_job_organization" references="organization(id)"/>
+            <column name="organization_id" type="varchar(32)">
+                <constraints nullable="false" foreignKeyName="fk_module_organization" references="organization(id)"/>
+            </column>
+        </createTable>
+        <createTable tableName="version">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="status" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sourceApply" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="module_id" type="varchar(32)">
+                <constraints nullable="false" foreignKeyName="fk_version_module" references="module(id)"/>
             </column>
         </createTable>
         <createTable tableName="workspace">
@@ -33,6 +50,9 @@
             </column>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_workspace_organization" references="organization(id)"/>
+            </column>
+            <column name="version_id" type="varchar(32)">
+                <constraints nullable="false" foreignKeyName="fk_workspace_version" references="version(id)"/>
             </column>
         </createTable>
         <createTable tableName="secret">
@@ -77,37 +97,6 @@
                 <constraints nullable="false" foreignKeyName="fk_environment_workspace" references="workspace(id)"/>
             </column>
         </createTable>
-        <createTable tableName="module">
-            <column name="id" type="varchar(36)">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="name" type="varchar(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="organization_id" type="varchar(32)">
-                <constraints nullable="false" foreignKeyName="fk_module_organization" references="organization(id)"/>
-            </column>
-        </createTable>
-        <createTable tableName="version">
-            <column name="id" type="int">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="name" type="varchar(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="status" type="varchar(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="source" type="varchar(1024)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="sourceApply" type="varchar(1024)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="module_id" type="varchar(32)">
-                <constraints nullable="false" foreignKeyName="fk_version_module" references="module(id)"/>
-            </column>
-        </createTable>
         <createTable tableName="parameter">
             <column name="id" type="varchar(32)">
                 <constraints primaryKey="true"/>
@@ -118,8 +107,28 @@
             <column name="value" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="version_id" type="int">
+            <column name="parameterType" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version_id" type="varchar(32)">
                 <constraints nullable="false" foreignKeyName="fk_parameter_version" references="version(id)"/>
+            </column>
+        </createTable>
+        <createTable tableName="job">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="command" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_job_organization" references="organization(id)"/>
+            </column>
+            <column name="workspace_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_job_workspace" references="workspace(id)"/>
             </column>
         </createTable>
     </changeSet>
