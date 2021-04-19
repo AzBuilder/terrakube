@@ -29,28 +29,29 @@ The server supports the following endpoints:
 
 ### Organization
 This endpoint allows creating, updating, deleting and search organizations.
-
-* /api/v1/organization/
- 
+```
+/api/v1/organization/
+``` 
 ### Module
 These endpoints allow creating, updating, deleting and search terraform module and define several versions with parameters.
-
-* /api/v1/organization/{{organizationId}}/module
-* /api/v1/organization/{{organizationId}}/module/{{moduleId}}/version
-* /api/v1/organization/{{organizationId}}/module/{{moduleId}}/version/{{versionId}}/parameter
-
+```
+/api/v1/organization/{{organizationId}}/module
+/api/v1/organization/{{organizationId}}/module/{{moduleId}}/version
+/api/v1/organization/{{organizationId}}/module/{{moduleId}}/version/{{versionId}}/parameter
+```
 ### Workspace
 These endpoints allow creating, updating, deleting and search terraform workspaces and define different parameters like variables, secrets and environment variables.
-
-* /api/v1/organization/{{organizationId}}/workspace
-* /api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable
-* /api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/secret
-* /api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment
-  
+```
+/api/v1/organization/{{organizationId}}/workspace
+/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable
+/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/secret
+/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment
+```
 ### Job
 This endpoint define the operation to be executed for a specific terraform workspace. 
-
-* /api/v1/organization/{{organizationId}}/job
+```
+/api/v1/organization/{{organizationId}}/job
+```
 
 ## Postman Examples
 For more detail information about how to use azb-server json:api please check the following files:
