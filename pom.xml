@@ -20,7 +20,6 @@
     <name>azbuilder-project</name>
 
     <modules>
-        <module>api</module>
         <module>server</module>
   </modules>
 </project>
