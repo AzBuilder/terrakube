@@ -24,6 +24,19 @@ To run the API use the following command:
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
+## Build Docker Images
+
+To build the docker images for the server and server job execute the following command:
+```bash
+mvn spring-boot:build-image
+```
+
+To run the container execute the following:
+```bash
+docker run -it -p8080:8080 -e SPRING_PROFILES_ACTIVE=local server:0.0.1;
+docker run -it -p8080:8080 -e SPRING_PROFILES_ACTIVE=local server-job:0.0.1;
+```
+
 ## API Operations
 The server supports the following endpoints:
 
