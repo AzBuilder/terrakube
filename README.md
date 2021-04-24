@@ -17,6 +17,14 @@ To compile and run the tool you will need the following:
 mvn clean install
 ```
 
+## Modules
+This project contains two modules describe below:
+
+|Name      |Description                                       |
+|:---------|--------------------------------------------------|
+|server    | Expose the API to manage all terraform workspaces|
+|server-job| Schedule job that validate the terraform workspaces with pending executions (Work in progress) |
+
 ## Running
 To run the API use the following command:
 
