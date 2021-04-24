@@ -1,4 +1,4 @@
-package org.azbuilder.server.job.rs.model.organization;
+package org.azbuilder.server.job.rs.model.organization.workspace;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 @Getter
 @Setter
-public class Organization extends Resource{
+public class Workspace extends Resource {
     HashMap<String, String> attributes;
     Relationships relationships;
 }

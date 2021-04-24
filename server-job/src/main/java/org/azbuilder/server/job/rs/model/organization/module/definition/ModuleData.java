@@ -1,13 +1,11 @@
-package org.azbuilder.server.job.rs.model.organization;
+package org.azbuilder.server.job.rs.model.organization.module.definition;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.server.job.rs.model.generic.Resource;
 
-import java.util.List;
-
 @Getter
 @Setter
 public class ModuleData {
-    List<Resource> data;
+    Resource data;
 }

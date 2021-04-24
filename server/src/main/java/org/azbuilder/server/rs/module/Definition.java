@@ -11,6 +11,7 @@ import org.azbuilder.server.rs.workspace.Workspace;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
 @Include(type = "definition")
 @Getter
@@ -18,8 +19,10 @@ import java.util.List;
 @Entity
 @SharePermission
 public class Definition {
+
     @Id
-    private String id;
+    @GeneratedValue
+    private UUID id;
 
     private Status status;
 

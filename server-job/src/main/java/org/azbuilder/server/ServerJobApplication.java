@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableFeignClients
 public class ServerJobApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ServerJobApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ServerJobApplication.class, args);
+    }
 
 }

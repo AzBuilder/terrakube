@@ -1,4 +1,4 @@
-package org.azbuilder.server.job.rs.model.organization;
+package org.azbuilder.server.job.rs.model.organization.workspace.variable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Relationships {
-    JobData job;
-    ModuleData module;
     WorkspaceData workspace;
 }

@@ -1,4 +1,4 @@
-package org.azbuilder.server.job.rs.configuration;
+package org.azbuilder.server.job.rs.client.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
