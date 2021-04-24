@@ -6,7 +6,7 @@
 		<groupId>org.azbuilder</groupId>
 		<artifactId>azbuilder-project</artifactId>
 		<version>${revision}</version>
-		<relativePath>..</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.azbuilder</groupId>
 	<artifactId>server</artifactId>

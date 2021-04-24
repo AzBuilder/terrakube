@@ -27,7 +27,7 @@ public class Parameter {
     private String value;
 
     @ManyToOne
-    private Version version;
+    private Definition definition;
 }
 
 enum ParameterType{

@@ -30,13 +30,6 @@ public class Job {
 
 }
 
-enum Status{
-    pending,
-    queue,
-    running,
-    completed
-}
-
 enum Command{
     plan,
     apply,

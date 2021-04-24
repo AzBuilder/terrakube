@@ -24,7 +24,7 @@
                 <constraints nullable="false" foreignKeyName="fk_module_organization" references="organization(id)"/>
             </column>
         </createTable>
-        <createTable tableName="version">
+        <createTable tableName="definition">
             <column name="id" type="varchar(32)">
                 <constraints primaryKey="true"/>
             </column>
@@ -38,7 +38,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="module_id" type="varchar(32)">
-                <constraints nullable="false" foreignKeyName="fk_version_module" references="module(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_definition_module" references="module(id)"/>
             </column>
         </createTable>
         <createTable tableName="workspace">
@@ -51,8 +51,8 @@
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_workspace_organization" references="organization(id)"/>
             </column>
-            <column name="version_id" type="varchar(32)">
-                <constraints nullable="false" foreignKeyName="fk_workspace_version" references="version(id)"/>
+            <column name="definition_id" type="varchar(32)">
+                <constraints nullable="false" foreignKeyName="fk_workspace_version" references="definition(id)"/>
             </column>
         </createTable>
         <createTable tableName="secret">
@@ -110,8 +110,8 @@
             <column name="parameterType" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="version_id" type="varchar(32)">
-                <constraints nullable="false" foreignKeyName="fk_parameter_version" references="version(id)"/>
+            <column name="definition_id" type="varchar(32)">
+                <constraints nullable="false" foreignKeyName="fk_parameter_definition" references="definition(id)"/>
             </column>
         </createTable>
         <createTable tableName="job">

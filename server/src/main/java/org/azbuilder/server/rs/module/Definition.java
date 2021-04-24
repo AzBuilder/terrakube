@@ -12,12 +12,12 @@ import org.azbuilder.server.rs.workspace.Workspace;
 import javax.persistence.*;
 import java.util.List;
 
-@Include(type = "version")
+@Include(type = "definition")
 @Getter
 @Setter
 @Entity
 @SharePermission
-public class Version {
+public class Definition {
     @Id
     private String id;
 
@@ -30,7 +30,7 @@ public class Version {
     @ManyToOne
     private Module module;
 
-    @OneToMany(mappedBy = "version")
+    @OneToMany(mappedBy = "definition")
     private List<Parameter> parameter;
 }
 

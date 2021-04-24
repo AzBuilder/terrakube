@@ -5,7 +5,6 @@ import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.server.rs.Organization;
-import org.azbuilder.server.rs.workspace.Workspace;
 
 import javax.persistence.*;
 import java.util.List;
@@ -26,5 +25,5 @@ public class Module {
     private Organization organization;
 
     @OneToMany(mappedBy = "module")
-    private List<Version> version;
+    private List<Definition> definition;
 }

@@ -33,11 +33,11 @@ This endpoint allows creating, updating, deleting and search organizations.
 /api/v1/organization/
 ``` 
 ### Module
-These endpoints allow creating, updating, deleting and search terraform module and define several versions with parameters.
+These endpoints allow creating, updating, deleting and search terraform module and define several definitions with parameters.
 ```
 /api/v1/organization/{{organizationId}}/module
-/api/v1/organization/{{organizationId}}/module/{{moduleId}}/version
-/api/v1/organization/{{organizationId}}/module/{{moduleId}}/version/{{versionId}}/parameter
+/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition
+/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition/{{versionId}}/parameter
 ```
 ### Workspace
 These endpoints allow creating, updating, deleting and search terraform workspaces and define different parameters like variables, secrets and environment variables.
