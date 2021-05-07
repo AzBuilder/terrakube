@@ -8,32 +8,19 @@
         <version>2.4.3</version>
     </parent>
 
-    <groupId>org.azbuilder</groupId>
-    <artifactId>azbuilder-project</artifactId>
+    <groupId>org.azbuilder.api</groupId>
+    <artifactId>api-solution</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
     <properties>
         <revision>0.0.1</revision>
-        <spring-cloud.version>2020.0.2</spring-cloud.version>
     </properties>
 
-    <name>azbuilder-project</name>
+    <name>api-server-solution</name>
 
     <modules>
-        <module>server</module>
-		<module>server-job</module>
+        <module>api</module>
+		<module>api-job</module>
   </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>

@@ -1,4 +1,4 @@
-# azb-server (work in progress)
+# AzBuilder - API (work in progress)
 
 Open source tool to handle remote terraform workspace in organizations and handle all the lifecycle (plan, apply, destroy).
 
