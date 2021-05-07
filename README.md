@@ -1,4 +1,4 @@
-# azb-server (work in progress)
+# AzBuilder - API (work in progress)
 
 Open source tool to handle remote terraform workspace in organizations and handle all the lifecycle (plan, apply, destroy).
 
@@ -17,11 +17,32 @@ To compile and run the tool you will need the following:
 mvn clean install
 ```
 
+## Modules
+This project contains two modules describe below:
+
+|Name      |Description                                       |
+|:---------|--------------------------------------------------|
+|server    | Expose the API to manage all terraform workspaces|
+|server-job| Schedule job that validate the terraform workspaces with pending executions (Work in progress) |
+
 ## Running
 To run the API use the following command:
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+## Build Docker Images
+
+To build the docker images for the server and server job execute the following command:
+```bash
+mvn spring-boot:build-image
+```
+
+To run the container execute the following:
+```bash
+docker run -it -p8080:8080 -e SPRING_PROFILES_ACTIVE=local server:0.0.1;
+docker run -it -p8080:8080 -e SPRING_PROFILES_ACTIVE=local server-job:0.0.1;
 ```
 
 ## API Operations
@@ -33,11 +54,11 @@ This endpoint allows creating, updating, deleting and search organizations.
 /api/v1/organization/
 ``` 
 ### Module
-These endpoints allow creating, updating, deleting and search terraform module and define several versions with parameters.
+These endpoints allow creating, updating, deleting and search terraform module and define several definitions with parameters.
 ```
 /api/v1/organization/{{organizationId}}/module
-/api/v1/organization/{{organizationId}}/module/{{moduleId}}/version
-/api/v1/organization/{{organizationId}}/module/{{moduleId}}/version/{{versionId}}/parameter
+/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition
+/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition/{{versionId}}/parameter
 ```
 ### Workspace
 These endpoints allow creating, updating, deleting and search terraform workspaces and define different parameters like variables, secrets and environment variables.

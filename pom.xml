@@ -8,8 +8,8 @@
         <version>2.4.3</version>
     </parent>
 
-    <groupId>org.azbuilder</groupId>
-    <artifactId>azbuilder-project</artifactId>
+    <groupId>org.azbuilder.api</groupId>
+    <artifactId>api-solution</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
@@ -17,9 +17,10 @@
         <revision>0.0.1</revision>
     </properties>
 
-    <name>azbuilder-project</name>
+    <name>api-server-solution</name>
 
     <modules>
-        <module>server</module>
+        <module>api</module>
+		<module>api-job</module>
   </modules>
 </project>
