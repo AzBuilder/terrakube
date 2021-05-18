@@ -37,6 +37,9 @@
             <column name="sourceSample" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
+            <column name="terraformVersion" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
             <column name="module_id" type="varchar(32)">
                 <constraints nullable="false" foreignKeyName="fk_definition_module" references="module(id)"/>
             </column>

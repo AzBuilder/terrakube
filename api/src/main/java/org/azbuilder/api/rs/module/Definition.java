@@ -27,6 +27,8 @@ public class Definition {
 
     private String sourceSample;
 
+    private String terraformVersion;
+
     @ManyToOne
     private Module module;
 
