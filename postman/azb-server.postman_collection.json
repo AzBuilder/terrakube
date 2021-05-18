@@ -58,9 +58,15 @@
 					"name": "search organizations",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/html; charset=utf8",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "{{server}}/api/v1/organization?filter[job]=status==completed&include=job",
+							"raw": "{{server}}/api/v1/organization?include=workspace&job.status=pending",
 							"host": [
 								"{{server}}"
 							],
@@ -71,12 +77,12 @@
 							],
 							"query": [
 								{
-									"key": "filter[job]",
-									"value": "status==completed"
+									"key": "include",
+									"value": "workspace"
 								},
 								{
-									"key": "include",
-									"value": "job"
+									"key": "job.status",
+									"value": "pending"
 								}
 							]
 						}
@@ -225,7 +231,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"definition\",\r\n    \"attributes\": {\r\n        \"status\": \"generalAvailability\",\r\n        \"source\": \"www.google.com\",\r\n        \"sourceApply\": \"www.microsoft.com\"\r\n    }\r\n  }\r\n}"
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"definition\",\r\n    \"attributes\": {\r\n        \"status\": \"generalAvailability\",\r\n        \"source\": \"https://pocazterrabot.blob.core.windows.net/terraform/main.zip\",\r\n        \"sourceSample\": \"https://pocazterrabot.blob.core.windows.net/terraform/main.zip\",\r\n        \"terraformVersion\": \"0.14.9\"\r\n    }\r\n  }\r\n}"
 								},
 								"url": {
 									"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition",
@@ -430,7 +436,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"SuperKey\",\r\n      \"value\": \"SuperValue\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"tag_name\",\r\n      \"value\": \"HolaMundo\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -868,6 +874,118 @@
 								"{{organizationId}}",
 								"workspace",
 								"{{workspaceId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search by id with definition",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=definition",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace",
+								"{{workspaceId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "definition"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search by id with variables",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=variable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace",
+								"{{workspaceId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "variable"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search by id with env",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=environment",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace",
+								"{{workspaceId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "environment"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search by id with secrets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=secret",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace",
+								"{{workspaceId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "secret"
+								}
 							]
 						}
 					},
