@@ -107,7 +107,7 @@
             <column name="key" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="value" type="varchar(32)">
+            <column name="value" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="parameterType" type="varchar(32)">
