@@ -11,6 +11,7 @@ import org.azbuilder.api.client.model.organization.workspace.secret.Secret;
 import org.azbuilder.api.client.model.organization.workspace.variable.Variable;
 import org.azbuilder.terraform.TerraformCommand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class Pending {
 
     @Autowired
     RestClient restClient;
+
+    @Value( "${org.azbuilder.executor.url}" )
+    private String executorUrl;
 
     @Scheduled(fixedRate = 60000)
     public void pendingJobs() {
@@ -106,5 +110,6 @@ class TerraformJob {
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
     private HashMap<String, String> secrets;
-
 }
+
+

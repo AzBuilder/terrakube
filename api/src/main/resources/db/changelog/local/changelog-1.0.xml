@@ -127,6 +127,9 @@
             <column name="status" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
+            <column name="output" type="clob">
+                <constraints nullable="true"/>
+            </column>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_job_organization" references="organization(id)"/>
             </column>

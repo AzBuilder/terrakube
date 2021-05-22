@@ -22,6 +22,9 @@ public class Job {
 
     private Status status = Status.pending;
 
+    @Lob
+    private String output;
+
     @ManyToOne
     private Organization organization;
 
