@@ -18,6 +18,8 @@
 		<elide.version>4.7.2</elide.version>
 		<liquibase-core.version>4.3.2</liquibase-core.version>
 		<azure.version>3.5.0</azure.version>
+		<mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>
+		<msal4j.version>1.10.0</msal4j.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -75,6 +77,18 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>${mssql-jdbc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>msal4j</artifactId>
+			<version>${msal4j.version}</version>
+		</dependency>
+
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

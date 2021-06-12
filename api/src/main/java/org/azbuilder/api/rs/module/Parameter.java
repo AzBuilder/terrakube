@@ -3,11 +3,9 @@ package org.azbuilder.api.rs.module;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Include(type = "parameter")
@@ -17,13 +15,18 @@ import java.util.UUID;
 public class Parameter {
 
     @Id
+    @Type(type="uuid-char")
     @GeneratedValue
     private UUID id;
 
+    @Column(name="parameter_type")
+    @Enumerated(EnumType.STRING)
     private ParameterType parameterType;
 
+    @Column(name="parameter_key")
     private String key;
 
+    @Column(name="parameter_value")
     private String value;
 
     @ManyToOne

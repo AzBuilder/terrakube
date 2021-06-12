@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.workspace.Workspace;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 

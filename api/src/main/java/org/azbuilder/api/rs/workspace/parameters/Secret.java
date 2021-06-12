@@ -4,11 +4,9 @@ import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.workspace.Workspace;
+import org.hibernate.annotations.Type;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.UUID;
 
 
@@ -19,10 +17,14 @@ import java.util.UUID;
 public class Secret {
 
     @Id
+    @Type(type="uuid-char")
     @GeneratedValue
     private UUID id;
 
+    @Column(name="secret_key")
     private String key;
+
+    @Column(name="secret_value")
     private String value;
 
     @ManyToOne
