@@ -16,8 +16,8 @@
 	<properties>
 		<java.version>11</java.version>
 		<okhttp.version>4.9.1</okhttp.version>
-		<api-client-starter.version>0.0.5</api-client-starter.version>
-		<terraform-spring-boot-starter.version>0.0.6</terraform-spring-boot-starter.version>
+		<api-client-starter.version>0.1.0</api-client-starter.version>
+		<terraform-spring-boot-starter.version>0.2.1</terraform-spring-boot-starter.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>org.azbuilder.terraform</groupId>
 			<artifactId>terraform-client</artifactId>
-			<version>0.0.6</version>
+			<version>${terraform-spring-boot-starter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

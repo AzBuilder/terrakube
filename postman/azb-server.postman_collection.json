@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "ebc79ec0-e357-49ad-be65-0f815172585d",
-		"name": "azb-server",
+		"name": "AzBuilder",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -23,6 +23,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{device_access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -33,7 +43,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"new organization\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"Sample Organization Name\",\r\n      \"description\": \"Sample Organization Description\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -171,6 +181,18 @@
 							"item": [
 								{
 									"name": "create parameter",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var json = JSON.parse(responseBody);\r",
+													"postman.setEnvironmentVariable(\"parameterId\", json.data.id);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [
@@ -185,7 +207,7 @@
 											"raw": "{\r\n  \"data\": {\r\n    \"type\": \"parameter\",\r\n    \"attributes\": {\r\n        \"key\": \"parameterKey\",\r\n        \"value\": \"parameterValue\",\r\n        \"parameterType\": \"VARIABLE\"\r\n    }\r\n  }\r\n}"
 										},
 										"url": {
-											"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition/{{versionId}}/parameter",
+											"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition/{{definitionId}}/parameter",
 											"host": [
 												"{{server}}"
 											],
@@ -197,8 +219,52 @@
 												"module",
 												"{{moduleId}}",
 												"definition",
-												"{{versionId}}",
+												"{{definitionId}}",
 												"parameter"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete parameter",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var json = JSON.parse(responseBody);\r",
+													"postman.setEnvironmentVariable(\"parameterId\", json.data.id);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/vnd.api+json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition/{{definitionId}}/parameter/{{parameterId}}",
+											"host": [
+												"{{server}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"organization",
+												"{{organizationId}}",
+												"module",
+												"{{moduleId}}",
+												"definition",
+												"{{definitionId}}",
+												"parameter",
+												"{{parameterId}}"
 											]
 										}
 									},
@@ -214,7 +280,7 @@
 									"script": {
 										"exec": [
 											"var json = JSON.parse(responseBody);\r",
-											"postman.setEnvironmentVariable(\"versionId\", json.data.id);"
+											"postman.setEnvironmentVariable(\"definitionId\", json.data.id);"
 										],
 										"type": "text/javascript"
 									}
@@ -231,7 +297,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"definition\",\r\n    \"attributes\": {\r\n        \"status\": \"generalAvailability\",\r\n        \"source\": \"https://pocazterrabot.blob.core.windows.net/terraform/main.zip\",\r\n        \"sourceSample\": \"https://pocazterrabot.blob.core.windows.net/terraform/main.zip\",\r\n        \"terraformVersion\": \"0.14.9\"\r\n    }\r\n  }\r\n}"
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"definition\",\r\n    \"attributes\": {\r\n        \"type\": \"HTTP\",\r\n        \"status\": \"GENERAL_AVAILABILITY\",\r\n        \"source\": \"https://pocazterrabot.blob.core.windows.net/terraform/main.zip\",\r\n        \"sourceSample\": \"https://pocazterrabot.blob.core.windows.net/terraform/main.zip\",\r\n        \"terraformVersion\": \"0.14.9\"\r\n    }\r\n  }\r\n}"
 								},
 								"url": {
 									"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition",
@@ -292,7 +358,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}/version/{{versionId}}",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition/{{definitionId}}",
 									"host": [
 										"{{server}}"
 									],
@@ -303,8 +369,8 @@
 										"{{organizationId}}",
 										"module",
 										"{{moduleId}}",
-										"version",
-										"{{versionId}}"
+										"definition",
+										"{{definitionId}}"
 									]
 								}
 							},
@@ -337,7 +403,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"TestModule\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"Sample Module Name\",\r\n      \"description\": \"Sample Module Description\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -539,7 +605,7 @@
 					"name": "environment",
 					"item": [
 						{
-							"name": "create",
+							"name": "ARM_CLIENT_ID",
 							"event": [
 								{
 									"listen": "test",
@@ -563,7 +629,157 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"SuperKey\",\r\n      \"value\": \"SuperValue\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_ID\",\r\n      \"value\": \"{{ARM_CLIENT_ID}}\"\r\n    }\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"environment"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ARM_CLIENT_SECRET",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var json = JSON.parse(responseBody);\r",
+											"postman.setEnvironmentVariable(\"environmentId\", json.data.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_SECRET\",\r\n      \"value\": \"{{ARM_CLIENT_SECRET}}\"\r\n    }\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"environment"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ARM_SUBSCRIPTION_ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var json = JSON.parse(responseBody);\r",
+											"postman.setEnvironmentVariable(\"environmentId\", json.data.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_SUBSCRIPTION_ID\",\r\n      \"value\": \"{{ARM_SUBSCRIPTION_ID}}\"\r\n    }\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"environment"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ARM_TENANT_ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var json = JSON.parse(responseBody);\r",
+											"postman.setEnvironmentVariable(\"environmentId\", json.data.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_TENANT_ID\",\r\n      \"value\": \"{{ARM_TENANT_ID}}\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -689,7 +905,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"secret\",\r\n    \"attributes\": {\r\n      \"key\": \"SuperKey\",\r\n      \"value\": \"SuperValue\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"secret\",\r\n    \"attributes\": {\r\n      \"key\": \"SecretKey\",\r\n      \"value\": \"SecretValue\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -813,7 +1029,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"workspace\",\r\n    \"attributes\": {\r\n      \"name\": \"new workspace\"\r\n    },\r\n    \"relationships\":{\r\n        \"definition\":{\r\n            \"data\":{\r\n                \"type\": \"definition\",\r\n                \"id\": \"{{versionId}}\"\r\n            }\r\n        }\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"workspace\",\r\n    \"attributes\": {\r\n      \"name\": \"Sample Workspace Name\"\r\n    },\r\n    \"relationships\":{\r\n        \"definition\":{\r\n            \"data\":{\r\n                \"type\": \"definition\",\r\n                \"id\": \"{{definitionId}}\"\r\n            }\r\n        }\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1043,7 +1259,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"job\",\r\n    \"attributes\": {\r\n      \"command\": \"apply\"\r\n    },\r\n    \"relationships\":{\r\n        \"workspace\":{\r\n            \"data\":{\r\n                \"type\": \"workspace\",\r\n                \"id\": \"{{workspaceId}}\"\r\n            }\r\n        }\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"job\",\r\n    \"attributes\": {\r\n      \"command\": \"plan\"\r\n    },\r\n    \"relationships\":{\r\n        \"workspace\":{\r\n            \"data\":{\r\n                \"type\": \"workspace\",\r\n                \"id\": \"{{workspaceId}}\"\r\n            }\r\n        }\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1184,6 +1400,36 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{device_access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
