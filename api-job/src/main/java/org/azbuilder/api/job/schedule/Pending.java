@@ -39,7 +39,7 @@ public class Pending {
 
     @Scheduled(fixedRate = 60000)
     public void pendingJobs() {
-        log.info("Checking Pendings Jobs");
+        log.info("Checking Pending Jobs");
 
         OrganizationResponse<List<Organization>, Job> organizationJobList = restClient.getAllOrganizationsWithJobStatus("pending");
 
