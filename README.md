@@ -74,8 +74,8 @@ mvn spring-boot:build-image
 
 To run the container execute the following:
 ```bash
-docker run -it -p8080:8080 -e server:1.0.0;
-docker run -it -p8080:8080 -e server-job:1.0.0;
+docker run -it -p8080:8080 -e api:1.0.0;
+docker run -it -p8080:8080 -e api-job:1.0.0;
 ```
 
 ## API Operations

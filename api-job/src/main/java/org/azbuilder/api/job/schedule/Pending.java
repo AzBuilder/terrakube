@@ -31,15 +31,11 @@ public class Pending {
     @Autowired
     RestClient restClient;
 
-    @Value("${org.azbuilder.api.url}")
-    private String apiUrl;
-
     @Value("${org.azbuilder.executor.url}")
     private String executorUrl;
 
     @Scheduled(fixedRate = 60000)
     public void pendingJobs() {
-        log.info("Checking Pending Jobs");
 
         OrganizationResponse<List<Organization>, Job> organizationJobList = restClient.getAllOrganizationsWithJobStatus("pending");
 
@@ -61,7 +57,7 @@ public class Pending {
                     for (Variable variable : variableList) {
                         String parameterKey = variable.getAttributes().get("key");
                         String parameterValue = variable.getAttributes().get("value");
-                        log.info("Variable Key: {} Value {}", parameterKey, parameterValue);
+                        //log.info("Variable Key: {} Value {}", parameterKey, parameterValue);
                         variables.put(parameterKey, parameterValue);
                     }
                 terraformJob.setVariables(variables);
@@ -74,7 +70,7 @@ public class Pending {
                     for (Secret secret : secretList) {
                         String parameterKey = secret.getAttributes().get("key");
                         String parameterValue = secret.getAttributes().get("value");
-                        log.info("Secret Key: {} Value {}", parameterKey, parameterValue);
+                        //log.info("Secret Key: {} Value {}", parameterKey, parameterValue);
                         secrets.put(parameterKey, parameterValue);
                     }
                 terraformJob.setSecrets(secrets);
@@ -87,7 +83,7 @@ public class Pending {
                     for (Environment environment : environmentVariableList) {
                         String parameterKey = environment.getAttributes().get("key");
                         String parameterValue = environment.getAttributes().get("value");
-                        log.info("Environment Variable Key: {} Value {}", parameterKey, parameterValue);
+                        //log.info("Environment Variable Key: {} Value {}", parameterKey, parameterValue);
                         environmentsVariables.put(parameterKey, parameterValue);
                     }
                 terraformJob.setEnvironmentVariables(environmentsVariables);
