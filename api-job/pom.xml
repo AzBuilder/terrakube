@@ -16,13 +16,23 @@
 	<properties>
 		<java.version>11</java.version>
 		<okhttp.version>4.9.1</okhttp.version>
-		<api-client-starter.version>0.0.1</api-client-starter.version>
+		<api-client-starter.version>0.1.0</api-client-starter.version>
+		<terraform-spring-boot-starter.version>0.2.1</terraform-spring-boot-starter.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.azbuilder.api.spring.starter</groupId>
 			<artifactId>api-client-spring-boot-starter</artifactId>
 			<version>${api-client-starter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.azbuilder.terraform</groupId>
+			<artifactId>terraform-client</artifactId>
+			<version>${terraform-spring-boot-starter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

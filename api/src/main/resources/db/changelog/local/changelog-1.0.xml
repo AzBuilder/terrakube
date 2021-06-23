@@ -12,6 +12,9 @@
             <column name="name" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
+            <column name="description" type="varchar(256)">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
         <createTable tableName="module">
             <column name="id" type="varchar(36)">
@@ -20,24 +23,33 @@
             <column name="name" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="organization_id" type="varchar(32)">
+            <column name="description" type="varchar(256)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_module_organization" references="organization(id)"/>
             </column>
         </createTable>
         <createTable tableName="definition">
-            <column name="id" type="varchar(32)">
+            <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
             <column name="status" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
+            <column name="type" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
             <column name="source" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
-            <column name="sourceSample" type="varchar(1024)">
+            <column name="source_sample" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
-            <column name="module_id" type="varchar(32)">
+            <column name="terraform_version" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="module_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_definition_module" references="module(id)"/>
             </column>
         </createTable>
@@ -51,7 +63,7 @@
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_workspace_organization" references="organization(id)"/>
             </column>
-            <column name="definition_id" type="varchar(32)">
+            <column name="definition_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_workspace_version" references="definition(id)"/>
             </column>
         </createTable>
@@ -59,10 +71,10 @@
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="key" type="varchar(32)">
+            <column name="secret_key" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="value" type="varchar(32)">
+            <column name="secret_value" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
             <column name="workspace_id" type="varchar(36)">
@@ -73,10 +85,10 @@
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="key" type="varchar(32)">
+            <column name="variable_key" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="value" type="varchar(32)">
+            <column name="variable_value" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
             <column name="workspace_id" type="varchar(36)">
@@ -87,10 +99,10 @@
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="key" type="varchar(32)">
+            <column name="environment_key" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="value" type="varchar(32)">
+            <column name="environment_value" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="workspace_id" type="varchar(36)">
@@ -98,19 +110,19 @@
             </column>
         </createTable>
         <createTable tableName="parameter">
-            <column name="id" type="varchar(32)">
+            <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="key" type="varchar(32)">
+            <column name="parameter_key" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="value" type="varchar(32)">
+            <column name="parameter_value" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="parameterType" type="varchar(32)">
+            <column name="parameter_type" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="definition_id" type="varchar(32)">
+            <column name="definition_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_parameter_definition" references="definition(id)"/>
             </column>
         </createTable>
@@ -123,6 +135,9 @@
             </column>
             <column name="status" type="varchar(32)">
                 <constraints nullable="false"/>
+            </column>
+            <column name="output" type="varchar(1024)">
+                <constraints nullable="true"/>
             </column>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_job_organization" references="organization(id)"/>

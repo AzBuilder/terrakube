@@ -10,6 +10,7 @@ import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.module.Definition;
 import org.azbuilder.api.rs.workspace.parameters.Environment;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class Workspace {
 
     @Id
+    @Type(type="uuid-char")
     @GeneratedValue
     private UUID id;
 
