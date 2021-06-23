@@ -76,7 +76,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{server}}/api/v1/organization?include=workspace&job.status=pending",
+							"raw": "{{server}}/api/v1/organization",
 							"host": [
 								"{{server}}"
 							],
@@ -84,23 +84,13 @@
 								"api",
 								"v1",
 								"organization"
-							],
-							"query": [
-								{
-									"key": "include",
-									"value": "workspace"
-								},
-								{
-									"key": "job.status",
-									"value": "pending"
-								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "search organizations Copy",
+					"name": "search organizations with pending jobs",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -129,7 +119,7 @@
 					"response": []
 				},
 				{
-					"name": "search by id",
+					"name": "search organization by id",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -149,7 +139,7 @@
 					"response": []
 				},
 				{
-					"name": "delete by id",
+					"name": "delete organization by id",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -347,7 +337,7 @@
 							"response": []
 						},
 						{
-							"name": "search by id",
+							"name": "search definition by id",
 							"request": {
 								"method": "GET",
 								"header": [
@@ -451,6 +441,28 @@
 					"name": "search module by id",
 					"request": {
 						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"module",
+								"{{moduleId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete module by id",
+					"request": {
+						"method": "DELETE",
 						"header": [],
 						"url": {
 							"raw": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}",
@@ -605,14 +617,14 @@
 					"name": "environment",
 					"item": [
 						{
-							"name": "ARM_CLIENT_ID",
+							"name": "create ARM_CLIENT_ID",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
 											"var json = JSON.parse(responseBody);\r",
-											"postman.setEnvironmentVariable(\"environmentId\", json.data.id);"
+											"postman.setEnvironmentVariable(\"environmentClientId\", json.data.id);"
 										],
 										"type": "text/javascript"
 									}
@@ -655,14 +667,55 @@
 							"response": []
 						},
 						{
-							"name": "ARM_CLIENT_SECRET",
+							"name": "delete ARM_CLIENT_ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentClientId}}",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"environment",
+										"{{environmentClientId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create ARM_CLIENT_SECRET",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
 											"var json = JSON.parse(responseBody);\r",
-											"postman.setEnvironmentVariable(\"environmentId\", json.data.id);"
+											"postman.setEnvironmentVariable(\"environmentSecretId\", json.data.id);"
 										],
 										"type": "text/javascript"
 									}
@@ -705,14 +758,55 @@
 							"response": []
 						},
 						{
-							"name": "ARM_SUBSCRIPTION_ID",
+							"name": "delete ARM_CLIENT_SECRET",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentSecretId}}",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"environment",
+										"{{environmentSecretId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create ARM_SUBSCRIPTION_ID",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
 											"var json = JSON.parse(responseBody);\r",
-											"postman.setEnvironmentVariable(\"environmentId\", json.data.id);"
+											"postman.setEnvironmentVariable(\"environmentSubscriptionId\", json.data.id);"
 										],
 										"type": "text/javascript"
 									}
@@ -755,14 +849,64 @@
 							"response": []
 						},
 						{
-							"name": "ARM_TENANT_ID",
+							"name": "delete ARM_SUBSCRIPTION_ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_SUBSCRIPTION_ID\",\r\n      \"value\": \"{{ARM_SUBSCRIPTION_ID}}\"\r\n    }\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentSubscriptionId}}",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"environment",
+										"{{environmentSubscriptionId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create ARM_TENANT_ID",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
 											"var json = JSON.parse(responseBody);\r",
-											"postman.setEnvironmentVariable(\"environmentId\", json.data.id);"
+											"postman.setEnvironmentVariable(\"environmentTenantId\", json.data.id);"
 										],
 										"type": "text/javascript"
 									}
@@ -805,6 +949,56 @@
 							"response": []
 						},
 						{
+							"name": "delete ARM_TENANT_ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_TENANT_ID\",\r\n      \"value\": \"{{ARM_TENANT_ID}}\"\r\n    }\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentTenantId}}",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"environment",
+										"{{environmentTenantId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "search",
 							"request": {
 								"method": "GET",
@@ -833,7 +1027,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{variableId}}",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentId}}",
 									"host": [
 										"{{server}}"
 									],
@@ -845,7 +1039,7 @@
 										"workspace",
 										"{{workspaceId}}",
 										"environment",
-										"{{variableId}}"
+										"{{environmentId}}"
 									]
 								}
 							},
@@ -857,7 +1051,7 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable/{{variableId}}",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable/{{environmentId}}",
 									"host": [
 										"{{server}}"
 									],
@@ -869,7 +1063,7 @@
 										"workspace",
 										"{{workspaceId}}",
 										"variable",
-										"{{variableId}}"
+										"{{environmentId}}"
 									]
 								}
 							},
