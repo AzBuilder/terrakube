@@ -9,7 +9,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.util.UUID;
 
-@Include(type = "variable")
+@Include
 @Getter
 @Setter
 @Entity

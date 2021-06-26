@@ -5,11 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.workspace.Workspace;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
-@Include(type = "job")
+@Include(rootLevel = false)
 @Getter
 @Setter
 @Entity
@@ -21,7 +20,7 @@ public class Job {
 
     private Command command;
 
-    private Status status = Status.pending;
+    private JobStatus status = JobStatus.pending;
 
     private String output;
 

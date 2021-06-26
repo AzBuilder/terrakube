@@ -2,20 +2,19 @@ package org.azbuilder.api.rs.module;
 
 
 import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.annotation.SharePermission;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Include(type = "definition")
+@Include
 @Getter
 @Setter
 @Entity
-@SharePermission
 public class Definition {
 
     @Id
@@ -40,10 +39,10 @@ public class Definition {
     DefinitionType type;
 
     @ManyToOne
-    private Module module;
+    private Module module = null;
 
     @OneToMany(mappedBy = "definition")
-    private List<Parameter> parameter;
+    private List<Parameter> parameter = new ArrayList<>();
 }
 
 enum DefinitionType{

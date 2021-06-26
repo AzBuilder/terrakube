@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.0.2</revision>
+        <revision>2.0.0</revision>
     </properties>
 
     <name>api-server-solution</name>

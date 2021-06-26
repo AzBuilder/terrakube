@@ -8,7 +8,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.util.UUID;
 
-@Include(type = "parameter")
+@Include
 @Getter
 @Setter
 @Entity
