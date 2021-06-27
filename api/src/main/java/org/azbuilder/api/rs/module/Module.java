@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Include(rootLevel = false)
+@Include
 @Getter
 @Setter
 @Entity
