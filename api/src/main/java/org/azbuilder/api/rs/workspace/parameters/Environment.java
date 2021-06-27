@@ -9,7 +9,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.util.UUID;
 
-@Include(type = "environment")
+@Include
 @Getter
 @Setter
 @Entity

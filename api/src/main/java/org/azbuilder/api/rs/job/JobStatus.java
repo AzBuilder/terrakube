@@ -1,6 +1,6 @@
 package org.azbuilder.api.rs.job;
 
-public enum Status{
+public enum JobStatus {
     pending,
     queue,
     running,

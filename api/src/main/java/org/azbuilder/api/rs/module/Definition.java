@@ -2,7 +2,6 @@ package org.azbuilder.api.rs.module;
 
 
 import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.annotation.SharePermission;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -11,11 +10,10 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@Include(type = "definition")
+@Include
 @Getter
 @Setter
 @Entity
-@SharePermission
 public class Definition {
 
     @Id

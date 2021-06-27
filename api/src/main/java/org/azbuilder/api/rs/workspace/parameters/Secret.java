@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.UUID;
 
 
-@Include(type = "secret")
+@Include
 @Getter
 @Setter
 @Entity

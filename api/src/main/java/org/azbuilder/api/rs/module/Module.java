@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@Include(type = "module")
+@Include
 @Getter
 @Setter
 @Entity

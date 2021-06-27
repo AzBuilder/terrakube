@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@Include(rootLevel = true, type = "organization")
+@Include
 @Getter
 @Setter
 @Entity
