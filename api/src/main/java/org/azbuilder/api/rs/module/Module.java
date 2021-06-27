@@ -8,7 +8,6 @@ import org.azbuilder.api.rs.Organization;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ public class Module {
     private String description;
 
     @ManyToOne
-    private Organization organization = null;
+    private Organization organization;
 
     @OneToMany(mappedBy = "module")
     private List<Definition> definition;

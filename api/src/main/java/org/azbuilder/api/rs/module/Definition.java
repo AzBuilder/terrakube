@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +38,7 @@ public class Definition {
     DefinitionType type;
 
     @ManyToOne
-    private Module module = null;
+    private Module module;
 
     @OneToMany(mappedBy = "definition")
     private List<Parameter> parameter;
