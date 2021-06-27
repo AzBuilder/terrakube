@@ -30,5 +30,5 @@ public class Module {
     private Organization organization = null;
 
     @OneToMany(mappedBy = "module")
-    private List<Definition> definition = new ArrayList<>();
+    private List<Definition> definition;
 }

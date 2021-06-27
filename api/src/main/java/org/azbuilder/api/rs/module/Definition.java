@@ -42,7 +42,7 @@ public class Definition {
     private Module module = null;
 
     @OneToMany(mappedBy = "definition")
-    private List<Parameter> parameter = new ArrayList<>();
+    private List<Parameter> parameter;
 }
 
 enum DefinitionType{

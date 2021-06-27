@@ -9,7 +9,6 @@ import org.azbuilder.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,11 +28,11 @@ public class Organization {
     private String description;
 
     @OneToMany(mappedBy = "organization")
-    private List<Workspace> workspace = new ArrayList<>();
+    private List<Workspace> workspace;
 
     @OneToMany(mappedBy = "organization")
-    private List<Module> module = new ArrayList<>();
+    private List<Module> module;
 
     @OneToMany(mappedBy = "organization")
-    private List<Job> job = new ArrayList<>();
+    private List<Job> job;
 }
