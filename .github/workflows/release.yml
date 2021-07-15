@@ -1,0 +1,54 @@
+name: Push Docker Images
+
+on: 
+  release:
+    types: [created]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+       VERSION: ${{ github.event.release.tag_name }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+    - name: Build Image with Maven
+      run: mvn spring-boot:build-image -B  --file pom.xml -s $GITHUB_WORKSPACE/.github/workflows/maven-settings.xml
+      env:
+        USER_NAME: ${{ secrets.USER_NAME }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - name: docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    
+    - name: Docker tag API Image 
+      run: docker tag $(docker images api-server -q) azbuilder/api-server:$VERSION
+      
+    - name: Docker tag API Image latest
+      run: docker tag $(docker images api-server -q) azbuilder/api-server:latest
+    
+    - name: Docker Push API latest
+      run: docker push azbuilder/api-server:$VERSION
+      
+    - name: Docker Push API latest
+      run: docker push azbuilder/api-server:latest
+    
+    - name: Docker tag JOB Image 
+      run: docker tag $(docker images api-job -q) azbuilder/api-job:$VERSION
+      
+    - name: Docker tag JOB Image latest
+      run: docker tag $(docker images api-job -q) azbuilder/api-job:latest
+    
+    - name: Docker Push JOB latest
+      run: docker push azbuilder/api-job:$VERSION
+      
+    - name: Docker Push JOB latest
+      run: docker push azbuilder/api-job:latest
