@@ -26,6 +26,15 @@
             <column name="description" type="varchar(256)">
                 <constraints nullable="true"/>
             </column>
+            <column name="provider" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_sample" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_module_organization" references="organization(id)"/>
             </column>
@@ -37,16 +46,10 @@
             <column name="status" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
-            <column name="type" type="varchar(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="source" type="varchar(1024)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="source_sample" type="varchar(1024)">
-                <constraints nullable="false"/>
-            </column>
             <column name="terraform_version" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="varchar(16)">
                 <constraints nullable="false"/>
             </column>
             <column name="module_id" type="varchar(36)">
