@@ -22,7 +22,6 @@
 		<msal4j.version>1.10.0</msal4j.version>
 		<lombok.version>1.18.20</lombok.version>
 		<jgit.version>5.12.0.202106070339-r</jgit.version>
-		<commons-io.version>2.8.0</commons-io.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -100,11 +99,6 @@
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>${jgit.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons-io.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

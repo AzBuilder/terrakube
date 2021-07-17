@@ -47,9 +47,6 @@ public class Module {
     @ManyToOne
     private Organization organization;
 
-    @OneToMany(mappedBy = "module")
-    private List<Definition> definition;
-
     @Transient
     @ComputedAttribute
     public String getRegistryPath(RequestScope requestScope) {
