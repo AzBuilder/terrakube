@@ -92,7 +92,8 @@ public class Pending {
 
                 terraformJob.setTerraformCommand(TerraformCommand.valueOf(job.getAttributes().getCommand()));
                 terraformJob.setTerraformVersion(workspaceData.getData().getAttributes().getTerraformVersion());
-                terraformJob.setSourceSample(workspaceData.getData().getAttributes().getSource());
+                terraformJob.setSource(workspaceData.getData().getAttributes().getSource());
+                terraformJob.setBranch(workspaceData.getData().getAttributes().getBranch());
 
                 ResponseEntity<TerraformJob> response = restTemplate.postForEntity(this.executorUrl, terraformJob, TerraformJob.class);
 
@@ -118,7 +119,8 @@ class TerraformJob {
     private String workspaceId;
     private String jobId;
     private String terraformVersion;
-    private String sourceSample;
+    private String source;
+    private String branch;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
     private HashMap<String, String> secrets;
