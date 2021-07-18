@@ -69,6 +69,8 @@ To run the api-registry you need the following environment variables:
 |AzureAdAppClientSecret | (Required) Azure Active Directory Application Secret    |
 |AzureAdAppTenantId     | (Required) Azure Active Directory Tenant Id             |
 |AzureAdAppScope        | (Required) Azure Active Directory Application Scope     |
+|AzureAccountName       | (Required) Azure Storage Account name to store all the module artifacts |
+|AzureAccountKey        | (Required) Azure Storage Key to access the storage account              |
 
 > Terraform cli require the registry to be deployed with https in order to work.
 
