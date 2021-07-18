@@ -6,11 +6,13 @@ import com.azure.storage.blob.BlobServiceClient;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.azbuilder.registry.plugin.storage.StorageService;
 import org.azbuilder.registry.service.git.GitService;
 import org.zeroturnaround.zip.ZipUtil;
 
 import java.io.File;
+import java.io.IOException;
 
 @Slf4j
 @Builder
@@ -42,6 +44,13 @@ public class AzureStorageServiceImpl implements StorageService {
             File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
             ZipUtil.pack(gitCloneDirectory, moduleZip);
             blobClient.uploadFromFile(moduleZip.getAbsolutePath());
+
+            try {
+                FileUtils.cleanDirectory(gitCloneDirectory);
+                moduleZip.delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return blobClient.getBlobUrl();
