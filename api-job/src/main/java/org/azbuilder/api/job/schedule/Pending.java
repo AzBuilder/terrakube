@@ -5,13 +5,13 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.client.RestClient;
 import org.azbuilder.api.client.model.organization.Organization;
-import org.azbuilder.api.client.model.organization.OrganizationResponse;
 import org.azbuilder.api.client.model.organization.job.Job;
 import org.azbuilder.api.client.model.organization.job.JobRequest;
-import org.azbuilder.api.client.model.organization.module.definition.Definition;
+import org.azbuilder.api.client.model.organization.workspace.Workspace;
 import org.azbuilder.api.client.model.organization.workspace.environment.Environment;
 import org.azbuilder.api.client.model.organization.workspace.secret.Secret;
 import org.azbuilder.api.client.model.organization.workspace.variable.Variable;
+import org.azbuilder.api.client.model.response.ResponseWithInclude;
 import org.azbuilder.terraform.TerraformCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +37,7 @@ public class Pending {
     @Scheduled(fixedRate = 60000)
     public void pendingJobs() {
 
-        OrganizationResponse<List<Organization>, Job> organizationJobList = restClient.getAllOrganizationsWithJobStatus("pending");
+        ResponseWithInclude<List<Organization>, Job> organizationJobList = restClient.getAllOrganizationsWithJobStatus("pending");
 
         if (organizationJobList.getData().size() > 0 && organizationJobList.getIncluded() != null)
             for (Job job : organizationJobList.getIncluded()) {
@@ -51,12 +51,14 @@ public class Pending {
 
                 log.info("Checking Variables");
                 //GET WORKSPACE BY ID WITH VARIABLES
+                ResponseWithInclude<Workspace, Variable> workspaceData = restClient.getWorkspaceByIdWithVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+
                 HashMap<String, String> variables = new HashMap<>();
-                List<Variable> variableList = restClient.getWorkspaceByIdWithVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getIncluded();
+                List<Variable> variableList = workspaceData.getIncluded();
                 if (variableList != null)
                     for (Variable variable : variableList) {
-                        String parameterKey = variable.getAttributes().get("key");
-                        String parameterValue = variable.getAttributes().get("value");
+                        String parameterKey = variable.getAttributes().getKey();
+                        String parameterValue = variable.getAttributes().getValue();
                         //log.info("Variable Key: {} Value {}", parameterKey, parameterValue);
                         variables.put(parameterKey, parameterValue);
                     }
@@ -65,11 +67,11 @@ public class Pending {
                 log.info("Checking Secrets");
                 //GET WORKSPACE BY ID WITH SECRETS
                 HashMap<String, String> secrets = new HashMap<>();
-                List<Secret> secretList = restClient.getWorkspaceByIdWithSecrets(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getIncluded();
+                List<Secret> secretList = restClient.getAllSecrets(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getData();
                 if (secretList != null)
                     for (Secret secret : secretList) {
-                        String parameterKey = secret.getAttributes().get("key");
-                        String parameterValue = secret.getAttributes().get("value");
+                        String parameterKey = secret.getAttributes().getKey();
+                        String parameterValue = secret.getAttributes().getValue();
                         //log.info("Secret Key: {} Value {}", parameterKey, parameterValue);
                         secrets.put(parameterKey, parameterValue);
                     }
@@ -78,7 +80,7 @@ public class Pending {
                 log.info("Checking Environments");
                 //GET WORKSPACE BY ID WITH ENVIRONMENTS
                 HashMap<String, String> environmentsVariables = new HashMap<>();
-                List<Environment> environmentVariableList = restClient.getWorkspaceByIdWithEnvironmentVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getIncluded();
+                List<Environment> environmentVariableList = restClient.getAllEnvironmentVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getData();
                 if (environmentVariableList != null)
                     for (Environment environment : environmentVariableList) {
                         String parameterKey = environment.getAttributes().get("key");
@@ -88,12 +90,10 @@ public class Pending {
                     }
                 terraformJob.setEnvironmentVariables(environmentsVariables);
 
-                log.info("Checking Definition");
-                //GET WORKSPACE BY ID INCLUDE DEFINITION
-                Definition definition = restClient.getWorkspaceByIdWithModuleDefinition(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getIncluded().get(0);
-                terraformJob.setTerraformCommand(TerraformCommand.valueOf(job.getAttributes().get("command")));
-                terraformJob.setTerraformVersion(definition.getAttributes().get("terraformVersion"));
-                terraformJob.setSourceSample(definition.getAttributes().get("sourceSample"));
+                terraformJob.setTerraformCommand(TerraformCommand.valueOf(job.getAttributes().getCommand()));
+                terraformJob.setTerraformVersion(workspaceData.getData().getAttributes().getTerraformVersion());
+                terraformJob.setSource(workspaceData.getData().getAttributes().getSource());
+                terraformJob.setBranch(workspaceData.getData().getAttributes().getBranch());
 
                 ResponseEntity<TerraformJob> response = restTemplate.postForEntity(this.executorUrl, terraformJob, TerraformJob.class);
 
@@ -101,7 +101,7 @@ public class Pending {
 
                 if (response.getStatusCode().equals(HttpStatus.ACCEPTED)) {
                     JobRequest jobRequest = new JobRequest();
-                    job.getAttributes().replace("status", "queue");
+                    job.getAttributes().setStatus("queue");
                     jobRequest.setData(job);
 
                     restClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
@@ -119,7 +119,8 @@ class TerraformJob {
     private String workspaceId;
     private String jobId;
     private String terraformVersion;
-    private String sourceSample;
+    private String source;
+    private String branch;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
     private HashMap<String, String> secrets;

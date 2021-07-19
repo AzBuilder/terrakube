@@ -9,7 +9,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.util.UUID;
 
-@Include
+@Include(rootLevel = false)
 @Getter
 @Setter
 @Entity

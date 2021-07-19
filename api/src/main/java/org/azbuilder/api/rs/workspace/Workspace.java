@@ -7,7 +7,6 @@ import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.workspace.parameters.Secret;
 import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
-import org.azbuilder.api.rs.module.Definition;
 import org.azbuilder.api.rs.workspace.parameters.Environment;
 import org.hibernate.annotations.Type;
 
@@ -26,7 +25,17 @@ public class Workspace {
     @GeneratedValue
     private UUID id;
 
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "source")
+    private String source;
+
+    @Column(name = "branch")
+    private String branch;
+
+    @Column(name = "terraform_version")
+    private String terraformVersion;
 
     @ManyToOne
     private Organization organization;
@@ -39,9 +48,6 @@ public class Workspace {
 
     @OneToMany(mappedBy = "workspace")
     private List<Environment> environment;
-
-    @OneToOne
-    private Definition definition;
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;

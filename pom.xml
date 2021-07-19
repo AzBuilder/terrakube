@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.1.0</revision>
+        <revision>1.3.0-SNAPSHOT</revision>
     </properties>
 
     <name>api-server-solution</name>
@@ -22,5 +22,6 @@
     <modules>
         <module>api</module>
 		<module>api-job</module>
+        <module>api-registry</module>
   </modules>
 </project>

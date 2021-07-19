@@ -31,7 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-.mvn/
-
-.DS_Store

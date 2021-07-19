@@ -20,6 +20,8 @@
 		<azure.version>3.5.0</azure.version>
 		<mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>
 		<msal4j.version>1.10.0</msal4j.version>
+		<lombok.version>1.18.20</lombok.version>
+		<jgit.version>5.12.0.202106070339-r</jgit.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -87,8 +89,17 @@
 			<artifactId>msal4j</artifactId>
 			<version>${msal4j.version}</version>
 		</dependency>
-
-
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+			<version>${jgit.version}</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

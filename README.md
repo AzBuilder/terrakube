@@ -2,7 +2,7 @@
 
 Open source tool to handle remote terraform workspace in organizations and handle all the lifecycle (plan, apply, destroy).
 
-The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expose a [JSON:API](https://jsonapi.org/).
+The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expose a [JSON:API](https://jsonapi.org/) or [GraphQL](https://graphql.org/).
 
 ## Requirements
 
@@ -20,10 +20,11 @@ mvn clean install
 ## Modules
 This project contains two modules describe below:
 
-|Name   |Description                                       |
-|:------|--------------------------------------------------|
-|api    | Expose the API to manage all terraform workspaces|
-|api-job| Schedule job that validate the terraform workspaces with pending executions |
+|Name        |Description                                       |
+|:-----------|--------------------------------------------------|
+|api         | Expose the API to manage all terraform workspaces|
+|api-job     | Schedule job that validate the terraform workspaces with pending executions |
+|api-registry| Open source terraform registry compatible with the api component |
 
 ## Security - Authentication
 
@@ -58,6 +59,21 @@ To run the api-job you need the following environment variables:
 |AzureAdAppTenantId     | (Required) Azure Active Directory Tenant Id             |
 |AzureAdAppScope        | (Required) Azure Active Directory Application Scope     |
 
+To run the api-registry you need the following environment variables:
+
+|Name                   |Description                                              |
+|:----------------------|---------------------------------------------------------|
+|AzBuilderRegistry      | (Required) Hostname where the application is running    |
+|AzBuilderApiUrl        | (Required) URL where the API component is running       |
+|AzureAdAppClientId     | (Required) Azure Active Directory Application Client ID |
+|AzureAdAppClientSecret | (Required) Azure Active Directory Application Secret    |
+|AzureAdAppTenantId     | (Required) Azure Active Directory Tenant Id             |
+|AzureAdAppScope        | (Required) Azure Active Directory Application Scope     |
+|AzureAccountName       | (Required) Azure Storage Account name to store all the module artifacts |
+|AzureAccountKey        | (Required) Azure Storage Key to access the storage account              |
+
+> Terraform cli require the registry to be deployed with https in order to work.
+
 ## Running
 To run the API use the following command:
 
@@ -90,8 +106,6 @@ This endpoint allows creating, updating, deleting and search organizations.
 These endpoints allow creating, updating, deleting and search terraform module and define several definitions with parameters.
 ```
 /api/v1/organization/{{organizationId}}/module
-/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition
-/api/v1/organization/{{organizationId}}/module/{{moduleId}}/definition/{{versionId}}/parameter
 ```
 ### Workspace
 These endpoints allow creating, updating, deleting and search terraform workspaces and define different parameters like variables, secrets and environment variables.
