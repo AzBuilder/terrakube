@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
-    <changeSet id="1" author="alfespa17@gmail.com">
+    <changeSet id="2" author="alfespa17@gmail.com">
         <addUniqueConstraint
                 columnNames="name"
                 constraintName="const_organization"
