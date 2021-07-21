@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="1" author="alfespa17@gmail.com">
+        <addUniqueConstraint
+                columnNames="name"
+                constraintName="const_organization"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="organization"
+                validate="true"/>
+        <addUniqueConstraint
+                columnNames="organization_id, name, provider"
+                constraintName="const_module"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="module"
+                validate="true"/>
+        <addUniqueConstraint
+                columnNames="organization_id, name"
+                constraintName="const_workspace"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="workspace"
+                validate="true"/>
+        <addUniqueConstraint
+                columnNames="workspace_id, environment_key"
+                constraintName="const_environment"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="environment"
+                validate="true"/>
+        <addUniqueConstraint
+                columnNames="workspace_id, secret_key"
+                constraintName="const_secret"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="secret"
+                validate="true"/>
+        <addUniqueConstraint
+                columnNames="workspace_id, variable_key"
+                constraintName="const_variable"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="variable"
+                validate="true"/>
+    </changeSet>
+</databaseChangeLog>
