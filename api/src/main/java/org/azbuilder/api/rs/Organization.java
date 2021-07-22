@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.module.Module;
+import org.azbuilder.api.rs.provider.Provider;
 import org.azbuilder.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
@@ -32,6 +33,9 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<Module> module;
+
+    @OneToMany(mappedBy = "organization")
+    private List<Provider> provider;
 
     @OneToMany(mappedBy = "organization")
     private List<Job> job;

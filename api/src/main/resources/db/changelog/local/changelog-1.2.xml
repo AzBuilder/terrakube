@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="3" author="alfespa17@gmail.com">
+        <createTable tableName="provider">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(256)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_provider_organization" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="organization_id, name, provider"
+                constraintName="const_provider"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="module"
+                validate="true"/>
+        <createTable tableName="implementation">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="protocol" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="os" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="arch" type="varchar(32)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="filename" type="varchar(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="download_url" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shasums_url" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shasums_signature_url" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shasum" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key_id" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ascii_armor" type="clob">
+                <constraints nullable="true"/>
+            </column>
+            <column name="trust_signature" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_url" type="varchar(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_implementation_provider" references="provider(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="provider_id, os, arch"
+                constraintName="const_implementation"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="implementation"
+                validate="true"/>
+    </changeSet>
+</databaseChangeLog>
