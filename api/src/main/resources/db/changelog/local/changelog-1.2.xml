@@ -15,25 +15,41 @@
             <column name="description" type="varchar(256)">
                 <constraints nullable="true"/>
             </column>
-            <column name="version" type="varchar(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="protocol" type="varchar(64)">
-                <constraints nullable="false"/>
-            </column>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_provider_organization" references="organization(id)"/>
             </column>
         </createTable>
         <addUniqueConstraint
-                columnNames="organization_id, name, provider, version, protocol"
+                columnNames="organization_id, name"
                 constraintName="const_provider"
                 deferrable="true"
                 disabled="true"
                 initiallyDeferred="true"
-                tableName="module"
+                tableName="provider"
                 validate="true"/>
-        <createTable tableName="implementation">
+        <createTable tableName="version">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="version_number" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="protocols" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_version_provider" references="provider(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="provider_id, version_number"
+                constraintName="const_version"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="version"
+                validate="true"/>
+        <createTable tableName="file">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
@@ -73,17 +89,17 @@
             <column name="source_url" type="varchar(512)">
                 <constraints nullable="false"/>
             </column>
-            <column name="provider_id" type="varchar(36)">
-                <constraints nullable="false" foreignKeyName="fk_implementation_provider" references="provider(id)"/>
+            <column name="version_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_files_implementation" references="version(id)"/>
             </column>
         </createTable>
         <addUniqueConstraint
-                columnNames="provider_id, os, arch"
-                constraintName="const_implementation"
+                columnNames="version_id, os, arch"
+                constraintName="const_files"
                 deferrable="true"
                 disabled="true"
                 initiallyDeferred="true"
-                tableName="implementation"
+                tableName="file"
                 validate="true"/>
     </changeSet>
 </databaseChangeLog>

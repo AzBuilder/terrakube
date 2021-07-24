@@ -4,7 +4,7 @@ import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.Organization;
-import org.azbuilder.api.rs.provider.implementation.Implementation;
+import org.azbuilder.api.rs.provider.implementation.Version;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -27,15 +27,9 @@ public class Provider {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "protocols")
-    private String protocols;
-
-    @Column(name = "version")
-    private String version;
-
     @ManyToOne
     private Organization organization;
 
     @OneToMany(mappedBy = "provider")
-    private List<Implementation> implementation;
+    private List<Version> version;
 }

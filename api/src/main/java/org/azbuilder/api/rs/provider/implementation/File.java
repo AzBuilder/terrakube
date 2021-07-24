@@ -3,7 +3,6 @@ package org.azbuilder.api.rs.provider.implementation;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
-import org.azbuilder.api.rs.provider.Provider;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -13,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Implementation {
+public class File {
 
     @Id
     @Type(type="uuid-char")
@@ -57,5 +56,5 @@ public class Implementation {
     private String sourceUrl;
 
     @ManyToOne
-    private Provider provider;
+    private Version version;
 }
