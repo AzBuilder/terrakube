@@ -20,9 +20,6 @@ public class Implementation {
     @GeneratedValue
     private UUID id;
 
-    @Column(name="protocol")
-    private String protocol;
-
     @Column(name="os")
     private String os;
 

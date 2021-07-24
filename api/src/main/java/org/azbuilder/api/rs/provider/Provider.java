@@ -27,6 +27,12 @@ public class Provider {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "protocols")
+    private String protocols;
+
+    @Column(name = "version")
+    private String version;
+
     @ManyToOne
     private Organization organization;
 

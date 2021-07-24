@@ -15,12 +15,18 @@
             <column name="description" type="varchar(256)">
                 <constraints nullable="true"/>
             </column>
+            <column name="version" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="protocol" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_provider_organization" references="organization(id)"/>
             </column>
         </createTable>
         <addUniqueConstraint
-                columnNames="organization_id, name, provider"
+                columnNames="organization_id, name, provider, version, protocol"
                 constraintName="const_provider"
                 deferrable="true"
                 disabled="true"
@@ -30,9 +36,6 @@
         <createTable tableName="implementation">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
-            </column>
-            <column name="protocol" type="varchar(32)">
-                <constraints nullable="false"/>
             </column>
             <column name="os" type="varchar(32)">
                 <constraints nullable="false"/>
