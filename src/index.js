@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './pages/home/App';
+import App from './domain/Home/App';
 import reportWebVitals from './reportWebVitals';
 import { PageHeader } from 'antd';
 import { PublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
-import { msalConfig } from "./authConfig";
+import { msalConfig } from "./config/authConfig";
 
 const msalInstance = new PublicClientApplication(msalConfig);
 

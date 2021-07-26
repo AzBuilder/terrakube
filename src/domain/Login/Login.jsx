@@ -1,7 +1,9 @@
 import React from 'react';
 import { MicrosoftLoginButton } from 'react-social-login-buttons';
 import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../../authConfig";
+import { loginRequest } from "../../config/authConfig";
+import './Login.css';
+import axiosInstance from "../../config/axiosConfig";
 
 const Login = () => {
   const { instance } = useMsal();
@@ -14,7 +16,12 @@ const Login = () => {
 }
 
 function handleLogin(instance) {
-  instance.loginPopup(loginRequest).catch(e => {
+  instance.loginPopup(loginRequest).then(response => {
+    console.log(response);
+    localStorage.setItem('azureAccessToken', response.accessToken);
+    axiosInstance.defaults.headers.common['Authorization'] = response.accessToken;
+  })
+  .catch(e => {
     console.error(e);
   });
 }
