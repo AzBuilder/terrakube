@@ -1,4 +1,4 @@
-package org.azbuilder.registry.service.search;
+package org.azbuilder.registry.service.module;
 
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.client.RestClient;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class SearchServiceImpl implements SearchService {
+public class ModuleServiceImpl implements ModuleService {
 
     private static final String GIT_DIRECTORY="/.terraform-spring-boot/git/";
 

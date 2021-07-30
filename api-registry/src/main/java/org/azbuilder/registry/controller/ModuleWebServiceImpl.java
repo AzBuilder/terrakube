@@ -1,9 +1,9 @@
 package org.azbuilder.registry.controller;
 
-import org.azbuilder.registry.controller.model.ModuleDTO;
-import org.azbuilder.registry.controller.model.VersionDTO;
-import org.azbuilder.registry.controller.model.VersionsDTO;
-import org.azbuilder.registry.service.search.SearchService;
+import org.azbuilder.registry.controller.model.module.ModuleDTO;
+import org.azbuilder.registry.controller.model.module.VersionDTO;
+import org.azbuilder.registry.controller.model.module.VersionsDTO;
+import org.azbuilder.registry.service.module.ModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +18,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/terraform/modules/v1")
-public class TerraformModuleWebServiceImpl {
+public class ModuleWebServiceImpl {
 
     @Autowired
-    SearchService searchService;
+    ModuleService moduleService;
 
     @GetMapping(value = "/{organization}/{module}/{provider}/versions", produces = "application/json")
     public ResponseEntity<ModuleDTO> searchModuleVersions(@PathVariable String organization, @PathVariable String module, @PathVariable String provider) {
-
         VersionsDTO versionsDTO = new VersionsDTO();
         List<VersionDTO> versionDTOList = new ArrayList<>();
-        for (String availableVersion : searchService.getAvailableVersions(organization, module, provider)) {
+        for (String availableVersion : moduleService.getAvailableVersions(organization, module, provider)) {
             VersionDTO version = new VersionDTO();
             version.setVersion(availableVersion);
 
@@ -45,7 +44,7 @@ public class TerraformModuleWebServiceImpl {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(
                 "X-Terraform-Get",
-                searchService.getModuleVersionPath(organization, module, provider, version)
+                moduleService.getModuleVersionPath(organization, module, provider, version)
         );
         return ResponseEntity.ok().headers(responseHeaders).body(null);
     }
