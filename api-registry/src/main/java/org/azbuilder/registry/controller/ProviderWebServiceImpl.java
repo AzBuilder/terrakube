@@ -2,6 +2,7 @@ package org.azbuilder.registry.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.registry.controller.model.module.ModuleDTO;
+import org.azbuilder.registry.controller.model.provider.FileDTO;
 import org.azbuilder.registry.controller.model.provider.VersionsDTO;
 import org.azbuilder.registry.controller.model.provider.VersionDTO;
 import org.azbuilder.registry.service.provider.ProviderService;
@@ -32,12 +33,8 @@ public class ProviderWebServiceImpl {
     }
 
     @GetMapping(value = "/{organization}/{provider}/{version}/download/{os}/{arch}", produces = "application/json")
-    public ResponseEntity<ModuleDTO> getModuleVersionPath(@PathVariable String organization, @PathVariable String module, @PathVariable String provider, @PathVariable String version) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(
-                "X-Terraform-Get",
-                ""
-        );
-        return ResponseEntity.ok().headers(responseHeaders).body(null);
+    public ResponseEntity<FileDTO> getModuleVersionPath(@PathVariable String organization, @PathVariable String provider, @PathVariable String version, @PathVariable String os, @PathVariable String arch) {
+        FileDTO fileDTO = providerService.getFileInformation(organization, provider, version, os, arch);
+        return ResponseEntity.ok().body(fileDTO);
     }
 }
