@@ -31,6 +31,6 @@ public class Version {
     private Provider provider;
 
     @OneToMany(mappedBy = "version")
-    List<File> file;
+    List<Implementation> implementation;
 
 }

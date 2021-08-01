@@ -49,7 +49,7 @@
                 initiallyDeferred="true"
                 tableName="version"
                 validate="true"/>
-        <createTable tableName="file">
+        <createTable tableName="implementation">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
@@ -90,16 +90,16 @@
                 <constraints nullable="false"/>
             </column>
             <column name="version_id" type="varchar(36)">
-                <constraints nullable="false" foreignKeyName="fk_files_implementation" references="version(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_implementation_version" references="version(id)"/>
             </column>
         </createTable>
         <addUniqueConstraint
                 columnNames="version_id, os, arch"
-                constraintName="const_files"
+                constraintName="const_implementation"
                 deferrable="true"
                 disabled="true"
                 initiallyDeferred="true"
-                tableName="file"
+                tableName="implementation"
                 validate="true"/>
     </changeSet>
 </databaseChangeLog>

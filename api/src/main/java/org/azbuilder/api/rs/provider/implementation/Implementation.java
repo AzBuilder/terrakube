@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class File {
+public class Implementation {
 
     @Id
     @Type(type="uuid-char")
