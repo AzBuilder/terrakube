@@ -9,4 +9,5 @@
         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd ">
     <include file="/db/changelog/local/changelog-1.0.xml"/>
     <include file="/db/changelog/local/changelog-1.1.xml"/>
+    <include file="/db/changelog/local/changelog-1.2.xml"/>
 </databaseChangeLog>

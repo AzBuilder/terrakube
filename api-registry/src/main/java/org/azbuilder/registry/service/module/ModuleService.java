@@ -1,8 +1,8 @@
-package org.azbuilder.registry.service.search;
+package org.azbuilder.registry.service.module;
 
 import java.util.List;
 
-public interface SearchService {
+public interface ModuleService {
 
     List<String> getAvailableVersions(String organizationName, String moduleName, String providerName);
 
