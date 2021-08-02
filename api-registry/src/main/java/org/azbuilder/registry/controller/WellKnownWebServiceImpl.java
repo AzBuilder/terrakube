@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class WellKnownWebServiceImpl {
 
     private static final String terraformJsonContent = "{\n" +
-            "  \"modules.v1\": \"%s/terraform/modules/v1/\"\n" +
+            "  \"modules.v1\": \"%s/terraform/modules/v1/\"\n," +
+            "  \"providers.v1\": \"%s/terraform/providers/v1/\"" +
             "}";
 
     @Autowired
@@ -20,6 +21,6 @@ public class WellKnownWebServiceImpl {
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<String> terraformJson() {
-        return ResponseEntity.ok(String.format(terraformJsonContent, openRegistryProperties.getHostname()));
+        return ResponseEntity.ok(String.format(terraformJsonContent, openRegistryProperties.getHostname(), openRegistryProperties.getHostname()));
     }
 }

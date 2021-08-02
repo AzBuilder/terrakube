@@ -1,4 +1,4 @@
-package org.azbuilder.registry.controller.model;
+package org.azbuilder.registry.controller.model.provider;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +8,5 @@ import java.util.List;
 @Getter
 @Setter
 public class VersionsDTO {
-
-    private List<VersionDTO> versions;
+    List<VersionDTO> versions;
 }
