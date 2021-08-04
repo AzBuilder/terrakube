@@ -4,8 +4,6 @@ import com.yahoo.elide.core.exceptions.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.Arrays;
-
 import static com.yahoo.elide.test.jsonapi.JsonApiDSL.*;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
@@ -14,13 +12,13 @@ public class ProviderTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE job; DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO provider (id, name, description, organization_id) VALUES\n" +
                     "\t\t('b5e41ba0-e7a5-4643-9200-1c45c5b82648','Provider','Description','a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
     })
-    void moduleApiGetTest() {
+    void providerApiGetTest() {
         when()
                 .get("/api/v1/organization/a42f538b-8c75-4311-8e73-ea2c0f2fb577/provider")
                 .then()
@@ -52,7 +50,7 @@ public class ProviderTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO provider (id, name, description, organization_id) VALUES\n" +
@@ -92,7 +90,7 @@ public class ProviderTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO provider (id, name, description, organization_id) VALUES\n" +

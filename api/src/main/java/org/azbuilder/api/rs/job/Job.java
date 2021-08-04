@@ -18,8 +18,10 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Enumerated(EnumType.STRING)
     private Command command;
 
+    @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.pending;
 
     private String output;
