@@ -29,7 +29,7 @@ const MODULE_COLUMNS = [
     dataIndex: 'name',
     key: 'name',
     render: (text, record) => (
-      <a href={"/workspaces/"+record.id}>{record.name}</a>
+      <a href={"/modules/"+record.id}>{record.name}</a>
     )
   },
   {
@@ -58,7 +58,6 @@ export const OrganizationDetails = (props) => {
         console.log(response);
         setOrganization(response.data);
         setupOrganizationIncludes(response.data.included, setModules, setWorkspaces);
-        console.log(workspaces)
         setLoading(false);
       })
   }, [resourceId]);
@@ -111,7 +110,6 @@ function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
     }
   });
 
-  console.log(workspaces)
   setModules(modules);
   setWorkspaces(workspaces);
 }
