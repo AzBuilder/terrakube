@@ -15,6 +15,8 @@
 
     <properties>
         <revision>1.2.0</revision>
+        <sonar.organization>azbuilder</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <name>api-server-solution</name>
@@ -24,4 +26,22 @@
 		<module>api-job</module>
         <module>api-registry</module>
   </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
