@@ -25,6 +25,8 @@
 		<rest-assured.version>4.4.0</rest-assured.version>
 		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
 		<groovy.version>3.0.8</groovy.version>
+		<jacoco.version>0.8.7</jacoco.version>
+		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -126,6 +128,11 @@
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>${junit-jupiter-api.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<version>${jacoco.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
