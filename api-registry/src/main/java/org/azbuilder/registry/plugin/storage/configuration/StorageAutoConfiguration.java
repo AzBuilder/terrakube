@@ -5,6 +5,7 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import org.azbuilder.registry.plugin.storage.StorageService;
 import org.azbuilder.registry.plugin.storage.azure.AzureStorageServiceImpl;
 import org.azbuilder.registry.plugin.storage.azure.AzureStorageServiceProperties;
+import org.azbuilder.registry.plugin.storage.local.LocalStorageServiceImpl;
 import org.azbuilder.registry.service.git.GitServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -36,6 +37,9 @@ public class StorageAutoConfiguration {
                             .blobServiceClient(blobServiceClient)
                             .gitService(new GitServiceImpl())
                             .build();
+                    break;
+                case Local:
+                    storageService = new LocalStorageServiceImpl();
                     break;
                 default:
                     storageService = null;

@@ -273,6 +273,6 @@ public class ProviderTests extends OpenRegistryApplicationTests{
                 .body("signing_keys.gpg_public_keys[0].source_url",equalTo("sampleData"))
                 .log().all()
                 .statusCode(HttpStatus.SC_OK);
-        
+
     }
 }
