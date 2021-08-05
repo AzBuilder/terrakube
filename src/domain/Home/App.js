@@ -8,6 +8,7 @@ import {
   Route
 } from 'react-router-dom';
 import { Organizations } from '../Organizations';
+import { OrganizationDetails } from '../Organizations/Details';
 
 const App = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -27,9 +28,8 @@ const App = () => {
           <Route exact path="/">
             Cloud Builder Home.
           </Route>
-          <Route path="/organizations">
-            <Organizations />
-          </Route>
+          <Route exact path="/organizations" component={Organizations} />
+          <Route exact path="/organizations/:id" component={OrganizationDetails} />
         </Switch>
       </Router>
     </div>
