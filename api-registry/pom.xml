@@ -20,6 +20,11 @@
 		<jgit.version>5.12.0.202106070339-r</jgit.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<azure-storage-blob.version>12.11.1</azure-storage-blob.version>
+		<mockserver-spring-test-listener.version>5.11.2</mockserver-spring-test-listener.version>
+		<rest-assured.version>4.4.0</rest-assured.version>
+		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
+		<groovy.version>3.0.8</groovy.version>
+		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -60,6 +65,29 @@
 			<groupId>com.azure</groupId>
 			<artifactId>azure-storage-blob</artifactId>
 			<version>${azure-storage-blob.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-spring-test-listener</artifactId>
+			<version>${mockserver-spring-test-listener.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit-jupiter-api.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter-api.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

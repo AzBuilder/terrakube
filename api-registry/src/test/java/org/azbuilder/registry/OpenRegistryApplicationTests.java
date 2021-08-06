@@ -1,13 +1,34 @@
 package org.azbuilder.registry;
 
-import org.junit.jupiter.api.Test;
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.mockserver.integration.ClientAndServer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 
-//@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 class OpenRegistryApplicationTests {
 
-	@Test
-	void contextLoads() {
+	ClientAndServer mockServer;
+
+	@LocalServerPort
+	int port;
+
+	@BeforeAll
+	public void setUp() {
+		RestAssured.port = port;
+		mockServer = mockServer.startClientAndServer(9999);
+	}
+
+	@AfterAll
+	public void stopServer() {
+		mockServer.stop();
 	}
 
 }

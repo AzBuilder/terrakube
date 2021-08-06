@@ -20,6 +20,7 @@ public class StorageProperties {
 }
 
 enum StorageType {
+    Local,
     AzureStorageImpl,
     AwsStorageImpl,
     GcpStorageImpl

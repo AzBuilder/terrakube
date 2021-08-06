@@ -22,6 +22,10 @@
 		<msal4j.version>1.10.0</msal4j.version>
 		<lombok.version>1.18.20</lombok.version>
 		<jgit.version>5.12.0.202106070339-r</jgit.version>
+		<rest-assured.version>4.4.0</rest-assured.version>
+		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
+		<groovy.version>3.0.8</groovy.version>
+		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -99,6 +103,30 @@
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>${jgit.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yahoo.elide</groupId>
+			<artifactId>elide-test-helpers</artifactId>
+			<version>${elide.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit-jupiter-api.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter-api.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
