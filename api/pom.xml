@@ -15,11 +15,11 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
-		<elide.version>5.0.4</elide.version>
+		<elide.version>5.0.6</elide.version>
 		<liquibase-core.version>4.3.2</liquibase-core.version>
 		<azure.version>3.5.0</azure.version>
 		<mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>
-		<msal4j.version>1.10.0</msal4j.version>
+		<msal4j.version>1.10.1</msal4j.version>
 		<lombok.version>1.18.20</lombok.version>
 		<jgit.version>5.12.0.202106070339-r</jgit.version>
 		<rest-assured.version>4.4.0</rest-assured.version>
