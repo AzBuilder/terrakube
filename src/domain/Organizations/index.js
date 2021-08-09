@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
-import { Table } from "antd";
+import { Button, Table } from "antd";
+import "./Organizations.css";
 
 const ORGANIZATIONS_COLUMNS = [
   {
@@ -32,7 +33,7 @@ export const Organizations = () => {
 
   return(
     <div>
-      <h2>Organizations</h2>
+      <div className='orgsActions'><h2>Organizations</h2><Button type="primary" htmlType="button" shape="round" href="/organizations/create">Create Organization</Button></div>
       <Table dataSource={orgs} columns={ORGANIZATIONS_COLUMNS} rowKey='name' />
     </div>
   );

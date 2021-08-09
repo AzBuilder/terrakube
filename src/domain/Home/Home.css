@@ -1,0 +1,5 @@
+.HomeButtons > * + * {
+  display: flex;
+  flex-direction: column;
+  margin-block: 10px;
+}

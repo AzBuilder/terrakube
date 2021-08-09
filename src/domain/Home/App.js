@@ -9,6 +9,9 @@ import {
 } from 'react-router-dom';
 import { Organizations } from '../Organizations';
 import { OrganizationDetails } from '../Organizations/Details';
+import { CreateOrganization } from '../Organizations/Create';
+import { Home } from './Home';
+import { WorkspaceDetails } from '../Workspaces/Details';
 
 const App = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -25,11 +28,12 @@ const App = () => {
     <div className="App">
       <Router>
         <Switch>
-          <Route exact path="/">
-            Cloud Builder Home.
-          </Route>
+          <Route exact path="/" component={Home} />
           <Route exact path="/organizations" component={Organizations} />
+          <Route exact path="/organizations/create" component={CreateOrganization} />
           <Route exact path="/organizations/:id" component={OrganizationDetails} />
+
+          <Route exact path="/workspaces/:id" component={WorkspaceDetails} />
         </Switch>
       </Router>
     </div>
