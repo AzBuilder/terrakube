@@ -35,7 +35,7 @@ jobs:
     - name: Docker tag API Image latest
       run: docker tag $(docker images api-server -q) azbuilder/api-server:latest
     
-    - name: Docker Push API latest
+    - name: Docker Push API 
       run: docker push azbuilder/api-server:$VERSION
       
     - name: Docker Push API latest
@@ -47,8 +47,20 @@ jobs:
     - name: Docker tag JOB Image latest
       run: docker tag $(docker images api-job -q) azbuilder/api-job:latest
     
-    - name: Docker Push JOB latest
+    - name: Docker Push JOB 
       run: docker push azbuilder/api-job:$VERSION
       
     - name: Docker Push JOB latest
       run: docker push azbuilder/api-job:latest
+      
+    - name: Docker tag Registry Image 
+      run: docker tag $(docker images api-registry -q) azbuilder/api-registry:$VERSION
+      
+    - name: Docker tag Registry Image latest
+      run: docker tag $(docker images api-registry -q) azbuilder/api-registry:latest
+    
+    - name: Docker Push Registry 
+      run: docker push azbuilder/api-registry:$VERSION
+      
+    - name: Docker Push Registry latest
+      run: docker push azbuilder/api-registry:latest
