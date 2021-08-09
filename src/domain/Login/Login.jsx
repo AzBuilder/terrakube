@@ -18,6 +18,7 @@ const Login = () => {
 function handleLogin(instance) {
   instance.loginPopup(loginRequest).then(response => {
     console.log(response);
+    localStorage.setItem('azureProfile', response.account);
     localStorage.setItem('azureAccessToken', response.accessToken);
     axiosInstance.defaults.headers.common['Authorization'] = response.accessToken;
   })
