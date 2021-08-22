@@ -4,22 +4,22 @@ info:
   title: Elide Service
 basePath: /api/v1
 tags:
-  - name: version
-  - name: environment
-  - name: job
-  - name: organization
-  - name: module
-  - name: provider
-  - name: secret
-  - name: variable
   - name: workspace
+  - name: version
+  - name: provider
+  - name: variable
+  - name: organization
   - name: implementation
+  - name: secret
+  - name: job
+  - name: environment
+  - name: module
 paths:
-  /workspace/{workspaceId}/secret:
+  /workspace/{workspaceId}/job:
     get:
       tags:
-        - secret
-      description: Returns the relationship secret
+        - job
+      description: Returns the relationship job
       consumes:
         - application/vnd.api+json
       produces:
@@ -33,23 +33,23 @@ paths:
           items:
             type: string
             enum:
-              - key
-              - '-key'
-              - value
-              - '-value'
+              - output
+              - '-output'
               - id
               - '-id'
           collectionFormat: csv
-        - name: fields[secret]
+        - name: fields[job]
           in: query
-          description: Selects the set of secret fields that should be returned in the result.
+          description: Selects the set of job fields that should be returned in the result.
           required: false
           type: array
           items:
             type: string
             enum:
-              - key
-              - value
+              - command
+              - output
+              - status
+              - organization
               - workspace
           collectionFormat: csv
         - name: include
@@ -60,11 +60,12 @@ paths:
           items:
             type: string
             enum:
+              - organization
               - workspace
           collectionFormat: csv
-        - name: filter[secret]
+        - name: filter[job]
           in: query
-          description: Filters the collection of secret using a 'disjoint' RSQL expression
+          description: Filters the collection of job using a 'disjoint' RSQL expression
           required: false
           type: string
         - name: page[number]
@@ -101,7 +102,7 @@ paths:
               data:
                 type: array
                 items:
-                  $ref: '#/definitions/secret'
+                  $ref: '#/definitions/job'
               included:
                 type: array
                 description: Included resources
@@ -119,20 +120,20 @@ paths:
                       type: string
     post:
       tags:
-        - secret
-      description: Creates an item of type secret and adds it to secret
+        - job
+      description: Creates an item of type job and adds it to job
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
         - in: body
-          name: secret
+          name: job
           required: false
           schema:
             properties:
               data:
-                $ref: '#/definitions/secret'
+                $ref: '#/definitions/job'
       responses:
         '201':
           description: Successful response
@@ -140,33 +141,35 @@ paths:
             type: object
             properties:
               data:
-                $ref: '#/definitions/secret'
+                $ref: '#/definitions/job'
     parameters:
       - name: workspaceId
         in: path
         description: workspace Identifier
         required: true
         type: string
-  /workspace/{workspaceId}/secret/{secretId}:
+  /workspace/{workspaceId}/job/{jobId}:
     get:
       tags:
-        - secret
-      description: Returns an instance of type secret
+        - job
+      description: Returns an instance of type job
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
-        - name: fields[secret]
+        - name: fields[job]
           in: query
-          description: Selects the set of secret fields that should be returned in the result.
+          description: Selects the set of job fields that should be returned in the result.
           required: false
           type: array
           items:
             type: string
             enum:
-              - key
-              - value
+              - command
+              - output
+              - status
+              - organization
               - workspace
           collectionFormat: csv
         - name: include
@@ -177,6 +180,7 @@ paths:
           items:
             type: string
             enum:
+              - organization
               - workspace
           collectionFormat: csv
       responses:
@@ -186,7 +190,7 @@ paths:
             type: object
             properties:
               data:
-                $ref: '#/definitions/secret'
+                $ref: '#/definitions/job'
               included:
                 type: array
                 description: Included resources
@@ -204,8 +208,8 @@ paths:
                       type: string
     delete:
       tags:
-        - secret
-      description: Deletes an instance of type secret
+        - job
+      description: Deletes an instance of type job
       consumes:
         - application/vnd.api+json
       produces:
@@ -216,20 +220,20 @@ paths:
           description: Successful response
     patch:
       tags:
-        - secret
-      description: Modifies an instance of type secret
+        - job
+      description: Modifies an instance of type job
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
         - in: body
-          name: secret
+          name: job
           required: false
           schema:
             properties:
               data:
-                $ref: '#/definitions/secret'
+                $ref: '#/definitions/job'
       responses:
         '204':
           description: Successful response
@@ -239,24 +243,24 @@ paths:
         description: workspace Identifier
         required: true
         type: string
-      - name: secretId
+      - name: jobId
         in: path
-        description: secret Identifier
+        description: job Identifier
         required: true
         type: string
-  /workspace/{workspaceId}/relationships/secret:
+  /workspace/{workspaceId}/relationships/job:
     get:
       tags:
-        - secret
-      description: Returns the relationship identifiers for secret
+        - job
+      description: Returns the relationship identifiers for job
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
-        - name: filter[secret]
+        - name: filter[job]
           in: query
-          description: Filters the collection of secret using a 'disjoint' RSQL expression
+          description: Filters the collection of job using a 'disjoint' RSQL expression
           required: false
           type: string
         - name: page[number]
@@ -300,11 +304,11 @@ paths:
                     type:
                       type: string
                       enum:
-                        - secret
+                        - job
     post:
       tags:
-        - secret
-      description: Adds items to the relationship secret
+        - job
+      description: Adds items to the relationship job
       consumes:
         - application/vnd.api+json
       produces:
@@ -325,7 +329,7 @@ paths:
                     type:
                       type: string
                       enum:
-                        - secret
+                        - job
       responses:
         '201':
           description: Successful response
@@ -342,11 +346,11 @@ paths:
                     type:
                       type: string
                       enum:
-                        - secret
+                        - job
     delete:
       tags:
-        - secret
-      description: Deletes items from the relationship secret
+        - job
+      description: Deletes items from the relationship job
       consumes:
         - application/vnd.api+json
       produces:
@@ -367,14 +371,14 @@ paths:
                     type:
                       type: string
                       enum:
-                        - secret
+                        - job
       responses:
         '204':
           description: Successful response
     patch:
       tags:
-        - secret
-      description: Replaces the relationship secret
+        - job
+      description: Replaces the relationship job
       consumes:
         - application/vnd.api+json
       produces:
@@ -395,397 +399,7 @@ paths:
                     type:
                       type: string
                       enum:
-                        - secret
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/variable:
-    get:
-      tags:
-        - variable
-      description: Returns the relationship variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: sort
-          in: query
-          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - key
-              - '-key'
-              - value
-              - '-value'
-              - id
-              - '-id'
-          collectionFormat: csv
-        - name: fields[variable]
-          in: query
-          description: Selects the set of variable fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - key
-              - value
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - workspace
-          collectionFormat: csv
-        - name: filter[variable]
-          in: query
-          description: Filters the collection of variable using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: '#/definitions/variable'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    post:
-      tags:
-        - variable
-      description: Creates an item of type variable and adds it to variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: variable
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/variable'
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/variable'
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/variable/{variableId}:
-    get:
-      tags:
-        - variable
-      description: Returns an instance of type variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: fields[variable]
-          in: query
-          description: Selects the set of variable fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - key
-              - value
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - workspace
-          collectionFormat: csv
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/variable'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    delete:
-      tags:
-        - variable
-      description: Deletes an instance of type variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters: []
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - variable
-      description: Modifies an instance of type variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: variable
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/variable'
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-      - name: variableId
-        in: path
-        description: variable Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/relationships/variable:
-    get:
-      tags:
-        - variable
-      description: Returns the relationship identifiers for variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: filter[variable]
-          in: query
-          description: Filters the collection of variable using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - variable
-    post:
-      tags:
-        - variable
-      description: Adds items to the relationship variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - variable
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - variable
-    delete:
-      tags:
-        - variable
-      description: Deletes items from the relationship variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - variable
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - variable
-      description: Replaces the relationship variable
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - variable
+                        - job
       responses:
         '204':
           description: Successful response
@@ -1203,11 +817,11 @@ paths:
         description: organization Identifier
         required: true
         type: string
-  /organization/{organizationId}/job:
+  /workspace/{workspaceId}/variable:
     get:
       tags:
-        - job
-      description: Returns the relationship job
+        - variable
+      description: Returns the relationship variable
       consumes:
         - application/vnd.api+json
       produces:
@@ -1221,23 +835,23 @@ paths:
           items:
             type: string
             enum:
-              - output
-              - '-output'
+              - key
+              - '-key'
+              - value
+              - '-value'
               - id
               - '-id'
           collectionFormat: csv
-        - name: fields[job]
+        - name: fields[variable]
           in: query
-          description: Selects the set of job fields that should be returned in the result.
+          description: Selects the set of variable fields that should be returned in the result.
           required: false
           type: array
           items:
             type: string
             enum:
-              - command
-              - output
-              - status
-              - organization
+              - key
+              - value
               - workspace
           collectionFormat: csv
         - name: include
@@ -1248,12 +862,11 @@ paths:
           items:
             type: string
             enum:
-              - organization
               - workspace
           collectionFormat: csv
-        - name: filter[job]
+        - name: filter[variable]
           in: query
-          description: Filters the collection of job using a 'disjoint' RSQL expression
+          description: Filters the collection of variable using a 'disjoint' RSQL expression
           required: false
           type: string
         - name: page[number]
@@ -1290,7 +903,7 @@ paths:
               data:
                 type: array
                 items:
-                  $ref: '#/definitions/job'
+                  $ref: '#/definitions/variable'
               included:
                 type: array
                 description: Included resources
@@ -1308,20 +921,20 @@ paths:
                       type: string
     post:
       tags:
-        - job
-      description: Creates an item of type job and adds it to job
+        - variable
+      description: Creates an item of type variable and adds it to variable
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
         - in: body
-          name: job
+          name: variable
           required: false
           schema:
             properties:
               data:
-                $ref: '#/definitions/job'
+                $ref: '#/definitions/variable'
       responses:
         '201':
           description: Successful response
@@ -1329,35 +942,33 @@ paths:
             type: object
             properties:
               data:
-                $ref: '#/definitions/job'
+                $ref: '#/definitions/variable'
     parameters:
-      - name: organizationId
+      - name: workspaceId
         in: path
-        description: organization Identifier
+        description: workspace Identifier
         required: true
         type: string
-  /organization/{organizationId}/job/{jobId}:
+  /workspace/{workspaceId}/variable/{variableId}:
     get:
       tags:
-        - job
-      description: Returns an instance of type job
+        - variable
+      description: Returns an instance of type variable
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
-        - name: fields[job]
+        - name: fields[variable]
           in: query
-          description: Selects the set of job fields that should be returned in the result.
+          description: Selects the set of variable fields that should be returned in the result.
           required: false
           type: array
           items:
             type: string
             enum:
-              - command
-              - output
-              - status
-              - organization
+              - key
+              - value
               - workspace
           collectionFormat: csv
         - name: include
@@ -1368,7 +979,6 @@ paths:
           items:
             type: string
             enum:
-              - organization
               - workspace
           collectionFormat: csv
       responses:
@@ -1378,7 +988,7 @@ paths:
             type: object
             properties:
               data:
-                $ref: '#/definitions/job'
+                $ref: '#/definitions/variable'
               included:
                 type: array
                 description: Included resources
@@ -1396,8 +1006,8 @@ paths:
                       type: string
     delete:
       tags:
-        - job
-      description: Deletes an instance of type job
+        - variable
+      description: Deletes an instance of type variable
       consumes:
         - application/vnd.api+json
       produces:
@@ -1408,47 +1018,47 @@ paths:
           description: Successful response
     patch:
       tags:
-        - job
-      description: Modifies an instance of type job
+        - variable
+      description: Modifies an instance of type variable
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
         - in: body
-          name: job
+          name: variable
           required: false
           schema:
             properties:
               data:
-                $ref: '#/definitions/job'
+                $ref: '#/definitions/variable'
       responses:
         '204':
           description: Successful response
     parameters:
-      - name: organizationId
+      - name: workspaceId
         in: path
-        description: organization Identifier
+        description: workspace Identifier
         required: true
         type: string
-      - name: jobId
+      - name: variableId
         in: path
-        description: job Identifier
+        description: variable Identifier
         required: true
         type: string
-  /organization/{organizationId}/relationships/job:
+  /workspace/{workspaceId}/relationships/variable:
     get:
       tags:
-        - job
-      description: Returns the relationship identifiers for job
+        - variable
+      description: Returns the relationship identifiers for variable
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
-        - name: filter[job]
+        - name: filter[variable]
           in: query
-          description: Filters the collection of job using a 'disjoint' RSQL expression
+          description: Filters the collection of variable using a 'disjoint' RSQL expression
           required: false
           type: string
         - name: page[number]
@@ -1492,11 +1102,11 @@ paths:
                     type:
                       type: string
                       enum:
-                        - job
+                        - variable
     post:
       tags:
-        - job
-      description: Adds items to the relationship job
+        - variable
+      description: Adds items to the relationship variable
       consumes:
         - application/vnd.api+json
       produces:
@@ -1517,7 +1127,7 @@ paths:
                     type:
                       type: string
                       enum:
-                        - job
+                        - variable
       responses:
         '201':
           description: Successful response
@@ -1534,11 +1144,11 @@ paths:
                     type:
                       type: string
                       enum:
-                        - job
+                        - variable
     delete:
       tags:
-        - job
-      description: Deletes items from the relationship job
+        - variable
+      description: Deletes items from the relationship variable
       consumes:
         - application/vnd.api+json
       produces:
@@ -1559,14 +1169,14 @@ paths:
                     type:
                       type: string
                       enum:
-                        - job
+                        - variable
       responses:
         '204':
           description: Successful response
     patch:
       tags:
-        - job
-      description: Replaces the relationship job
+        - variable
+      description: Replaces the relationship variable
       consumes:
         - application/vnd.api+json
       produces:
@@ -1587,21 +1197,21 @@ paths:
                     type:
                       type: string
                       enum:
-                        - job
+                        - variable
       responses:
         '204':
           description: Successful response
     parameters:
-      - name: organizationId
+      - name: workspaceId
         in: path
-        description: organization Identifier
+        description: workspace Identifier
         required: true
         type: string
-  /workspace/{workspaceId}/organization:
+  /workspace:
     get:
       tags:
-        - organization
-      description: Returns the relationship organization
+        - workspace
+      description: Returns the collection of type workspace
       consumes:
         - application/vnd.api+json
       produces:
@@ -1615,776 +1225,34 @@ paths:
           items:
             type: string
             enum:
-              - description
-              - '-description'
+              - branch
+              - '-branch'
               - name
               - '-name'
-              - id
-              - '-id'
-          collectionFormat: csv
-        - name: fields[organization]
-          in: query
-          description: Selects the set of organization fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - description
-              - name
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-        - name: filter[organization]
-          in: query
-          description: Filters the collection of organization using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: '#/definitions/organization'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    post:
-      tags:
-        - organization
-      description: Creates an item of type organization and adds it to organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: organization
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/organization/{organizationId}:
-    get:
-      tags:
-        - organization
-      description: Returns an instance of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: fields[organization]
-          in: query
-          description: Selects the set of organization fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - description
-              - name
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    delete:
-      tags:
-        - organization
-      description: Deletes an instance of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters: []
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - organization
-      description: Modifies an instance of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: organization
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-      - name: organizationId
-        in: path
-        description: organization Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/relationships/organization:
-    get:
-      tags:
-        - organization
-      description: Returns the relationship identifiers for organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: filter[organization]
-          in: query
-          description: Filters the collection of organization using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  type:
-                    type: string
-                    enum:
-                      - organization
-    patch:
-      tags:
-        - organization
-      description: Replaces the relationship organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  type:
-                    type: string
-                    enum:
-                      - organization
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/job:
-    get:
-      tags:
-        - job
-      description: Returns the relationship job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: sort
-          in: query
-          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - output
-              - '-output'
-              - id
-              - '-id'
-          collectionFormat: csv
-        - name: fields[job]
-          in: query
-          description: Selects the set of job fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - command
-              - output
-              - status
-              - organization
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - organization
-              - workspace
-          collectionFormat: csv
-        - name: filter[job]
-          in: query
-          description: Filters the collection of job using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: '#/definitions/job'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    post:
-      tags:
-        - job
-      description: Creates an item of type job and adds it to job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: job
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/job'
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/job'
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/job/{jobId}:
-    get:
-      tags:
-        - job
-      description: Returns an instance of type job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: fields[job]
-          in: query
-          description: Selects the set of job fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - command
-              - output
-              - status
-              - organization
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - organization
-              - workspace
-          collectionFormat: csv
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/job'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    delete:
-      tags:
-        - job
-      description: Deletes an instance of type job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters: []
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - job
-      description: Modifies an instance of type job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: job
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/job'
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-      - name: jobId
-        in: path
-        description: job Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/relationships/job:
-    get:
-      tags:
-        - job
-      description: Returns the relationship identifiers for job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: filter[job]
-          in: query
-          description: Filters the collection of job using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - job
-    post:
-      tags:
-        - job
-      description: Adds items to the relationship job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - job
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - job
-    delete:
-      tags:
-        - job
-      description: Deletes items from the relationship job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - job
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - job
-      description: Replaces the relationship job
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - job
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /implementation:
-    get:
-      tags:
-        - implementation
-      description: Returns the collection of type implementation
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: sort
-          in: query
-          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - arch
-              - '-arch'
-              - asciiArmor
-              - '-asciiArmor'
-              - downloadUrl
-              - '-downloadUrl'
-              - filename
-              - '-filename'
-              - keyId
-              - '-keyId'
-              - os
-              - '-os'
-              - shasum
-              - '-shasum'
-              - shasumsSignatureUrl
-              - '-shasumsSignatureUrl'
-              - shasumsUrl
-              - '-shasumsUrl'
               - source
               - '-source'
-              - sourceUrl
-              - '-sourceUrl'
-              - trustSignature
-              - '-trustSignature'
+              - terraformVersion
+              - '-terraformVersion'
               - id
               - '-id'
           collectionFormat: csv
-        - name: fields[implementation]
+        - name: fields[workspace]
           in: query
-          description: Selects the set of implementation fields that should be returned in the result.
+          description: Selects the set of workspace fields that should be returned in the result.
           required: false
           type: array
           items:
             type: string
             enum:
-              - arch
-              - asciiArmor
-              - downloadUrl
-              - filename
-              - keyId
-              - os
-              - shasum
-              - shasumsSignatureUrl
-              - shasumsUrl
+              - branch
+              - name
               - source
-              - sourceUrl
-              - trustSignature
-              - version
+              - terraformVersion
+              - environment
+              - job
+              - organization
+              - secret
+              - variable
           collectionFormat: csv
         - name: include
           in: query
@@ -2394,16 +1262,20 @@ paths:
           items:
             type: string
             enum:
-              - version
+              - environment
+              - job
+              - organization
+              - secret
+              - variable
           collectionFormat: csv
-        - name: filter[implementation]
+        - name: filter[workspace]
           in: query
-          description: Filters the collection of implementation using a 'disjoint' RSQL expression
+          description: Filters the collection of workspace using a 'disjoint' RSQL expression
           required: false
           type: string
         - name: filter
           in: query
-          description: Filters the collection of implementation using a 'joined' RSQL expression
+          description: Filters the collection of workspace using a 'joined' RSQL expression
           required: false
           type: string
         - name: page[number]
@@ -2440,7 +1312,7 @@ paths:
               data:
                 type: array
                 items:
-                  $ref: '#/definitions/implementation'
+                  $ref: '#/definitions/workspace'
               included:
                 type: array
                 description: Included resources
@@ -2458,20 +1330,20 @@ paths:
                       type: string
     post:
       tags:
-        - implementation
-      description: Creates an item of type implementation
+        - workspace
+      description: Creates an item of type workspace
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
         - in: body
-          name: implementation
+          name: workspace
           required: false
           schema:
             properties:
               data:
-                $ref: '#/definitions/implementation'
+                $ref: '#/definitions/workspace'
       responses:
         '201':
           description: Successful response
@@ -2479,38 +1351,34 @@ paths:
             type: object
             properties:
               data:
-                $ref: '#/definitions/implementation'
-  /implementation/{implementationId}:
+                $ref: '#/definitions/workspace'
+  /workspace/{workspaceId}:
     get:
       tags:
-        - implementation
-      description: Returns an instance of type implementation
+        - workspace
+      description: Returns an instance of type workspace
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
-        - name: fields[implementation]
+        - name: fields[workspace]
           in: query
-          description: Selects the set of implementation fields that should be returned in the result.
+          description: Selects the set of workspace fields that should be returned in the result.
           required: false
           type: array
           items:
             type: string
             enum:
-              - arch
-              - asciiArmor
-              - downloadUrl
-              - filename
-              - keyId
-              - os
-              - shasum
-              - shasumsSignatureUrl
-              - shasumsUrl
+              - branch
+              - name
               - source
-              - sourceUrl
-              - trustSignature
-              - version
+              - terraformVersion
+              - environment
+              - job
+              - organization
+              - secret
+              - variable
           collectionFormat: csv
         - name: include
           in: query
@@ -2520,7 +1388,11 @@ paths:
           items:
             type: string
             enum:
-              - version
+              - environment
+              - job
+              - organization
+              - secret
+              - variable
           collectionFormat: csv
       responses:
         '200':
@@ -2529,7 +1401,7 @@ paths:
             type: object
             properties:
               data:
-                $ref: '#/definitions/implementation'
+                $ref: '#/definitions/workspace'
               included:
                 type: array
                 description: Included resources
@@ -2547,8 +1419,8 @@ paths:
                       type: string
     delete:
       tags:
-        - implementation
-      description: Deletes an instance of type implementation
+        - workspace
+      description: Deletes an instance of type workspace
       consumes:
         - application/vnd.api+json
       produces:
@@ -2559,27 +1431,417 @@ paths:
           description: Successful response
     patch:
       tags:
-        - implementation
-      description: Modifies an instance of type implementation
+        - workspace
+      description: Modifies an instance of type workspace
       consumes:
         - application/vnd.api+json
       produces:
         - application/vnd.api+json
       parameters:
         - in: body
-          name: implementation
+          name: workspace
           required: false
           schema:
             properties:
               data:
-                $ref: '#/definitions/implementation'
+                $ref: '#/definitions/workspace'
       responses:
         '204':
           description: Successful response
     parameters:
-      - name: implementationId
+      - name: workspaceId
         in: path
-        description: implementation Identifier
+        description: workspace Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/environment:
+    get:
+      tags:
+        - environment
+      description: Returns the relationship environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: sort
+          in: query
+          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - key
+              - '-key'
+              - value
+              - '-value'
+              - id
+              - '-id'
+          collectionFormat: csv
+        - name: fields[environment]
+          in: query
+          description: Selects the set of environment fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - key
+              - value
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - workspace
+          collectionFormat: csv
+        - name: filter[environment]
+          in: query
+          description: Filters the collection of environment using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/environment'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    post:
+      tags:
+        - environment
+      description: Creates an item of type environment and adds it to environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: environment
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/environment'
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/environment'
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/environment/{environmentId}:
+    get:
+      tags:
+        - environment
+      description: Returns an instance of type environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: fields[environment]
+          in: query
+          description: Selects the set of environment fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - key
+              - value
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - workspace
+          collectionFormat: csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/environment'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    delete:
+      tags:
+        - environment
+      description: Deletes an instance of type environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters: []
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - environment
+      description: Modifies an instance of type environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: environment
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/environment'
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+      - name: environmentId
+        in: path
+        description: environment Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/relationships/environment:
+    get:
+      tags:
+        - environment
+      description: Returns the relationship identifiers for environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: filter[environment]
+          in: query
+          description: Filters the collection of environment using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - environment
+    post:
+      tags:
+        - environment
+      description: Adds items to the relationship environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - environment
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - environment
+    delete:
+      tags:
+        - environment
+      description: Deletes items from the relationship environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - environment
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - environment
+      description: Replaces the relationship environment
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - environment
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
         required: true
         type: string
   /implementation/{implementationId}/version:
@@ -3296,878 +2558,6 @@ paths:
         description: organization Identifier
         required: true
         type: string
-  /workspace/{workspaceId}/environment:
-    get:
-      tags:
-        - environment
-      description: Returns the relationship environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: sort
-          in: query
-          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - key
-              - '-key'
-              - value
-              - '-value'
-              - id
-              - '-id'
-          collectionFormat: csv
-        - name: fields[environment]
-          in: query
-          description: Selects the set of environment fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - key
-              - value
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - workspace
-          collectionFormat: csv
-        - name: filter[environment]
-          in: query
-          description: Filters the collection of environment using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: '#/definitions/environment'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    post:
-      tags:
-        - environment
-      description: Creates an item of type environment and adds it to environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: environment
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/environment'
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/environment'
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/environment/{environmentId}:
-    get:
-      tags:
-        - environment
-      description: Returns an instance of type environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: fields[environment]
-          in: query
-          description: Selects the set of environment fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - key
-              - value
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - workspace
-          collectionFormat: csv
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/environment'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    delete:
-      tags:
-        - environment
-      description: Deletes an instance of type environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters: []
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - environment
-      description: Modifies an instance of type environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: environment
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/environment'
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-      - name: environmentId
-        in: path
-        description: environment Identifier
-        required: true
-        type: string
-  /workspace/{workspaceId}/relationships/environment:
-    get:
-      tags:
-        - environment
-      description: Returns the relationship identifiers for environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: filter[environment]
-          in: query
-          description: Filters the collection of environment using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - environment
-    post:
-      tags:
-        - environment
-      description: Adds items to the relationship environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - environment
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - environment
-    delete:
-      tags:
-        - environment
-      description: Deletes items from the relationship environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - environment
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - environment
-      description: Replaces the relationship environment
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: relationship
-          required: false
-          schema:
-            properties:
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                        - environment
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /workspace:
-    get:
-      tags:
-        - workspace
-      description: Returns the collection of type workspace
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: sort
-          in: query
-          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - branch
-              - '-branch'
-              - name
-              - '-name'
-              - source
-              - '-source'
-              - terraformVersion
-              - '-terraformVersion'
-              - id
-              - '-id'
-          collectionFormat: csv
-        - name: fields[workspace]
-          in: query
-          description: Selects the set of workspace fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - branch
-              - name
-              - source
-              - terraformVersion
-              - environment
-              - job
-              - organization
-              - secret
-              - variable
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - environment
-              - job
-              - organization
-              - secret
-              - variable
-          collectionFormat: csv
-        - name: filter[workspace]
-          in: query
-          description: Filters the collection of workspace using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: filter
-          in: query
-          description: Filters the collection of workspace using a 'joined' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: '#/definitions/workspace'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    post:
-      tags:
-        - workspace
-      description: Creates an item of type workspace
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: workspace
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/workspace'
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/workspace'
-  /workspace/{workspaceId}:
-    get:
-      tags:
-        - workspace
-      description: Returns an instance of type workspace
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: fields[workspace]
-          in: query
-          description: Selects the set of workspace fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - branch
-              - name
-              - source
-              - terraformVersion
-              - environment
-              - job
-              - organization
-              - secret
-              - variable
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - environment
-              - job
-              - organization
-              - secret
-              - variable
-          collectionFormat: csv
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/workspace'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    delete:
-      tags:
-        - workspace
-      description: Deletes an instance of type workspace
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters: []
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - workspace
-      description: Modifies an instance of type workspace
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: workspace
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/workspace'
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: workspaceId
-        in: path
-        description: workspace Identifier
-        required: true
-        type: string
-  /organization:
-    get:
-      tags:
-        - organization
-      description: Returns the collection of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: sort
-          in: query
-          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - description
-              - '-description'
-              - name
-              - '-name'
-              - id
-              - '-id'
-          collectionFormat: csv
-        - name: fields[organization]
-          in: query
-          description: Selects the set of organization fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - description
-              - name
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-        - name: filter[organization]
-          in: query
-          description: Filters the collection of organization using a 'disjoint' RSQL expression
-          required: false
-          type: string
-        - name: filter
-          in: query
-          description: Filters the collection of organization using a 'joined' RSQL expression
-          required: false
-          type: string
-        - name: page[number]
-          in: query
-          description: Number of pages to return.  Can be used with page[size]
-          required: false
-          type: integer
-        - name: page[size]
-          in: query
-          description: Number of elements per page.  Can be used with page[number]
-          required: false
-          type: integer
-        - name: page[offset]
-          in: query
-          description: Offset from 0 to start paginating.  Can be used with page[limit]
-          required: false
-          type: integer
-        - name: page[limit]
-          in: query
-          description: Maximum number of items to return.  Can be used with page[offset]
-          required: false
-          type: integer
-        - name: page[totals]
-          in: query
-          description: For requesting total pages/records be included in the response page meta data
-          required: false
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: '#/definitions/organization'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    post:
-      tags:
-        - organization
-      description: Creates an item of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: organization
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-      responses:
-        '201':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-  /organization/{organizationId}:
-    get:
-      tags:
-        - organization
-      description: Returns an instance of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - name: fields[organization]
-          in: query
-          description: Selects the set of organization fields that should be returned in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - description
-              - name
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-        - name: include
-          in: query
-          description: Selects the set of relationships that should be expanded as a compound document in the result.
-          required: false
-          type: array
-          items:
-            type: string
-            enum:
-              - job
-              - module
-              - provider
-              - workspace
-          collectionFormat: csv
-      responses:
-        '200':
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-              included:
-                type: array
-                description: Included resources
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    attributes:
-                      type: object
-                    id:
-                      type: string
-                    relationships:
-                      type: object
-                    type:
-                      type: string
-    delete:
-      tags:
-        - organization
-      description: Deletes an instance of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters: []
-      responses:
-        '204':
-          description: Successful response
-    patch:
-      tags:
-        - organization
-      description: Modifies an instance of type organization
-      consumes:
-        - application/vnd.api+json
-      produces:
-        - application/vnd.api+json
-      parameters:
-        - in: body
-          name: organization
-          required: false
-          schema:
-            properties:
-              data:
-                $ref: '#/definitions/organization'
-      responses:
-        '204':
-          description: Successful response
-    parameters:
-      - name: organizationId
-        in: path
-        description: organization Identifier
-        required: true
-        type: string
   /organization/{organizationId}/workspace:
     get:
       tags:
@@ -4582,33 +2972,1617 @@ paths:
         description: organization Identifier
         required: true
         type: string
-definitions:
-  environment:
-    properties:
-      type:
-        type: string
-        description: ''
-      id:
-        type: string
-      attributes:
-        type: object
-        properties:
-          key:
+  /workspace/{workspaceId}/organization:
+    get:
+      tags:
+        - organization
+      description: Returns the relationship organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: sort
+          in: query
+          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
+          required: false
+          type: array
+          items:
             type: string
-          value:
+            enum:
+              - description
+              - '-description'
+              - name
+              - '-name'
+              - id
+              - '-id'
+          collectionFormat: csv
+        - name: fields[organization]
+          in: query
+          description: Selects the set of organization fields that should be returned in the result.
+          required: false
+          type: array
+          items:
             type: string
-      relationships:
-        type: object
-        properties:
-          workspace:
+            enum:
+              - description
+              - name
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+        - name: filter[organization]
+          in: query
+          description: Filters the collection of organization using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
             type: object
             properties:
-              id:
-                type: string
-              type:
-                type: string
-                enum:
-                  - workspace
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/organization'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    post:
+      tags:
+        - organization
+      description: Creates an item of type organization and adds it to organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: organization
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/organization/{organizationId}:
+    get:
+      tags:
+        - organization
+      description: Returns an instance of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: fields[organization]
+          in: query
+          description: Selects the set of organization fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - description
+              - name
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    delete:
+      tags:
+        - organization
+      description: Deletes an instance of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters: []
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - organization
+      description: Modifies an instance of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: organization
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+      - name: organizationId
+        in: path
+        description: organization Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/relationships/organization:
+    get:
+      tags:
+        - organization
+      description: Returns the relationship identifiers for organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: filter[organization]
+          in: query
+          description: Filters the collection of organization using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                    enum:
+                      - organization
+    patch:
+      tags:
+        - organization
+      description: Replaces the relationship organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                    enum:
+                      - organization
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+  /implementation:
+    get:
+      tags:
+        - implementation
+      description: Returns the collection of type implementation
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: sort
+          in: query
+          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - arch
+              - '-arch'
+              - asciiArmor
+              - '-asciiArmor'
+              - downloadUrl
+              - '-downloadUrl'
+              - filename
+              - '-filename'
+              - keyId
+              - '-keyId'
+              - os
+              - '-os'
+              - shasum
+              - '-shasum'
+              - shasumsSignatureUrl
+              - '-shasumsSignatureUrl'
+              - shasumsUrl
+              - '-shasumsUrl'
+              - source
+              - '-source'
+              - sourceUrl
+              - '-sourceUrl'
+              - trustSignature
+              - '-trustSignature'
+              - id
+              - '-id'
+          collectionFormat: csv
+        - name: fields[implementation]
+          in: query
+          description: Selects the set of implementation fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - arch
+              - asciiArmor
+              - downloadUrl
+              - filename
+              - keyId
+              - os
+              - shasum
+              - shasumsSignatureUrl
+              - shasumsUrl
+              - source
+              - sourceUrl
+              - trustSignature
+              - version
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - version
+          collectionFormat: csv
+        - name: filter[implementation]
+          in: query
+          description: Filters the collection of implementation using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: filter
+          in: query
+          description: Filters the collection of implementation using a 'joined' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/implementation'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    post:
+      tags:
+        - implementation
+      description: Creates an item of type implementation
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: implementation
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/implementation'
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/implementation'
+  /implementation/{implementationId}:
+    get:
+      tags:
+        - implementation
+      description: Returns an instance of type implementation
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: fields[implementation]
+          in: query
+          description: Selects the set of implementation fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - arch
+              - asciiArmor
+              - downloadUrl
+              - filename
+              - keyId
+              - os
+              - shasum
+              - shasumsSignatureUrl
+              - shasumsUrl
+              - source
+              - sourceUrl
+              - trustSignature
+              - version
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - version
+          collectionFormat: csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/implementation'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    delete:
+      tags:
+        - implementation
+      description: Deletes an instance of type implementation
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters: []
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - implementation
+      description: Modifies an instance of type implementation
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: implementation
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/implementation'
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: implementationId
+        in: path
+        description: implementation Identifier
+        required: true
+        type: string
+  /organization:
+    get:
+      tags:
+        - organization
+      description: Returns the collection of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: sort
+          in: query
+          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - description
+              - '-description'
+              - name
+              - '-name'
+              - id
+              - '-id'
+          collectionFormat: csv
+        - name: fields[organization]
+          in: query
+          description: Selects the set of organization fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - description
+              - name
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+        - name: filter[organization]
+          in: query
+          description: Filters the collection of organization using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: filter
+          in: query
+          description: Filters the collection of organization using a 'joined' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/organization'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    post:
+      tags:
+        - organization
+      description: Creates an item of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: organization
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+  /organization/{organizationId}:
+    get:
+      tags:
+        - organization
+      description: Returns an instance of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: fields[organization]
+          in: query
+          description: Selects the set of organization fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - description
+              - name
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - job
+              - module
+              - provider
+              - workspace
+          collectionFormat: csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    delete:
+      tags:
+        - organization
+      description: Deletes an instance of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters: []
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - organization
+      description: Modifies an instance of type organization
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: organization
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/organization'
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: organizationId
+        in: path
+        description: organization Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/secret:
+    get:
+      tags:
+        - secret
+      description: Returns the relationship secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: sort
+          in: query
+          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - key
+              - '-key'
+              - value
+              - '-value'
+              - id
+              - '-id'
+          collectionFormat: csv
+        - name: fields[secret]
+          in: query
+          description: Selects the set of secret fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - key
+              - value
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - workspace
+          collectionFormat: csv
+        - name: filter[secret]
+          in: query
+          description: Filters the collection of secret using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/secret'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    post:
+      tags:
+        - secret
+      description: Creates an item of type secret and adds it to secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: secret
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/secret'
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/secret'
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/secret/{secretId}:
+    get:
+      tags:
+        - secret
+      description: Returns an instance of type secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: fields[secret]
+          in: query
+          description: Selects the set of secret fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - key
+              - value
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - workspace
+          collectionFormat: csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/secret'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    delete:
+      tags:
+        - secret
+      description: Deletes an instance of type secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters: []
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - secret
+      description: Modifies an instance of type secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: secret
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/secret'
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+      - name: secretId
+        in: path
+        description: secret Identifier
+        required: true
+        type: string
+  /workspace/{workspaceId}/relationships/secret:
+    get:
+      tags:
+        - secret
+      description: Returns the relationship identifiers for secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: filter[secret]
+          in: query
+          description: Filters the collection of secret using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - secret
+    post:
+      tags:
+        - secret
+      description: Adds items to the relationship secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - secret
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - secret
+    delete:
+      tags:
+        - secret
+      description: Deletes items from the relationship secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - secret
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - secret
+      description: Replaces the relationship secret
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - secret
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: workspaceId
+        in: path
+        description: workspace Identifier
+        required: true
+        type: string
+  /organization/{organizationId}/job:
+    get:
+      tags:
+        - job
+      description: Returns the relationship job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: sort
+          in: query
+          description: Sorts the collection on the selected attributes.  A prefix of '-' sorts descending
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - output
+              - '-output'
+              - id
+              - '-id'
+          collectionFormat: csv
+        - name: fields[job]
+          in: query
+          description: Selects the set of job fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - command
+              - output
+              - status
+              - organization
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - organization
+              - workspace
+          collectionFormat: csv
+        - name: filter[job]
+          in: query
+          description: Filters the collection of job using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/job'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    post:
+      tags:
+        - job
+      description: Creates an item of type job and adds it to job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: job
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/job'
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/job'
+    parameters:
+      - name: organizationId
+        in: path
+        description: organization Identifier
+        required: true
+        type: string
+  /organization/{organizationId}/job/{jobId}:
+    get:
+      tags:
+        - job
+      description: Returns an instance of type job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: fields[job]
+          in: query
+          description: Selects the set of job fields that should be returned in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - command
+              - output
+              - status
+              - organization
+              - workspace
+          collectionFormat: csv
+        - name: include
+          in: query
+          description: Selects the set of relationships that should be expanded as a compound document in the result.
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - organization
+              - workspace
+          collectionFormat: csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/job'
+              included:
+                type: array
+                description: Included resources
+                uniqueItems: true
+                items:
+                  type: object
+                  properties:
+                    attributes:
+                      type: object
+                    id:
+                      type: string
+                    relationships:
+                      type: object
+                    type:
+                      type: string
+    delete:
+      tags:
+        - job
+      description: Deletes an instance of type job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters: []
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - job
+      description: Modifies an instance of type job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: job
+          required: false
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/job'
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: organizationId
+        in: path
+        description: organization Identifier
+        required: true
+        type: string
+      - name: jobId
+        in: path
+        description: job Identifier
+        required: true
+        type: string
+  /organization/{organizationId}/relationships/job:
+    get:
+      tags:
+        - job
+      description: Returns the relationship identifiers for job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - name: filter[job]
+          in: query
+          description: Filters the collection of job using a 'disjoint' RSQL expression
+          required: false
+          type: string
+        - name: page[number]
+          in: query
+          description: Number of pages to return.  Can be used with page[size]
+          required: false
+          type: integer
+        - name: page[size]
+          in: query
+          description: Number of elements per page.  Can be used with page[number]
+          required: false
+          type: integer
+        - name: page[offset]
+          in: query
+          description: Offset from 0 to start paginating.  Can be used with page[limit]
+          required: false
+          type: integer
+        - name: page[limit]
+          in: query
+          description: Maximum number of items to return.  Can be used with page[offset]
+          required: false
+          type: integer
+        - name: page[totals]
+          in: query
+          description: For requesting total pages/records be included in the response page meta data
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - job
+    post:
+      tags:
+        - job
+      description: Adds items to the relationship job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - job
+      responses:
+        '201':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - job
+    delete:
+      tags:
+        - job
+      description: Deletes items from the relationship job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - job
+      responses:
+        '204':
+          description: Successful response
+    patch:
+      tags:
+        - job
+      description: Replaces the relationship job
+      consumes:
+        - application/vnd.api+json
+      produces:
+        - application/vnd.api+json
+      parameters:
+        - in: body
+          name: relationship
+          required: false
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - job
+      responses:
+        '204':
+          description: Successful response
+    parameters:
+      - name: organizationId
+        in: path
+        description: organization Identifier
+        required: true
+        type: string
+definitions:
   workspace:
     properties:
       type:
@@ -4675,6 +4649,32 @@ definitions:
                 type: string
                 enum:
                   - variable
+  environment:
+    properties:
+      type:
+        type: string
+        description: ''
+      id:
+        type: string
+      attributes:
+        type: object
+        properties:
+          key:
+            type: string
+          value:
+            type: string
+      relationships:
+        type: object
+        properties:
+          workspace:
+            type: object
+            properties:
+              id:
+                type: string
+              type:
+                type: string
+                enum:
+                  - workspace
   provider:
     properties:
       type:
@@ -4763,44 +4763,6 @@ definitions:
                 type: string
                 enum:
                   - workspace
-  module:
-    properties:
-      type:
-        type: string
-        description: ''
-      id:
-        type: string
-      attributes:
-        type: object
-        properties:
-          description:
-            type: string
-          name:
-            type: string
-          provider:
-            type: string
-          registryPath:
-            type: string
-          source:
-            type: string
-          sourceSample:
-            type: string
-          versions:
-            type: array
-            items:
-              type: object
-      relationships:
-        type: object
-        properties:
-          organization:
-            type: object
-            properties:
-              id:
-                type: string
-              type:
-                type: string
-                enum:
-                  - organization
   implementation:
     properties:
       type:
@@ -4847,6 +4809,44 @@ definitions:
                 type: string
                 enum:
                   - version
+  module:
+    properties:
+      type:
+        type: string
+        description: ''
+      id:
+        type: string
+      attributes:
+        type: object
+        properties:
+          description:
+            type: string
+          name:
+            type: string
+          provider:
+            type: string
+          registryPath:
+            type: string
+          source:
+            type: string
+          sourceSample:
+            type: string
+          versions:
+            type: array
+            items:
+              type: object
+      relationships:
+        type: object
+        properties:
+          organization:
+            type: object
+            properties:
+              id:
+                type: string
+              type:
+                type: string
+                enum:
+                  - organization
   variable:
     properties:
       type:
@@ -4980,4 +4980,3 @@ definitions:
                 type: string
                 enum:
                   - provider
-
