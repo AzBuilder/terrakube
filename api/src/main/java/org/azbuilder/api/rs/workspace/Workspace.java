@@ -4,10 +4,8 @@ import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.Organization;
-import org.azbuilder.api.rs.workspace.parameters.Secret;
 import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
-import org.azbuilder.api.rs.workspace.parameters.Environment;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -42,12 +40,6 @@ public class Workspace {
 
     @OneToMany(mappedBy = "workspace")
     private List<Variable> variable;
-
-    @OneToMany(mappedBy = "workspace")
-    private List<Secret> secret;
-
-    @OneToMany(mappedBy = "workspace")
-    private List<Environment> environment;
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;
