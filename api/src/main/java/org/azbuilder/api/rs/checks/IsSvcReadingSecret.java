@@ -20,7 +20,7 @@ public class IsSvcReadingSecret extends OperationCheck<Variable> {
 
     @Override
     public boolean ok(Variable variable, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        if(variable.isSecret()) {
+        if(variable.isSensitive()) {
             return (azureAuthenticatedPrincipal.isServiceAccount(requestScope.getUser())) ? true: false;
         }
         else

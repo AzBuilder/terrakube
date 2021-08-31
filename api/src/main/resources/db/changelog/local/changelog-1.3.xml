@@ -8,8 +8,20 @@
         <addColumn tableName="variable" >
             <column name="variable_category"
                     type="varchar(32)"/>
-            <column name="is_secret"
+            <column name="variable_description"
+                    type="varchar(512)"/>
+            <column name="sensitive"
                     type="boolean"/>
+            <column name="hcl"
+                    type="boolean"/>
+        </addColumn>
+        <addColumn tableName="organization" >
+            <column name="owner"
+                    type="varchar(64)"/>
+        </addColumn>
+        <addColumn tableName="workspace" >
+            <column name="owner"
+                    type="varchar(64)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

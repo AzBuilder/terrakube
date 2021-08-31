@@ -28,12 +28,18 @@ public class Variable {
     @Column(name="variable_value")
     private String value;
 
+    @Column(name="variable_description")
+    private String description;
+
     @Enumerated(EnumType.STRING)
     @Column(name="variable_category")
     private Category category;
 
-    @Column(name="is_secret")
-    private boolean isSecret;
+    @Column(name="sensitive")
+    private boolean sensitive;
+
+    @Column(name="hcl")
+    private boolean hcl;
 
     @ManyToOne
     private Workspace workspace;
@@ -41,5 +47,5 @@ public class Variable {
 
 enum Category{
     terraform,
-    environment
+    env
 }

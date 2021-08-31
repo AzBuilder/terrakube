@@ -23,6 +23,9 @@ public class Workspace {
     @GeneratedValue
     private UUID id;
 
+    @Column(name = "owner")
+    private String owner;
+
     @Column(name = "name")
     private String name;
 
