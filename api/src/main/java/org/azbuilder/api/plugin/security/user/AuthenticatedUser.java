@@ -2,9 +2,9 @@ package org.azbuilder.api.plugin.security.user;
 
 import com.yahoo.elide.core.security.User;
 
-public interface AuthenticatedPrincipal {
+public interface AuthenticatedUser {
 
-    String getPrincipal(User user);
+    String getEmail(User user);
 
     public boolean isServiceAccount(User user);
 }

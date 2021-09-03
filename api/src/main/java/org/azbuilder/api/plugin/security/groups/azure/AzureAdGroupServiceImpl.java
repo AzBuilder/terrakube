@@ -4,26 +4,37 @@ import com.microsoft.graph.models.DirectoryObjectCheckMemberGroupsParameterSet;
 import com.microsoft.graph.options.Option;
 import com.microsoft.graph.options.QueryOption;
 import com.microsoft.graph.requests.*;
+import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.security.groups.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 @Service
+@ConditionalOnProperty(prefix = "org.azbuilder.api.groups", name = "type", havingValue = "AzureAd")
 public class AzureAdGroupServiceImpl implements GroupService {
 
     @Autowired
     private GraphServiceClient graphServiceClient;
 
+    @Autowired
+    CacheManager cacheManager;
+
     @Override
+    @Cacheable(cacheNames = "isMember")
     public boolean isMember(String userName, String groupName) {
         return isUserMemberGroup(getUserId(userName), getGroupId(groupName));
     }
 
-    public String getGroupId(String groupName) {
+    private String getGroupId(String groupName) {
+        log.info("Search Group Id {}", groupName);
         List<Option> requestOptions = new ArrayList<Option>();
         requestOptions.add(new QueryOption("$filter", "displayName eq '" + groupName + "'"));
 
@@ -35,7 +46,8 @@ public class AzureAdGroupServiceImpl implements GroupService {
         }
     }
 
-    public String getUserId(String userName) {
+    private String getUserId(String userName) {
+        log.info("Search User Id {}", userName);
         List<Option> requestOptions = new ArrayList<Option>();
         requestOptions.add(new QueryOption("$filter", "userPrincipalName eq '" + userName + "'"));
 
@@ -47,7 +59,7 @@ public class AzureAdGroupServiceImpl implements GroupService {
         }
     }
 
-    public boolean isUserMemberGroup(String userId, String groupId) {
+    private boolean isUserMemberGroup(String userId, String groupId) {
 
         List<Option> requestOptions = new ArrayList<Option>();
 

@@ -2,11 +2,13 @@ package org.azbuilder.api.plugin.security.user.azure;
 
 import com.azure.spring.aad.webapi.AADOAuth2AuthenticatedPrincipal;
 import com.yahoo.elide.core.security.User;
-import org.azbuilder.api.plugin.security.user.AuthenticatedPrincipal;
+import org.azbuilder.api.plugin.security.user.AuthenticatedUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AzureAuthenticatedPrincipal implements AuthenticatedPrincipal {
+@ConditionalOnProperty(prefix = "org.azbuilder.api.users", name = "type", havingValue = "AzureAd")
+public class AzureAuthenticatedUserImpl implements AuthenticatedUser {
 
     private AADOAuth2AuthenticatedPrincipal getAzureAdPrincipal(User user){
         org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication bearerTokenAuthenticationToken = (org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication) user.getPrincipal();
@@ -14,7 +16,7 @@ public class AzureAuthenticatedPrincipal implements AuthenticatedPrincipal {
     }
 
     @Override
-    public String getPrincipal(User user) {
+    public String getEmail(User user) {
         return (String) getAzureAdPrincipal(user).getAttributes().get("upn");
     }
 

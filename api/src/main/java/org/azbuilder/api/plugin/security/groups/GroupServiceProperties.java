@@ -21,5 +21,5 @@ public class GroupServiceProperties {
 
 enum GroupType {
     AzureAd,
-    NoGroups
+    Local
 }

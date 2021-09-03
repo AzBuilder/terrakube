@@ -15,13 +15,5 @@
             <column name="hcl"
                     type="boolean"/>
         </addColumn>
-        <addColumn tableName="organization" >
-            <column name="owner"
-                    type="varchar(64)"/>
-        </addColumn>
-        <addColumn tableName="workspace" >
-            <column name="owner"
-                    type="varchar(64)"/>
-        </addColumn>
     </changeSet>
 </databaseChangeLog>
