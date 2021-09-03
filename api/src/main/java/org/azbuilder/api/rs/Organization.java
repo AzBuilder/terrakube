@@ -1,6 +1,8 @@
 package org.azbuilder.api.rs;
 
+import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.ReadPermission;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.job.Job;
@@ -13,6 +15,8 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+@CreatePermission(expression = "owner organization")
+@ReadPermission(expression = "owner organization")
 @Include
 @Getter
 @Setter

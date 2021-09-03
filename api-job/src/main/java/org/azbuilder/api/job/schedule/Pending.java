@@ -59,36 +59,10 @@ public class Pending {
                     for (Variable variable : variableList) {
                         String parameterKey = variable.getAttributes().getKey();
                         String parameterValue = variable.getAttributes().getValue();
-                        //log.info("Variable Key: {} Value {}", parameterKey, parameterValue);
+                        log.info("Variable Key: {} Value {}", parameterKey, parameterValue);
                         variables.put(parameterKey, parameterValue);
                     }
                 terraformJob.setVariables(variables);
-
-                log.info("Checking Secrets");
-                //GET WORKSPACE BY ID WITH SECRETS
-                HashMap<String, String> secrets = new HashMap<>();
-                List<Secret> secretList = restClient.getAllSecrets(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getData();
-                if (secretList != null)
-                    for (Secret secret : secretList) {
-                        String parameterKey = secret.getAttributes().getKey();
-                        String parameterValue = secret.getAttributes().getValue();
-                        //log.info("Secret Key: {} Value {}", parameterKey, parameterValue);
-                        secrets.put(parameterKey, parameterValue);
-                    }
-                terraformJob.setSecrets(secrets);
-
-                log.info("Checking Environments");
-                //GET WORKSPACE BY ID WITH ENVIRONMENTS
-                HashMap<String, String> environmentsVariables = new HashMap<>();
-                List<Environment> environmentVariableList = restClient.getAllEnvironmentVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()).getData();
-                if (environmentVariableList != null)
-                    for (Environment environment : environmentVariableList) {
-                        String parameterKey = environment.getAttributes().get("key");
-                        String parameterValue = environment.getAttributes().get("value");
-                        //log.info("Environment Variable Key: {} Value {}", parameterKey, parameterValue);
-                        environmentsVariables.put(parameterKey, parameterValue);
-                    }
-                terraformJob.setEnvironmentVariables(environmentsVariables);
 
                 terraformJob.setTerraformCommand(TerraformCommand.valueOf(job.getAttributes().getCommand()));
                 terraformJob.setTerraformVersion(workspaceData.getData().getAttributes().getTerraformVersion());

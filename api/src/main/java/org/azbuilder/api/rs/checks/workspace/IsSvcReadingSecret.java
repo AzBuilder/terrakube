@@ -1,4 +1,4 @@
-package org.azbuilder.api.rs.checks;
+package org.azbuilder.api.rs.checks.workspace;
 
 import com.yahoo.elide.annotation.SecurityCheck;
 import com.yahoo.elide.core.security.ChangeSpec;
