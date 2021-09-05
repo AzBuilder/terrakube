@@ -28,7 +28,7 @@ public class AzureAdGroupServiceImpl implements GroupService {
     CacheManager cacheManager;
 
     @Override
-    @Cacheable(cacheNames = "isMember")
+    @Cacheable(cacheNames = "members")
     public boolean isMember(String userName, String groupName) {
         return isUserMemberGroup(getUserId(userName), getGroupId(groupName));
     }

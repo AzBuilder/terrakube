@@ -15,5 +15,33 @@
             <column name="hcl"
                     type="boolean"/>
         </addColumn>
+        <createTable tableName="team">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manage_workspace" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manage_module" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manage_provider" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_team_organization" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="id, name"
+                constraintName="const_team"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="team"
+                validate="true"/>
     </changeSet>
 </databaseChangeLog>

@@ -1,6 +1,6 @@
 package org.azbuilder.api.rs.workspace;
 
-import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.Organization;
@@ -12,6 +12,10 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+
+@CreatePermission(expression = "team manage workspace")
+@UpdatePermission(expression = "team manage workspace")
+@DeletePermission(expression = "team manage workspace")
 @Include
 @Getter
 @Setter

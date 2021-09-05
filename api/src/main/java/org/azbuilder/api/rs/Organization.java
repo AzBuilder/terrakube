@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.module.Module;
 import org.azbuilder.api.rs.provider.Provider;
+import org.azbuilder.api.rs.team.Team;
 import org.azbuilder.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
@@ -13,10 +14,9 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@CreatePermission(expression = "owner instance")
-@ReadPermission(expression = "owner instance")
-@UpdatePermission(expression = "owner instance")
-@DeletePermission(expression = "owner instance")
+@CreatePermission(expression = "user is a superuser")
+@UpdatePermission(expression = "user is a superuser")
+@DeletePermission(expression = "user is a superuser")
 @Include
 @Getter
 @Setter
@@ -45,4 +45,7 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<Job> job;
+
+    @OneToMany(mappedBy = "organization")
+    private List<Team> team;
 }
