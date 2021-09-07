@@ -24,7 +24,7 @@ public class Variable {
     @Column(name="variable_key")
     private String key;
 
-    @ReadPermission(expression = "svc is reading secrets")
+    @ReadPermission(expression = "service read secret")
     @Column(name="variable_value")
     private String value;
 

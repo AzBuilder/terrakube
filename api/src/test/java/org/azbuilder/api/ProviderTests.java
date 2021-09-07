@@ -12,9 +12,11 @@ public class ProviderTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
+            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
+                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO provider (id, name, description, organization_id) VALUES\n" +
                     "\t\t('b5e41ba0-e7a5-4643-9200-1c45c5b82648','Provider','Description','a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
     })
@@ -50,9 +52,11 @@ public class ProviderTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
+            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
+                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO provider (id, name, description, organization_id) VALUES\n" +
                     "\t\t('b5e41ba0-e7a5-4643-9200-1c45c5b82648','Provider','Description','a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO version (id, version_number, protocols, provider_id) VALUES\n" +
@@ -90,9 +94,11 @@ public class ProviderTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
+            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
+                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO provider (id, name, description, organization_id) VALUES\n" +
                     "\t\t('b5e41ba0-e7a5-4643-9200-1c45c5b82648','Provider','Description','a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO version (id, version_number, protocols, provider_id) VALUES\n" +

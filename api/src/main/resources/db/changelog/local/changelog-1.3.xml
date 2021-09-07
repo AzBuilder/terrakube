@@ -43,5 +43,9 @@
                 initiallyDeferred="true"
                 tableName="team"
                 validate="true"/>
+        <modifyDataType
+                columnName="variable_value"
+                newDataType="varchar(2048)"
+                tableName="variable"/>
     </changeSet>
 </databaseChangeLog>

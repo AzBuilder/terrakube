@@ -1,4 +1,4 @@
-package org.azbuilder.api.rs.checks.workspace;
+package org.azbuilder.api.rs.checks.provider;
 
 import com.yahoo.elide.annotation.SecurityCheck;
 import com.yahoo.elide.core.security.ChangeSpec;
@@ -7,18 +7,18 @@ import com.yahoo.elide.core.security.checks.OperationCheck;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.security.groups.GroupService;
 import org.azbuilder.api.plugin.security.user.AuthenticatedUser;
+import org.azbuilder.api.rs.provider.Provider;
 import org.azbuilder.api.rs.team.Team;
-import org.azbuilder.api.rs.workspace.Workspace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@SecurityCheck(TeamManageWorkspace.RULE)
-public class TeamManageWorkspace extends OperationCheck<Workspace> {
+@SecurityCheck(TeamManageProvider.RULE)
+public class TeamManageProvider extends OperationCheck<Provider> {
 
-    public static final String RULE = "team manage workspace";
+    public static final String RULE = "team manage provider";
 
     @Autowired
     AuthenticatedUser authenticatedUser;
@@ -27,11 +27,11 @@ public class TeamManageWorkspace extends OperationCheck<Workspace> {
     GroupService groupService;
 
     @Override
-    public boolean ok(Workspace workspace, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team manage workspace {}", workspace.getId());
-        List<Team> teamList = workspace.getOrganization().getTeam();
+    public boolean ok(Provider provider, RequestScope requestScope, Optional<ChangeSpec> optional) {
+        log.info("team manage provider {}", provider.getId());
+        List<Team> teamList = provider.getOrganization().getTeam();
         for (Team team : teamList) {
-             if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageWorkspace())
+            if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageWorkspace())
                 return true;
         }
         return false;

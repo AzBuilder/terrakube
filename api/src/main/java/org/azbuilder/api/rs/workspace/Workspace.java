@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+@ReadPermission(expression = "team view workspace OR user is a service")
 @CreatePermission(expression = "team manage workspace")
 @UpdatePermission(expression = "team manage workspace")
 @DeletePermission(expression = "team manage workspace")

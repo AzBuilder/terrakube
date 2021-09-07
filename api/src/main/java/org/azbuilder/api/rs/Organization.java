@@ -14,8 +14,9 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+@ReadPermission(expression = "user belongs organization OR user is a service")
 @CreatePermission(expression = "user is a superuser")
-@UpdatePermission(expression = "user is a superuser")
+@UpdatePermission(expression = "user is a superuser ")
 @DeletePermission(expression = "user is a superuser")
 @Include
 @Getter
@@ -34,12 +35,15 @@ public class Organization {
     @Column(name = "description")
     private String description;
 
+    @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Workspace> workspace;
 
+    @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Module> module;
 
+    @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Provider> provider;
 

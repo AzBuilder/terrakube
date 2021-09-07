@@ -8,8 +8,6 @@ import org.azbuilder.api.client.model.organization.Organization;
 import org.azbuilder.api.client.model.organization.job.Job;
 import org.azbuilder.api.client.model.organization.job.JobRequest;
 import org.azbuilder.api.client.model.organization.workspace.Workspace;
-import org.azbuilder.api.client.model.organization.workspace.environment.Environment;
-import org.azbuilder.api.client.model.organization.workspace.secret.Secret;
 import org.azbuilder.api.client.model.organization.workspace.variable.Variable;
 import org.azbuilder.api.client.model.response.ResponseWithInclude;
 import org.azbuilder.terraform.TerraformCommand;
@@ -50,19 +48,33 @@ public class Pending {
                 terraformJob.setJobId(job.getId());
 
                 log.info("Checking Variables");
-                //GET WORKSPACE BY ID WITH VARIABLES
                 ResponseWithInclude<Workspace, Variable> workspaceData = restClient.getWorkspaceByIdWithVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
 
                 HashMap<String, String> variables = new HashMap<>();
+                HashMap<String, String> environmentVariables = new HashMap<>();
+                HashMap<String, String> secrets = new HashMap<>();
                 List<Variable> variableList = workspaceData.getIncluded();
                 if (variableList != null)
                     for (Variable variable : variableList) {
+                        switch (variable.getAttributes().getCategory()) {
+                            case "terraform":
+                                if (variable.getAttributes().isSensitive())
+                                    secrets.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
+                                else
+                                    variables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
+                                break;
+                            case "env":
+                                environmentVariables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
+                                break;
+                        }
                         String parameterKey = variable.getAttributes().getKey();
                         String parameterValue = variable.getAttributes().getValue();
-                        log.info("Variable Key: {} Value {}", parameterKey, parameterValue);
+                        log.info("Variable Key: {} Value {}", parameterKey, variable.getAttributes().isSensitive() ? "sensitive" : parameterValue);
                         variables.put(parameterKey, parameterValue);
                     }
                 terraformJob.setVariables(variables);
+                terraformJob.setSecrets(secrets);
+                terraformJob.setEnvironmentVariables(environmentVariables);
 
                 terraformJob.setTerraformCommand(TerraformCommand.valueOf(job.getAttributes().getCommand()));
                 terraformJob.setTerraformVersion(workspaceData.getData().getAttributes().getTerraformVersion());

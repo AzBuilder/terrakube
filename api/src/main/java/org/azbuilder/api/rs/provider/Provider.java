@@ -1,8 +1,9 @@
 package org.azbuilder.api.rs.provider;
 
-import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.provider.implementation.Version;
 import org.hibernate.annotations.Type;
@@ -11,6 +12,11 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+@ReadPermission(expression = "team view provider OR user is a service")
+@CreatePermission(expression = "team manage provider")
+@UpdatePermission(expression = "team manage provider")
+@DeletePermission(expression = "team manage provider")
+@Slf4j
 @Include(rootLevel = false)
 @Getter
 @Setter

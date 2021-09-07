@@ -2,10 +2,12 @@ package org.azbuilder.api.plugin.security.user.azure;
 
 import com.azure.spring.aad.webapi.AADOAuth2AuthenticatedPrincipal;
 import com.yahoo.elide.core.security.User;
+import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.security.user.AuthenticatedUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @ConditionalOnProperty(prefix = "org.azbuilder.api.users", name = "type", havingValue = "AzureAd")
 public class AzureAuthenticatedUserImpl implements AuthenticatedUser {
