@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.concurrent.TimeUnit;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
@@ -29,6 +31,7 @@ class OpenRegistryApplicationTests {
 	@AfterAll
 	public void stopServer() {
 		mockServer.stop();
+		while (!mockServer.hasStopped(10,100L, TimeUnit.MILLISECONDS)){}
 	}
 
 }
