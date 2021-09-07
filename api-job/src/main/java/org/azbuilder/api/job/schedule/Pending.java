@@ -58,22 +58,16 @@ public class Pending {
                     for (Variable variable : variableList) {
                         switch (variable.getAttributes().getCategory()) {
                             case "terraform":
-                                if (variable.getAttributes().isSensitive())
-                                    secrets.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
-                                else
-                                    variables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
-                                break;
+                                log.info("Adding terraform");
+                                variables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
                             case "env":
+                                log.info("Adding environment variable");
                                 environmentVariables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
                                 break;
                         }
-                        String parameterKey = variable.getAttributes().getKey();
-                        String parameterValue = variable.getAttributes().getValue();
-                        log.info("Variable Key: {} Value {}", parameterKey, variable.getAttributes().isSensitive() ? "sensitive" : parameterValue);
-                        variables.put(parameterKey, parameterValue);
+                        log.info("Variable Key: {} Value {}", variable.getAttributes().getKey(), variable.getAttributes().isSensitive() ? "sensitive" : variable.getAttributes().getValue());
                     }
                 terraformJob.setVariables(variables);
-                terraformJob.setSecrets(secrets);
                 terraformJob.setEnvironmentVariables(environmentVariables);
 
                 terraformJob.setTerraformCommand(TerraformCommand.valueOf(job.getAttributes().getCommand()));

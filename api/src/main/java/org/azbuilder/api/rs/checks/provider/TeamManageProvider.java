@@ -31,7 +31,7 @@ public class TeamManageProvider extends OperationCheck<Provider> {
         log.info("team manage provider {}", provider.getId());
         List<Team> teamList = provider.getOrganization().getTeam();
         for (Team team : teamList) {
-            if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageWorkspace())
+            if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageProvider())
                 return true;
         }
         return false;

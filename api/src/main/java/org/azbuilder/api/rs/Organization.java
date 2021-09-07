@@ -47,6 +47,7 @@ public class Organization {
     @OneToMany(mappedBy = "organization")
     private List<Provider> provider;
 
+    @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Job> job;
 
