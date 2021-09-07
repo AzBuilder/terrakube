@@ -164,6 +164,7 @@ public class ProviderTests extends OpenRegistryApplicationTests{
 
     @Test
     void providerApiGetTestStep1() {
+        mockServer.reset();
        mockServer.when(
                request()
                        .withMethod(HttpMethod.GET.name())
