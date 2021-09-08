@@ -3,6 +3,8 @@ package org.azbuilder.api.plugin.datasource.configuration;
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.datasource.azure.AzureDataSourceProperties;
+import org.azbuilder.api.plugin.datasource.postgresql.PostgreSQLDataSourceProperties;
+import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -21,7 +25,7 @@ import javax.sql.DataSource;
 public class DataSourceAutoConfiguration {
 
     @Bean
-    public DataSource getDataSource(DataSourceConfigurationProperties dataSourceConfigurationProperties, AzureDataSourceProperties azureDataSourceProperties) {
+    public DataSource getDataSource(DataSourceConfigurationProperties dataSourceConfigurationProperties, AzureDataSourceProperties azureDataSourceProperties, PostgreSQLDataSourceProperties postgreSQLDataSourceProperties) {
         log.info("DataSourceType: {}", dataSourceConfigurationProperties.getType());
         DataSource dataSource = null;
         switch (dataSourceConfigurationProperties.getType()) {
@@ -34,6 +38,15 @@ public class DataSourceAutoConfiguration {
                 sqlServerDataSource.setPassword(azureDataSourceProperties.getDatabasePassword());
                 sqlServerDataSource.setLoginTimeout(30);
                 dataSource = sqlServerDataSource;
+                break;
+            case POSTGRESQL:
+                PGSimpleDataSource ds = new PGSimpleDataSource();
+                ds.setServerNames(new String[] {postgreSQLDataSourceProperties.getServerName()});
+                ds.setDatabaseName(postgreSQLDataSourceProperties.getDatabaseName());
+                ds.setUser(postgreSQLDataSourceProperties.getDatabaseUser());
+                ds.setPassword(postgreSQLDataSourceProperties.getDatabasePassword());
+                ds.setSsl(true);
+                dataSource = ds;
                 break;
             default:
                 DriverManagerDataSource h2DataSource = new DriverManagerDataSource();

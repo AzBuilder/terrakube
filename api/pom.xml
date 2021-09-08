@@ -27,6 +27,7 @@
 		<groovy.version>3.0.8</groovy.version>
 		<azure-identity.version>1.3.5</azure-identity.version>
 		<microsoft-graph.version>5.0.0</microsoft-graph.version>
+		<postgresql.version>42.2.23</postgresql.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
@@ -147,6 +148,11 @@
 			<groupId>com.microsoft.graph</groupId>
 			<artifactId>microsoft-graph</artifactId>
 			<version>${microsoft-graph.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${postgresql.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
