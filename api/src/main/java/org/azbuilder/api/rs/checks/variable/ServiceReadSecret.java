@@ -24,7 +24,7 @@ public class ServiceReadSecret extends OperationCheck<Variable> {
     public boolean ok(Variable variable, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("user view variable {}", variable.getId());
         if(variable.isSensitive()) {
-            return (authenticatedUser.isServiceAccount(requestScope.getUser())) ? true: false;
+            return authenticatedUser.isServiceAccount(requestScope.getUser());
         }
         else
             return true;

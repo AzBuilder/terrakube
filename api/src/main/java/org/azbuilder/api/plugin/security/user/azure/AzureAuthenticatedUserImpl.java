@@ -26,6 +26,6 @@ public class AzureAuthenticatedUserImpl implements AuthenticatedUser {
     @Override
     public boolean isServiceAccount(User user){
         AADOAuth2AuthenticatedPrincipal aadoAuth2AuthenticatedPrincipal = getAzureAdPrincipal(user);
-        return ( (String) aadoAuth2AuthenticatedPrincipal.getAttributes().get("appidacr")).equals("1")? true : false;
+        return ((String) aadoAuth2AuthenticatedPrincipal.getAttributes().get("appidacr")).equals("1");
     }
 }

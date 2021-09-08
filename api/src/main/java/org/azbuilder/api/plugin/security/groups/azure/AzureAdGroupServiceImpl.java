@@ -35,7 +35,7 @@ public class AzureAdGroupServiceImpl implements GroupService {
 
     private String getGroupId(String groupName) {
         log.info("Search Group Id {}", groupName);
-        List<Option> requestOptions = new ArrayList<Option>();
+        List<Option> requestOptions = new ArrayList<>();
         requestOptions.add(new QueryOption("$filter", "displayName eq '" + groupName + "'"));
 
         GroupCollectionPage groupCollectionPage = graphServiceClient.groups().buildRequest(requestOptions).get();

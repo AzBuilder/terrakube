@@ -18,6 +18,6 @@ public class IsServiceUser extends UserCheck {
 
     @Override
     public boolean ok(User user) {
-        return (authenticatedUser.isServiceAccount(user)) ? true: false;
+        return authenticatedUser.isServiceAccount(user);
     }
 }
