@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="4" author="alfespa17@gmail.com">
+        <addColumn tableName="variable" >
+            <column name="variable_category"
+                    type="varchar(32)"/>
+            <column name="variable_description"
+                    type="varchar(512)"/>
+            <column name="sensitive"
+                    type="boolean"/>
+            <column name="hcl"
+                    type="boolean"/>
+        </addColumn>
+        <createTable tableName="team">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manage_workspace" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manage_module" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manage_provider" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_team_organization" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="id, name"
+                constraintName="const_team"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="team"
+                validate="true"/>
+        <modifyDataType
+                columnName="variable_value"
+                newDataType="varchar(2048)"
+                tableName="variable"/>
+    </changeSet>
+</databaseChangeLog>

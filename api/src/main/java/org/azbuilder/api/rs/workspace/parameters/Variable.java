@@ -1,6 +1,7 @@
 package org.azbuilder.api.rs.workspace.parameters;
 
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.ReadPermission;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.workspace.Workspace;
@@ -23,9 +24,28 @@ public class Variable {
     @Column(name="variable_key")
     private String key;
 
+    @ReadPermission(expression = "service read secret")
     @Column(name="variable_value")
     private String value;
 
+    @Column(name="variable_description")
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="variable_category")
+    private Category category;
+
+    @Column(name="sensitive")
+    private boolean sensitive;
+
+    @Column(name="hcl")
+    private boolean hcl;
+
     @ManyToOne
     private Workspace workspace;
+}
+
+enum Category{
+    TERRAFORM,
+    ENV
 }

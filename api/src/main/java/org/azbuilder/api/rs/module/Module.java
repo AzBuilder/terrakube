@@ -1,7 +1,6 @@
 package org.azbuilder.api.rs.module;
 
-import com.yahoo.elide.annotation.ComputedAttribute;
-import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.*;
 import com.yahoo.elide.core.RequestScope;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@ReadPermission(expression = "team view module OR user is a service")
+@CreatePermission(expression = "team manage module")
+@UpdatePermission(expression = "team manage module")
+@DeletePermission(expression = "team manage module")
 @Slf4j
 @Include(rootLevel = false)
 @Getter

@@ -1,19 +1,22 @@
 package org.azbuilder.api.rs.workspace;
 
-import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.Organization;
-import org.azbuilder.api.rs.workspace.parameters.Secret;
 import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
-import org.azbuilder.api.rs.workspace.parameters.Environment;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+
+@ReadPermission(expression = "team view workspace OR user is a service")
+@CreatePermission(expression = "team manage workspace")
+@UpdatePermission(expression = "team manage workspace")
+@DeletePermission(expression = "team manage workspace")
 @Include
 @Getter
 @Setter
@@ -42,12 +45,6 @@ public class Workspace {
 
     @OneToMany(mappedBy = "workspace")
     private List<Variable> variable;
-
-    @OneToMany(mappedBy = "workspace")
-    private List<Secret> secret;
-
-    @OneToMany(mappedBy = "workspace")
-    private List<Environment> environment;
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;

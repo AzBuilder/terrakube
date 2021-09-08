@@ -19,7 +19,7 @@ public class OrganizationTests extends ServerApplicationTests {
 
     @Test
     @Sql(statements = {
-            "DELETE job; DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');"
     })
@@ -41,6 +41,7 @@ public class OrganizationTests extends ServerApplicationTests {
                                                 relation("job"),
                                                 relation("module"),
                                                 relation("provider"),
+                                                relation("team"),
                                                 relation("workspace")
                                         )
                                 )

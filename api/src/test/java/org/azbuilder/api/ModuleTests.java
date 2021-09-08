@@ -14,9 +14,11 @@ public class ModuleTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE job; DELETE secret; DELETE variable; DELETE environment; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM organization;",
+            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
+            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
+                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO module (id, name, description, provider, source, source_sample, organization_id) VALUES\n" +
                     "\t\t('b5e41ba0-e7a5-4643-9200-1c45c5b82648','Module','Description', 'Provider', 'https://github.com/AzBuilder/terraform-sample-repository.git', 'https://github.com/AzBuilder/terraform-sample-repository.git', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
     })
