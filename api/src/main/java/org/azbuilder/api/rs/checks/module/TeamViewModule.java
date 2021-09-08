@@ -31,7 +31,7 @@ public class TeamViewModule extends OperationCheck<Module> {
         log.info("team view module {}", module.getId());
         List<Team> teamList = module.getOrganization().getTeam();
         for (Team team : teamList) {
-            if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageWorkspace())
+            if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()))
                 return true;
         }
         return false;
