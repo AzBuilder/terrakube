@@ -52,3 +52,15 @@ jobs:
       
     - name: Docker Push JOB latest
       run: docker push azbuilder/api-job:latest
+
+    - name: Docker tag Registry Image
+      run: docker tag $(docker images open-registry -q) azbuilder/open-registry:$VERSION
+
+    - name: Docker tag Registry Image latest
+      run: docker tag $(docker images open-registry -q) azbuilder/open-registry:latest
+
+    - name: Docker Push Registry
+      run: docker push azbuilder/open-registry:$VERSION
+
+    - name: Docker Push Registry latest
+      run: docker push azbuilder/open-registry:latest
