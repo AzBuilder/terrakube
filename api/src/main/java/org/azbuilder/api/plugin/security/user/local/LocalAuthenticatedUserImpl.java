@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnProperty(prefix = "org.azbuilder.api.users", name = "type", havingValue = "Local")
+@ConditionalOnProperty(prefix = "org.azbuilder.api.users", name = "type", havingValue = "LOCAL")
 public class LocalAuthenticatedUserImpl implements AuthenticatedUser {
 
     private static final String LOCAL_USER="local@user.com";

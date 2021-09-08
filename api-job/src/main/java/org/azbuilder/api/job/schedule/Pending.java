@@ -52,18 +52,15 @@ public class Pending {
 
                 HashMap<String, String> variables = new HashMap<>();
                 HashMap<String, String> environmentVariables = new HashMap<>();
-                HashMap<String, String> secrets = new HashMap<>();
                 List<Variable> variableList = workspaceData.getIncluded();
                 if (variableList != null)
                     for (Variable variable : variableList) {
-                        switch (variable.getAttributes().getCategory()) {
-                            case "terraform":
-                                log.info("Adding terraform");
-                                variables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
-                            case "env":
-                                log.info("Adding environment variable");
-                                environmentVariables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
-                                break;
+                        if(variable.getAttributes().getCategory().equals("terraform")){
+                            log.info("Adding terraform");
+                            variables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
+                        }else{
+                            log.info("Adding environment variable");
+                            environmentVariables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
                         }
                         log.info("Variable Key: {} Value {}", variable.getAttributes().getKey(), variable.getAttributes().isSensitive() ? "sensitive" : variable.getAttributes().getValue());
                     }

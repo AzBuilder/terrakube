@@ -10,16 +10,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
-@PropertySources({
-        @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
-})
+@PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
 @ConfigurationProperties(prefix = "org.azbuilder.api.groups")
 public class GroupServiceProperties {
     private GroupType type;
 }
 
 enum GroupType {
-    AzureAd,
-    Local
+    AZURE,
+    LOCAL
 }

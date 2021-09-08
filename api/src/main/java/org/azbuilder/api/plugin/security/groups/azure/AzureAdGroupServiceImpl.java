@@ -18,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(prefix = "org.azbuilder.api.groups", name = "type", havingValue = "AzureAd")
+@ConditionalOnProperty(prefix = "org.azbuilder.api.groups", name = "type", havingValue = "AZURE")
 public class AzureAdGroupServiceImpl implements GroupService {
 
     @Autowired
@@ -48,7 +48,7 @@ public class AzureAdGroupServiceImpl implements GroupService {
 
     private String getUserId(String userName) {
         log.info("Search User Id {}", userName);
-        List<Option> requestOptions = new ArrayList<Option>();
+        List<Option> requestOptions = new ArrayList<>();
         requestOptions.add(new QueryOption("$filter", "userPrincipalName eq '" + userName + "'"));
 
         UserCollectionPage userCollectionPage = graphServiceClient.users().buildRequest(requestOptions).get();
@@ -60,10 +60,7 @@ public class AzureAdGroupServiceImpl implements GroupService {
     }
 
     private boolean isUserMemberGroup(String userId, String groupId) {
-
-        List<Option> requestOptions = new ArrayList<Option>();
-
-        LinkedList<String> groupIdsList = new LinkedList<String>();
+        LinkedList<String> groupIdsList = new LinkedList<>();
         groupIdsList.add(groupId);
 
         DirectoryObjectCheckMemberGroupsCollectionPage directoryObjectCheckMemberGroupsCollectionPage = graphServiceClient.users(userId)
@@ -74,7 +71,7 @@ public class AzureAdGroupServiceImpl implements GroupService {
                 .buildRequest()
                 .post();
 
-        return directoryObjectCheckMemberGroupsCollectionPage.getCurrentPage().size() == 1 ? true : false;
+        return directoryObjectCheckMemberGroupsCollectionPage.getCurrentPage().size() == 1;
 
     }
 }

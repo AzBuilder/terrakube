@@ -43,7 +43,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp2\",\r\n      \"description\": \"Sample Organization\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp\",\r\n      \"description\": \"Sample Organization\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -299,7 +299,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_USER\",\n      \"manageWorkspace\": true,\n      \"manageModule\": false,\n      \"manageProvider\": false\n    }\n  }\n}",
+							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_USER\",\n      \"manageWorkspace\": true,\n      \"manageModule\": true,\n      \"manageProvider\": true\n    }\n  }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -347,7 +347,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_TEST\",\n      \"manageWorkspace\": true,\n      \"manageModule\": false,\n      \"manageProvider\": false\n    }\n  }\n}",
+							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_TEST\",\n      \"manageWorkspace\": true,\n      \"manageModule\": true,\n      \"manageProvider\": true\n    }\n  }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1158,7 +1158,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"tag_name\",\r\n      \"value\": \"HolaMundo\",\r\n      \"sensitive\": false,\r\n      \"hcl\": false,\r\n      \"category\": \"terraform\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"tag_name\",\r\n      \"value\": \"HolaMundo\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"TERRAFORM\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1309,7 +1309,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_ID\",\r\n      \"value\": \"{{ARM_CLIENT_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"env\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_ID\",\r\n      \"value\": \"{{ARM_CLIENT_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1400,7 +1400,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_SECRET\",\r\n      \"value\": \"{{ARM_CLIENT_SECRET}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"env\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_SECRET\",\r\n      \"value\": \"{{ARM_CLIENT_SECRET}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1491,7 +1491,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_SUBSCRIPTION_ID\",\r\n      \"value\": \"{{ARM_SUBSCRIPTION_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"env\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_SUBSCRIPTION_ID\",\r\n      \"value\": \"{{ARM_SUBSCRIPTION_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1591,7 +1591,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_TENANT_ID\",\r\n      \"value\": \"{{ARM_TENANT_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"env\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_TENANT_ID\",\r\n      \"value\": \"{{ARM_TENANT_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2150,17 +2150,12 @@
 							}
 						},
 						"url": {
-							"raw": "https://poc.aks.vse.aespana.me/azbuilder/doc",
-							"protocol": "https",
+							"raw": "localhost:8080/doc",
 							"host": [
-								"poc",
-								"aks",
-								"vse",
-								"aespana",
-								"me"
+								"localhost"
 							],
+							"port": "8080",
 							"path": [
-								"azbuilder",
 								"doc"
 							]
 						}

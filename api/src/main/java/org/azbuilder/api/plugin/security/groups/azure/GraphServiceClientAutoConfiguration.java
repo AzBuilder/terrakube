@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Configuration
-@ConditionalOnProperty(prefix = "org.azbuilder.api.groups", name = "type", havingValue = "AzureAd")
+@ConditionalOnProperty(prefix = "org.azbuilder.api.groups", name = "type", havingValue = "AZURE")
 public class GraphServiceClientAutoConfiguration {
 
     @Bean

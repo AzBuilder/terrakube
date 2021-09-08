@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@ConditionalOnProperty(prefix = "org.azbuilder.api.authentication", name = "type", havingValue = "AzureAd")
+@ConditionalOnProperty(prefix = "org.azbuilder.api.authentication", name = "type", havingValue = "AZURE")
 public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebSecurityConfigurerAdapter {
     /**
      * Add configuration logic as needed.
@@ -16,6 +16,6 @@ public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebS
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.authorizeRequests((requests) -> requests.anyRequest().authenticated());
+        http.authorizeRequests(requests -> requests.anyRequest().authenticated());
     }
 }

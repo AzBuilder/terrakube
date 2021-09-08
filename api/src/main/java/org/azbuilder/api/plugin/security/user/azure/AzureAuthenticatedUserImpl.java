@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(prefix = "org.azbuilder.api.users", name = "type", havingValue = "AzureAd")
+@ConditionalOnProperty(prefix = "org.azbuilder.api.users", name = "type", havingValue = "AZURE")
 public class AzureAuthenticatedUserImpl implements AuthenticatedUser {
 
     private AADOAuth2AuthenticatedPrincipal getAzureAdPrincipal(User user){

@@ -63,7 +63,7 @@ public class WorkspaceTests extends ServerApplicationTests{
             "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
                     "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO variable (id, variable_key, variable_value, variable_category, sensitive, workspace_id, variable_description, hcl) VALUES\n" +
-                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889','variableKey','variableValue', 'terraform', false, 'c05da917-81a3-4da3-9619-20b240cbd7f7', 'someDescription', true);"
+                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889','variableKey','variableValue', 'TERRAFORM', false, 'c05da917-81a3-4da3-9619-20b240cbd7f7', 'someDescription', true);"
     })
     void variableApiGetTest() {
         when()
@@ -76,7 +76,7 @@ public class WorkspaceTests extends ServerApplicationTests{
                                         type( "variable"),
                                         id("4ea7855d-ab07-4080-934c-3aab429da889"),
                                         attributes(
-                                                attr("category", "terraform"),
+                                                attr("category", "TERRAFORM"),
                                                 attr("description", "someDescription"),
                                                 attr("hcl", true),
                                                 attr("key", "variableKey"),

@@ -46,6 +46,6 @@ public class Variable {
 }
 
 enum Category{
-    terraform,
-    env
+    TERRAFORM,
+    ENV
 }
