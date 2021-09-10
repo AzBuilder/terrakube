@@ -1,14 +1,13 @@
-.orgsActions {
+.variableActions {
   display: flex;
   justify-content: space-between;
 }
 
-.workspaceActions {
+.jobActions {
   display: flex;
   justify-content: space-between;
 }
 
-.moduleActions {
-  display: flex;
-  justify-content: space-between;
+.tableWrapper {
+  margin-top: 3em;;
 }
