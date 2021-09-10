@@ -1,4 +1,4 @@
-package org.azbuilder.api.plugin.datasource.configuration;
+package org.azbuilder.api.plugin.datasource;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,4 +17,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "org.azbuilder.api.plugin.datasource")
 public class DataSourceConfigurationProperties {
     private DataSourceType type;
+    private String hostname;
+    private String databaseName;
+    private String databaseUser;
+    private String databasePassword;
 }
