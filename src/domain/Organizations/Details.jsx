@@ -1,6 +1,8 @@
 import { Table } from "antd";
 import { React, useState, useEffect } from "react";
+import { Button } from "antd";
 import axiosInstance from "../../config/axiosConfig";
+import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 
 const include = {
   WORKSPACE: "workspace",
@@ -12,7 +14,7 @@ const WORKSPACE_COLUMNS = [
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
-    render: (text, record) => (
+    render: (_, record) => (
       <a href={"/workspaces/"+record.id}>{record.name}</a>
     )
   },
@@ -53,11 +55,14 @@ export const OrganizationDetails = (props) => {
 
   useEffect(() => {
     setLoading(true);
+    localStorage.setItem(ORGANIZATION_ARCHIVE, resourceId);
     axiosInstance.get(`organization/${resourceId}?include=workspace,module`)
       .then(response => {
         console.log(response);
         setOrganization(response.data);
-        setupOrganizationIncludes(response.data.included, setModules, setWorkspaces);
+        if(response.data.included) {
+          setupOrganizationIncludes(response.data.included, setModules, setWorkspaces);
+        }
         setLoading(false);
       })
   }, [resourceId]);
@@ -70,11 +75,11 @@ export const OrganizationDetails = (props) => {
         <div className="orgWrapper">
           <h2>Organization name: {organization.data.attributes.name}</h2>
           <div>
-            <h3>Workspaces</h3>
+            <div className='workspaceActions'><h3>Workspaces</h3><Button type="primary" htmlType="button" shape="round" href={`/workspaces/create`}>Create Workspace</Button></div>
             <Table dataSource={workspaces} columns={WORKSPACE_COLUMNS} rowKey='name' />
           </div>
           <div>
-            <h3>Modules</h3>
+          <div className='moduleActions'><h3>Modules</h3><Button type="primary" htmlType="button" shape="round" href={`/modules/create`}>Add Module</Button></div>
             <Table dataSource={modules} columns={MODULE_COLUMNS} rowKey='name' />
           </div>
         </div>
