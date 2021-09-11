@@ -1,9 +1,11 @@
 import { Table } from "antd";
 import { React, useState, useEffect } from "react";
-import { Button } from "antd";
+import { Button, Layout, Breadcrumb } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 
+import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
+const { Content } = Layout;
+const { DateTime } = require("luxon");
 const include = {
   WORKSPACE: "workspace",
   MODULE: "module"
@@ -11,17 +13,29 @@ const include = {
 
 const WORKSPACE_COLUMNS = [
   {
-    title: 'Name',
+    title: 'Workspace Name',
     dataIndex: 'name',
     key: 'name',
     render: (_, record) => (
-      <a href={"/workspaces/"+record.id}>{record.name}</a>
+      <a href={"/workspaces/" + record.id}>{record.name}</a>
     )
   },
+  ,
   {
-    title: 'Terraform Version',
-    dataIndex: 'terraformVersion',
-    key: 'terraformVersion',
+    title: 'Run Status',
+    dataIndex: 'runStatus',
+    key: 'runStatus',
+  },
+  ,
+  {
+    title: 'Repo',
+    dataIndex: 'source',
+    key: 'source',
+  },
+  {
+    title: 'Latest Change',
+    dataIndex: 'latestChange',
+    key: 'latestChange',
   }
 ]
 
@@ -31,7 +45,7 @@ const MODULE_COLUMNS = [
     dataIndex: 'name',
     key: 'name',
     render: (text, record) => (
-      <a href={"/modules/"+record.id}>{record.name}</a>
+      <a href={"/modules/" + record.id}>{record.name}</a>
     )
   },
   {
@@ -60,7 +74,7 @@ export const OrganizationDetails = (props) => {
       .then(response => {
         console.log(response);
         setOrganization(response.data);
-        if(response.data.included) {
+        if (response.data.included) {
           setupOrganizationIncludes(response.data.included, setModules, setWorkspaces);
         }
         setLoading(false);
@@ -68,23 +82,25 @@ export const OrganizationDetails = (props) => {
   }, [resourceId]);
 
   return (
-    <div className="orgDisplay">
-      {loading || !organization.data || !workspaces ? (
-        <p>Data loading...</p>
-      ) : (
-        <div className="orgWrapper">
-          <h2>Organization name: {organization.data.attributes.name}</h2>
-          <div>
-            <div className='workspaceActions'><h3>Workspaces</h3><Button type="primary" htmlType="button" shape="round" href={`/workspaces/create`}>Create Workspace</Button></div>
+    <Content style={{ padding: '0 50px' }}>
+      <Breadcrumb style={{ margin: '16px 0' }}>
+        <Breadcrumb.Item>devops-organization</Breadcrumb.Item>
+        <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
+      </Breadcrumb>
+      <div className="site-layout-content">
+        {loading || !organization.data || !workspaces ? (
+          <p>Data loading...</p>
+        ) : (
+          <div className="orgWrapper">
+            <div className='workspaceActions'><h2>Workspaces</h2><Button type="primary" htmlType="button"  href={`/workspaces/create`}>New workspace</Button></div>
             <Table dataSource={workspaces} columns={WORKSPACE_COLUMNS} rowKey='name' />
+
+
           </div>
-          <div>
-          <div className='moduleActions'><h3>Modules</h3><Button type="primary" htmlType="button" shape="round" href={`/modules/create`}>Add Module</Button></div>
-            <Table dataSource={modules} columns={MODULE_COLUMNS} rowKey='name' />
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </Content>
+
   );
 }
 
@@ -98,6 +114,7 @@ function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
         workspaces.push(
           {
             id: element.id,
+            latestChange: DateTime.local().minus({ minutes: Math.floor(Math.random() * 5) }).toRelative() ,
             ...element.attributes
           }
         );

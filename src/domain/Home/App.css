@@ -39,3 +39,13 @@
     transform: rotate(360deg);
   }
 }
+
+.App-text{
+  color:rgb(82, 87, 97);
+  margin-bottom: 35px;
+}
+
+h1  {
+  border-bottom: 1px solid rgb(220, 224, 230);
+  font-weight: 700;
+}

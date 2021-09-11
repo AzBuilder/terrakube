@@ -13,13 +13,6 @@ const msalInstance = new PublicClientApplication(msalConfig);
 ReactDOM.render(
   <React.StrictMode>
     <MsalProvider instance={msalInstance}>
-      <div className="site-page-header"> 
-        <PageHeader
-          ghost={false}
-          title='Cloud Builder'
-          subTitle='Execute Terraform operations as if you were on Terraform Enterprise.'
-        />
-      </div>
       <App />
     </MsalProvider>
   </React.StrictMode>,

@@ -1,43 +1,46 @@
 import { React, useEffect, useState } from "react";
+import { useHistory } from 'react-router-dom';
 import axiosInstance from "../../config/axiosConfig";
-import { Button, Table } from "antd";
+import { Menu } from "antd";
 import "./Organizations.css";
+import { DownCircleOutlined,PlusCircleOutlined, SelectOutlined} from '@ant-design/icons';
+const { SubMenu } = Menu;
 
-const ORGANIZATIONS_COLUMNS = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: (text, record) => (
-      <a href={"/organizations/"+record.id}>{record.name}</a>
-    )
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-    key: 'description'
-  }
-]
+
 
 export const Organizations = () => {
   const [orgs, setOrgs] = useState([]);
 
+  const history = useHistory();
+
   useEffect(() => {
     axiosInstance.get("organization")
       .then(response => {
-        console.log(response);
-        console.log(response.data);
         setOrgs(prepareOrgs(response.data));
       })
   }, []);
 
-  return(
-    <div>
-      <div className='orgsActions'><h2>Organizations</h2><Button type="primary" htmlType="button" shape="round" href="/organizations/create">Create Organization</Button></div>
-      <Table dataSource={orgs} columns={ORGANIZATIONS_COLUMNS} rowKey='name' />
-    </div>
+  const handleClick = e => {
+    if (e.key =="new")
+      history.push("/organizations/create")
+    else
+      history.push("/organizations/"+e.key)
+  };
+
+  return (
+    <SubMenu key="devops-organization" icon={<DownCircleOutlined />} title="devops-organization">
+      <Menu.Item icon={<PlusCircleOutlined />} onClick={handleClick}  key="new" >Create new organization</Menu.Item>
+      <Menu.Divider></Menu.Divider>
+      <Menu.ItemGroup  title="Organizations">
+      {orgs.sort((a, b) => a.name.localeCompare(b.name))
+        .map((org, index) => (
+          <Menu.Item onClick={handleClick}  key={org.id} >{org.name}</Menu.Item>
+        ))}
+     </Menu.ItemGroup>
+    </SubMenu>
   );
 };
+
 
 function prepareOrgs(organizations) {
   let orgs = []
@@ -51,3 +54,4 @@ function prepareOrgs(organizations) {
 
   return orgs;
 }
+

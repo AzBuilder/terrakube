@@ -12,3 +12,9 @@
   display: flex;
   justify-content: space-between;
 }
+
+.createOrganization{
+  width: 50%;
+  margin: auto;
+  margin-top: 20px;
+}
