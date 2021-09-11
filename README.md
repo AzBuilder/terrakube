@@ -20,7 +20,7 @@ Run the script:
 Build/Start the application:
 
 ```bash
-yarn isntall
+yarn install
 yarn start
 ```
 
