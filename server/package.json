@@ -1,0 +1,16 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "AzBuilder",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.17.1",
+    "path": "^0.12.7"
+  }
+}
