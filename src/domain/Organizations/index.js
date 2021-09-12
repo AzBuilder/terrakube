@@ -28,7 +28,7 @@ export const Organizations = () => {
   };
 
   return (
-    <SubMenu key="devops-organization" icon={<DownCircleOutlined />} title="devops-organization">
+    <SubMenu key="organization-name" icon={<DownCircleOutlined />} title="organization-name">
       <Menu.Item icon={<PlusCircleOutlined />} onClick={handleClick}  key="new" >Create new organization</Menu.Item>
       <Menu.Divider></Menu.Divider>
       <Menu.ItemGroup  title="Organizations">

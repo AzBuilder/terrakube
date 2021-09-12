@@ -84,7 +84,7 @@ export const OrganizationDetails = (props) => {
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>devops-organization</Breadcrumb.Item>
+        <Breadcrumb.Item>organization-name</Breadcrumb.Item>
         <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
@@ -94,8 +94,6 @@ export const OrganizationDetails = (props) => {
           <div className="orgWrapper">
             <div className='workspaceActions'><h2>Workspaces</h2><Button type="primary" htmlType="button"  href={`/workspaces/create`}>New workspace</Button></div>
             <Table dataSource={workspaces} columns={WORKSPACE_COLUMNS} rowKey='name' />
-
-
           </div>
         )}
       </div>

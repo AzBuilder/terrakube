@@ -1,7 +1,4 @@
-.variableActions {
-  display: flex;
-  justify-content: space-between;
-}
+
 
 .jobActions {
   display: flex;
@@ -10,4 +7,18 @@
 
 .tableWrapper {
   margin-top: 3em;;
+}
+
+.envVariables{
+  margin-top: 50px;
+}
+
+.textLeft{
+  text-align: left;
+}
+
+.generalSettings{
+  width: 60%;
+  margin: auto;
+  margin-top: 20px;
 }

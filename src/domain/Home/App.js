@@ -51,7 +51,7 @@ const App = () => {
             </Menu>
           </div>
           <div className="user" >
-            <Avatar shape="square" size="default" src="https://scontent.fsal5-1.fna.fbcdn.net/v/t1.6435-9/64248240_435198120394124_7423615203201253376_n.png?_nc_cat=109&ccb=1-5&_nc_sid=174925&_nc_ohc=Z__Q0f4a_WIAX8KxCZE&_nc_ht=scontent.fsal5-1.fna&oh=3f979cc60a562b48418a00e22849ec50&oe=6162C513" />
+            <Avatar shape="square" size="default" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" />
           </div>
         </Header>
         
