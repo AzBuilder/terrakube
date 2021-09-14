@@ -81,7 +81,7 @@ export const WorkspaceDetails = (props) => {
             <p>Data loading...</p>
           ) : (
             <div className="orgWrapper">
-              <h2>{workspace.data.attributes.name}</h2>
+             <div className='variableActions'> <h2>{workspace.data.attributes.name}</h2><Button type="primary" htmlType="button"  href={`/workspaces/${workspace.data.attributes.name}/jobs/create`}>Start new job</Button></div>
               <div className="App-text">
                 No workspace description available. Add workspace description.
               </div>

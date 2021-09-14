@@ -22,3 +22,39 @@
   margin: auto;
   margin-top: 20px;
 }
+
+.variableActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.createWorkspace{
+  width: 60%;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.chooseType{
+  width: 100%;
+  margin-top:30px;
+}
+
+.workflowType{
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.workflowDescription{
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.workflowDescription2{
+  margin-bottom: 20px;
+}
+
+.workflowSelect{
+  text-align: right;
+  margin-right: 40px;
+}
+
