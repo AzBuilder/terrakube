@@ -1,6 +1,6 @@
 import { React, useState } from 'react';
-import { Form, Input, Button, Breadcrumb, Layout, Steps, Card, Space } from "antd";
-import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
+import { Form, Input, Button, Breadcrumb, Layout, Steps, Card, Space ,Select} from "antd";
+import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
 import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
 import { IconContext } from "react-icons";
@@ -11,7 +11,7 @@ const { Step } = Steps;
 const validateMessages = {
   required: '${label} is required!'
 }
-
+const { Option } = Select;
 
 
 
@@ -22,8 +22,17 @@ export const CreateWorkspace = () => {
 
   const handleGitClick = e => {
     setCurrent(2);
+    setStep2Hidden(false);
+  };
+
+  const handleGitContinueClick = e => {
+    setCurrent(3);
+    setStep3Hidden(false);
+    setStep2Hidden(true);
   };
   const [current, setCurrent] = useState(0);
+  const [step3Hidden, setStep3Hidden] = useState(true);
+  const [step2Hidden, setStep2Hidden] = useState(true);
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
 
   const onFinish = (values) => {
@@ -47,6 +56,15 @@ export const CreateWorkspace = () => {
 
   const handleChange = current => {
     setCurrent(current);
+    if (current == 2){
+      setStep2Hidden(false);
+      setStep3Hidden(true);
+    }
+
+    if (current == 3){
+      setStep3Hidden(false);
+      setStep2Hidden(true);
+    }
 
   };
 
@@ -56,6 +74,7 @@ export const CreateWorkspace = () => {
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>organization-name</Breadcrumb.Item>
         <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
+        <Breadcrumb.Item>New Workspace</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
         <div className="createWorkspace">
@@ -123,37 +142,59 @@ export const CreateWorkspace = () => {
 
           )}
 
-          {current == 2 && (
-            <Space className="chooseType" direction="vertical">
+         <Form name="create-workspace" layout="vertical" onFinish={onFinish} validateMessages={validateMessages}> 
+     
+            <Space hidden={step2Hidden} className="chooseType" direction="vertical">
               <h3>Choose a repository</h3>
               <div className="workflowDescription2 App-text">
                 Choose the repository that hosts your Terraform source code.
               </div>
+              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/AzBuilder/terraform-sample-repository.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+              <Form.Item>
+                <Button onClick={handleGitContinueClick} type="primary">
+                  Continue
+                </Button>
+              </Form.Item>
+              
             </Space>
-          )}
+        
 
 
-          {current == 3 && (
-            <Form name="create-workspace" onFinish={onFinish} validateMessages={validateMessages}>
-              <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+          
+           <Space hidden={step3Hidden} className="chooseType" direction="vertical">
+              <h3>Configure settings</h3>
+              <Form.Item name="name" label="Workspace Name" rules={[{ required: true }]} extra="The name of your workspace is unique and used in tools, routing, and UI. Dashes, underscores, and alphanumeric characters are permitted.">
                 <Input />
               </Form.Item>
-              <Form.Item name="source" label="Source" rules={[{ required: true }]}>
+             
+              <Form.Item name="branch" label="VCS branch" placeholder="(default branch)" extra=" The branch from which to import new versions. This defaults to the value your version control provides as the default branch for this repository." rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
-              <Form.Item name="branch" label="Branch" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item name="terraformVersion" label="Terraform Version" rules={[{ required: true }]}>
-                <Input />
+              <Form.Item name="terraformVersion" label="Terraform Version" rules={[{ required: true }]} extra="The version of Terraform to use for this workspace. It will not upgrade automatically.">
+              <Select placeholder="select version"  style={{ width: 250 }} >
+                          <Option value="0.13.0">0.13.0</Option>
+                          <Option value="0.14.0">0.14.0</Option>
+                          <Option value="0.14.1">0.14.1</Option>
+                          <Option value="0.14.2">0.14.2</Option>
+                          <Option value="0.14.3">0.14.3</Option>
+                          <Option value="0.15.0">0.15.0</Option>
+                          <Option value="0.15.1">0.15.1</Option>
+                          <Option value="0.15.2">0.15.2</Option>
+                          <Option value="0.15.3">0.15.3</Option>
+                          <Option value="1.0.0">1.0.0</Option>
+                        </Select>
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
                   Submit
                 </Button>
               </Form.Item>
-            </Form>
-          )}
+              </Space>
+            
+        
+          </Form>
         </div>
       </div>
     </Content>

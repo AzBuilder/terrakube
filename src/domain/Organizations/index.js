@@ -4,19 +4,20 @@ import axiosInstance from "../../config/axiosConfig";
 import { Menu } from "antd";
 import "./Organizations.css";
 import { DownCircleOutlined,PlusCircleOutlined, SelectOutlined} from '@ant-design/icons';
+import {ORGANIZATION_NAME } from '../../config/actionTypes';
 const { SubMenu } = Menu;
 
 
 
-export const Organizations = () => {
+export const Organizations = ({organizationName,setOrganizationName}) => {
   const [orgs, setOrgs] = useState([]);
-
   const history = useHistory();
 
   useEffect(() => {
     axiosInstance.get("organization")
       .then(response => {
         setOrgs(prepareOrgs(response.data));
+        setOrganizationName(localStorage.getItem(ORGANIZATION_NAME)||"select organization");
       })
   }, []);
 
@@ -25,10 +26,11 @@ export const Organizations = () => {
       history.push("/organizations/create")
     else
       history.push("/organizations/"+e.key)
+
   };
 
   return (
-    <SubMenu key="organization-name" icon={<DownCircleOutlined />} title="organization-name">
+    <SubMenu key="organization-name" icon={<DownCircleOutlined />} title={organizationName}>
       <Menu.Item icon={<PlusCircleOutlined />} onClick={handleClick}  key="new" >Create new organization</Menu.Item>
       <Menu.Divider></Menu.Divider>
       <Menu.ItemGroup  title="Organizations">

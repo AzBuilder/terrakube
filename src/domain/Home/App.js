@@ -1,9 +1,10 @@
-import { React } from 'react';
+import { React,useState } from 'react';
 import './App.css';
 import Login from '../Login/Login'
 import { Layout, Menu, Avatar } from 'antd';
 import { AppstoreOutlined, SettingOutlined, CloudOutlined } from '@ant-design/icons';
 import { useIsAuthenticated } from "@azure/msal-react";
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -14,7 +15,6 @@ import { OrganizationDetails } from '../Organizations/Details';
 import { CreateOrganization } from '../Organizations/Create';
 import { Home } from './Home';
 import { WorkspaceDetails } from '../Workspaces/Details';
-import { CreateJob } from '../Jobs/Create';
 import { CreateVariable } from '../Variables/Create';
 import { CreateWorkspace } from '../Workspaces/Create';
 import { CreateModule } from '../Modules/Create';
@@ -22,7 +22,7 @@ const { Header, Footer } = Layout;
 
 const App = () => {
   const isAuthenticated = useIsAuthenticated();
-
+  const [organizationName, setOrganizationName] = useState([]);
   if (!isAuthenticated) {
     return (
       <div className='App'>
@@ -38,7 +38,7 @@ const App = () => {
           <div className="logo" />
           <div className="menu">
             <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['workspaces']}>
-              <Organizations></Organizations>
+              <Organizations organizationName={organizationName} setOrganizationName={setOrganizationName}></Organizations>
               <Menu.Item key="workspaces" icon={<AppstoreOutlined />}>
                 Workspaces
               </Menu.Item>
@@ -58,13 +58,12 @@ const App = () => {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/organizations/create" component={CreateOrganization} />
-          <Route exact path="/organizations/:id" component={OrganizationDetails} />
-
+          <Route exact path="/organizations/:id">
+             <OrganizationDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
+          </Route>
           <Route exact path="/workspaces/create" component={CreateWorkspace} />
-          <Route exact path="/workspaces/:name/jobs/:create" component={CreateJob} />
           <Route exact path="/workspaces/:name/variable/:create" component={CreateVariable} />
           <Route exact path="/workspaces/:id" component={WorkspaceDetails} />
-
           <Route exact path="/modules/create" component={CreateModule} />
         </Switch>
         <Footer style={{ textAlign: 'center' }}>AZBuilder ©2021</Footer>

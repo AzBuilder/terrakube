@@ -2,8 +2,9 @@ import { Table } from "antd";
 import { React, useState, useEffect } from "react";
 import { Button, Layout, Breadcrumb } from "antd";
 import axiosInstance from "../../config/axiosConfig";
+import {useParams} from "react-router-dom";
 
-import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
+import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 const { Content } = Layout;
 const { DateTime } = require("luxon");
 const include = {
@@ -60,8 +61,8 @@ const MODULE_COLUMNS = [
   }
 ]
 
-export const OrganizationDetails = (props) => {
-  const resourceId = props.match.params.id;
+export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
+  const { id } = useParams();
   const [organization, setOrganization] = useState({});
   const [workspaces, setWorkspaces] = useState([]);
   const [modules, setModules] = useState([]);
@@ -69,22 +70,27 @@ export const OrganizationDetails = (props) => {
 
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(ORGANIZATION_ARCHIVE, resourceId);
-    axiosInstance.get(`organization/${resourceId}?include=workspace,module`)
+    localStorage.setItem(ORGANIZATION_ARCHIVE, id);
+    axiosInstance.get(`organization/${id}?include=workspace,module`)
       .then(response => {
         console.log(response);
         setOrganization(response.data);
+       
         if (response.data.included) {
           setupOrganizationIncludes(response.data.included, setModules, setWorkspaces);
         }
+
         setLoading(false);
-      })
-  }, [resourceId]);
+        localStorage.setItem(ORGANIZATION_NAME,response.data.data.attributes.name)
+        setOrganizationName(response.data.data.attributes.name)
+      });
+      
+  }, [id]);
 
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>organization-name</Breadcrumb.Item>
+        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
         <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">

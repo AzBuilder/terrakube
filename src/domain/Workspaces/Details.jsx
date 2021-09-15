@@ -1,8 +1,11 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
-import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
+import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE ,ORGANIZATION_NAME} from '../../config/actionTypes';
 import { Button, Layout, Breadcrumb, Table, Tabs, List, Avatar, Tag, Form, Input, Select } from "antd";
 import { DeleteFilled } from '@ant-design/icons';
+import { CreateJob } from '../Jobs/Create';
+import { DetailsJob } from '../Jobs/Details';
+import {CreateVariable} from  '../Variables/Create';
 import {
   CheckCircleOutlined, ClockCircleOutlined
 } from '@ant-design/icons';
@@ -53,7 +56,11 @@ export const WorkspaceDetails = (props) => {
   const [envVariables, setEnvVariables] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [jobVisible, setjobVisible] = useState(false);
+  const [organizationName, setOrganizationName] = useState([]);
+  const handleClick = e => {
+    setjobVisible(true);
+  };
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(WORKSPACE_ARCHIVE, resourceId);
@@ -65,13 +72,14 @@ export const WorkspaceDetails = (props) => {
           setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables);
         }
         setLoading(false);
-      })
+        setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+      });
   }, [resourceId]);
 
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>organization-name</Breadcrumb.Item>
+        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
         <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
         <Breadcrumb.Item>workpace_name</Breadcrumb.Item>
       </Breadcrumb>
@@ -81,12 +89,17 @@ export const WorkspaceDetails = (props) => {
             <p>Data loading...</p>
           ) : (
             <div className="orgWrapper">
-             <div className='variableActions'> <h2>{workspace.data.attributes.name}</h2><Button type="primary" htmlType="button"  href={`/workspaces/${workspace.data.attributes.name}/jobs/create`}>Start new job</Button></div>
+             <div className='variableActions'> <h2>{workspace.data.attributes.name}</h2><CreateJob/></div>
               <div className="App-text">
                 No workspace description available. Add workspace description.
               </div>
               <Tabs defaultActiveKey="1" onChange={callback}>
                 <TabPane tab="Runs" key="2">
+                  
+                 {jobVisible ? (
+                       <DetailsJob/>
+                 ):(
+                  <div>
                   <h3>Run List</h3>
                   <List
                     itemLayout="horizontal"
@@ -99,13 +112,15 @@ export const WorkspaceDetails = (props) => {
                       }>
                         <List.Item.Meta
                           avatar={<Avatar shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" />}
-                          title={item.title}
-                          description={<span>#job-{item.id}  |  <b>Rick</b> triggered via CLI</span>}
+                          title={<a onClick={handleClick}>{item.title}</a>}
+                          description={<span>#job-{item.id}  |  <b>Rick</b> triggered via UI</span>}
 
                         />
                       </List.Item>
-                    )}
-                  />
+                    )}/>
+                  </div>
+                 )}
+                
 
                 </TabPane>
                 <TabPane tab="States" key="3">
@@ -121,12 +136,12 @@ export const WorkspaceDetails = (props) => {
                   <h2>Terraform Variables</h2>
                   <div className="App-text">These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string value for a variable, click its HCL checkbox.</div>
                   <Table dataSource={variables} columns={VARIABLES_COLUMS(organizationId, resourceId)} rowKey='key' />
-                  <Button type="primary" htmlType="button" href={`/workspaces/${workspace.data.attributes.name}/variable/create`}>Add Variable</Button>
+                  <CreateVariable varType="variable"/>
                   <div className="envVariables">
                     <h2>Environment Variables</h2>
                     <div className="App-text">These variables are set in Terraform's shell environment using export.</div>
                     <Table dataSource={envVariables} columns={VARIABLES_COLUMS(organizationId, resourceId)} rowKey='key' />
-                    <Button type="primary" htmlType="button" href={`/workspaces/${workspace.data.attributes.name}/variable/create`}>Add Variable</Button>
+                    <CreateVariable varType="environment"/>
                   </div>
                 </TabPane>
                 <TabPane tab="Settings" key="5">
