@@ -1,8 +1,8 @@
 import { React,useState } from 'react';
 import './App.css';
 import Login from '../Login/Login'
-import { Layout, Menu, Avatar } from 'antd';
-import { AppstoreOutlined, SettingOutlined, CloudOutlined } from '@ant-design/icons';
+import MainMenu from '../Home/MainMenu'
+import { Layout, Avatar } from 'antd';
 import { useIsAuthenticated } from "@azure/msal-react";
 
 import {
@@ -10,7 +10,6 @@ import {
   Switch,
   Route
 } from 'react-router-dom';
-import { Organizations } from '../Organizations';
 import { OrganizationDetails } from '../Organizations/Details';
 import { CreateOrganization } from '../Organizations/Create';
 import { Home } from './Home';
@@ -18,37 +17,32 @@ import { WorkspaceDetails } from '../Workspaces/Details';
 import { CreateVariable } from '../Variables/Create';
 import { CreateWorkspace } from '../Workspaces/Create';
 import { CreateModule } from '../Modules/Create';
+import { ModuleDetails } from '../Modules/Details';
 const { Header, Footer } = Layout;
 
 const App = () => {
   const isAuthenticated = useIsAuthenticated();
   const [organizationName, setOrganizationName] = useState([]);
+  const [current, setCurrent] = useState('mail');
+  
+  
   if (!isAuthenticated) {
     return (
-      <div className='App'>
-        <Login />
-      </div>
+       <Login />
     )
   }
-
+  const handleClick = e => {
+    console.log('click ', e);
+    setCurrent(e.key);
+  };
   return (
     <Router>
       <Layout className="layout">
         <Header>
           <div className="logo" />
+          
           <div className="menu">
-            <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['workspaces']}>
-              <Organizations organizationName={organizationName} setOrganizationName={setOrganizationName}></Organizations>
-              <Menu.Item key="workspaces" icon={<AppstoreOutlined />}>
-                Workspaces
-              </Menu.Item>
-              <Menu.Item key="registry" icon={<CloudOutlined />}>
-                Registry
-              </Menu.Item>
-              <Menu.Item key="settings" icon={<SettingOutlined />}>
-                Settings
-              </Menu.Item>
-            </Menu>
+            <MainMenu organizationName={organizationName} setOrganizationName={setOrganizationName}/>
           </div>
           <div className="user" >
             <Avatar shape="square" size="default" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" />
@@ -64,7 +58,11 @@ const App = () => {
           <Route exact path="/workspaces/create" component={CreateWorkspace} />
           <Route exact path="/workspaces/:name/variable/:create" component={CreateVariable} />
           <Route exact path="/workspaces/:id" component={WorkspaceDetails} />
-          <Route exact path="/modules/create" component={CreateModule} />
+          
+          <Route exact path="/organizations/:orgid/registry/create" component={CreateModule} />
+          <Route exact path="/organizations/:orgid/registry">
+            <ModuleDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
+          </Route>
         </Switch>
         <Footer style={{ textAlign: 'center' }}>AZBuilder ©2021</Footer>
       </Layout>

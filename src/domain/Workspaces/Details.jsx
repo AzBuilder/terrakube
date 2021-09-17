@@ -55,15 +55,17 @@ export const WorkspaceDetails = (props) => {
   const [variables, setVariables] = useState([]);
   const [envVariables, setEnvVariables] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [jobId, setJobId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [jobVisible, setjobVisible] = useState(false);
   const [organizationName, setOrganizationName] = useState([]);
-  const handleClick = e => {
+  const handleClick = jobId => {
+    console.log(jobId)
+    setJobId(jobId)
     setjobVisible(true);
   };
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(WORKSPACE_ARCHIVE, resourceId);
     axiosInstance.get(`organization/${organizationId}/workspace/${resourceId}?include=environment,job,secret,variable`)
       .then(response => {
         console.log(response);
@@ -97,7 +99,7 @@ export const WorkspaceDetails = (props) => {
                 <TabPane tab="Runs" key="2">
                   
                  {jobVisible ? (
-                       <DetailsJob/>
+                       <DetailsJob jobId={jobId}/>
                  ):(
                   <div>
                   <h3>Run List</h3>
@@ -112,8 +114,8 @@ export const WorkspaceDetails = (props) => {
                       }>
                         <List.Item.Meta
                           avatar={<Avatar shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" />}
-                          title={<a onClick={handleClick}>{item.title}</a>}
-                          description={<span>#job-{item.id}  |  <b>Rick</b> triggered via UI</span>}
+                          title={<a onClick={() => handleClick(item.id)}>{item.title}</a>}
+                          description={<span>#job-{item.id}  |  <b>jcanizalez</b> triggered via UI</span>}
 
                         />
                       </List.Item>
