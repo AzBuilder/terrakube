@@ -6,9 +6,9 @@ import { DeleteFilled } from '@ant-design/icons';
 import { CreateJob } from '../Jobs/Create';
 import { DetailsJob } from '../Jobs/Details';
 import {CreateVariable} from  '../Variables/Create';
-import { useParams,useHistory } from "react-router-dom";
+import { useParams,Link } from "react-router-dom";
 import {
-  CheckCircleOutlined, ClockCircleOutlined
+  CheckCircleOutlined, ClockCircleOutlined,SyncOutlined
 } from '@ant-design/icons';
 import './Workspaces.css';
 const { DateTime } = require("luxon");
@@ -23,9 +23,7 @@ const include = {
 
 
 const { Content } = Layout;
-function callback(key) {
-  console.log(key);
-}
+
 const VARIABLES_COLUMS = (organizationId, resourceId) => [
   {
     title: 'Key',
@@ -61,18 +59,34 @@ export const WorkspaceDetails = (props) => {
   const [loading, setLoading] = useState(false);
   const [jobVisible, setjobVisible] = useState(false);
   const [organizationName, setOrganizationName] = useState([]);
+  const [workspaceName, setWorkspaceName] = useState("...");
+  const [activeKey, setActiveKey] = useState("2");
   const handleClick = jobId => {
-    console.log(jobId)
-    setJobId(jobId)
-    setjobVisible(true);
+    changeJob(jobId);
   };
+
+  const callback = (key)  =>{
+    setActiveKey(key);
+    if (key =="2"){
+      setjobVisible(false);
+    }
+  }
   useEffect(() => {
     setLoading(true);
     loadWorkspace();
     setLoading(false);
-    setInterval(loadWorkspace, 2000);
+    const interval = setInterval(() => {
+      loadWorkspace();
+    }, 1000);
+    return () => clearInterval(interval);
   }, [id]);
-   
+  
+  const changeJob = jobId => {
+    console.log(jobId);
+    setJobId(jobId);
+    setjobVisible(true);
+    setActiveKey("2");
+  }
 
   const loadWorkspace = () => {
 
@@ -84,6 +98,7 @@ export const WorkspaceDetails = (props) => {
           setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables);
         }
         setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+        setWorkspaceName(response.data.data.attributes.name);
       });
   }
 
@@ -91,8 +106,8 @@ export const WorkspaceDetails = (props) => {
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
-        <Breadcrumb.Item>workpace_name</Breadcrumb.Item>
+        <Breadcrumb.Item><Link to={`/organizations/${organizationId}/workspaces`}>Workspaces</Link></Breadcrumb.Item>
+        <Breadcrumb.Item>{workspaceName}</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
         <div className="workspaceDisplay">
@@ -100,11 +115,25 @@ export const WorkspaceDetails = (props) => {
             <p>Data loading...</p>
           ) : (
             <div className="orgWrapper">
-             <div className='variableActions'> <h2>{workspace.data.attributes.name}</h2><CreateJob/></div>
+             <div className='variableActions'> 
+             <h2>{workspace.data.attributes.name}</h2>
+             <table className="moduleDetails">
+                      <tr>
+                        <td>Resources</td>
+                        <td>Terraform version</td>
+                        <td>Updated</td>
+                      </tr>
+                      <tr className="black">
+                        <td>0</td>
+                        <td>{workspace.data.attributes.terraformVersion}</td>
+                        <td>1 minute ago</td>
+                      </tr>
+                    </table>
+             </div>
               <div className="App-text">
                 No workspace description available. Add workspace description.
               </div>
-              <Tabs defaultActiveKey="1" onChange={callback}>
+              <Tabs activeKey={activeKey} defaultActiveKey="1" tabBarExtraContent={<CreateJob changeJob={changeJob}/>} onChange={callback}>
                 <TabPane tab="Runs" key="2">
                   
                  {jobVisible ? (
@@ -114,11 +143,11 @@ export const WorkspaceDetails = (props) => {
                   <h3>Run List</h3>
                   <List
                     itemLayout="horizontal"
-                    dataSource={jobs}
+                    dataSource={jobs.sort((a, b) => a.id.localeCompare(b.id)).reverse()}
                     renderItem={item => (
                       <List.Item extra={
                         <div className="textLeft">
-                          <Tag icon={item.status == "completed" ? <CheckCircleOutlined /> : <ClockCircleOutlined />} color={item.statusColor}>{item.status}</Tag> <br />
+                          <Tag icon={item.status == "completed" ? <CheckCircleOutlined /> :(item.status == "running" ? <SyncOutlined spin />:  <ClockCircleOutlined />)} color={item.statusColor}>{item.status}</Tag> <br />
                         </div>
                       }>
                         <List.Item.Meta
@@ -217,7 +246,7 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
           {
             id: element.id,
             title: "Queue manually using Terraform",
-            statusColor: element.attributes.status == "completed" ? "#2eb039" : "",
+            statusColor: element.attributes.status == "completed" ? "#2eb039" : (element.attributes.status == "running"?"#108ee9":""),
             latestChange: DateTime.local().minus({ minutes: Math.floor(Math.random() * 5) }).toRelative(),
             ...element.attributes
           }

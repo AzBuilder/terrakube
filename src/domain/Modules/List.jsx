@@ -1,9 +1,9 @@
 import { React, useState, useEffect } from 'react';
 import { Button, Layout, Breadcrumb, Card, List, Space, Input, Tag } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import { useParams,useHistory } from "react-router-dom";
-import { CloudUploadOutlined, ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
-import { SiMicrosoftazure } from "react-icons/si";
+import { useParams,useHistory,Link } from "react-router-dom";
+import { CloudUploadOutlined,CloudOutlined, ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
+import { SiMicrosoftazure,SiAmazonaws } from "react-icons/si";
 import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from 'react-icons/md';
@@ -48,19 +48,33 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
     history.push("/organizations/"+orgid+"/registry/"+id)
   };
 
+  const renderLogo = (provider) => {
+    switch(provider) {
+      case 'azurerm':
+        return <IconContext.Provider value={{ color: "#008AD7", size: "1.5em" }}><SiMicrosoftazure /></IconContext.Provider>;
+      case 'aws':
+        return <IconContext.Provider value={{ color:"#232F3E", size: "1.5em" }}><SiAmazonaws/></IconContext.Provider>;
+      default:
+        return <CloudOutlined />;
+    }
+  }
+
+  const handlePublish = () => {
+    history.push("/organizations/"+orgid+"/registry/create")
+  };
+
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>Registry</Breadcrumb.Item>
-        <Breadcrumb.Item>Modules</Breadcrumb.Item>
+        <Breadcrumb.Item><Link to={`/organizations/${orgid}/registry`}>Modules</Link></Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
         {loading || !organization.data || !modules ? (
           <p>Data loading...</p>
         ) : (
           <div className="modulesWrapper">
-            <div className='variableActions'><h2>Modules</h2><Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} href={`/organization/${orgid}/registry/create`}>Publish module</Button></div>
+            <div className='variableActions'><h2>Modules</h2><Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} onClick={handlePublish}>Publish module</Button></div>
             <Search placeholder="Filter modules" style={{ width: "100%" }} />
             <List split="" className="moduleList" dataSource={modules}
               renderItem={item => (
@@ -71,8 +85,8 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
                       {item.description}
                       <Space size={size} style={{ marginTop: "25px" }}>
                         <Tag color="blue"><span><MdBusiness /> Private</span></Tag>
-                        <span><IconContext.Provider value={{ color: "#008AD7", size: "1.3em" }}><SiMicrosoftazure /></IconContext.Provider>&nbsp;&nbsp;{item.provider}</span>
-                        <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;0.0.1</span>
+                        <span>{renderLogo(item.provider)}&nbsp;&nbsp;{item.provider}</span>
+                        <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;1.0.0</span>
                         <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
                         <span><DownloadOutlined />&nbsp;&nbsp; &lt; 100</span>
                       </Space>

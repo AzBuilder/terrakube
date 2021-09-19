@@ -2,13 +2,12 @@ import { Table } from "antd";
 import { React, useState, useEffect } from "react";
 import { Button, Layout, Breadcrumb } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import {useParams,useHistory} from "react-router-dom";
+import {useParams,useHistory,Link} from "react-router-dom";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 const { Content } = Layout;
 const { DateTime } = require("luxon");
 const include = {
-  WORKSPACE: "workspace",
-  MODULE: "module"
+  WORKSPACE: "workspace"
 }
 
 const WORKSPACE_COLUMNS = [
@@ -17,7 +16,7 @@ const WORKSPACE_COLUMNS = [
     dataIndex: 'name',
     key: 'name',
     render: (_, record) => (
-      <a href={"/workspaces/" + record.id}>{record.name}</a>
+      <Link to={"/workspaces/" + record.id}>{record.name}</Link>
     )
   },
   ,
@@ -43,7 +42,6 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   const { id } = useParams();
   const [organization, setOrganization] = useState({});
   const [workspaces, setWorkspaces] = useState([]);
-  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
   const history = useHistory();
   const handleCreate = e => {
@@ -58,7 +56,7 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
         setOrganization(response.data);
        
         if (response.data.included) {
-          setupOrganizationIncludes(response.data.included, setModules, setWorkspaces);
+          setupOrganizationIncludes(response.data.included, setWorkspaces);
         }
 
         setLoading(false);
@@ -89,8 +87,7 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   );
 }
 
-function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
-  let modules = [];
+function setupOrganizationIncludes(includes, setWorkspaces) {
   let workspaces = [];
 
   includes.forEach(element => {
@@ -104,19 +101,10 @@ function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
           }
         );
         break;
-      case include.MODULE:
-        modules.push(
-          {
-            id: element.id,
-            ...element.attributes
-          }
-        );
-        break;
       default:
         break;
     }
   });
 
-  setModules(modules);
   setWorkspaces(workspaces);
 }

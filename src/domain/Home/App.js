@@ -23,19 +23,13 @@ const { Header, Footer } = Layout;
 
 const App = () => {
   const isAuthenticated = useIsAuthenticated();
-  const [organizationName, setOrganizationName] = useState([]);
-  const [current, setCurrent] = useState('mail');
-  
+  const [organizationName, setOrganizationName] = useState("...");
   
   if (!isAuthenticated) {
     return (
        <Login />
     )
   }
-  const handleClick = e => {
-    console.log('click ', e);
-    setCurrent(e.key);
-  };
   return (
     <Router>
       <Layout className="layout">
@@ -53,7 +47,7 @@ const App = () => {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/organizations/create" component={CreateOrganization} />
-          <Route exact path="/organizations/:id">
+          <Route exact path="/organizations/:id/workspaces">
              <OrganizationDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
           </Route>
           <Route exact path="/workspaces/create" component={CreateWorkspace} />

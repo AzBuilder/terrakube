@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState,useEffect } from 'react';
 import { Form, Input, Button, Breadcrumb, Layout, Steps, Card, Space ,Select} from "antd";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
@@ -6,17 +6,24 @@ import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
 import { IconContext } from "react-icons";
 import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
 import { SiGit } from "react-icons/si";
-import { useHistory } from "react-router-dom";
+import { useHistory,Link } from "react-router-dom";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
-  required: '${label} is required!'
+  required: '${label} is required!',
+  types: {
+    url: '${label} is not a valid git url',
+  }
 }
 const { Option } = Select;
 
 
 
 export const CreateWorkspace = () => {
+  const [organizationName, setOrganizationName] = useState([]);
+  useEffect(() => {
+    setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+  });
   const handleClick = e => {
     setCurrent(1);
   };
@@ -25,11 +32,16 @@ export const CreateWorkspace = () => {
     setCurrent(2);
     setStep2Hidden(false);
   };
-
+  const [form] = Form.useForm();
   const handleGitContinueClick = e => {
     setCurrent(3);
     setStep3Hidden(false);
     setStep2Hidden(true);
+    var source = form.getFieldValue("source");
+    var nameValue = source.match('\/([^\/]+)\/?$');
+    if(nameValue!=null && nameValue.length > 0){
+      form.setFieldsValue({ name:nameValue[1].replace(".git","")});
+    }
   };
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep3Hidden] = useState(true);
@@ -59,6 +71,8 @@ export const CreateWorkspace = () => {
       })
   };
 
+  
+
   const handleChange = current => {
     setCurrent(current);
     if (current == 2){
@@ -77,8 +91,8 @@ export const CreateWorkspace = () => {
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>organization-name</Breadcrumb.Item>
-        <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
+        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
+        <Breadcrumb.Item><Link to={`/organizations/${organizationId}/workspaces`}>Workspaces</Link></Breadcrumb.Item>
         <Breadcrumb.Item>New Workspace</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
@@ -147,14 +161,14 @@ export const CreateWorkspace = () => {
 
           )}
 
-         <Form name="create-workspace" layout="vertical" onFinish={onFinish} validateMessages={validateMessages}> 
+         <Form form={form} name="create-workspace" layout="vertical" onFinish={onFinish} validateMessages={validateMessages}> 
      
             <Space hidden={step2Hidden} className="chooseType" direction="vertical">
               <h3>Choose a repository</h3>
               <div className="workflowDescription2 App-text">
                 Choose the repository that hosts your Terraform source code.
               </div>
-              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/AzBuilder/terraform-sample-repository.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true }]}>
+              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/AzBuilder/terraform-sample-repository.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true },{ type: 'url'}]}>
                 <Input />
               </Form.Item>
               <Form.Item>

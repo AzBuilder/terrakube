@@ -1,9 +1,9 @@
 import { React, useState, useEffect } from 'react';
 import { Menu,Button, Layout, Breadcrumb, Dropdown, Alert, Tabs, Space, Input, Tag, Row, Col, Card, Divider } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import { useParams } from "react-router-dom";
-import { DownOutlined,DeleteOutlined , ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
-import { SiMicrosoftazure } from "react-icons/si";
+import { useParams,Link } from "react-router-dom";
+import { DownOutlined,CloudOutlined , ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
+import { SiMicrosoftazure ,SiAmazonaws} from "react-icons/si";
 import { BiBookBookmark } from "react-icons/bi";
 import { RiFolderHistoryLine, RiGithubFill } from "react-icons/ri";
 import { IconContext } from "react-icons";
@@ -20,11 +20,23 @@ const include = {
 }
 const { Search } = Input;
 
+
 export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const { orgid, id } = useParams();
   const [module, setModule] = useState([]);
+  const [moduleName, setModuleName] = useState("...");
   const [loading, setLoading] = useState(false);
 
+  const renderLogo = (provider) => {
+    switch(provider) {
+      case 'azurerm':
+        return <IconContext.Provider value={{ color: "#008AD7", size: "1.5em" }}><SiMicrosoftazure /></IconContext.Provider>;
+      case 'aws':
+        return <IconContext.Provider value={{ color:"#232F3E", size: "1.5em" }}><SiAmazonaws/></IconContext.Provider>;
+      default:
+        return <CloudOutlined />;
+    }
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -35,6 +47,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         console.log(response);
         setModule(response.data);
         setLoading(false);
+        setModuleName(response.data.data.attributes.name);
       });
 
   }, [orgid, id]);
@@ -42,12 +55,12 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const versions = (
     <Menu>
       <Menu.Item key="0">
-        0.1.0
+        1.0.0
       </Menu.Item>
       <Menu.Item key="1">
-        0.2.0
+        1.1.0
       </Menu.Item>
-      <Menu.Item key="3">0.3.0</Menu.Item>
+      <Menu.Item key="3">2.0.0</Menu.Item>
     </Menu>
   );
 
@@ -55,8 +68,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
         <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>Registry</Breadcrumb.Item>
-        <Breadcrumb.Item>Modules</Breadcrumb.Item>
+        <Breadcrumb.Item><Link to={`/organizations/${orgid}/registry`}>Modules</Link></Breadcrumb.Item>
+        <Breadcrumb.Item>{moduleName}</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
         {loading || !module.data ? (
@@ -73,19 +86,18 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                   </div>
                   <Space className="moduleProvider" size="large" direction="horizontal">
                     <span>Published by {organizationName}</span>
-                    <span>Provider <IconContext.Provider value={{ color: "#008AD7", size: "1.5em" }}><SiMicrosoftazure /></IconContext.Provider> {module.data.attributes.provider}</span>
+                    <span>Provider {renderLogo(module.data.attributes.provider)} {module.data.attributes.provider}</span>
                   </Space>
                   <IconContext.Provider value={{ size: "1.3em" }}>
                     <table className="moduleDetails">
                       <tr>
-
                         <td><RiFolderHistoryLine /> Version</td>
                         <td><ClockCircleOutlined /> Published</td>
                         <td><DownloadOutlined /> Provisions</td>
                         <td><BiBookBookmark /> Source</td>
                       </tr>
                       <tr className="black">
-                        <td>0.0.1 <Dropdown overlay={versions} trigger={['click']}>
+                        <td>1.0.0 <Dropdown overlay={versions} trigger={['click']}>
                           <a className="ant-dropdown-link">
                             Change <DownOutlined />
                           </a>

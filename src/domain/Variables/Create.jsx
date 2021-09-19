@@ -42,8 +42,7 @@ export const CreateVariable = ({varType}) => {
       .then(response => {
         console.log(response);
         setVisible(false);
-        history.go(0);
-      })
+      });
   };
 
   return (
@@ -54,7 +53,7 @@ export const CreateVariable = ({varType}) => {
         }}>
         Add variable
       </Button>
-      <Modal visible={visible} title="Add new variable" okText="Save variable" cancelText="Cancel" onCancel={onCancel}
+      <Modal width="350px" visible={visible} title="Add new variable" okText="Save variable" cancelText="Cancel" onCancel={onCancel}
         onOk={() => {
           form.validateFields().then((values) => {
             form.resetFields();
@@ -63,7 +62,7 @@ export const CreateVariable = ({varType}) => {
             console.log('Validate Failed:', info);
           });
         }}>
-        <Space direction="vertical">
+        <Space style={{width:"100%"}} direction="vertical">
           <Form name="create-org" form={form} layout="vertical" validateMessages={validateMessages} initialValues={{ type: varType }}>
             <Form.Item name="key" label="Key" rules={[{ required: true }]}>
               <Input />

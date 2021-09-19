@@ -6,7 +6,7 @@ import {InfoCircleTwoTone} from '@ant-design/icons';
 
 const validateMessages = {required: '${label} is required!'}
 
-export const CreateJob = () => {
+export const CreateJob = ({changeJob}) => {
   const workspaceId = localStorage.getItem(WORKSPACE_ARCHIVE);
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
   const [visible, setVisible] = useState(false);
@@ -42,6 +42,7 @@ export const CreateJob = () => {
       .then(response => {
         console.log(response);
         setVisible(false);
+        changeJob(response.data.data.id);
       });
     
   };
