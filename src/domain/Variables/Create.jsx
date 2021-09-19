@@ -2,6 +2,7 @@ import { React, useState } from 'react';
 import { Form, Input, Button, Select, Modal, Space } from "antd";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
+import { useHistory } from "react-router-dom";
 
 const layout = {
   labelCol: { span: 8 },
@@ -20,6 +21,7 @@ export const CreateVariable = ({varType}) => {
   const onCancel = () => {
     setVisible(false);
   };
+  const history = useHistory();
   const onCreate = (values) => {
     const body = {
       data: {
@@ -40,6 +42,7 @@ export const CreateVariable = ({varType}) => {
       .then(response => {
         console.log(response);
         setVisible(false);
+        history.go(0);
       })
   };
 

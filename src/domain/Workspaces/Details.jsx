@@ -6,6 +6,7 @@ import { DeleteFilled } from '@ant-design/icons';
 import { CreateJob } from '../Jobs/Create';
 import { DetailsJob } from '../Jobs/Details';
 import {CreateVariable} from  '../Variables/Create';
+import { useParams,useHistory } from "react-router-dom";
 import {
   CheckCircleOutlined, ClockCircleOutlined
 } from '@ant-design/icons';
@@ -49,8 +50,9 @@ const VARIABLES_COLUMS = (organizationId, resourceId) => [
 ]
 
 export const WorkspaceDetails = (props) => {
-  const resourceId = props.match.params.id;
+  const { id } = useParams();
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  localStorage.setItem(WORKSPACE_ARCHIVE, id);
   const [workspace, setWorkspace] = useState({});
   const [variables, setVariables] = useState([]);
   const [envVariables, setEnvVariables] = useState([]);
@@ -66,17 +68,24 @@ export const WorkspaceDetails = (props) => {
   };
   useEffect(() => {
     setLoading(true);
-    axiosInstance.get(`organization/${organizationId}/workspace/${resourceId}?include=environment,job,secret,variable`)
+    loadWorkspace();
+    setLoading(false);
+    setInterval(loadWorkspace, 2000);
+  }, [id]);
+   
+
+  const loadWorkspace = () => {
+
+    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=environment,job,secret,variable`)
       .then(response => {
         console.log(response);
         setWorkspace(response.data);
         if (response.data.included) {
           setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables);
         }
-        setLoading(false);
         setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
       });
-  }, [resourceId]);
+  }
 
   return (
     <Content style={{ padding: '0 50px' }}>
@@ -137,12 +146,12 @@ export const WorkspaceDetails = (props) => {
                     </p> </div>
                   <h2>Terraform Variables</h2>
                   <div className="App-text">These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string value for a variable, click its HCL checkbox.</div>
-                  <Table dataSource={variables} columns={VARIABLES_COLUMS(organizationId, resourceId)} rowKey='key' />
+                  <Table dataSource={variables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
                   <CreateVariable varType="variable"/>
                   <div className="envVariables">
                     <h2>Environment Variables</h2>
                     <div className="App-text">These variables are set in Terraform's shell environment using export.</div>
-                    <Table dataSource={envVariables} columns={VARIABLES_COLUMS(organizationId, resourceId)} rowKey='key' />
+                    <Table dataSource={envVariables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
                     <CreateVariable varType="environment"/>
                   </div>
                 </TabPane>
@@ -152,7 +161,7 @@ export const WorkspaceDetails = (props) => {
                     <Form layout="vertical" name="form-settings" >
                       <Form.Item name="id" label="ID" >
                         <div className="App-text">
-                          {resourceId}
+                          {id}
                         </div>
                       </Form.Item>
                       <Form.Item name="name" label="Name" >

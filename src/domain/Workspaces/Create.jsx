@@ -6,6 +6,7 @@ import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
 import { IconContext } from "react-icons";
 import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
 import { SiGit } from "react-icons/si";
+import { useHistory } from "react-router-dom";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -34,7 +35,7 @@ export const CreateWorkspace = () => {
   const [step3Hidden, setStep3Hidden] = useState(true);
   const [step2Hidden, setStep2Hidden] = useState(true);
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
-
+  const history = useHistory();
   const onFinish = (values) => {
     const body = {
       data: {
@@ -51,6 +52,10 @@ export const CreateWorkspace = () => {
     })
       .then(response => {
         console.log(response);
+        if(response.status =="201")
+        {
+          history.push('/workspaces/' + response.data.data.id);
+        }
       })
   };
 
@@ -188,7 +193,7 @@ export const CreateWorkspace = () => {
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
-                  Submit
+                  Create Workspace
                 </Button>
               </Form.Item>
               </Space>

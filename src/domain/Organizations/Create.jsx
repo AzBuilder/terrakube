@@ -1,6 +1,8 @@
 import { React } from "react";
 import axiosInstance from "../../config/axiosConfig";
 import { Button, Layout, Breadcrumb ,Form, Input} from "antd";
+import './Organizations.css';
+import { useHistory } from "react-router-dom";
 const { Content } = Layout;
 
 
@@ -11,6 +13,8 @@ const validateMessages = {
 
 
 export const CreateOrganization = () => {
+
+  const history = useHistory();
   const onFinish = (values) => {
     const body = {
       data: {
@@ -27,8 +31,14 @@ export const CreateOrganization = () => {
     })
       .then(response => {
         console.log(response);
+        if(response.status =="201")
+        {
+          history.push('/organizations/' + response.data.data.id);
+        }
       })
   };
+
+  
 
   return (
     <Content style={{ padding: '0 50px' }}>

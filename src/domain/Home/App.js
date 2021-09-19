@@ -17,6 +17,7 @@ import { WorkspaceDetails } from '../Workspaces/Details';
 import { CreateVariable } from '../Variables/Create';
 import { CreateWorkspace } from '../Workspaces/Create';
 import { CreateModule } from '../Modules/Create';
+import { ModuleList } from '../Modules/List';
 import { ModuleDetails } from '../Modules/Details';
 const { Header, Footer } = Layout;
 
@@ -61,6 +62,9 @@ const App = () => {
           
           <Route exact path="/organizations/:orgid/registry/create" component={CreateModule} />
           <Route exact path="/organizations/:orgid/registry">
+            <ModuleList setOrganizationName={setOrganizationName} organizationName={organizationName} />
+          </Route>
+          <Route exact path="/organizations/:orgid/registry/:id">
             <ModuleDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
           </Route>
         </Switch>

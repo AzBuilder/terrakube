@@ -1,1 +1,83 @@
 
+.moduleList{
+    width: 100%;
+    margin-top:30px;
+  }
+
+.modulesWrapper{
+  margin: auto;
+    margin-top: 20px;
+    width: 80%;
+  }
+
+.moduleProvider{
+  color:rgb(82, 87, 97);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.moduleDescription{
+  font-size: 15px;
+}
+
+.moduleTitle{
+  font-size: 30px;
+  margin: 0;
+}
+
+.moduleDetails{
+  color:rgb(82, 87, 97);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.moduleDetails td{
+  padding-right: 20px;
+  padding-top:5px;
+}
+
+.black{
+  color:black;
+}
+
+.moduleTabs{
+  margin-top: 20px;
+}
+
+.moduleCode{
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(186, 193, 204);
+  border-image: initial;
+  color: rgb(82, 87, 97);
+  font-family: SFMono-Regular, consolas, "Liberation Mono", menlo, courier, monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  width: 290px;
+  padding: 5px;
+  background-color: rgb(247, 248, 250)
+}
+
+.moduleCredentials{
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(186, 193, 204);
+  border-image: initial;
+  color: rgb(82, 87, 97);
+  font-family: SFMono-Regular, consolas, "Liberation Mono", menlo, courier, monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  width: 270px;
+  padding: 5px;
+  background-color: rgb(247, 248, 250);
+  margin-top: 10px;
+}
+
+.moduleInstructions{
+  font-size: 13px;
+}
+
+.moduleSubtitles{
+  font-size: 15px;
+  font-weight: 400;
+}

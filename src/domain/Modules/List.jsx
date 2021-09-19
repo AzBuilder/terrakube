@@ -1,0 +1,111 @@
+import { React, useState, useEffect } from 'react';
+import { Button, Layout, Breadcrumb, Card, List, Space, Input, Tag } from "antd";
+import axiosInstance from "../../config/axiosConfig";
+import { useParams,useHistory } from "react-router-dom";
+import { CloudUploadOutlined, ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
+import { SiMicrosoftazure } from "react-icons/si";
+import { RiFolderHistoryLine } from "react-icons/ri";
+import { IconContext } from "react-icons";
+import { MdBusiness } from 'react-icons/md';
+import './Module.css';
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from '../../config/actionTypes';
+
+
+const { Content } = Layout;
+const { DateTime } = require("luxon");
+const include = { MODULE: "module" }
+const { Search } = Input;
+
+
+export const ModuleList = ({ setOrganizationName, organizationName }) => {
+  const { orgid } = useParams();
+  const [organization, setOrganization] = useState({});
+  const [modules, setModules] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [size, setSize] = useState(40);
+
+  useEffect(() => {
+    setLoading(true);
+    localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
+    axiosInstance.get(`organization/${orgid}?include=workspace,module`)
+      .then(response => {
+        console.log(response);
+        setOrganization(response.data);
+
+        if (response.data.included) {
+          setupOrganizationIncludes(response.data.included, setModules);
+        }
+
+        setLoading(false);
+        localStorage.setItem(ORGANIZATION_NAME, response.data.data.attributes.name)
+        setOrganizationName(response.data.data.attributes.name)
+      });
+
+  }, [orgid]);
+  const history = useHistory();
+  const handleClick = id => {
+    console.log(id);
+    history.push("/organizations/"+orgid+"/registry/"+id)
+  };
+
+  return (
+    <Content style={{ padding: '0 50px' }}>
+      <Breadcrumb style={{ margin: '16px 0' }}>
+        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
+        <Breadcrumb.Item>Registry</Breadcrumb.Item>
+        <Breadcrumb.Item>Modules</Breadcrumb.Item>
+      </Breadcrumb>
+      <div className="site-layout-content">
+        {loading || !organization.data || !modules ? (
+          <p>Data loading...</p>
+        ) : (
+          <div className="modulesWrapper">
+            <div className='variableActions'><h2>Modules</h2><Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} href={`/organization/${orgid}/registry/create`}>Publish module</Button></div>
+            <Search placeholder="Filter modules" style={{ width: "100%" }} />
+            <List split="" className="moduleList" dataSource={modules}
+              renderItem={item => (
+                <List.Item>
+                  <Card onClick={() => handleClick(item.id)} style={{ width: "100%" }} hoverable>
+                    <Space style={{ color: "rgb(82, 87, 97)" }} direction="vertical" >
+                      <h3>{item.name}</h3>
+                      {item.description}
+                      <Space size={size} style={{ marginTop: "25px" }}>
+                        <Tag color="blue"><span><MdBusiness /> Private</span></Tag>
+                        <span><IconContext.Provider value={{ color: "#008AD7", size: "1.3em" }}><SiMicrosoftazure /></IconContext.Provider>&nbsp;&nbsp;{item.provider}</span>
+                        <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;0.0.1</span>
+                        <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
+                        <span><DownloadOutlined />&nbsp;&nbsp; &lt; 100</span>
+                      </Space>
+                    </Space>
+                  </Card>
+                </List.Item>
+              )}
+            />
+          </div>
+        )}
+      </div>
+    </Content>
+
+  );
+}
+
+function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
+  let modules = [];
+
+  includes.forEach(element => {
+    switch (element.type) {
+      case include.MODULE:
+        modules.push(
+          {
+            id: element.id,
+            ...element.attributes
+          }
+        );
+        break;
+      default:
+        break;
+    }
+  });
+
+  setModules(modules);
+}

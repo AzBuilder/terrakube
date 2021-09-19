@@ -2,8 +2,7 @@ import { Table } from "antd";
 import { React, useState, useEffect } from "react";
 import { Button, Layout, Breadcrumb } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import {useParams} from "react-router-dom";
-
+import {useParams,useHistory} from "react-router-dom";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 const { Content } = Layout;
 const { DateTime } = require("luxon");
@@ -40,34 +39,16 @@ const WORKSPACE_COLUMNS = [
   }
 ]
 
-const MODULE_COLUMNS = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: (text, record) => (
-      <a href={"/modules/" + record.id}>{record.name}</a>
-    )
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-    key: 'description'
-  },
-  {
-    title: 'Provider',
-    dataIndex: 'provider',
-    key: 'provider'
-  }
-]
-
 export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   const { id } = useParams();
   const [organization, setOrganization] = useState({});
   const [workspaces, setWorkspaces] = useState([]);
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const history = useHistory();
+  const handleCreate = e => {
+      history.push("/workspaces/create");
+  };
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
@@ -98,7 +79,7 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
           <p>Data loading...</p>
         ) : (
           <div className="orgWrapper">
-            <div className='workspaceActions'><h2>Workspaces</h2><Button type="primary" htmlType="button"  href={`/workspaces/create`}>New workspace</Button></div>
+            <div className='variableActions'><h2>Workspaces</h2><Button type="primary" htmlType="button" onClick={handleCreate}>New workspace</Button></div>
             <Table dataSource={workspaces} columns={WORKSPACE_COLUMNS} rowKey='name' />
           </div>
         )}
