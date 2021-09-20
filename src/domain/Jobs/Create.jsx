@@ -1,26 +1,25 @@
-import { React } from 'react';
-import { Form, Button, Select } from "antd";
+import { React, useState } from 'react';
+import { Form, Button, Select, Modal,Space } from "antd";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
+import {InfoCircleTwoTone} from '@ant-design/icons';
 
-const layout = {
-  labelCol: { span: 14 },
-  wrapperCol: { span: 100 }
-}
+const validateMessages = {required: '${label} is required!'}
 
-const validateMessages = {
-  required: '${label} is required!'
-}
-
-export const CreateJob = () => {
+export const CreateJob = ({changeJob}) => {
   const workspaceId = localStorage.getItem(WORKSPACE_ARCHIVE);
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const [visible, setVisible] = useState(false);
+  const [form] = Form.useForm();
+  const onCancel = () => {
+    setVisible(false);
+  };
 
-  const onFinish = (values) => {
+  const onCreate = (values) => {
     const body = {
       data: {
         type: "job",
-        attributes: { 
+        attributes: {
           command: values.action
         },
         relationships: {
@@ -42,26 +41,46 @@ export const CreateJob = () => {
     })
       .then(response => {
         console.log(response);
-      })
+        setVisible(false);
+        changeJob(response.data.data.id);
+      });
+    
   };
 
   return (
-    <div className="createForm">
-      <h2>Trigger new job</h2>
-      <Form {...layout} name="create-org" onFinish={onFinish} validateMessages={validateMessages}>
-        <Form.Item name="action" label="Action" rules={[{required: true}]}>
-          <Select>
-            <Select.Option value="plan">Plan</Select.Option>
-            <Select.Option value="apply">Apply</Select.Option>
-            <Select.Option value="destroy">Destroy</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>  
+
+    <div>
+      <Button type="primary" htmlType="button"
+        onClick={() => {
+          setVisible(true);
+        }}>
+        Start new job
+      </Button>
+
+      <Modal visible={visible} title="Start a new job" okText="Start" cancelText="Cancel" onCancel={onCancel}
+        onOk={() => {
+          form.validateFields().then((values) => {
+            form.resetFields();
+            onCreate(values);
+          }).catch((info) => {
+            console.log('Validate Failed:', info);
+          });
+        }}>
+        <Space  direction="vertical">
+        <div className="popup-text">
+          <InfoCircleTwoTone style={{ fontSize: '16px' }} /> You will be redirected to the run details page to see this job executed. 
+        </div>
+        <Form form={form} layout="vertical" name="create-org" validateMessages={validateMessages}>
+          <Form.Item name="action" label="Choose job type" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="plan">Plan</Select.Option>
+              <Select.Option value="apply">Apply</Select.Option>
+              <Select.Option value="destroy">Destroy</Select.Option>
+            </Select>
+          </Form.Item>
+        </Form>
+        </Space>
+      </Modal>
+    </div>
   )
 }

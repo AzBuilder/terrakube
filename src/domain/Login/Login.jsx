@@ -4,14 +4,22 @@ import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../config/authConfig";
 import './Login.css';
 import axiosInstance from "../../config/axiosConfig";
-
+import { Card ,Space} from "antd";
 const Login = () => {
   const { instance } = useMsal();
 
   return (
-    <div className='login-wrapper'>
-      <MicrosoftLoginButton onClick={() => handleLogin(instance)} />
-    </div>
+    <div className='login-container'>
+      <div className='login-wrapper'>
+
+        <Card title="Terraform" >
+          <Space direction="vertical">
+          Sign in to AZBuilder
+          <MicrosoftLoginButton onClick={() => handleLogin(instance)} />
+          </Space>
+        </Card>
+
+      </div> </div>
   )
 }
 
@@ -22,9 +30,9 @@ function handleLogin(instance) {
     localStorage.setItem('azureAccessToken', response.accessToken);
     axiosInstance.defaults.headers.common['Authorization'] = response.accessToken;
   })
-  .catch(e => {
-    console.error(e);
-  });
+    .catch(e => {
+      console.error(e);
+    });
 }
 
 export default Login;

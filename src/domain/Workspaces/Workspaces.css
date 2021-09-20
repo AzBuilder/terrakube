@@ -1,7 +1,4 @@
-.variableActions {
-  display: flex;
-  justify-content: space-between;
-}
+
 
 .jobActions {
   display: flex;
@@ -10,4 +7,78 @@
 
 .tableWrapper {
   margin-top: 3em;;
+}
+
+.envVariables{
+  margin-top: 50px;
+}
+
+.textLeft{
+  text-align: left;
+}
+
+.generalSettings{
+  width: 60%;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.variableActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.createWorkspace{
+  width: 60%;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.chooseType{
+  width: 100%;
+  margin-top:30px;
+}
+
+.workflowType{
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.workflowDescription{
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.workflowDescription2{
+  margin-bottom: 20px;
+}
+
+.workflowDescription3{
+  margin-bottom: 0px;
+}
+
+.workflowSelect{
+  text-align: right;
+  margin-right: 40px;
+}
+
+#code-container {
+  background-color: #000000;
+  width: 100%;
+  height: 100%;
+  max-height: 400px;
+  min-height: 400px;
+  overflow: scroll;
+}
+
+#code-content {
+  color: #ffffff;
+  font-family: SFMono-Regular,consolas,"Liberation Mono",menlo,courier,monospace;
+  padding:20px;
+  font-size: .875em;
+  white-space: pre-wrap;
+}
+
+.ant-collapse-content > .ant-collapse-content-box {
+  padding: 0px;
 }

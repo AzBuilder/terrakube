@@ -1,10 +1,18 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
-import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
-import { Table, Button } from "antd";
+import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE ,ORGANIZATION_NAME} from '../../config/actionTypes';
+import { Button, Layout, Breadcrumb, Table, Tabs, List, Avatar, Tag, Form, Input, Select } from "antd";
 import { DeleteFilled } from '@ant-design/icons';
+import { CreateJob } from '../Jobs/Create';
+import { DetailsJob } from '../Jobs/Details';
+import {CreateVariable} from  '../Variables/Create';
+import { useParams,Link } from "react-router-dom";
+import {
+  CheckCircleOutlined, ClockCircleOutlined,SyncOutlined
+} from '@ant-design/icons';
 import './Workspaces.css';
-
+const { TabPane } = Tabs;
+const { Option } = Select;
 const include = {
   ENVIRONMENT_VAR: 'environment',
   SECRET_VAR: 'secret',
@@ -12,16 +20,14 @@ const include = {
   JOB: 'job'
 }
 
+
+const { Content } = Layout;
+
 const VARIABLES_COLUMS = (organizationId, resourceId) => [
   {
     title: 'Key',
     dataIndex: 'key',
     key: 'key'
-  },
-  {
-    title: 'Type',
-    dataIndex: 'type',
-    key: 'type'
   },
   {
     title: 'Value',
@@ -40,79 +46,197 @@ const VARIABLES_COLUMS = (organizationId, resourceId) => [
   }
 ]
 
-const JOBS_COLUMNS = [
-  {
-    title: 'Id',
-    dataIndex: 'id',
-    key: 'id'
-  },
-  {
-    title: 'Action',
-    dataIndex: 'command',
-    key: 'command'
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    key: 'status'
-  },
-  {
-    title: 'Plan Output',
-    dataIndex: 'output',
-    key: 'output',
-    render: (_, record) => {
-      return record.status === 'completed' ? <a href={record.output} target='_blank'>Go to plan</a> : 'Action still in progress'
-    }
-  }
-]
-
 export const WorkspaceDetails = (props) => {
-  const resourceId = props.match.params.id;
+  const { id } = useParams();
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  localStorage.setItem(WORKSPACE_ARCHIVE, id);
   const [workspace, setWorkspace] = useState({});
   const [variables, setVariables] = useState([]);
+  const [envVariables, setEnvVariables] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [jobId, setJobId] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [jobVisible, setjobVisible] = useState(false);
+  const [organizationName, setOrganizationName] = useState([]);
+  const [workspaceName, setWorkspaceName] = useState("...");
+  const [activeKey, setActiveKey] = useState("2");
+  const handleClick = id => {
+    changeJob(id);
+  };
 
+  const callback = (key)  =>{
+    setActiveKey(key);
+    if (key =="2"){
+      setjobVisible(false);
+    }
+  }
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(WORKSPACE_ARCHIVE, resourceId);
-    axiosInstance.get(`organization/${organizationId}/workspace/${resourceId}?include=environment,job,secret,variable`)
+    loadWorkspace();
+    setLoading(false);
+    const interval = setInterval(() => {
+      loadWorkspace();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [id]);
+  
+  const changeJob = id => {
+    console.log(id);
+    setJobId(id);
+    setjobVisible(true);
+    setActiveKey("2");
+  }
+
+  const loadWorkspace = () => {
+
+    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=environment,job,secret,variable`)
       .then(response => {
         console.log(response);
         setWorkspace(response.data);
-        if(response.data.included) {
-          setupWorkspaceIncludes(response.data.included, setVariables, setJobs);
+        if (response.data.included) {
+          setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables);
         }
-        setLoading(false);
-      })
-  }, [resourceId]);
-  
-  return(
-    <div className="workspaceDisplay">
-      {loading || !workspace.data || !variables || !jobs ? (
-        <p>Data loading...</p>
-      ) : (
-        <div className="orgWrapper">
-          <h2>Worspace name: {workspace.data.attributes.name}</h2>
-          Git repo: <a href={workspace.data.attributes.source} target='_blank'>{workspace.data.attributes.source}</a><br />
-          Branch: {workspace.data.attributes.branch}<br />
-          Terraform Version: {workspace.data.attributes.terraformVersion}
-          <div className='tableWrapper'>
-            <div className='variableActions'><h3>Variables</h3><Button type="primary" htmlType="button" shape="round" href={`/workspaces/${workspace.data.attributes.name}/variable/create`}>Add Variable</Button></div>
-            <Table dataSource={variables} columns={VARIABLES_COLUMS(organizationId, resourceId)} rowKey='key' />
-            <div className='jobActions'><h3>Jobs</h3><Button type="primary" htmlType="button" shape="round" href={`/workspaces/${workspace.data.attributes.name}/jobs/create`}>Trigger Job</Button></div>
-            <Table dataSource={jobs} columns={JOBS_COLUMNS} rowKey='id' />
-          </div>
+        setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+        setWorkspaceName(response.data.data.attributes.name);
+      });
+  }
+
+  return (
+    <Content style={{ padding: '0 50px' }}>
+      <Breadcrumb style={{ margin: '16px 0' }}>
+        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
+        <Breadcrumb.Item><Link to={`/organizations/${organizationId}/workspaces`}>Workspaces</Link></Breadcrumb.Item>
+        <Breadcrumb.Item>{workspaceName}</Breadcrumb.Item>
+      </Breadcrumb>
+      <div className="site-layout-content">
+        <div className="workspaceDisplay">
+          {loading || !workspace.data || !variables || !jobs ? (
+            <p>Data loading...</p>
+          ) : (
+            <div className="orgWrapper">
+             <div className='variableActions'> 
+             <h2>{workspace.data.attributes.name}</h2>
+             <table className="moduleDetails">
+                      <tr>
+                        <td>Resources</td>
+                        <td>Terraform version</td>
+                        <td>Updated</td>
+                      </tr>
+                      <tr className="black">
+                        <td>0</td>
+                        <td>{workspace.data.attributes.terraformVersion}</td>
+                        <td>1 minute ago</td>
+                      </tr>
+                    </table>
+             </div>
+              <div className="App-text">
+                No workspace description available. Add workspace description.
+              </div>
+              <Tabs activeKey={activeKey} defaultActiveKey="1" tabBarExtraContent={<CreateJob changeJob={changeJob}/>} onChange={callback}>
+                <TabPane tab="Runs" key="2">
+                  
+                 {jobVisible ? (
+                       <DetailsJob jobId={jobId}/>
+                 ):(
+                  <div>
+                  <h3>Run List</h3>
+                  <List
+                    itemLayout="horizontal"
+                    dataSource={jobs.sort((a, b) => a.id.localeCompare(b.id)).reverse()}
+                    renderItem={item => (
+                      <List.Item extra={
+                        <div className="textLeft">
+                          <Tag icon={item.status == "completed" ? <CheckCircleOutlined /> :(item.status == "running" ? <SyncOutlined spin />:  <ClockCircleOutlined />)} color={item.statusColor}>{item.status}</Tag> <br />
+                        </div>
+                      }>
+                        <List.Item.Meta
+                          avatar={<Avatar shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" />}
+                          title={<a onClick={() => handleClick(item.id)}>{item.title}</a>}
+                          description={<span>#job-{item.id}  |  <b>jcanizalez</b> triggered via UI</span>}
+
+                        />
+                      </List.Item>
+                    )}/>
+                  </div>
+                 )}
+                
+
+                </TabPane>
+                <TabPane tab="States" key="3">
+                  Coming soon
+                </TabPane>
+                <TabPane tab="Variables" key="4">
+
+                  <h1>Variables</h1>
+                  <div className="App-text">
+                    <p>These variables are used for all plans and applies in this workspace.Workspaces using Terraform 0.10.0 or later can also load default values from any *.auto.tfvars files in the configuration.</p>
+                    <p>Sensitive variables are hidden from view in the UI and API, and can't be edited. (To change a sensitive variable, delete and replace it.) Sensitive variables can still appear in Terraform logs if your configuration is designed to output them.
+                    </p> </div>
+                  <h2>Terraform Variables</h2>
+                  <div className="App-text">These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string value for a variable, click its HCL checkbox.</div>
+                  <Table dataSource={variables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
+                  <CreateVariable varType="variable"/>
+                  <div className="envVariables">
+                    <h2>Environment Variables</h2>
+                    <div className="App-text">These variables are set in Terraform's shell environment using export.</div>
+                    <Table dataSource={envVariables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
+                    <CreateVariable varType="environment"/>
+                  </div>
+                </TabPane>
+                <TabPane tab="Settings" key="5">
+                  <div className="generalSettings">
+                    <h1>General Settings</h1>
+                    <Form layout="vertical" name="form-settings" >
+                      <Form.Item name="id" label="ID" >
+                        <div className="App-text">
+                          {id}
+                        </div>
+                      </Form.Item>
+                      <Form.Item name="name" label="Name" >
+                        <Input defaultValue={workspace.data.attributes.name} />
+                      </Form.Item>
+
+                      <Form.Item name="description" label="Description">
+                        <Input.TextArea placeholder="Workspace description" />
+                      </Form.Item>
+                      <Form.Item name="terraformVersion" label="Terraform Version">
+                        <Select defaultValue={workspace.data.attributes.terraformVersion} style={{ width: 250 }}>
+                          <Option value="0.13.0">0.13.0</Option>
+                          <Option value="0.14.0">0.14.0</Option>
+                          <Option value="0.14.1">0.14.1</Option>
+                          <Option value="0.14.2">0.14.2</Option>
+                          <Option value="0.14.3">0.14.3</Option>
+                          <Option value="0.15.0">0.15.0</Option>
+                          <Option value="0.15.1">0.15.1</Option>
+                          <Option value="0.15.2">0.15.2</Option>
+                          <Option value="0.15.3">0.15.3</Option>
+                          <Option value="1.0.0">1.0.0</Option>
+                        </Select>
+                        <div className="App-text">
+                        The version of Terraform to use for this workspace. Upon creating this workspace, the latest version was selected and will be used until it is changed manually. It will not upgrade automatically.
         </div>
-      )}
-    </div>
+                      </Form.Item>
+                      <Form.Item>
+                        <Button type="primary" htmlType="submit">
+                          Save settings
+                        </Button>
+                      </Form.Item>
+                    </Form>
+                  </div>
+                </TabPane>
+              </Tabs>
+            </div>
+          )}
+        </div>
+      </div>
+    </Content>
   )
 }
 
-function setupWorkspaceIncludes(includes, setVariables, setJobs) {
+function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables) {
   let variables = [];
   let jobs = [];
+  let envVariables = [];
 
   includes.forEach(element => {
     switch (element.type) {
@@ -120,6 +244,18 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs) {
         jobs.push(
           {
             id: element.id,
+            title: "Queue manually using Terraform",
+            statusColor: element.attributes.status == "completed" ? "#2eb039" : (element.attributes.status == "running"?"#108ee9":""),
+            latestChange: "1 minute ago",
+            ...element.attributes
+          }
+        );
+        break;
+      case include.ENVIRONMENT_VAR:
+        envVariables.push(
+          {
+            id: element.id,
+            type: element.type,
             ...element.attributes
           }
         );
@@ -137,6 +273,7 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs) {
   });
 
   setVariables(variables);
+  setEnvVariables(envVariables);
   setJobs(jobs);
 }
 

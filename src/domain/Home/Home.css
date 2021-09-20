@@ -3,3 +3,26 @@
   flex-direction: column;
   margin-block: 10px;
 }
+
+.logo {
+  float: left;
+    width: 120px;
+    height: 31px;
+    margin: 16px 24px 16px 0;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.user{
+  float: right;
+    height: 31px;
+    margin: 4px 0 10px 0;
+}
+.menu{
+  float: left;
+  width: 60%;
+}
+.site-layout-content {
+    min-height: 600px;
+    padding: 24px;
+    background: #fff;
+}
