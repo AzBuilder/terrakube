@@ -96,7 +96,7 @@ function setupOrganizationIncludes(includes, setWorkspaces) {
         workspaces.push(
           {
             id: element.id,
-            latestChange: DateTime.local().minus({ minutes: Math.floor(Math.random() * 5) }).toRelative() ,
+            latestChange: "1 minute ago" ,
             ...element.attributes
           }
         );

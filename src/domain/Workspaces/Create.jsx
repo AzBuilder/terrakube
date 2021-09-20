@@ -73,14 +73,14 @@ export const CreateWorkspace = () => {
 
   
 
-  const handleChange = current => {
-    setCurrent(current);
-    if (current == 2){
+  const handleChange = currentVal => {
+    setCurrent(currentVal);
+    if (currentVal == 2){
       setStep2Hidden(false);
       setStep3Hidden(true);
     }
 
-    if (current == 3){
+    if (currentVal == 3){
       setStep3Hidden(false);
       setStep2Hidden(true);
     }

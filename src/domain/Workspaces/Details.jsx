@@ -11,7 +11,6 @@ import {
   CheckCircleOutlined, ClockCircleOutlined,SyncOutlined
 } from '@ant-design/icons';
 import './Workspaces.css';
-const { DateTime } = require("luxon");
 const { TabPane } = Tabs;
 const { Option } = Select;
 const include = {
@@ -61,8 +60,8 @@ export const WorkspaceDetails = (props) => {
   const [organizationName, setOrganizationName] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
   const [activeKey, setActiveKey] = useState("2");
-  const handleClick = jobId => {
-    changeJob(jobId);
+  const handleClick = id => {
+    changeJob(id);
   };
 
   const callback = (key)  =>{
@@ -81,9 +80,9 @@ export const WorkspaceDetails = (props) => {
     return () => clearInterval(interval);
   }, [id]);
   
-  const changeJob = jobId => {
-    console.log(jobId);
-    setJobId(jobId);
+  const changeJob = id => {
+    console.log(id);
+    setJobId(id);
     setjobVisible(true);
     setActiveKey("2");
   }
@@ -247,7 +246,7 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
             id: element.id,
             title: "Queue manually using Terraform",
             statusColor: element.attributes.status == "completed" ? "#2eb039" : (element.attributes.status == "running"?"#108ee9":""),
-            latestChange: DateTime.local().minus({ minutes: Math.floor(Math.random() * 5) }).toRelative(),
+            latestChange: "1 minute ago",
             ...element.attributes
           }
         );

@@ -1,6 +1,6 @@
 import { React, useState } from 'react';
 import { Form, Input, Button, Breadcrumb, Layout, Steps, Space ,Select} from "antd";
-import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
+import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
 import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
 import { SiGit } from "react-icons/si";
@@ -76,14 +76,14 @@ export const CreateModule = () => {
   };
   const [form] = Form.useForm();
 
-  const handleChange = current => {
-    setCurrent(current);
-    if (current == 1){
+  const handleChange = currentVal => {
+    setCurrent(currentVal);
+    if (currentVal == 1){
       setStep2Hidden(false);
       setStep3Hidden(true);
     }
 
-    if (current == 2){
+    if (currentVal == 2){
       setStep3Hidden(false);
       setStep2Hidden(true);
     }

@@ -12,7 +12,6 @@ import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from '../../config/actionType
 
 
 const { Content } = Layout;
-const { DateTime } = require("luxon");
 const include = { MODULE: "module" }
 const { Search } = Input;
 
