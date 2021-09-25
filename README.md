@@ -149,8 +149,6 @@ These endpoints allow creating, updating, deleting and search terraform workspac
 ```
 /api/v1/organization/{{organizationId}}/workspace
 /api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable
-/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/secret
-/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment
 ```
 ### Job
 This endpoint defines the operation to be executed for a specific terraform workspace. 
