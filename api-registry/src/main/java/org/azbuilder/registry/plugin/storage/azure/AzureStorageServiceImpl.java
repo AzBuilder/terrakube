@@ -47,9 +47,9 @@ public class AzureStorageServiceImpl implements StorageService {
 
             try {
                 FileUtils.cleanDirectory(gitCloneDirectory);
-                moduleZip.delete();
+                if (moduleZip.delete()) log.info("Successfully delete folder");
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
         }
 
