@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="5" author="alfespa17@gmail.com">
+        <createTable tableName="vcs">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(264)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vcs_type" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="varchar2(64)">
+            </column>
+            <column name="client_secret" type="varchar2(128)">
+            </column>
+            <column name="access_token" type="varchar2(512)">
+            </column>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_vcs_organization" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="id, name"
+                constraintName="const_vcs"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="vcs"
+                validate="true"/>
+        <addColumn tableName="team" >
+            <column name="manage_vcs"
+                    type="boolean"/>
+        </addColumn>
+        <addColumn tableName="workspace" >
+            <column name="vcs_id" type="varchar(36)">
+                <constraints nullable="true" foreignKeyName="fk_workspace_vcs" references="vcs(id)"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="module" >
+            <column name="vcs_id" type="varchar(36)">
+                <constraints nullable="true" foreignKeyName="fk_module_vcs" references="vcs(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

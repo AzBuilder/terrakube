@@ -35,6 +35,9 @@ public class Team {
     @Column(name = "manage_provider")
     private boolean manageProvider;
 
+    @Column(name = "manage_vcs")
+    private boolean manageVcs;
+
     @ManyToOne
     private Organization organization;
 }
