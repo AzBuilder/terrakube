@@ -62,7 +62,7 @@ const App = () => {
             <ModuleDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
           </Route>
         </Switch>
-        <Footer style={{ textAlign: 'center' }}>AZBuilder ©2021</Footer>
+        <Footer style={{ textAlign: 'center' }}>Terrakube ©2021</Footer>
       </Layout>
     </Router>
   )

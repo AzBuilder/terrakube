@@ -4,8 +4,8 @@ WORKDIR /usr/local/app
 
 COPY ./ /usr/local/app/
 
-ARG BUILDER_API_URL
-ENV REACT_CONFIG_AZBUILDER_URL=$BUILDER_API_URL
+ARG TERRAKUBE_API_URL
+ENV REACT_CONFIG_TERRAKUBE_URL=$TERRAKUBE_API_URL
 
 ARG CLIENT_ID
 ENV REACT_CONFIG_CLIENT_ID=$CLIENT_ID
@@ -29,10 +29,10 @@ RUN yarn install
 FROM node:lts-alpine
 
 # Copy the build output to replace the default nginx contents.
-COPY --from=build /usr/local/app/build /opt/azbuilder/build/
-COPY --from=build /usr/local/app/server /opt/azbuilder/server/
+COPY --from=build /usr/local/app/build /opt/terrakube/build/
+COPY --from=build /usr/local/app/server /opt/terrakube/server/
 
-WORKDIR /opt/azbuilder/server
+WORKDIR /opt/terrakube/server
 
 EXPOSE 3000
 

@@ -14,7 +14,7 @@ const Login = () => {
 
         <Card title="Terraform" >
           <Space direction="vertical">
-          Sign in to AZBuilder
+          Sign in to Terrakube
           <MicrosoftLoginButton onClick={() => handleLogin(instance)} />
           </Space>
         </Card>

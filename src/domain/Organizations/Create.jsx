@@ -54,7 +54,7 @@ export const CreateOrganization = () => {
         Organizations are privately shared spaces for teams to collaborate on infrastructure.
       </div>
       <Form layout="vertical" name="create-org" onFinish={onFinish} validateMessages={validateMessages}>
-        <Form.Item name="name" label="Organization name" tooltip="e.g. company-name" extra=" Organization names must be unique and will be part of your resource names used in various tools, for example azbuilder/www-prod." required>
+        <Form.Item name="name" label="Organization name" tooltip="e.g. company-name" extra=" Organization names must be unique and will be part of your resource names used in various tools, for example terrakube/www-prod." required>
           <Input />
 
         </Form.Item>

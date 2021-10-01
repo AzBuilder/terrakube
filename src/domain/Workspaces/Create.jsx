@@ -168,7 +168,7 @@ export const CreateWorkspace = () => {
               <div className="workflowDescription2 App-text">
                 Choose the repository that hosts your Terraform source code.
               </div>
-              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/AzBuilder/terraform-sample-repository.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true },{ type: 'url'}]}>
+              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/Terrakube/terraform-sample-repository.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true },{ type: 'url'}]}>
                 <Input />
               </Form.Item>
               <Form.Item>
