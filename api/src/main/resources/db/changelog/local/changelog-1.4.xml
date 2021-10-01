@@ -50,5 +50,8 @@
                 <constraints nullable="true" foreignKeyName="fk_module_vcs" references="vcs(id)"/>
             </column>
         </addColumn>
+        <dropColumn tableName="module">
+            <column  name="source_sample"/>
+        </dropColumn>
     </changeSet>
 </databaseChangeLog>

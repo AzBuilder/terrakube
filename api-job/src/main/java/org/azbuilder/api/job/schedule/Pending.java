@@ -7,6 +7,7 @@ import org.azbuilder.api.client.RestClient;
 import org.azbuilder.api.client.model.organization.Organization;
 import org.azbuilder.api.client.model.organization.job.Job;
 import org.azbuilder.api.client.model.organization.job.JobRequest;
+import org.azbuilder.api.client.model.organization.vcs.Vcs;
 import org.azbuilder.api.client.model.organization.workspace.Workspace;
 import org.azbuilder.api.client.model.organization.workspace.variable.Variable;
 import org.azbuilder.api.client.model.response.ResponseWithInclude;
@@ -51,6 +52,13 @@ public class Pending {
 
         log.info("Checking Variables");
         ResponseWithInclude<Workspace, Variable> workspaceData = restClient.getWorkspaceByIdWithVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+        if (workspaceData.getData().getRelationships().getVcs() != null) {
+            Vcs vcs = restClient.getVcsById(job.getRelationships().getOrganization().getData().getId(), workspaceData.getData().getRelationships().getVcs().getData().getId()).getData();
+            terraformJob.setVcsType(vcs.getType());
+            terraformJob.setAccessToken(vcs.getAttributes().getAccessToken());
+        } else {
+            terraformJob.setVcsType("PUBLIC");
+        }
 
         HashMap<String, String> variables = new HashMap<>();
         HashMap<String, String> environmentVariables = new HashMap<>();
@@ -113,8 +121,9 @@ class TerraformJob {
     private String terraformVersion;
     private String source;
     private String branch;
+    private String vcsType;
+    private String accessToken;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
-    private HashMap<String, String> secrets;
 }
 

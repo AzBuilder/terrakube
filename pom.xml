@@ -24,7 +24,7 @@
         <aggregate.report.dir>coverage/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
     </properties>
 
-    <name>AzBuilder API</name>
+    <name>Terrakube Platform</name>
 
     <modules>
         <module>api</module>

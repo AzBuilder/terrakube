@@ -47,9 +47,6 @@ public class Module {
     @Column(name = "source")
     private String source;
 
-    @Column(name = "source_sample")
-    private String sourceSample;
-
     @ManyToOne
     private Organization organization;
 

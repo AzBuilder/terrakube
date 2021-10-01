@@ -12,13 +12,15 @@ public class WorkspaceTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
+            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
-                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
+            "INSERT INTO vcs (id, name, description, vcs_type, organization_id) VALUES\n" +
+                    "\t\t('0f21ba16-16d4-4ac7-bce0-3484024ee6bf','publicConnection', 'publicConnection', 'PUBLIC', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
+            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id, vcs_id) VALUES\n" +
+                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577', '0f21ba16-16d4-4ac7-bce0-3484024ee6bf');"
     })
     void workspaceApiGetTest() {
         when()
@@ -44,7 +46,13 @@ public class WorkspaceTests extends ServerApplicationTests{
                                                                 id("a42f538b-8c75-4311-8e73-ea2c0f2fb577")
                                                         )
                                                 ),
-                                                relation("variable")
+                                                relation("variable"),
+                                                relation("vcs",true,
+                                                        resource(
+                                                                type("vcs"),
+                                                                id("0f21ba16-16d4-4ac7-bce0-3484024ee6bf")
+                                                        )
+                                                )
                                         )
                                 )
                         ).toJSON())
@@ -55,7 +63,7 @@ public class WorkspaceTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
+            "DELETE job; DELETE variable; DELETE workspace; DELETE VCS; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +

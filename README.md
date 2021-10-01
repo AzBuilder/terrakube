@@ -1,4 +1,4 @@
-# AzBuilder - API
+# Terrakube Platform
 
 [![Gitter](https://badges.gitter.im/AzBuilder/community.svg)](https://gitter.im/AzBuilder/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml/badge.svg)](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml)
@@ -15,18 +15,18 @@ The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expo
 ![Architecture](https://raw.githubusercontent.com/AzBuilder/docs/master/.gitbook/assets/diagrama-sin-titulo.png)
 
 Component descriptions:
-* **AzBuilder API**:
+* **Terrakube API**:
 Expose a JSON:API or GraphQL API providing endpoints to handle:
   - Organizations.
   - Workspaces
   - Jobs.
   - Modules
   - Providers
-* **AzBuilder Job**:
+* **Terrakube Shedule Job**:
   - Automatic process that check for any pending terraform operations in any workspace (plan, apply or destroy)
-* **AzBuilder Executor**:
+* **Terrakube Executor**:
   - Service that executes the terraform operations, updates the status using the AzBuilder API and save the results using different cloud storage providers.
-* **AzBuilder Open Registry**:
+* **Terrakube Registry**:
   - Open Source terraform registry with support for the module and provider protocol.
 * **Cloud Storage**:
   - Cloud storage to save terraform state and terraform outputs.
@@ -34,9 +34,9 @@ Expose a JSON:API or GraphQL API providing endpoints to handle:
   - The platform can be used with any database supported by the Liquibase project.
 * **Security**:
   - To handle authentication the platform uses Azure Active Directory.
-* **AzBuilder CLI**:
+* **Terrakube CLI**:
   - Go based CLI that can communicate with the AzBuilder API and execute operation for organizations, workspaces, jobs, modules or providers
-* **AzBuilder UI**:
+* **Terrakube UI**:
   - React based frontend to handle all AzBuilder Operations.
 
 For more information please visit our [documentation](https://azbuilder.gitbook.io/azb-builder/).
@@ -61,7 +61,7 @@ This project contains two modules describe below:
 |:-----------|--------------------------------------------------|
 |api         | Expose the API to manage all terraform workspaces|
 |api-job     | Schedule job that validate the terraform workspaces with pending executions |
-|api-registry| Open source terraform registry compatible with the api component |
+|api-registry| Open source terraform registry compatible with the terrakube API |
 
 ## Security - Authentication
 
