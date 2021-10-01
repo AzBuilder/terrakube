@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class GitHubTokenService implements GetAccessToken {
     @Override
-    public String getAccessToken(String clientId, String clientSecret, String tempCode) {
+    public String getAccessToken(String clientId, String clientSecret, String tempCode) throws GitHubTokenException {
         WebClient client = WebClient.builder()
                 .baseUrl("https://github.com")
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -23,6 +23,11 @@ public class GitHubTokenService implements GetAccessToken {
                         .queryParam("code",tempCode)
                         .build())
                 .retrieve().bodyToMono(GitHubToken.class).block();
-        return gitHubToken.getAccess_token();
+
+        if(gitHubToken != null)
+            return gitHubToken.getAccess_token();
+        else {
+            throw new GitHubTokenException("500","Unable to get GitHub Token");
+        }
     }
 }

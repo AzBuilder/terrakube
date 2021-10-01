@@ -1,6 +1,7 @@
 package org.azbuilder.api.plugin.vcs;
 
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.vcs.provider.github.GitHubTokenException;
 import org.azbuilder.api.plugin.vcs.provider.github.GitHubTokenService;
 import org.azbuilder.api.repository.VcsRepository;
 import org.azbuilder.api.rs.vcs.Vcs;
@@ -21,8 +22,13 @@ public class TokenService {
 
     public boolean setGitHubToken(String vcsId, String tempCode){
         Vcs vcs = vcsRepository.getOne(UUID.fromString(vcsId));
-        vcs.setAccessToken(gitHubTokenService.getAccessToken(vcs.getClientId(),vcs.getClientSecret(),tempCode));
-        vcsRepository.save(vcs);
+        try {
+            vcs.setAccessToken(gitHubTokenService.getAccessToken(vcs.getClientId(),vcs.getClientSecret(),tempCode));
+            vcsRepository.save(vcs);
+        } catch (GitHubTokenException e) {
+            log.error(e.getMessage());
+        }
+
         return true;
     }
 }
