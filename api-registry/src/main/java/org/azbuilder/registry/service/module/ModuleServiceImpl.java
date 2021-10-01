@@ -3,6 +3,7 @@ package org.azbuilder.registry.service.module;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.client.RestClient;
 import org.azbuilder.api.client.model.organization.module.Module;
+import org.azbuilder.api.client.model.organization.vcs.Vcs;
 import org.azbuilder.registry.plugin.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +14,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class ModuleServiceImpl implements ModuleService {
-
-    private static final String GIT_DIRECTORY="/.terraform-spring-boot/git/";
 
     @Autowired
     RestClient restClient;
@@ -43,15 +42,26 @@ public class ModuleServiceImpl implements ModuleService {
         String moduleVersionPath = "";
 
         String organizationId = restClient.getOrganizationByName(organizationName).getData().get(0).getId();
-        List<Module> moduleList = restClient.getModuleByNameAndProvider(organizationId, moduleName, providerName).getData();
-        List<String> versionList = moduleList.get(0).getAttributes().getVersions();
-        for (String moduleVersion : versionList) {
-            if (moduleVersion.equals(version))
-                moduleVersionPath = storageService.searchModule(
-                        organizationName, moduleName, providerName, moduleVersion, moduleList.get(0).getAttributes().getSource()
-                );
+        Module module = restClient.getModuleByNameAndProvider(organizationId, moduleName, providerName).getData().get(0);
+        List<String> versionList = module.getAttributes().getVersions();
+        String moduleSource = module.getAttributes().getSource();
+        String vcsType = "PUBLIC";
+        String accessToken = null;
+        if(module.getRelationships().getVcs().getData()!=null){
+            Vcs vcsInformation = getVcsInformation(organizationId,module.getRelationships().getVcs().getData().getId());
+            vcsType = vcsInformation.getAttributes().getVcsType();
+            accessToken = vcsInformation.getAttributes().getAccessToken();
         }
+
+        moduleVersionPath = storageService.searchModule(
+                organizationName, moduleName, providerName, version, moduleSource, vcsType, accessToken
+        );
+
         log.info("Registry Path: {}", moduleVersionPath);
         return moduleVersionPath;
+    }
+
+    private Vcs getVcsInformation(String organizationId, String vcsId){
+        return restClient.getVcsById(organizationId, vcsId).getData();
     }
 }
