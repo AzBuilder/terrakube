@@ -52,12 +52,14 @@ public class Pending {
 
         log.info("Checking Variables");
         ResponseWithInclude<Workspace, Variable> workspaceData = restClient.getWorkspaceByIdWithVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-        if (workspaceData.getData().getRelationships().getVcs() != null) {
+        if (workspaceData.getData().getRelationships().getVcs().getData() != null) {
             Vcs vcs = restClient.getVcsById(job.getRelationships().getOrganization().getData().getId(), workspaceData.getData().getRelationships().getVcs().getData().getId()).getData();
-            terraformJob.setVcsType(vcs.getType());
+            terraformJob.setVcsType(vcs.getAttributes().getVcsType());
             terraformJob.setAccessToken(vcs.getAttributes().getAccessToken());
+            log.info("Private Repository {}",terraformJob.getVcsType());
         } else {
             terraformJob.setVcsType("PUBLIC");
+            log.info("Public Repository");
         }
 
         HashMap<String, String> variables = new HashMap<>();
