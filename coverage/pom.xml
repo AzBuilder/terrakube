@@ -11,7 +11,8 @@
 	<groupId>org.azbuilder.api</groupId>
 	<artifactId>coverage</artifactId>
 	<version>${revision}</version>
-	<name>coverage</name>
+	<name>Terrakube Code Coverage</name>
+	<description>Code Coverage Report</description>
 	<properties>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>

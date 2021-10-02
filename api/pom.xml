@@ -11,11 +11,11 @@
 	<groupId>org.azbuilder.api</groupId>
 	<artifactId>api-server</artifactId>
 	<version>${revision}</version>
-	<name>api-server</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Terrakube API</name>
+	<description>Spring Boot Terrakube API</description>
 	<properties>
 		<java.version>11</java.version>
-		<elide.version>5.0.6</elide.version>
+		<elide.version>5.0.12</elide.version>
 		<liquibase-core.version>4.3.2</liquibase-core.version>
 		<azure.version>3.5.0</azure.version>
 		<mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>

@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.Organization;
+import org.azbuilder.api.rs.vcs.Vcs;
 import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
 import org.hibernate.annotations.Type;
@@ -48,4 +49,7 @@ public class Workspace {
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;
+
+    @OneToOne
+    private Vcs vcs;
 }

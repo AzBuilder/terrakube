@@ -16,6 +16,10 @@ public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebS
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.authorizeRequests(requests -> requests.anyRequest().authenticated());
+        //http.authorizeRequests(requests -> requests.anyRequest().authenticated());
+        http.authorizeRequests()
+                .antMatchers("/callback/v1/**").permitAll()
+                .antMatchers("/doc").permitAll()
+                .anyRequest().authenticated();
     }
 }

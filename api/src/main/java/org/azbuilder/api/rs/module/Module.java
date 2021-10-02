@@ -6,9 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.rs.Organization;
+import org.azbuilder.api.rs.vcs.Vcs;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -44,9 +47,6 @@ public class Module {
     @Column(name = "source")
     private String source;
 
-    @Column(name = "source_sample")
-    private String sourceSample;
-
     @ManyToOne
     private Organization organization;
 
@@ -61,9 +61,22 @@ public class Module {
     public List<String> getVersions(RequestScope requestScope) {
         List<String> versionList = new ArrayList<>();
         try {
+            CredentialsProvider credentialsProvider = null;
+            if (vcs != null) {
+                log.info("vcs using {}", vcs.getVcsType());
+                switch (vcs.getVcsType()) {
+                    case GITHUB:
+                        credentialsProvider = new UsernamePasswordCredentialsProvider(vcs.getAccessToken(), "");
+                        break;
+                    default:
+                        credentialsProvider = null;
+                        break;
+                }
+            }
             Map<String, Ref> tags = Git.lsRemoteRepository()
                     .setTags(true)
                     .setRemote(source)
+                    .setCredentialsProvider(credentialsProvider)
                     .callAsMap();
             tags.forEach((key, value) -> {
                 versionList.add(key.replace("refs/tags/", ""));
@@ -73,4 +86,7 @@ public class Module {
         }
         return versionList;
     }
+
+    @OneToOne
+    private Vcs vcs;
 }

@@ -66,7 +66,10 @@ public class ModuleTests extends OpenRegistryApplicationTests{
             "                    \"data\": {\n" +
             "                        \"type\": \"organization\",\n" +
             "                        \"id\": \"b8938f8f-92c7-40fc-90ce-e4725ee8e985\"\n" +
-            "                    }\n" +
+            "                    },\n" +
+            "                \"vcs\": {\n" +
+            "                    \"data\": null\n" +
+            "                   }\n" +
             "                }\n" +
             "            }\n" +
             "        }\n" +
