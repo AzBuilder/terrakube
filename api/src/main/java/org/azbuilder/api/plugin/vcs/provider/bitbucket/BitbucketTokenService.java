@@ -1,6 +1,7 @@
 package org.azbuilder.api.plugin.vcs.provider.bitbucket;
 
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.vcs.provider.GetAccessToken;
 import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,13 +13,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Service
-public class BitbucketTokenService {
+public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
 
+    @Override
     public BitBucketToken getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException {
         WebClient client = WebClient.builder()
                 .baseUrl("https://bitbucket.org")
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .defaultHeaders(header -> header.setBasicAuth(clientId, clientSecret))
                 .build();
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -32,8 +35,9 @@ public class BitbucketTokenService {
                 .bodyToMono(BitBucketToken.class)
                 .block();
 
-        if(bitBucketToken != null)
+        if(bitBucketToken != null) {
             return bitBucketToken;
+        }
         else {
             throw new TokenException("500","Unable to get GitHub Token");
         }

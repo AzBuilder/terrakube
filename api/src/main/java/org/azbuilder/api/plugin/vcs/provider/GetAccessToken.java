@@ -2,7 +2,7 @@ package org.azbuilder.api.plugin.vcs.provider;
 
 import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
 
-public interface GetAccessToken {
+public interface GetAccessToken<T> {
 
-    Object getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException;
+    T getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException;
 }

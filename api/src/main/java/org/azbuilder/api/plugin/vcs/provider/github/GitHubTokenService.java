@@ -1,6 +1,7 @@
 package org.azbuilder.api.plugin.vcs.provider.github;
 
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.vcs.provider.GetAccessToken;
 import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -9,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Service
-public class GitHubTokenService {
+public class GitHubTokenService implements GetAccessToken<GitHubToken> {
     public GitHubToken getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException {
         WebClient client = WebClient.builder()
                 .baseUrl("https://github.com")
