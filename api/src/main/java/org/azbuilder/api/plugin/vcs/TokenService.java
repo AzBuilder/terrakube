@@ -1,7 +1,10 @@
 package org.azbuilder.api.plugin.vcs;
 
 import lombok.extern.slf4j.Slf4j;
-import org.azbuilder.api.plugin.vcs.provider.github.GitHubTokenException;
+import org.azbuilder.api.plugin.vcs.provider.bitbucket.BitBucketToken;
+import org.azbuilder.api.plugin.vcs.provider.bitbucket.BitbucketTokenService;
+import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
+import org.azbuilder.api.plugin.vcs.provider.github.GitHubToken;
 import org.azbuilder.api.plugin.vcs.provider.github.GitHubTokenService;
 import org.azbuilder.api.repository.VcsRepository;
 import org.azbuilder.api.rs.vcs.Vcs;
@@ -20,15 +23,31 @@ public class TokenService {
     @Autowired
     GitHubTokenService gitHubTokenService;
 
-    public boolean setGitHubToken(String vcsId, String tempCode){
+    @Autowired
+    BitbucketTokenService bitbucketTokenService;
+
+    public boolean generateAccessToken(String vcsId, String tempCode){
         Vcs vcs = vcsRepository.getOne(UUID.fromString(vcsId));
         try {
-            vcs.setAccessToken(gitHubTokenService.getAccessToken(vcs.getClientId(),vcs.getClientSecret(),tempCode));
+            switch (vcs.getVcsType()){
+                case GITHUB:
+                    GitHubToken gitHubToken = gitHubTokenService.getAccessToken(vcs.getClientId(),vcs.getClientSecret(),tempCode);
+                    vcs.setAccessToken(gitHubToken.getAccess_token());
+                    break;
+                case BITBUCKET:
+                    BitBucketToken bitBucketToken = bitbucketTokenService.getAccessToken(vcs.getClientId(),vcs.getClientSecret(), tempCode);
+                    vcs.setAccessToken(bitBucketToken.getAccess_token());
+                    break;
+                default:
+                    break;
+            }
+
             vcsRepository.save(vcs);
-        } catch (GitHubTokenException e) {
+        } catch (TokenException e) {
             log.error(e.getMessage());
         }
 
         return true;
     }
+
 }

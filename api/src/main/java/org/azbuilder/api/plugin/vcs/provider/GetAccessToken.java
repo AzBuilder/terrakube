@@ -1,8 +1,8 @@
 package org.azbuilder.api.plugin.vcs.provider;
 
-import org.azbuilder.api.plugin.vcs.provider.github.GitHubTokenException;
+import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
 
 public interface GetAccessToken {
 
-    String getAccessToken(String clientId, String clientSecret, String tempCode) throws GitHubTokenException;
+    Object getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException;
 }
