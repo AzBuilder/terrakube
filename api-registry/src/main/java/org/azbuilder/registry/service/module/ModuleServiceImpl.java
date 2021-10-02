@@ -43,7 +43,6 @@ public class ModuleServiceImpl implements ModuleService {
 
         String organizationId = restClient.getOrganizationByName(organizationName).getData().get(0).getId();
         Module module = restClient.getModuleByNameAndProvider(organizationId, moduleName, providerName).getData().get(0);
-        List<String> versionList = module.getAttributes().getVersions();
         String moduleSource = module.getAttributes().getSource();
         String vcsType = "PUBLIC";
         String accessToken = null;
