@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/callback/v1/github")
+@RequestMapping("/callback/v1")
 public class CallbackController {
 
     @Autowired
@@ -16,7 +16,7 @@ public class CallbackController {
     @GetMapping("/vcs/{vcsId}")
     public String connected(@PathVariable("vcsId") String vcsId, @RequestParam String code){
         log.info("Updating connection for vcs {}", vcsId);
-        tokenService.setGitHubToken(vcsId,code);
+        tokenService.generateAccessToken(vcsId,code);
         return "Connected";
     }
 

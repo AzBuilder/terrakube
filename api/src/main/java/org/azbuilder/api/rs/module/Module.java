@@ -68,6 +68,9 @@ public class Module {
                     case GITHUB:
                         credentialsProvider = new UsernamePasswordCredentialsProvider(vcs.getAccessToken(), "");
                         break;
+                    case BITBUCKET:
+                        credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", vcs.getAccessToken());
+                        break;
                     default:
                         credentialsProvider = null;
                         break;

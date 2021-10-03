@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class GitLabTokenService implements GetAccessToken {
-    @Override
+public class GitLabTokenService {
     public String getAccessToken(String clientId, String clientSecret, String tempCode) {
         return null;
     }

@@ -24,6 +24,10 @@
             </column>
             <column name="access_token" type="varchar2(512)">
             </column>
+            <column name="refresh_token" type="varchar2(512)">
+            </column>
+            <column name="token_expiration" type="time">
+            </column>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_vcs_organization" references="organization(id)"/>
             </column>

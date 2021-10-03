@@ -50,6 +50,9 @@ public class GitServiceImpl implements GitService{
             case "GITHUB":
                 credentialsProvider = new UsernamePasswordCredentialsProvider(accessToken, "");
                 break;
+            case "BITBUCKET":
+                credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", accessToken);
+                break;
             default:
                 credentialsProvider = null;
                 break;
