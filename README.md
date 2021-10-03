@@ -41,6 +41,13 @@ Expose a JSON:API or GraphQL API providing endpoints to handle:
 
 For more information please visit our [documentation](https://azbuilder.gitbook.io/azb-builder/).
 
+## Version Control Services
+The platform support public and private repositories in the following providers:
+
+* GitHub.com
+* Bitbucket.com
+* Gitlab.com
+
 ## Requirements
 
 To compile and run the tool you will need the following:

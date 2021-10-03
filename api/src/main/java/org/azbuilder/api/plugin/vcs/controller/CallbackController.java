@@ -3,6 +3,7 @@ package org.azbuilder.api.plugin.vcs.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.vcs.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -14,10 +15,13 @@ public class CallbackController {
     TokenService tokenService;
 
     @GetMapping("/vcs/{vcsId}")
-    public String connected(@PathVariable("vcsId") String vcsId, @RequestParam String code){
-        log.info("Updating connection for vcs {}", vcsId);
-        tokenService.generateAccessToken(vcsId,code);
-        return "Connected";
+    public ResponseEntity<String> connected(@PathVariable("vcsId") String vcsId, @RequestParam String code){
+        if(code != null){
+            log.info("Updating connection for vcs {}", vcsId);
+            tokenService.generateAccessToken(vcsId, code);
+            return ResponseEntity.ok("Connected");
+        }
+        return ResponseEntity.ok().build();
     }
 
 }
