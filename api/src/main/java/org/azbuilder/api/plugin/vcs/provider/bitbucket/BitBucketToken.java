@@ -8,7 +8,7 @@ import lombok.Setter;
 public class BitBucketToken {
     private String scopes;
     private String access_token;
-    private String expires_in;
+    private int expires_in;
     private String token_type;
     private String state;
     private String refresh_token;

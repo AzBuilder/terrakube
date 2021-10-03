@@ -43,7 +43,30 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
         }
     }
 
-    public String refreshAccessToken(){
-        return null;
+    public BitBucketToken refreshAccessToken(String clientId, String clientSecret, String refreshToken) throws TokenException {
+        WebClient client = WebClient.builder()
+                .baseUrl("https://bitbucket.org")
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .defaultHeaders(header -> header.setBasicAuth(clientId, clientSecret))
+                .build();
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("grant_type", "refresh_token");
+        formData.add("refresh_token", refreshToken);
+
+        BitBucketToken bitBucketToken = client.post()
+                .uri("/site/oauth2/access_token")
+                .body(BodyInserters.fromFormData(formData))
+                .retrieve()
+                .bodyToMono(BitBucketToken.class)
+                .block();
+
+        if(bitBucketToken != null) {
+            return bitBucketToken;
+        }
+        else {
+            throw new TokenException("500","Unable to get GitHub Token");
+        }
     }
 }

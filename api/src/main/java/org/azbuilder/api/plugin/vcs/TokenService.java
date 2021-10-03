@@ -11,6 +11,7 @@ import org.azbuilder.api.rs.vcs.Vcs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
@@ -26,17 +27,19 @@ public class TokenService {
     @Autowired
     BitbucketTokenService bitbucketTokenService;
 
-    public boolean generateAccessToken(String vcsId, String tempCode){
+    public boolean generateAccessToken(String vcsId, String tempCode) {
         Vcs vcs = vcsRepository.getOne(UUID.fromString(vcsId));
         try {
-            switch (vcs.getVcsType()){
+            switch (vcs.getVcsType()) {
                 case GITHUB:
-                    GitHubToken gitHubToken = gitHubTokenService.getAccessToken(vcs.getClientId(),vcs.getClientSecret(),tempCode);
+                    GitHubToken gitHubToken = gitHubTokenService.getAccessToken(vcs.getClientId(), vcs.getClientSecret(), tempCode);
                     vcs.setAccessToken(gitHubToken.getAccess_token());
                     break;
                 case BITBUCKET:
-                    BitBucketToken bitBucketToken = bitbucketTokenService.getAccessToken(vcs.getClientId(),vcs.getClientSecret(), tempCode);
+                    BitBucketToken bitBucketToken = bitbucketTokenService.getAccessToken(vcs.getClientId(), vcs.getClientSecret(), tempCode);
                     vcs.setAccessToken(bitBucketToken.getAccess_token());
+                    vcs.setRefreshToken(bitBucketToken.getRefresh_token());
+                    vcs.setTokenExpiration(new Date(System.currentTimeMillis() + bitBucketToken.getExpires_in() * 1000));
                     break;
                 default:
                     break;
