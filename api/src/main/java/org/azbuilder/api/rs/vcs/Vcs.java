@@ -4,10 +4,8 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.azbuilder.api.plugin.vcs.provider.bitbucket.BitBucketToken;
-import org.azbuilder.api.plugin.vcs.provider.bitbucket.BitbucketTokenService;
-import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
 import org.azbuilder.api.rs.Organization;
+import org.azbuilder.api.rs.hooks.vcs.VcsReadTokenHook;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -49,6 +47,7 @@ public class Vcs {
     private String clientSecret;
 
     @ReadPermission(expression = "service read vcs secret")
+    @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.PRESECURITY, hook = VcsReadTokenHook.class)
     @Column(name = "access_token")
     private String accessToken;
 
@@ -63,24 +62,5 @@ public class Vcs {
 
     @ManyToOne
     private Organization organization;
-
-    public String getAccessToken() {
-        log.info("Token Expiration: {}", tokenExpiration);
-        //Refresh token every 1.5 hours, Bitbucket Token expire after 2 hours (7200 seconds)
-        if (tokenExpiration != null && tokenExpiration.before(new Date(System.currentTimeMillis() + 5400 * 1000))) {
-            log.info("Refreshing Token {}", this.vcsType);
-            try {
-                BitbucketTokenService bitbucketTokenService = new BitbucketTokenService();
-                BitBucketToken bitBucketToken = bitbucketTokenService.refreshAccessToken(this.clientId, this.clientSecret, this.refreshToken);
-                this.accessToken = bitBucketToken.getAccess_token();
-                this.tokenExpiration = new Date(System.currentTimeMillis() + bitBucketToken.getExpires_in() * 1000);
-                log.info("New Token Expiration: {}", this.tokenExpiration);
-            } catch (TokenException e) {
-                log.error(e.getMessage());
-            }
-
-        }
-        return accessToken;
-    }
 
 }

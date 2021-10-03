@@ -53,6 +53,9 @@ public class GitServiceImpl implements GitService{
             case "BITBUCKET":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", accessToken);
                 break;
+            case "GITLAB":
+                credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", accessToken);
+                break;
             default:
                 credentialsProvider = null;
                 break;

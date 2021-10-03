@@ -71,6 +71,9 @@ public class Module {
                     case BITBUCKET:
                         credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", vcs.getAccessToken());
                         break;
+                    case GITLAB:
+                        credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", vcs.getAccessToken());
+                        break;
                     default:
                         credentialsProvider = null;
                         break;
