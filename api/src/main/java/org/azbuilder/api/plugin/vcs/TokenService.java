@@ -67,8 +67,8 @@ public class TokenService {
         return true;
     }
 
-    public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId, String clientSecret, String refreshToken, String currentToken) {
-        Map<String, Object> tokenInformation = new HashMap();
+    public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId, String clientSecret, String refreshToken) {
+        Map<String, Object> tokenInformation = new HashMap<>();
         switch (vcsType) {
             case BITBUCKET:
                 //Refresh token every 1.5 hours, Bitbucket Token expire after 2 hours (7200 seconds)

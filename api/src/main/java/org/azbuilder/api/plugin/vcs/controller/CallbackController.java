@@ -15,7 +15,7 @@ public class CallbackController {
     TokenService tokenService;
 
     @GetMapping("/vcs/{vcsId}")
-    public ResponseEntity connected(@PathVariable("vcsId") String vcsId, @RequestParam String code){
+    public ResponseEntity<String> connected(@PathVariable("vcsId") String vcsId, @RequestParam String code){
         if(code != null){
             log.info("Updating connection for vcs {}", vcsId);
             tokenService.generateAccessToken(vcsId, code);

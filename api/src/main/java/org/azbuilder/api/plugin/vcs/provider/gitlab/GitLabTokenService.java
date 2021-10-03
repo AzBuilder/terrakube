@@ -1,16 +1,10 @@
 package org.azbuilder.api.plugin.vcs.provider.gitlab;
 
 import lombok.extern.slf4j.Slf4j;
-import org.azbuilder.api.plugin.vcs.provider.GetAccessToken;
-import org.azbuilder.api.plugin.vcs.provider.bitbucket.BitBucketToken;
 import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
-import org.azbuilder.api.plugin.vcs.provider.github.GitHubToken;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j

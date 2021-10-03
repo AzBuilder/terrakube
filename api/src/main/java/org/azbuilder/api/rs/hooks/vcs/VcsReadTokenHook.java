@@ -26,7 +26,7 @@ public class VcsReadTokenHook implements LifeCycleHook<Vcs> {
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase transactionPhase, Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
         if (authenticatedUser.isServiceAccount(requestScope.getUser())) {
             log.info("Checking if accessToken is valid for Service Account");
-            Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(vcs.getId().toString(), vcs.getVcsType(), vcs.getTokenExpiration(), vcs.getClientId(), vcs.getClientSecret(), vcs.getRefreshToken(), vcs.getAccessToken());
+            Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(vcs.getId().toString(), vcs.getVcsType(), vcs.getTokenExpiration(), vcs.getClientId(), vcs.getClientSecret(), vcs.getRefreshToken());
             if (!newTokenInformation.isEmpty()) {
                 vcs.setAccessToken((String) newTokenInformation.get("accessToken"));
                 vcs.setRefreshToken((String) newTokenInformation.get("refreshToken"));
