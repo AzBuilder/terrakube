@@ -20,11 +20,11 @@
             </column>
             <column name="client_id" type="varchar2(64)">
             </column>
-            <column name="client_secret" type="varchar2(128)">
+            <column name="client_secret" type="varchar2(1024)">
             </column>
-            <column name="access_token" type="varchar2(512)">
+            <column name="access_token" type="varchar2(1024)">
             </column>
-            <column name="refresh_token" type="varchar2(512)">
+            <column name="refresh_token" type="varchar2(1024)">
             </column>
             <column name="token_expiration" type="time">
             </column>

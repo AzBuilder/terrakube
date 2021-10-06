@@ -4,5 +4,6 @@ public enum VcsType {
     GITHUB,
     GITLAB,
     BITBUCKET,
+    AZURE_DEVOPS,
     PUBLIC
 }
