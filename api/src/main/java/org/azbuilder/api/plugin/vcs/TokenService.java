@@ -1,6 +1,8 @@
 package org.azbuilder.api.plugin.vcs;
 
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.vcs.provider.azdevops.AzDevOpsToken;
+import org.azbuilder.api.plugin.vcs.provider.azdevops.AzDevOpsTokenService;
 import org.azbuilder.api.plugin.vcs.provider.bitbucket.BitBucketToken;
 import org.azbuilder.api.plugin.vcs.provider.bitbucket.BitbucketTokenService;
 import org.azbuilder.api.plugin.vcs.provider.exception.TokenException;
@@ -35,6 +37,9 @@ public class TokenService {
     @Autowired
     GitLabTokenService gitLabTokenService;
 
+    @Autowired
+    AzDevOpsTokenService azDevOpsTokenService;
+
     public boolean generateAccessToken(String vcsId, String tempCode) {
         Vcs vcs = vcsRepository.getOne(UUID.fromString(vcsId));
         try {
@@ -54,6 +59,12 @@ public class TokenService {
                     vcs.setAccessToken(gitLabToken.getAccess_token());
                     vcs.setRefreshToken(gitLabToken.getRefresh_token());
                     vcs.setTokenExpiration(new Date(System.currentTimeMillis() + gitLabToken.getExpires_in() * 1000));
+                    break;
+                case AZURE_DEVOPS:
+                    AzDevOpsToken azDevOpsToken = azDevOpsTokenService.getAccessToken(vcs.getId().toString(), vcs.getClientSecret(), tempCode);
+                    vcs.setAccessToken(azDevOpsToken.getAccess_token());
+                    vcs.setRefreshToken(azDevOpsToken.getRefresh_token());
+                    vcs.setTokenExpiration(new Date(System.currentTimeMillis() + azDevOpsToken.getExpires_in() * 1000));
                     break;
                 default:
                     break;
@@ -91,6 +102,19 @@ public class TokenService {
                         tokenInformation.put("accessToken", gitLabToken.getAccess_token());
                         tokenInformation.put("refreshToken", gitLabToken.getRefresh_token());
                         tokenInformation.put("tokenExpiration", new Date(System.currentTimeMillis() + gitLabToken.getExpires_in() * 1000));
+                    } catch (TokenException e) {
+                        log.error(e.getMessage());
+                    }
+                }
+                break;
+            case AZURE_DEVOPS:
+                //Refresh token every 45 minutes, Azure DevOps Token expire after 1 hour (3599 seconds)
+                if (tokenExpiration != null && tokenExpiration.before(new Date(System.currentTimeMillis() + 2700 * 1000))) {
+                    try {
+                        AzDevOpsToken azDevOpsToken = azDevOpsTokenService.refreshAccessToken(vcsId, clientSecret, refreshToken);
+                        tokenInformation.put("accessToken", azDevOpsToken.getAccess_token());
+                        tokenInformation.put("refreshToken", azDevOpsToken.getRefresh_token());
+                        tokenInformation.put("tokenExpiration", new Date(System.currentTimeMillis() + azDevOpsToken.getExpires_in() * 1000));
                     } catch (TokenException e) {
                         log.error(e.getMessage());
                     }

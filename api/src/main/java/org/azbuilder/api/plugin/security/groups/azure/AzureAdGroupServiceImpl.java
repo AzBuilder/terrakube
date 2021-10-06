@@ -49,7 +49,7 @@ public class AzureAdGroupServiceImpl implements GroupService {
     private String getUserId(String userName) {
         log.info("Search User Id {}", userName);
         List<Option> requestOptions = new ArrayList<>();
-        requestOptions.add(new QueryOption("$filter", "userPrincipalName eq '" + userName + "'"));
+        requestOptions.add(new QueryOption("$filter", "mail eq '" + userName + "'"));
 
         UserCollectionPage userCollectionPage = graphServiceClient.users().buildRequest(requestOptions).get();
         if (userCollectionPage.getCurrentPage().size() == 1) {

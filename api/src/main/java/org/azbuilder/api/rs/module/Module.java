@@ -74,6 +74,9 @@ public class Module {
                     case GITLAB:
                         credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", vcs.getAccessToken());
                         break;
+                    case AZURE_DEVOPS:
+                        credentialsProvider = new UsernamePasswordCredentialsProvider("dummy", vcs.getAccessToken());
+                        break;
                     default:
                         credentialsProvider = null;
                         break;
