@@ -56,7 +56,7 @@ public class Vcs {
     private String refreshToken;
 
     @Exclude
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "token_expiration")
     private Date tokenExpiration;
 
