@@ -34,8 +34,12 @@ public class JobTests extends ServerApplicationTests{
                                         id("1"),
                                         attributes(
                                                 attr("command", "apply"),
+                                                attr("createdBy", null),
+                                                attr("createdDate", null),
                                                 attr("output", "sampleOutput"),
-                                                attr("status", "pending")
+                                                attr("status", "pending"),
+                                                attr("updatedBy", null),
+                                                attr("updatedDate", null)
                                         ),
                                         relationships(
                                                 relation("organization",true,

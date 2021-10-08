@@ -3,6 +3,7 @@ package org.azbuilder.api.rs.job;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.workspace.Workspace;
 
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-public class Job {
+public class Job extends GenericAuditFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
