@@ -24,7 +24,7 @@ public class AzDevOpsTokenService {
         formData.add("client_assertion", clientSecret);
         formData.add("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
         formData.add("assertion", tempCode);
-        formData.add("redirect_uri", String.format("https://%s/%s", hostname, vcsId));
+        formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, vcsId));
 
         AzDevOpsToken azDevOpsToken = getWebClient().post()
                 .uri("/oauth2/token")
@@ -42,7 +42,7 @@ public class AzDevOpsTokenService {
         formData.add("client_assertion", clientSecret);
         formData.add("grant_type", "refresh_token");
         formData.add("assertion", refreshToken);
-        formData.add("redirect_uri", String.format("https://%s/%s", hostname, vcsId));
+        formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, vcsId));
 
         AzDevOpsToken azDevOpsToken  = getWebClient().post()
                 .uri("/oauth2/token")
