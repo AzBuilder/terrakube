@@ -17,7 +17,7 @@ public class AzureAuditorAwareImpl implements AuditorAware<String> {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+            return Optional.empty();
         }
 
         return Optional.of(isServiceAccount(authentication) ? "serviceAccount" : getEmail(authentication));
