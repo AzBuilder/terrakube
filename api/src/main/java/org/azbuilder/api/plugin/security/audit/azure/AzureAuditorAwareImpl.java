@@ -1,7 +1,6 @@
 package org.azbuilder.api.plugin.security.audit.azure;
 
-import com.azure.spring.aad.webapi.AADOAuth2AuthenticatedPrincipal;
-import com.yahoo.elide.core.security.User;
+import com.azure.spring.aad.AADOAuth2AuthenticatedPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
