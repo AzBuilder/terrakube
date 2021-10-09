@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "ebc79ec0-e357-49ad-be65-0f815172585d",
-		"name": "AzBuilder",
+		"_postman_id": "944ff826-68f4-47be-b1b9-ba2db9ff1900",
+		"name": "AzBuilder v1.4",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -43,7 +43,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp\",\r\n      \"description\": \"Sample Organization\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp\",\r\n      \"description\": \"Demo Organization\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -76,7 +76,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{server}}/api/v1/organization?include=module,workspace.variable",
+							"raw": "{{server}}/api/v1/organization",
 							"host": [
 								"{{server}}"
 							],
@@ -84,12 +84,6 @@
 								"api",
 								"v1",
 								"organization"
-							],
-							"query": [
-								{
-									"key": "include",
-									"value": "module,workspace.variable"
-								}
 							]
 						}
 					},
@@ -130,7 +124,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{server}}/api/v1/organization?filter[organization]=name==sampleOrg&filter[provider]=name==sampleProvider",
+							"raw": "{{server}}/api/v1/organization?filter[organization]=name==hashicorp&filter[provider]=name==random",
 							"host": [
 								"{{server}}"
 							],
@@ -142,11 +136,11 @@
 							"query": [
 								{
 									"key": "filter[organization]",
-									"value": "name==sampleOrg"
+									"value": "name==hashicorp"
 								},
 								{
 									"key": "filter[provider]",
-									"value": "name==sampleProvider"
+									"value": "name==random"
 								}
 							]
 						}
@@ -159,7 +153,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{server}}/api/v1/organization?filter[organization]=name==organization1",
+							"raw": "{{server}}/api/v1/organization?filter[organization]=name==hashicorp",
 							"host": [
 								"{{server}}"
 							],
@@ -171,7 +165,7 @@
 							"query": [
 								{
 									"key": "filter[organization]",
-									"value": "name==organization1"
+									"value": "name==hashicorp"
 								}
 							]
 						}
@@ -270,6 +264,378 @@
 								"v1",
 								"organization",
 								"{{organizationId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "teams",
+			"item": [
+				{
+					"name": "create team A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"teamIdA\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_USER\",\n      \"manageWorkspace\": true,\n      \"manageModule\": true,\n      \"manageProvider\": true,\n      \"manageVcs\": true\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/team",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"team"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create team B",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"teamIdB\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_TEST\",\n      \"manageWorkspace\": true,\n      \"manageModule\": false,\n      \"manageProvider\": true\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/team",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"team"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"teamIdB\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/team",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"team"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "vcs",
+			"item": [
+				{
+					"name": "callback",
+					"item": [
+						{
+							"name": "VCS Callback",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{server}}/callback/v1/vcs/{{vcsId}}?code=12345",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"callback",
+										"v1",
+										"vcs",
+										"{{vcsId}}"
+									],
+									"query": [
+										{
+											"key": "code",
+											"value": "12345"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "create vcs GitHub",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"vcsIdGitHub\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitHub\",\n      \"description\": \"vcsGitHubDescription\",\n      \"vcsType\": \"GITHUB\",\n      \"clientId\": \"{{githubClientId}}\",\n      \"clientSecret\": \"{{githubClientSecret}}\",\n      \"accessToken\": \"{{githubAccessToken}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"vcs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create vcs Bitbucket",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"vcsIdBitBucket\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsBitbucket\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"BITBUCKET\",\n      \"clientId\": \"{{bitbucketClientId}}\",\n      \"clientSecret\": \"{{bitbucketSecret}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"vcs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create vcs GitLab",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"vcsIdGitLab\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitLab\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"GITLAB\",\n      \"clientId\": \"{{gitlabClientId}}\",\n      \"clientSecret\": \"{{gitlabSecretId}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"vcs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create vcs Azure DevOps",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"vcsIdAzDevOps\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsAzDevOps\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"AZURE_DEVOPS\",\n      \"clientId\": \"{{azDevOpsClientId}}\",\n      \"clientSecret\": \"{{azDevOpsClientSecret}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"vcs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search vcs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"vcs"
 							]
 						}
 					},
@@ -834,7 +1200,7 @@
 			"name": "module",
 			"item": [
 				{
-					"name": "create module",
+					"name": "create module without vcs",
 					"event": [
 						{
 							"listen": "test",
@@ -859,6 +1225,198 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"azure\",\r\n      \"description\": \"aespana sample module\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://github.com/AzBuilder/terraform-sample-repository.git\",\r\n      \"sourceSample\": \"https://github.com/AzBuilder/terraform-sample-repository.git\"\r\n    }\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/module",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"module"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create module with vcs GitHub",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"moduleId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"privateRepoGitHub\",\r\n      \"description\": \"GitHub private repository\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://github.com/alfespa17/terraform-module-private.git\"\r\n    },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdGitHub}}\"\r\n                }\r\n            }\r\n        }\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/module",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"module"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create module with vcs Bitbucket",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"moduleId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"privateRepoBitbucket\",\r\n      \"description\": \"Bitbucket private repository\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://bitbucket.org/alfespa17/private-module.git\"\r\n    },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdBitBucket}}\"\r\n                }\r\n            }\r\n        }\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/module",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"module"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create module with vcs Gitlab",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"moduleId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"privateRepoGitLab\",\r\n      \"description\": \"GitLab private repository\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://gitlab.com/alfespa17/terraform-private-module.git\"\r\n    },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdGitLab}}\"\r\n                }\r\n            }\r\n        }\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/module",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"module"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create module with vcs AzDevOps",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"moduleId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"privateRepoAzDevOps\",\r\n      \"description\": \"AzDevOps private repository\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://dev.azure.com/AzTerraBot/PoC/_git/azterrabot-server\"\r\n    },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdAzDevOps}}\"\r\n                }\r\n            }\r\n        }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1012,7 +1570,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"tag_name\",\r\n      \"value\": \"HolaMundo\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"tag_name\",\r\n      \"value\": \"HolaMundo\",\r\n      \"sensitive\": false,\r\n      \"hcl\": false,\r\n      \"category\": \"TERRAFORM\",\r\n      \"description\": \"Azure RG Tag\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1056,6 +1614,35 @@
 										"{{workspaceId}}",
 										"variable",
 										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search secrets",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable?filter[variable]=sensitive==true;category==terraform",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"variable"
+									],
+									"query": [
+										{
+											"key": "filter[variable]",
+											"value": "sensitive==true;category==terraform"
+										}
 									]
 								}
 							},
@@ -1108,12 +1695,7 @@
 								}
 							},
 							"response": []
-						}
-					]
-				},
-				{
-					"name": "environment",
-					"item": [
+						},
 						{
 							"name": "create ARM_CLIENT_ID",
 							"event": [
@@ -1139,7 +1721,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_ID\",\r\n      \"value\": \"{{ARM_CLIENT_ID}}\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_ID\",\r\n      \"value\": \"{{ARM_CLIENT_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1147,7 +1729,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable",
 									"host": [
 										"{{server}}"
 									],
@@ -1158,7 +1740,7 @@
 										"{{organizationId}}",
 										"workspace",
 										"{{workspaceId}}",
-										"environment"
+										"variable"
 									]
 								}
 							},
@@ -1183,11 +1765,12 @@
 									{
 										"key": "Content-Type",
 										"value": "application/vnd.api+json",
-										"type": "text"
+										"type": "text",
+										"disabled": true
 									}
 								],
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentClientId}}",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable/{{environmentClientId}}",
 									"host": [
 										"{{server}}"
 									],
@@ -1198,7 +1781,7 @@
 										"{{organizationId}}",
 										"workspace",
 										"{{workspaceId}}",
-										"environment",
+										"variable",
 										"{{environmentClientId}}"
 									]
 								}
@@ -1230,7 +1813,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_SECRET\",\r\n      \"value\": \"{{ARM_CLIENT_SECRET}}\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_CLIENT_SECRET\",\r\n      \"value\": \"{{ARM_CLIENT_SECRET}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1238,7 +1821,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable",
 									"host": [
 										"{{server}}"
 									],
@@ -1249,7 +1832,7 @@
 										"{{organizationId}}",
 										"workspace",
 										"{{workspaceId}}",
-										"environment"
+										"variable"
 									]
 								}
 							},
@@ -1274,11 +1857,12 @@
 									{
 										"key": "Content-Type",
 										"value": "application/vnd.api+json",
-										"type": "text"
+										"type": "text",
+										"disabled": true
 									}
 								],
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentSecretId}}",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable/{{environmentSecretId}}",
 									"host": [
 										"{{server}}"
 									],
@@ -1289,7 +1873,7 @@
 										"{{organizationId}}",
 										"workspace",
 										"{{workspaceId}}",
-										"environment",
+										"variable",
 										"{{environmentSecretId}}"
 									]
 								}
@@ -1321,7 +1905,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_SUBSCRIPTION_ID\",\r\n      \"value\": \"{{ARM_SUBSCRIPTION_ID}}\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_SUBSCRIPTION_ID\",\r\n      \"value\": \"{{ARM_SUBSCRIPTION_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1329,7 +1913,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable",
 									"host": [
 										"{{server}}"
 									],
@@ -1340,7 +1924,7 @@
 										"{{organizationId}}",
 										"workspace",
 										"{{workspaceId}}",
-										"environment"
+										"variable"
 									]
 								}
 							},
@@ -1421,7 +2005,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"environment\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_TENANT_ID\",\r\n      \"value\": \"{{ARM_TENANT_ID}}\"\r\n    }\r\n  }\r\n}",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"variable\",\r\n    \"attributes\": {\r\n      \"key\": \"ARM_TENANT_ID\",\r\n      \"value\": \"{{ARM_TENANT_ID}}\",\r\n      \"sensitive\": true,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"random description\"\r\n    }\r\n  }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1429,7 +2013,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable",
 									"host": [
 										"{{server}}"
 									],
@@ -1440,7 +2024,7 @@
 										"{{organizationId}}",
 										"workspace",
 										"{{workspaceId}}",
-										"environment"
+										"variable"
 									]
 								}
 							},
@@ -1495,209 +2079,11 @@
 								}
 							},
 							"response": []
-						},
-						{
-							"name": "search",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment",
-									"host": [
-										"{{server}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"organization",
-										"{{organizationId}}",
-										"workspace",
-										"{{workspaceId}}",
-										"environment"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "search by id",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/environment/{{environmentId}}",
-									"host": [
-										"{{server}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"organization",
-										"{{organizationId}}",
-										"workspace",
-										"{{workspaceId}}",
-										"environment",
-										"{{environmentId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete by id",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/variable/{{environmentId}}",
-									"host": [
-										"{{server}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"organization",
-										"{{organizationId}}",
-										"workspace",
-										"{{workspaceId}}",
-										"variable",
-										"{{environmentId}}"
-									]
-								}
-							},
-							"response": []
 						}
 					]
 				},
 				{
-					"name": "secret",
-					"item": [
-						{
-							"name": "create",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var json = JSON.parse(responseBody);\r",
-											"postman.setEnvironmentVariable(\"secretId\", json.data.id);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/vnd.api+json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"secret\",\r\n    \"attributes\": {\r\n      \"key\": \"SecretKey\",\r\n      \"value\": \"SecretValue\"\r\n    }\r\n  }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/secret",
-									"host": [
-										"{{server}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"organization",
-										"{{organizationId}}",
-										"workspace",
-										"{{workspaceId}}",
-										"secret"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "search",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/secret/{{secretId}}",
-									"host": [
-										"{{server}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"organization",
-										"{{organizationId}}",
-										"workspace",
-										"{{workspaceId}}",
-										"secret",
-										"{{secretId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "search by id",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/secret/{{secretId}}",
-									"host": [
-										"{{server}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"organization",
-										"{{organizationId}}",
-										"workspace",
-										"{{workspaceId}}",
-										"secret",
-										"{{secretId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete by id",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/secret/{{secretId}}",
-									"host": [
-										"{{server}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"organization",
-										"{{organizationId}}",
-										"workspace",
-										"{{workspaceId}}",
-										"secret",
-										"{{secretId}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "create",
+					"name": "create with vcs",
 					"event": [
 						{
 							"listen": "test",
@@ -1721,7 +2107,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"workspace\",\r\n    \"attributes\": {\r\n      \"name\": \"workspace1\",\r\n      \"source\": \"https://github.com/AzBuilder/terraform-sample-repository.git\",\r\n      \"branch\": \"main\",\r\n      \"terraformVersion\": \"0.15.0\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n    \"data\": {\r\n        \"type\": \"workspace\",\r\n        \"attributes\": {\r\n            \"branch\": \"main\",\r\n            \"name\": \"Demo Workspace\",\r\n            \"source\": \"https://github.com/alfespa17/terraform-module-private.git\",\r\n            \"terraformVersion\": \"0.15.0\"\r\n        },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsId}}\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1739,6 +2125,102 @@
 								"organization",
 								"{{organizationId}}",
 								"workspace"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create without vcs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"workspaceId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"workspace\",\r\n    \"attributes\": {\r\n      \"name\": \"Without VCS Workspace\",\r\n      \"source\": \"https://github.com/AzBuilder/terraform-sample-repository.git\",\r\n      \"branch\": \"main\",\r\n      \"terraformVersion\": \"0.15.0\"\r\n    }\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update workspace with vcs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"id\": \"{{vcsId}}\",\r\n    \"type\": \"vcs\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/workspace/{{workspaceId}}/relationships/vcs",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"{{workspaceId}}",
+								"relationships",
+								"vcs"
 							]
 						}
 					},
@@ -2151,14 +2633,7 @@
 					},
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{device_access_token}}",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [
@@ -2178,10 +2653,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{server}}/doc",
+							"raw": "localhost:8080/doc",
 							"host": [
-								"{{server}}"
+								"localhost"
 							],
+							"port": "8080",
 							"path": [
 								"doc"
 							]
