@@ -5,6 +5,7 @@ import { loginRequest } from "../../config/authConfig";
 import './Login.css';
 import axiosInstance from "../../config/axiosConfig";
 import { Card ,Space} from "antd";
+import logo from './logo.jpg';
 const Login = () => {
   const { instance } = useMsal();
 
@@ -12,7 +13,7 @@ const Login = () => {
     <div className='login-container'>
       <div className='login-wrapper'>
 
-        <Card title="Terraform" >
+        <Card title={<img  className="loginLogo" src={logo} />}>
           <Space direction="vertical">
           Sign in to Terrakube
           <MicrosoftLoginButton onClick={() => handleLogin(instance)} />

@@ -14,9 +14,7 @@ import './Workspaces.css';
 const { TabPane } = Tabs;
 const { Option } = Select;
 const include = {
-  ENVIRONMENT_VAR: 'environment',
-  SECRET_VAR: 'secret',
-  TERRAFORM_VAR: 'variable',
+  VARIABLE: 'variable',
   JOB: 'job'
 }
 
@@ -27,14 +25,17 @@ const VARIABLES_COLUMS = (organizationId, resourceId) => [
   {
     title: 'Key',
     dataIndex: 'key',
-    key: 'key'
+    key: 'key',
+    render: (_, record) => {
+      return  <div>{record.key} &nbsp;&nbsp;&nbsp;&nbsp; <Tag visible={record.hcl}>HCL</Tag> <Tag visible={record.sensitive}>Sensitive</Tag></div> ;
+    }
   },
   {
     title: 'Value',
     dataIndex: 'value',
     key: 'value',
     render: (_, record) => {
-      return record.type === 'secret' ? 'Hidden Value' : record.value;
+      return record.sensitive ? <i>Sensitive - write only</i> : <div>{record.value}</div> ;
     }
   },
   {
@@ -89,7 +90,7 @@ export const WorkspaceDetails = (props) => {
 
   const loadWorkspace = () => {
 
-    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=environment,job,secret,variable`)
+    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable`)
       .then(response => {
         console.log(response);
         setWorkspace(response.data);
@@ -175,12 +176,12 @@ export const WorkspaceDetails = (props) => {
                   <h2>Terraform Variables</h2>
                   <div className="App-text">These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string value for a variable, click its HCL checkbox.</div>
                   <Table dataSource={variables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
-                  <CreateVariable varType="variable"/>
+                  <CreateVariable varType="TERRAFORM"/>
                   <div className="envVariables">
                     <h2>Environment Variables</h2>
                     <div className="App-text">These variables are set in Terraform's shell environment using export.</div>
                     <Table dataSource={envVariables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
-                    <CreateVariable varType="environment"/>
+                    <CreateVariable varType="ENV"/>
                   </div>
                 </TabPane>
                 <TabPane tab="Settings" key="5">
@@ -251,7 +252,8 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
           }
         );
         break;
-      case include.ENVIRONMENT_VAR:
+      case include.VARIABLE:
+       if (element.attributes.category == "ENV"){
         envVariables.push(
           {
             id: element.id,
@@ -259,8 +261,8 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
             ...element.attributes
           }
         );
-        break;
-      default:
+       }
+       else {
         variables.push(
           {
             id: element.id,
@@ -268,6 +270,7 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
             ...element.attributes
           }
         );
+       }
         break;
     }
   });

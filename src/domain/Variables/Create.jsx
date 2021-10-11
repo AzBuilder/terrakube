@@ -1,9 +1,9 @@
 import { React, useState } from 'react';
-import { Form, Input, Button, Select, Modal, Space } from "antd";
+import { Form, Input, Button, Switch,Select, Modal, Space } from "antd";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
 import { useHistory } from "react-router-dom";
-
+import {InfoCircleOutlined} from '@ant-design/icons';
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 }
@@ -25,16 +25,20 @@ export const CreateVariable = ({varType}) => {
   const onCreate = (values) => {
     const body = {
       data: {
-        type: values.type,
+        type: "variable",
         attributes: {
           key: values.key,
-          value: values.value
+          value: values.value,
+          sensitive: values.sensitive,
+          description:values.description,
+          hcl: values.hcl,
+          category: varType
         }
       }
     }
     console.log(body);
 
-    axiosInstance.post(`organization/${organizationId}/workspace/${workspaceId}/${values.type}`, body, {
+    axiosInstance.post(`organization/${organizationId}/workspace/${workspaceId}/variable`, body, {
       headers: {
         'Content-Type': 'application/vnd.api+json'
       }
@@ -53,7 +57,7 @@ export const CreateVariable = ({varType}) => {
         }}>
         Add variable
       </Button>
-      <Modal width="350px" visible={visible} title="Add new variable" okText="Save variable" cancelText="Cancel" onCancel={onCancel}
+      <Modal width="600px" visible={visible} title="Add new variable" okText="Save variable" cancelText="Cancel" onCancel={onCancel}
         onOk={() => {
           form.validateFields().then((values) => {
             form.resetFields();
@@ -70,13 +74,15 @@ export const CreateVariable = ({varType}) => {
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item name="type" hidden="true">
-              <Select>
-                <Select.Option value="variable">Terraform</Select.Option>
-                <Select.Option value="environment">Environment</Select.Option>
-                <Select.Option value="secret">Secret</Select.Option>
-              </Select>
-            </Form.Item>
+            <Form.Item name="hcl" label="HCL" tooltip={{ title: 'Parse this field as HashiCorp Configuration Language (HCL). This allows you to interpolate values at runtime.', icon: <InfoCircleOutlined /> }} >
+              <Switch />
+           </Form.Item>
+           <Form.Item name="sensitive" label="Sensitive" tooltip={{ title: 'Sensitive variables are never shown in the UI or API. They may appear in Terraform logs if your configuration is designed to output them.', icon: <InfoCircleOutlined /> }} >
+              <Switch />
+           </Form.Item>
+           <Form.Item name="description"  label="Description">
+              <Input.TextArea width="800px" />
+          </Form.Item>
           </Form>
         </Space>
       </Modal>

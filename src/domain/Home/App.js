@@ -4,7 +4,7 @@ import Login from '../Login/Login'
 import MainMenu from '../Home/MainMenu'
 import { Layout, Avatar } from 'antd';
 import { useIsAuthenticated } from "@azure/msal-react";
-
+import logo from './white_logo.png';
 import {
   BrowserRouter as Router,
   Switch,
@@ -34,7 +34,12 @@ const App = () => {
     <Router>
       <Layout className="layout">
         <Header>
-          <div className="logo" />
+
+          <a>
+          <img className="logo" src={logo} ></img>
+          </a>
+          
+      
           
           <div className="menu">
             <MainMenu organizationName={organizationName} setOrganizationName={setOrganizationName}/>
