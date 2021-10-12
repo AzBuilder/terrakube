@@ -63,7 +63,6 @@ public class AzDevOpsTokenService {
 
     private AzDevOpsToken validateNewToken(AzDevOpsToken azDevOpsToken) throws TokenException {
         if(azDevOpsToken != null) {
-            log.info("Azure DevOps Token {}", azDevOpsToken.getAccess_token());
             return azDevOpsToken;
         } else {
             throw new TokenException("500","Unable to get GitHub Token");
