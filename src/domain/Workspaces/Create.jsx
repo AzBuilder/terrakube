@@ -99,7 +99,7 @@ export const CreateWorkspace = () => {
         <div className="createWorkspace">
           <h2>Create a new Workspace</h2>
           <div className="App-text">
-            Workspaces determine how Terraform Cloud organizes infrastructure. A workspace contains your Terraform configuration (infrastructure as code), shared variable values, your current and historical Terraform state, and run logs.
+            Workspaces determine how Terrakube organizes infrastructure. A workspace contains your Terraform configuration (infrastructure as code), shared variable values, your current and historical Terraform state, and run logs.
           </div>
           <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
             <Step title="Choose Type" />

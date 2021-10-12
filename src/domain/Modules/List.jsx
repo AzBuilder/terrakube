@@ -26,7 +26,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
-    axiosInstance.get(`organization/${orgid}?include=workspace,module`)
+    axiosInstance.get(`organization/${orgid}?include=module`)
       .then(response => {
         console.log(response);
         setOrganization(response.data);
@@ -85,7 +85,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
                       <Space size={size} style={{ marginTop: "25px" }}>
                         <Tag color="blue"><span><MdBusiness /> Private</span></Tag>
                         <span>{renderLogo(item.provider)}&nbsp;&nbsp;{item.provider}</span>
-                        <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;1.0.0</span>
+                        <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;{item.versions[0]}</span>
                         <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
                         <span><DownloadOutlined />&nbsp;&nbsp; &lt; 100</span>
                       </Space>

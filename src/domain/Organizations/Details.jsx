@@ -50,7 +50,7 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
-    axiosInstance.get(`organization/${id}?include=workspace,module`)
+    axiosInstance.get(`organization/${id}?include=workspace`)
       .then(response => {
         console.log(response);
         setOrganization(response.data);

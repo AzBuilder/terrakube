@@ -1,9 +1,9 @@
 import { React, useState, useEffect } from 'react';
 import { Menu, Layout, Breadcrumb, Dropdown, Tabs, Space, Input, Tag, Row, Col, Card, Divider } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import { useParams,Link } from "react-router-dom";
-import { DownOutlined,CloudOutlined , ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
-import { SiMicrosoftazure ,SiAmazonaws} from "react-icons/si";
+import { useParams, Link } from "react-router-dom";
+import { DownOutlined, CloudOutlined, ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
+import { SiMicrosoftazure, SiAmazonaws } from "react-icons/si";
 import { BiBookBookmark } from "react-icons/bi";
 import { RiFolderHistoryLine, RiGithubFill } from "react-icons/ri";
 import { IconContext } from "react-icons";
@@ -25,19 +25,22 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const { orgid, id } = useParams();
   const [module, setModule] = useState([]);
   const [moduleName, setModuleName] = useState("...");
+  const [version, setVersion] = useState("...");
   const [loading, setLoading] = useState(false);
 
   const renderLogo = (provider) => {
-    switch(provider) {
+    switch (provider) {
       case 'azurerm':
         return <IconContext.Provider value={{ color: "#008AD7", size: "1.5em" }}><SiMicrosoftazure /></IconContext.Provider>;
       case 'aws':
-        return <IconContext.Provider value={{ color:"#232F3E", size: "1.5em" }}><SiAmazonaws/></IconContext.Provider>;
+        return <IconContext.Provider value={{ color: "#232F3E", size: "1.5em" }}><SiAmazonaws /></IconContext.Provider>;
       default:
         return <CloudOutlined />;
     }
   }
-
+  const handleClick = e => {
+    setVersion(e.key);
+  };
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
@@ -48,21 +51,11 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         setModule(response.data);
         setLoading(false);
         setModuleName(response.data.data.attributes.name);
+        setVersion(response.data.data.attributes.versions[0]); // latest version
       });
 
   }, [orgid, id]);
 
-  const versions = (
-    <Menu>
-      <Menu.Item key="0">
-        1.0.0
-      </Menu.Item>
-      <Menu.Item key="1">
-        1.1.0
-      </Menu.Item>
-      <Menu.Item key="3">2.0.0</Menu.Item>
-    </Menu>
-  );
 
   return (
     <Content style={{ padding: '0 50px' }}>
@@ -97,7 +90,11 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         <td><BiBookBookmark /> Source</td>
                       </tr>
                       <tr className="black">
-                        <td>1.0.0 <Dropdown overlay={versions} trigger={['click']}>
+                        <td>{version} <Dropdown overlay={<Menu onClick={handleClick}> {module.data.attributes.versions.map(function(name, index){
+                    return <Menu.Item key={name}>{name}</Menu.Item>;
+                  })
+                          
+                }</Menu>} trigger={['click']}>
                           <a className="ant-dropdown-link">
                             Change <DownOutlined />
                           </a>
@@ -127,33 +124,33 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                   </Tabs>
                 </Space>
               </Col>
-              <Col  span={6}>
+              <Col span={6}>
                 <Card >
-                  <Space style={{paddingRight:"10px"}} direction="vertical">
+                  <Space style={{ paddingRight: "10px" }} direction="vertical">
                     <p className="moduleSubtitles">Usage Instructions</p>
                     <p className="moduleInstructions">Copy and paste into your Terraform configuration and set values for the input variables.</p>
-                    <div><Divider />
-                    <p className="moduleSubtitles">Copy configuration details</p>
+                    <div style={{ width: "65%" }}><Divider />
+                      <p className="moduleSubtitles">Copy configuration details</p>
                     </div>
                     <pre className="moduleCode">
                       module "{module.data.attributes.name}" {"{"} <br />
                       &nbsp;&nbsp;source  = "registry.aks.vse.aespana.me/{module.data.attributes.registryPath}" <br />
-                      &nbsp;&nbsp;version = "0.1.0" <br />
+                      &nbsp;&nbsp;version = "{version}" <br />
                       &nbsp;&nbsp;# insert required variables here <br />
                       {"}"}
                     </pre>
-                    <Tag style={{ width: "290px", fontSize: "13px" }} color="blue">When running Terraform on the CLI, you must  <br />
+                    <Tag style={{ width: "65%", fontSize: "13px" }} color="blue">When running Terraform on the CLI, you must  <br />
                       configure credentials in .terraformrc or <br /> terraform.rc
-                      to access this module: 
+                      to access this module:
                       <pre className="moduleCredentials">
-                        credentials "app.terraform.io" {"{"} <br />
+                        credentials "app.terrakube.io" {"{"} <br />
                         &nbsp;&nbsp;# valid user API token:<br />
                         &nbsp;&nbsp;token = "xxxxxx.yyyyyy.zzzzzzzzzzzzz"<br />
                         {"}"}
                       </pre>
 
                     </Tag>
-                    
+
                   </Space>
                 </Card>
               </Col>
