@@ -25,7 +25,7 @@ Expose a JSON:API or GraphQL API providing endpoints to handle:
 * **Terrakube Shedule Job**:
   - Automatic process that check for any pending terraform operations in any workspace (plan, apply or destroy)
 * **Terrakube Executor**:
-  - Service that executes the terraform operations, updates the status using the AzBuilder API and save the results using different cloud storage providers.
+  - Service that executes the terraform operations, updates the status using the Terrakube API and save the results using different cloud storage providers.
 * **Terrakube Registry**:
   - Open Source terraform registry with support for the module and provider protocol.
 * **Cloud Storage**:
@@ -35,11 +35,11 @@ Expose a JSON:API or GraphQL API providing endpoints to handle:
 * **Security**:
   - To handle authentication the platform uses Azure Active Directory.
 * **Terrakube CLI**:
-  - Go based CLI that can communicate with the AzBuilder API and execute operation for organizations, workspaces, jobs, modules or providers
+  - Go based CLI that can communicate with the Terrakube API and execute operation for organizations, workspaces, jobs, modules or providers
 * **Terrakube UI**:
-  - React based frontend to handle all AzBuilder Operations.
+  - React based frontend to handle all Terrakube Operations.
 
-For more information please visit our [documentation](https://azbuilder.gitbook.io/azb-builder/).
+For more information please visit our [documentation](https://docs.terrakube.org/).
 
 ## Version Control Services
 The platform support public and private repositories in the following providers:
@@ -47,6 +47,7 @@ The platform support public and private repositories in the following providers:
 * GitHub.com
 * Bitbucket.com
 * Gitlab.com
+* Azure DevOps
 
 ## Requirements
 
