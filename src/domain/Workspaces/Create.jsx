@@ -1,10 +1,11 @@
 import { React, useState,useEffect } from 'react';
 import { Form, Input, Button, Breadcrumb, Layout, Steps, Card, Space ,Select} from "antd";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
-import axiosInstance from "../../config/axiosConfig";
+import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
+import { compareVersions } from './Workspaces'
 import { IconContext } from "react-icons";
-import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
+import { CodeSandboxSquareFilled, GithubOutlined, GitlabOutlined } from '@ant-design/icons';
 import { SiGit } from "react-icons/si";
 import { useHistory,Link } from "react-router-dom";
 const { Content } = Layout;
@@ -21,9 +22,24 @@ const { Option } = Select;
 
 export const CreateWorkspace = () => {
   const [organizationName, setOrganizationName] = useState([]);
+  const [terraformVersions, setTerraformVersions] = useState([]);
+  const terraformVersionsApi = "https://releases.hashicorp.com/terraform/index.json";
   useEffect(() => {
     setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
-  });
+    axiosClient.get(terraformVersionsApi).then(
+      resp => {
+        console.log(resp);
+        const tfVersions = [];
+        for (const version in resp.data.versions) {
+          if (!version.includes("-"))
+              tfVersions.push(version)
+        }
+        setTerraformVersions(tfVersions.sort(compareVersions).reverse());
+        console.log(tfVersions);
+        
+      }
+    );
+  }, [terraformVersionsApi]);
   const handleClick = e => {
     setCurrent(1);
   };
@@ -32,6 +48,8 @@ export const CreateWorkspace = () => {
     setCurrent(2);
     setStep2Hidden(false);
   };
+
+ 
   const [form] = Form.useForm();
   const handleGitContinueClick = e => {
     setCurrent(3);
@@ -193,17 +211,10 @@ export const CreateWorkspace = () => {
               </Form.Item>
               <Form.Item name="terraformVersion" label="Terraform Version" rules={[{ required: true }]} extra="The version of Terraform to use for this workspace. It will not upgrade automatically.">
               <Select placeholder="select version"  style={{ width: 250 }} >
-                          <Option value="0.13.0">0.13.0</Option>
-                          <Option value="0.14.0">0.14.0</Option>
-                          <Option value="0.14.1">0.14.1</Option>
-                          <Option value="0.14.2">0.14.2</Option>
-                          <Option value="0.14.3">0.14.3</Option>
-                          <Option value="0.15.0">0.15.0</Option>
-                          <Option value="0.15.1">0.15.1</Option>
-                          <Option value="0.15.2">0.15.2</Option>
-                          <Option value="0.15.3">0.15.3</Option>
-                          <Option value="1.0.0">1.0.0</Option>
-                        </Select>
+              {terraformVersions.map(function(name, index){
+                    return <Option key={name}>{name}</Option>;
+                  })}
+              </Select>
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">

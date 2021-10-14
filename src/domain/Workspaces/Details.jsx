@@ -1,8 +1,9 @@
 import { React, useEffect, useState } from "react";
-import axiosInstance from "../../config/axiosConfig";
+import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE ,ORGANIZATION_NAME} from '../../config/actionTypes';
 import { Button, Layout, Breadcrumb, Table, Tabs, List, Avatar, Tag, Form, Input, Select } from "antd";
 import { DeleteFilled } from '@ant-design/icons';
+import { compareVersions } from './Workspaces'
 import { CreateJob } from '../Jobs/Create';
 import { DetailsJob } from '../Jobs/Details';
 import {CreateVariable} from  '../Variables/Create';
@@ -61,6 +62,8 @@ export const WorkspaceDetails = (props) => {
   const [organizationName, setOrganizationName] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
   const [activeKey, setActiveKey] = useState("2");
+  const [terraformVersions, setTerraformVersions] = useState([]);
+  const terraformVersionsApi = "https://releases.hashicorp.com/terraform/index.json";
   const handleClick = id => {
     changeJob(id);
   };
@@ -75,6 +78,19 @@ export const WorkspaceDetails = (props) => {
     setLoading(true);
     loadWorkspace();
     setLoading(false);
+    axiosClient.get(terraformVersionsApi).then(
+      resp => {
+        console.log(resp);
+        const tfVersions = [];
+        for (const version in resp.data.versions) {
+          if (!version.includes("-"))
+              tfVersions.push(version)
+        }
+        setTerraformVersions(tfVersions.sort(compareVersions).reverse());
+        console.log(tfVersions);
+        
+      }
+    );
     const interval = setInterval(() => {
       loadWorkspace();
     }, 1000);
@@ -202,16 +218,9 @@ export const WorkspaceDetails = (props) => {
                       </Form.Item>
                       <Form.Item name="terraformVersion" label="Terraform Version">
                         <Select defaultValue={workspace.data.attributes.terraformVersion} style={{ width: 250 }}>
-                          <Option value="0.13.0">0.13.0</Option>
-                          <Option value="0.14.0">0.14.0</Option>
-                          <Option value="0.14.1">0.14.1</Option>
-                          <Option value="0.14.2">0.14.2</Option>
-                          <Option value="0.14.3">0.14.3</Option>
-                          <Option value="0.15.0">0.15.0</Option>
-                          <Option value="0.15.1">0.15.1</Option>
-                          <Option value="0.15.2">0.15.2</Option>
-                          <Option value="0.15.3">0.15.3</Option>
-                          <Option value="1.0.0">1.0.0</Option>
+                        {terraformVersions.map(function(name, index){
+                    return <Option key={name}>{name}</Option>;
+                  })}
                         </Select>
                         <div className="App-text">
                         The version of Terraform to use for this workspace. Upon creating this workspace, the latest version was selected and will be used until it is changed manually. It will not upgrade automatically.
