@@ -42,6 +42,7 @@ public class OrganizationTests extends ServerApplicationTests {
                                                 relation("module"),
                                                 relation("provider"),
                                                 relation("team"),
+                                                relation("template"),
                                                 relation("vcs"),
                                                 relation("workspace")
                                         )

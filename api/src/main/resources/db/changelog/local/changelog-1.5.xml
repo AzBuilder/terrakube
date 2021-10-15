@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="6" author="alfespa17@gmail.com">
+        <createTable tableName="state">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+            <column name="output" type="varchar(1024)"/>
+            <column name="workspace_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_workspace_state" references="workspace(id)"/>
+            </column>
+        </createTable>
+        <addColumn tableName="team" >
+            <column name="manage_template"
+                    type="boolean"/>
+        </addColumn>
+        <createTable tableName="template">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+            <column name="name" type="varchar(256)"/>
+            <column name="description" type="varchar(256)"/>
+            <column name="version" type="varchar(32)"/>
+            <column name="tcl" type="clob"/>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_organization_template" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="id, organization_id, name, version"
+                constraintName="const_template"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="template"
+                validate="true"/>
+    </changeSet>
+</databaseChangeLog>
