@@ -38,6 +38,7 @@ public class JobTests extends ServerApplicationTests{
                                                 attr("createdDate", null),
                                                 attr("output", "sampleOutput"),
                                                 attr("status", "pending"),
+                                                attr("tcl", null),
                                                 attr("updatedBy", null),
                                                 attr("updatedDate", null)
                                         ),

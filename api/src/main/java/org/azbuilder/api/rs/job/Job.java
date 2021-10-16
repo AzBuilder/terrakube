@@ -1,14 +1,19 @@
 package org.azbuilder.api.rs.job;
 
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.LifeCycleHookBinding;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
+import org.azbuilder.api.rs.hooks.job.JobCreateTclHook;
+import org.azbuilder.api.rs.job.step.Step;
 import org.azbuilder.api.rs.workspace.Workspace;
 
 import javax.persistence.*;
+import java.util.List;
 
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobCreateTclHook.class)
 @Include(rootLevel = false)
 @Getter
 @Setter
@@ -25,7 +30,14 @@ public class Job extends GenericAuditFields {
     @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.pending;
 
+    @Column(name = "output")
     private String output;
+
+    @Column(name = "terraform_plan")
+    private String terraformPlan;
+
+    @Column(name = "tcl")
+    private String tcl;
 
     @ManyToOne
     private Organization organization;
@@ -33,11 +45,8 @@ public class Job extends GenericAuditFields {
     @ManyToOne
     private Workspace workspace;
 
-}
+    @OneToMany(mappedBy = "job")
+    private List<Step> step;
 
-enum Command{
-    plan,
-    apply,
-    destroy
 }
 

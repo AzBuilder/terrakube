@@ -29,6 +29,7 @@
 		<microsoft-graph.version>5.0.0</microsoft-graph.version>
 		<postgresql.version>42.2.23</postgresql.version>
 		<mysql.version>8.0.26</mysql.version>
+		<snakeyaml.version>1.29</snakeyaml.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
@@ -160,7 +161,17 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>${snakeyaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>${groovy.version}</version>
+			<type>pom</type>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

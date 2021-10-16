@@ -22,6 +22,12 @@
             <column name="manage_template"
                     type="boolean"/>
         </addColumn>
+        <addColumn tableName="job">
+            <column name="terraform_plan"
+                    type="varchar(1024)"/>
+            <column name="tcl"
+                    type="clob"/>
+        </addColumn>
         <createTable tableName="template">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
@@ -45,6 +51,26 @@
                 disabled="true"
                 initiallyDeferred="true"
                 tableName="template"
+                validate="true"/>
+        <createTable tableName="step">
+            <column name="id" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="output"
+                    type="varchar(1024)"/>
+            <column name="status"
+                    type="varchar(1024)"/>
+            <column name="job_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_job_step" references="job(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="id, job_id"
+                constraintName="const_step"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="step"
                 validate="true"/>
     </changeSet>
 </databaseChangeLog>
