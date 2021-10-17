@@ -1,19 +1,16 @@
 package org.azbuilder.api.rs.job;
 
 import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.annotation.LifeCycleHookBinding;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
-import org.azbuilder.api.rs.hooks.job.JobCreateTclHook;
 import org.azbuilder.api.rs.job.step.Step;
 import org.azbuilder.api.rs.workspace.Workspace;
 
 import javax.persistence.*;
 import java.util.List;
 
-@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobCreateTclHook.class)
 @Include(rootLevel = false)
 @Getter
 @Setter

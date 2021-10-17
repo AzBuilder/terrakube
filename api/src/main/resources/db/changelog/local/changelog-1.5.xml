@@ -53,9 +53,11 @@
                 tableName="template"
                 validate="true"/>
         <createTable tableName="step">
-            <column name="id" type="int">
+            <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
+            <column name="step_number"
+                    type="int"/>
             <column name="output"
                     type="varchar(1024)"/>
             <column name="status"
@@ -65,7 +67,7 @@
             </column>
         </createTable>
         <addUniqueConstraint
-                columnNames="id, job_id"
+                columnNames="id, job_id, step_number"
                 constraintName="const_step"
                 deferrable="true"
                 disabled="true"

@@ -39,6 +39,7 @@ public class JobTests extends ServerApplicationTests{
                                                 attr("output", "sampleOutput"),
                                                 attr("status", "pending"),
                                                 attr("tcl", null),
+                                                attr("terraformPlan", null),
                                                 attr("updatedBy", null),
                                                 attr("updatedDate", null)
                                         ),
@@ -49,6 +50,7 @@ public class JobTests extends ServerApplicationTests{
                                                                 id("a42f538b-8c75-4311-8e73-ea2c0f2fb577")
                                                         )
                                                 ),
+                                                relation("step"),
                                                 relation("workspace",true,
                                                         resource(
                                                                 type("workspace"),

@@ -5,8 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.job.JobStatus;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Include(rootLevel = false)
 @Getter
@@ -15,7 +17,12 @@ import javax.persistence.*;
 public class Step {
 
     @Id
-    private int id;
+    @Type(type = "uuid-char")
+    @GeneratedValue
+    private UUID id;
+
+    @Column(name = "step_number")
+    private int stepNumber;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
