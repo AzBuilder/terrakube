@@ -28,6 +28,9 @@
             <column name="tcl"
                     type="clob"/>
         </addColumn>
+        <dropColumn tableName="job">
+            <column  name="command"/>
+        </dropColumn>
         <createTable tableName="template">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>

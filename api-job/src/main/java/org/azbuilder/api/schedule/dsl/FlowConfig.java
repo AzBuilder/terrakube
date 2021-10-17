@@ -1,4 +1,4 @@
-package org.azbuilder.api.dsl;
+package org.azbuilder.api.schedule.dsl;
 
 import lombok.Getter;
 import lombok.Setter;

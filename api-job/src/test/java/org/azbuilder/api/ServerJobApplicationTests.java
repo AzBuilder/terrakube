@@ -1,4 +1,4 @@
-package org.azbuilder.api.job;
+package org.azbuilder.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -22,9 +22,6 @@ public class Job extends GenericAuditFields {
     private int id;
 
     @Enumerated(EnumType.STRING)
-    private Command command;
-
-    @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.pending;
 
     @Column(name = "output")
