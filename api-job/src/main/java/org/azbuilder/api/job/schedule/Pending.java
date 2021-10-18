@@ -67,7 +67,7 @@ public class Pending {
         List<Variable> variableList = workspaceData.getIncluded();
         if (variableList != null)
             for (Variable variable : variableList) {
-                if (variable.getAttributes().getCategory().equals("terraform")) {
+                if (variable.getAttributes().getCategory().equals("TERRAFORM")) {
                     log.info("Adding terraform");
                     variables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
                 } else {
