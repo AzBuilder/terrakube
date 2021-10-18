@@ -28,7 +28,6 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.util.*;
-import java.util.concurrent.Flow;
 
 @Service
 @Slf4j
@@ -47,7 +46,7 @@ public class Pending {
             if (job.getRelationships().getStep().getData().isEmpty())
                 job = initialJobSetup(job);
 
-            Optional<Command> command = Optional.of(getNextCommand(job));
+            Optional<Command> command = Optional.ofNullable(getNextCommand(job));
             if (command.isPresent()) {
                 log.info("Execute command: {} {}", command.get());
                 TerraformJob terraformJob = processPendingJob(job, command.get());
@@ -65,6 +64,7 @@ public class Pending {
         terraformJob.setOrganizationId(job.getRelationships().getOrganization().getData().getId());
         terraformJob.setWorkspaceId(job.getRelationships().getWorkspace().getData().getId());
         terraformJob.setJobId(job.getId());
+        terraformJob.setStepId(getCurrentStepId(job));
 
         log.info("Checking Variables");
         ResponseWithInclude<Workspace, Variable> workspaceData = terrakubeClient.getWorkspaceByIdWithVariables(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
@@ -83,7 +83,7 @@ public class Pending {
         List<Variable> variableList = workspaceData.getIncluded();
         if (variableList != null)
             for (Variable variable : variableList) {
-                if (variable.getAttributes().getCategory().equals("terraform")) {
+                if (variable.getAttributes().getCategory().equals("TERRAFORM")) {
                     log.info("Adding terraform");
                     variables.put(variable.getAttributes().getKey(), variable.getAttributes().getValue());
                 } else {
@@ -96,7 +96,7 @@ public class Pending {
         terraformJob.setVariables(variables);
         terraformJob.setEnvironmentVariables(environmentVariables);
 
-        terraformJob.setTerraformCommand(command);
+        terraformJob.setCommand(command);
         terraformJob.setTerraformVersion(workspaceData.getData().getAttributes().getTerraformVersion());
         terraformJob.setSource(workspaceData.getData().getAttributes().getSource());
         terraformJob.setBranch(workspaceData.getData().getAttributes().getBranch());
@@ -134,19 +134,30 @@ public class Pending {
     }
 
     private Command getNextCommand(Job job) {
+        TreeMap<Integer, Step> map = getPendingSteps(job);
+        if (!map.isEmpty())
+            return getFlowConfig(job.getAttributes().getTcl())
+                    .getFlow()
+                    .stream()
+                    .filter(command -> command.getStep() == map.firstKey())
+                    .findFirst()
+                    .get();
+        else
+            return null;
+    }
+
+    private TreeMap<Integer, Step> getPendingSteps(Job job) {
         final TreeMap<Integer, Step> map = new TreeMap<>();
         terrakubeClient.getJobById(job.getRelationships().getOrganization().getData().getId(), job.getId())
                 .getIncluded()
                 .stream()
                 .filter(step -> step.getAttributes().getStatus().equals("pending"))
                 .forEach(step -> map.put(Integer.valueOf(step.getAttributes().getStepNumber()), step));
+        return map;
+    }
 
-        return getFlowConfig(job.getAttributes().getTcl())
-                .getFlow()
-                .stream()
-                .filter(command -> command.getStep() == map.firstKey())
-                .findFirst()
-                .get();
+    private String getCurrentStepId(Job job) {
+        return getPendingSteps(job).firstEntry().getValue().getId();
     }
 
     private List<Job> searchPendingJobs() {
@@ -186,11 +197,11 @@ public class Pending {
 @Getter
 @Setter
 class TerraformJob {
-
-    private Command terraformCommand;
+    private Command command;
     private String organizationId;
     private String workspaceId;
     private String jobId;
+    private String stepId;
     private String terraformVersion;
     private String source;
     private String branch;
