@@ -8,9 +8,8 @@ import lombok.ToString;
 @Getter
 @Setter
 public class Command {
-    private String type;
-    private int step;
-    private String team;
     private String runtime;
     private String script;
+    private boolean before;
+    private boolean after;
 }

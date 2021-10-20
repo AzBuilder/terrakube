@@ -28,6 +28,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -46,10 +47,11 @@ public class Pending {
             if (job.getRelationships().getStep().getData().isEmpty())
                 job = initialJobSetup(job);
 
-            Optional<Command> command = Optional.ofNullable(getNextCommand(job));
-            if (command.isPresent()) {
+            Optional<LinkedList<Command>> command = Optional.ofNullable(getNextCommand(job));
+            Optional<String> type = Optional.ofNullable(getNextType(job));
+            if (command.isPresent() && type.isPresent()) {
                 log.info("Execute command: {} {}", command.get());
-                TerraformJob terraformJob = processPendingJob(job, command.get());
+                TerraformJob terraformJob = processPendingJob(job, type.get(), command.get());
                 updateJobStatus(job, terraformJob);
             } else {
                 completeJob(job);
@@ -57,7 +59,7 @@ public class Pending {
         });
     }
 
-    private TerraformJob processPendingJob(Job job, Command command) {
+    private TerraformJob processPendingJob(Job job, String type, LinkedList<Command> command) {
         log.info("Pending Job: {} WorkspaceId: {}", job.getId(), job.getRelationships().getWorkspace().getData().getId());
 
         TerraformJob terraformJob = new TerraformJob();
@@ -96,7 +98,8 @@ public class Pending {
         terraformJob.setVariables(variables);
         terraformJob.setEnvironmentVariables(environmentVariables);
 
-        terraformJob.setCommand(command);
+        terraformJob.setCommandList(command);
+        terraformJob.setType(type);
         terraformJob.setTerraformVersion(workspaceData.getData().getAttributes().getTerraformVersion());
         terraformJob.setSource(workspaceData.getData().getAttributes().getSource());
         terraformJob.setBranch(workspaceData.getData().getAttributes().getBranch());
@@ -110,14 +113,15 @@ public class Pending {
             FlowConfig tclConfiguration = getFlowConfig(job.getAttributes().getTcl());
             log.info("Custom Job Setup: {}", tclConfiguration.toString());
 
-            tclConfiguration.getFlow().parallelStream().forEach(command -> {
-                log.info("Creating step: {}", command.getStep());
+            AtomicInteger step = new AtomicInteger(0);
+            tclConfiguration.getFlow().parallelStream().forEach(flow -> {
+                log.info("Creating step: {}", flow.toString());
                 StepRequest stepRequest = new StepRequest();
                 Step newStep = new Step();
                 newStep.setType("step");
                 StepAttributes stepAttributes = new StepAttributes();
                 stepAttributes.setStatus("pending");
-                stepAttributes.setStepNumber(String.valueOf(command.getStep()));
+                stepAttributes.setStepNumber(String.valueOf(step.getAndAdd(1)));
                 newStep.setAttributes(stepAttributes);
                 stepRequest.setData(newStep);
                 terrakubeClient.createStep(stepRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
@@ -133,15 +137,24 @@ public class Pending {
         return yaml.load(new String(Base64.getDecoder().decode(tcl)));
     }
 
-    private Command getNextCommand(Job job) {
+    private LinkedList<Command> getNextCommand(Job job) {
         TreeMap<Integer, Step> map = getPendingSteps(job);
+
         if (!map.isEmpty())
             return getFlowConfig(job.getAttributes().getTcl())
                     .getFlow()
-                    .stream()
-                    .filter(command -> command.getStep() == map.firstKey())
-                    .findFirst()
-                    .get();
+                    .get(map.firstKey()).getCommands();
+        else
+            return null;
+    }
+
+    private String getNextType(Job job) {
+        TreeMap<Integer, Step> map = getPendingSteps(job);
+
+        if (!map.isEmpty())
+            return getFlowConfig(job.getAttributes().getTcl())
+                    .getFlow()
+                    .get(map.firstKey()).getType();
         else
             return null;
     }
@@ -197,7 +210,8 @@ public class Pending {
 @Getter
 @Setter
 class TerraformJob {
-    private Command command;
+    private LinkedList<Command> commandList;
+    private String type;
     private String organizationId;
     private String workspaceId;
     private String jobId;
