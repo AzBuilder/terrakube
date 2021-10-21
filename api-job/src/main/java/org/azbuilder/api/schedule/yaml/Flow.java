@@ -1,14 +1,16 @@
-package org.azbuilder.api.schedule.dsl;
+package org.azbuilder.api.schedule.yaml;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
-import java.util.LinkedList;
+import java.util.List;
 
+@ToString
 @Getter
 @Setter
 public class Flow {
     private String type;
     private int step;
-    LinkedList<Command> commands;
+    List<Command> commands;
 }
