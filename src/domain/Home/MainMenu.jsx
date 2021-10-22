@@ -25,8 +25,12 @@ export const RegistryMenu = (props) => {
       if(location.pathname.includes("registry")){
         setDefaultSelected(['registry']);
       }
-      else 
-       setDefaultSelected(['workspaces']);
+      else if (location.pathname.includes("settings")) {
+       setDefaultSelected(['settings']);
+      }
+      else {
+        setDefaultSelected(['workspaces']);
+      }
       
   }, []);
 
@@ -53,6 +57,12 @@ export const RegistryMenu = (props) => {
     setDefaultSelected(['workspaces']);
   };
 
+  const handleSettings = e => {
+    const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE)
+    history.push(`/organizations/${organizationId}/settings`);
+    setDefaultSelected(['settings']);
+  };
+
   return (
     <>
       <Menu selectedKeys={defaultSelected} theme="dark" mode="horizontal" >
@@ -72,7 +82,7 @@ export const RegistryMenu = (props) => {
         <Menu.Item key="registry" icon={<CloudOutlined />} onClick={handleRegistry}>
           Registry
         </Menu.Item>
-        <Menu.Item key="settings" icon={<SettingOutlined />}>
+        <Menu.Item key="settings" icon={<SettingOutlined /> } onClick={handleSettings}>
           Settings
         </Menu.Item>
       </Menu>

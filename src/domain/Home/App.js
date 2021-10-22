@@ -19,6 +19,7 @@ import { CreateWorkspace } from '../Workspaces/Create';
 import { CreateModule } from '../Modules/Create';
 import { ModuleList } from '../Modules/List';
 import { ModuleDetails } from '../Modules/Details';
+import { OrganizationSettings } from '../Settings/Settings';
 const { Header, Footer } = Layout;
 
 const App = () => {
@@ -66,6 +67,8 @@ const App = () => {
           <Route exact path="/organizations/:orgid/registry/:id">
             <ModuleDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
           </Route>
+          <Route exact path="/organizations/:orgid/settings" component={OrganizationSettings} />
+
         </Switch>
         <Footer style={{ textAlign: 'center' }}>Terrakube ©2021</Footer>
       </Layout>

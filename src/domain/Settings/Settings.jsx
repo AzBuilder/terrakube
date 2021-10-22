@@ -1,0 +1,39 @@
+import { React } from "react";
+
+import {  Layout, Breadcrumb, Tabs} from "antd";
+import './Settings.css';
+import { GeneralSettings } from "./General";
+import { TeamSettings } from "./Teams"
+import { VCSSettings } from "./VCS";
+const { Content } = Layout;
+const { TabPane } = Tabs;
+
+const validateMessages = {
+  required: '${label} is required!'
+}
+
+
+
+export const OrganizationSettings = () => {
+  return (
+    <Content style={{ padding: '0 50px' }}>
+      <Breadcrumb style={{ margin: '16px 0' }}>
+        <Breadcrumb.Item>organization_name</Breadcrumb.Item>
+        <Breadcrumb.Item>Settings</Breadcrumb.Item>
+      </Breadcrumb>
+      <div className="site-layout-content">
+        <Tabs tabPosition="left" defaultActiveKey="1">
+          <TabPane tab="General" key="1">
+            <GeneralSettings />
+          </TabPane>
+          <TabPane tab="Teams" key="2">
+            <TeamSettings />
+          </TabPane>
+          <TabPane tab="VCS Providers" key="3">
+            <VCSSettings />
+          </TabPane>
+        </Tabs>
+      </div>
+    </Content>
+  );
+}
