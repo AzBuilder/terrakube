@@ -14,7 +14,6 @@ import { OrganizationDetails } from '../Organizations/Details';
 import { CreateOrganization } from '../Organizations/Create';
 import { Home } from './Home';
 import { WorkspaceDetails } from '../Workspaces/Details';
-import { CreateVariable } from '../Variables/Create';
 import { CreateWorkspace } from '../Workspaces/Create';
 import { CreateModule } from '../Modules/Create';
 import { ModuleList } from '../Modules/List';
@@ -57,7 +56,6 @@ const App = () => {
              <OrganizationDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
           </Route>
           <Route exact path="/workspaces/create" component={CreateWorkspace} />
-          <Route exact path="/workspaces/:name/variable/:create" component={CreateVariable} />
           <Route exact path="/workspaces/:id" component={WorkspaceDetails} />
           
           <Route exact path="/organizations/:orgid/registry/create" component={CreateModule} />

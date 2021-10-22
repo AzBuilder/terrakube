@@ -1,12 +1,11 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE ,ORGANIZATION_NAME} from '../../config/actionTypes';
-import { Button, Layout, Breadcrumb, Table, Tabs, List, Avatar, Tag, Form, Input, Select } from "antd";
-import { DeleteFilled } from '@ant-design/icons';
+import { Button, Layout, Breadcrumb, Tabs, List, Avatar, Tag, Form, Input, Select } from "antd";
 import { compareVersions } from './Workspaces'
 import { CreateJob } from '../Jobs/Create';
 import { DetailsJob } from '../Jobs/Details';
-import {CreateVariable} from  '../Variables/Create';
+import {Variables} from  '../Workspaces/Variables';
 import { useParams,Link } from "react-router-dom";
 import {
   CheckCircleOutlined, ClockCircleOutlined,SyncOutlined
@@ -21,32 +20,6 @@ const include = {
 
 
 const { Content } = Layout;
-
-const VARIABLES_COLUMS = (organizationId, resourceId) => [
-  {
-    title: 'Key',
-    dataIndex: 'key',
-    key: 'key',
-    render: (_, record) => {
-      return  <div>{record.key} &nbsp;&nbsp;&nbsp;&nbsp; <Tag visible={record.hcl}>HCL</Tag> <Tag visible={record.sensitive}>Sensitive</Tag></div> ;
-    }
-  },
-  {
-    title: 'Value',
-    dataIndex: 'value',
-    key: 'value',
-    render: (_, record) => {
-      return record.sensitive ? <i>Sensitive - write only</i> : <div>{record.value}</div> ;
-    }
-  },
-  {
-    title: 'Actions',
-    key: 'action',
-    render: (_, record) => {
-      return <Button icon={<DeleteFilled />} onClick={() => deleteVariable(record.id, record.type, organizationId, resourceId)}></Button>
-    }
-  }
-]
 
 export const WorkspaceDetails = (props) => {
   const { id } = useParams();
@@ -183,22 +156,7 @@ export const WorkspaceDetails = (props) => {
                   Coming soon
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-
-                  <h1>Variables</h1>
-                  <div className="App-text">
-                    <p>These variables are used for all plans and applies in this workspace.Workspaces using Terraform 0.10.0 or later can also load default values from any *.auto.tfvars files in the configuration.</p>
-                    <p>Sensitive variables are hidden from view in the UI and API, and can't be edited. (To change a sensitive variable, delete and replace it.) Sensitive variables can still appear in Terraform logs if your configuration is designed to output them.
-                    </p> </div>
-                  <h2>Terraform Variables</h2>
-                  <div className="App-text">These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string value for a variable, click its HCL checkbox.</div>
-                  <Table dataSource={variables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
-                  <CreateVariable varType="TERRAFORM"/>
-                  <div className="envVariables">
-                    <h2>Environment Variables</h2>
-                    <div className="App-text">These variables are set in Terraform's shell environment using export.</div>
-                    <Table dataSource={envVariables} columns={VARIABLES_COLUMS(organizationId, id)} rowKey='key' />
-                    <CreateVariable varType="ENV"/>
-                  </div>
+                    <Variables vars={variables} env={envVariables} />
                 </TabPane>
                 <TabPane tab="Settings" key="5">
                   <div className="generalSettings">
@@ -289,15 +247,3 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
   setJobs(jobs);
 }
 
-function deleteVariable(variableId, variableType, organizationId, resourceId) {
-  console.log(variableId);
-
-  axiosInstance.delete(`organization/${organizationId}/workspace/${resourceId}/${variableType}/${variableId}`, {
-    headers: {
-      'Content-Type': 'application/vnd.api+json'
-    }
-  })
-    .then(response => {
-      console.log(response);
-    })
-}

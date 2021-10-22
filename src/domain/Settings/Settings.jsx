@@ -1,16 +1,12 @@
-import { React } from "react";
-
+import { React ,useState} from "react";
 import {  Layout, Breadcrumb, Tabs} from "antd";
 import './Settings.css';
 import { GeneralSettings } from "./General";
 import { TeamSettings } from "./Teams"
 import { VCSSettings } from "./VCS";
+import {ORGANIZATION_NAME} from '../../config/actionTypes';
 const { Content } = Layout;
 const { TabPane } = Tabs;
-
-const validateMessages = {
-  required: '${label} is required!'
-}
 
 
 
@@ -18,7 +14,7 @@ export const OrganizationSettings = () => {
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>organization_name</Breadcrumb.Item>
+        <Breadcrumb.Item>{localStorage.getItem(ORGANIZATION_NAME)}</Breadcrumb.Item>
         <Breadcrumb.Item>Settings</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">

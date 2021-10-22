@@ -13,7 +13,6 @@ import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 
 const { TabPane } = Tabs;
 const { Content } = Layout;
-const { DateTime } = require("luxon");
 const include = {
   WORKSPACE: "workspace",
   MODULE: "module"

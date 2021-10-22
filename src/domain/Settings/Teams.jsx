@@ -153,10 +153,10 @@ export const TeamSettings = () => {
         )}
       />)}
 
-   <Modal width="600px" visible={visible} title={mode == "edit" ? "Edit team " + teamName : "Create new team"} okText="Save team" onCancel={onCancel} cancelText="Cancel" 
+   <Modal width="600px" visible={visible} title={mode === "edit" ? "Edit team " + teamName : "Create new team"} okText="Save team" onCancel={onCancel} cancelText="Cancel" 
         onOk={() => {
           form.validateFields().then((values) => {
-            if(mode == "create")
+            if(mode === "create")
               onCreate(values);
             else
               onUpdate(values);
@@ -166,7 +166,7 @@ export const TeamSettings = () => {
         }}>
         <Space style={{width:"100%"}} direction="vertical">
           <Form name="team" form={form} layout="vertical" >
-            {mode == "create"?(
+            {mode === "create"?(
             <Form.Item name="name"  tooltip={{ title: 'Must be a valid AD Group name', icon: <InfoCircleOutlined /> }} label="Name" rules={[{ required: true }]}>
               <Input />
             </Form.Item>):""}
