@@ -1,9 +1,9 @@
 import { React, useState, useEffect } from 'react';
 import { Tag, Space, Collapse, Avatar } from "antd";
-import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
+import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { CheckCircleOutlined, CheckCircleTwoTone, SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
-
+import Ansi from "ansi-to-react";
 const { Panel } = Collapse;
 
 export const DetailsJob = ({ jobId }) => {
@@ -65,7 +65,9 @@ export const DetailsJob = ({ jobId }) => {
               <Panel header={<span>{job.data.attributes.status == "completed" ? <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} /> : (job.data.attributes.status == "running" ? <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} /> : <ClockCircleOutlined style={{ fontSize: "20px" }} />)}<h3 style={{ display: "inline" }}> Job {job.data.attributes.status}</h3></span>} key="2">
                 <div id="code-container">
                   <div id="code-content">
+                    <Ansi>
                     {log}
+                    </Ansi>
                   </div>
                 </div>
               </Panel>
