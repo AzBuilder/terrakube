@@ -1,5 +1,5 @@
 import { React,useState, useEffect } from "react";
-import { Button, List, Popconfirm ,Form,Modal,Space,Input,Switch,Avatar} from "antd";
+import { Button, List, Popconfirm ,Form,Modal,Space,Input,Switch,Avatar,Divider} from "antd";
 import './Settings.css';
 import axiosInstance from "../../config/axiosConfig";
 import {useParams} from "react-router-dom";
@@ -25,7 +25,7 @@ export const TeamSettings = () => {
     .then(response => {
       console.log(response);
       setTeamName(response.data.data.attributes.name);
-      form.setFieldsValue({manageProvider: response.data.data.attributes.manageProvider,manageModule:response.data.data.attributes.manageModule, manageWorkspace:response.data.data.attributes.manageWorkspace});
+      form.setFieldsValue({manageProvider: response.data.data.attributes.manageProvider,manageModule:response.data.data.attributes.manageModule, manageWorkspace:response.data.data.attributes.manageWorkspace, manageVcs:response.data.data.attributes.manageVcs});
     });
   };
 
@@ -54,7 +54,8 @@ export const TeamSettings = () => {
           name: values.name,
           manageWorkspace: values.manageWorkspace,
           manageModule: values.manageModule,
-          manageProvider:values.manageProvider
+          manageProvider:values.manageProvider,
+          manageVcs:values.manageVcs
         }
       }
     }
@@ -81,7 +82,8 @@ export const TeamSettings = () => {
         attributes: {
           manageWorkspace: values.manageWorkspace,
           manageModule: values.manageModule,
-          manageProvider:values.manageProvider
+          manageProvider:values.manageProvider,
+          manageVcs:values.manageVcs
         }
       }
     }
@@ -142,12 +144,13 @@ export const TeamSettings = () => {
           <List.Item.Meta
                avatar={<Avatar style={{ backgroundColor: '#1890ff' }} icon={<TeamOutlined />}></Avatar>}
                 title={item.attributes.name}
-                description={<Space split={<span>&nbsp;</span>}e>
-                 Access to Manage:  
-                 {item.attributes.manageWorkspace ? ("Workspaces"):("")}
-                  {item.attributes.manageModule ? ("Modules"):("")}
-                  {item.attributes.manageProvider ? ("Providers"):("")}
-                </Space>}
+                description={<div>Access to Manage:&nbsp;&nbsp;&nbsp; 
+                <Space split={<Divider type="vertical" />}>
+                 {item.attributes.manageWorkspace ? (<span>Workspaces</span>):null}
+                  {item.attributes.manageModule ? (<span>Modules</span>):null}
+                  {item.attributes.manageProvider ? (<span>Providers</span>):null}
+                  {item.attributes.manageVcs ? (<span>Vcs</span>):null}
+                </Space></div>}
               />
           </List.Item>
         )}
@@ -177,6 +180,9 @@ export const TeamSettings = () => {
               <Switch />
            </Form.Item>
            <Form.Item name="manageProvider" valuePropName="checked" label="Manage Providers" tooltip={{ title: 'Allow members to create and administrate all providers within the organization', icon: <InfoCircleOutlined /> }} >
+              <Switch />
+           </Form.Item>
+           <Form.Item name="manageVcs" valuePropName="checked" label="Manage VCS Settings" tooltip={{ title: 'Allow members to create and administrate all VCS Settings within the organization', icon: <InfoCircleOutlined /> }} >
               <Switch />
            </Form.Item>
           </Form>
