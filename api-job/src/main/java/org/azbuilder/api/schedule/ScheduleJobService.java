@@ -78,12 +78,12 @@ public class ScheduleJobService {
 
         if (!map.isEmpty()) {
             log.info("Next Command: {}", map.firstKey());
-            return getFlowConfig(job.getAttributes().getTcl())
+            Optional<Flow> nextFlow = getFlowConfig(job.getAttributes().getTcl())
                     .getFlow()
                     .stream()
                     .filter(flow -> flow.getStep() == map.firstKey())
-                    .findFirst()
-                    .get();
+                    .findFirst();
+            return nextFlow.isPresent()? nextFlow.get(): null;
         }
         else
             return null;
