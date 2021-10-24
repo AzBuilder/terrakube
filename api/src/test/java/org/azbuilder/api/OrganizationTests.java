@@ -15,7 +15,7 @@ import static com.yahoo.elide.test.jsonapi.JsonApiDSL.type;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
-public class OrganizationTests extends ServerApplicationTests {
+class OrganizationTests extends ServerApplicationTests {
 
     @Test
     @Sql(statements = {

@@ -8,7 +8,7 @@ import static com.yahoo.elide.test.jsonapi.JsonApiDSL.*;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
-public class JobTests extends ServerApplicationTests{
+class JobTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {

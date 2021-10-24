@@ -83,7 +83,7 @@ public class JobService {
     public List<Job> searchPendingJobs() {
         ResponseWithInclude<List<Organization>, Job> organizationJobList = terrakubeClient.getAllOrganizationsWithJobStatus("pending");
 
-        if (organizationJobList.getData().size() > 0 && organizationJobList.getIncluded() != null)
+        if (!organizationJobList.getData().isEmpty() && organizationJobList.getIncluded() != null)
             return organizationJobList.getIncluded();
         else
             return new ArrayList<>();
@@ -109,7 +109,7 @@ public class JobService {
             jobRequest.setData(job);
             terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
             return true;
-        }else
+        } else
             return false;
     }
 }

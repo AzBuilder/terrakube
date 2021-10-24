@@ -9,7 +9,6 @@ import org.azbuilder.api.plugin.security.groups.GroupService;
 import org.azbuilder.api.plugin.security.user.AuthenticatedUser;
 import org.azbuilder.api.rs.team.Team;
 import org.azbuilder.api.rs.template.Template;
-import org.azbuilder.api.rs.vcs.Vcs;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
