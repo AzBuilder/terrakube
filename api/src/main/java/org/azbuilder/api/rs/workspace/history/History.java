@@ -1,4 +1,4 @@
-package org.azbuilder.api.rs.workspace.state;
+package org.azbuilder.api.rs.workspace.history;
 
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class State extends GenericAuditFields {
+public class History extends GenericAuditFields {
 
     @Id
     @Type(type="uuid-char")
