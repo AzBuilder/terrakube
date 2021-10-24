@@ -15,11 +15,11 @@ import static com.yahoo.elide.test.jsonapi.JsonApiDSL.type;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
-public class OrganizationTests extends ServerApplicationTests {
+class OrganizationTests extends ServerApplicationTests {
 
     @Test
     @Sql(statements = {
-            "DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
+            "DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');"
     })
@@ -42,6 +42,7 @@ public class OrganizationTests extends ServerApplicationTests {
                                                 relation("module"),
                                                 relation("provider"),
                                                 relation("team"),
+                                                relation("template"),
                                                 relation("vcs"),
                                                 relation("workspace")
                                         )

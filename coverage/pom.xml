@@ -1,65 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.azbuilder.api</groupId>
-		<artifactId>api-solution</artifactId>
-		<version>${revision}</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-	<groupId>org.azbuilder.api</groupId>
-	<artifactId>coverage</artifactId>
-	<version>${revision}</version>
-	<name>Terrakube Code Coverage</name>
-	<description>Code Coverage Report</description>
-	<properties>
-		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
-	</properties>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.azbuilder.api</groupId>
+        <artifactId>api-solution</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>org.azbuilder.api</groupId>
+    <artifactId>coverage</artifactId>
+    <version>${revision}</version>
+    <name>Terrakube Code Coverage</name>
+    <description>Code Coverage Report</description>
+    <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
+        </sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
 
-	<dependencies>
-			<dependency>
-				<groupId>org.azbuilder.api</groupId>
-				<artifactId>api-server</artifactId>
-				<version>${revision}</version>
-			</dependency>
-		<dependency>
-			<groupId>org.azbuilder.registry</groupId>
-			<artifactId>open-registry</artifactId>
-			<version>${revision}</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.azbuilder.api</groupId>
+            <artifactId>api-server</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.azbuilder.registry</groupId>
+            <artifactId>open-registry</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>**/azure/*</exclude>
-						<exclude>org/azbuilder/api/**/*Properties.*</exclude>
-						<exclude>org/azbuilder/rs/*</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<id>report</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>report-aggregate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/azure/*</exclude>
+                        <exclude>org/azbuilder/api/**/*Properties.*</exclude>
+                        <exclude>org/azbuilder/rs/*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

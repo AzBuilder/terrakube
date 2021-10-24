@@ -7,6 +7,7 @@ import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.module.Module;
 import org.azbuilder.api.rs.provider.Provider;
 import org.azbuilder.api.rs.team.Team;
+import org.azbuilder.api.rs.template.Template;
 import org.azbuilder.api.rs.vcs.Vcs;
 import org.azbuilder.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
@@ -57,4 +58,7 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<Vcs> vcs;
+
+    @OneToMany(mappedBy = "organization")
+    private List<Template> template;
 }

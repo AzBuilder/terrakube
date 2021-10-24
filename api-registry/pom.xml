@@ -14,6 +14,7 @@
 	<name>Terrakube Terraform Registry</name>
 	<description>Open Source Terraform Registry for AZB Server</description>
 	<properties>
+		<revision>1.5.0-beta.1</revision>
 		<java.version>11</java.version>
 		<lombok.version>1.18.20</lombok.version>
 		<api-client-starter.version>0.6.0</api-client-starter.version>
@@ -90,22 +91,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

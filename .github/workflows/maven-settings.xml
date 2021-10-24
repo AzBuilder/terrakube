@@ -15,7 +15,7 @@
                 </repository>
                 <repository>
                     <id>github</id>
-                    <url>https://maven.pkg.github.com/azbuilder/azb-api-client-spring-boot-starter</url>
+                    <url>https://maven.pkg.github.com/azbuilder/terrakube-spring-boot-starter</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>

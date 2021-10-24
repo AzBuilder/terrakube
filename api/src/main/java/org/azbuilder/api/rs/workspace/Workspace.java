@@ -7,6 +7,7 @@ import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.vcs.Vcs;
 import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
+import org.azbuilder.api.rs.workspace.history.History;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -46,6 +47,9 @@ public class Workspace {
 
     @OneToMany(mappedBy = "workspace")
     private List<Variable> variable;
+
+    @OneToMany(mappedBy = "workspace")
+    private List<History> history;
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;
