@@ -51,7 +51,9 @@ const App = () => {
         
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route exact path="/organizations/create" component={CreateOrganization} />
+          <Route exact path="/organizations/create">
+            <CreateOrganization setOrganizationName={setOrganizationName}></CreateOrganization>
+          </Route>
           <Route exact path="/organizations/:id/workspaces">
              <OrganizationDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
           </Route>

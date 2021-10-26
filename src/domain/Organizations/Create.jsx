@@ -1,6 +1,7 @@
 import { React } from "react";
 import axiosInstance from "../../config/axiosConfig";
 import { Button, Layout, Breadcrumb ,Form, Input} from "antd";
+import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 import './Organizations.css';
 import { useHistory } from "react-router-dom";
 const { Content } = Layout;
@@ -12,7 +13,7 @@ const validateMessages = {
 
 
 
-export const CreateOrganization = () => {
+export const CreateOrganization = ({setOrganizationName}) => {
 
   const history = useHistory();
   const onFinish = (values) => {
@@ -33,7 +34,11 @@ export const CreateOrganization = () => {
         console.log(response);
         if(response.status =="201")
         {
+          localStorage.setItem(ORGANIZATION_ARCHIVE, response.data.data.id);
+          localStorage.setItem(ORGANIZATION_NAME, response.data.data.attributes.name);
+          setOrganizationName(response.data.data.attributes.name);
           history.push(`/organizations/${response.data.data.id}/settings/teams` );
+          
         }
       })
   };
