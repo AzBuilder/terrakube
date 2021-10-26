@@ -33,7 +33,7 @@ export const CreateOrganization = () => {
         console.log(response);
         if(response.status =="201")
         {
-          history.push(`/organizations/${response.data.data.id}/workspaces` );
+          history.push(`/organizations/${response.data.data.id}/settings/teams` );
         }
       })
   };
