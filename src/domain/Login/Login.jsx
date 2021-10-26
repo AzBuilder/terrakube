@@ -13,7 +13,7 @@ const Login = () => {
     <div className='login-container'>
       <div className='login-wrapper'>
 
-        <Card title={<img  className="loginLogo" src={logo} />}>
+        <Card title={<img alt="logo"  className="loginLogo" src={logo} />}>
           <Space direction="vertical">
           Sign in to Terrakube
           <MicrosoftLoginButton onClick={() => handleLogin(instance)} />

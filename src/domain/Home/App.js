@@ -66,6 +66,18 @@ const App = () => {
             <ModuleDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
           </Route>
           <Route exact path="/organizations/:orgid/settings" component={OrganizationSettings} />
+          <Route exact path="/organizations/:orgid/settings/general">
+              <OrganizationSettings selectedTab="1" />
+          </Route>
+          <Route exact path="/organizations/:orgid/settings/teams">
+              <OrganizationSettings selectedTab="2" />
+          </Route>
+          <Route exact path="/organizations/:orgid/settings/vcs">
+             <OrganizationSettings selectedTab="3" />
+          </Route>
+          <Route exact path="/organizations/:orgid/settings/vcs/new/:vcsName">
+             <OrganizationSettings selectedTab="3" vcsMode="new" />
+          </Route>
 
         </Switch>
         <Footer style={{ textAlign: 'center' }}>Terrakube ©2021</Footer>

@@ -1,8 +1,10 @@
-import { React, useState } from 'react';
+import { React, useState,useEffect } from 'react';
 import { Form, Input, Button, Breadcrumb, Layout, Steps, Space ,Select} from "antd";
-import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
+import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
 import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
+import { SiBitbucket, SiAzuredevops } from "react-icons/si";
+import { IconContext } from "react-icons";
 import { SiGit } from "react-icons/si";
 import { useHistory,Link } from "react-router-dom";
 const { Content } = Layout;
@@ -14,14 +16,28 @@ const validateMessages = {
   }
 
 }
-const { Option } = Select;
 
 
 
 export const CreateModule = () => {
- 
- const handleGitClick = e => {
+  const [current, setCurrent] = useState(0);
+  const [step3Hidden, setStep3Hidden] = useState(true);
+  const [step2Hidden, setStep2Hidden] = useState(true);
+  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const [vcs, setVCS] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const history = useHistory();
+  const [vcsId, setVcsId] = useState("");
+  const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
+
+  useEffect(() => {
+     
+    loadVCSProviders();
+  },[organizationId]);
+
+ const handleGitClick = (id) => {
     setCurrent(1);
+    setVcsId(id);
     setStep2Hidden(false);
   };
 
@@ -30,6 +46,8 @@ export const CreateModule = () => {
     setStep3Hidden(false);
     setStep2Hidden(true);
     var source = form.getFieldValue("source");
+
+    if(source!= null){
     var providerValue = source.match('terraform-(.*)-');
     if(providerValue!=null && providerValue.length > 0){
       form.setFieldsValue({ provider:providerValue[1]});
@@ -38,26 +56,78 @@ export const CreateModule = () => {
         form.setFieldsValue({ name:nameValue[1]});
       }
     }
-    
-    
+  }
   };
-  const [current, setCurrent] = useState(0);
-  const [step3Hidden, setStep3Hidden] = useState(true);
-  const [step2Hidden, setStep2Hidden] = useState(true);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
-  const history = useHistory();
+
+  const handleVCSClick = (vcsType) => {
+    history.push(`/organizations/${organizationId}/settings/vcs/new/${vcsType}`)
+ };
+
+  const handleDifferent = () => {
+    setVCSButtonsVisible(false);
+  };
+
+  const handleExisting = () => {
+     setVCSButtonsVisible(true);
+  };
+
+  const renderVCSLogo = (vcs) => {
+    switch (vcs) {
+      case 'GITLAB':
+        return <GitlabOutlined style={{ fontSize: '20px' }} />;
+      case 'BITBUCKET':
+        return <IconContext.Provider value={{ size: "20px" }}><SiBitbucket />&nbsp;&nbsp;</IconContext.Provider>;
+      case 'AZURE_DEVOPS':
+        return <IconContext.Provider value={{ size: "20px" }}><SiAzuredevops />&nbsp;&nbsp;</IconContext.Provider>;
+      default:
+        return <GithubOutlined style={{ fontSize: '20px' }} />;
+
+    }
+  }
+
+  const loadVCSProviders = () => {
+    axiosInstance.get(`organization/${organizationId}/vcs`)
+      .then(response => {
+        console.log(response);
+        setVCS(response.data);
+        setLoading(false);
+      });
+  }
+
   const onFinish = (values) => {
-    const body = {
+    let body = {
       data: {
         type: "module",
         attributes: { 
           name: values.name,
           description: values.description,
           provider: values.provider,
-          source: values.source,
-          sourceSample: values.source
+          source: values.source
         }
       }
+    }
+
+    if (vcsId !== "") {
+      body = {
+        data: {
+          type: "module",
+          attributes: { 
+            name: values.name,
+            description: values.description,
+            provider: values.provider,
+            source: values.source
+          },
+          relationships: {
+            vcs: {
+              data: {
+                type: "vcs",
+                id: vcsId
+              }
+            }
+          }
+        }
+      }
+
     }
     console.log(body);
 
@@ -94,7 +164,7 @@ export const CreateModule = () => {
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>organization-name</Breadcrumb.Item>
+        <Breadcrumb.Item>{localStorage.getItem(ORGANIZATION_NAME)}</Breadcrumb.Item>
         <Breadcrumb.Item><Link to={`/organizations/${organizationId}/registry`}>Modules</Link></Breadcrumb.Item>
         <Breadcrumb.Item>New Module</Breadcrumb.Item>
       </Breadcrumb>
@@ -118,11 +188,34 @@ export const CreateModule = () => {
               <div className="workflowDescription2 App-text">
               Choose the version control provider that hosts your module source code.
               </div>
+              {vcsButtonsVisible ?  (
+              <div>
               <Space direction="horizontal">
-                <Button icon={<SiGit />} onClick={handleGitClick} size="large">&nbsp;Git</Button>
-                <Button icon={<GithubOutlined />} size="large" >Github</Button>
-                <Button icon={<GitlabOutlined />} size="large" >Gitlab</Button>
+                <Button icon={<SiGit />} onClick={() => { handleGitClick(""); }}  size="large">&nbsp;Git</Button>
+                {loading || !vcs.data ? (
+                  <p>Data loading...</p>
+                ) : (
+                  vcs.data.map(function (item, i) {
+                    return <Button icon={renderVCSLogo(item.attributes.vcsType)} onClick={() => { handleGitClick(item.id); }} size="large">&nbsp;{item.attributes.name}</Button>;
+                  }))}
               </Space>
+              <br/>
+              <Button onClick={handleDifferent} className="link" type="link">
+                Connect to a different VCS
+              </Button>
+              </div>):
+
+              (<div>
+              <Space direction="horizontal">
+                  <Button icon={<GithubOutlined />} onClick={() => {handleVCSClick("GITHUB");}} size="large" >Github</Button>
+                  <Button icon={<GitlabOutlined />} onClick={() => {handleVCSClick("GITLAB");}} size="large" >Gitlab</Button>
+                  <Button icon={<SiBitbucket />} onClick={() => {handleVCSClick("BITBUCKET");}} size="large" >&nbsp;&nbsp;Bitbucket</Button>
+                  <Button icon={<SiAzuredevops />} onClick={() => {handleVCSClick("AZURE_DEVOPS");}} size="large" >&nbsp;&nbsp;Azure Devops</Button>
+              </Space><br/>
+              <Button onClick={handleExisting} className="link" type="link">
+                Use an existing VCS connection
+              </Button>
+              </div>)}
             </Space>
 
           )}

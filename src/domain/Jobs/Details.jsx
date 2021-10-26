@@ -38,7 +38,7 @@ export const DetailsJob = ({ jobId }) => {
           .catch(err => { console.log(err); setLog("No logs available"); });
         }
         else {
-          if (response.data.data.attributes.status == "running")
+          if (response.data.data.attributes.status ==="running")
             setLog("Initializing the backend...")
           else
             setLog("Waiting logs...")
@@ -53,7 +53,7 @@ export const DetailsJob = ({ jobId }) => {
       ) : (
         <Space direction="vertical" style={{ width: "100%" }}>
           <div>
-            <Tag icon={job.data.attributes.status == "completed" ? <CheckCircleOutlined /> : (job.data.attributes.status == "running" ? <SyncOutlined spin /> : <ClockCircleOutlined />)} color={job.data.attributes.status == "completed" ? "#2eb039" : (job.data.attributes.status == "running" ? "#108ee9" : "")}>{job.data.attributes.status}</Tag> <h2 style={{ display: "inline" }}>Triggered via UI</h2>
+            <Tag icon={job.data.attributes.status === "completed" ? <CheckCircleOutlined /> : (job.data.attributes.status === "running" ? <SyncOutlined spin /> : <ClockCircleOutlined />)} color={job.data.attributes.status === "completed" ? "#2eb039" : (job.data.attributes.status === "running" ? "#108ee9" : "")}>{job.data.attributes.status}</Tag> <h2 style={{ display: "inline" }}>Triggered via UI</h2>
           </div>
           <Space direction="vertical" style={{ width: "100%" }}>
             <Collapse >
@@ -62,7 +62,7 @@ export const DetailsJob = ({ jobId }) => {
               </Panel>
             </Collapse>
             <Collapse defaultActiveKey={['2']} >
-              <Panel header={<span>{job.data.attributes.status == "completed" ? <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} /> : (job.data.attributes.status == "running" ? <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} /> : <ClockCircleOutlined style={{ fontSize: "20px" }} />)}<h3 style={{ display: "inline" }}> Job {job.data.attributes.status}</h3></span>} key="2">
+              <Panel header={<span>{job.data.attributes.status === "completed" ? <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} /> : (job.data.attributes.status === "running" ? <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} /> : <ClockCircleOutlined style={{ fontSize: "20px" }} />)}<h3 style={{ display: "inline" }}> Job {job.data.attributes.status}</h3></span>} key="2">
                 <div id="code-container">
                   <div id="code-content">
                     <Ansi>

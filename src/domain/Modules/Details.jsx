@@ -1,11 +1,13 @@
 import { React, useState, useEffect } from 'react';
-import { Menu, Layout, Breadcrumb, Dropdown, Tabs, Space, Input, Tag, Row, Col, Card, Divider } from "antd";
+import { Menu, Layout, Breadcrumb, Dropdown, Tabs, Space, Tag, Row, Col, Card, Divider } from "antd";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams, Link } from "react-router-dom";
 import { DownOutlined, CloudOutlined, ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
+import { GitlabOutlined,GithubOutlined } from '@ant-design/icons';
+import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { SiMicrosoftazure, SiAmazonaws } from "react-icons/si";
 import { BiBookBookmark } from "react-icons/bi";
-import { RiFolderHistoryLine, RiGithubFill } from "react-icons/ri";
+import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from 'react-icons/md';
 import './Module.css';
@@ -13,11 +15,6 @@ import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 
 const { TabPane } = Tabs;
 const { Content } = Layout;
-const include = {
-  WORKSPACE: "workspace",
-  MODULE: "module"
-}
-const { Search } = Input;
 
 
 export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
@@ -25,6 +22,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const [module, setModule] = useState([]);
   const [moduleName, setModuleName] = useState("...");
   const [version, setVersion] = useState("...");
+  const [vcsProvider, setVCSProvider] = useState("");
   const [loading, setLoading] = useState(false);
 
   const renderLogo = (provider) => {
@@ -43,18 +41,36 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
-    axiosInstance.get(`organization/${orgid}/module/${id}`)
+    axiosInstance.get(`organization/${orgid}/module/${id}?include=vcs`)
       .then(response => {
         console.log(`organization/${orgid}/module/${id}`)
         console.log(response);
         setModule(response.data);
         setLoading(false);
         setModuleName(response.data.data.attributes.name);
+        if(response.data.included != null && response.data.included[0] != null)
+        {
+          setVCSProvider(response.data.included[0].attributes.vcsType);
+        }
+
         setVersion(response.data.data.attributes.versions[0]); // latest version
       });
 
   }, [orgid, id]);
 
+
+  const renderVCSLogo = (vcs) => {
+    switch (vcs) {
+      case 'GITLAB':
+        return <GitlabOutlined style={{ fontSize: '18px' }} />;
+      case 'BITBUCKET':
+        return <IconContext.Provider value={{ size: "18px" }}><SiBitbucket />&nbsp;</IconContext.Provider>;
+      case 'AZURE_DEVOPS':
+        return <IconContext.Provider value={{ size: "18px" }}><SiAzuredevops />&nbsp;</IconContext.Provider>;
+      default:
+        return <GithubOutlined style={{ fontSize: '18px' }} />;
+    }
+  }
 
   return (
     <Content style={{ padding: '0 50px' }}>
@@ -100,7 +116,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         </Dropdown>,</td>
                         <td>1 minute ago</td>
                         <td>&lt; 100</td>
-                        <td><RiGithubFill /> <a href={module.data.attributes.source} target="_blank">{module.data.attributes.source.replace(".git", "").replace("https://github.com/", "")}</a></td>
+                        <td>{renderVCSLogo(vcsProvider)} <a href={module.data.attributes.source} target="_blank">{module.data.attributes.source.replace(".git", "").replace("https://github.com/", "")}</a></td>
                       </tr>
                     </table>
                   </IconContext.Provider>
@@ -165,25 +181,4 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     </Content>
 
   );
-}
-
-function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
-  let modules = [];
-
-  includes.forEach(element => {
-    switch (element.type) {
-      case include.MODULE:
-        modules.push(
-          {
-            id: element.id,
-            ...element.attributes
-          }
-        );
-        break;
-      default:
-        break;
-    }
-  });
-
-  setModules(modules);
 }

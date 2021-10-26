@@ -1,4 +1,5 @@
-import { React ,useState} from "react";
+import { React } from "react";
+
 import {  Layout, Breadcrumb, Tabs} from "antd";
 import './Settings.css';
 import { GeneralSettings } from "./General";
@@ -10,7 +11,7 @@ const { TabPane } = Tabs;
 
 
 
-export const OrganizationSettings = () => {
+export const OrganizationSettings = ({ selectedTab ,vcsMode}) => {
   return (
     <Content style={{ padding: '0 50px' }}>
       <Breadcrumb style={{ margin: '16px 0' }}>
@@ -18,7 +19,7 @@ export const OrganizationSettings = () => {
         <Breadcrumb.Item>Settings</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
-        <Tabs tabPosition="left" defaultActiveKey="1">
+        <Tabs tabPosition="left" defaultActiveKey={selectedTab}>
           <TabPane tab="General" key="1">
             <GeneralSettings />
           </TabPane>
@@ -26,7 +27,7 @@ export const OrganizationSettings = () => {
             <TeamSettings />
           </TabPane>
           <TabPane tab="VCS Providers" key="3">
-            <VCSSettings />
+            <VCSSettings vcsMode={vcsMode} />
           </TabPane>
         </Tabs>
       </div>

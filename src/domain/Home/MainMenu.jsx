@@ -35,7 +35,7 @@ export const RegistryMenu = (props) => {
   }, []);
 
   const handleClick = e => {
-    if (e.key == "new")
+    if (e.key === "new")
       history.push("/organizations/create");
     else
     {
