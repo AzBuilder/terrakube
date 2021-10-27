@@ -1,4 +1,4 @@
-package org.azbuilder.api.plugin.security.authentication.azure;
+package org.azbuilder.registry.configuration.security.authentication.azure;
 
 import com.azure.spring.aad.webapi.AADResourceServerWebSecurityConfigurerAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +18,7 @@ public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebS
         super.configure(http);
         //http.authorizeRequests(requests -> requests.anyRequest().authenticated());
         http.authorizeRequests()
-                .antMatchers("/callback/v1/**").permitAll()
-                .antMatchers("/doc").permitAll()
+                .antMatchers("/.well-known/**").permitAll()
                 .and()
                 .authorizeRequests()
                 .anyRequest()

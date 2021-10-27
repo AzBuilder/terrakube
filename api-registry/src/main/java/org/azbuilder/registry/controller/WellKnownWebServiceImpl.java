@@ -13,7 +13,14 @@ public class WellKnownWebServiceImpl {
 
     private static final String terraformJsonContent = "{\n" +
             "  \"modules.v1\": \"%s/terraform/modules/v1/\"\n," +
-            "  \"providers.v1\": \"%s/terraform/providers/v1/\"" +
+            "  \"providers.v1\": \"%s/terraform/providers/v1/\"," +
+            "  \"login.v1\": {\n" +
+            "    \"client\": \"%s\",\n" +
+            "    \"grant_types\": [\"authz_code\", \"%s\"],\n" +
+            "    \"authz\": \"https://login.microsoftonline.com/%s/oauth2/v2.0/authorize?scope=%s\",\n" +
+            "    \"token\": \"https://login.microsoftonline.com/%s/oauth2/v2.0/token\",\n" +
+            "    \"ports\": [10000, 10001]\n" +
+            "    }"+
             "}";
 
     @Autowired
@@ -21,6 +28,16 @@ public class WellKnownWebServiceImpl {
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<String> terraformJson() {
-        return ResponseEntity.ok(String.format(terraformJsonContent, openRegistryProperties.getHostname(), openRegistryProperties.getHostname()));
+        return ResponseEntity.ok(
+                String.format(terraformJsonContent,
+                        openRegistryProperties.getHostname(),
+                        openRegistryProperties.getHostname(),
+                        openRegistryProperties.getClientId(),
+                        openRegistryProperties.getScope(),
+                        openRegistryProperties.getTenantId(),
+                        openRegistryProperties.getScope(),
+                        openRegistryProperties.getTenantId()
+                )
+        );
     }
 }

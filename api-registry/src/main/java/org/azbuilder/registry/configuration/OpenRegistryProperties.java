@@ -15,4 +15,7 @@ import org.springframework.stereotype.Component;
 public class OpenRegistryProperties {
 
     private String hostname;
+    private String clientId;
+    private String tenantId;
+    private String scope;
 }
