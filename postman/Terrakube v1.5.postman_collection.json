@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "944ff826-68f4-47be-b1b9-ba2db9ff1900",
-		"name": "AzBuilder v1.4",
+		"_postman_id": "ec8238be-7df3-47bf-a554-5e373afff0e7",
+		"name": "AzBuilder v1.5",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -23,16 +23,6 @@
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{device_access_token}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [
 							{
@@ -43,7 +33,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp\",\r\n      \"description\": \"Demo Organization\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp\",\r\n      \"description\": \"hashicorp organization\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -299,7 +289,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_USER\",\n      \"manageWorkspace\": true,\n      \"manageModule\": true,\n      \"manageProvider\": true,\n      \"manageVcs\": true\n    }\n  }\n}",
+							"raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"AZB_USER\",\n      \"manageWorkspace\": true,\n      \"manageModule\": true,\n      \"manageProvider\": true,\n      \"manageVcs\": true,\n      \"manageTemplate\": true\n    }\n  }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -404,6 +394,59 @@
 								"organization",
 								"{{organizationId}}",
 								"team"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "template",
+			"item": [
+				{
+					"name": "create template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"templateId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"template\",\n    \"attributes\": {\n      \"name\": \"sample template\",\n      \"description\": \"template description\",\n      \"version\": \"1.0.0\",\n      \"tcl\": \"{{templateSample}}\"\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/template",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"template"
 							]
 						}
 					},
@@ -615,6 +658,46 @@
 								"organization",
 								"{{organizationId}}",
 								"vcs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete vcs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/vcs/24928590-f83b-41a4-81d0-94e896de5f5c",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"vcs",
+								"24928590-f83b-41a4-81d0-94e896de5f5c"
 							]
 						}
 					},
@@ -1224,7 +1307,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"azure\",\r\n      \"description\": \"aespana sample module\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://github.com/AzBuilder/terraform-sample-repository.git\",\r\n      \"sourceSample\": \"https://github.com/AzBuilder/terraform-sample-repository.git\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"azure\",\r\n      \"description\": \"hashicorp sample module\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://github.com/alfespa17/terraform-sample-repository.git\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2083,7 +2166,102 @@
 					]
 				},
 				{
-					"name": "create with vcs",
+					"name": "history",
+					"item": [
+						{
+							"name": "create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var json = JSON.parse(responseBody);\r",
+											"postman.setEnvironmentVariable(\"variableId\", json.data.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"type\": \"history\",\r\n    \"attributes\": {\r\n      \"output\": \"holaMundo\"\r\n    }\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/history",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search history",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}/history",
+									"host": [
+										"{{server}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organization",
+										"{{organizationId}}",
+										"workspace",
+										"{{workspaceId}}",
+										"history"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "create with vcs GitHub",
 					"event": [
 						{
 							"listen": "test",
@@ -2107,7 +2285,151 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"data\": {\r\n        \"type\": \"workspace\",\r\n        \"attributes\": {\r\n            \"branch\": \"main\",\r\n            \"name\": \"Demo Workspace\",\r\n            \"source\": \"https://github.com/alfespa17/terraform-module-private.git\",\r\n            \"terraformVersion\": \"0.15.0\"\r\n        },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsId}}\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
+							"raw": "{\r\n    \"data\": {\r\n        \"type\": \"workspace\",\r\n        \"attributes\": {\r\n            \"branch\": \"main\",\r\n            \"name\": \"Demo Workspace\",\r\n            \"source\": \"https://github.com/alfespa17/terraform-module-private.git\",\r\n            \"terraformVersion\": \"0.15.0\"\r\n        },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdGitHub}}\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create with vcs Bitbucket",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"workspaceId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\": {\r\n        \"type\": \"workspace\",\r\n        \"attributes\": {\r\n            \"branch\": \"main\",\r\n            \"name\": \"Bitbucket Workspace\",\r\n            \"source\": \"https://bitbucket.org/alfespa17/private-module.git\",\r\n            \"terraformVersion\": \"0.15.0\"\r\n        },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdBitBucket}}\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create with vcs Gitlab",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"workspaceId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\": {\r\n        \"type\": \"workspace\",\r\n        \"attributes\": {\r\n            \"branch\": \"main\",\r\n            \"name\": \"Bitbucket Workspace\",\r\n            \"source\": \"https://bitbucket.org/alfespa17/private-module.git\",\r\n            \"terraformVersion\": \"0.15.0\"\r\n        },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdBitBucket}}\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization",
+								"{{organizationId}}",
+								"workspace"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create with vcs Azure DevOps",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"workspaceId\", json.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\": {\r\n        \"type\": \"workspace\",\r\n        \"attributes\": {\r\n            \"branch\": \"main\",\r\n            \"name\": \"Bitbucket Workspace\",\r\n            \"source\": \"https://bitbucket.org/alfespa17/private-module.git\",\r\n            \"terraformVersion\": \"0.15.0\"\r\n        },\r\n        \"relationships\": {\r\n            \"vcs\": {\r\n                \"data\": {\r\n                    \"type\": \"vcs\",\r\n                    \"id\": \"{{vcsIdBitBucket}}\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2155,7 +2477,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"workspace\",\r\n    \"attributes\": {\r\n      \"name\": \"Without VCS Workspace\",\r\n      \"source\": \"https://github.com/AzBuilder/terraform-sample-repository.git\",\r\n      \"branch\": \"main\",\r\n      \"terraformVersion\": \"0.15.0\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"workspace\",\r\n    \"attributes\": {\r\n      \"name\": \"Without VCS Workspace\",\r\n      \"source\": \"https://github.com/AzBuilder/terraform-sample-repository.git\",\r\n      \"branch\": \"main\",\r\n      \"terraformVersion\": \"1.0.2\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2253,29 +2575,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}",
-							"host": [
-								"{{server}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"organization",
-								"{{organizationId}}",
-								"workspace",
-								"{{workspaceId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "search by id with definition",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=definition",
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=variable",
 							"host": [
 								"{{server}}"
 							],
@@ -2290,7 +2590,7 @@
 							"query": [
 								{
 									"key": "include",
-									"value": "definition"
+									"value": "variable"
 								}
 							]
 						}
@@ -2326,62 +2626,6 @@
 					"response": []
 				},
 				{
-					"name": "search by id with env",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=environment",
-							"host": [
-								"{{server}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"organization",
-								"{{organizationId}}",
-								"workspace",
-								"{{workspaceId}}"
-							],
-							"query": [
-								{
-									"key": "include",
-									"value": "environment"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "search by id with secrets",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{server}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}?include=secret",
-							"host": [
-								"{{server}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"organization",
-								"{{organizationId}}",
-								"workspace",
-								"{{workspaceId}}"
-							],
-							"query": [
-								{
-									"key": "include",
-									"value": "secret"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "delete by id",
 					"request": {
 						"method": "DELETE",
@@ -2406,7 +2650,7 @@
 			]
 		},
 		{
-			"name": "Job",
+			"name": "job",
 			"item": [
 				{
 					"name": "create",
@@ -2433,7 +2677,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"job\",\r\n    \"attributes\": {\r\n      \"command\": \"plan\"\r\n    },\r\n    \"relationships\":{\r\n        \"workspace\":{\r\n            \"data\":{\r\n                \"type\": \"workspace\",\r\n                \"id\": \"{{workspaceId}}\"\r\n            }\r\n        }\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"job\",\r\n    \"attributes\": {\r\n      \"tcl\": \"{{templateSample}}\"\r\n    },\r\n    \"relationships\":{\r\n        \"workspace\":{\r\n            \"data\":{\r\n                \"type\": \"workspace\",\r\n                \"id\": \"{{workspaceId}}\"\r\n            }\r\n        }\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2480,7 +2724,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"job\",\r\n    \"id\": \"{{jobId}}\",\r\n    \"attributes\": {\r\n      \"command\": \"plan\",\r\n      \"status\": \"pending\"\r\n    }\r\n  }\r\n}",
+							"raw": "{\r\n  \"data\": {\r\n    \"type\": \"job\",\r\n    \"id\": \"{{jobId}}\",\r\n    \"attributes\": {\r\n      \"status\": \"completed\"\r\n    }\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2510,7 +2754,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{server}}/api/v1/organization/{{organizationId}}/job",
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/job?include=step",
 							"host": [
 								"{{server}}"
 							],
@@ -2520,6 +2764,12 @@
 								"organization",
 								"{{organizationId}}",
 								"job"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "step"
+								}
 							]
 						}
 					},
@@ -2531,7 +2781,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{server}}/api/v1/organization/{{organizationId}}/job/{{jobId}}",
+							"raw": "{{server}}/api/v1/organization/{{organizationId}}/job/{{jobId}}?include=step",
 							"host": [
 								"{{server}}"
 							],
@@ -2542,6 +2792,12 @@
 								"{{organizationId}}",
 								"job",
 								"{{jobId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "step"
+								}
 							]
 						}
 					},
@@ -2664,6 +2920,188 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "registry",
+			"item": [
+				{
+					"name": "module",
+					"item": [
+						{
+							"name": "Step1",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8075/.well-known/terraform.json",
+									"host": [
+										"localhost"
+									],
+									"port": "8075",
+									"path": [
+										".well-known",
+										"terraform.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step2",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8075/terraform/modules/v1/hashicorp/azure/azurerm/versions",
+									"host": [
+										"localhost"
+									],
+									"port": "8075",
+									"path": [
+										"terraform",
+										"modules",
+										"v1",
+										"hashicorp",
+										"azure",
+										"azurerm",
+										"versions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step3",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8075/terraform/modules/v1/hashicorp/privateRepo/azurerm/0.0.1/download",
+									"host": [
+										"localhost"
+									],
+									"port": "8075",
+									"path": [
+										"terraform",
+										"modules",
+										"v1",
+										"hashicorp",
+										"privateRepo",
+										"azurerm",
+										"0.0.1",
+										"download"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Readme Information",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8075/terraform/readme/v1/hashicorp/azure/azurerm/0.0.3/download",
+									"host": [
+										"localhost"
+									],
+									"port": "8075",
+									"path": [
+										"terraform",
+										"readme",
+										"v1",
+										"hashicorp",
+										"azure",
+										"azurerm",
+										"0.0.3",
+										"download"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "provider",
+					"item": [
+						{
+							"name": "Step1",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8075/.well-known/terraform.json",
+									"host": [
+										"localhost"
+									],
+									"port": "8075",
+									"path": [
+										".well-known",
+										"terraform.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step2",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{registry}}/open-registry/terraform/providers/v1/sampleOrg1/sampleProvider1/versions",
+									"host": [
+										"{{registry}}"
+									],
+									"path": [
+										"open-registry",
+										"terraform",
+										"providers",
+										"v1",
+										"sampleOrg1",
+										"sampleProvider1",
+										"versions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Step3",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{registry}}/open-registry/terraform/providers/v1/sample/sampleProvider/2.0.0/download/darwin/amd64",
+									"host": [
+										"{{registry}}"
+									],
+									"path": [
+										"open-registry",
+										"terraform",
+										"providers",
+										"v1",
+										"sample",
+										"sampleProvider",
+										"2.0.0",
+										"download",
+										"darwin",
+										"amd64"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
