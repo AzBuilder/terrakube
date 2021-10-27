@@ -1,5 +1,5 @@
 import { React, useState,useEffect } from 'react';
-import { Form, Input, Button, Breadcrumb, Layout, Steps, Space ,Select} from "antd";
+import { Form, Input, Button, Breadcrumb, Layout, Steps, Space } from "antd";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
 import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
@@ -138,7 +138,7 @@ export const CreateModule = () => {
     })
       .then(response => {
         console.log(response);
-        if(response.status =="201")
+        if(response.status ==="201")
         {
           history.push(`/organizations/${organizationId}/registry/${response.data.data.id}`);
         }
@@ -148,12 +148,12 @@ export const CreateModule = () => {
 
   const handleChange = currentVal => {
     setCurrent(currentVal);
-    if (currentVal == 1){
+    if (currentVal === 1){
       setStep2Hidden(false);
       setStep3Hidden(true);
     }
 
-    if (currentVal == 2){
+    if (currentVal === 2){
       setStep3Hidden(false);
       setStep2Hidden(true);
     }
@@ -172,7 +172,7 @@ export const CreateModule = () => {
         <div className="createWorkspace">
           <h2>Add Module</h2>
           <div className="App-text">
-            This module will be created under the current organization, devops-mindset. 
+            This module will be created under the current organization, {localStorage.getItem(ORGANIZATION_NAME)}. 
           </div>
           <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
             <Step title="Connect to VCS" />
@@ -182,7 +182,7 @@ export const CreateModule = () => {
           
 
 
-          {current == 0 && (
+          {current === 0 && (
             <Space className="chooseType" direction="vertical">
               <h3>Connect to a version control provider</h3>
               <div className="workflowDescription2 App-text">

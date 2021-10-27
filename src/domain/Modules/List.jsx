@@ -7,6 +7,7 @@ import { SiMicrosoftazure,SiAmazonaws } from "react-icons/si";
 import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from 'react-icons/md';
+import { compareVersions } from '../Workspaces/Workspaces'
 import './Module.css';
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from '../../config/actionTypes';
 
@@ -21,7 +22,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
   const [organization, setOrganization] = useState({});
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [size, setSize] = useState(40);
 
   useEffect(() => {
     setLoading(true);
@@ -82,10 +82,10 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
                     <Space style={{ color: "rgb(82, 87, 97)" }} direction="vertical" >
                       <h3>{item.name}</h3>
                       {item.description}
-                      <Space size={size} style={{ marginTop: "25px" }}>
+                      <Space size={40} style={{ marginTop: "25px" }}>
                         <Tag color="blue"><span><MdBusiness /> Private</span></Tag>
                         <span>{renderLogo(item.provider)}&nbsp;&nbsp;{item.provider}</span>
-                        <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;{item.versions[0]}</span>
+                        <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;{item.versions.sort(compareVersions).reverse()[0]}</span>
                         <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
                         <span><DownloadOutlined />&nbsp;&nbsp; &lt; 100</span>
                       </Space>

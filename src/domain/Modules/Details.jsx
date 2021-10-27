@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react';
 import { Menu, Layout, Breadcrumb, Dropdown, Tabs, Space, Tag, Row, Col, Card, Divider } from "antd";
-import axiosInstance from "../../config/axiosConfig";
 import { useParams, Link } from "react-router-dom";
+import axiosInstance,{axiosClient} from "../../config/axiosConfig";
 import { DownOutlined, CloudOutlined, ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
 import { GitlabOutlined,GithubOutlined } from '@ant-design/icons';
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
@@ -10,12 +10,14 @@ import { BiBookBookmark } from "react-icons/bi";
 import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from 'react-icons/md';
+import ReactMarkdown from 'react-markdown'
+import { compareVersions } from '../Workspaces/Workspaces'
+import {unzip} from 'unzipit';
 import './Module.css';
 import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 
 const { TabPane } = Tabs;
 const { Content } = Layout;
-
 
 export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const { orgid, id } = useParams();
@@ -24,7 +26,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const [version, setVersion] = useState("...");
   const [vcsProvider, setVCSProvider] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [markdown, setMarkdown] = useState("loading...");
   const renderLogo = (provider) => {
     switch (provider) {
       case 'azurerm':
@@ -36,8 +38,30 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     }
   }
   const handleClick = e => {
+    setMarkdown("loading...");
     setVersion(e.key);
+    loadReadme(module.data.attributes.registryPath,e.key)
   };
+
+  async function readFiles(url) {
+    const {entries} = await unzip(url);
+
+    if(entries['README.md'] != null){
+    const readmeFile = await entries['README.md'].blob();
+
+    if(readmeFile != null)
+    {
+       const text = await readmeFile.text();
+       setMarkdown(text);
+      
+    }
+  }
+  else
+  {
+    setMarkdown("");
+  }
+}
+
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
@@ -53,11 +77,26 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
           setVCSProvider(response.data.included[0].attributes.vcsType);
         }
 
-        setVersion(response.data.data.attributes.versions[0]); // latest version
+        
+        setVersion(response.data.data.attributes.versions.sort(compareVersions).reverse()[0]); // latest version
+        loadReadme(response.data.data.attributes.registryPath,response.data.data.attributes.versions[0]);
       });
+      
 
   }, [orgid, id]);
 
+ 
+  const loadReadme = (path,version) => {
+     axiosClient.get(`${process.env.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`).then(
+      resp => {
+        console.log(resp);
+        // TODO: get url from headers
+        readFiles(`https://aksazbuilderstorage.blob.core.windows.net/registry/${path}/${version}/module.zip`);
+
+      }
+    );
+    
+  }
 
   const renderVCSLogo = (vcs) => {
     switch (vcs) {
@@ -105,7 +144,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         <td><BiBookBookmark /> Source</td>
                       </tr>
                       <tr className="black">
-                        <td>{version} <Dropdown overlay={<Menu onClick={handleClick}> {module.data.attributes.versions.map(function(name, index){
+                        <td>{version} <Dropdown overlay={<Menu onClick={handleClick}> {module.data.attributes.versions.sort(compareVersions).reverse().map(function(name, index){
                     return <Menu.Item key={name}>{name}</Menu.Item>;
                   })
                           
@@ -121,8 +160,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                     </table>
                   </IconContext.Provider>
                   <Tabs className="moduleTabs" defaultActiveKey="1" >
-                    <TabPane tab="Readme" key="1">
-                      Coming soon
+                    <TabPane className="markdown-body" tab="Readme" key="1">
+                      <ReactMarkdown>{markdown}</ReactMarkdown>
                     </TabPane>
                     <TabPane tab="Inputs" key="2">
                       Coming soon

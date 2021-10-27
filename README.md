@@ -10,6 +10,7 @@ Define the following environment variables:
 |REACT_CONFIG_CLIENT_ID       | Azure Active Directory Application Id                                |
 |REACT_CONFIG_AUTHORITY       | https://login.microsoftonline.com/(Azure Active Directory Tenant ID) |
 |REACT_CONFIG_REDIRECT        | Redirct URL. Example: http://localhost:3000                          |
+|REACT_CONFIG_REGISTRY_URI    | Terrakube Registry url. Example: https://someurl/open-registry/      |
 
 Run the script:
 

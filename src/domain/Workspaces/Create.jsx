@@ -107,7 +107,7 @@ export const CreateWorkspace = () => {
 
     if (source!=null)
     {
-    var nameValue = source.match('\/([^\/]+)\/?$');
+    var nameValue = source.match('/([^/]+)/?$');
     if (nameValue != null && nameValue.length > 0) {
       form.setFieldsValue({ name: nameValue[1].replace(".git", "") });
     }
@@ -152,7 +152,7 @@ export const CreateWorkspace = () => {
     })
       .then(response => {
         console.log(response);
-        if (response.status == "201") {
+        if (response.status === "201") {
           history.push('/workspaces/' + response.data.data.id);
         }
       })
@@ -162,17 +162,17 @@ export const CreateWorkspace = () => {
 
   const handleChange = currentVal => {
     setCurrent(currentVal);
-    if (currentVal == 2) {
+    if (currentVal === 2) {
       setStep2Hidden(false);
       setStep3Hidden(true);
     }
 
-    if (currentVal == 3) {
+    if (currentVal === 3) {
       setStep3Hidden(false);
       setStep2Hidden(true);
     }
 
-    if (currentVal == 1 ||currentVal==0 )  {
+    if (currentVal === 1 ||currentVal===0 )  {
       setStep3Hidden(true);
       setStep2Hidden(true);
 
@@ -202,7 +202,7 @@ export const CreateWorkspace = () => {
             <Step title="Choose a repository" />
             <Step title="Configure Settings" />
           </Steps>
-          {current == 0 && (
+          {current === 0 && (
             <Space className="chooseType" direction="vertical">
               <h3>Choose your workflow </h3>
               <Card hoverable onClick={handleClick}>
@@ -241,7 +241,7 @@ export const CreateWorkspace = () => {
           )}
 
 
-          {current == 1 && (
+          {current === 1 && (
             <Space className="chooseType" direction="vertical">
               <h3>Connect to a version control provider</h3>
               <div className="workflowDescription2 App-text">
