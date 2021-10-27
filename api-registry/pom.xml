@@ -14,7 +14,7 @@
 	<name>Terrakube Terraform Registry</name>
 	<description>Open Source Terraform Registry for AZB Server</description>
 	<properties>
-		<revision>1.5.0-beta.1</revision>
+		<azure.version>3.9.0</azure.version>
 		<java.version>11</java.version>
 		<lombok.version>1.18.20</lombok.version>
 		<api-client-starter.version>0.6.0</api-client-starter.version>
@@ -68,6 +68,19 @@
 			<version>${azure-storage-blob.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>azure-spring-boot-starter-active-directory</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-spring-test-listener</artifactId>
 			<version>${mockserver-spring-test-listener.version}</version>
@@ -91,5 +104,15 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.azure.spring</groupId>
+				<artifactId>azure-spring-boot-bom</artifactId>
+				<version>${azure.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

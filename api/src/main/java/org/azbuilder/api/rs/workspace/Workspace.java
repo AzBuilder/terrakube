@@ -48,6 +48,7 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace")
     private List<Variable> variable;
 
+    @UpdatePermission(expression = "user is a service")
     @OneToMany(mappedBy = "workspace")
     private List<History> history;
 
