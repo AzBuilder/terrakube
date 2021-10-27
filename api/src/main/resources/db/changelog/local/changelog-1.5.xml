@@ -65,7 +65,7 @@
                     type="varchar(1024)"/>
             <column name="status"
                     type="varchar(1024)"/>
-            <column name="job_id" type="int">
+            <column name="job_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_job_step" references="job(id)"/>
             </column>
         </createTable>
