@@ -1,7 +1,7 @@
 package org.azbuilder.registry.service.module;
 
 import lombok.extern.slf4j.Slf4j;
-import org.azbuilder.api.client.RestClient;
+import org.azbuilder.api.client.TerrakubeClient;
 import org.azbuilder.api.client.model.organization.module.Module;
 import org.azbuilder.api.client.model.organization.vcs.Vcs;
 import org.azbuilder.registry.plugin.storage.StorageService;
@@ -16,7 +16,7 @@ import java.util.List;
 public class ModuleServiceImpl implements ModuleService {
 
     @Autowired
-    RestClient restClient;
+    TerrakubeClient restClient;
 
     @Autowired
     StorageService storageService;
