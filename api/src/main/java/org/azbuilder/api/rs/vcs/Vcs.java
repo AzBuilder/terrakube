@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.hooks.vcs.VcsReadTokenHook;
 import org.hibernate.annotations.Type;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Vcs {
+public class Vcs extends GenericAuditFields {
 
     @Id
     @Type(type = "uuid-char")

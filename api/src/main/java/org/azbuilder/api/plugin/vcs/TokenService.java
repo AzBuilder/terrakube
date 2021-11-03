@@ -62,10 +62,14 @@ public class TokenService {
                 default:
                     break;
             }
+            vcs.setUpdatedBy("serviceAccount");
+            vcs.setUpdatedDate(new Date(System.currentTimeMillis()));
             vcs.setStatus(VcsStatus.COMPLETED);
             vcsRepository.save(vcs);
         } catch (TokenException e) {
             log.error(e.getMessage());
+            vcs.setUpdatedBy("serviceAccount");
+            vcs.setUpdatedDate(new Date(System.currentTimeMillis()));
             vcs.setStatus(VcsStatus.ERROR);
             vcsRepository.save(vcs);
         }

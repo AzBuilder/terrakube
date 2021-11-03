@@ -9,6 +9,10 @@
             <column name="status"
                     type="varchar(16)"
                     defaultValue="COMPLETED"/>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
