@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.hooks.vcs.VcsReadTokenHook;
 import org.hibernate.annotations.Type;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Vcs {
+public class Vcs extends GenericAuditFields {
 
     @Id
     @Type(type = "uuid-char")
@@ -45,6 +46,11 @@ public class Vcs {
     @ReadPermission(expression = "service read vcs secret")
     @Column(name = "client_secret")
     private String clientSecret;
+
+    @UpdatePermission(expression = "user is a service")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private VcsStatus status = VcsStatus.PENDING;
 
     @ReadPermission(expression = "service read vcs secret")
     @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.PRESECURITY, hook = VcsReadTokenHook.class)

@@ -17,8 +17,8 @@ class VcsTests extends ServerApplicationTests{
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO vcs (id, name, description, vcs_type, client_id, client_secret, access_token, organization_id) VALUES\n" +
-                    "\t\t('0f21ba16-16d4-4ac7-bce0-3484024ee6bf','publicConnection', 'publicConnection', 'PUBLIC', 'sampleId', 'sampleSecret', 'sampleToken', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
+            "INSERT INTO vcs (id, name, description, vcs_type, client_id, client_secret, access_token, status, organization_id) VALUES\n" +
+                    "\t\t('0f21ba16-16d4-4ac7-bce0-3484024ee6bf','publicConnection', 'publicConnection', 'PUBLIC', 'sampleId', 'sampleSecret', 'sampleToken', 'PENDING', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
     })
     void moduleApiGetTest() {
         when()
@@ -34,8 +34,13 @@ class VcsTests extends ServerApplicationTests{
                                                 attr("accessToken", "sampleToken"),
                                                 attr("clientId", "sampleId"),
                                                 attr("clientSecret", "sampleSecret"),
+                                                attr("createdBy", null),
+                                                attr("createdDate", null),
                                                 attr("description", "publicConnection"),
                                                 attr("name", "publicConnection"),
+                                                attr("status", "PENDING"),
+                                                attr("updatedBy", null),
+                                                attr("updatedDate", null),
                                                 attr("vcsType", "PUBLIC")
                                         ),
                                         relationships(
