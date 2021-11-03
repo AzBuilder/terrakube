@@ -34,9 +34,13 @@ class VcsTests extends ServerApplicationTests{
                                                 attr("accessToken", "sampleToken"),
                                                 attr("clientId", "sampleId"),
                                                 attr("clientSecret", "sampleSecret"),
+                                                attr("createdBy", null),
+                                                attr("createdDate", null),
                                                 attr("description", "publicConnection"),
                                                 attr("name", "publicConnection"),
                                                 attr("status", "PENDING"),
+                                                attr("updatedBy", null),
+                                                attr("updatedDate", null),
                                                 attr("vcsType", "PUBLIC")
                                         ),
                                         relationships(
