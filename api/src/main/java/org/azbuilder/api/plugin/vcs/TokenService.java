@@ -1,5 +1,6 @@
 package org.azbuilder.api.plugin.vcs;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.vcs.provider.azdevops.AzDevOpsToken;
 import org.azbuilder.api.plugin.vcs.provider.azdevops.AzDevOpsTokenService;
@@ -12,8 +13,8 @@ import org.azbuilder.api.plugin.vcs.provider.gitlab.GitLabToken;
 import org.azbuilder.api.plugin.vcs.provider.gitlab.GitLabTokenService;
 import org.azbuilder.api.repository.VcsRepository;
 import org.azbuilder.api.rs.vcs.Vcs;
+import org.azbuilder.api.rs.vcs.VcsStatus;
 import org.azbuilder.api.rs.vcs.VcsType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -21,23 +22,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@AllArgsConstructor
 @Slf4j
 @Service
 public class TokenService {
 
-    @Autowired
     VcsRepository vcsRepository;
-
-    @Autowired
     GitHubTokenService gitHubTokenService;
-
-    @Autowired
     BitbucketTokenService bitbucketTokenService;
-
-    @Autowired
     GitLabTokenService gitLabTokenService;
-
-    @Autowired
     AzDevOpsTokenService azDevOpsTokenService;
 
     public boolean generateAccessToken(String vcsId, String tempCode) {
@@ -69,10 +62,12 @@ public class TokenService {
                 default:
                     break;
             }
-
+            vcs.setStatus(VcsStatus.COMPLETED);
             vcsRepository.save(vcs);
         } catch (TokenException e) {
             log.error(e.getMessage());
+            vcs.setStatus(VcsStatus.ERROR);
+            vcsRepository.save(vcs);
         }
 
         return true;

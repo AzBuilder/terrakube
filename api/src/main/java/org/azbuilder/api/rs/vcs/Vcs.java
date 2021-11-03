@@ -46,6 +46,11 @@ public class Vcs {
     @Column(name = "client_secret")
     private String clientSecret;
 
+    @UpdatePermission(expression = "user is a service")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private VcsStatus status = VcsStatus.PENDING;
+
     @ReadPermission(expression = "service read vcs secret")
     @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.PRESECURITY, hook = VcsReadTokenHook.class)
     @Column(name = "access_token")
