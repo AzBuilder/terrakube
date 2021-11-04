@@ -14,5 +14,19 @@
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
         </addColumn>
+        <createTable tableName="trigger">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+            <column name="cron" type="varchar(128)"/>
+            <column name="tcl" type="clob"/>
+            <column name="workspace_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_workspace_trigger" references="workspace(id)"/>
+            </column>
+        </createTable>
     </changeSet>
 </databaseChangeLog>

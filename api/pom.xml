@@ -30,6 +30,7 @@
 		<postgresql.version>42.2.23</postgresql.version>
 		<mysql.version>8.0.26</mysql.version>
 		<snakeyaml.version>1.29</snakeyaml.version>
+		<quartz.version>2.3.2</quartz.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
@@ -165,6 +166,11 @@
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>${snakeyaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${quartz.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
