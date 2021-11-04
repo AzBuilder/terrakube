@@ -8,6 +8,7 @@ import org.azbuilder.api.rs.vcs.Vcs;
 import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.workspace.history.History;
+import org.azbuilder.api.rs.workspace.schedule.Schedule;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -51,6 +52,9 @@ public class Workspace {
     @UpdatePermission(expression = "user is a service")
     @OneToMany(mappedBy = "workspace")
     private List<History> history;
+
+    @OneToMany(mappedBy = "workspace")
+    private List<Schedule> schedule;
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;
