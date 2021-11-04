@@ -8,7 +8,7 @@ import org.azbuilder.api.rs.vcs.Vcs;
 import org.azbuilder.api.rs.workspace.parameters.Variable;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.workspace.history.History;
-import org.azbuilder.api.rs.workspace.trigger.Trigger;
+import org.azbuilder.api.rs.workspace.schedule.Schedule;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -54,7 +54,7 @@ public class Workspace {
     private List<History> history;
 
     @OneToMany(mappedBy = "workspace")
-    private List<Trigger> trigger;
+    private List<Schedule> schedule;
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;

@@ -1,26 +1,54 @@
 package org.azbuilder.api.plugin.scheduler;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.Job;
+import org.azbuilder.api.repository.JobRepository;
+import org.azbuilder.api.repository.ScheduleRepository;
+import org.azbuilder.api.rs.job.Job;
+import org.azbuilder.api.rs.job.JobStatus;
+import org.azbuilder.api.rs.workspace.schedule.Schedule;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.UUID;
+
+@AllArgsConstructor
 @Component
 @Getter
 @Setter
 @Slf4j
-public class ScheduleJob implements Job {
+public class ScheduleJob implements org.quartz.Job {
 
+    public static final String TRIGGER_ID = "triggerId";
+    public static final String TRIGGER_TCL = "triggerTcl";
 
+    ScheduleRepository scheduleRepository;
+    JobRepository jobRepository;
+
+    @Transactional
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        String message = jobExecutionContext.getJobDetail().getJobDataMap().getString("message");
+        String triggerId = jobExecutionContext.getJobDetail().getJobDataMap().getString(TRIGGER_ID);
+        Schedule schedule = scheduleRepository.getOne(UUID.fromString(triggerId));
 
-        log.info("Execute {}", message);
+        log.info("Creating new job for triggerId: {}", triggerId);
+        Job job = new Job();
+        job.setWorkspace(schedule.getWorkspace());
+        job.setOrganization(schedule.getWorkspace().getOrganization());
+        job.setTcl(schedule.getTcl());
+        job.setStatus(JobStatus.pending);
+        job.setCreatedBy("serviceAccount");
+        job.setUpdatedBy("serviceAccount");
+        Date triggerDate = new Date(System.currentTimeMillis());
+        job.setCreatedDate(triggerDate);
+        job.setUpdatedDate(triggerDate);
+
+        job = jobRepository.save(job);
+        log.info("New jobId: {}", job.getId());
     }
 }

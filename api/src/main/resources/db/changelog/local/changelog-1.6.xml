@@ -14,7 +14,7 @@
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
         </addColumn>
-        <createTable tableName="trigger">
+        <createTable tableName="schedule">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
@@ -23,7 +23,9 @@
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
             <column name="cron" type="varchar(128)"/>
+            <column name="description" type="varchar(256)"/>
             <column name="tcl" type="clob"/>
+            <column name="enabled" type="boolean" defaultValueBoolean="true"/>
             <column name="workspace_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_workspace_trigger" references="workspace(id)"/>
             </column>

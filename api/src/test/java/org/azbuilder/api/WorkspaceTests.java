@@ -12,7 +12,7 @@ class WorkspaceTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
+            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
@@ -47,6 +47,7 @@ class WorkspaceTests extends ServerApplicationTests{
                                                                 id("a42f538b-8c75-4311-8e73-ea2c0f2fb577")
                                                         )
                                                 ),
+                                                relation("schedule"),
                                                 relation("variable"),
                                                 relation("vcs",true,
                                                         resource(
@@ -64,7 +65,7 @@ class WorkspaceTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE VCS; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
+            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE VCS; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
@@ -109,7 +110,7 @@ class WorkspaceTests extends ServerApplicationTests{
 
     @Test
     @Sql(statements = {
-            "DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE VCS; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
+            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE VCS; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
             "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
@@ -133,6 +134,53 @@ class WorkspaceTests extends ServerApplicationTests{
                                                 attr("createdBy", null),
                                                 attr("createdDate", null),
                                                 attr("output", "sampleOutput"),
+                                                attr("updatedBy", null),
+                                                attr("updatedDate", null)
+                                        ),
+                                        relationships(
+                                                relation("workspace",true,
+                                                        resource(
+                                                                type("workspace"),
+                                                                id("c05da917-81a3-4da3-9619-20b240cbd7f7")
+                                                        )
+                                                )
+                                        )
+                                )
+                        ).toJSON())
+                )
+                .log().all()
+                .statusCode(HttpStatus.SC_OK);
+    }
+
+    @Test
+    @Sql(statements = {
+            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE VCS; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
+            "INSERT INTO organization (id, name, description) VALUES\n" +
+                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
+            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
+                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
+            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
+                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
+            "INSERT INTO schedule (id, cron, tcl, enabled, description, workspace_id) VALUES\n" +
+                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889','0/30 0/1 * 1/1 * ? *', 'sampleSchedule', true, 'sampleDescription', 'c05da917-81a3-4da3-9619-20b240cbd7f7');"
+    })
+    void scheduleApiGetTest() {
+        when()
+                .get("/api/v1/organization/a42f538b-8c75-4311-8e73-ea2c0f2fb577/workspace/c05da917-81a3-4da3-9619-20b240cbd7f7/schedule")
+                .then()
+                .log().all()
+                .body(equalTo(
+                        data(
+                                resource(
+                                        type( "schedule"),
+                                        id("4ea7855d-ab07-4080-934c-3aab429da889"),
+                                        attributes(
+                                                attr("createdBy", null),
+                                                attr("createdDate", null),
+                                                attr("cron", "0/30 0/1 * 1/1 * ? *"),
+                                                attr("description", "sampleDescription"),
+                                                attr("enabled", true),
+                                                attr("tcl", "sampleSchedule"),
                                                 attr("updatedBy", null),
                                                 attr("updatedDate", null)
                                         ),
