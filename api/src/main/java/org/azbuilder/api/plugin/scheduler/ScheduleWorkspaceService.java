@@ -12,6 +12,8 @@ import java.text.ParseException;
 @Service
 public class ScheduleWorkspaceService {
 
+    private static final String PREFIX_JOB = "Terrakube_Trigger_";
+
     Scheduler scheduler;
 
     public void createTask(String cronExpression, String triggerId) throws ParseException, SchedulerException {
@@ -23,14 +25,14 @@ public class ScheduleWorkspaceService {
         JobDetail jobDetail = JobBuilder.newJob().ofType(ScheduleJob.class)
                 .storeDurably()
                 .setJobData(jobDataMap)
-                .withIdentity("Terrakube_Trigger_" + triggerId)
+                .withIdentity(PREFIX_JOB + triggerId)
                 .withDescription(triggerId)
                 .build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
                 .startNow()
                 .forJob(jobDetail)
-                .withIdentity("Terrakube_Trigger_" + triggerId)
+                .withIdentity(PREFIX_JOB + triggerId)
                 .withDescription(triggerId)
                 .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(cronExpression)))
                 .build();
@@ -41,6 +43,6 @@ public class ScheduleWorkspaceService {
 
     public void deleteTask(String triggerId) throws ParseException, SchedulerException {
         log.info("Delete Schedule Trigger {}", triggerId);
-        scheduler.deleteJob(new JobKey("Terrakube_Trigger_" + triggerId));
+        scheduler.deleteJob(new JobKey(PREFIX_JOB + triggerId));
     }
 }

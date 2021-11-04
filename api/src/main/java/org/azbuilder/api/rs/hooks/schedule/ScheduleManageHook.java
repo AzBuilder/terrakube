@@ -35,6 +35,9 @@ public class ScheduleManageHook implements LifeCycleHook<Schedule> {
                 case DELETE:
                     schedulerService.deleteTask(schedule.getId().toString());
                     break;
+                default:
+                    log.info("Not supported");
+                    break;
             }
 
         } catch (ParseException | SchedulerException e) {
