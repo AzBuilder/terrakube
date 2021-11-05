@@ -55,7 +55,8 @@ export const TeamSettings = () => {
           manageWorkspace: values.manageWorkspace,
           manageModule: values.manageModule,
           manageProvider:values.manageProvider,
-          manageVcs:values.manageVcs
+          manageVcs:values.manageVcs,
+          manageTemplate:values.manageTemplate
         }
       }
     }
@@ -83,7 +84,8 @@ export const TeamSettings = () => {
           manageWorkspace: values.manageWorkspace,
           manageModule: values.manageModule,
           manageProvider:values.manageProvider,
-          manageVcs:values.manageVcs
+          manageVcs:values.manageVcs,
+          manageTemplate:values.manageTemplate,
         }
       }
     }
@@ -150,6 +152,7 @@ export const TeamSettings = () => {
                   {item.attributes.manageModule ? (<span>Modules</span>):null}
                   {item.attributes.manageProvider ? (<span>Providers</span>):null}
                   {item.attributes.manageVcs ? (<span>Vcs</span>):null}
+                  {item.attributes.manageTemplate ? (<span>Templates</span>):null}
                 </Space></div>}
               />
           </List.Item>
@@ -183,6 +186,9 @@ export const TeamSettings = () => {
               <Switch />
            </Form.Item>
            <Form.Item name="manageVcs" valuePropName="checked" label="Manage VCS Settings" tooltip={{ title: 'Allow members to create and administrate all VCS Settings within the organization', icon: <InfoCircleOutlined /> }} >
+              <Switch />
+           </Form.Item>
+           <Form.Item name="manageTemplate" valuePropName="checked" label="Manage Templates" tooltip={{ title: 'Allow members to create and administrate all Templates within the organization', icon: <InfoCircleOutlined /> }} >
               <Switch />
            </Form.Item>
           </Form>

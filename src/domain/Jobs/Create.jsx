@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState ,useEffect} from 'react';
 import { Form, Button, Select, Modal,Space } from "antd";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
@@ -11,16 +11,32 @@ export const CreateJob = ({changeJob}) => {
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(false);
   const onCancel = () => {
     setVisible(false);
   };
 
+  useEffect(() => {
+    setLoading(true);
+    loadTemplates();
+
+  }, [organizationId]);
+
+  const loadTemplates = () => {
+    axiosInstance.get(`organization/${organizationId}/template`)
+      .then(response => {
+        console.log(response);
+        setTemplates(response.data);
+        setLoading(false);
+      });
+  }
   const onCreate = (values) => {
     const body = {
       data: {
         type: "job",
         attributes: {
-          command: values.action
+          tcl: values.tcl
         },
         relationships: {
           workspace: {
@@ -71,12 +87,14 @@ export const CreateJob = ({changeJob}) => {
           <InfoCircleTwoTone style={{ fontSize: '16px' }} /> You will be redirected to the run details page to see this job executed. 
         </div>
         <Form form={form} layout="vertical" name="create-org" validateMessages={validateMessages}>
-          <Form.Item name="action" label="Choose job type" rules={[{ required: true }]}>
-            <Select>
-              <Select.Option value="plan">Plan</Select.Option>
-              <Select.Option value="apply">Apply</Select.Option>
-              <Select.Option value="destroy">Destroy</Select.Option>
-            </Select>
+          <Form.Item name="tcl" label="Choose job type" rules={[{ required: true }]}>
+          {loading || !templates.data ? (
+            <p>Data loading...</p>
+          ) : ( <Select >
+             {templates.data.map((item) => (
+                 <Select.Option value={item.attributes.tcl}>{item.attributes.name}</Select.Option>
+             ))}
+            </Select>)}
           </Form.Item>
         </Form>
         </Space>

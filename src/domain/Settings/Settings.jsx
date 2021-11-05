@@ -5,6 +5,7 @@ import './Settings.css';
 import { GeneralSettings } from "./General";
 import { TeamSettings } from "./Teams"
 import { VCSSettings } from "./VCS";
+import { TemplatesSettings } from "./Templates";
 import {ORGANIZATION_NAME} from '../../config/actionTypes';
 const { Content } = Layout;
 const { TabPane } = Tabs;
@@ -28,6 +29,9 @@ export const OrganizationSettings = ({ selectedTab ,vcsMode}) => {
           </TabPane>
           <TabPane tab="VCS Providers" key="3">
             <VCSSettings vcsMode={vcsMode} />
+          </TabPane>
+          <TabPane tab="Templates" key="4">
+            <TemplatesSettings />
           </TabPane>
         </Tabs>
       </div>

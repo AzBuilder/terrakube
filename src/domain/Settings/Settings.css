@@ -39,3 +39,6 @@
 .vcsList{
   width: 100%;
 }
+.editor{
+  border: 1px solid #eee;
+}
