@@ -83,7 +83,14 @@ public class JobService {
     public void requireJobApproval(Job job, String newStatus, String approvalTeam) {
         JobRequest jobRequest = new JobRequest();
         job.getAttributes().setStatus(newStatus);
-        //job.getAttributes().setApprovalTeam(approvalTeam);
+        job.getAttributes().setApprovalTeam(approvalTeam);
+        jobRequest.setData(job);
+        terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
+    }
+
+    public void removeApprovalTeam(Job job) {
+        JobRequest jobRequest = new JobRequest();
+        job.getAttributes().setApprovalTeam("");
         jobRequest.setData(job);
         terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
     }

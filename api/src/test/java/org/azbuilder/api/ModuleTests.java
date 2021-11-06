@@ -22,8 +22,8 @@ class ModuleTests extends ServerApplicationTests{
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO vcs (id, name, description, vcs_type, organization_id) VALUES\n" +
                     "\t\t('0f21ba16-16d4-4ac7-bce0-3484024ee6bf','publicConnection', 'publicConnection', 'PUBLIC', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO module (id, name, description, provider, source, organization_id, vcs_id) VALUES\n" +
-                    "\t\t('b5e41ba0-e7a5-4643-9200-1c45c5b82648','Module','Description', 'Provider', 'https://github.com/AzBuilder/terraform-sample-repository.git', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577', '0f21ba16-16d4-4ac7-bce0-3484024ee6bf');"
+            "INSERT INTO module (id, name, description, provider, source, download_quantity, organization_id, vcs_id) VALUES\n" +
+                    "\t\t('b5e41ba0-e7a5-4643-9200-1c45c5b82648','Module','Description', 'Provider', 'https://github.com/AzBuilder/terraform-sample-repository.git', 100, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577', '0f21ba16-16d4-4ac7-bce0-3484024ee6bf');"
     })
     void moduleApiGetTest() {
         when()
@@ -37,6 +37,7 @@ class ModuleTests extends ServerApplicationTests{
                                         id("b5e41ba0-e7a5-4643-9200-1c45c5b82648"),
                                         attributes(
                                                 attr("description", "Description"),
+                                                attr("downloadQuantity", 100),
                                                 attr("name", "Module"),
                                                 attr("provider", "Provider"),
                                                 attr("registryPath", "Organization/Module/Provider"),

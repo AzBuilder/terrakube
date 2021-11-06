@@ -17,7 +17,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<okhttp.version>4.9.1</okhttp.version>
-		<api-client-starter.version>0.7.1</api-client-starter.version>
+		<api-client-starter.version>0.8.0</api-client-starter.version>
 		<terraform-spring-boot-starter.version>0.2.1</terraform-spring-boot-starter.version>
 		<lombok.version>1.18.20</lombok.version>
 		<maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>

@@ -44,7 +44,7 @@ public class ModuleWebServiceImpl {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(
                 "X-Terraform-Get",
-                moduleService.getModuleVersionPath(organization, module, provider, version)
+                moduleService.getModuleVersionPath(organization, module, provider, version, true)
         );
         return ResponseEntity.ok().headers(responseHeaders).body(null);
     }

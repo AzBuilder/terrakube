@@ -25,7 +25,7 @@ public class TeamApproveJob extends OperationCheck<Job> {
 
     @Override
     public boolean ok(Job job, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        if (job.getApprovalTeam() == null)
+        if (job.getApprovalTeam() == null || job.getApprovalTeam().isEmpty())
             return true;
         else {
             return groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), job.getApprovalTeam());

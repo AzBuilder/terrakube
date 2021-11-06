@@ -24,7 +24,7 @@ import java.util.UUID;
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.PRESECURITY, hook = ModuleReadTokenHook.class)
 @ReadPermission(expression = "team view module OR user is a service")
 @CreatePermission(expression = "team manage module")
-@UpdatePermission(expression = "team manage module")
+@UpdatePermission(expression = "user is a service OR team manage module")
 @DeletePermission(expression = "team manage module")
 @Slf4j
 @Include(rootLevel = false)
@@ -48,6 +48,9 @@ public class Module {
 
     @Column(name = "source")
     private String source;
+
+    @Column(name = "download_quantity")
+    private int downloadQuantity = 0;
 
     @ManyToOne
     private Organization organization;
