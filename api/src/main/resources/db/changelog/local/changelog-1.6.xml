@@ -17,6 +17,9 @@
         <addColumn tableName="job" >
             <column name="approval_team" type="varchar2(64)"/>
         </addColumn>
+        <addColumn tableName="module">
+            <column name="download_quantity" type="BIGINT"/>
+        </addColumn>
         <createTable tableName="schedule">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
