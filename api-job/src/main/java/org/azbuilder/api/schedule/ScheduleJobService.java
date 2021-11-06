@@ -73,6 +73,7 @@ public class ScheduleJobService {
             if (flow.isPresent()) {
                 log.info("Execute command: {} \n {}", flow.get().getType(), flow.get().getCommands());
                 String stepId = getCurrentStepId(job);
+                jobService.removeApprovalTeam(job);
                 if (jobService.execute(job, stepId, flow.get()))
                     log.info("Executing Job {} Step Id {}", job.getId(), stepId);
             }
