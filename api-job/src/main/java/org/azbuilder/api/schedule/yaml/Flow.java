@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 public class Flow {
     private String type;
+    private String team;
     private int step;
     List<Command> commands;
 }

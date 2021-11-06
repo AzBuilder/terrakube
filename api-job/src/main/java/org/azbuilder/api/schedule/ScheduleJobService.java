@@ -9,6 +9,7 @@ import org.azbuilder.api.client.model.organization.job.step.StepAttributes;
 import org.azbuilder.api.client.model.organization.job.step.StepRequest;
 import org.azbuilder.api.schedule.yaml.Flow;
 import org.azbuilder.api.schedule.yaml.FlowConfig;
+import org.azbuilder.api.schedule.yaml.FlowType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
@@ -20,6 +21,9 @@ import java.util.*;
 @Service
 @Slf4j
 public class ScheduleJobService {
+
+    private static final String JOB_COMPLETED="completed";
+    private static final String JOB_WAITING_APPROVAL="waitingApproval";
 
     TerrakubeClient terrakubeClient;
     JobService jobService;
@@ -34,10 +38,43 @@ public class ScheduleJobService {
             if (flow.isPresent()) {
                 log.info("Execute command: {} \n {}", flow.get().getType(), flow.get().getCommands());
                 String stepId = getCurrentStepId(job);
-                if(jobService.execute(job, stepId, flow.get()))
-                    log.info("Executing Job {} Step Id {}", job.getId(), stepId);
+                FlowType tempFlowType = FlowType.valueOf(flow.get().getType());
+
+                switch (tempFlowType) {
+                    case terraformPlan:
+                    case terraformApply:
+                    case terraformDestroy:
+                    case customScripts:
+                        if (jobService.execute(job, stepId, flow.get()))
+                            log.info("Executing Job {} Step Id {}", job.getId(), stepId);
+                        break;
+                    case approval:
+                        jobService.requireJobApproval(job, JOB_WAITING_APPROVAL, flow.get().getTeam());
+                        log.info("Waiting Approval for Job {} Step Id {}", job.getId(), stepId);
+                        break;
+                    default:
+                        log.error("FlowType not supported");
+                        break;
+                }
+
             } else {
                 jobService.completeJob(job);
+            }
+        });
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void searchApprovedJobs() {
+        jobService.searchApprovedJobs().parallelStream().forEach(job -> {
+
+            job = initialJobSetup(job);
+
+            Optional<Flow> flow = Optional.ofNullable(getNextFlow(job));
+            if (flow.isPresent()) {
+                log.info("Execute command: {} \n {}", flow.get().getType(), flow.get().getCommands());
+                String stepId = getCurrentStepId(job);
+                if (jobService.execute(job, stepId, flow.get()))
+                    log.info("Executing Job {} Step Id {}", job.getId(), stepId);
             }
         });
     }
@@ -83,9 +120,8 @@ public class ScheduleJobService {
                     .stream()
                     .filter(flow -> flow.getStep() == map.firstKey())
                     .findFirst();
-            return nextFlow.isPresent()? nextFlow.get(): null;
-        }
-        else
+            return nextFlow.isPresent() ? nextFlow.get() : null;
+        } else
             return null;
     }
 

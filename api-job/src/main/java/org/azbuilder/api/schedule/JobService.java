@@ -11,6 +11,7 @@ import org.azbuilder.api.client.model.organization.workspace.variable.Variable;
 import org.azbuilder.api.client.model.response.ResponseWithInclude;
 import org.azbuilder.api.schedule.executor.ExecutorJob;
 import org.azbuilder.api.schedule.yaml.Flow;
+import org.azbuilder.api.schedule.yaml.FlowType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -80,8 +81,25 @@ public class JobService {
         return sendToExecutor(job, executorJob);
     }
 
+    public void requireJobApproval(Job job, String newStatus, String approvalTeam) {
+        JobRequest jobRequest = new JobRequest();
+        job.getAttributes().setStatus(newStatus);
+        //job.getAttributes().setApprovalTeam(approvalTeam);
+        jobRequest.setData(job);
+        terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
+    }
+
     public List<Job> searchPendingJobs() {
         ResponseWithInclude<List<Organization>, Job> organizationJobList = terrakubeClient.getAllOrganizationsWithJobStatus("pending");
+
+        if (!organizationJobList.getData().isEmpty() && organizationJobList.getIncluded() != null)
+            return organizationJobList.getIncluded();
+        else
+            return new ArrayList<>();
+    }
+
+    public List<Job> searchApprovedJobs() {
+        ResponseWithInclude<List<Organization>, Job> organizationJobList = terrakubeClient.getAllOrganizationsWithJobStatus("approved");
 
         if (!organizationJobList.getData().isEmpty() && organizationJobList.getIncluded() != null)
             return organizationJobList.getIncluded();
