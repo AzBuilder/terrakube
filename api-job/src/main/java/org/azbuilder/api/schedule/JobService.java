@@ -11,7 +11,6 @@ import org.azbuilder.api.client.model.organization.workspace.variable.Variable;
 import org.azbuilder.api.client.model.response.ResponseWithInclude;
 import org.azbuilder.api.schedule.executor.ExecutorJob;
 import org.azbuilder.api.schedule.yaml.Flow;
-import org.azbuilder.api.schedule.yaml.FlowType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

@@ -2,7 +2,6 @@ package org.azbuilder.api.rs.job;
 
 import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.annotation.ReadPermission;
 import com.yahoo.elide.annotation.UpdatePermission;
 import lombok.Getter;
 import lombok.Setter;

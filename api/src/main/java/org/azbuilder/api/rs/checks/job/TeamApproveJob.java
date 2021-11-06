@@ -28,10 +28,7 @@ public class TeamApproveJob extends OperationCheck<Job> {
         if (job.getApprovalTeam() == null)
             return true;
         else {
-            if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), job.getApprovalTeam()))
-                return true;
-            else
-                return false;
+            return groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), job.getApprovalTeam())
         }
     }
 }
