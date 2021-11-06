@@ -33,6 +33,7 @@ class JobTests extends ServerApplicationTests{
                                         type( "job"),
                                         id("1"),
                                         attributes(
+                                                attr("approvalTeam", null),
                                                 attr("createdBy", null),
                                                 attr("createdDate", null),
                                                 attr("output", "sampleOutput"),

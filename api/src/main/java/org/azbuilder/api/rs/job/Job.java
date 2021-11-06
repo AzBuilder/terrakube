@@ -1,6 +1,8 @@
 package org.azbuilder.api.rs.job;
 
+import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.UpdatePermission;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
@@ -21,6 +23,7 @@ public class Job extends GenericAuditFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @UpdatePermission(expression = "team approve job OR user is a service")
     @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.pending;
 
@@ -29,6 +32,11 @@ public class Job extends GenericAuditFields {
 
     @Column(name = "terraform_plan")
     private String terraformPlan;
+
+    @CreatePermission(expression = "user is a service")
+    @UpdatePermission(expression = "user is a service")
+    @Column(name = "approval_team")
+    private String approvalTeam;
 
     @Column(name = "tcl")
     private String tcl;
