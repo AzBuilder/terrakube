@@ -10,7 +10,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.util.UUID;
 
-@ReadPermission(expression = "team view template")
+@ReadPermission(expression = "team view template OR user is a service")
 @CreatePermission(expression = "team manage template")
 @UpdatePermission(expression = "team manage template")
 @DeletePermission(expression = "team manage template")

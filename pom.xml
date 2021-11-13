@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.6.0</revision>
+        <revision>1.6.1</revision>
         <sonar.organization>azbuilder</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.project.key>AzBuilder_azb-server</sonar.project.key>
