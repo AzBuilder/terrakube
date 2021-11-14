@@ -1,5 +1,6 @@
 package org.azbuilder.api.plugin.scheduler.configuration;
 
+import org.azbuilder.api.plugin.datasource.DataSourceConfigurationProperties;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.spi.TriggerFiredBundle;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import org.springframework.util.Assert;
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 public class QuartzAutoConfiguration {
@@ -36,10 +38,24 @@ public class QuartzAutoConfiguration {
     }
 
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean(ApplicationContext applicationContext, DataSource quartzDataSource) {
+    public SchedulerFactoryBean schedulerFactoryBean(ApplicationContext applicationContext, DataSource quartzDataSource, DataSourceConfigurationProperties dataSourceConfigurationProperties) {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
         schedulerFactoryBean.setJobFactory(new AutowireCapableBeanJobFactory(applicationContext.getAutowireCapableBeanFactory()));
         schedulerFactoryBean.setDataSource(quartzDataSource);
+        Properties properties = new Properties();
+        properties.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreTX");
+        switch(dataSourceConfigurationProperties.getType()){
+            case SQL_AZURE:
+                properties.put("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.MSSQLDelegate");
+                break;
+            case POSTGRESQL:
+                properties.put("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
+                break;
+            default:
+                properties.put("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
+                break;
+        }
+        schedulerFactoryBean.setQuartzProperties(properties);
         return schedulerFactoryBean;
     }
 
