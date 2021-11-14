@@ -10,6 +10,7 @@ import org.azbuilder.api.plugin.vcs.TokenService;
 import org.azbuilder.api.repository.VcsRepository;
 import org.azbuilder.api.rs.vcs.Vcs;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class VcsReadTokenHook implements LifeCycleHook<Vcs> {
     @Autowired
     VcsRepository vcsRepository;
 
+    @Transactional
     @Override
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase transactionPhase, Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
         if (authenticatedUser.isServiceAccount(requestScope.getUser())) {
