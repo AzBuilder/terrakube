@@ -44,6 +44,8 @@ public class QuartzAutoConfiguration {
         schedulerFactoryBean.setDataSource(quartzDataSource);
         Properties properties = new Properties();
         properties.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreTX");
+        properties.put("org.quartz.jobStore.isClustered","true");
+        properties.put("org.quartz.scheduler.instanceId","AUTO");
         switch(dataSourceConfigurationProperties.getType()){
             case SQL_AZURE:
                 properties.put("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.MSSQLDelegate");
