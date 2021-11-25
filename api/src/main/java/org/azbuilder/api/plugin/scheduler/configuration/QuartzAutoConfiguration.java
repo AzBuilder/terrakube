@@ -38,12 +38,12 @@ public class QuartzAutoConfiguration {
     }
 
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean(ApplicationContext applicationContext, DataSource quartzDataSource, DataSourceConfigurationProperties dataSourceConfigurationProperties) {
+    public SchedulerFactoryBean schedulerFactoryBean(ApplicationContext applicationContext, DataSource dataSource, DataSourceConfigurationProperties dataSourceConfigurationProperties) {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
         schedulerFactoryBean.setJobFactory(new AutowireCapableBeanJobFactory(applicationContext.getAutowireCapableBeanFactory()));
-        schedulerFactoryBean.setDataSource(quartzDataSource);
+        schedulerFactoryBean.setDataSource(dataSource);
         Properties properties = new Properties();
-        properties.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreTX");
+        properties.put("org.quartz.jobStore.class","org.springframework.scheduling.quartz.LocalDataSourceJobStore");
         properties.put("org.quartz.jobStore.isClustered","true");
         properties.put("org.quartz.scheduler.instanceId","AUTO");
         switch(dataSourceConfigurationProperties.getType()){
@@ -64,6 +64,7 @@ public class QuartzAutoConfiguration {
     @Bean
     public Scheduler scheduler(SchedulerFactoryBean schedulerFactoryBean) throws SchedulerException {
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
         scheduler.start();
         return scheduler;
     }
