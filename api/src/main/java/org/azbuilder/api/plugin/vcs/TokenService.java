@@ -94,6 +94,7 @@ public class TokenService {
 
     public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId, String clientSecret, String refreshToken) {
         Map<String, Object> tokenInformation = new HashMap<>();
+        log.info("Renew Token before: {}", tokenExpiration);
         switch (vcsType) {
             case BITBUCKET:
                 try {

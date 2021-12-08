@@ -8,7 +8,6 @@ import org.azbuilder.api.plugin.vcs.TokenService;
 import org.azbuilder.api.repository.VcsRepository;
 import org.azbuilder.api.rs.vcs.Vcs;
 import org.azbuilder.api.rs.vcs.VcsStatus;
-import org.azbuilder.api.rs.workspace.schedule.Schedule;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
