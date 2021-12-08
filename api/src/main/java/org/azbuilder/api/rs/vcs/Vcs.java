@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
-import org.azbuilder.api.rs.hooks.vcs.VcsReadTokenHook;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -53,7 +52,6 @@ public class Vcs extends GenericAuditFields {
     private VcsStatus status = VcsStatus.PENDING;
 
     @ReadPermission(expression = "service read vcs secret")
-    @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.PRESECURITY, hook = VcsReadTokenHook.class)
     @Column(name = "access_token")
     private String accessToken;
 

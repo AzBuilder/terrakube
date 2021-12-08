@@ -17,7 +17,15 @@ public class ScheduleWorkspaceService {
     Scheduler scheduler;
 
     public void createTask(String cronExpression, String triggerId) throws ParseException, SchedulerException {
+        if(jobExists(triggerId)) {
+            deleteTask(triggerId);
+            createQuartzJob(cronExpression, triggerId);
+        }else{
+            createQuartzJob(cronExpression, triggerId);
+        }
+    }
 
+    private void createQuartzJob(String cronExpression, String triggerId) throws ParseException, SchedulerException {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(ScheduleJob.TRIGGER_ID, triggerId);
 
@@ -44,5 +52,17 @@ public class ScheduleWorkspaceService {
     public void deleteTask(String triggerId) throws ParseException, SchedulerException {
         log.info("Delete Schedule Trigger {}", triggerId);
         scheduler.deleteJob(new JobKey(PREFIX_JOB + triggerId));
+    }
+
+    private boolean jobExists(String triggerId){
+        boolean jobExists = false;
+        try {
+            scheduler.getJobDetail(new JobKey(PREFIX_JOB + triggerId));
+            jobExists = true;
+            log.info("JobId {} exists", triggerId);
+        } catch (SchedulerException e) {
+            log.error(e.getMessage());
+        }
+        return jobExists;
     }
 }

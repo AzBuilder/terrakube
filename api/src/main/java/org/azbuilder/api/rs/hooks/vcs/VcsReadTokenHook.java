@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+@Deprecated(since = "1.7.0", forRemoval = true)
 @Slf4j
 public class VcsReadTokenHook implements LifeCycleHook<Vcs> {
     @Autowired

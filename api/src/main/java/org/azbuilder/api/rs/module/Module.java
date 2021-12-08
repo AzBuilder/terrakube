@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.rs.Organization;
-import org.azbuilder.api.rs.hooks.module.ModuleReadTokenHook;
 import org.azbuilder.api.rs.vcs.Vcs;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.READ, phase = LifeCycleHookBinding.TransactionPhase.PRESECURITY, hook = ModuleReadTokenHook.class)
 @ReadPermission(expression = "team view module OR user is a service")
 @CreatePermission(expression = "team manage module")
 @UpdatePermission(expression = "user is a service OR team manage module")
