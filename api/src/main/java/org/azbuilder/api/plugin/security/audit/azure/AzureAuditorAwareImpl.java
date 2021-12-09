@@ -3,6 +3,7 @@ package org.azbuilder.api.plugin.security.audit.azure;
 import com.azure.spring.aad.AADOAuth2AuthenticatedPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -12,14 +13,16 @@ import java.util.Optional;
 public class AzureAuditorAwareImpl implements AuditorAware<String> {
     @Override
     public Optional<String> getCurrentAuditor() {
-        log.info("getCurrentAuditor");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return Optional.empty();
+        if (authentication != null && authentication.isAuthenticated()) {
+            log.info("getCurrentAuditor: {}", authentication);
+            if (authentication instanceof AnonymousAuthenticationToken)
+                return Optional.of("AnonymousUser");
+            else
+                return Optional.of(isServiceAccount(authentication) ? "serviceAccount" : getEmail(authentication));
+        } else {
+            return Optional.of("Internal");
         }
-
-        return Optional.of(isServiceAccount(authentication) ? "serviceAccount" : getEmail(authentication));
     }
 
     private AADOAuth2AuthenticatedPrincipal getAzureAdPrincipal(Authentication authentication) {
