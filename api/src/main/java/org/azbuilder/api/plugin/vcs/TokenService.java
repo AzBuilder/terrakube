@@ -18,6 +18,7 @@ import org.azbuilder.api.rs.vcs.VcsStatus;
 import org.azbuilder.api.rs.vcs.VcsType;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.*;
@@ -37,6 +38,7 @@ public class TokenService {
     AzDevOpsTokenService azDevOpsTokenService;
     ScheduleVcsService scheduleVcsService;
 
+    @Transactional
     public boolean generateAccessToken(String vcsId, String tempCode) {
         Vcs vcs = vcsRepository.getOne(UUID.fromString(vcsId));
         int minutes = Calendar.getInstance().get(Calendar.MINUTE);
@@ -73,14 +75,10 @@ public class TokenService {
                 default:
                     break;
             }
-            vcs.setUpdatedBy("serviceAccount");
-            vcs.setUpdatedDate(new Date(System.currentTimeMillis()));
             vcs.setStatus(VcsStatus.COMPLETED);
             vcsRepository.save(vcs);
         } catch (TokenException e) {
             log.error(e.getMessage());
-            vcs.setUpdatedBy("serviceAccount");
-            vcs.setUpdatedDate(new Date(System.currentTimeMillis()));
             vcs.setStatus(VcsStatus.ERROR);
             vcsRepository.save(vcs);
         } catch (SchedulerException e) {
@@ -94,7 +92,7 @@ public class TokenService {
 
     public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId, String clientSecret, String refreshToken) {
         Map<String, Object> tokenInformation = new HashMap<>();
-        log.info("Renew Token before: {}", tokenExpiration);
+        log.info("Renew Token before: {} {}", tokenExpiration, vcsId);
         switch (vcsType) {
             case BITBUCKET:
                 try {

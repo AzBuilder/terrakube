@@ -17,7 +17,15 @@ public class ScheduleVcsService {
     Scheduler scheduler;
 
     public void createTask(String cronExpression, String vcsId) throws ParseException, SchedulerException {
+        if(jobExists(vcsId)) {
+            deleteTask(vcsId);
+            createQuartzJob(cronExpression, vcsId);
+        }else{
+            createQuartzJob(cronExpression, vcsId);
+        }
+    }
 
+    private void createQuartzJob(String cronExpression, String vcsId) throws SchedulerException, ParseException {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(ScheduleVcs.VCS_ID, vcsId);
 
@@ -42,8 +50,20 @@ public class ScheduleVcsService {
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    public void deleteTask(String triggerId) throws ParseException, SchedulerException {
-        log.info("Delete Vcs Trigger {}", triggerId);
-        scheduler.deleteJob(new JobKey(PREFIX_JOB + triggerId));
+    public void deleteTask(String vcsId) throws ParseException, SchedulerException {
+        log.info("Delete Vcs Trigger {}", vcsId);
+        scheduler.deleteJob(new JobKey(PREFIX_JOB + vcsId));
+    }
+
+    private boolean jobExists(String vcsId){
+        boolean jobExists = false;
+        try {
+            scheduler.getJobDetail(new JobKey(PREFIX_JOB + vcsId));
+            jobExists = true;
+            log.info("JobId {} exists", vcsId);
+        } catch (SchedulerException e) {
+            log.error(e.getMessage());
+        }
+        return jobExists;
     }
 }
