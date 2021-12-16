@@ -11,6 +11,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
+
 @Slf4j
 @Service
 public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
@@ -33,6 +35,7 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
                 .body(BodyInserters.fromFormData(formData))
                 .retrieve()
                 .bodyToMono(BitBucketToken.class)
+                .timeout(Duration.ofSeconds(10))
                 .block();
 
         if(bitBucketToken != null) {

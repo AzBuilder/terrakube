@@ -33,6 +33,7 @@
         <quartz.version>2.3.2</quartz.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
+        <log4j2.version>2.16.0</log4j2.version>
     </properties>
     <dependencies>
         <dependency>
