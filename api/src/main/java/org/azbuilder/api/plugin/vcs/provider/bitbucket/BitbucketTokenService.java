@@ -63,6 +63,7 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
                 .body(BodyInserters.fromFormData(formData))
                 .retrieve()
                 .bodyToMono(BitBucketToken.class)
+                .timeout(Duration.ofSeconds(10))
                 .block();
 
         if(bitBucketToken != null) {
