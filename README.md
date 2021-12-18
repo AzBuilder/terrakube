@@ -12,7 +12,7 @@ The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expo
 
 ## High Level Architecture
 
-![Architecture](https://raw.githubusercontent.com/AzBuilder/docs/master/.gitbook/assets/diagrama-sin-titulo.png)
+![Architecture](https://github.com/AzBuilder/docs/raw/master/.gitbook/assets/terrakube.drawio.png)
 
 Component descriptions:
 * **Terrakube API**:
