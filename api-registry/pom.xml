@@ -17,7 +17,7 @@
 		<azure.version>3.9.0</azure.version>
 		<java.version>11</java.version>
 		<lombok.version>1.18.20</lombok.version>
-		<api-client-starter.version>0.8.0</api-client-starter.version>
+		<api-client-starter.version>0.8.1</api-client-starter.version>
 		<jgit.version>5.12.0.202106070339-r</jgit.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<azure-storage-blob.version>12.14.1</azure-storage-blob.version>
