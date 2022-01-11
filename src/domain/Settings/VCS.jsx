@@ -147,7 +147,7 @@ export const VCSSettings = ({vcsMode}) => {
                           Created
                         </Col> 
                         <Col span={18}>
-                           Oct 31, 2021 19:36:33 pm
+                           {item.attributes.createdDate}
                         </Col> 
                       </Row>
                     </p>
@@ -155,19 +155,24 @@ export const VCSSettings = ({vcsMode}) => {
                     <p className="paragraph">
                        <Row> 
                          <Col span={6}>
-                         Connect to {renderVCSType(item.attributes.vcsType)}
+                         {item.attributes.status !=="COMPLETED" ? 
+                        ( <span>Connect to {renderVCSType(item.attributes.vcsType)}</span>) :
+                        (<span>Connection</span>)}
                         </Col> 
                         <Col span={12}>
-                        {item.attributes.accessToken !=="" ? 
+                        {item.attributes.status !=="COMPLETED" ? 
                         (<span>Connecting to {renderVCSType(item.attributes.vcsType)} will take your {renderVCSType(item.attributes.vcsType)} user through the OAuth flow to create an authorization token for access to all repositories for this organization. This means that your currently logged in {renderVCSType(item.attributes.vcsType)} user token will be used for all {renderVCSType(item.attributes.vcsType)} API interactions by any Terrakube user anywhere within the scope of <b>{localStorage.getItem(ORGANIZATION_NAME)}</b>.</span>)
                          :(
                           <span>
-                            A connection was made on Oct 31, 2021 19:36:33 pm by authenticating via OAuth as GitHub user <b>username</b>, which assigned an OAuth token for use by all Terrakube users in the <b>{localStorage.getItem(ORGANIZATION_NAME)}</b> organization.
+                            A connection was made on {item.attributes.createdDate} by authenticating via OAuth as {renderVCSType(item.attributes.vcsType)} user <b>{item.attributes.createdBy}</b>, which assigned an OAuth token for use by all Terrakube users in the <b>{localStorage.getItem(ORGANIZATION_NAME)}</b> organization.
                           </span>
                          )}
                         </Col> 
                         <Col span={6}>
+                        {item.attributes.status !=="COMPLETED" ? 
+                        (
                           <Button type="primary" target="_blank" href={getConnectUrl(item.attributes.vcsType,item.attributes.clientId,getCallBackUrl(item.id))} size="small">Connect to {renderVCSType(item.attributes.vcsType)}</Button>
+                        ) : (<span/>)}
                         </Col> 
                       </Row>
                     </p>
