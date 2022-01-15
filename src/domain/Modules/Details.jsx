@@ -154,7 +154,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                           </a>
                         </Dropdown>,</td>
                         <td>1 minute ago</td>
-                        <td>&lt; 100</td>
+                        <td>&nbsp; {module.data.attributes.downloadQuantity}</td>
                         <td>{renderVCSLogo(vcsProvider)} <a href={module.data.attributes.source} target="_blank">{module.data.attributes.source.replace(".git", "").replace("https://github.com/", "")}</a></td>
                       </tr>
                     </table>

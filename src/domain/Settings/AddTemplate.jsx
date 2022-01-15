@@ -3,7 +3,7 @@ import './Settings.css';
 import { Steps, Space, Button, Form, Input,Card,message } from "antd";
 import { IconContext } from "react-icons";
 import { HiOutlineExternalLink } from "react-icons/hi";
-import {  BiFileBlank, BiMobileLandscape } from "react-icons/bi";
+import {  BiFileBlank } from "react-icons/bi";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";

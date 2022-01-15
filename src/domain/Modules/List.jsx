@@ -87,7 +87,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
                         <span>{renderLogo(item.provider)}&nbsp;&nbsp;{item.provider}</span>
                         <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;{item.versions.sort(compareVersions).reverse()[0]}</span>
                         <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
-                        <span><DownloadOutlined />&nbsp;&nbsp; &lt; 100</span>
+                        <span><DownloadOutlined />&nbsp;&nbsp;  {item.downloadQuantity}</span>
                       </Space>
                     </Space>
                   </Card>

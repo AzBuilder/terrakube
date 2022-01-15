@@ -82,3 +82,22 @@
 .ant-collapse-content > .ant-collapse-content-box {
   padding: 0px;
 }
+
+.metadata{
+  font-size: 13px;
+  padding-top: 10px;
+  display: block;
+  color: rgb(140 140 140) !important;
+}
+
+
+.states{
+  font-size: 13px;
+  padding-top: 10px;
+  color: #6f7682;
+}
+
+.stateDetails{
+  font-size: 13px;
+  color: #6f7682;
+}

@@ -1,14 +1,10 @@
 import { React, useState, useEffect } from "react";
 import './Settings.css';
-import { Button, List, Card ,Divider,Row,Col,Popconfirm} from "antd";
-import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
+import { Button, List,Popconfirm} from "antd";
 import { AddTemplate } from "./AddTemplate"
 import { useParams } from "react-router-dom";
 import { DeleteOutlined,EditOutlined} from '@ant-design/icons';
-import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import axiosInstance from "../../config/axiosConfig";
-import { IconContext } from "react-icons";
-import {ORGANIZATION_NAME } from '../../config/actionTypes';
 
 export const TemplatesSettings = ({vcsMode}) => {
   const { orgid} = useParams();
