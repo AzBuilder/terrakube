@@ -8,6 +8,7 @@ import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
+import {Buffer} from 'buffer';
 const { Step } = Steps;
 const validateMessages = {
   required: '${label} is required!'

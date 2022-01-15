@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from 'react';
-import { Tag, Space, Collapse, Avatar } from "antd";
+import { Tag, Space, Collapse, Avatar, Skeleton } from "antd";
 import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { CheckCircleOutlined, CheckCircleTwoTone, SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
@@ -10,7 +10,29 @@ export const DetailsJob = ({ jobId }) => {
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
   const [loading, setLoading] = useState(false);
   const [job, setJob] = useState([]);
-  const [log, setLog] = useState("Waiting logs...");
+  const [steps, setSteps] = useState([]);
+  const outputLog = async (output, status) => {
+    if (output != null) {
+      return axiosClient.get(output).then(
+        resp => resp.data
+      ).catch(err => "No logs available");
+    }
+    else {
+      if (status === "running")
+        return "Initializing the backend...";
+      else
+        return "Waiting logs...";
+    }
+  }
+
+  const sortbyName = (a, b) => {
+    if (a.stepNumber < b.stepNumber)
+      return -1;
+    if (a.stepNumber > b.stepNumber)
+      return 1;
+    return 0;
+  }
+
   useEffect(() => {
     setLoading(true);
     console.log(jobId)
@@ -23,56 +45,62 @@ export const DetailsJob = ({ jobId }) => {
   }, [jobId]);
 
   const loadJob = () => {
-    axiosInstance.get(`organization/${organizationId}/job/${jobId}`)
+    let jobSteps = [];
+    axiosInstance.get(`organization/${organizationId}/job/${jobId}?include=step`)
       .then(response => {
-        console.log(response);
-        setJob(response.data);
-        console.log(response.data.data.attributes.output);
-        if (response.data.data.attributes.output != null) {
-          axiosClient.get(response.data.data.attributes.output).then(
-            resp => {
-              console.log(resp);
-              setLog(resp.data);
+        (async () => {
+          setJob(response.data);
+
+          if (response.data.included != null) {
+            for (const element of response.data.included) {
+              let log = await outputLog(element.attributes.output, element.attributes.status);
+              jobSteps.push({
+                id: element.id,
+                stepNumber: element.attributes.stepNumber,
+                status: element.attributes.status,
+                output: element.attributes.output,
+                outputLog: log
+              });
             }
-          )
-          .catch(err => { console.log(err); setLog("No logs available"); });
-        }
-        else {
-          if (response.data.data.attributes.status ==="running")
-            setLog("Initializing the backend...")
-          else
-            setLog("Waiting logs...")
-        }
+          }
+          setSteps(jobSteps.sort(sortbyName));
+
+        })();
       });
   }
   return (
 
     <div style={{ marginTop: "14px" }}>
-      {loading || !job.data ? (
+      {loading || !job.data || !steps ? (
         <p>Data loading...</p>
       ) : (
         <Space direction="vertical" style={{ width: "100%" }}>
           <div>
             <Tag icon={job.data.attributes.status === "completed" ? <CheckCircleOutlined /> : (job.data.attributes.status === "running" ? <SyncOutlined spin /> : <ClockCircleOutlined />)} color={job.data.attributes.status === "completed" ? "#2eb039" : (job.data.attributes.status === "running" ? "#108ee9" : "")}>{job.data.attributes.status}</Tag> <h2 style={{ display: "inline" }}>Triggered via UI</h2>
           </div>
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <Collapse >
-              <Panel header={<span><Avatar size="small" shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" /> <b>jcanizalez</b> triggered a run from UI</span>} key="1">
-                <p></p>
-              </Panel>
-            </Collapse>
-            <Collapse defaultActiveKey={['2']} >
-              <Panel header={<span>{job.data.attributes.status === "completed" ? <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} /> : (job.data.attributes.status === "running" ? <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} /> : <ClockCircleOutlined style={{ fontSize: "20px" }} />)}<h3 style={{ display: "inline" }}> Job {job.data.attributes.status}</h3></span>} key="2">
+
+          <Collapse >
+            <Panel header={<span><Avatar size="small" shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" /> <b>jcanizalez</b> triggered a run from UI</span>} key="1">
+              <p></p>
+            </Panel>
+          </Collapse>
+          {steps.length > 0 ? (steps.map(item => (
+            <Collapse style={{ width: "100%" }} defaultActiveKey={item.status === "running" ? ['2'] : []} >
+              <Panel header={<span>{item.status === "completed" ? <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} /> : (item.status === "running" ? <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} /> : <ClockCircleOutlined style={{ fontSize: "20px" }} />)}<h3 style={{ display: "inline" }}> Step {item.stepNumber} {item.status}</h3></span>} key="2">
                 <div id="code-container">
                   <div id="code-content">
                     <Ansi>
-                    {log}
+                      {item.outputLog}
                     </Ansi>
                   </div>
                 </div>
               </Panel>
             </Collapse>
-          </Space>
+          ))) : (
+            <span/>
+          )}
+
+
         </Space>)}
     </div>
   )

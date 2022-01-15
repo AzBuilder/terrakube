@@ -79,7 +79,7 @@ export const WorkspaceDetails = (props) => {
 
   const loadWorkspace = () => {
 
-    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable`)
+    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable,history`)
       .then(response => {
         console.log(response);
         setWorkspace(response.data);
