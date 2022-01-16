@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react';
 import { Menu, Layout, Breadcrumb, Dropdown, Tabs, Space, Tag, Row, Col, Card, Divider } from "antd";
 import { useParams, Link } from "react-router-dom";
-import axiosInstance,{axiosClient} from "../../config/axiosConfig";
+import axiosInstance from "../../config/axiosConfig";
 import { DownOutlined, CloudOutlined, ClockCircleOutlined, DownloadOutlined } from '@ant-design/icons';
 import { GitlabOutlined,GithubOutlined } from '@ant-design/icons';
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
@@ -87,7 +87,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
  
   const loadReadme = (path,version) => {
-     axiosClient.get(`${process.env.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`).then(
+    axiosInstance.get(`${process.env.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`).then(
       resp => {
         console.log(resp);
         // TODO: get url from headers
@@ -178,7 +178,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                   </Tabs>
                 </Space>
               </Col>
-              <Col span={6}>
+              <Col span={7}>
                 <Card >
                   <Space style={{ paddingRight: "10px" }} direction="vertical">
                     <p className="moduleSubtitles">Usage Instructions</p>

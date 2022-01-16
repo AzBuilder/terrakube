@@ -7,6 +7,7 @@ import { CreateJob } from '../Jobs/Create';
 import { DetailsJob } from '../Jobs/Details';
 import { Variables } from '../Workspaces/Variables';
 import { States } from '../Workspaces/States';
+import { Schedules } from "../Workspaces/Schedules";
 import { useParams, Link } from "react-router-dom";
 import {
   CheckCircleOutlined, ClockCircleOutlined, SyncOutlined
@@ -17,7 +18,8 @@ const { Option } = Select;
 const include = {
   VARIABLE: 'variable',
   JOB: 'job',
-  HISTORY: 'history'
+  HISTORY: 'history',
+  SCHEDULE: 'schedule'
 }
 const { DateTime } = require("luxon");
 
@@ -31,6 +33,7 @@ export const WorkspaceDetails = (props) => {
   const [workspace, setWorkspace] = useState({});
   const [variables, setVariables] = useState([]);
   const [history, setHistory] = useState([]);
+  const [schedule, setSchedule] = useState([]);
   const [envVariables, setEnvVariables] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [stateDetailsVisible, setStateDetailsVisible] = useState(false);
@@ -94,12 +97,12 @@ export const WorkspaceDetails = (props) => {
 
   const loadWorkspace = () => {
 
-    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable,history`)
+    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule`)
       .then(response => {
         console.log(response);
         setWorkspace(response.data);
         if (response.data.included) {
-          setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory);
+          setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule);
         }
         setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
         setWorkspaceName(response.data.data.attributes.name);
@@ -174,7 +177,10 @@ export const WorkspaceDetails = (props) => {
                 <TabPane tab="Variables" key="4">
                   <Variables vars={variables} env={envVariables} />
                 </TabPane>
-                <TabPane tab="Settings" key="5">
+                <TabPane tab="Schedules" key="5">
+                  <Schedules schedules={schedule} />
+                 </TabPane>
+                <TabPane tab="Settings" key="6">
                   <div className="generalSettings">
                     <h1>General Settings</h1>
                     <Form layout="vertical" name="form-settings" >
@@ -217,11 +223,12 @@ export const WorkspaceDetails = (props) => {
   )
 }
 
-function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables, setHistory) {
+function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables, setHistory,setSchedule) {
   let variables = [];
   let jobs = [];
   let envVariables = [];
   let history = [];
+  let schedule = [];
 
   includes.forEach(element => {
     switch (element.type) {
@@ -247,6 +254,16 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
           }
         );
         break;
+        case include.SCHEDULE:
+          schedule.push(
+            {
+              id: element.id,
+              name: "Apply",
+              ...element.attributes,
+  
+            }
+          );
+          break;
       case include.VARIABLE:
         if (element.attributes.category == "ENV") {
           envVariables.push(
@@ -274,5 +291,6 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
   setEnvVariables(envVariables);
   setJobs(jobs);
   setHistory(history);
+  setSchedule(schedule);
 }
 

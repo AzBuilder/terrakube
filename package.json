@@ -16,6 +16,7 @@
     "antd": "^4.16.6",
     "axios": "^0.21.3",
     "buffer": "^6.0.3",
+    "cronstrue": "^1.122.0",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
     "luxon": "^2.0.2",
