@@ -1,42 +1,19 @@
-import { Table } from "antd";
 import { React, useState, useEffect } from "react";
-import { Button, Layout, Breadcrumb } from "antd";
+import { Button, Layout, Breadcrumb ,Input,List,Space,Card,Tag} from "antd";
+import { GitlabOutlined,GithubOutlined, ClockCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { SiTerraform,SiBitbucket, SiAzuredevops  } from "react-icons/si";
+import { MdBusiness } from 'react-icons/md';
+import { IconContext } from "react-icons";
 import axiosInstance from "../../config/axiosConfig";
 import {useParams,useHistory,Link} from "react-router-dom";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 const { Content } = Layout;
 const { DateTime } = require("luxon");
+const { Search } = Input;
 const include = {
   WORKSPACE: "workspace"
 }
 
-const WORKSPACE_COLUMNS = [
-  {
-    title: 'Workspace Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: (_, record) => (
-      <Link to={"/workspaces/" + record.id}>{record.name}</Link>
-    )
-  },
-  ,
-  {
-    title: 'Run Status',
-    dataIndex: 'runStatus',
-    key: 'runStatus',
-  },
-  ,
-  {
-    title: 'Repo',
-    dataIndex: 'source',
-    key: 'source',
-  },
-  {
-    title: 'Latest Change',
-    dataIndex: 'latestChange',
-    key: 'latestChange',
-  }
-]
 
 export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   const { id } = useParams();
@@ -47,6 +24,24 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   const handleCreate = e => {
       history.push("/workspaces/create");
   };
+  const renderVCSLogo = (vcs) => {
+    switch (vcs) {
+      case 'GITLAB':
+        return <GitlabOutlined style={{ fontSize: '18px' }} />;
+      case 'BITBUCKET':
+        return <IconContext.Provider value={{ size: "18px" }}><SiBitbucket />&nbsp;</IconContext.Provider>;
+      case 'AZURE_DEVOPS':
+        return <IconContext.Provider value={{ size: "18px" }}><SiAzuredevops />&nbsp;</IconContext.Provider>;
+      default:
+        return <GithubOutlined style={{ fontSize: '18px' }} />;
+    }
+  }
+
+  const handleClick = id => {
+    console.log(id);
+    history.push("/workspaces/"+id)
+  };
+
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
@@ -76,9 +71,28 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
         {loading || !organization.data || !workspaces ? (
           <p>Data loading...</p>
         ) : (
-          <div className="orgWrapper">
+          <div className="workspaceWrapper">
             <div className='variableActions'><h2>Workspaces</h2><Button type="primary" htmlType="button" onClick={handleCreate}>New workspace</Button></div>
-            <Table dataSource={workspaces} columns={WORKSPACE_COLUMNS} rowKey='name' />
+            <Search placeholder="Filter workspaces" style={{ width: "100%" }} />
+            <List split="" className="workspaceList" dataSource={workspaces}
+              renderItem={item => (
+                <List.Item>
+                  <Card onClick={() => handleClick(item.id)} style={{ width: "100%" }} hoverable>
+                    <Space style={{ color: "rgb(82, 87, 97)" }} direction="vertical" >
+                      <h3>{item.name}</h3>
+                      {item.description}
+                      <Space size={40} style={{ marginTop: "25px" }}>
+                        <Tag color="#2eb039" icon={<CheckCircleOutlined />}>completed</Tag>
+                        <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
+                        <span><IconContext.Provider value={{ size: "1.3em" }}><SiTerraform /></IconContext.Provider>&nbsp;&nbsp;{item.terraformVersion}</span>
+                        <span><GithubOutlined style={{ fontSize: '18px' }} />&nbsp; <a href={item.source} target="_blank">{item.source.replace(".git", "").replace("https://github.com/", "")}</a></span>
+                     
+                      </Space>
+                    </Space>
+                  </Card>
+                </List.Item>
+              )}
+            />
           </div>
         )}
       </div>

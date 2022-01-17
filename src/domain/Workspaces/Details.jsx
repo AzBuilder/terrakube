@@ -161,7 +161,7 @@ export const WorkspaceDetails = (props) => {
                             <List.Item.Meta style={{margin:"0px", padding:"0px"}}
                               avatar={<Avatar shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" />}
                               title={<a onClick={() => handleClick(item.id)}>{item.title}</a>}
-                              description={<span> #job-{item.id}  |  <b>jcanizalez</b> triggered via UI</span>}
+                              description={<span> #job-{item.id}  |  <b>{item.createdBy}</b> triggered via UI</span>}
 
                             />
                           </List.Item>

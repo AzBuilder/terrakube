@@ -82,7 +82,7 @@ const App = () => {
           </Route>
 
         </Switch>
-        <Footer style={{ textAlign: 'center' }}>Terrakube ©2021</Footer>
+        <Footer style={{ textAlign: 'center' }}>Terrakube ©2022</Footer>
       </Layout>
     </Router>
   )

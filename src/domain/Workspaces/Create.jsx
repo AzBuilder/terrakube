@@ -143,19 +143,18 @@ export const CreateWorkspace = () => {
         }
       }
     }
-    console.log(body);
 
     axiosInstance.post(`organization/${organizationId}/workspace`, body, {
       headers: {
         'Content-Type': 'application/vnd.api+json'
       }
-    })
-      .then(response => {
-        console.log(response);
-        if (response.status === "201") {
+    }).then(response => {
+        console.log(response.status);
+        if (response.status === 201) {
+          console.log('/workspaces/' + response.data.data.id);
           history.push('/workspaces/' + response.data.data.id);
         }
-      })
+      });
   };
 
 
