@@ -11,5 +11,8 @@
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
         </addColumn>
+        <addColumn tableName="step" >
+            <column name="name" type="varchar2(128)"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>
