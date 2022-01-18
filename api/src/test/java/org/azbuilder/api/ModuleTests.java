@@ -36,12 +36,16 @@ class ModuleTests extends ServerApplicationTests{
                                         type( "module"),
                                         id("b5e41ba0-e7a5-4643-9200-1c45c5b82648"),
                                         attributes(
+                                                attr("createdBy", null),
+                                                attr("createdDate", null),
                                                 attr("description", "Description"),
                                                 attr("downloadQuantity", 100),
                                                 attr("name", "Module"),
                                                 attr("provider", "Provider"),
                                                 attr("registryPath", "Organization/Module/Provider"),
                                                 attr("source", "https://github.com/AzBuilder/terraform-sample-repository.git"),
+                                                attr("updatedBy", null),
+                                                attr("updatedDate", null),
                                                 attr("versions", Arrays.asList("0.0.2","0.0.1"))
                                         ),
                                         relationships(

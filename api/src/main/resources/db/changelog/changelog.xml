@@ -15,4 +15,5 @@
     <include file="/db/changelog/local/changelog-1.5.xml"/>
     <include file="/db/changelog/local/changelog-1.6.xml"/>
     <include file="/db/changelog/local/changelog-1.6-quartz.xml"/>
+    <include file="/db/changelog/local/changelog-1.8.xml"/>
 </databaseChangeLog>
