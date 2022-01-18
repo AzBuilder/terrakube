@@ -10,7 +10,7 @@ import { States } from '../Workspaces/States';
 import { Schedules } from "../Workspaces/Schedules";
 import { useParams, Link } from "react-router-dom";
 import {
-  CheckCircleOutlined, ClockCircleOutlined, SyncOutlined
+  CheckCircleOutlined, ClockCircleOutlined, SyncOutlined,ExclamationCircleOutlined
 } from '@ant-design/icons';
 import './Workspaces.css';
 const { TabPane } = Tabs;
@@ -154,7 +154,7 @@ export const WorkspaceDetails = (props) => {
                         renderItem={item => (
                           <List.Item  extra={
                             <div className="textLeft">
-                              <Tag icon={item.status == "completed" ? <CheckCircleOutlined /> : (item.status == "running" ? <SyncOutlined spin /> : <ClockCircleOutlined />)} color={item.statusColor}>{item.status}</Tag> <br />
+                              <Tag icon={item.status == "completed" ? <CheckCircleOutlined /> : (item.status == "running" ? <SyncOutlined spin /> : (item.status === "waitingApproval" ? <ExclamationCircleOutlined /> : <ClockCircleOutlined />))} color={item.statusColor}>{item.status}</Tag> <br />
                               <span className="metadata">{item.latestChange}</span>
                             </div>
                           }>
@@ -237,7 +237,7 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
           {
             id: element.id,
             title: "Queue manually using Terraform",
-            statusColor: element.attributes.status == "completed" ? "#2eb039" : (element.attributes.status == "running" ? "#108ee9" : ""),
+            statusColor: element.attributes.status == "completed" ? "#2eb039" : (element.attributes.status == "running" ? "#108ee9" : (element.attributes.status == "waitingApproval" ? "#fa8f37" : "")),
             latestChange: DateTime.fromISO(element.attributes.createdDate).toRelative(),
             ...element.attributes
           }

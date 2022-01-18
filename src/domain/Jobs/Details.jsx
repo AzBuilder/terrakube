@@ -1,8 +1,8 @@
 import { React, useState, useEffect } from 'react';
-import { Tag, Space, Collapse, Avatar, Skeleton } from "antd";
+import { Tag, Space, Collapse, Avatar, Card, Button,message } from "antd";
 import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
-import { CheckCircleOutlined, CheckCircleTwoTone, SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CheckCircleTwoTone, SyncOutlined, ClockCircleOutlined,ExclamationCircleOutlined,CheckOutlined,CloseOutlined ,CommentOutlined} from '@ant-design/icons';
 import Ansi from "ansi-to-react";
 const { Panel } = Collapse;
 
@@ -24,6 +24,32 @@ export const DetailsJob = ({ jobId }) => {
         return "Waiting logs...";
     }
   }
+
+  const handleComingSoon = e => {
+    message.info("Coming Soon!");
+  };
+
+  const handleApprove = e => {
+    const body = {
+      data: {
+        type: "job",
+        id:jobId,
+        attributes: {
+          status: "approved"
+        }
+      }
+    }
+
+    axiosInstance.patch(`organization/${organizationId}/job/${jobId}`, body, {
+      headers: {
+        'Content-Type': 'application/vnd.api+json'
+      }
+    })
+      .then(response => {
+        console.log(response);
+        
+      });
+  };
 
   const sortbyName = (a, b) => {
     if (a.stepNumber < b.stepNumber)
@@ -76,7 +102,7 @@ export const DetailsJob = ({ jobId }) => {
       ) : (
         <Space direction="vertical" style={{ width: "100%" }}>
           <div>
-            <Tag icon={job.data.attributes.status === "completed" ? <CheckCircleOutlined /> : (job.data.attributes.status === "running" ? <SyncOutlined spin /> : <ClockCircleOutlined />)} color={job.data.attributes.status === "completed" ? "#2eb039" : (job.data.attributes.status === "running" ? "#108ee9" : "")}>{job.data.attributes.status}</Tag> <h2 style={{ display: "inline" }}>Triggered via UI</h2>
+            <Tag icon={job.data.attributes.status === "completed" ? <CheckCircleOutlined /> : (job.data.attributes.status === "running" ? <SyncOutlined spin /> :(job.data.attributes.status === "waitingApproval" ? <ExclamationCircleOutlined /> : <ClockCircleOutlined />))} color={job.data.attributes.status === "completed" ? "#2eb039" : (job.data.attributes.status === "running" ? "#108ee9" : (job.data.attributes.status == "waitingApproval" ? "#fa8f37" : ""))}>{job.data.attributes.status}</Tag> <h2 style={{ display: "inline" }}>Triggered via UI</h2>
           </div>
 
           <Collapse >
@@ -97,10 +123,20 @@ export const DetailsJob = ({ jobId }) => {
               </Panel>
             </Collapse>
           ))) : (
-            <span/>
+            <span />
           )}
 
+          {(job.data.attributes.status === "waitingApproval" )? (
+            <div style={{ margin: "auto", width: "50%", marginTop: "20px" }}>
+              <Card title={<span style={{fontSize:"14px"}}><b>Needs Confirmation:</b> Someone from <b>{job.data.attributes.approvalTeam}</b> must confirm to continue.</span>}>
+                <Space size={20}>
+                  <Button icon={<CheckOutlined />} onClick={handleApprove} type="primary">Approve</Button>
+                  <Button icon={<CloseOutlined />} onClick={handleComingSoon} type="primary" danger>Discard</Button>
+                  <Button icon={<CommentOutlined />} onClick={handleComingSoon}>Add Comment</Button>
+                </Space>
+              </Card>
 
+            </div>) : (<span />)}
         </Space>)}
     </div>
   )
