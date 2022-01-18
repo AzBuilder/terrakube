@@ -5,6 +5,7 @@ import com.yahoo.elide.core.RequestScope;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.vcs.Vcs;
 import org.eclipse.jgit.api.Git;
@@ -29,7 +30,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Module {
+public class Module extends GenericAuditFields {
     @Id
     @Type(type = "uuid-char")
     @GeneratedValue
