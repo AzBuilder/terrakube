@@ -98,7 +98,7 @@ public class ScheduleJobService {
                 if(flow.getName()!=null) {
                     stepAttributes.setName(flow.getName());
                 }else{
-                    stepAttributes.setName("Running "+ flow.getStep());
+                    stepAttributes.setName("Running Step"+ flow.getStep());
                 }
                 newStep.setAttributes(stepAttributes);
                 stepRequest.setData(newStep);
