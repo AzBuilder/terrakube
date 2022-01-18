@@ -19,8 +19,8 @@ class WorkspaceTests extends ServerApplicationTests{
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO vcs (id, name, description, vcs_type, organization_id) VALUES\n" +
                     "\t\t('0f21ba16-16d4-4ac7-bce0-3484024ee6bf','publicConnection', 'publicConnection', 'PUBLIC', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id, vcs_id) VALUES\n" +
-                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577', '0f21ba16-16d4-4ac7-bce0-3484024ee6bf');"
+            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id, vcs_id, description) VALUES\n" +
+                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577', '0f21ba16-16d4-4ac7-bce0-3484024ee6bf', 'Description');"
     })
     void workspaceApiGetTest() {
         when()
@@ -34,6 +34,7 @@ class WorkspaceTests extends ServerApplicationTests{
                                         id("c05da917-81a3-4da3-9619-20b240cbd7f7"),
                                         attributes(
                                                 attr("branch", "main"),
+                                                attr("description", "Description"),
                                                 attr("name", "Workspace"),
                                                 attr("source", "https://github.com/AzBuilder/terraform-sample-repository.git"),
                                                 attr("terraformVersion", "0.15.2")

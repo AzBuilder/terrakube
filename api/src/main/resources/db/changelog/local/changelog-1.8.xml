@@ -11,5 +11,8 @@
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
         </addColumn>
+        <addColumn tableName="workspace" >
+            <column name="description" type="varchar2(512)"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>
