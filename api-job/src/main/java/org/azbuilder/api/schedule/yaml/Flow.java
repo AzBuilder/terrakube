@@ -12,6 +12,7 @@ import java.util.List;
 public class Flow {
     private String type;
     private String team;
+    private String name;
     private int step;
     List<Command> commands;
 }

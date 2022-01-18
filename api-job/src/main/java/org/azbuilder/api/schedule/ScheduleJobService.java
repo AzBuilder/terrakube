@@ -94,6 +94,12 @@ public class ScheduleJobService {
                 StepAttributes stepAttributes = new StepAttributes();
                 stepAttributes.setStatus("pending");
                 stepAttributes.setStepNumber(String.valueOf(flow.getStep()));
+                log.info("Step name {}", flow.getName());
+                if(flow.getName()!=null) {
+                    stepAttributes.setName(flow.getName());
+                }else{
+                    stepAttributes.setName("Running Step"+ flow.getStep());
+                }
                 newStep.setAttributes(stepAttributes);
                 stepRequest.setData(newStep);
                 terrakubeClient.createStep(stepRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
