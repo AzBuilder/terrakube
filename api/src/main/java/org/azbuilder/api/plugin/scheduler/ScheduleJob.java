@@ -34,7 +34,7 @@ public class ScheduleJob implements org.quartz.Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         String triggerId = jobExecutionContext.getJobDetail().getJobDataMap().getString(TRIGGER_ID);
-        Schedule schedule = scheduleRepository.getOne(UUID.fromString(triggerId));
+        Schedule schedule = scheduleRepository.getById(UUID.fromString(triggerId));
 
         log.info("Creating new job for triggerId: {}", triggerId);
         Job job = new Job();

@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
+import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
@@ -21,9 +22,13 @@ public class History extends GenericAuditFields {
     @GeneratedValue
     private UUID id;
 
+    @Column(name = "job_reference")
+    private String jobReference;
+
     @Column(name = "output")
     private String output;
 
     @ManyToOne
     private Workspace workspace;
+
 }
