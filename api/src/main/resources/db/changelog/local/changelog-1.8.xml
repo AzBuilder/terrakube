@@ -17,5 +17,8 @@
         <addColumn tableName="workspace" >
             <column name="description" type="varchar2(512)"/>
         </addColumn>
+        <addColumn tableName="history" >
+            <column name="job_reference" type="varchar2(16)"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

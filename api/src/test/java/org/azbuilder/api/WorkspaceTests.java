@@ -118,8 +118,8 @@ class WorkspaceTests extends ServerApplicationTests{
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
                     "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO history (id, output, workspace_id) VALUES\n" +
-                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889','sampleOutput', 'c05da917-81a3-4da3-9619-20b240cbd7f7');"
+            "INSERT INTO history (id, output, workspace_id, job_reference) VALUES\n" +
+                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889','sampleOutput', 'c05da917-81a3-4da3-9619-20b240cbd7f7','1');"
     })
     void stateApiGetTest() {
         when()
@@ -134,6 +134,7 @@ class WorkspaceTests extends ServerApplicationTests{
                                         attributes(
                                                 attr("createdBy", null),
                                                 attr("createdDate", null),
+                                                attr("jobReference", "1"),
                                                 attr("output", "sampleOutput"),
                                                 attr("updatedBy", null),
                                                 attr("updatedDate", null)
