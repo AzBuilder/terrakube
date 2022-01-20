@@ -29,6 +29,17 @@ export const DetailsJob = ({ jobId }) => {
     message.info("Coming Soon!");
   };
 
+  const getIconStatus = (item) =>{
+    switch(item.status){
+      case "completed":
+        return <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} />;
+      case "running":
+       return <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} />;
+      default:
+      return <ClockCircleOutlined style={{ fontSize: "20px" }} />
+    }
+  }
+
   const handleApprove = e => {
     const body = {
       data: {
@@ -85,6 +96,7 @@ export const DetailsJob = ({ jobId }) => {
                 stepNumber: element.attributes.stepNumber,
                 status: element.attributes.status,
                 output: element.attributes.output,
+                name: element.attributes.name,
                 outputLog: log
               });
             }
@@ -112,7 +124,7 @@ export const DetailsJob = ({ jobId }) => {
           </Collapse>
           {steps.length > 0 ? (steps.map(item => (
             <Collapse style={{ width: "100%" }} defaultActiveKey={item.status === "running" ? ['2'] : []} >
-              <Panel header={<span>{item.status === "completed" ? <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} /> : (item.status === "running" ? <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} /> : <ClockCircleOutlined style={{ fontSize: "20px" }} />)}<h3 style={{ display: "inline" }}> Step {item.stepNumber} {item.status}</h3></span>} key="2">
+              <Panel header={<span>{getIconStatus(item)}<h3 style={{ display: "inline" }}> {item.name} {item.status}</h3></span>} key="2">
                 <div id="code-container">
                   <div id="code-content">
                     <Ansi>
