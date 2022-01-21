@@ -35,7 +35,7 @@ public class AzureStorageServiceImpl implements StorageService {
         if (!blobContainerClient.exists()) {
             blobContainerClient.create();
         }
-        String blobName = organizationName + "/" + moduleName + "/" + providerName + "/" + moduleVersion + "/" + "module.zip";
+        String blobName = String.format("%s/%s/%s/%s/module.zip", organizationName, moduleName, providerName, moduleVersion);
         log.info("blobName: {}", blobName);
         BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
 
