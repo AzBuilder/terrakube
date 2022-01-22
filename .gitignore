@@ -4,6 +4,7 @@
 /node_modules
 /server/node_modules
 /.pnp
+/.idea
 .pnp.js
 
 # testing

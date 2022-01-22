@@ -162,7 +162,7 @@ export const WorkspaceDetails = (props) => {
                 </table>
               </div>
               <div className="App-text">
-                No workspace description available. Add workspace description.
+                  {workspace.data.attributes.description}
               </div>
               <Tabs activeKey={activeKey} defaultActiveKey="1" onTabClick={handleStatesClick} tabBarExtraContent={<CreateJob changeJob={changeJob} />} onChange={callback}>
                 <TabPane tab="Runs" key="2">
