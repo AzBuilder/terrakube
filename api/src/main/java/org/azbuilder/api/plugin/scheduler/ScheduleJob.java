@@ -6,8 +6,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.repository.JobRepository;
 import org.azbuilder.api.repository.ScheduleRepository;
+import org.azbuilder.api.repository.TemplateRepository;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.job.JobStatus;
+import org.azbuilder.api.rs.template.Template;
 import org.azbuilder.api.rs.workspace.schedule.Schedule;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -29,6 +31,7 @@ public class ScheduleJob implements org.quartz.Job {
 
     ScheduleRepository scheduleRepository;
     JobRepository jobRepository;
+    TemplateRepository templateRepository;
 
     @Transactional
     @Override
@@ -40,7 +43,13 @@ public class ScheduleJob implements org.quartz.Job {
         Job job = new Job();
         job.setWorkspace(schedule.getWorkspace());
         job.setOrganization(schedule.getWorkspace().getOrganization());
-        job.setTcl(schedule.getTcl());
+        if(schedule.getTemplateReference() != null){
+            Template template = templateRepository.getById(UUID.fromString(schedule.getTemplateReference()));
+            job.setTcl(template.getTcl());
+            job.setTemplateReference(schedule.getTemplateReference());
+        }else {
+            job.setTcl(schedule.getTcl());
+        }
         job.setStatus(JobStatus.pending);
         job.setCreatedBy("serviceAccount");
         job.setUpdatedBy("serviceAccount");

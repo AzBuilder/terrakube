@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.client.TerrakubeClient;
 import org.azbuilder.api.client.model.organization.job.Job;
+import org.azbuilder.api.client.model.organization.job.JobRequest;
 import org.azbuilder.api.client.model.organization.job.step.Step;
 import org.azbuilder.api.client.model.organization.job.step.StepAttributes;
 import org.azbuilder.api.client.model.organization.job.step.StepRequest;
+import org.azbuilder.api.client.model.organization.template.Template;
 import org.azbuilder.api.schedule.yaml.Flow;
 import org.azbuilder.api.schedule.yaml.FlowConfig;
 import org.azbuilder.api.schedule.yaml.FlowType;
@@ -22,8 +24,8 @@ import java.util.*;
 @Slf4j
 public class ScheduleJobService {
 
-    private static final String JOB_COMPLETED="completed";
-    private static final String JOB_WAITING_APPROVAL="waitingApproval";
+    private static final String JOB_COMPLETED = "completed";
+    private static final String JOB_WAITING_APPROVAL = "waitingApproval";
 
     TerrakubeClient terrakubeClient;
     JobService jobService;
@@ -83,7 +85,17 @@ public class ScheduleJobService {
     private Job initialJobSetup(Job job) {
         if (job.getRelationships().getStep().getData().isEmpty()) {
 
-            FlowConfig flowConfig = getFlowConfig(job.getAttributes().getTcl());
+            FlowConfig flowConfig = null;
+            if (job.getAttributes().getTemplateReference() != null) {
+                String tcl = getTemplateTcl(job.getRelationships().getOrganization().getData().getId(), job.getAttributes().getTemplateReference());
+                JobRequest jobRequest = new JobRequest();
+                job.getAttributes().setTcl(tcl);
+                jobRequest.setData(job);
+                terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
+                flowConfig = getFlowConfig(tcl);
+            } else {
+                flowConfig = getFlowConfig(job.getAttributes().getTcl());
+            }
             log.info("Custom Job Setup: \n {}", flowConfig.toString());
 
             flowConfig.getFlow().parallelStream().forEach(flow -> {
@@ -95,10 +107,10 @@ public class ScheduleJobService {
                 stepAttributes.setStatus("pending");
                 stepAttributes.setStepNumber(String.valueOf(flow.getStep()));
                 log.info("Step name {}", flow.getName());
-                if(flow.getName()!=null) {
+                if (flow.getName() != null) {
                     stepAttributes.setName(flow.getName());
-                }else{
-                    stepAttributes.setName("Running Step"+ flow.getStep());
+                } else {
+                    stepAttributes.setName("Running Step" + flow.getStep());
                 }
                 newStep.setAttributes(stepAttributes);
                 stepRequest.setData(newStep);
@@ -108,7 +120,6 @@ public class ScheduleJobService {
         } else
             return job;
     }
-
 
     private FlowConfig getFlowConfig(String tcl) {
         Yaml yaml = new Yaml(new Constructor(FlowConfig.class));
@@ -144,6 +155,11 @@ public class ScheduleJobService {
 
     public String getCurrentStepId(Job job) {
         return getPendingSteps(job).firstEntry().getValue().getId();
+    }
+
+    private String getTemplateTcl(String organizationId, String templateId) {
+        Template template = terrakubeClient.getTemplateById(organizationId, templateId).getData();
+        return template.getAttributes().getTcl();
     }
 }
 

@@ -12,6 +12,7 @@ import org.azbuilder.api.rs.workspace.Workspace;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
 @Include(rootLevel = false)
 @Getter
@@ -40,6 +41,9 @@ public class Job extends GenericAuditFields {
 
     @Column(name = "tcl")
     private String tcl;
+
+    @Column(name = "template_reference")
+    private String templateReference;
 
     @ManyToOne
     private Organization organization;

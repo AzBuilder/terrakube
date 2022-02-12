@@ -19,8 +19,8 @@ class JobTests extends ServerApplicationTests{
                     "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
             "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
                     "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO job (tcl, status, output, workspace_id, organization_id) VALUES\n" +
-                    "\t\t('sampleTcl', 'pending', 'sampleOutput', 'c05da917-81a3-4da3-9619-20b240cbd7f7', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
+            "INSERT INTO job (tcl, template_reference, status, output, workspace_id, organization_id) VALUES\n" +
+                    "\t\t('sampleTcl', 'c05da917-81a3-4da3-9619-20b240cbd7f7', 'pending', 'sampleOutput', 'c05da917-81a3-4da3-9619-20b240cbd7f7', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
     })
     void jobApiGetTest() {
         when()
@@ -39,6 +39,7 @@ class JobTests extends ServerApplicationTests{
                                                 attr("output", "sampleOutput"),
                                                 attr("status", "pending"),
                                                 attr("tcl", "sampleTcl"),
+                                                attr("templateReference", "c05da917-81a3-4da3-9619-20b240cbd7f7"),
                                                 attr("terraformPlan", null),
                                                 attr("updatedBy", null),
                                                 attr("updatedDate", null)
