@@ -29,8 +29,12 @@ public class Schedule extends GenericAuditFields {
     @Column(name = "cron")
     private String cron;
 
+    @Deprecated(since = "1.9")
     @Column(name = "tcl")
     private String tcl;
+
+    @Column(name = "template_reference")
+    private String templateReference;
 
     @Column(name = "description")
     private String description;
