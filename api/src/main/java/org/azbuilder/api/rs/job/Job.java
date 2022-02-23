@@ -2,18 +2,20 @@ package org.azbuilder.api.rs.job;
 
 import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.LifeCycleHookBinding;
 import com.yahoo.elide.annotation.UpdatePermission;
 import lombok.Getter;
 import lombok.Setter;
 import org.azbuilder.api.plugin.security.audit.GenericAuditFields;
 import org.azbuilder.api.rs.Organization;
+import org.azbuilder.api.rs.hooks.job.JobManageHook;
 import org.azbuilder.api.rs.job.step.Step;
 import org.azbuilder.api.rs.workspace.Workspace;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.UUID;
 
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)
 @Include(rootLevel = false)
 @Getter
 @Setter

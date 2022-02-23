@@ -45,7 +45,3 @@ public class Variable {
     private Workspace workspace;
 }
 
-enum Category{
-    TERRAFORM,
-    ENV
-}
