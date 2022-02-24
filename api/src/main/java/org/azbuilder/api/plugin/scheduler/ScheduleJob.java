@@ -51,7 +51,7 @@ public class ScheduleJob implements org.quartz.Job {
                 executeApprovedJobs(job);
                 break;
             case running:
-                log.info("Job {} running",job.getId());
+                log.info("Job {} running", job.getId());
                 break;
             case completed:
                 try {
@@ -60,6 +60,9 @@ public class ScheduleJob implements org.quartz.Job {
                 } catch (SchedulerException e) {
                     log.error(e.getMessage());
                 }
+                break;
+            default:
+                log.info("Job {} Status {}", job.getId(), job.getStatus());
                 break;
         }
     }

@@ -23,13 +23,10 @@ public class JobManageHook implements LifeCycleHook<Job> {
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase transactionPhase, Job job, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("JobCreateHook {}", job.getId());
         try {
-            switch (operation) {
-                case CREATE:
-                    scheduleJobService.createJobContext(job);
-                    break;
-                default:
-                    log.info("Not supported");
-                    break;
+            if(operation.equals(LifeCycleHookBinding.Operation.CREATE)) {
+                scheduleJobService.createJobContext(job);
+            }else {
+                log.info("Not supported {}", operation);
             }
 
         } catch (ParseException | SchedulerException e) {
