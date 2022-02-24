@@ -6,7 +6,7 @@ import com.yahoo.elide.core.security.ChangeSpec;
 import com.yahoo.elide.core.security.RequestScope;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.azbuilder.api.plugin.scheduler.ScheduleWorkspaceService;
+import org.azbuilder.api.plugin.scheduler.ScheduleJobService;
 import org.azbuilder.api.rs.workspace.schedule.Schedule;
 import org.quartz.SchedulerException;
 
@@ -17,7 +17,7 @@ import java.util.Optional;
 @Slf4j
 public class ScheduleManageHook implements LifeCycleHook<Schedule> {
 
-    private ScheduleWorkspaceService schedulerService;
+    private ScheduleJobService scheduleJobService;
 
     @Override
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase transactionPhase, Schedule schedule, RequestScope requestScope, Optional<ChangeSpec> optional) {
@@ -25,15 +25,15 @@ public class ScheduleManageHook implements LifeCycleHook<Schedule> {
         try {
             switch (operation) {
                 case CREATE:
-                    schedulerService.createTask(schedule.getCron(), schedule.getId().toString());
+                    scheduleJobService.createJobTrigger(schedule.getCron(), schedule.getId().toString());
                     break;
                 case UPDATE:
                     if (!schedule.isEnabled()) {
-                        schedulerService.deleteTask(schedule.getId().toString());
+                        scheduleJobService.deleteJobTrigger(schedule.getId().toString());
                     }
                     break;
                 case DELETE:
-                    schedulerService.deleteTask(schedule.getId().toString());
+                    scheduleJobService.deleteJobTrigger(schedule.getId().toString());
                     break;
                 default:
                     log.info("Not supported");
