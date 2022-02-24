@@ -20,6 +20,7 @@ import java.util.UUID;
 @Transactional
 public class TclParserTests extends ServerApplicationTests{
 
+
     @Autowired
     JobRepository jobRepository;
 
@@ -35,7 +36,7 @@ public class TclParserTests extends ServerApplicationTests{
     @Autowired
     OrganizationRepository organizationRepository;
 
-    @Test
+    //@Test
     @Sql(statements = {
             "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
             "INSERT INTO organization (id, name, description) VALUES\n" +
@@ -48,20 +49,7 @@ public class TclParserTests extends ServerApplicationTests{
                     "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
     })
     void jobApiGetTest() {
-        Job job = new Job();
-        job.setWorkspace(workspaceRepository.getById(UUID.fromString("c05da917-81a3-4da3-9619-20b240cbd7f7")));
-        job.setOrganization(organizationRepository.getById(UUID.fromString("a42f538b-8c75-4311-8e73-ea2c0f2fb577")));
 
-        Template template = templateRepository.getById(UUID.fromString("a42f538b-8c75-4311-8e73-ea2c0f2fb578"));
-        job.setTcl(template.getTcl());
-        job.setTemplateReference("a42f538b-8c75-4311-8e73-ea2c0f2fb578");
-        job.setStatus(JobStatus.pending);
-        job.setCreatedBy("serviceAccount");
-        job.setUpdatedBy("serviceAccount");
-        Date triggerDate = new Date(System.currentTimeMillis());
-        job.setCreatedDate(triggerDate);
-        job.setUpdatedDate(triggerDate);
-
-        jobRepository.save(job);
     }
+
 }
