@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: process.env.REACT_APP_TERRAKUBE_API_URL
+    baseURL: window._env_.REACT_APP_TERRAKUBE_API_URL
 });
 
 export const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_TERRAKUBE_API_URL
+  baseURL: window._env_.REACT_APP_TERRAKUBE_API_URL
 });
 
 axiosInstance.interceptors.request.use(

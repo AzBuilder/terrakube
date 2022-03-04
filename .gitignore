@@ -27,3 +27,8 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 .env
+
+# Temporary env files
+/public/env-config.js
+env-config.js
+.env-local

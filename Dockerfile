@@ -1,39 +1,35 @@
-FROM node:lts-buster as build
-
-WORKDIR /usr/local/app
-
-COPY ./ /usr/local/app/
-
-ARG TERRAKUBE_API_URL
-ENV REACT_CONFIG_TERRAKUBE_URL=$TERRAKUBE_API_URL
-
-ARG CLIENT_ID
-ENV REACT_CONFIG_CLIENT_ID=$CLIENT_ID
-
-ARG AUTHORITY
-ENV REACT_CONFIG_AUTHORITY=$AUTHORITY
-
-ARG REDIRECT_URI
-ENV REACT_CONFIG_REDIRECT=$REDIRECT_URI
-
-RUN ./setupEnv.sh
-
-RUN yarn install
-
+# => Build container
+FROM node:alpine as builder
+WORKDIR /app
+COPY package.json .
+COPY yarn.lock .
+RUN yarn
+COPY . .
 RUN yarn build
 
-WORKDIR /usr/local/app/server
+# => Run container
+FROM nginx:mainline-alpine
 
-RUN yarn install
+# Nginx config
+RUN rm -rf /etc/nginx/conf.d
+COPY conf /etc/nginx
 
-FROM node:lts-alpine
+# Static build
+COPY --from=builder /app/build /usr/share/nginx/html/
 
-# Copy the build output to replace the default nginx contents.
-COPY --from=build /usr/local/app/build /opt/terrakube/build/
-COPY --from=build /usr/local/app/server /opt/terrakube/server/
+# Default port exposure
+EXPOSE 8080
 
-WORKDIR /opt/terrakube/server
+# Copy .env file and shell script to container
+WORKDIR /usr/share/nginx/html
+COPY ./env.sh .
+COPY .env .
 
-EXPOSE 3000
+# Add bash
+RUN apk add --no-cache bash
 
-CMD [ "node", "server.js" ]
+# Make our shell script executable
+RUN chmod +x env.sh
+
+# Start Nginx server
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/env.sh && nginx -g \"daemon off;\""]

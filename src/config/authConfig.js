@@ -1,8 +1,8 @@
 export const msalConfig = {
   auth: {
-    clientId: process.env.REACT_APP_CLIENT_ID,
-    authority: process.env.REACT_APP_AUTHORITY,
-    redirectUri: process.env.REACT_APP_REDIRECT_URI,
+    clientId: window._env_.REACT_APP_CLIENT_ID,
+    authority: window._env_.REACT_APP_AUTHORITY,
+    redirectUri: window._env_.REACT_APP_REDIRECT_URI,
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
@@ -12,5 +12,5 @@ export const msalConfig = {
 
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
 export const loginRequest = {
- scopes: [process.env.REACT_APP_SCOPE]
+ scopes: [window._env_.REACT_APP_SCOPE]
 };
