@@ -19,7 +19,7 @@ Run the script to generate .env file in your local
 ./setupEnv.sh
 ```
 
-Run the script env.sh to generate static configuration file env-config.js that will be loaded when the ui 
+Run the script env.sh to generate static configuration file env-config.js that will be loaded when the ui starts
 
 Build/Start the application:
 
