@@ -25,7 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 /server/package-lock.json
 package-lock.json
-yarn.lock
+# yarn.lock Github Action require file
 .env
 
 # Temporary env files
