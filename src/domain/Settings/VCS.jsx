@@ -83,7 +83,7 @@ export const VCSSettings = ({vcsMode}) => {
   };
 
   const getCallBackUrl = (id) => {
-    return `${process.env.REACT_APP_TERRAKUBE_API_URL.replace("api","callback")}vcs/${id}`;
+    return `${window._env_.REACT_APP_TERRAKUBE_API_URL.replace("api","callback")}vcs/${id}`;
   }
 
   useEffect(() => {

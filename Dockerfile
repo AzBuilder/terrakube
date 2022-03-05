@@ -23,7 +23,14 @@ EXPOSE 8080
 # Copy .env file and shell script to container
 WORKDIR /usr/share/nginx/html
 COPY ./env.sh .
-COPY .env .
+
+# Generate empty file for parameters
+RUN echo "REACT_APP_TERRAKUBE_API_URL=" >> .env &&\
+    echo "REACT_APP_CLIENT_ID=" >> .env &&\
+    echo "REACT_APP_AUTHORITY=" >> .env &&\
+    echo "REACT_APP_REDIRECT_URI=" >>.env &&\
+    echo "REACT_APP_REGISTRY_URI=" >>.env &&\
+    echo "REACT_APP_SCOPE=" >>.env
 
 # Add bash
 RUN apk add --no-cache bash

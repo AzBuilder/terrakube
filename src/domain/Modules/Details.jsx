@@ -86,7 +86,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
  
   const loadReadme = (path,version) => {
-    axiosInstance.get(`${process.env.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`).then(
+    axiosInstance.get(`${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`).then(
       resp => {
         console.log(resp);
         // TODO: get url from headers
