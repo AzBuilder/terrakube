@@ -50,7 +50,7 @@ jobs:
       run: docker tag $(docker images terrakube-ui -q) azbuilder/terakube-ui:latest
 
     - name: Docker Push UI Version
-      run: docker push azbuilder/terakube-ui:$VERSION
+      run: docker push azbuilder/terrakube-ui:$VERSION
 
     - name: Docker Push UI Latest
-      run: docker push azbuilder/terakube-ui:latest
+      run: docker push azbuilder/terrakube-ui:latest
