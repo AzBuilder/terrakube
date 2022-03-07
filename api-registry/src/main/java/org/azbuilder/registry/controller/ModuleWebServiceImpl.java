@@ -46,6 +46,9 @@ public class ModuleWebServiceImpl {
                 "X-Terraform-Get",
                 moduleService.getModuleVersionPath(organization, module, provider, version, true)
         );
+        responseHeaders.set(
+                "Access-Control-Expose-Headers","X-Terraform-Get"
+        );
         return ResponseEntity.ok().headers(responseHeaders).body(null);
     }
 }
