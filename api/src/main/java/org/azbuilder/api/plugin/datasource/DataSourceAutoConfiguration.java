@@ -40,7 +40,7 @@ public class DataSourceAutoConfiguration {
                 ds.setDatabaseName(dataSourceConfigurationProperties.getDatabaseName());
                 ds.setUser(dataSourceConfigurationProperties.getDatabaseUser());
                 ds.setPassword(dataSourceConfigurationProperties.getDatabasePassword());
-                ds.setSsl(true);
+                ds.setSslMode("require");
                 dataSource = ds;
                 break;
             case MYSQL:
