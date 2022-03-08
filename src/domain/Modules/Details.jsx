@@ -14,6 +14,7 @@ import { compareVersions } from '../Workspaces/Workspaces'
 import {unzip} from 'unzipit';
 import './Module.css';
 import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
+import {Buffer} from 'buffer';
 
 const { TabPane } = Tabs;
 const { Content } = Layout;
@@ -61,6 +62,20 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   }
 }
 
+async function loadReadmeFile(text) {
+
+  if(text != null)
+  {
+     const textReadme = Buffer.from(text, "base64").toString();
+     setMarkdown(textReadme);
+    
+  }
+  else
+  {
+    setMarkdown("");
+  }
+}
+
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
@@ -86,12 +101,12 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
  
   const loadReadme = (path,version) => {
-    axiosInstance.get(`${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`).then(
+    axiosInstance.get(`${window._env_.REACT_APP_REGISTRY_URI}/terraform/readme/v1/${path}/${version}/download`).then(
       resp => {
         console.log(resp);
-        // TODO: get url from headers
-        readFiles(`https://aksazbuilderstorage.blob.core.windows.net/registry/${path}/${version}/module.zip`);
-
+        console.log('Headers')
+        console.log(resp.headers);
+        loadReadmeFile(resp.data.content);
       }
     );
     
