@@ -44,10 +44,10 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     
     - name: Docker tag UI Image 
-      run: docker tag $(docker images terrakube-ui -q) azbuilder/terakube-ui:$VERSION
+      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:$VERSION
 
     - name: Docker tag UI Image latest
-      run: docker tag $(docker images terrakube-ui -q) azbuilder/terakube-ui:latest
+      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:latest
 
     - name: Docker Push UI Version
       run: docker push azbuilder/terrakube-ui:$VERSION
