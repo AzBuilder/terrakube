@@ -6,5 +6,9 @@ public interface AuthenticatedUser {
 
     String getEmail(User user);
 
+    String getApplication(User user);
+
     public boolean isServiceAccount(User user);
+
+    public boolean isSuperUser(User user);
 }

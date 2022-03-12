@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
+@Deprecated
 @Slf4j
 @SecurityCheck(ServiceReadVcsSecret.RULE)
 public class ServiceReadVcsSecret extends OperationCheck<Vcs> {

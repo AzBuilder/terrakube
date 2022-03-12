@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@ReadPermission(expression = "team view provider OR user is a service")
+@ReadPermission(expression = "team view provider")
 @CreatePermission(expression = "team manage provider")
 @UpdatePermission(expression = "team manage provider")
 @DeletePermission(expression = "team manage provider")

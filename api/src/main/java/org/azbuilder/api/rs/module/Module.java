@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@ReadPermission(expression = "team view module OR user is a service")
+@ReadPermission(expression = "team view module")
 @CreatePermission(expression = "team manage module")
-@UpdatePermission(expression = "user is a service OR team manage module")
+@UpdatePermission(expression = "team manage module")
 @DeletePermission(expression = "team manage module")
 @Slf4j
 @Include(rootLevel = false)

@@ -29,11 +29,22 @@ public class TeamViewModule extends OperationCheck<Module> {
     @Override
     public boolean ok(Module module, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("team view module {}", module.getId());
+        boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = module.getOrganization().getTeam();
-        for (Team team : teamList) {
-            if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()))
-                return true;
+        if (authenticatedUser.isSuperUser(requestScope.getUser())) {
+            return true;
+        } else {
+            for (Team team : teamList) {
+                if (authenticatedUser.isServiceAccount(requestScope.getUser())){
+                    if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) ){
+                        return true;
+                    }
+                } else {
+                    if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()))
+                        return true;
+                }
+            }
+            return false;
         }
-        return false;
     }
 }

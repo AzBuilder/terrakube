@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.security.user.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+@Deprecated
 @Slf4j
 @SecurityCheck(IsServiceUser.RULE)
 public class IsServiceUser extends UserCheck {

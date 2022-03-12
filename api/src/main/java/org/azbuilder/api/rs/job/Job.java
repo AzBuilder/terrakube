@@ -26,7 +26,7 @@ public class Job extends GenericAuditFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @UpdatePermission(expression = "team approve job OR user is a service")
+    @UpdatePermission(expression = "team approve job OR user is a super service")
     @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.pending;
 
@@ -36,8 +36,8 @@ public class Job extends GenericAuditFields {
     @Column(name = "terraform_plan")
     private String terraformPlan;
 
-    @CreatePermission(expression = "user is a service")
-    @UpdatePermission(expression = "user is a service")
+    @CreatePermission(expression = "user is a super service")
+    @UpdatePermission(expression = "user is a super service")
     @Column(name = "approval_team")
     private String approvalTeam;
 
@@ -53,6 +53,7 @@ public class Job extends GenericAuditFields {
     @ManyToOne
     private Workspace workspace;
 
+    @UpdatePermission(expression = "user is a super service")
     @OneToMany(mappedBy = "job")
     private List<Step> step;
 

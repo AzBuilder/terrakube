@@ -28,11 +28,22 @@ public class TeamViewTemplate extends OperationCheck<Template> {
     @Override
     public boolean ok(Template template, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("team view template {}", template.getId());
+        boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = template.getOrganization().getTeam();
-        for (Team team : teamList) {
-            if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()))
-                return true;
+        if (authenticatedUser.isSuperUser(requestScope.getUser())) {
+            return true;
+        } else {
+            for (Team team : teamList) {
+                if (isServiceAccount){
+                    if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) ){
+                        return true;
+                    }
+                } else {
+                    if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()))
+                        return true;
+                }
+            }
+            return false;
         }
-        return false;
     }
 }

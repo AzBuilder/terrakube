@@ -28,11 +28,22 @@ public class TeamViewVcs extends OperationCheck<Vcs> {
     @Override
     public boolean ok(Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("team view vcs {}", vcs.getId());
+        boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = vcs.getOrganization().getTeam();
-        for (Team team : teamList) {
-            if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()))
-                return true;
+        if (authenticatedUser.isSuperUser(requestScope.getUser())) {
+            return true;
+        } else {
+            for (Team team : teamList) {
+                if (isServiceAccount){
+                    if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) ){
+                        return true;
+                    }
+                } else {
+                    if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()))
+                        return true;
+                }
+            }
+            return false;
         }
-        return false;
     }
 }
