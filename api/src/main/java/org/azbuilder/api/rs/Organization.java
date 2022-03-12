@@ -56,9 +56,11 @@ public class Organization {
     @OneToMany(mappedBy = "organization")
     private List<Team> team;
 
+    @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Vcs> vcs;
 
+    @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Template> template;
 }
