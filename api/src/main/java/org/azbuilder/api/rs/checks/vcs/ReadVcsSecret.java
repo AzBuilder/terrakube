@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @Slf4j
-@SecurityCheck(ServiceReadVcsSecret.RULE)
-public class ServiceReadVcsSecret extends OperationCheck<Vcs> {
+@SecurityCheck(ReadVcsSecret.RULE)
+public class ReadVcsSecret extends OperationCheck<Vcs> {
     public static final String RULE = "read vcs secret";
 
     @Autowired

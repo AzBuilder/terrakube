@@ -33,7 +33,6 @@ class VcsTests extends ServerApplicationTests{
                                         attributes(
                                                 attr("accessToken", "sampleToken"),
                                                 attr("clientId", "sampleId"),
-                                                attr("clientSecret", "sampleSecret"),
                                                 attr("createdBy", null),
                                                 attr("createdDate", null),
                                                 attr("description", "publicConnection"),
