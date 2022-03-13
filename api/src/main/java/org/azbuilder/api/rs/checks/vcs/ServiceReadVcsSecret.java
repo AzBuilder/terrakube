@@ -11,11 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-@Deprecated
 @Slf4j
 @SecurityCheck(ServiceReadVcsSecret.RULE)
 public class ServiceReadVcsSecret extends OperationCheck<Vcs> {
-    public static final String RULE = "service read vcs secret";
+    public static final String RULE = "read vcs secret";
 
     @Autowired
     AuthenticatedUser authenticatedUser;
@@ -23,6 +22,6 @@ public class ServiceReadVcsSecret extends OperationCheck<Vcs> {
     @Override
     public boolean ok(Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("user view vcs {}", vcs.getId());
-        return authenticatedUser.isServiceAccount(requestScope.getUser());
+        return false;
     }
 }

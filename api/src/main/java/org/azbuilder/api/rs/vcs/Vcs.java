@@ -14,7 +14,7 @@ import java.util.UUID;
 
 
 @Slf4j
-@ReadPermission(expression = "team view vcs OR user is a service")
+@ReadPermission(expression = "team view vcs")
 @CreatePermission(expression = "team manage vcs")
 @UpdatePermission(expression = "team manage vcs")
 @DeletePermission(expression = "team manage vcs")
@@ -42,16 +42,16 @@ public class Vcs extends GenericAuditFields {
     @Column(name = "client_id")
     private String clientId;
 
-    @ReadPermission(expression = "service read vcs secret")
+    @ReadPermission(expression = "read vcs secret")
     @Column(name = "client_secret")
     private String clientSecret;
 
-    @UpdatePermission(expression = "user is a service")
+    @UpdatePermission(expression = "user is a super service")
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private VcsStatus status = VcsStatus.PENDING;
 
-    @ReadPermission(expression = "service read vcs secret")
+    @Exclude
     @Column(name = "access_token")
     private String accessToken;
 
