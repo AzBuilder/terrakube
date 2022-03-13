@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 @Slf4j
-@SecurityCheck(IsSuperUser.RULE)
-public class IsSuperUser extends UserCheck {
+@SecurityCheck(isSuperService.RULE)
+public class isSuperService extends UserCheck {
 
-    public static final String RULE = "user is a superuser";
+    public static final String RULE = "user is a super service";
 
     @Autowired
     AuthenticatedUser authenticatedUser;
@@ -26,11 +26,10 @@ public class IsSuperUser extends UserCheck {
 
     @Override
     public boolean ok(User user) {
-        if (authenticatedUser.isServiceAccount(user)){
+        if (authenticatedUser.isServiceAccount(user)) {
             return groupService.isServiceMember(authenticatedUser.getApplication(user), instanceOwner);
-        }else{
-            return groupService.isMember(authenticatedUser.getEmail(user), instanceOwner);
+        } else {
+            return false;
         }
     }
 }
-

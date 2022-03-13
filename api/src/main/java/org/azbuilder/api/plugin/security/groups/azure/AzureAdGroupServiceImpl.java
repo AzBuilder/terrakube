@@ -33,6 +33,12 @@ public class AzureAdGroupServiceImpl implements GroupService {
         return isUserMemberGroup(getUserId(userName), getGroupId(groupName));
     }
 
+    @Override
+    @Cacheable(cacheNames = "applications")
+    public boolean isServiceMember(String application, String groupName) {
+        return isServiceMemberGroup(application, getGroupId(groupName));
+    }
+
     private String getGroupId(String groupName) {
         log.info("Search Group Id {}", groupName);
         List<Option> requestOptions = new ArrayList<>();
@@ -64,6 +70,22 @@ public class AzureAdGroupServiceImpl implements GroupService {
         groupIdsList.add(groupId);
 
         DirectoryObjectCheckMemberGroupsCollectionPage directoryObjectCheckMemberGroupsCollectionPage = graphServiceClient.users(userId)
+                .checkMemberGroups(DirectoryObjectCheckMemberGroupsParameterSet
+                        .newBuilder()
+                        .withGroupIds(groupIdsList)
+                        .build())
+                .buildRequest()
+                .post();
+
+        return directoryObjectCheckMemberGroupsCollectionPage.getCurrentPage().size() == 1;
+
+    }
+
+    private boolean isServiceMemberGroup(String applicationId, String groupId) {
+        LinkedList<String> groupIdsList = new LinkedList<>();
+        groupIdsList.add(groupId);
+
+        DirectoryObjectCheckMemberGroupsCollectionPage directoryObjectCheckMemberGroupsCollectionPage = graphServiceClient.servicePrincipals(applicationId)
                 .checkMemberGroups(DirectoryObjectCheckMemberGroupsParameterSet
                         .newBuilder()
                         .withGroupIds(groupIdsList)

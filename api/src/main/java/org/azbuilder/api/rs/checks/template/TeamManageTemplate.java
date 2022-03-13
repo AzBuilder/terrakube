@@ -30,10 +30,17 @@ public class TeamManageTemplate extends OperationCheck<Template> {
     @Override
     public boolean ok(Template template, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("team manage template {}", template.getId());
+        boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = template.getOrganization().getTeam();
         for (Team team : teamList) {
-            if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageTemplate())
-                return true;
+            if (isServiceAccount){
+                if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) && team.isManageTemplate() ){
+                    return true;
+                }
+            } else {
+                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageTemplate())
+                    return true;
+            }
         }
         return false;
     }

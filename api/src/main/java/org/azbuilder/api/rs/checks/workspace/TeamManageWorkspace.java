@@ -29,10 +29,17 @@ public class TeamManageWorkspace extends OperationCheck<Workspace> {
     @Override
     public boolean ok(Workspace workspace, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("team manage workspace {}", workspace.getId());
+        boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = workspace.getOrganization().getTeam();
         for (Team team : teamList) {
-             if(groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageWorkspace())
-                return true;
+            if (isServiceAccount){
+                if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) && team.isManageWorkspace() ){
+                    return true;
+                }
+            } else {
+                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageWorkspace())
+                    return true;
+            }
         }
         return false;
     }

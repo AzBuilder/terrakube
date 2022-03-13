@@ -11,4 +11,7 @@ public class LocalGroupServiceImpl implements GroupService {
     public boolean isMember(String user, String group) {
         return true;
     }
+
+    @Override
+    public boolean isServiceMember(String application, String group) { return true; }
 }

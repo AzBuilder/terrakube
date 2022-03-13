@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-@ReadPermission(expression = "team view workspace OR user is a service")
+@ReadPermission(expression = "team view workspace")
 @CreatePermission(expression = "team manage workspace")
 @UpdatePermission(expression = "team manage workspace")
 @DeletePermission(expression = "team manage workspace")
@@ -52,7 +52,7 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace")
     private List<Variable> variable;
 
-    @UpdatePermission(expression = "user is a service")
+    @UpdatePermission(expression = "user is a super service")
     @OneToMany(mappedBy = "workspace")
     private List<History> history;
 

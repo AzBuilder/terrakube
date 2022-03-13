@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @Slf4j
-@SecurityCheck(ServiceReadSecret.RULE)
-public class ServiceReadSecret extends OperationCheck<Variable> {
+@SecurityCheck(UserReadSecret.RULE)
+public class UserReadSecret extends OperationCheck<Variable> {
 
-    public static final String RULE = "service read secret";
+    public static final String RULE = "user read secret";
 
     @Autowired
     AuthenticatedUser authenticatedUser;
@@ -24,7 +24,7 @@ public class ServiceReadSecret extends OperationCheck<Variable> {
     public boolean ok(Variable variable, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("user view variable {}", variable.getId());
         if(variable.isSensitive()) {
-            return authenticatedUser.isServiceAccount(requestScope.getUser());
+            return false;
         }
         else
             return true;
