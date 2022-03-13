@@ -31,7 +31,6 @@ class VcsTests extends ServerApplicationTests{
                                         type( "vcs"),
                                         id("0f21ba16-16d4-4ac7-bce0-3484024ee6bf"),
                                         attributes(
-                                                attr("accessToken", "sampleToken"),
                                                 attr("clientId", "sampleId"),
                                                 attr("createdBy", null),
                                                 attr("createdDate", null),
