@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @ReadPermission(expression = "team view module")
 @CreatePermission(expression = "team manage module")
-@UpdatePermission(expression = "team manage module")
+@UpdatePermission(expression = "team manage module OR user is a super service")
 @DeletePermission(expression = "team manage module")
 @Slf4j
 @Include(rootLevel = false)
