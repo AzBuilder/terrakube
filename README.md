@@ -116,7 +116,7 @@ The server supports the following endpoints:
 * Schedule
 * History
 
-Please refer to the [API documentation](https://docs.terrakube.org/api/methods)
+For more information please refer to the [API documentation](https://docs.terrakube.org/api/methods)
 
 ## Postman Examples
 For more detail information about how to use azb-server json:api please check the following files:
