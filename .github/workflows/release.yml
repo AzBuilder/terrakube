@@ -18,7 +18,7 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Build Image with Maven
-      run: mvn -pl "api,api-job,api-registry" spring-boot:build-image -B  --file pom.xml -s $GITHUB_WORKSPACE/.github/workflows/maven-settings.xml
+      run: mvn -pl "api,api-registry" spring-boot:build-image -B  --file pom.xml -s $GITHUB_WORKSPACE/.github/workflows/maven-settings.xml
       env:
         USER_NAME: ${{ secrets.USER_NAME }}
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -40,18 +40,6 @@ jobs:
       
     - name: Docker Push API latest
       run: docker push azbuilder/api-server:latest
-    
-    - name: Docker tag JOB Image 
-      run: docker tag $(docker images api-job -q) azbuilder/api-job:$VERSION
-      
-    - name: Docker tag JOB Image latest
-      run: docker tag $(docker images api-job -q) azbuilder/api-job:latest
-    
-    - name: Docker Push JOB latest
-      run: docker push azbuilder/api-job:$VERSION
-      
-    - name: Docker Push JOB latest
-      run: docker push azbuilder/api-job:latest
 
     - name: Docker tag Registry Image
       run: docker tag $(docker images open-registry -q) azbuilder/open-registry:$VERSION
