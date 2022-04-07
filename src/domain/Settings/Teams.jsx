@@ -25,7 +25,7 @@ export const TeamSettings = () => {
     .then(response => {
       console.log(response);
       setTeamName(response.data.data.attributes.name);
-      form.setFieldsValue({manageProvider: response.data.data.attributes.manageProvider,manageModule:response.data.data.attributes.manageModule, manageWorkspace:response.data.data.attributes.manageWorkspace, manageVcs:response.data.data.attributes.manageVcs});
+      form.setFieldsValue({manageProvider: response.data.data.attributes.manageProvider,manageModule:response.data.data.attributes.manageModule, manageWorkspace:response.data.data.attributes.manageWorkspace, manageVcs:response.data.data.attributes.manageVcs,manageTemplate:response.data.data.attributes.manageTemplate});
     });
   };
 
