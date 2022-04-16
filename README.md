@@ -39,6 +39,10 @@ Expose a JSON:API or GraphQL API providing endpoints to handle:
 
 For more information please visit our [documentation](https://docs.terrakube.org/).
 
+## Getting started guide.
+
+Please refere to the following [document](https://docs.terrakube.org/api/getting-started) to understand how Terrakube API works.
+
 ## Version Control Services
 The platform support public and private repositories in the following providers:
 
