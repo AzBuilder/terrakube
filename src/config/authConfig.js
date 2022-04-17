@@ -1,3 +1,4 @@
+import { PublicClientApplication } from "@azure/msal-browser";
 export const msalConfig = {
   auth: {
     clientId: window._env_.REACT_APP_CLIENT_ID,
@@ -14,3 +15,5 @@ export const msalConfig = {
 export const loginRequest = {
  scopes: [window._env_.REACT_APP_SCOPE]
 };
+
+export const msalInstance = new PublicClientApplication(msalConfig);

@@ -1,10 +1,9 @@
-import { React,useState,useEffect } from 'react';
+import { React,useState } from 'react';
 import './App.css';
 import Login from '../Login/Login'
 import MainMenu from '../Home/MainMenu'
 import { Layout, Avatar } from 'antd';
-import { useIsAuthenticated,useMsal,AuthenticatedTemplate } from "@azure/msal-react";
-import { InteractionRequiredAuthError, InteractionStatus } from "@azure/msal-browser";
+import { useIsAuthenticated } from "@azure/msal-react";
 import logo from './white_logo.png';
 import {
   BrowserRouter as Router,
@@ -25,29 +24,6 @@ const { Header, Footer } = Layout;
 const App = () => {
   const isAuthenticated = useIsAuthenticated();
   const [organizationName, setOrganizationName] = useState("...");
-  function ProtectedComponent() {
-    const { instance, inProgress, accounts } = useMsal();
-    useEffect(() => {
-        const accessTokenRequest = {
-            scopes: [window._env_.REACT_APP_SCOPE],
-            account: accounts[0]
-        }
-        if (inProgress === InteractionStatus.None) {
-            instance.acquireTokenSilent(accessTokenRequest).then((accessTokenResponse) => {
-                // Acquire token silent success
-                let accessToken = accessTokenResponse.accessToken;
-                localStorage.setItem('azureAccessToken', accessToken);
-            }).catch((error) => {
-                if (error instanceof InteractionRequiredAuthError) {
-                    instance.acquireTokenRedirect(accessTokenRequest);
-                }
-                console.log(error);
-            })
-        }
-    }, [instance, accounts, inProgress]);
-
-    return <></>
-}
   if (!isAuthenticated) {
     return (
        <Login />
@@ -56,9 +32,6 @@ const App = () => {
   return (
     <Router>
       <Layout className="layout">
-        <AuthenticatedTemplate>
-            <ProtectedComponent />
-        </ AuthenticatedTemplate>
         <Header>
           <a>
           <img className="logo" src={logo} ></img>
