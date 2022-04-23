@@ -17,7 +17,7 @@ public class CorsConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins(uiURL);
+                registry.addMapping("/**").allowedOrigins(uiURL).allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS");
             }
         };
     }
