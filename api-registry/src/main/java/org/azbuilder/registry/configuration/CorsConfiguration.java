@@ -1,4 +1,4 @@
-package org.azbuilder.api.plugin.cors;
+package org.azbuilder.registry.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
