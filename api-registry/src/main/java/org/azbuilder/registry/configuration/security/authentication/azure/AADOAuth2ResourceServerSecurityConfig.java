@@ -4,6 +4,7 @@ import com.azure.spring.aad.webapi.AADResourceServerWebSecurityConfigurerAdapter
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,6 +28,7 @@ public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebS
         //http.authorizeRequests(requests -> requests.anyRequest().authenticated());
         http.cors().and().authorizeRequests()
                 .antMatchers("/.well-known/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .and()
                 .authorizeRequests()
                 .anyRequest()
