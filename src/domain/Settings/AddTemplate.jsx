@@ -1,16 +1,11 @@
 import { React, useState, useRef,useEffect } from "react";
 import './Settings.css';
-import { Steps, Space, Button, Form, Input, Card, Avatar, List } from "antd";
-import { IconContext } from "react-icons";
+import { Steps, Space, Button, Form, Input, Card, List } from "antd";
 import { HiOutlineExternalLink } from "react-icons/hi";
-import { BiFileBlank } from "react-icons/bi";
-import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { Buffer } from 'buffer';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-
 const { Step } = Steps;
 const { Meta } = Card;
 const validateMessages = {
