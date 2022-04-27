@@ -22,7 +22,7 @@ import java.util.Arrays;
 public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebSecurityConfigurerAdapter {
 
     @Value( "${org.terrakube.ui.fqdn:http://localhost:3000}" )
-    private String uiURL;
+    private String uiDomain;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -37,12 +37,12 @@ public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebS
     }
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        log.info("Loading CORS {}", uiURL);
+        log.info("CORS for UI Domain {}", uiDomain);
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(uiURL));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(Arrays.asList(uiDomain));
         configuration.setAllowedHeaders(Arrays.asList("Access-Control-Allow-Headers", "Access-Control-Allow-Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Origin", "Cache-Control", "Content-Type", "Authorization"));
         configuration.setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PATCH", "PUT", "OPTIONS"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
