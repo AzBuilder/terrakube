@@ -202,7 +202,7 @@ async function loadReadmeFile(text) {
                     </div>
                     <pre className="moduleCode">
                       module "{module.data.attributes.name}" {"{"} <br />
-                      &nbsp;&nbsp;source  = "registry.aks.vse.aespana.me/{module.data.attributes.registryPath}" <br />
+                      &nbsp;&nbsp;source  = "{new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}/{module.data.attributes.registryPath}" <br />
                       &nbsp;&nbsp;version = "{version}" <br />
                       &nbsp;&nbsp;# insert required variables here <br />
                       {"}"}
