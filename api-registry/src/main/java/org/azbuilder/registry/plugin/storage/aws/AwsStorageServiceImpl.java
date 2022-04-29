@@ -1,8 +1,7 @@
 package org.azbuilder.registry.plugin.storage.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,12 @@ public class AwsStorageServiceImpl implements StorageService {
             File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
             ZipUtil.pack(gitCloneDirectory, moduleZip);
 
-            s3client.putObject(new PutObjectRequest(bucketName, blobKey, moduleZip).withCannedAcl(CannedAccessControlList.PublicRead));
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, blobKey, moduleZip);
+            AccessControlList acl = new AccessControlList();
+            acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
+            putObjectRequest.setAccessControlList(acl);
+
+            s3client.putObject(putObjectRequest);
 
             log.info("Upload Aws S3 Object completed", blobKey);
             try {
