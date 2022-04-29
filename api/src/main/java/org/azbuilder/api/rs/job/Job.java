@@ -26,6 +26,9 @@ public class Job extends GenericAuditFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "comments")
+    private String comments;
+
     @UpdatePermission(expression = "team approve job OR user is a super service")
     @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.pending;
