@@ -3,6 +3,7 @@ package org.azbuilder.registry.plugin.storage.configuration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.azure.storage.blob.BlobServiceClient;
@@ -58,7 +59,7 @@ public class StorageAutoConfiguration {
                     AmazonS3 s3client = AmazonS3ClientBuilder
                             .standard()
                             .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                            .withRegion(awsStorageServiceProperties.getRegion())
+                            .withRegion(Regions.fromName(awsStorageServiceProperties.getRegion()))
                             .build();
 
                     storageService = AwsStorageServiceImpl.builder()
