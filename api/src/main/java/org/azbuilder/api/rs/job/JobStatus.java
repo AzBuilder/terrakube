@@ -6,5 +6,8 @@ public enum JobStatus {
     approved,
     queue,
     running,
-    completed
+    completed,
+
+    rejected,
+    cancelled
 }
