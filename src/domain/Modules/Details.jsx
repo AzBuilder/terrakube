@@ -15,7 +15,7 @@ import {unzip} from 'unzipit';
 import './Module.css';
 import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 import {Buffer} from 'buffer';
-
+const { DateTime } = require("luxon");
 const { TabPane } = Tabs;
 const { Content } = Layout;
 
@@ -167,7 +167,7 @@ async function loadReadmeFile(text) {
                             Change <DownOutlined />
                           </a>
                         </Dropdown>,</td>
-                        <td>1 minute ago</td>
+                        <td>{DateTime.fromISO(module.data.attributes.createdDate).toRelative()}</td>
                         <td>&nbsp; {module.data.attributes.downloadQuantity}</td>
                         <td>{renderVCSLogo(vcsProvider)} <a href={module.data.attributes.source} target="_blank">{module.data.attributes.source.replace(".git", "").replace("https://github.com/", "")}</a></td>
                       </tr>

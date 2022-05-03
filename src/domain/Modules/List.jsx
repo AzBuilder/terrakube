@@ -10,8 +10,7 @@ import { MdBusiness } from 'react-icons/md';
 import { compareVersions } from '../Workspaces/Workspaces'
 import './Module.css';
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from '../../config/actionTypes';
-
-
+const { DateTime } = require("luxon");
 const { Content } = Layout;
 const include = { MODULE: "module" }
 const { Search } = Input;
@@ -86,7 +85,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
                         <Tag color="blue"><span><MdBusiness /> Private</span></Tag>
                         <span>{renderLogo(item.provider)}&nbsp;&nbsp;{item.provider}</span>
                         <span><IconContext.Provider value={{ size: "1.3em" }}><RiFolderHistoryLine /></IconContext.Provider>&nbsp;&nbsp;{item.versions.sort(compareVersions).reverse()[0]}</span>
-                        <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
+                        <span><ClockCircleOutlined />&nbsp;&nbsp;{DateTime.fromISO(item.createdDate).toRelative()}</span>
                         <span><DownloadOutlined />&nbsp;&nbsp;  {item.downloadQuantity}</span>
                       </Space>
                     </Space>

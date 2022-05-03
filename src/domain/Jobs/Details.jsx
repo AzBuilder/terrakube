@@ -4,7 +4,9 @@ import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { CheckCircleOutlined, CheckCircleTwoTone, SyncOutlined, ClockCircleOutlined,ExclamationCircleOutlined,CheckOutlined,CloseOutlined ,CommentOutlined} from '@ant-design/icons';
 import Ansi from "ansi-to-react";
+const { DateTime } = require("luxon");
 const { Panel } = Collapse;
+
 
 export const DetailsJob = ({ jobId }) => {
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
@@ -118,7 +120,7 @@ export const DetailsJob = ({ jobId }) => {
           </div>
 
           <Collapse >
-            <Panel header={<span><Avatar size="small" shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" /> <b>jcanizalez</b> triggered a run from UI</span>} key="1">
+            <Panel header={<span><Avatar size="small" shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" /> <b>{job.data.attributes.createdBy}</b> triggered a run from UI {DateTime.fromISO(job.data.attributes.createdDate).toRelative()}</span>} key="1">
               <p></p>
             </Panel>
           </Collapse>
