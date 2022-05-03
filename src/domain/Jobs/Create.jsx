@@ -36,7 +36,7 @@ export const CreateJob = ({changeJob}) => {
       data: {
         type: "job",
         attributes: {
-          tcl: values.tcl
+          templateReference: values.templateId
         },
         relationships: {
           workspace: {
@@ -87,12 +87,12 @@ export const CreateJob = ({changeJob}) => {
           <InfoCircleTwoTone style={{ fontSize: '16px' }} /> You will be redirected to the run details page to see this job executed. 
         </div>
         <Form form={form} layout="vertical" name="create-org" validateMessages={validateMessages}>
-          <Form.Item name="tcl" label="Choose job type" rules={[{ required: true }]}>
+          <Form.Item name="templateId" label="Choose job type" rules={[{ required: true }]}>
           {loading || !templates.data ? (
             <p>Data loading...</p>
           ) : ( <Select >
              {templates.data.map((item) => (
-                 <Select.Option value={item.attributes.tcl}>{item.attributes.name}</Select.Option>
+                 <Select.Option value={item.id}>{item.attributes.name}</Select.Option>
              ))}
             </Select>)}
           </Form.Item>

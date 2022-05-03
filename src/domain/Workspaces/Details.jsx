@@ -44,6 +44,7 @@ export const WorkspaceDetails = (props) => {
   const [workspaceName, setWorkspaceName] = useState("...");
   const [activeKey, setActiveKey] = useState("2");
   const [terraformVersions, setTerraformVersions] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const terraformVersionsApi = "https://releases.hashicorp.com/terraform/index.json";
   const handleClick = id => {
     changeJob(id);
@@ -91,8 +92,12 @@ export const WorkspaceDetails = (props) => {
   }
   useEffect(() => {
     setLoading(true);
-    loadWorkspace();
-    setLoading(false);
+    axiosInstance.get(`organization/${organizationId}/template`)
+    .then(response => {
+      console.log(response);
+      setTemplates(response.data);
+      loadWorkspace();
+    });
     axiosClient.get(terraformVersionsApi).then(
       resp => {
         console.log(resp);
@@ -106,6 +111,7 @@ export const WorkspaceDetails = (props) => {
 
       }
     );
+    setLoading(false);
     const interval = setInterval(() => {
       loadWorkspace();
     }, 1000);
@@ -126,11 +132,12 @@ export const WorkspaceDetails = (props) => {
         console.log(response);
         setWorkspace(response.data);
         if (response.data.included) {
-          setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule);
+          setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,templates);
         }
         setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
         setWorkspaceName(response.data.data.attributes.name);
       });
+      
   }
 
   return (
@@ -247,7 +254,7 @@ export const WorkspaceDetails = (props) => {
   )
 }
 
-function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables, setHistory,setSchedule) {
+function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,templates) {
   let variables = [];
   let jobs = [];
   let envVariables = [];
@@ -282,7 +289,7 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
           schedule.push(
             {
               id: element.id,
-              name: "Apply",
+              name: templates?.data?.find(template => template.id === element.attributes.templateReference)?.attributes?.name,
               ...element.attributes,
   
             }

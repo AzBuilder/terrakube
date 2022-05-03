@@ -90,7 +90,7 @@ export const Schedules = ({ schedules }) => {
   const onEdit = (schedule) => {
     setMode("edit")
     setScheduleId(schedule.id);
-    form.setFieldsValue({tcl:schedule.tcl,cron:schedule.cron});
+    form.setFieldsValue({templateId:schedule.templateReference,cron:schedule.cron});
     setVisible(true);
   };
 
@@ -99,7 +99,7 @@ export const Schedules = ({ schedules }) => {
       data: {
         type: "schedule",
         attributes: {
-          tcl: values.tcl,
+          templateReference: values.templateId,
           cron: values.cron
         }
       }
@@ -125,7 +125,7 @@ export const Schedules = ({ schedules }) => {
         type: "schedule",
         id: scheduleId,
         attributes: {
-          tcl: values.tcl,
+          templateReference: values.templateId,
           cron: values.cron
         }
       }
@@ -171,12 +171,12 @@ export const Schedules = ({ schedules }) => {
         }}>
         <Space style={{ width: "100%" }} direction="vertical">
           <Form name="create-org" form={form} layout="vertical" validateMessages={validateMessages}>
-            <Form.Item name="tcl" label="Job Type" rules={[{ required: true }]} tooltip={{ title: 'Job to trigger in a scheduled basis', icon: <InfoCircleOutlined /> }} >
+            <Form.Item name="templateId" label="Job Type" rules={[{ required: true }]} tooltip={{ title: 'Job to trigger in a scheduled basis', icon: <InfoCircleOutlined /> }} >
             {loading || !templates.data ? (
             <p>Data loading...</p>
           ) : ( <Select >
              {templates.data.map((item) => (
-                 <Select.Option value={item.attributes.tcl}>{item.attributes.name}</Select.Option>
+                 <Select.Option value={item.id}>{item.attributes.name}</Select.Option>
              ))}
             </Select>)}
             </Form.Item>
