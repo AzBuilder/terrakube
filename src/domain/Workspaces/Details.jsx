@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE, ORGANIZATION_NAME } from '../../config/actionTypes';
-import { Button, Layout, Breadcrumb, Tabs, List, Avatar, Row, Col, Tag, Form, Input, Select, Card, Space } from "antd";
+import { Button, Layout, Breadcrumb, Tabs, List, Avatar, Row, Col, Tag, Form, Input, Select, message,Spin } from "antd";
 import { compareVersions } from './Workspaces'
 import { CreateJob } from '../Jobs/Create';
 import { DetailsJob } from '../Jobs/Details';
@@ -44,6 +44,7 @@ export const WorkspaceDetails = (props) => {
   const [workspaceName, setWorkspaceName] = useState("...");
   const [activeKey, setActiveKey] = useState("2");
   const [terraformVersions, setTerraformVersions] = useState([]);
+  const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
   const terraformVersionsApi = "https://releases.hashicorp.com/terraform/index.json";
   const handleClick = id => {
@@ -92,12 +93,7 @@ export const WorkspaceDetails = (props) => {
   }
   useEffect(() => {
     setLoading(true);
-    axiosInstance.get(`organization/${organizationId}/template`)
-    .then(response => {
-      console.log(response);
-      setTemplates(response.data);
-      loadWorkspace();
-    });
+    loadWorkspace();
     axiosClient.get(terraformVersionsApi).then(
       resp => {
         console.log(resp);
@@ -126,19 +122,56 @@ export const WorkspaceDetails = (props) => {
   }
 
   const loadWorkspace = () => {
-
-    axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule`)
-      .then(response => {
-        console.log(response);
-        setWorkspace(response.data);
-        if (response.data.included) {
-          setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,templates);
-        }
-        setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
-        setWorkspaceName(response.data.data.attributes.name);
-      });
+    axiosInstance.get(`organization/${organizationId}/template`)
+    .then(response => {
+      setTemplates(response.data);
+      axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule`)
+        .then(response => {
+          console.log(response);
+          setWorkspace(response.data);
+          if (response.data.included) {
+            setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,templates);
+          }
+          setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+          setWorkspaceName(response.data.data.attributes.name);
+        });
+    });
       
   }
+
+  const onFinish = (values) => {
+    setWaiting(true);
+    const body = {
+      data: {
+        type: "workspace",
+        id: id,
+        attributes: {
+          name: values.name,
+          description: values.description,
+          terraformVersion: values.terraformVersion
+        }
+      }
+    }
+    console.log(body);
+
+    axiosInstance.patch(`organization/${organizationId}/workspace/${id}`, body, {
+      headers: {
+        'Content-Type': 'application/vnd.api+json'
+      }
+    })
+      .then(response => {
+        console.log(response);
+        if (response.status == "204") {
+          message.success('Workspace updated successfully');
+
+        }
+        else{
+          message.error('Workspace update failed');
+        }
+        setWaiting(false);
+
+      })
+  };
 
   return (
     <Content style={{ padding: '0 50px' }}>
@@ -214,7 +247,8 @@ export const WorkspaceDetails = (props) => {
                 <TabPane tab="Settings" key="6">
                   <div className="generalSettings">
                     <h1>General Settings</h1>
-                    <Form layout="vertical" name="form-settings" >
+                    <Spin spinning={waiting}>
+                    <Form onFinish={onFinish} layout="vertical" name="form-settings" >
                       <Form.Item name="id" label="ID" >
                         <div className="App-text">
                           {id}
@@ -243,6 +277,7 @@ export const WorkspaceDetails = (props) => {
                         </Button>
                       </Form.Item>
                     </Form>
+                    </Spin>
                   </div>
                 </TabPane>
               </Tabs>
