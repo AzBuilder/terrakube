@@ -235,8 +235,7 @@ public class ProviderTests extends OpenRegistryApplicationTests{
                 request()
                         .withMethod(HttpMethod.GET.name())
                         .withPath(PATH_SEARCH_IMPLEMENTATION_FILE)
-                        .withQueryStringParameter("filter[implementation]","os==darwin")
-                        .withQueryStringParameter("arch","=amd64")
+                        .withQueryStringParameter("filter[implementation]","os==darwin;arch==amd64")
         ).respond(
                 response().withStatusCode(HttpStatus.SC_OK).withBody(PATH_SEARCH_IMPLEMENTATION_FILE_BODY)
         );

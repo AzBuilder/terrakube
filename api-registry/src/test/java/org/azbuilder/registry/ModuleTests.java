@@ -92,8 +92,7 @@ public class ModuleTests extends OpenRegistryApplicationTests{
                 request()
                         .withMethod(HttpMethod.GET.name())
                         .withPath(MODULE_SEARCH)
-                        .withQueryStringParameter("filter[module]","name==sampleModule")
-                        .withQueryStringParameter("provider","=sampleProvider")
+                        .withQueryStringParameter("filter[module]","name==sampleModule;provider==sampleProvider")
         ).respond(
                 response().withStatusCode(HttpStatus.SC_OK).withBody(MODULE_SEARCH_BODY)
         );
