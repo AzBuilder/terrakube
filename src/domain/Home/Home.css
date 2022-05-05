@@ -14,9 +14,11 @@
 
 .user{
   float: right;
-    height: 31px;
+    height: 51px;
     margin: 4px 0 10px 0;
 }
+
+
 .menu{
   float: left;
   width: 60%;
