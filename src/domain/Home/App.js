@@ -2,8 +2,8 @@ import { React,useState } from 'react';
 import './App.css';
 import Login from '../Login/Login'
 import MainMenu from '../Home/MainMenu'
-import { Layout, Avatar,Menu,Dropdown } from 'antd';
-import { useIsAuthenticated,useMsal } from "@azure/msal-react";
+import { Layout} from 'antd';
+import { useIsAuthenticated } from "@azure/msal-react";
 import logo from './white_logo.png';
 import {
   BrowserRouter as Router,
@@ -19,37 +19,12 @@ import { CreateModule } from '../Modules/Create';
 import { ModuleList } from '../Modules/List';
 import { ModuleDetails } from '../Modules/Details';
 import { OrganizationSettings } from '../Settings/Settings';
-import {QuestionCircleOutlined} from '@ant-design/icons';
+import { ProfilePicture } from './ProfilePicture';
 const { Header, Footer } = Layout;
 const App = () => {
   const isAuthenticated = useIsAuthenticated();
   const [organizationName, setOrganizationName] = useState("...");
-  const { instance } = useMsal();
-  const userMenu = (
-    <Menu theme="dark">
-      <Menu.Item>User Settings</Menu.Item>
-      <Menu.Item onClick={() => signOutClickHandler(instance)}>Sign Out</Menu.Item>
-    </Menu>
-  );
-  const signOutClickHandler= (instance) => {
-    instance.logoutRedirect({
-      onRedirectNavigate: (url) => {
-          return false;
-      }
-  });
-  }
-
-  const helpMenu = (
-    <Menu theme="dark">
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="https://docs.terrakube.org/">
-            Documentation
-          </a>
-      </Menu.Item>
-      <Menu.Item>Tutorials</Menu.Item>
-      <Menu.Item>Support</Menu.Item>
-    </Menu>
-  );
+  
   if (!isAuthenticated) {
     return (
        <Login />
@@ -65,13 +40,8 @@ const App = () => {
           <div className="menu">
             <MainMenu organizationName={organizationName} setOrganizationName={setOrganizationName}/>
           </div>
-          <div className="user" >
-          <Dropdown overlay={helpMenu} placement="bottomLeft" trigger={['click']}>
-            <Avatar style={{cursor:"pointer",color: '#f56a00', backgroundColor: 'transparent',marginRight:"30px",marginTop:"6px",marginLeft:"30px"}} size="default" icon={<QuestionCircleOutlined style={{color:"white",fontSize:"22px"}}/>} />
-          </Dropdown>
-          <Dropdown overlay={userMenu} trigger={['click']}>
-            <Avatar shape="square" style={{cursor:"pointer"}} size="default" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" />
-          </Dropdown>
+          <div className="user">
+             <ProfilePicture />
           </div>
         </Header>
         

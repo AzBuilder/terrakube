@@ -13,7 +13,16 @@ export const msalConfig = {
 
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
 export const loginRequest = {
- scopes: [window._env_.REACT_APP_SCOPE]
+ scopes: [window._env_.REACT_APP_SCOPE,"user.read"]
 };
+
+export const apiRequest = {
+  scopes: [window._env_.REACT_APP_SCOPE]
+ };
+
+ export const userRequest = {
+  scopes: ["user.read"]
+ };
+
 
 export const msalInstance = new PublicClientApplication(msalConfig);
