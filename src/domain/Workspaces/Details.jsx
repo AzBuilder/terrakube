@@ -46,6 +46,7 @@ export const WorkspaceDetails = (props) => {
   const [terraformVersions, setTerraformVersions] = useState([]);
   const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
+  const [lastRun,setLastRun] = useState("");
   const terraformVersionsApi = "https://releases.hashicorp.com/terraform/index.json";
   const handleClick = id => {
     changeJob(id);
@@ -130,7 +131,7 @@ export const WorkspaceDetails = (props) => {
           console.log(response);
           setWorkspace(response.data);
           if (response.data.included) {
-            setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,template.data.data);
+            setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,template.data.data,setLastRun);
           }
           setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
           setWorkspaceName(response.data.data.attributes.name);
@@ -197,7 +198,7 @@ export const WorkspaceDetails = (props) => {
                   <tr className="black">
                     <td>0</td>
                     <td>{workspace.data.attributes.terraformVersion}</td>
-                    <td>1 minute ago</td>
+                    <td>{DateTime.fromISO(lastRun).toRelative()??"never executed"}</td>
                   </tr>
                 </table>
               </div>
@@ -290,7 +291,7 @@ export const WorkspaceDetails = (props) => {
   )
 }
 
-function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,templates) {
+function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,templates,setLastRun) {
   let variables = [];
   let jobs = [];
   let envVariables = [];
@@ -311,6 +312,7 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
             ...element.attributes
           }
         );
+        setLastRun(element.attributes.updatedDate);
         break;
       case include.HISTORY:
         history.push(

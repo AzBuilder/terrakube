@@ -1,11 +1,10 @@
 import { React, useState, useEffect } from "react";
 import { Button, Layout, Breadcrumb ,Input,List,Space,Card,Tag} from "antd";
-import { GitlabOutlined,GithubOutlined, ClockCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { GitlabOutlined,GithubOutlined, ClockCircleOutlined, CheckCircleOutlined ,SyncOutlined,ExclamationCircleOutlined,InfoCircleOutlined} from '@ant-design/icons';
 import { SiTerraform,SiBitbucket, SiAzuredevops  } from "react-icons/si";
-import { MdBusiness } from 'react-icons/md';
 import { IconContext } from "react-icons";
 import axiosInstance from "../../config/axiosConfig";
-import {useParams,useHistory,Link} from "react-router-dom";
+import {useParams,useHistory} from "react-router-dom";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 const { Content } = Layout;
 const { DateTime } = require("luxon");
@@ -45,7 +44,7 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
-    axiosInstance.get(`organization/${id}?include=workspace`)
+    axiosInstance.get(`organization/${id}?include=workspace,job`)
       .then(response => {
         console.log(response);
         setOrganization(response.data);
@@ -82,8 +81,8 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
                       <h3>{item.name}</h3>
                       {item.description}
                       <Space size={40} style={{ marginTop: "25px" }}>
-                        <Tag color="#2eb039" icon={<CheckCircleOutlined />}>completed</Tag>
-                        <span><ClockCircleOutlined />&nbsp;&nbsp;1 minute ago</span>
+                      <Tag icon={item.lastStatus == "completed" ? <CheckCircleOutlined /> : (item.lastStatus == "running" ? <SyncOutlined spin /> : (item.lastStatus === "waitingApproval" ? <ExclamationCircleOutlined /> : ( item.lastStatus === "never executed"?<InfoCircleOutlined /> :<ClockCircleOutlined />)))} color={item.statusColor}>{item.lastStatus}</Tag> <br />
+                        <span><ClockCircleOutlined />&nbsp;&nbsp;{DateTime.fromISO(item.lastRun).toRelative()??"never executed"}</span>
                         <span><IconContext.Provider value={{ size: "1.3em" }}><SiTerraform /></IconContext.Provider>&nbsp;&nbsp;{item.terraformVersion}</span>
                         <span><GithubOutlined style={{ fontSize: '18px' }} />&nbsp; <a href={item.source} target="_blank">{item.source.replace(".git", "").replace("https://github.com/", "")}</a></span>
                      
@@ -107,10 +106,17 @@ function setupOrganizationIncludes(includes, setWorkspaces) {
   includes.forEach(element => {
     switch (element.type) {
       case include.WORKSPACE:
+        //get latest job for workspace
+        var lastJobId = element.relationships?.job?.data?.slice(-1)?.pop()?.id;
+        var lastRunDate = includes.find(x => x.type === "job" && x.id === lastJobId)?.attributes?.updatedDate;
+        var lastStatus = includes.find(x => x.type === "job" && x.id === lastJobId)?.attributes?.status ?? "never executed";
+        console.log("id", lastJobId);
         workspaces.push(
           {
             id: element.id,
-            latestChange: "1 minute ago" ,
+            lastRun: lastRunDate,
+            lastStatus: lastStatus,
+            statusColor:lastStatus == "completed" ? "#2eb039" : (lastStatus == "running" ? "#108ee9" : (lastStatus == "waitingApproval" ? "#fa8f37" : "")),
             ...element.attributes
           }
         );
