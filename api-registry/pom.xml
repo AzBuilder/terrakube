@@ -25,6 +25,7 @@
 		<rest-assured.version>4.4.0</rest-assured.version>
 		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
 		<groovy.version>3.0.8</groovy.version>
+		<aws-sdk.version>1.12.204</aws-sdk.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
@@ -81,6 +82,10 @@
 			<artifactId>azure-spring-boot-starter-active-directory</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-spring-test-listener</artifactId>
 			<version>${mockserver-spring-test-listener.version}</version>
@@ -110,6 +115,13 @@
 				<groupId>com.azure.spring</groupId>
 				<artifactId>azure-spring-boot-bom</artifactId>
 				<version>${azure.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-bom</artifactId>
+				<version>${aws-sdk.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
