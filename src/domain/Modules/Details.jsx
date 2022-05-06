@@ -169,7 +169,7 @@ async function loadReadmeFile(text) {
                         </Dropdown>,</td>
                         <td>{DateTime.fromISO(module.data.attributes.createdDate).toRelative()}</td>
                         <td>&nbsp; {module.data.attributes.downloadQuantity}</td>
-                        <td>{renderVCSLogo(vcsProvider)} <a href={module.data.attributes.source} target="_blank">{module.data.attributes.source.replace(".git", "").replace("https://github.com/", "")}</a></td>
+                        <td>{renderVCSLogo(vcsProvider)} <a href={module.data.attributes.source} target="_blank">{new URL(module.data.attributes.source)?.pathname?.replace(".git","")?.substring(1,)}</a></td>
                       </tr>
                     </table>
                   </IconContext.Provider>

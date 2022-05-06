@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
-import { Button, Layout, Breadcrumb ,Input,List,Space,Card,Tag} from "antd";
+import { Button, Layout, Breadcrumb ,Input,List,Space,Card,Tag,Tooltip} from "antd";
 import { GitlabOutlined,GithubOutlined, ClockCircleOutlined, CheckCircleOutlined ,SyncOutlined,ExclamationCircleOutlined,InfoCircleOutlined} from '@ant-design/icons';
+
 import { SiTerraform,SiBitbucket, SiAzuredevops  } from "react-icons/si";
 import { IconContext } from "react-icons";
 import axiosInstance from "../../config/axiosConfig";
@@ -23,17 +24,16 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
   const handleCreate = e => {
       history.push("/workspaces/create");
   };
-  const renderVCSLogo = (vcs) => {
-    switch (vcs) {
-      case 'GITLAB':
-        return <GitlabOutlined style={{ fontSize: '18px' }} />;
-      case 'BITBUCKET':
-        return <IconContext.Provider value={{ size: "18px" }}><SiBitbucket />&nbsp;</IconContext.Provider>;
-      case 'AZURE_DEVOPS':
-        return <IconContext.Provider value={{ size: "18px" }}><SiAzuredevops />&nbsp;</IconContext.Provider>;
-      default:
-        return <GithubOutlined style={{ fontSize: '18px' }} />;
-    }
+
+  const renderVCSLogo = (hostname) => {
+      if (hostname.includes("gitlab"))
+        return <Tooltip title="Gitlab"><GitlabOutlined style={{ fontSize: '18px' }} /></Tooltip>;
+      if (hostname.includes("bitbucket"))
+        return <IconContext.Provider value={{ size: "18px" }}><Tooltip title="Bit Bucket"><SiBitbucket /></Tooltip></IconContext.Provider>;
+      if (hostname.includes("azure"))
+       return <IconContext.Provider value={{ size: "18px" }}><Tooltip title="Azure Devops"><SiAzuredevops /></Tooltip></IconContext.Provider>;
+       
+      return <Tooltip title="Github"><GithubOutlined style={{ fontSize: '18px' }} /></Tooltip>;
   }
 
   const handleClick = id => {
@@ -84,7 +84,7 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
                       <Tag icon={item.lastStatus == "completed" ? <CheckCircleOutlined /> : (item.lastStatus == "running" ? <SyncOutlined spin /> : (item.lastStatus === "waitingApproval" ? <ExclamationCircleOutlined /> : ( item.lastStatus === "never executed"?<InfoCircleOutlined /> :<ClockCircleOutlined />)))} color={item.statusColor}>{item.lastStatus}</Tag> <br />
                         <span><ClockCircleOutlined />&nbsp;&nbsp;{DateTime.fromISO(item.lastRun).toRelative()??"never executed"}</span>
                         <span><IconContext.Provider value={{ size: "1.3em" }}><SiTerraform /></IconContext.Provider>&nbsp;&nbsp;{item.terraformVersion}</span>
-                        <span><GithubOutlined style={{ fontSize: '18px' }} />&nbsp; <a href={item.source} target="_blank">{item.source.replace(".git", "").replace("https://github.com/", "")}</a></span>
+                        <span>{renderVCSLogo(new URL(item.source).hostname)}&nbsp; <a href={item.source} target="_blank">{new URL(item.source)?.pathname?.replace(".git","")?.substring(1,)}</a></span>
                      
                       </Space>
                     </Space>

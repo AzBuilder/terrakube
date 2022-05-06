@@ -250,17 +250,17 @@ export const WorkspaceDetails = (props) => {
                   <div className="generalSettings">
                     <h1>General Settings</h1>
                     <Spin spinning={waiting}>
-                    <Form onFinish={onFinish} layout="vertical" name="form-settings" >
+                    <Form onFinish={onFinish} initialValues={{name:workspace.data.attributes.name,description:workspace.data.attributes.description}} layout="vertical" name="form-settings" >
                       <Form.Item name="id" label="ID" >
                         <div className="App-text">
                           {id}
                         </div>
                       </Form.Item>
                       <Form.Item name="name" label="Name" >
-                        <Input defaultValue={workspace.data.attributes.name} />
+                        <Input />
                       </Form.Item>
 
-                      <Form.Item name="description" label="Description">
+                      <Form.Item valuePropName="value" name="description" label="Description">
                         <Input.TextArea placeholder="Workspace description" />
                       </Form.Item>
                       <Form.Item name="terraformVersion" label="Terraform Version">
