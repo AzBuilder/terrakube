@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.security.groups.GroupService;
 import org.azbuilder.api.plugin.security.user.AuthenticatedUser;
 import org.azbuilder.api.rs.job.Job;
+import org.azbuilder.api.rs.job.JobStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
@@ -28,10 +29,12 @@ public class TeamApproveJob extends OperationCheck<Job> {
         if (job.getApprovalTeam() == null || job.getApprovalTeam().isEmpty())
             return true;
         else {
-            if (!authenticatedUser.isServiceAccount(requestScope.getUser()))
-                return groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), job.getApprovalTeam());
+            boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
+            if (isServiceAccount)
+                return groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), job.getApprovalTeam());
             else
-                return true;
+                return groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), job.getApprovalTeam());
+
         }
     }
 }

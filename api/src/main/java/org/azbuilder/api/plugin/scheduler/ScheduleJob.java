@@ -9,8 +9,10 @@ import org.azbuilder.api.plugin.scheduler.job.tcl.TclService;
 import org.azbuilder.api.plugin.scheduler.job.tcl.model.Flow;
 import org.azbuilder.api.plugin.scheduler.job.tcl.model.FlowType;
 import org.azbuilder.api.repository.JobRepository;
+import org.azbuilder.api.repository.StepRepository;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.job.JobStatus;
+import org.azbuilder.api.rs.job.step.Step;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
@@ -32,6 +34,8 @@ public class ScheduleJob implements org.quartz.Job {
     public static final String JOB_ID = "jobId";
 
     JobRepository jobRepository;
+
+    StepRepository stepRepository;
     TclService tclService;
     ExecutorService executorService;
 
@@ -56,6 +60,16 @@ public class ScheduleJob implements org.quartz.Job {
             case completed:
                 try {
                     log.info("Deleting Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
+                    jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+                } catch (SchedulerException e) {
+                    log.error(e.getMessage());
+                }
+                break;
+            case cancelled:
+            case rejected:
+                try {
+                    log.info("Deleting Cancelled/Rejected Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
+                    rejectJob(job.getId());
                     jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
                 } catch (SchedulerException e) {
                     log.error(e.getMessage());
@@ -111,6 +125,15 @@ public class ScheduleJob implements org.quartz.Job {
             jobRepository.save(job);
             if (executorService.execute(job, stepId, flow.get()))
                 log.info("Executing Job {} Step Id {}", job.getId(), stepId);
+        }
+    }
+
+    private void rejectJob(int jobId){
+        for(Step step: stepRepository.findByJobId(jobId)){
+            if(step.getStatus().equals(JobStatus.pending)){
+                step.setStatus(JobStatus.cancelled);
+                stepRepository.save(step);
+            }
         }
     }
 }
