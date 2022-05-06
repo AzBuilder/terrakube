@@ -34,6 +34,9 @@ public class Organization {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "disabled")
+    private boolean disabled;
+
     @Column(name = "description")
     private String description;
 

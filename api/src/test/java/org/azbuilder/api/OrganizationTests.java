@@ -20,8 +20,8 @@ class OrganizationTests extends ServerApplicationTests {
     @Test
     @Sql(statements = {
             "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
-            "INSERT INTO organization (id, name, description) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');"
+            "INSERT INTO organization (id, name, description, disabled) VALUES\n" +
+                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description', false);"
     })
     void organizationApiGetTest() {
         when()
@@ -35,6 +35,7 @@ class OrganizationTests extends ServerApplicationTests {
                                         id("a42f538b-8c75-4311-8e73-ea2c0f2fb577"),
                                         attributes(
                                                 attr("description", "Description"),
+                                                attr("disabled", false),
                                                 attr("name", "Organization")
                                         ),
                                         relationships(
