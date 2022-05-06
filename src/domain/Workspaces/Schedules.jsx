@@ -1,9 +1,11 @@
-import { React, useState,useCallback,useEffect } from 'react';
-import { Form, Input, Button, Select, Table, Modal,Tag, Tooltip,Space,Popconfirm } from "antd";
+import { React, useState,useEffect } from 'react';
+import { Form, Input, Button, Select, Table, Modal,Tag,Space,Popconfirm } from "antd";
+import{Cron} from "react-js-cron"
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
-import { DeleteOutlined ,EditOutlined,ClockCircleOutlined,InfoCircleOutlined,QuestionCircleTwoTone} from '@ant-design/icons';
+import { DeleteOutlined ,EditOutlined,ClockCircleOutlined,InfoCircleOutlined} from '@ant-design/icons';
 import cronstrue from 'cronstrue';
+var C2Q = require('cron-to-quartz');
 
 
 const VARIABLES_COLUMS = (organizationId, workspaceId,onEdit) => [
@@ -67,7 +69,8 @@ export const Schedules = ({ schedules }) => {
   const [mode, setMode] = useState("create");
   const [scheduleId, setScheduleId] = useState("");
   const [templates, setTemplates] = useState([]);
- 
+  const defaultValue = '* * * * *'
+  const [value, setValue] = useState(defaultValue)
 
   useEffect(() => {
     setLoading(true);
@@ -100,7 +103,7 @@ export const Schedules = ({ schedules }) => {
         type: "schedule",
         attributes: {
           templateReference: values.templateId,
-          cron: values.cron
+          cron: C2Q.getQuartz(value)[0]?.join(" ")
         }
       }
     }
@@ -126,7 +129,7 @@ export const Schedules = ({ schedules }) => {
         id: scheduleId,
         attributes: {
           templateReference: values.templateId,
-          cron: values.cron
+          cron: C2Q.getQuartz(value)[0]?.join(" ")
         }
       }
     }
@@ -180,12 +183,10 @@ export const Schedules = ({ schedules }) => {
              ))}
             </Select>)}
             </Form.Item>
-            <Form.Item name="cron" rules={[{ required: true,pattern:"" }]}  label="Cron" tooltip={{ title: 'A cron expression is a string consisting of six or seven subexpressions (fields) that describe individual details of the schedule.', icon: <InfoCircleOutlined /> }} >
-              <Input />
-              
-         
-            </Form.Item>
           </Form>
+         <span> <span style={{color:"#ff4d4f"}}>*</span> Cron</span>
+          <Input name="cron" value={value} />
+          <Cron value={value} setValue={setValue}/>
         </Space>
       </Modal>
     </div>

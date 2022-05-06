@@ -123,14 +123,14 @@ export const WorkspaceDetails = (props) => {
 
   const loadWorkspace = () => {
     axiosInstance.get(`organization/${organizationId}/template`)
-    .then(response => {
-      setTemplates(response.data);
+    .then(template => {
+      setTemplates(template.data.data);
       axiosInstance.get(`organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule`)
         .then(response => {
           console.log(response);
           setWorkspace(response.data);
           if (response.data.included) {
-            setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,templates);
+            setupWorkspaceIncludes(response.data.included, setVariables, setJobs, setEnvVariables, setHistory,setSchedule,template.data.data);
           }
           setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
           setWorkspaceName(response.data.data.attributes.name);
@@ -242,7 +242,8 @@ export const WorkspaceDetails = (props) => {
                   <Variables vars={variables} env={envVariables} />
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
-                  <Schedules schedules={schedule} />
+                {templates ? (
+                  <Schedules schedules={schedule} />) : (<p>Loading...</p>)}
                  </TabPane>
                 <TabPane tab="Settings" key="6">
                   <div className="generalSettings">
@@ -296,6 +297,8 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
   let history = [];
   let schedule = [];
 
+
+
   includes.forEach(element => {
     switch (element.type) {
       case include.JOB:
@@ -320,11 +323,12 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
           }
         );
         break;
+       
         case include.SCHEDULE:
           schedule.push(
             {
               id: element.id,
-              name: templates?.data?.find(template => template.id === element.attributes.templateReference)?.attributes?.name,
+              name: templates?.find(template => template.id === element.attributes.templateReference)?.attributes?.name,
               ...element.attributes,
   
             }

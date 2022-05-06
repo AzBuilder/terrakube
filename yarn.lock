@@ -3336,6 +3336,11 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+cron-to-quartz@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/cron-to-quartz/-/cron-to-quartz-1.4.7.tgz#ae56c4bd89aa82689aab88c435d98c027b7da66c"
+  integrity sha512-d71zq3s2gwi8fvlS9fybqLC6GokWiOR5T1+q/gTqXBDKe9dsiW3pB//QSzCfRl/QRCURc5r8uNgCJzKuFv6qlg==
+
 cronstrue@^1.122.0:
   version "1.125.0"
   resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-1.125.0.tgz#8030816d033d00caade9b2a9f9b71e69175bcf42"
@@ -8092,6 +8097,11 @@ react-is@^17.0.0, react-is@^17.0.1, react-is@^17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
+
+react-js-cron@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/react-js-cron/-/react-js-cron-1.4.0.tgz#58341434e3db00da11bc8009abb0ea6cd926cda7"
+  integrity sha512-gbx1NXMDJgiKBnn1ljTS/jIXBw+jAEDMFOW/kWeGXuLwV+HEDIfj2oIsgStGGzCjRgcjgM3UTtHxaWrBdo0lFQ==
 
 react-markdown@^7.1.0:
   version "7.1.2"
