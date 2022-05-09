@@ -111,7 +111,7 @@ export const WorkspaceDetails = (props) => {
     setLoading(false);
     const interval = setInterval(() => {
       loadWorkspace();
-    }, 1000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [id]);
 

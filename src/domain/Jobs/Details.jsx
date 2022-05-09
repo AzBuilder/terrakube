@@ -79,7 +79,7 @@ export const DetailsJob = ({ jobId }) => {
     setLoading(false);
     const interval = setInterval(() => {
       loadJob();
-    }, 1000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [jobId]);
 

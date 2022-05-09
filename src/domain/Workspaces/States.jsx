@@ -4,6 +4,7 @@ import Editor from "@monaco-editor/react";
 import { axiosClient } from "../../config/axiosConfig";
 import ReactFlow, { Controls, Background } from 'react-flow-renderer';
 import NodeResource from './NodeResource';
+import { RestTwoTone } from '@ant-design/icons';
 
 
 export const States = ({ history, setStateDetailsVisible, stateDetailsVisible }) => {
@@ -21,6 +22,37 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
     editorRef.current = editor;
   }
 
+  function pushNode(resources, dependencies, element, xmap, y) {
+    resources.push(
+      {
+        id: element.address,
+        type: 'resourceNode',
+        data: { name: element.name, provider: element.provider_name, type: element.type },
+        position: { x: xmap.get(dependencies), y: (y + (dependencies * 130)) },
+      });
+
+    return resources
+  }
+
+  function pushNodeDependency(resources, dependencies, element, elementDependsOn) {
+    if (dependencies > 0)
+      elementDependsOn.forEach(dep => {
+
+        resources.push(
+          {
+            id: element.address + "-" + dep,
+            source: element.address,
+            target: dep,
+            className: 'normal-edge',
+            animated: true,
+            arrowHeadType: 'arrow',
+            style: { stroke: '#1890ff' },
+          });
+      });
+
+    return resources
+  }
+
   const changeState = state => {
     setCurrentState(state);
     setStateDetailsVisible(true);
@@ -34,42 +66,41 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
         let x = new Map();
         let y = 100;
 
-        if (resp.data != null &&  resp.data.values!= null &&resp.data.values.root_module != null) { 
+        if (resp.data != null && resp.data.values != null && resp.data.values.root_module != null) {
+          if (resp.data.values.root_module.resources != null) {
 
-        resp.data.values.root_module.resources.forEach(element => {
-          let dependencies = 0;
-          if (element.depends_on != null)
-            dependencies = element.depends_on.length;
-          x.set(dependencies, (x.get(dependencies) ? x.get(dependencies) : 0) + 350);
+            resp.data.values.root_module.resources.forEach(element => {
+              let dependencies = 0;
+              if (element.depends_on != null)
+                dependencies = element.depends_on.length;
+              x.set(dependencies, (x.get(dependencies) ? x.get(dependencies) : 0) + 350);
 
-          resources.push(
-            {
-              id: element.address,
-              type: 'resourceNode',
-              data: { name: element.name, provider: element.provider_name, type: element.type },
-              position: { x: x.get(dependencies), y: (y + (dependencies * 130)) },
+              resources = pushNode(resources, dependencies, element, x, y)
+              resources = pushNodeDependency(resources, dependencies, element, element.depends_on)
+            
             });
 
-          if (dependencies > 0) {
-            element.depends_on.forEach(dep => {
+          }
 
-              resources.push(
-                {
-                  id: element.address + "-" + dep,
-                  source: element.address,
-                  target: dep,
-                  className: 'normal-edge',
-                  animated: true,
-                  arrowHeadType: 'arrow',
-                  style: { stroke: '#1890ff' },
-                });
+          if (resp.data.values.root_module.child_modules != null) {
+            resp.data.values.root_module.child_modules.forEach(child => {
+              child.resources.forEach(element => {
+                let dependencies = 0;
+                if (element.depends_on != null)
+                  dependencies = element.depends_on.length;
+                x.set(dependencies, (x.get(dependencies) ? x.get(dependencies) : 0) + 350);
+
+                resources = pushNode(resources, dependencies, element, x, y)
+                resources = pushNodeDependency(resources, dependencies, element, element.depends_on)
+
+              });
             });
           }
-        });
+        }
 
         setResources(resources);
-       
-      }
+
+
       }
     ).catch(err => setStateContent(`{"error":"Failed to load state ${err}"}`));
   }
@@ -89,7 +120,7 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
     setactivetab(key);
   };
 
-  
+
 
   const nodeTypes = {
     resourceNode: NodeResource,
@@ -106,7 +137,7 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
                 <Space className="states" size={40} split="|">
                   <span>#{item.id}</span>
                   <span><b>username</b> triggered from Terraform</span>
-                  <span><a>job #32</a></span>
+                  <span><a>job #{item.jobReference}</a></span>
                   <span>{item.relativeDate}</span>
                 </Space>
               </Card>
@@ -119,7 +150,7 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
                 <Space className="stateDetails" size={40} split="|">
                   <span>#{currentState.id}</span>
                   <span><b>username</b> triggered from Terraform</span>
-                  <span><a>job #32</a></span>
+                  <span><a>job #{currentState.jobReference}</a></span>
                 </Space>
               </Col>
               <Col span={2}>
@@ -140,7 +171,7 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
                 >
                   {activeTab === "diagram" ? (
                     <div style={{ height: 500 }}>
-                      <ReactFlow zoomOnScroll={false} nodeTypes={nodeTypes}  elements={resources}>
+                      <ReactFlow zoomOnScroll={false} nodeTypes={nodeTypes} elements={resources}>
                         <Controls />
                         <Background />
                       </ReactFlow>
