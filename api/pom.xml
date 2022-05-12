@@ -31,6 +31,8 @@
         <mysql.version>8.0.28</mysql.version>
         <snakeyaml.version>1.29</snakeyaml.version>
         <quartz.version>2.3.2</quartz.version>
+        <azure-storage-blob.version>12.14.3</azure-storage-blob.version>
+        <aws-sdk.version>1.12.204</aws-sdk.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -176,7 +178,15 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
+            <version>${azure-storage-blob.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -184,6 +194,13 @@
                 <groupId>com.azure.spring</groupId>
                 <artifactId>azure-spring-boot-bom</artifactId>
                 <version>${azure.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws-sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
