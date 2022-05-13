@@ -87,7 +87,7 @@ To run the api you need the following environment variables:
 |:-----------------|-------------|
 | SQL Azure        | Supported   |
 | PostgreSQL       | Supported   |
-| MySQL            | In testing  |
+| MySQL            | Supported   |
 | MariaDB          | Pending     |
 | Oracle           | Pending     |
 
