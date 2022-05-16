@@ -20,6 +20,8 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String BUCKET_STATE_JSON = "tfstate/%s/%s/state/%s.json";
 
+    private static final String S3_ERROR_LOG = "S3 Not found: {}";
+
     @NonNull
     private AmazonS3 s3client;
 
@@ -28,14 +30,14 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
-        byte data[];
+        byte[] data;
         try {
             log.info("Searching: tfoutput/{}/{}/{}.tfoutput", organizationId, jobId, stepId);
             S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_LOCATION_OUTPUT, organizationId, jobId, stepId));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
         } catch (IOException e) {
-            log.error("Not found: {}",e.getMessage());
+            log.error(S3_ERROR_LOG,e.getMessage());
             data = new byte[0];
         }
         return data;
@@ -43,14 +45,14 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId) {
-        byte data[];
+        byte[] data;
         try {
             log.info("Searching: tfstate/{}/{}/{}/{}/terraformLibrary.tfPlan", organizationId, workspaceId, jobId, stepId);
             S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_STATE_LOCATION, organizationId, workspaceId, jobId, stepId));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
         } catch (IOException e) {
-            log.error("Not found: {}",e.getMessage());
+            log.error(S3_ERROR_LOG,e.getMessage());
             data = new byte[0];
         }
         return data;
@@ -58,14 +60,14 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
-        byte data[];
+        byte[] data;
         try {
             log.info("Searching: tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
             S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_STATE_JSON, organizationId, workspaceId, stateFileName));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
         } catch (IOException e) {
-            log.error("Not found: {}",e.getMessage());
+            log.error(S3_ERROR_LOG,e.getMessage());
             data = new byte[0];
         }
         return data;

@@ -20,7 +20,7 @@ public class TerraformOutputController {
             value = "/organization/{organizationId}/job/{jobId}/step/{stepId}",
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public @ResponseBody byte[] getFile(@PathVariable("organizationId") String organizationId, @PathVariable("jobId") String jobId, @PathVariable("stepId") String stepId) throws IOException {
+    public @ResponseBody byte[] getFile(@PathVariable("organizationId") String organizationId, @PathVariable("jobId") String jobId, @PathVariable("stepId") String stepId) {
         return storageTypeService.getStepOutput(organizationId, jobId, stepId);
     }
 }

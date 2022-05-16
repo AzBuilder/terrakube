@@ -1,4 +1,4 @@
-package org.azbuilder.api.plugin.storage.configuration;
+package org.azbuilder.api.plugin.storage.azure.configuration;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -31,7 +31,7 @@ public class StorageTypeAutoConfiguration {
 
     @Bean
     public StorageTypeService terraformOutput(StorageTypeProperties storageTypeProperties, AzureStorageTypeProperties azureStorageTypeProperties, AwsStorageTypeProperties awsStorageTypeProperties) {
-        StorageTypeService StorageTypeService = null;
+        StorageTypeService storageTypeService = null;
         log.info("StorageType={}", storageTypeProperties.getType());
         switch (storageTypeProperties.getType()) {
             case AZURE:
@@ -42,7 +42,7 @@ public class StorageTypeAutoConfiguration {
                                         azureStorageTypeProperties.getAccountKey())
                         ).buildClient();
 
-                StorageTypeService = AzureStorageTypeServiceImpl.builder()
+                storageTypeService = AzureStorageTypeServiceImpl.builder()
                         .blobServiceClient(blobServiceClient)
                         .build();
                 break;
@@ -58,14 +58,14 @@ public class StorageTypeAutoConfiguration {
                         .withRegion(Regions.fromName(awsStorageTypeProperties.getRegion()))
                         .build();
 
-                StorageTypeService = AwsStorageTypeServiceImpl.builder()
+                storageTypeService = AwsStorageTypeServiceImpl.builder()
                         .s3client(s3client)
                         .bucketName(awsStorageTypeProperties.getBucketName())
                         .build();
                 break;
             default:
-                StorageTypeService = new LocalStorageTypeServiceImpl();
+                storageTypeService = new LocalStorageTypeServiceImpl();
         }
-        return StorageTypeService;
+        return storageTypeService;
     }
 }

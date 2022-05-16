@@ -20,7 +20,7 @@ public class TerraformStateController {
             value = "/organization/{organizationId}/workspace/{workspaceId}/jobId/{jobId}/step/{stepId}/terraform.tfstate",
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public @ResponseBody byte[] getTerraformPlanBinary(@PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId, @PathVariable("jobId") String jobId, @PathVariable("stepId") String stepId) throws IOException {
+    public @ResponseBody byte[] getTerraformPlanBinary(@PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId, @PathVariable("jobId") String jobId, @PathVariable("stepId") String stepId) {
         return storageTypeService.getTerraformPlan(organizationId, workspaceId, jobId, stepId);
     }
 
@@ -28,7 +28,7 @@ public class TerraformStateController {
             value = "/organization/{organizationId}/workspace/{workspaceId}/state/{stateFilename}.json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public @ResponseBody byte[] getTerraformStateJson(@PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId, @PathVariable("stateFilename") String stateFilename) throws IOException {
+    public @ResponseBody byte[] getTerraformStateJson(@PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId, @PathVariable("stateFilename") String stateFilename) {
         return storageTypeService.getTerraformStateJson(organizationId, workspaceId, stateFilename);
     }
 }

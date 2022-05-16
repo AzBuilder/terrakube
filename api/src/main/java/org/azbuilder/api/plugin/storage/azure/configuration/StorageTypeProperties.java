@@ -1,4 +1,4 @@
-package org.azbuilder.api.plugin.storage.configuration;
+package org.azbuilder.api.plugin.storage.azure.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
