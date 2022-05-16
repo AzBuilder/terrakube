@@ -6,8 +6,6 @@ import org.azbuilder.api.plugin.storage.StorageTypeService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 @AllArgsConstructor
 @Slf4j
 @RestController
