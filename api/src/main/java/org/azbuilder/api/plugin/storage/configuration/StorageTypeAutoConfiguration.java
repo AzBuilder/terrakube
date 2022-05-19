@@ -1,4 +1,4 @@
-package org.azbuilder.api.plugin.storage.azure.configuration;
+package org.azbuilder.api.plugin.storage.configuration;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
