@@ -15,9 +15,15 @@ export const DetailsJob = ({ jobId }) => {
   const [steps, setSteps] = useState([]);
   const outputLog = async (output, status) => {
     if (output != null) {
-      return axiosClient.get(output).then(
-        resp => resp.data
-      ).catch(err => "No logs available");
+      const apiDomain = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).hostname;
+      if (output.includes(apiDomain))
+        return axiosInstance.get(output).then(
+          resp => resp.data
+        ).catch(err => "No logs available");
+      else
+        return axiosClient.get(output).then(
+          resp => resp.data
+        ).catch(err => "No logs available");
     }
     else {
       if (status === "running")

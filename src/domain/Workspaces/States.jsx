@@ -1,7 +1,7 @@
 import { React, useState, useRef, useEffect } from 'react';
 import { List, Space, Card, Row, Col, Avatar, Button } from "antd";
 import Editor from "@monaco-editor/react";
-import { axiosClient } from "../../config/axiosConfig";
+import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import ReactFlow, { Controls, Background } from 'react-flow-renderer';
 import NodeResource from './NodeResource';
 import { RestTwoTone } from '@ant-design/icons';
@@ -53,13 +53,8 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
     return resources
   }
 
-  const changeState = state => {
-    setCurrentState(state);
-    setStateDetailsVisible(true);
-
-    axiosClient.get(state.output).then(
-      resp => {
-        console.log(JSON.stringify(resp.data, null, '\t'));
+  function loadData(resp){
+    console.log(JSON.stringify(resp.data, null, '\t'));
         setStateContent(JSON.stringify(resp.data, null, '\t'));
 
         let resources = [];
@@ -101,8 +96,25 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
         setResources(resources);
 
 
-      }
-    ).catch(err => setStateContent(`{"error":"Failed to load state ${err}"}`));
+  }
+
+  const changeState = state => {
+    setCurrentState(state);
+    setStateDetailsVisible(true);
+
+    const apiDomain = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).hostname;
+    if (state.output.includes(apiDomain))
+      axiosInstance.get(state.output).then(
+        resp => {
+          loadData(resp)
+        }
+      ).catch(err => setStateContent(`{"error":"Failed to load state ${err}"}`));
+    else
+      axiosClient.get(state.output).then(
+        resp => {
+          loadData(resp)
+        }
+      ).catch(err => setStateContent(`{"error":"Failed to load state ${err}"}`));
   }
 
   const tabs = [
