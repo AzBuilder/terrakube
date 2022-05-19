@@ -19,4 +19,5 @@
     <include file="/db/changelog/local/changelog-2.0.xml"/>
     <include file="/db/changelog/local/changelog-2.1.2.xml"/>
     <include file="/db/changelog/local/changelog-2.2.0.xml"/>
+    <include file="/db/changelog/local/changelog-2.3.1.xml"/>
 </databaseChangeLog>
