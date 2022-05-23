@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Button, Layout, Breadcrumb ,Input,List,Space,Card,Tag,Tooltip} from "antd";
-import { GitlabOutlined,GithubOutlined, ClockCircleOutlined, CheckCircleOutlined ,SyncOutlined,ExclamationCircleOutlined,InfoCircleOutlined} from '@ant-design/icons';
+import { GitlabOutlined,GithubOutlined, ClockCircleOutlined, CheckCircleOutlined ,SyncOutlined,ExclamationCircleOutlined,InfoCircleOutlined, CloseCircleTwoTone, CloseCircleOutlined} from '@ant-design/icons';
 
 import { SiTerraform,SiBitbucket, SiAzuredevops  } from "react-icons/si";
 import { IconContext } from "react-icons";
@@ -81,7 +81,7 @@ export const OrganizationDetails = ({setOrganizationName,organizationName}) => {
                       <h3>{item.name}</h3>
                       {item.description}
                       <Space size={40} style={{ marginTop: "25px" }}>
-                      <Tag icon={item.lastStatus == "completed" ? <CheckCircleOutlined /> : (item.lastStatus == "running" ? <SyncOutlined spin /> : (item.lastStatus === "waitingApproval" ? <ExclamationCircleOutlined /> : ( item.lastStatus === "never executed"?<InfoCircleOutlined /> :<ClockCircleOutlined />)))} color={item.statusColor}>{item.lastStatus}</Tag> <br />
+                      <Tag icon={item.lastStatus == "completed" ? <CheckCircleOutlined /> : (item.lastStatus == "running" ? <SyncOutlined spin /> : (item.lastStatus === "waitingApproval" ? <ExclamationCircleOutlined /> : ( item.lastStatus === "never executed"?<InfoCircleOutlined /> : ( item.lastStatus === "rejected" ? <CloseCircleOutlined/> : <ClockCircleOutlined />))))} color={item.statusColor}>{item.lastStatus}</Tag> <br />
                         <span><ClockCircleOutlined />&nbsp;&nbsp;{DateTime.fromISO(item.lastRun).toRelative()??"never executed"}</span>
                         <span><IconContext.Provider value={{ size: "1.3em" }}><SiTerraform /></IconContext.Provider>&nbsp;&nbsp;{item.terraformVersion}</span>
                         <span>{renderVCSLogo(new URL(item.source).hostname)}&nbsp; <a href={item.source} target="_blank">{new URL(item.source)?.pathname?.replace(".git","")?.substring(1,)}</a></span>
@@ -116,7 +116,7 @@ function setupOrganizationIncludes(includes, setWorkspaces) {
             id: element.id,
             lastRun: lastRunDate,
             lastStatus: lastStatus,
-            statusColor:lastStatus == "completed" ? "#2eb039" : (lastStatus == "running" ? "#108ee9" : (lastStatus == "waitingApproval" ? "#fa8f37" : "")),
+            statusColor:lastStatus == "completed" ? "#2eb039" : (lastStatus == "running" ? "#108ee9" : (lastStatus == "waitingApproval" ? "#fa8f37" : (lastStatus === "rejected" ? "#FB0136" : ""))),
             ...element.attributes
           }
         );

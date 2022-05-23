@@ -303,11 +303,33 @@ function setupWorkspaceIncludes(includes, setVariables, setJobs, setEnvVariables
   includes.forEach(element => {
     switch (element.type) {
       case include.JOB:
+      
+      let finalColor = "";
+      switch(element.attributes.status){
+        case "completed":
+          finalColor = "#2eb039";
+          break;
+        case "rejected":
+          finalColor = "#FB0136";
+          break;
+        case "cancelled":
+            finalColor = "#FB0136";
+            break;
+        case "running":
+          finalColor = "#108ee9";
+          break;
+        case "waitingApproval":
+          finalColor = "#fa8f37";
+          break;
+        default:
+            finalColor = "#7198AF"
+            break;
+      }
         jobs.push(
           {
             id: element.id,
             title: "Queue manually using Terraform",
-            statusColor: element.attributes.status == "completed" ? "#2eb039" : (element.attributes.status == "running" ? "#108ee9" : (element.attributes.status == "waitingApproval" ? "#fa8f37" : "")),
+            statusColor: finalColor,
             latestChange: DateTime.fromISO(element.attributes.createdDate).toRelative(),
             ...element.attributes
           }

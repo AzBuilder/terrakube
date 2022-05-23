@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { Tag, Space, Collapse, Avatar, Card, Button,message } from "antd";
 import { ORGANIZATION_ARCHIVE } from '../../config/actionTypes';
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
-import { CheckCircleOutlined, CheckCircleTwoTone, SyncOutlined, ClockCircleOutlined,ExclamationCircleOutlined,CheckOutlined,CloseOutlined ,CommentOutlined} from '@ant-design/icons';
+import { CheckCircleOutlined, CheckCircleTwoTone, SyncOutlined, ClockCircleOutlined,ExclamationCircleOutlined,CheckOutlined,CloseOutlined ,CommentOutlined, CloseCircleTwoTone} from '@ant-design/icons';
 import Ansi from "ansi-to-react";
 const { DateTime } = require("luxon");
 const { Panel } = Collapse;
@@ -43,8 +43,10 @@ export const DetailsJob = ({ jobId }) => {
         return <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} />;
       case "running":
        return <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} />;
+      case "cancelled":
+        return <CloseCircleTwoTone twoToneColor="#FB0136" style={{ fontSize: "20px" }} />;
       default:
-      return <ClockCircleOutlined style={{ fontSize: "20px" }} />
+        return <ClockCircleOutlined style={{ fontSize: "20px" }} />
     }
   }
 
@@ -55,6 +57,28 @@ export const DetailsJob = ({ jobId }) => {
         id:jobId,
         attributes: {
           status: "approved"
+        }
+      }
+    }
+
+    axiosInstance.patch(`organization/${organizationId}/job/${jobId}`, body, {
+      headers: {
+        'Content-Type': 'application/vnd.api+json'
+      }
+    })
+      .then(response => {
+        console.log(response);
+        
+      });
+  };
+
+  const handleRejected = e => {
+    const body = {
+      data: {
+        type: "job",
+        id:jobId,
+        attributes: {
+          status: "rejected"
         }
       }
     }
@@ -122,7 +146,7 @@ export const DetailsJob = ({ jobId }) => {
       ) : (
         <Space direction="vertical" style={{ width: "100%" }}>
           <div>
-            <Tag icon={job.data.attributes.status === "completed" ? <CheckCircleOutlined /> : (job.data.attributes.status === "running" ? <SyncOutlined spin /> :(job.data.attributes.status === "waitingApproval" ? <ExclamationCircleOutlined /> : <ClockCircleOutlined />))} color={job.data.attributes.status === "completed" ? "#2eb039" : (job.data.attributes.status === "running" ? "#108ee9" : (job.data.attributes.status == "waitingApproval" ? "#fa8f37" : ""))}>{job.data.attributes.status}</Tag> <h2 style={{ display: "inline" }}>Triggered via UI</h2>
+            <Tag icon={job.data.attributes.status === "completed" ? <CheckCircleOutlined /> : (job.data.attributes.status === "running" ? <SyncOutlined spin /> :(job.data.attributes.status === "waitingApproval" ? <ExclamationCircleOutlined /> : <ClockCircleOutlined />))} color={job.data.attributes.status === "completed" ? "#2eb039" : (job.data.attributes.status === "running" ? "#108ee9" : (job.data.attributes.status == "waitingApproval" ? "#fa8f37" : (job.data.attributes.status == "rejected" ? "#FB0136" : "")))}>{job.data.attributes.status}</Tag> <h2 style={{ display: "inline" }}>Triggered via UI</h2>
           </div>
 
           <Collapse >
@@ -151,7 +175,7 @@ export const DetailsJob = ({ jobId }) => {
               <Card title={<span style={{fontSize:"14px"}}><b>Needs Confirmation:</b> Someone from <b>{job.data.attributes.approvalTeam}</b> must confirm to continue.</span>}>
                 <Space size={20}>
                   <Button icon={<CheckOutlined />} onClick={handleApprove} type="primary">Approve</Button>
-                  <Button icon={<CloseOutlined />} onClick={handleComingSoon} type="primary" danger>Discard</Button>
+                  <Button icon={<CloseOutlined />} onClick={handleRejected} type="primary" danger>Discard</Button>
                   <Button icon={<CommentOutlined />} onClick={handleComingSoon}>Add Comment</Button>
                 </Space>
               </Card>
