@@ -7,4 +7,9 @@ public class LocalStorageServiceImpl implements StorageService {
     public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
         return null;
     }
+
+    @Override
+    public byte[] downloadModule(String organizationName, String moduleName, String providerName, String moduleVersion) {
+        return new byte[0];
+    }
 }
