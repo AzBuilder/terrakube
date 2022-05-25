@@ -19,7 +19,7 @@ import java.io.IOException;
 public class AzureStorageServiceImpl implements StorageService {
 
     private static final String CONTAINER_NAME = "registry";
-    private static String BUCKET_DOWNLOAD_MODULE_LOCATION = "https://%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
+    private static String BUCKET_DOWNLOAD_MODULE_LOCATION = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
 
 
     @NonNull

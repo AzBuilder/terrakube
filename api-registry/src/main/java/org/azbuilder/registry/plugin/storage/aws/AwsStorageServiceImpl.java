@@ -18,7 +18,7 @@ import java.io.IOException;
 public class AwsStorageServiceImpl implements StorageService {
 
     private static String BUCKET_ZIP_MODULE_LOCATION = "registry/%s/%s/%s/%s/module.zip";
-    private static String BUCKET_DOWNLOAD_MODULE_LOCATION = "https://%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
+    private static String BUCKET_DOWNLOAD_MODULE_LOCATION = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
     private static final String S3_ERROR_LOG = "S3 Not found: {}";
 
     @NonNull
