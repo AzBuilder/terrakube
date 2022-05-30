@@ -3,6 +3,7 @@ package org.azbuilder.api.rs;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.azbuilder.api.rs.globalvar.Globalvar;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.module.Module;
 import org.azbuilder.api.rs.provider.Provider;
@@ -66,4 +67,7 @@ public class Organization {
     @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Template> template;
+
+    @OneToMany(mappedBy = "organization")
+    private List<Globalvar> globalvar;
 }
