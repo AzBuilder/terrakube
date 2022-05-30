@@ -30,6 +30,7 @@ public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebS
         super.configure(http);
         http.cors().and().authorizeRequests()
                 .antMatchers("/.well-known/**").permitAll()
+                .antMatchers("/terraform/modules/v1/download/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .and()
                 .authorizeRequests()

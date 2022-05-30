@@ -19,12 +19,17 @@ import java.io.IOException;
 public class AzureStorageServiceImpl implements StorageService {
 
     private static final String CONTAINER_NAME = "registry";
+    private static String BUCKET_DOWNLOAD_MODULE_LOCATION = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
+
 
     @NonNull
     BlobServiceClient blobServiceClient;
 
     @NonNull
     GitService gitService;
+
+    @NonNull
+    String registryHostname;
 
     @Override
     public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
@@ -53,6 +58,13 @@ public class AzureStorageServiceImpl implements StorageService {
             }
         }
 
-        return blobClient.getBlobUrl();
+        return String.format(BUCKET_DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName, providerName, moduleVersion);
+    }
+
+    @Override
+    public byte[] downloadModule(String organizationName, String moduleName, String providerName, String moduleVersion) {
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
+        log.info("Searching: /registry/{}/{}/{}/{}/module.zip", organizationName, moduleName, providerName, moduleVersion);
+        return containerClient.getBlobClient(String.format("%s/%s/%s/%s/module.zip", organizationName, moduleName, providerName, moduleVersion)).downloadContent().toBytes();
     }
 }

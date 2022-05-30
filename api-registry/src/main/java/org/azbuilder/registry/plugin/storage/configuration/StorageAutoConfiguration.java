@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.registry.configuration.OpenRegistryProperties;
 import org.azbuilder.registry.plugin.storage.StorageService;
 import org.azbuilder.registry.plugin.storage.aws.AwsStorageServiceImpl;
 import org.azbuilder.registry.plugin.storage.aws.AwsStorageServiceProperties;
@@ -24,14 +25,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties({
         AzureStorageServiceProperties.class,
-        StorageProperties.class
+        StorageProperties.class,
+        OpenRegistryProperties.class
 })
 @ConditionalOnMissingBean(StorageService.class)
 @Slf4j
 public class StorageAutoConfiguration {
 
     @Bean
-    public StorageService terraformOutput(StorageProperties storageProperties, AzureStorageServiceProperties azureStorageServiceProperties, AwsStorageServiceProperties awsStorageServiceProperties) {
+    public StorageService terraformOutput(OpenRegistryProperties openRegistryProperties, StorageProperties storageProperties, AzureStorageServiceProperties azureStorageServiceProperties, AwsStorageServiceProperties awsStorageServiceProperties) {
         StorageService storageService = null;
         log.info("StorageType=", storageProperties.getType());
         switch (storageProperties.getType()) {
@@ -46,6 +48,7 @@ public class StorageAutoConfiguration {
                 storageService = AzureStorageServiceImpl.builder()
                         .blobServiceClient(blobServiceClient)
                         .gitService(new GitServiceImpl())
+                        .registryHostname(openRegistryProperties.getHostname())
                         .build();
                 break;
             case AwsStorageImpl:
@@ -65,6 +68,7 @@ public class StorageAutoConfiguration {
                         .s3client(s3client)
                         .gitService(new GitServiceImpl())
                         .bucketName(awsStorageServiceProperties.getBucketName())
+                        .registryHostname(openRegistryProperties.getHostname())
                         .build();
                 break;
             case Local:

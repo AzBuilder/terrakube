@@ -3,14 +3,13 @@ package org.azbuilder.registry.controller;
 import org.azbuilder.registry.controller.model.module.ModuleDTO;
 import org.azbuilder.registry.controller.model.module.VersionDTO;
 import org.azbuilder.registry.controller.model.module.VersionsDTO;
+import org.azbuilder.registry.plugin.storage.StorageService;
 import org.azbuilder.registry.service.module.ModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +21,9 @@ public class ModuleWebServiceImpl {
 
     @Autowired
     ModuleService moduleService;
+
+    @Autowired
+    StorageService storageService;
 
     @GetMapping(value = "/{organization}/{module}/{provider}/versions", produces = "application/json")
     public ResponseEntity<ModuleDTO> searchModuleVersions(@PathVariable String organization, @PathVariable String module, @PathVariable String provider) {
@@ -50,5 +52,12 @@ public class ModuleWebServiceImpl {
                 "Access-Control-Expose-Headers","X-Terraform-Get"
         );
         return ResponseEntity.ok().headers(responseHeaders).body(null);
+    }
+
+    @GetMapping(
+            value = "/download/{organizationName}/{moduleName}/{providerName}/{version}/module.zip",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody byte[] getModuleZip(@PathVariable String organizationName, @PathVariable String moduleName, @PathVariable String providerName, @PathVariable String version) {
+        return storageService.downloadModule(organizationName, moduleName, providerName, version);
     }
 }
