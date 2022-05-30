@@ -3,6 +3,7 @@ package org.azbuilder.api.plugin.scheduler.job.tcl.executor;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.scheduler.job.tcl.model.Flow;
 import org.azbuilder.api.repository.JobRepository;
+import org.azbuilder.api.rs.globalvar.Globalvar;
 import org.azbuilder.api.rs.job.Job;
 import org.azbuilder.api.rs.job.JobStatus;
 import org.azbuilder.api.rs.vcs.Vcs;
@@ -53,6 +54,7 @@ public class ExecutorService {
         HashMap<String, String> variables = new HashMap<>();
         HashMap<String, String> environmentVariables = new HashMap<>();
         List<Variable> variableList = job.getWorkspace().getVariable();
+        List<Globalvar> globalvarList = job.getOrganization().getGlobalvar();
         if (variableList != null)
             for (Variable variable : variableList) {
                 if (variable.getCategory().equals(Category.TERRAFORM)) {
@@ -63,6 +65,18 @@ public class ExecutorService {
                     environmentVariables.put(variable.getKey(), variable.getValue());
                 }
                 log.info("Variable Key: {} Value {}", variable.getKey(), variable.isSensitive() ? "sensitive" : variable.getValue());
+            }
+
+        if(globalvarList != null)
+            for(Globalvar globalvar : globalvarList){
+                if (globalvar.getCategory().equals(Category.TERRAFORM)) {
+                    log.info("Adding terraform");
+                    variables.putIfAbsent(globalvar.getKey(), globalvar.getValue());
+                } else {
+                    log.info("Adding environment variable");
+                    environmentVariables.putIfAbsent(globalvar.getKey(), globalvar.getValue());
+                }
+                log.info("Global Variable Key: {} Value {}", globalvar.getKey(), globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
             }
 
         executorContext.setVariables(variables);

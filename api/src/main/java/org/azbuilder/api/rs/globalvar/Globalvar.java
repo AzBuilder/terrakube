@@ -1,8 +1,9 @@
-package org.azbuilder.api.rs.globalvars;
+package org.azbuilder.api.rs.globalvar;
 
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.azbuilder.api.rs.Organization;
 import org.azbuilder.api.rs.workspace.parameters.Category;
 import org.hibernate.annotations.Type;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-public class Vars {
+public class Globalvar {
 
     @Id
     @Type(type="uuid-char")
@@ -43,4 +44,6 @@ public class Vars {
 
     @Column(name="hcl")
     private boolean hcl;
+    @ManyToOne
+    private Organization organization;
 }

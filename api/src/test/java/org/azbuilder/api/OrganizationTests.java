@@ -39,6 +39,7 @@ class OrganizationTests extends ServerApplicationTests {
                                                 attr("name", "Organization")
                                         ),
                                         relationships(
+                                                relation("globalvar"),
                                                 relation("job"),
                                                 relation("module"),
                                                 relation("provider"),

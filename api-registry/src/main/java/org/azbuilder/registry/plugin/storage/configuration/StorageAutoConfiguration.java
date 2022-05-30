@@ -33,7 +33,7 @@ public class StorageAutoConfiguration {
     @Bean
     public StorageService terraformOutput(StorageProperties storageProperties, AzureStorageServiceProperties azureStorageServiceProperties, AwsStorageServiceProperties awsStorageServiceProperties) {
         StorageService storageService = null;
-        log.info("StorageType=", storageProperties.getType());
+        log.info("StorageType={}", storageProperties.getType());
         switch (storageProperties.getType()) {
             case AzureStorageImpl:
                 BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()

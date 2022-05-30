@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="13" author="alfespa17@gmail.com">
+        <createTable tableName="globalvar">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="variable_key" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variable_value" type="varchar(3072)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variable_description" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sensitive" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hcl" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variable_category" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_global_var_org" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="organization_id, variable_key"
+                constraintName="const_global_var"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="globalvar"
+                validate="true"/>
+    </changeSet>
+</databaseChangeLog>
