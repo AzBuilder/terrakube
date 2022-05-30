@@ -24,19 +24,8 @@ public class Globalvar {
     @GeneratedValue
     private UUID id;
 
-    @Column(name="variable_key")
-    private String key;
-
-    @ReadPermission(expression = "admin read secret")
-    @Column(name="variable_value")
-    private String value;
-
     @Column(name="variable_description")
     private String description;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name="variable_category")
-    private Category category;
 
     @UpdatePermission(expression = "admin update secret")
     @Column(name="sensitive")
@@ -44,6 +33,18 @@ public class Globalvar {
 
     @Column(name="hcl")
     private boolean hcl;
+
+    @Column(name="variable_key")
+    private String key;
+
+    @ReadPermission(expression = "admin read secret")
+    @Column(name="variable_value")
+    private String value;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="variable_category")
+    private Category category;
+
     @ManyToOne
     private Organization organization;
 }
