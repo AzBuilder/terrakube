@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.zeroturnaround.zip.ZipUtil;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
@@ -20,7 +19,8 @@ public class ReadMeServiceImpl {
 
     private static final String README_DIRECTORY = "/.terraform-spring-boot/readme/";
 
-    public String getContent(String moduleURL) {
+    public String getContent(InputStream moduleInputStream) {
+        log.info("Get content README.md");
         String readmeText = new String(Base64.getEncoder().encode("NO README FILE".getBytes(StandardCharsets.UTF_8)));
         String userHomeDirectory = FileUtils.getUserDirectoryPath();
         String gitModulePath = userHomeDirectory.concat(
@@ -30,14 +30,17 @@ public class ReadMeServiceImpl {
         File gitModuleFolder = new File(gitModulePath);
 
         try {
+            log.info("Creating temp folder");
             FileUtils.forceMkdir(gitModuleFolder);
             FileUtils.cleanDirectory(gitModuleFolder);
 
             File gitModuleZip = new File(gitModuleFolder.getAbsolutePath() + "/module.zip");
-            FileUtils.copyURLToFile(new URL(moduleURL), gitModuleZip);
+            log.info("Copy Input-stream to file");
+            FileUtils.copyInputStreamToFile(moduleInputStream, gitModuleZip);
 
             ZipUtil.unpack(gitModuleZip, gitModuleFolder);
 
+            log.info("Checking README.md");
             File readmeFile = new File(gitModuleFolder.getAbsolutePath() + "/README.md");
             readmeText = readFromInputStream(new FileInputStream(readmeFile));
 
