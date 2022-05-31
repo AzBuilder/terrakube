@@ -53,7 +53,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
           "name": "Snyk",
           "description": "This template uses Snyk to scan and monitor your workspace for security vulnerabilities.",
           "tcl": "ZmxvdzoKICAtIHR5cGU6ICJjdXN0b21TY3JpcHRzIgogICAgc3RlcDogMTAwCiAgICBjb21tYW5kczoKICAgICAgLSBydW50aW1lOiAiR1JPT1ZZIgogICAgICAgIHByaW9yaXR5OiAxMDAKICAgICAgICBhZnRlcjogdHJ1ZQogICAgICAgIHNjcmlwdDogfAogICAgICAgICAgaW1wb3J0IFNueWsKCiAgICAgICAgICBuZXcgU255aygpLmxvYWRUb29sKAogICAgICAgICAgICAiJHdvcmtpbmdEaXJlY3RvcnkiLAogICAgICAgICAgICAiJGJhc2hUb29sc0RpcmVjdG9yeSIsCiAgICAgICAgICAgICIxLjgzMS4wIikKICAgICAgICAgICJTbnlrIERvd25sb2FkIENvbXBsZXRlZC4uLiIKICAgICAgLSBydW50aW1lOiAiQkFTSCIKICAgICAgICBwcmlvcml0eTogMjAwCiAgICAgICAgYWZ0ZXI6IHRydWUKICAgICAgICBzY3JpcHQ6IHwKICAgICAgICAgIGNkICR3b3JraW5nRGlyZWN0b3J5OwogICAgICAgICAgc255ayBpYWMgdGVzdCAuOw==",
-          "image": "https://snyk.io/wp-content/themes/snyk_v2_etyhadar/dist/images/snyk-logo-patch-new.svg"
+          "image": "https://res.cloudinary.com/snyk/image/upload/v1537345897/press-kit/brand/logo-vertical-black.png"
         },
         {
           "name": "Terrascan",
