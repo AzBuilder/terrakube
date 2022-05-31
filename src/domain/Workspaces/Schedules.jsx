@@ -34,7 +34,7 @@ const VARIABLES_COLUMS = (organizationId, workspaceId,onEdit) => [
     width: "30%",
     render: (_, record) => {
       return <span><Tag color="default">cron: {record.cron} </Tag> 
-      <Tag icon={<InfoCircleOutlined />} color="default">{cronstrue.toString(record.cron)}</Tag>
+      <Tag icon={<InfoCircleOutlined />} color="default">{cronstrue.toString(record.cron, {dayOfWeekStartIndexZero: false})}</Tag>
      
       </span>;
       
