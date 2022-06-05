@@ -28,6 +28,8 @@ import static com.diogonunes.jcolor.Attribute.*;
 @Service
 public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
+    private static final String STEP_SEPARATOR = "***************************************";
+
     TerraformClient terraformClient;
     TerraformState terraformState;
     ScriptEngineService scriptEngineService;
@@ -304,17 +306,17 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     private void initBanner(TerraformJob terraformJob, Consumer<String> output) {
         AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
-        output.accept(colorize("***************************************", colorMessage));
+        output.accept(colorize(STEP_SEPARATOR, colorMessage));
         output.accept(colorize("Initializing Terrakube Job " + terraformJob.getJobId() + " Step " + terraformJob.getStepId(), colorMessage));
         output.accept(colorize("Running Terraform " + terraformJob.getTerraformVersion(), colorMessage));
-        output.accept(colorize("\n\n***************************************", colorMessage));
+        output.accept(colorize("\n\n" + STEP_SEPARATOR, colorMessage));
         output.accept(colorize("Running Terraform Init: ", colorMessage));
     }
 
     private void showTerraformMessage(String operation, Consumer<String> output) {
         AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
-        output.accept(colorize("***************************************", colorMessage));
+        output.accept(colorize(STEP_SEPARATOR, colorMessage));
         output.accept(colorize("Running Terraform " + operation, colorMessage));
-        output.accept(colorize("***************************************", colorMessage));
+        output.accept(colorize(STEP_SEPARATOR, colorMessage));
     }
 }
