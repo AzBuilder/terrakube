@@ -25,7 +25,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     SetupPrivateRegistry setupPrivateRegistry;
     boolean enableRegistrySecurity;
 
-    public SetupWorkspaceImpl(OkHttpClient httpClient, SetupPrivateRegistry setupPrivateRegistry, @Value("${org.azbuilder.api.enableSecurity}") boolean enableRegistrySecurity){
+    public SetupWorkspaceImpl(OkHttpClient httpClient, SetupPrivateRegistry setupPrivateRegistry, @Value("${org.azbuilder.api.enableSecurity}") boolean enableRegistrySecurity) {
         this.httpClient = httpClient;
         this.setupPrivateRegistry = setupPrivateRegistry;
         this.enableRegistrySecurity = enableRegistrySecurity;
@@ -40,7 +40,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             if (enableRegistrySecurity)
                 setupPrivateRegistry.addCredentials(workspaceFolder);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return workspaceFolder;
     }
