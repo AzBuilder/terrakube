@@ -67,11 +67,11 @@ mvn clean install
 ## Modules
 This project contains three modules describe below:
 
-| Name         | Description                                                      |
-|:-------------|------------------------------------------------------------------|
-| api          | Expose the API to manage all terraform workspaces                |
-| api-registry | Open source terraform registry compatible with the terrakube API |
-| executor     | This components run terraform jobs using                         |
+| Name     | Description                                                      |
+|:---------|------------------------------------------------------------------|
+| api      | Expose the API to manage all terraform workspaces                |
+| registry | Open source terraform registry compatible with the terrakube API |
+| executor | This components run terraform jobs and use Terrakube extensions  |
 
 ## Security - Authentication
 
