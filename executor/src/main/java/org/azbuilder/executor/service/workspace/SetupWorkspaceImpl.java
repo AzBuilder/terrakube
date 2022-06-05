@@ -41,9 +41,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 setupPrivateRegistry.addCredentials(workspaceFolder);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            return workspaceFolder;
         }
+        return workspaceFolder;
     }
 
     private File setupWorkspaceDirectory(String organizationId, String workspaceId) throws IOException {

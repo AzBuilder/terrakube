@@ -262,7 +262,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             });
             terraformVersion = terraformClient.version().get();
         } catch (IOException | ExecutionException | InterruptedException exception) {
-            log.error(exception.getMessage());
+            setError(exception);
         }
         return terraformVersion;
     }
