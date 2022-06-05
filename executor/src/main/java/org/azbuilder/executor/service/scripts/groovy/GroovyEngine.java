@@ -1,0 +1,135 @@
+package org.azbuilder.executor.service.scripts.groovy;
+
+import groovy.lang.Binding;
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.azbuilder.api.client.TerrakubeClient;
+import org.azbuilder.executor.service.mode.TerraformJob;
+import org.azbuilder.executor.service.scripts.CommandExecution;
+import org.azbuilder.executor.service.scripts.ScriptEngineService;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class GroovyEngine implements CommandExecution {
+
+    private static final String USER_GROOVY_SCRIPT = "/userScript.groovy";
+
+    private TerrakubeClient terrakubeClient;
+
+    @Autowired
+    public GroovyEngine(TerrakubeClient terrakubeClient) {
+        this.terrakubeClient = terrakubeClient;
+    }
+
+    @Override
+    public boolean execute(TerraformJob terraformJob, String scriptContent, File workingDirectory, Consumer<String> output) {
+        boolean executeSuccess = true;
+        File groovyScript = new File(workingDirectory.getAbsolutePath() + USER_GROOVY_SCRIPT);
+
+        try {
+            log.info("ScriptPath: {}", groovyScript.toURI().toURL());
+            FileUtils.writeStringToFile(groovyScript, scriptContent, Charset.defaultCharset());
+
+            List<URL> groovyClasses = getGroovyExtensions(workingDirectory);
+            groovyClasses.add(groovyScript.toURI().toURL());
+
+            log.info("Execute Groovy scriptContent: \n {}", scriptContent);
+            final GroovyScriptEngine engine = new GroovyScriptEngine(
+                    groovyClasses.toArray(URL[]::new),
+                    this.getClass().getClassLoader()
+            );
+
+            Binding sharedData = setupBindings(terraformJob, workingDirectory);
+            sharedData.setProperty("terrakubeOutput", new ByteArrayOutputStream());
+
+            engine.run(groovyScript.getName(), sharedData);
+
+            ByteArrayOutputStream terrakubeOutput = (ByteArrayOutputStream) sharedData.getProperty("terrakubeOutput");
+            String terrakubeOutputString = terrakubeOutput.toString(Charset.defaultCharset());
+
+            log.info("Groovy output script \n{}", terrakubeOutputString);
+            output.accept(terrakubeOutputString != null ? terrakubeOutputString : "Groovy Script completed\n");
+        } catch (IOException | ResourceException | ScriptException exception) {
+            log.error(exception.getMessage());
+            executeSuccess = false;
+            output.accept(exception.getMessage());
+        }
+        return executeSuccess;
+    }
+
+    @NotNull
+    private File getToolsRepository(File workingDirectory) {
+        return new File(workingDirectory.getAbsolutePath() + ScriptEngineService.TOOLS_REPOSITORY);
+    }
+
+    @NotNull
+    private File getBashToolsDirectory(File workingDirectory) {
+        return new File(workingDirectory.getAbsolutePath() + ScriptEngineService.TOOLS);
+    }
+
+    @NotNull
+    private Binding setupBindings(TerraformJob terraformJob, File workingDirectory) {
+        Binding sharedData = new Binding();
+        sharedData.setVariable("workingDirectory", workingDirectory.getAbsolutePath());
+        sharedData.setVariable("organizationId", terraformJob.getOrganizationId());
+        sharedData.setVariable("workspaceId", terraformJob.getWorkspaceId());
+        sharedData.setVariable("jobId", terraformJob.getJobId());
+        sharedData.setVariable("stepId", terraformJob.getStepId());
+        sharedData.setVariable("terraformVersion", terraformJob.getTerraformVersion());
+        sharedData.setVariable("source", terraformJob.getSource());
+        sharedData.setVariable("branch", terraformJob.getBranch());
+        sharedData.setVariable("vcsType", terraformJob.getVcsType() != null ? terraformJob.getVcsType() : "");
+        sharedData.setVariable("accessToken", terraformJob.getAccessToken() != null ? terraformJob.getAccessToken() : "");
+
+        if(!terraformJob.getEnvironmentVariables().isEmpty()){
+            terraformJob.getEnvironmentVariables().forEach((key,value)->{
+                sharedData.setVariable(key,value);
+            });
+        }
+
+        if(!terraformJob.getVariables().isEmpty()){
+            terraformJob.getVariables().forEach((key,value)->{
+                sharedData.setVariable(key,value);
+            });
+        }
+
+        sharedData.setVariable("terraformOutput", terraformJob.getTerraformOutput() != null ? terraformJob.getTerraformOutput() : "");
+        sharedData.setVariable("terrakubeClient", terrakubeClient);
+        sharedData.setVariable("terraformOutputJson", terraformJob.getTerraformOutput() != null ? terraformJob.getTerraformOutput() : "");
+
+        sharedData.setVariable("bashToolsDirectory", getBashToolsDirectory(workingDirectory).getAbsolutePath());
+        sharedData.setVariable("terrakubeToolsRepository", getToolsRepository(workingDirectory).getAbsolutePath());
+        return sharedData;
+    }
+
+    private List<URL> getGroovyExtensions(File workingDirectory) {
+
+        Collection<File> groovyClasses = FileUtils.listFiles(getToolsRepository(workingDirectory), new String[]{"groovy"}, true);
+        log.info("Found {} groovy files", groovyClasses.size());
+        return groovyClasses.stream().map(groovyFile -> {
+            try {
+                log.info("Loading Groovy: {}", groovyFile.getName());
+                return groovyFile.toURI().toURL();
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage());
+            }
+            return null;
+        }).collect(Collectors.toList());
+    }
+}

@@ -23,6 +23,16 @@
                         <enabled>true</enabled>
                   </releases>
                 </repository>
+                <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/azbuilder/terraform-spring-boot</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
             </repositories>
         </profile>
     </profiles>
