@@ -1,0 +1,137 @@
+package org.azbuilder.executor.service.scripts.bash;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.azbuilder.executor.service.mode.TerraformJob;
+import org.azbuilder.executor.service.scripts.CommandExecution;
+import org.azbuilder.executor.service.scripts.ScriptEngineService;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class BashEngine implements CommandExecution {
+    private static final String USER_BASH_SCRIPT = "/userScript.sh";
+    private static final String TERRAFORM_DIRECTORY="/.terraform-spring-boot/terraform/";
+
+    private final ExecutorService executor = Executors.newWorkStealingPool();
+
+    @Override
+    public boolean execute(TerraformJob terraformJob, String script, File workingDirectory, Consumer<String> output) {
+        boolean executeSuccess = true;
+        File bashScript = new File(
+                FilenameUtils.separatorsToSystem(
+                        workingDirectory.getAbsolutePath().concat(USER_BASH_SCRIPT)
+                )
+        );
+
+        try {
+            log.info("ScriptPath: {}", bashScript.toURI().toURL());
+            FileUtils.writeStringToFile(bashScript, script, Charset.defaultCharset());
+
+            ProcessLauncher processLauncher = setupBashProcess(terraformJob, workingDirectory, bashScript, output, output);
+            processLauncher.launch().get();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            executeSuccess = false;
+            output.accept(e.getMessage());
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+            executeSuccess = false;
+            output.accept(e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+
+        return executeSuccess;
+    }
+
+    @NotNull
+    private ProcessLauncher setupBashProcess(TerraformJob terraformJob, File workingDirectory, File bashScript, Consumer<String> outputListener, Consumer<String> errorListener) {
+        ProcessLauncher processLauncher = new ProcessLauncher(this.executor, "bash", bashScript.getAbsolutePath());
+        processLauncher.setDirectory(workingDirectory);
+
+        processLauncher.setEnvironmentVariable("bashToolsDirectory", getBashToolsDirectory(workingDirectory).getAbsolutePath());
+        processLauncher.setEnvironmentVariable("terrakubeToolsRepository", getToolsRepository(workingDirectory).getAbsolutePath());
+
+        processLauncher.setEnvironmentVariable("workingDirectory", workingDirectory.getAbsolutePath());
+        processLauncher.setEnvironmentVariable("organizationId", terraformJob.getOrganizationId());
+        processLauncher.setEnvironmentVariable("workspaceId", terraformJob.getWorkspaceId());
+        processLauncher.setEnvironmentVariable("jobId", terraformJob.getJobId());
+        processLauncher.setEnvironmentVariable("stepId", terraformJob.getStepId());
+        processLauncher.setEnvironmentVariable("terraformVersion", terraformJob.getTerraformVersion());
+        processLauncher.setEnvironmentVariable("source", terraformJob.getSource());
+        processLauncher.setEnvironmentVariable("branch", terraformJob.getBranch());
+        processLauncher.setEnvironmentVariable("vcsType", terraformJob.getVcsType() != null ? terraformJob.getVcsType() : "");
+        processLauncher.setEnvironmentVariable("accessToken", terraformJob.getAccessToken() != null ? terraformJob.getAccessToken() : "");
+        processLauncher.setEnvironmentVariable("terraformOutput", terraformJob.getTerraformOutput() != null ? terraformJob.getTerraformOutput() : "");
+        terraformJob.getEnvironmentVariables().forEach((key, value) -> processLauncher.setEnvironmentVariable(key, value));
+        terraformJob.getVariables().forEach((key, value) -> processLauncher.setEnvironmentVariable(key, value));
+        processLauncher.setOrAppendEnvironmentVariable("PATH", workingDirectory.getAbsolutePath() + ScriptEngineService.TOOLS, ":");
+
+        //Adding terraform to the process PATH
+        String bashToolsCompletePath = String.join(
+                ":",
+                loadingBashTools(workingDirectory),
+                FileUtils.getUserDirectoryPath() + TERRAFORM_DIRECTORY + terraformJob.getTerraformVersion()
+        );
+
+        log.info("Job Complete Path {}", bashToolsCompletePath);
+        processLauncher.setOrAppendEnvironmentVariable("PATH", bashToolsCompletePath, ":");
+
+        processLauncher.setOutputListener(outputListener);
+        processLauncher.setErrorListener(errorListener);
+
+        return processLauncher;
+    }
+
+    @NotNull
+    private String loadingBashTools(File workingDirectory) {
+        // Loading Bash scripts from central repository /.terrakube/toolsRepository and adding to the process PATH
+        Collection<File> bashTools = FileUtils.listFiles(getToolsRepository(workingDirectory), new String[]{"sh"}, true);
+        bashTools.stream().forEach(bash -> bash.setExecutable(true));
+
+        String bashToolsCompletePath = bashTools.stream()
+                .map(bash -> bash.getParentFile().getAbsolutePath())
+                .collect(Collectors.joining(":"));
+
+        // Search all external tools inside folder /.terrakube/tools
+        Collection<File> externalTools = FileUtils.listFilesAndDirs(
+                getBashToolsDirectory(workingDirectory),
+                new NotFileFilter(TrueFileFilter.INSTANCE),
+                TrueFileFilter.TRUE
+        );
+
+        // Show folders with tools
+        externalTools.forEach(tool -> log.info("External: {}", tool.getName()));
+
+        // Load to the process PATH
+        String externalToolsCompletePath = externalTools.stream()
+                .map(externalTool -> externalTool.getAbsolutePath())
+                .collect(Collectors.joining(":"));
+
+        bashToolsCompletePath = String.join(":", externalToolsCompletePath, bashToolsCompletePath);
+        return bashToolsCompletePath;
+    }
+
+    @NotNull
+    private File getToolsRepository(File workingDirectory) {
+        return new File(workingDirectory.getAbsolutePath() + ScriptEngineService.TOOLS_REPOSITORY);
+    }
+
+    @NotNull
+    private File getBashToolsDirectory(File workingDirectory) {
+        return new File(workingDirectory.getAbsolutePath() + ScriptEngineService.TOOLS);
+    }
+}

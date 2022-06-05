@@ -65,18 +65,19 @@ mvn clean install
 ```
 
 ## Modules
-This project contains two modules describe below:
+This project contains three modules describe below:
 
-|Name        |Description                                       |
-|:-----------|--------------------------------------------------|
-|api         | Expose the API to manage all terraform workspaces|
-|api-registry| Open source terraform registry compatible with the terrakube API |
+| Name         | Description                                                      |
+|:-------------|------------------------------------------------------------------|
+| api          | Expose the API to manage all terraform workspaces                |
+| api-registry | Open source terraform registry compatible with the terrakube API |
+| executor     | This components run terraform jobs using                         |
 
 ## Security - Authentication
 
 By default, Azure Active Directory protects the API authentication. To better understand Azure Active directory authentication please refer to these links:
 
-* [Azure AD Spring Boot Starter](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/spring/azure-spring-boot-starter-active-directory/README.md)
+* [Azure AD Spring Boot Starter](https://github.com/MicrosoftDocs/azure-dev-docs/blob/main/articles/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-active-directory.md)
 * [OAuth 2.0 authorization code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
 * [Accessing a resource server](https://github.com/Azure-Samples/azure-spring-boot-samples/tree/main/aad/spring-cloud-azure-starter-active-directory/web-client-access-resource-server/aad-resource-server)
 
