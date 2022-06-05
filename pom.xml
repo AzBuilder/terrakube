@@ -29,7 +29,7 @@
 
     <modules>
         <module>api</module>
-        <module>api-registry</module>
+        <module>registry</module>
         <module>executor</module>
         <module>coverage</module>
     </modules>

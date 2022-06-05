@@ -18,7 +18,7 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Build Image with Maven
-      run: mvn -pl "api,api-registry,executor" spring-boot:build-image -B  --file pom.xml -s $GITHUB_WORKSPACE/.github/workflows/maven-settings.xml
+      run: mvn -pl "api,registry,executor" spring-boot:build-image -B  --file pom.xml -s $GITHUB_WORKSPACE/.github/workflows/maven-settings.xml
       env:
         USER_NAME: ${{ secrets.USER_NAME }}
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
