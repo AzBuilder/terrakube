@@ -51,7 +51,7 @@ public class Vcs extends GenericAuditFields {
     @Column(name = "status")
     private VcsStatus status = VcsStatus.PENDING;
 
-    @Exclude
+    @ReadPermission(expression = "read access token")
     @Column(name = "access_token")
     private String accessToken;
 
