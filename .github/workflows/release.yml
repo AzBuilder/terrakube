@@ -28,6 +28,12 @@ jobs:
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+    - name: Add Git to Executor
+      run: docker run --user="root" --entrypoint launcher $(docker images executor -q) "apt-get update && apt-get install git -y"
+
+    - name: Restore default user and entrypoint
+      run: docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER cnb' $(docker ps -lq) executorTemp
     
     - name: Docker tag API Image 
       run: docker tag $(docker images api-server -q) azbuilder/api-server:$VERSION
@@ -54,10 +60,10 @@ jobs:
       run: docker push azbuilder/open-registry:latest
 
     - name: Docker tag EXECUTOR Image
-      run: docker tag $(docker images executor -q) azbuilder/executor:$VERSION
+      run: docker tag $(docker images executorTemp -q) azbuilder/executor:$VERSION
 
     - name: Docker tag EXECUTOR Image latest
-      run: docker tag $(docker images executor -q) azbuilder/executor:latest
+      run: docker tag $(docker images executorTemp -q) azbuilder/executor:latest
 
     - name: Docker Push EXECUTOR latest
       run: docker push azbuilder/executor:$VERSION
