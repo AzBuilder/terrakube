@@ -43,6 +43,7 @@ import { unzip } from "unzipit";
 import "./Module.css";
 import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
 import { Buffer } from "buffer";
+import remarkGfm from "remark-gfm";
 const { DateTime } = require("luxon");
 const { TabPane } = Tabs;
 const { Content } = Layout;
@@ -293,7 +294,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                   </IconContext.Provider>
                   <Tabs className="moduleTabs" defaultActiveKey="1">
                     <TabPane className="markdown-body" tab="Readme" key="1">
-                      <ReactMarkdown>{markdown}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {markdown}
+                      </ReactMarkdown>
                     </TabPane>
                     <TabPane tab="Inputs" key="2">
                       Coming soon
