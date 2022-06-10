@@ -23,7 +23,6 @@ import {
   CloudOutlined,
   ClockCircleOutlined,
   DownloadOutlined,
-  SettingOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
 import { GitlabOutlined, GithubOutlined } from "@ant-design/icons";
@@ -44,6 +43,7 @@ import "./Module.css";
 import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
 import { Buffer } from "buffer";
 import remarkGfm from "remark-gfm";
+const hcl = require("hcl2-parser");
 const { DateTime } = require("luxon");
 const { TabPane } = Tabs;
 const { Content } = Layout;
@@ -56,6 +56,13 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const [vcsProvider, setVCSProvider] = useState("");
   const [loading, setLoading] = useState(false);
   const [markdown, setMarkdown] = useState("loading...");
+  const [hclObject, setHclObject] = useState(null);
+  const [inputs, setInputs] = useState("Inputs");
+  const [loadingInputs, setLoadingInputs] = useState("loading...");
+  const [loadingOutputs, setLoadingOutputs] = useState("loading...");
+  const [loadingResources, setLoadingResources] = useState("loading...");
+  const [outputs, setOutputs] = useState("Outputs");
+  const [resources, setResources] = useState("Resources");
   const history = useHistory();
   const renderLogo = (provider) => {
     switch (provider) {
@@ -79,20 +86,45 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     setMarkdown("loading...");
     setVersion(e.key);
     loadReadme(module.data.attributes.registryPath, e.key);
+    loadModuleDetails(module.data.attributes.registryPath, e.key);
   };
 
   async function readFiles(url) {
     const { entries } = await unzip(url);
-
-    if (entries["README.md"] != null) {
-      const readmeFile = await entries["README.md"].blob();
-
-      if (readmeFile != null) {
-        const text = await readmeFile.text();
-        setMarkdown(text);
+    var hclString = "";
+    for (const [name, entry] of Object.entries(entries)) {
+      if (name.includes(".tf") && !name.includes("/")) {
+        var contentText = await entry.text();
+        hclString += "\n" + contentText;
       }
-    } else {
-      setMarkdown("");
+    }
+
+    const hclResult = hcl.parseToObject(hclString);
+    console.log(hclResult);
+    if (hclResult) {
+      setHclObject(hclResult[0]);
+      if (hclResult[0]?.variable) {
+        setInputs(`Inputs (${Object.keys(hclResult[0]?.variable)?.length})`);
+      } else {
+        setInputs("Inputs");
+        setLoadingInputs("No inputs");
+      }
+
+      if (hclResult[0]?.output) {
+        setOutputs(`Outputs (${Object.keys(hclResult[0]?.output)?.length})`);
+      } else {
+        setOutputs("Outputs");
+        setLoadingOutputs("No outputs");
+      }
+
+      if (hclResult[0]?.resource)
+        setResources(
+          `Resources (${Object.keys(hclResult[0]?.resource)?.length})`
+        );
+      else {
+        setResources("Resources");
+        setLoadingResources("No resources");
+      }
     }
   }
 
@@ -110,6 +142,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       });
   };
 
+  const onChange = (key) => {
+    console.log(key);
+  };
   async function loadReadmeFile(text) {
     if (text != null) {
       const textReadme = Buffer.from(text, "base64").toString();
@@ -126,7 +161,6 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       .get(`organization/${orgid}/module/${id}?include=vcs`)
       .then((response) => {
         console.log(`organization/${orgid}/module/${id}`);
-        console.log(response);
         setModule(response.data);
         setLoading(false);
         setModuleName(response.data.data.attributes.name);
@@ -136,18 +170,31 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         ) {
           setVCSProvider(response.data.included[0].attributes.vcsType);
         }
-
-        setVersion(
-          response.data.data.attributes.versions
-            .sort(compareVersions)
-            .reverse()[0]
-        ); // latest version
-        loadReadme(
+        const latestVersion = response.data.data.attributes.versions
+          .sort(compareVersions)
+          .reverse()[0];
+        setVersion(latestVersion);
+        loadReadme(response.data.data.attributes.registryPath, latestVersion);
+        loadModuleDetails(
           response.data.data.attributes.registryPath,
-          response.data.data.attributes.versions[0]
+          latestVersion
         );
       });
   }, [orgid, id]);
+
+  const loadModuleDetails = async (path, version) => {
+    setLoadingInputs("loading...");
+    setLoadingOutputs("loading...");
+    setLoadingResources("loading...");
+    setHclObject(null);
+    axiosInstance
+      .get(
+        `${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`
+      )
+      .then((resp) => {
+        readFiles(resp.headers["x-terraform-get"]);
+      });
+  };
 
   const loadReadme = (path, version) => {
     axiosInstance
@@ -155,9 +202,6 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         `${window._env_.REACT_APP_REGISTRY_URI}/terraform/readme/v1/${path}/${version}/download`
       )
       .then((resp) => {
-        console.log(resp);
-        console.log("Headers");
-        console.log(resp.headers);
         loadReadmeFile(resp.data.content);
       });
   };
@@ -292,23 +336,148 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       </tr>
                     </table>
                   </IconContext.Provider>
-                  <Tabs className="moduleTabs" defaultActiveKey="1">
+                  <Tabs
+                    className="moduleTabs"
+                    onChange={onChange}
+                    defaultActiveKey="1"
+                  >
                     <TabPane className="markdown-body" tab="Readme" key="1">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {markdown}
                       </ReactMarkdown>
                     </TabPane>
-                    <TabPane tab="Inputs" key="2">
-                      Coming soon
+                    <TabPane tab={inputs} key="2">
+                      {hclObject && hclObject?.variable ? (
+                        <Space direction="vertical">
+                          <h3>Inputs</h3>
+                          <span>
+                            These variables should be set in the module block
+                            when using this module.
+                          </span>
+                          <table
+                            style={{ width: "100%", tableLayout: "fixed" }}
+                          >
+                            <thead className="ant-table-thead">
+                              <tr>
+                                <th style={{ width: "25%" }}>Name</th>
+                                <th style={{ width: "15%" }}>Type</th>
+                                <th style={{ width: "40%" }}>Description</th>
+                                <th style={{ width: "20%" }}>Default</th>
+                              </tr>
+                            </thead>
+                            <tbody className="ant-table-tbody">
+                              {Object.keys(hclObject?.variable).map(
+                                (keyName, i) => (
+                                  <tr key={i}>
+                                    <td
+                                      style={{ width: "10%" }}
+                                      className="ant-table-cell"
+                                    >
+                                      <b>{keyName}</b>
+                                    </td>
+                                    <td className="ant-table-cell">
+                                      <Tag>
+                                        {hclObject?.variable[
+                                          keyName
+                                        ][0]?.type?.replace(/{|}|\$/g, "")}
+                                      </Tag>
+                                    </td>
+                                    <td className="ant-table-cell">
+                                      {JSON.stringify(
+                                        hclObject?.variable[keyName][0]
+                                          ?.description
+                                      )?.replaceAll('"', "")}
+                                    </td>
+
+                                    <td className="ant-table-cell">
+                                      {JSON.stringify(
+                                        hclObject?.variable[keyName][0]?.default
+                                      )}
+                                    </td>
+                                  </tr>
+                                )
+                              )}
+                            </tbody>
+                          </table>
+                        </Space>
+                      ) : (
+                        <p>{loadingInputs}</p>
+                      )}
                     </TabPane>
-                    <TabPane tab="Outputs" key="3">
-                      Coming soon
+                    <TabPane tab={outputs} key="3">
+                      {hclObject && hclObject?.output ? (
+                        <Space direction="vertical">
+                          <h3>Outputs</h3>
+                          <span>
+                            These outputs will be returned by this module.
+                          </span>
+                          <table
+                            style={{ width: "100%", tableLayout: "fixed" }}
+                          >
+                            <thead className="ant-table-thead">
+                              <tr>
+                                <th style={{ width: "30%" }}>Name</th>
+                                <th style={{ width: "70%" }}>Description</th>
+                              </tr>
+                            </thead>
+                            <tbody className="ant-table-tbody">
+                              {Object.keys(hclObject?.output).map(
+                                (keyName, i) => (
+                                  <tr key={i}>
+                                    <td
+                                      style={{ width: "10%" }}
+                                      className="ant-table-cell"
+                                    >
+                                      <b>{keyName}</b>
+                                    </td>
+
+                                    <td className="ant-table-cell">
+                                      {JSON.stringify(
+                                        hclObject?.output[keyName][0]
+                                          ?.description
+                                      )?.replaceAll('"', "")}
+                                    </td>
+                                  </tr>
+                                )
+                              )}
+                            </tbody>
+                          </table>
+                        </Space>
+                      ) : (
+                        <p>{loadingOutputs}</p>
+                      )}
                     </TabPane>
-                    <TabPane tab="Dependencies" key="4">
-                      Coming soon
-                    </TabPane>
-                    <TabPane tab="Resources" key="5">
-                      Coming soon
+                    <TabPane tab={resources} key="5">
+                      {hclObject && hclObject?.resource ? (
+                        <Space direction="vertical">
+                          <h3>Resources</h3>
+                          <span>
+                            This is the list of resources that the module may
+                            create.
+                          </span>
+                          <span>
+                            This module defines{" "}
+                            {Object.keys(hclObject?.resource)?.length}{" "}
+                            resources.
+                          </span>
+                          <ul>
+                            {Object.keys(hclObject?.resource).map(
+                              (resourceType, i) =>
+                                Object.keys(
+                                  hclObject?.resource[resourceType]
+                                ).map((resourceName, j) => (
+                                  <li>
+                                    <Tag>
+                                      {resourceType}.{resourceName}
+                                    </Tag>
+                                  </li>
+                                ))
+                            )}
+                          </ul>
+                        </Space>
+                      ) : (
+                        <p>{loadingResources}</p>
+                      )}
                     </TabPane>
                   </Tabs>
                 </Space>
