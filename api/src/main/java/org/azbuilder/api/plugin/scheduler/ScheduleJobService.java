@@ -2,9 +2,13 @@ package org.azbuilder.api.plugin.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.repository.StepRepository;
 import org.azbuilder.api.rs.job.Job;
+import org.azbuilder.api.rs.job.JobStatus;
+import org.azbuilder.api.rs.job.step.Step;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 
@@ -18,6 +22,8 @@ public class ScheduleJobService {
     public static final String CRON_SCHEDULE = "0 * * ? * *"; //CHECK EVERY MINUTES
 
     Scheduler scheduler;
+
+    StepRepository stepRepository;
 
     public void createJobTrigger(String cronExpression, String triggerId) throws ParseException, SchedulerException {
 
@@ -70,6 +76,18 @@ public class ScheduleJobService {
     public void deleteJobTrigger(String triggerId) throws ParseException, SchedulerException {
         log.info("Delete Schedule Job Trigger {}", triggerId);
         scheduler.deleteJob(new JobKey(PREFIX_JOB + triggerId));
+    }
+
+    @Transactional
+    public void deleteJobContext(int jobId) throws ParseException, SchedulerException {
+        log.info("Delete Job Context {}", jobId);
+        scheduler.deleteJob(new JobKey(PREFIX_JOB_CONTEXT + jobId));
+        for(Step step: stepRepository.findByJobId(jobId)){
+            if(step.getStatus().equals(JobStatus.pending) || step.getStatus().equals(JobStatus.running)){
+                step.setStatus(JobStatus.cancelled);
+                stepRepository.save(step);
+            }
+        }
     }
 
 }

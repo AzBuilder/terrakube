@@ -66,10 +66,11 @@ public class ScheduleJob implements org.quartz.Job {
                 }
                 break;
             case cancelled:
+            case failed:
             case rejected:
                 try {
-                    log.info("Deleting Cancelled/Rejected Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
-                    rejectJob(job.getId());
+                    log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
+                    cancelJobSteps(job.getId());
                     jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
                 } catch (SchedulerException e) {
                     log.error(e.getMessage());
@@ -97,6 +98,11 @@ public class ScheduleJob implements org.quartz.Job {
                 case customScripts:
                     if (executorService.execute(job, stepId, flow.get()))
                         log.info("Executing Job {} Step Id {}", job.getId(), stepId);
+                    else {
+                        log.error("Error when sending context to executor marking job {} as failed", job.getId());
+                        job.setStatus(JobStatus.failed);
+                        jobRepository.save(job);
+                    }
                     break;
                 case approval:
                     job.setStatus(JobStatus.waitingApproval);
@@ -128,9 +134,9 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
-    private void rejectJob(int jobId){
+    private void cancelJobSteps(int jobId){
         for(Step step: stepRepository.findByJobId(jobId)){
-            if(step.getStatus().equals(JobStatus.pending)){
+            if(step.getStatus().equals(JobStatus.pending) || step.getStatus().equals(JobStatus.running)){
                 step.setStatus(JobStatus.cancelled);
                 stepRepository.save(step);
             }
