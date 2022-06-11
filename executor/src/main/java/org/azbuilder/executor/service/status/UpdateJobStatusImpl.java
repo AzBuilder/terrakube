@@ -43,13 +43,26 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     public void setCompletedStatus(boolean successful, TerraformJob terraformJob, String jobOutput, String jobErrorOutput, String jobPlan) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
             updateStepStatus(terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput);
-            updateJobStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput, jobPlan);
+            if(!isJobCancelled(terraformJob))
+                updateJobStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput, jobPlan);
+        }
+    }
+
+    private boolean isJobCancelled(TerraformJob terraformJob){
+        Job job = terrakubeClient.getJobById(terraformJob.getOrganizationId(), terraformJob.getJobId()).getData();
+        if(job.getAttributes().getStatus().equals("cancelled")) {
+            log.warn("Job {} was cancelled when running executor", terraformJob.getJobId());
+            return true;
+        }
+        else {
+            log.info("Job {} is still active", terraformJob.getJobId());
+            return false;
         }
     }
 
     private void updateJobStatus(boolean successful, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput, String jobPlan) {
         Job job = terrakubeClient.getJobById(organizationId, jobId).getData();
-        job.getAttributes().setStatus(successful ? "pending" : "completed");
+        job.getAttributes().setStatus(successful ? "pending" : "failed");
 
         log.info("output: {}", jobOutput.length());
         log.info("outputError: {}", jobErrorOutput.length());

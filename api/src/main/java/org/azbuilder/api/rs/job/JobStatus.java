@@ -9,5 +9,6 @@ public enum JobStatus {
     completed,
 
     rejected,
-    cancelled
+    cancelled,
+    failed
 }
