@@ -9,7 +9,7 @@ import org.azbuilder.executor.service.executor.ExecutorJobResult;
 import org.azbuilder.executor.service.mode.TerraformJob;
 import org.azbuilder.executor.service.scripts.ScriptEngineService;
 import org.jetbrains.annotations.NotNull;
-import org.azbuilder.terraform.TerraformClient;
+import org.terrakube.terraform.TerraformClient;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
