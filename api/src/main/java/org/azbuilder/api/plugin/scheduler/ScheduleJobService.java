@@ -72,4 +72,9 @@ public class ScheduleJobService {
         scheduler.deleteJob(new JobKey(PREFIX_JOB + triggerId));
     }
 
+    public void deleteJobContext(int jobId) throws ParseException, SchedulerException {
+        log.info("Delete Job Context {}", jobId);
+        scheduler.deleteJob(new JobKey(PREFIX_JOB_CONTEXT + jobId));
+    }
+
 }

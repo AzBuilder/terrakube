@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.plugin.scheduler.ScheduleJobService;
 import org.azbuilder.api.rs.job.Job;
+import org.azbuilder.api.rs.job.JobStatus;
 import org.quartz.SchedulerException;
 
 import java.text.ParseException;
@@ -23,10 +24,17 @@ public class JobManageHook implements LifeCycleHook<Job> {
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase transactionPhase, Job job, RequestScope requestScope, Optional<ChangeSpec> optional) {
         log.info("JobCreateHook {}", job.getId());
         try {
-            if(operation.equals(LifeCycleHookBinding.Operation.CREATE)) {
-                scheduleJobService.createJobContext(job);
-            }else {
-                log.info("Not supported {}", operation);
+            switch (operation){
+                case CREATE:
+                    scheduleJobService.createJobContext(job);
+                    break;
+                case UPDATE:
+                    if(job.getStatus().equals(JobStatus.cancelled))
+                        scheduleJobService.deleteJobContext(job.getId());
+                    break;
+                default:
+                    log.info("Not supported {}", operation);
+                    break;
             }
 
         } catch (ParseException | SchedulerException e) {
