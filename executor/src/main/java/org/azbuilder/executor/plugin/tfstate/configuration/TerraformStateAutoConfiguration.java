@@ -15,7 +15,6 @@ import com.google.cloud.storage.StorageOptions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.api.client.TerrakubeClient;
-import org.azbuilder.executor.plugin.tfoutput.gcp.GcpTerraformOutputImpl;
 import org.azbuilder.executor.plugin.tfstate.TerraformState;
 import org.azbuilder.executor.plugin.tfstate.TerraformStatePathService;
 import org.azbuilder.executor.plugin.tfstate.aws.AwsTerraformStateImpl;
@@ -92,7 +91,7 @@ public class TerraformStateAutoConfiguration {
                             .terraformStatePathService(terraformStatePathService)
                             .build();
                     break;
-                case GcpTerraformStateIml:
+                case GcpTerraformStateImpl:
                     try {
                         Credentials gcpCredentials = GoogleCredentials.fromStream(new ByteArrayInputStream(
                                                 Base64.getDecoder().decode(gcpTerraformStateProperties.getCredentials()))

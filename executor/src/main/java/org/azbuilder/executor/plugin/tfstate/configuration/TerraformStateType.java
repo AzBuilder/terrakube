@@ -4,6 +4,6 @@ public enum TerraformStateType {
     AzureTerraformStateImpl,
     AwsTerraformStateImpl,
 
-    GcpTerraformStateIml,
+    GcpTerraformStateImpl,
     LocalTerraformStateImpl
 }
