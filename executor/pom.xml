@@ -29,6 +29,7 @@
 		<jcolor.version>5.2.0</jcolor.version>
 		<aws-sdk.version>1.12.204</aws-sdk.version>
 		<google-storage.version>1.17.0</google-storage.version>
+		<slf4j.version>1.7.36</slf4j.version>
 	</properties>
 
 	<dependencies>
@@ -134,12 +135,12 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.5</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.5</version>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 	</dependencies>
 

@@ -14,6 +14,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.azbuilder.api.client.TerrakubeClient;
 import org.azbuilder.executor.plugin.tfstate.TerraformState;
 import org.azbuilder.executor.plugin.tfstate.TerraformStatePathService;
@@ -31,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @AllArgsConstructor
@@ -93,9 +94,12 @@ public class TerraformStateAutoConfiguration {
                     break;
                 case GcpTerraformStateImpl:
                     try {
-                        Credentials gcpCredentials = GoogleCredentials.fromStream(new ByteArrayInputStream(
-                                                Base64.getDecoder().decode(gcpTerraformStateProperties.getCredentials()))
-                                );
+                        log.info("GCP Credentials Base64 {} length", gcpTerraformStateProperties.getCredentials().length());
+                        Credentials gcpCredentials = GoogleCredentials.fromStream(
+                                new ByteArrayInputStream(
+                                        Base64.decodeBase64(gcpTerraformStateProperties.getCredentials())
+                                )
+                        );
                         Storage gcpStorage = StorageOptions.newBuilder()
                                 .setCredentials(gcpCredentials)
                                 .setProjectId(gcpTerraformStateProperties.getProjectId())

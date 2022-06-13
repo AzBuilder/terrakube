@@ -1,7 +1,5 @@
 package org.azbuilder.executor.plugin.tfstate.gcp;
 
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -9,6 +7,7 @@ import com.google.cloud.storage.Storage;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -25,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +63,7 @@ public class GcpTerraformStateImpl implements TerraformState {
             TextStringBuilder gcpBackendHcl = new TextStringBuilder();
             gcpBackendHcl.appendln("bucket      = \"" + bucketName + "\"");
             gcpBackendHcl.appendln("prefix      = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
-            gcpBackendHcl.appendln("credentials = \"${file(\"" + GCP_CREDENTIALS_FILE + "\")}\"");
+            gcpBackendHcl.appendln("credentials = \"" + GCP_CREDENTIALS_FILE + "\"");
 
             File gcpBackendCredentials = new File(
                     FilenameUtils.separatorsToSystem(
@@ -77,7 +76,7 @@ public class GcpTerraformStateImpl implements TerraformState {
                             workingDirectory.getAbsolutePath().concat("/").concat(BACKEND_FILE_NAME)
                     )
             );
-            FileUtils.writeStringToFile(gcpBackendCredentials, Base64.getDecoder().decode(credentials.getBytes()).toString(), Charset.defaultCharset());
+            FileUtils.writeStringToFile(gcpBackendCredentials, new String(Base64.decodeBase64(credentials), StandardCharsets.UTF_8), Charset.defaultCharset());
             FileUtils.writeStringToFile(gcpBackendFile, gcpBackendHcl.toString(), Charset.defaultCharset());
 
             File gcpBackendMainTf = new File(
@@ -107,8 +106,8 @@ public class GcpTerraformStateImpl implements TerraformState {
             try {
                 BlobId blobId = BlobId.of(bucketName, blobKey);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-                Blob blob = storage.create(blobInfo, FileUtils.readFileToByteArray(tfPlanContent));
-                url = blob.getMediaLink();
+                storage.create(blobInfo, FileUtils.readFileToByteArray(tfPlanContent));
+                url = String.format("https://storage.cloud.google.com/%s/%s", bucketName, blobKey);
                 log.info("File URL {}", url);
             } catch (IOException e) {
                 log.error(e.getMessage());
@@ -127,11 +126,11 @@ public class GcpTerraformStateImpl implements TerraformState {
                 .ifPresent(stateUrl -> {
                     try {
                         log.info("Downloading state from {}:", stateUrl);
-
-                        log.info("Generating pre-signed URL. {}", new URL(stateUrl).getPath().replace("/" + bucketName, bucketName));
+                        String buketNamePath = String.format("/%s/",bucketName);
+                        log.info("Generating pre-signed URL. {}", new URL(stateUrl).getPath().replace(buketNamePath, ""));
 
                         // Define resource
-                        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, new URL(stateUrl).getPath().replace("/" + bucketName, bucketName))).build();
+                        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, new URL(stateUrl).getPath().replace(buketNamePath, ""))).build();
 
                         URL signedUrl = storage.signUrl(blobInfo, 5, TimeUnit.MINUTES);
 
