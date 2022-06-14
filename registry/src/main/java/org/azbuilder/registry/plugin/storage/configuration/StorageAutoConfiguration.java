@@ -84,8 +84,6 @@ public class StorageAutoConfiguration {
                         .build();
                 break;
             case GcpStorageImpl:
-                break;
-            case Local:
                 Credentials gcpCredentials = null;
                 try {
                     gcpCredentials = GoogleCredentials
@@ -109,6 +107,9 @@ public class StorageAutoConfiguration {
                     throw new RuntimeException(e);
                 }
 
+                break;
+            case Local:
+                storageService = new LocalStorageServiceImpl();
                 break;
             default:
                 storageService = null;
