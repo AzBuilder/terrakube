@@ -1,0 +1,5 @@
+{
+    "git.ignoreLimitWarning": true,
+    "appService.defaultWebAppToDeploy": "/subscriptions/cd779444-43c9-4d89-a61b-92777b14d764/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/azbuilder-ui",
+    "appService.deploySubpath": "."
+}
