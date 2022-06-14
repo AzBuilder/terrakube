@@ -8,6 +8,10 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.registry.configuration.OpenRegistryProperties;
 import org.azbuilder.registry.plugin.storage.StorageService;
@@ -15,6 +19,8 @@ import org.azbuilder.registry.plugin.storage.aws.AwsStorageServiceImpl;
 import org.azbuilder.registry.plugin.storage.aws.AwsStorageServiceProperties;
 import org.azbuilder.registry.plugin.storage.azure.AzureStorageServiceImpl;
 import org.azbuilder.registry.plugin.storage.azure.AzureStorageServiceProperties;
+import org.azbuilder.registry.plugin.storage.gcp.GcpStorageServiceImpl;
+import org.azbuilder.registry.plugin.storage.gcp.GcpStorageServiceProperties;
 import org.azbuilder.registry.plugin.storage.local.LocalStorageServiceImpl;
 import org.azbuilder.registry.service.git.GitServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -22,18 +28,24 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Base64;
+
 @Configuration
 @EnableConfigurationProperties({
         AzureStorageServiceProperties.class,
         StorageProperties.class,
-        OpenRegistryProperties.class
+        OpenRegistryProperties.class,
+        AwsStorageServiceProperties.class,
+        GcpStorageServiceProperties.class
 })
 @ConditionalOnMissingBean(StorageService.class)
 @Slf4j
 public class StorageAutoConfiguration {
 
     @Bean
-    public StorageService terraformOutput(OpenRegistryProperties openRegistryProperties, StorageProperties storageProperties, AzureStorageServiceProperties azureStorageServiceProperties, AwsStorageServiceProperties awsStorageServiceProperties) {
+    public StorageService terraformOutput(OpenRegistryProperties openRegistryProperties, StorageProperties storageProperties, AzureStorageServiceProperties azureStorageServiceProperties, AwsStorageServiceProperties awsStorageServiceProperties, GcpStorageServiceProperties gcpStorageServiceProperties) {
         StorageService storageService = null;
         log.info("StorageType={}", storageProperties.getType());
         switch (storageProperties.getType()) {
@@ -71,8 +83,32 @@ public class StorageAutoConfiguration {
                         .registryHostname(openRegistryProperties.getHostname())
                         .build();
                 break;
+            case GcpStorageImpl:
+                break;
             case Local:
-                storageService = new LocalStorageServiceImpl();
+                Credentials gcpCredentials = null;
+                try {
+                    gcpCredentials = GoogleCredentials
+                            .fromStream(
+                                    new ByteArrayInputStream(
+                                            Base64.getDecoder().decode(gcpStorageServiceProperties.getCredentials()))
+                            );
+                    Storage gcpStorage = StorageOptions.newBuilder()
+                            .setCredentials(gcpCredentials)
+                            .setProjectId(gcpStorageServiceProperties.getProjectId())
+                            .build()
+                            .getService();
+
+                    storageService = GcpStorageServiceImpl.builder()
+                            .bucketName(gcpStorageServiceProperties.getBucketName())
+                            .storage(gcpStorage)
+                            .gitService(new GitServiceImpl())
+                            .registryHostname(openRegistryProperties.getHostname())
+                            .build();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
                 break;
             default:
                 storageService = null;

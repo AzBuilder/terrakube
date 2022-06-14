@@ -1,18 +1,51 @@
 package org.azbuilder.api.plugin.storage.gcp;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.azbuilder.api.plugin.storage.StorageTypeService;
 
-@Component
-@Getter
-@Setter
-@PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
-@PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
-@ConfigurationProperties(prefix = "org.terrakube.storage.gcp")
-public class GcpStorageTypeServiceImpl {
+@Slf4j
+@Builder
+public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
-    private String projectId;
+    private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
+    private static final String GCP_LOCATION_OUTPUT = "tfoutput/%s/%s/%s.tfoutput";
+    private static final String GCP_STATE_LOCATION  = "tfstate/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
+    private static final String GCP_STATE_JSON      = "tfstate/%s/%s/state/%s.json";
+    private static final String GCP_ERROR_LOG = "File Not found: {}";
+
+    @NonNull
+    private String bucketName;
+    @NonNull
+    private Storage storage;
+
+    @Override
+    public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
+        return storage.get(
+                BlobId.of(
+                        bucketName,
+                        String.format(GCP_LOCATION_OUTPUT, organizationId, jobId, stepId)))
+                .getContent();
+    }
+
+    @Override
+    public byte[] getTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId) {
+        return storage.get(
+                BlobId.of(
+                        bucketName,
+                        String.format(GCP_STATE_LOCATION, organizationId, workspaceId, jobId, stepId)))
+                .getContent();
+    }
+
+    @Override
+    public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
+        return storage.get(
+                BlobId.of(
+                        bucketName,
+                        String.format(GCP_STATE_JSON, organizationId, workspaceId, stateFileName)))
+                .getContent();
+    }
 }

@@ -1,4 +1,4 @@
-package org.azbuilder.api.plugin.storage.gcp;
+package org.azbuilder.registry.plugin.storage.gcp;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,12 +11,9 @@ import org.springframework.stereotype.Component;
 @Setter
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
-@ConfigurationProperties(prefix = "org.terrakube.storage.gcp")
-public class GcpStorageTypeProperties {
-
+@ConfigurationProperties(prefix = "org.terrakube.registry.plugin.storage.gcp")
+public class GcpStorageServiceProperties {
     private String credentials;
-
     private String bucketName;
-
     private String projectId;
 }
