@@ -104,7 +104,7 @@ public class StorageAutoConfiguration {
                             .registryHostname(openRegistryProperties.getHostname())
                             .build();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    log.error(e.getMessage());
                 }
 
                 break;

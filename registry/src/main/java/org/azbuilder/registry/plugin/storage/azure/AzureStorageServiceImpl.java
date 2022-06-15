@@ -52,7 +52,7 @@ public class AzureStorageServiceImpl implements StorageService {
 
             try {
                 FileUtils.cleanDirectory(gitCloneDirectory);
-                if (moduleZip.delete()) log.info("Successfully delete folder");
+                if (FileUtils.deleteQuietly(moduleZip)) log.info("Successfully delete folder");
             } catch (IOException e) {
                 log.error(e.getMessage());
             }

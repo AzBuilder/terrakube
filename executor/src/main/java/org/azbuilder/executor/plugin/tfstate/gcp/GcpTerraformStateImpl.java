@@ -99,7 +99,7 @@ public class GcpTerraformStateImpl implements TerraformState {
         String blobKey = String.format("tfstate/%s/%s/%s/%s/%s", organizationId, workspaceId, jobId, stepId, TERRAFORM_PLAN_FILE);
         log.info("terraformGcpStateFile: {}", blobKey);
 
-        File tfPlanContent = new File(workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE);
+        File tfPlanContent = new File(FilenameUtils.concat(workingDirectory.getAbsolutePath(), TERRAFORM_PLAN_FILE));
         log.info("terraformGcpStateFile Path: {} {}", workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE, tfPlanContent.exists());
         if (tfPlanContent.exists()) {
             String url = null;
@@ -138,7 +138,7 @@ public class GcpTerraformStateImpl implements TerraformState {
 
                         FileUtils.copyURLToFile(
                                 signedUrl,
-                                new File(workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE),
+                                new File(FilenameUtils.concat(workingDirectory.getAbsolutePath() , TERRAFORM_PLAN_FILE)),
                                 30000,
                                 30000);
                         planGcExist.set(true);

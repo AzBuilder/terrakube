@@ -1,8 +1,5 @@
 package org.azbuilder.registry.plugin.storage.gcp;
 
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.google.cloud.storage.BlobInfo;
 import lombok.Builder;
 import lombok.NonNull;
@@ -15,16 +12,15 @@ import org.azbuilder.registry.service.git.GitService;
 import org.zeroturnaround.zip.ZipUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 @Slf4j
 @Builder
 public class GcpStorageServiceImpl implements StorageService {
 
-    private static String GCP_ZIP_MODULE_LOCATION = "registry/%s/%s/%s/%s/module.zip";
-    private static String GCP_DOWNLOAD_MODULE_LOCATION = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
-    private static final String GCP_ERROR_LOG = "S3 Not found: {}";
+    private static String gcpZipModuleLocation = "registry/%s/%s/%s/%s/module.zip";
+    private static String gcpDownloadModuleLocation = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
+    private static final String gcpErrorLog = "S3 Not found: {}";
 
     @NonNull
     String registryHostname;
@@ -38,10 +34,10 @@ public class GcpStorageServiceImpl implements StorageService {
 
     @Override
     public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
-        String blobKey = String.format(GCP_ZIP_MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion);
+        String blobKey = String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion);
         BlobId blobId = BlobId.of(
                 bucketName,
-                String.format(GCP_ZIP_MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion)
+                String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion)
         );
         log.info("Checking GCP Object exist {}", blobKey);
 
@@ -52,17 +48,18 @@ public class GcpStorageServiceImpl implements StorageService {
                 ZipUtil.pack(gitCloneDirectory, moduleZip);
 
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-                storage.create(blobInfo, new FileInputStream(moduleZip).readAllBytes());
+                storage.create(blobInfo, FileUtils.readFileToByteArray(moduleZip));
+
                 log.info("File uploaded to bucket {} as {}", bucketName, blobKey);
 
                 FileUtils.cleanDirectory(gitCloneDirectory);
-                if (moduleZip.delete()) log.info("Successfully delete folder");
+                if (FileUtils.deleteQuietly(moduleZip)) log.info("Successfully delete folder for gcp module");
             } catch (IOException e) {
                 log.error(e.getMessage());
             }
         }
 
-        return String.format(GCP_DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName, providerName, moduleVersion);
+        return String.format(gcpDownloadModuleLocation, registryHostname, organizationName, moduleName, providerName, moduleVersion);
     }
 
     @Override
@@ -72,7 +69,7 @@ public class GcpStorageServiceImpl implements StorageService {
         data = storage.get(
                         BlobId.of(
                                 bucketName,
-                                String.format(GCP_ZIP_MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion)))
+                                String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion)))
                 .getContent();
         return data;
     }
