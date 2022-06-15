@@ -94,7 +94,7 @@ public class StorageTypeAutoConfiguration {
                             .bucketName(gcpStorageTypeProperties.getBucketName())
                             .build();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                   log.error(e.getMessage());
                 }
 
                 break;
