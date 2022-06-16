@@ -24,6 +24,7 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
+        log.info("getStepOutput {}", String.format(GCP_LOCATION_OUTPUT, organizationId, jobId, stepId));
         return storage.get(
                 BlobId.of(
                         bucketName,
@@ -33,6 +34,7 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId) {
+        log.info("getTerraformPlan {}", String.format(GCP_STATE_LOCATION, organizationId, workspaceId, jobId, stepId));
         return storage.get(
                 BlobId.of(
                         bucketName,
@@ -42,6 +44,7 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
+        log.info("getTerraformStateJson {}", String.format(GCP_STATE_JSON, organizationId, workspaceId, stateFileName));
         return storage.get(
                 BlobId.of(
                         bucketName,

@@ -86,6 +86,10 @@ public class StorageAutoConfiguration {
             case GcpStorageImpl:
                 Credentials gcpCredentials = null;
                 try {
+                    log.info("Credentials Lenght: {}", gcpStorageServiceProperties.getCredentials().length());
+                    log.info("GCP Project: {}", gcpStorageServiceProperties.getProjectId());
+                    log.info("GCP Bucket: {}", gcpStorageServiceProperties.getBucketName());
+
                     gcpCredentials = GoogleCredentials
                             .fromStream(
                                     new ByteArrayInputStream(
@@ -97,6 +101,7 @@ public class StorageAutoConfiguration {
                             .build()
                             .getService();
 
+                    log.info("GCP Storage null: {}", gcpStorage == null);
                     storageService = GcpStorageServiceImpl.builder()
                             .bucketName(gcpStorageServiceProperties.getBucketName())
                             .storage(gcpStorage)

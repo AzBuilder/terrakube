@@ -23,25 +23,25 @@ public class GcpStorageServiceImpl implements StorageService {
     private static final String gcpErrorLog = "S3 Not found: {}";
 
     @NonNull
-    String registryHostname;
+    private String registryHostname;
     @NonNull
     private String bucketName;
     @NonNull
     private Storage storage;
 
     @NonNull
-    GitService gitService;
+    private GitService gitService;
 
     @Override
     public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
         String blobKey = String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion);
+        log.info("Searching module: {}", blobKey);
         BlobId blobId = BlobId.of(
                 bucketName,
                 String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion)
         );
         log.info("Checking GCP Object exist {}", blobKey);
-
-        if (!storage.get(blobId).exists()) {
+        if (storage.get(blobId) == null) {
             try {
                 File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken);
                 File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
