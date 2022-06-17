@@ -27,6 +27,7 @@
 		<groovy.version>3.0.8</groovy.version>
 		<aws-sdk.version>1.12.204</aws-sdk.version>
 		<zt-zip.version>1.14</zt-zip.version>
+		<gcp-libraries-bom.version>25.4.0</gcp-libraries-bom.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
@@ -92,6 +93,10 @@
 			<version>${mockserver-spring-test-listener.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-storage</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 			<version>${rest-assured.version}</version>
@@ -123,6 +128,13 @@
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-bom</artifactId>
 				<version>${aws-sdk.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.cloud</groupId>
+				<artifactId>libraries-bom</artifactId>
+				<version>${gcp-libraries-bom.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

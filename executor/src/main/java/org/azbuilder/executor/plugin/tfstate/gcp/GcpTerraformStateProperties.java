@@ -1,4 +1,4 @@
-package org.azbuilder.registry.plugin.storage.azure;
+package org.azbuilder.executor.plugin.tfstate.gcp;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +11,12 @@ import org.springframework.stereotype.Component;
 @Setter
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
-@ConfigurationProperties(prefix = "org.azbuilder.registry.plugin.storage.azure")
-public class AzureStorageServiceProperties {
+@ConfigurationProperties(prefix = "org.terrakube.executor.plugin.tfstate.gcp")
+public class GcpTerraformStateProperties {
 
-    private String accountName;
-    private String accountKey;
+    private String credentials;
+
+    private String bucketName;
+
+    private String projectId;
 }
