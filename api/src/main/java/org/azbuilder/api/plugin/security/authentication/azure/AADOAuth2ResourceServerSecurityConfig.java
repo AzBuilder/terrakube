@@ -31,6 +31,7 @@ public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebS
         //http.authorizeRequests(requests -> requests.anyRequest().authenticated());
         http.cors().and().authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/callback/v1/**").permitAll()
                 .antMatchers("/doc").permitAll()
                 .and()
