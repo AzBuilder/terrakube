@@ -28,6 +28,9 @@
 		<ivy.version>2.5.0</ivy.version>
 		<jcolor.version>5.2.0</jcolor.version>
 		<aws-sdk.version>1.12.204</aws-sdk.version>
+		<google-storage.version>1.17.0</google-storage.version>
+		<slf4j.version>1.7.36</slf4j.version>
+		<gcp-libraries-bom.version>25.4.0</gcp-libraries-bom.version>
 	</properties>
 
 	<dependencies>
@@ -126,9 +129,23 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-storage</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -138,6 +155,13 @@
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-bom</artifactId>
 				<version>${aws-sdk.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.cloud</groupId>
+				<artifactId>libraries-bom</artifactId>
+				<version>${gcp-libraries-bom.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

@@ -8,27 +8,41 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import lombok.extern.slf4j.Slf4j;
 import org.azbuilder.executor.plugin.tfoutput.TerraformOutput;
 import org.azbuilder.executor.plugin.tfoutput.TerraformOutputPathService;
 import org.azbuilder.executor.plugin.tfoutput.aws.AwsTerraformOutputImpl;
 import org.azbuilder.executor.plugin.tfoutput.aws.AwsTerraformOutputProperties;
 import org.azbuilder.executor.plugin.tfoutput.azure.AzureTerraformOutputImpl;
 import org.azbuilder.executor.plugin.tfoutput.azure.AzureTerraformOutputProperties;
+import org.azbuilder.executor.plugin.tfoutput.gcp.GcpTerraformOutputImpl;
+import org.azbuilder.executor.plugin.tfoutput.gcp.GcpTerraformOutputProperties;
 import org.azbuilder.executor.plugin.tfoutput.local.LocalTerraformOutputImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Base64;
+
+@Slf4j
 @Configuration
 @EnableConfigurationProperties({
-        AzureTerraformOutputProperties.class
+        AzureTerraformOutputProperties.class,
+        AwsTerraformOutputProperties.class,
+        GcpTerraformOutputProperties.class
 })
 @ConditionalOnMissingBean(TerraformOutput.class)
 public class TerraformOutputAutoConfiguration {
 
     @Bean
-    public TerraformOutput terraformOutput(TerraformOutputProperties terraformOutputProperties, AzureTerraformOutputProperties azureTerraformOutputProperties, AwsTerraformOutputProperties awsTerraformOutputProperties, TerraformOutputPathService terraformOutputPathService) {
+    public TerraformOutput terraformOutput(TerraformOutputProperties terraformOutputProperties, AzureTerraformOutputProperties azureTerraformOutputProperties, AwsTerraformOutputProperties awsTerraformOutputProperties, GcpTerraformOutputProperties gcpTerraformOutputProperties, TerraformOutputPathService terraformOutputPathService) {
         TerraformOutput terraformOutput = null;
 
         if (terraformOutputProperties != null)
@@ -63,6 +77,28 @@ public class TerraformOutputAutoConfiguration {
                             .bucketName(awsTerraformOutputProperties.getBucketName())
                             .terraformOutputPathService(terraformOutputPathService)
                             .build();
+                    break;
+                case GcpTerraformOutputImpl:
+                    try {
+                        Credentials gcpCredentials = GoogleCredentials
+                                .fromStream(
+                                        new ByteArrayInputStream(
+                                                Base64.getDecoder().decode(gcpTerraformOutputProperties.getCredentials()))
+                                );
+                        Storage gcpStorage = StorageOptions.newBuilder()
+                                .setCredentials(gcpCredentials)
+                                .setProjectId(gcpTerraformOutputProperties.getProjectId())
+                                .build()
+                                .getService();
+
+                        terraformOutput = GcpTerraformOutputImpl.builder()
+                                .terraformOutputPathService(terraformOutputPathService)
+                                .bucketName(gcpTerraformOutputProperties.getBucketName())
+                                .storage(gcpStorage)
+                                .build();
+                    } catch (IOException e) {
+                        log.error(e.getMessage());
+                    }
                     break;
                 default:
                     terraformOutput = new LocalTerraformOutputImpl();

@@ -1,20 +1,22 @@
 package org.azbuilder.api.plugin.storage.gcp;
 
-import org.azbuilder.api.plugin.storage.StorageTypeService;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
-public class GcpStorageTypeProperties implements StorageTypeService {
-    @Override
-    public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
-        return new byte[0];
-    }
+@Component
+@Getter
+@Setter
+@PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
+@ConfigurationProperties(prefix = "org.terrakube.storage.gcp")
+public class GcpStorageTypeProperties {
 
-    @Override
-    public byte[] getTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId) {
-        return new byte[0];
-    }
+    private String credentials;
 
-    @Override
-    public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
-        return new byte[0];
-    }
+    private String bucketName;
+
+    private String projectId;
 }
