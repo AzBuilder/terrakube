@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.azbuilder.api</groupId>
-        <artifactId>api-solution</artifactId>
+        <groupId>org.terrakube</groupId>
+        <artifactId>terrakube-platform</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>org.azbuilder.api</groupId>
+    <groupId>org.terrakube.coverage</groupId>
     <artifactId>coverage</artifactId>
     <version>${revision}</version>
     <name>Terrakube Code Coverage</name>
@@ -20,13 +20,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.azbuilder.api</groupId>
+            <groupId>org.terrakube.api</groupId>
             <artifactId>api-server</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>org.azbuilder.registry</groupId>
+            <groupId>org.terrakube.registry</groupId>
             <artifactId>open-registry</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.terrakube.executor</groupId>
+            <artifactId>executor</artifactId>
             <version>${revision}</version>
         </dependency>
     </dependencies>
@@ -39,8 +44,8 @@
                 <configuration>
                     <excludes>
                         <exclude>**/azure/*</exclude>
-                        <exclude>org/azbuilder/api/**/*Properties.*</exclude>
-                        <exclude>org/azbuilder/rs/*</exclude>
+                        <exclude>org/terrakube/api/**/*Properties.*</exclude>
+                        <exclude>org/terrakube/rs/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

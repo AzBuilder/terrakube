@@ -3,16 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
     <parent>
-		<groupId>org.azbuilder.api</groupId>
-		<artifactId>api-solution</artifactId>
+		<groupId>org.terrakube</groupId>
+		<artifactId>terrakube-platform</artifactId>
 		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>org.azbuilder.registry</groupId>
+	<groupId>org.terrakube.registry</groupId>
 	<artifactId>open-registry</artifactId>
 	<version>${revision}</version>
 	<name>Terrakube Terraform Registry</name>
-	<description>Open Source Terraform Registry for AZB Server</description>
+	<description>Open Source Terraform Registry for Terrakube</description>
 	<properties>
 		<azure.version>3.13.1</azure.version>
 		<java.version>11</java.version>

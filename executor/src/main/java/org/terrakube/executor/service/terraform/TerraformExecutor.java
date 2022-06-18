@@ -1,0 +1,18 @@
+package org.terrakube.executor.service.terraform;
+
+import org.terrakube.executor.service.executor.ExecutorJobResult;
+import org.terrakube.executor.service.mode.TerraformJob;
+
+import java.io.File;
+
+public interface TerraformExecutor {
+
+    ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory);
+
+    ExecutorJobResult apply(TerraformJob terraformJob, File workingDirectory);
+
+    ExecutorJobResult destroy(TerraformJob terraformJob, File workingDirectory);
+
+    String version();
+
+}

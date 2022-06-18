@@ -9,8 +9,8 @@
         <version>2.6.8</version>
     </parent>
 
-    <groupId>org.azbuilder.api</groupId>
-    <artifactId>api-solution</artifactId>
+    <groupId>org.terrakube</groupId>
+    <artifactId>terrakube-platform</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
