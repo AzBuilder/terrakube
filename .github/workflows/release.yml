@@ -70,3 +70,15 @@ jobs:
 
     - name: Docker Push EXECUTOR latest
       run: docker push azbuilder/executor:latest
+      
+    - name: Docker tag UI Image 
+      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:$VERSION
+
+    - name: Docker tag UI Image latest
+      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:latest
+
+    - name: Docker Push UI Version
+      run: docker push azbuilder/terrakube-ui:$VERSION
+
+    - name: Docker Push UI Latest
+      run: docker push azbuilder/terrakube-ui:latest
