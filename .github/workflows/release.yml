@@ -22,6 +22,26 @@ jobs:
       env:
         USER_NAME: ${{ secrets.USER_NAME }}
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        
+    - name: Use Node.js 
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+        cache: 'npm'
+    
+    - run: yarn install --frozen-lockfile
+      working-directory: ./ui
+      
+    - run: npm run build --if-present
+      working-directory: ./ui
+      env:
+         CI: false
+    
+    - name: docker build ui
+      working-directory: ./ui
+      run: |
+        docker build -t terrakube-ui:latest  . 
+        
     - name: docker login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
