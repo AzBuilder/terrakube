@@ -17,11 +17,15 @@ The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expo
 Component descriptions:
 * **Terrakube API**:
 Expose a JSON:API or GraphQL API providing endpoints to handle:
-  - Organizations.
+  - Organizations
   - Workspaces
-  - Jobs.
+  - Jobs
   - Modules
   - Providers
+  - Variables
+  - Global Variables
+  - Workspace Schedules
+  - State History
 * **Terrakube Executor**:
   - Service that executes the terraform operations, updates the status using the Terrakube API and save the results using different cloud storage providers.
 * **Terrakube Registry**:
@@ -72,6 +76,7 @@ This project contains three modules describe below:
 | api      | Expose the API to manage all terraform workspaces                |
 | registry | Open source terraform registry compatible with the terrakube API |
 | executor | This components run terraform jobs and use Terrakube extensions  |
+| ui       | React JS terrakube front end                                     |
 
 ## Security - Authentication
 
