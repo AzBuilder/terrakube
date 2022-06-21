@@ -28,6 +28,7 @@ jobs:
       with:
         node-version: 16
         cache: 'npm'
+        cache-dependency-path: ui/package.json
     
     - run: yarn install --frozen-lockfile
       working-directory: ./ui
