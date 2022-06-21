@@ -2,14 +2,13 @@ package org.terrakube.registry.service.module;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.azbuilder.api.client.TerrakubeClient;
-import org.azbuilder.api.client.model.organization.module.Module;
-import org.azbuilder.api.client.model.organization.module.ModuleAttributes;
-import org.azbuilder.api.client.model.organization.module.ModuleRequest;
-import org.azbuilder.api.client.model.organization.vcs.Vcs;
+import org.terrakube.client.TerrakubeClient;
+import org.terrakube.client.model.organization.module.Module;
+import org.terrakube.client.model.organization.module.ModuleAttributes;
+import org.terrakube.client.model.organization.module.ModuleRequest;
+import org.terrakube.client.model.organization.vcs.Vcs;
 import org.terrakube.registry.plugin.storage.StorageService;
 import org.springframework.stereotype.Service;
-import org.terrakube.registry.service.module.ModuleService;
 
 import java.util.ArrayList;
 import java.util.List;
