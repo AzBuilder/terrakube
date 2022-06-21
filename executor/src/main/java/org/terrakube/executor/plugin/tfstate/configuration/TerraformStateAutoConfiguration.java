@@ -15,7 +15,7 @@ import com.google.cloud.storage.StorageOptions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.azbuilder.api.client.TerrakubeClient;
+import org.terrakube.client.TerrakubeClient;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.plugin.tfstate.aws.AwsTerraformStateImpl;

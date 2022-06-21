@@ -1,12 +1,12 @@
 package org.terrakube.executor.service.status;
 
 import lombok.extern.slf4j.Slf4j;
-import org.azbuilder.api.client.TerrakubeClient;
-import org.azbuilder.api.client.model.organization.job.Job;
-import org.azbuilder.api.client.model.organization.job.JobRequest;
-import org.azbuilder.api.client.model.organization.job.step.Step;
-import org.azbuilder.api.client.model.organization.job.step.StepAttributes;
-import org.azbuilder.api.client.model.organization.job.step.StepRequest;
+import org.terrakube.client.TerrakubeClient;
+import org.terrakube.client.model.organization.job.Job;
+import org.terrakube.client.model.organization.job.JobRequest;
+import org.terrakube.client.model.organization.job.step.Step;
+import org.terrakube.client.model.organization.job.step.StepAttributes;
+import org.terrakube.client.model.organization.job.step.StepRequest;
 import org.terrakube.executor.configuration.ExecutorFlagsProperties;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
 import org.terrakube.executor.service.mode.TerraformJob;

@@ -7,7 +7,7 @@ import groovy.util.ScriptException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.azbuilder.api.client.TerrakubeClient;
+import org.terrakube.client.TerrakubeClient;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.scripts.CommandExecution;
 import org.terrakube.executor.service.scripts.ScriptEngineService;

@@ -17,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.TextStringBuilder;
-import org.azbuilder.api.client.TerrakubeClient;
-import org.azbuilder.api.client.model.organization.workspace.history.History;
-import org.azbuilder.api.client.model.organization.workspace.history.HistoryAttributes;
-import org.azbuilder.api.client.model.organization.workspace.history.HistoryRequest;
+import org.terrakube.client.TerrakubeClient;
+import org.terrakube.client.model.organization.workspace.history.History;
+import org.terrakube.client.model.organization.workspace.history.HistoryAttributes;
+import org.terrakube.client.model.organization.workspace.history.HistoryRequest;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.service.mode.TerraformJob;
 

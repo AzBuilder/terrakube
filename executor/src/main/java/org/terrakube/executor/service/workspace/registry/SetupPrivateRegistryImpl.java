@@ -6,10 +6,10 @@ import feign.gson.GsonDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.azbuilder.api.client.security.azure.ClientCredentialApi;
-import org.azbuilder.api.spring.autoconfigure.RestClientProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.terrakube.client.azure.ClientCredentialApi;
+import org.terrakube.client.spring.autoconfigure.RestClientProperties;
 
 import java.io.File;
 import java.io.IOException;
