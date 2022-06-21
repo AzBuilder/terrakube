@@ -22,6 +22,27 @@ jobs:
       env:
         USER_NAME: ${{ secrets.USER_NAME }}
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        
+    - name: Use Node.js 
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+        cache: 'npm'
+        cache-dependency-path: ui/package.json
+    
+    - run: yarn install --frozen-lockfile
+      working-directory: ./ui
+      
+    - run: npm run build --if-present
+      working-directory: ./ui
+      env:
+         CI: false
+    
+    - name: docker build ui
+      working-directory: ./ui
+      run: |
+        docker build -t terrakube-ui:latest  . 
+        
     - name: docker login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -70,3 +91,15 @@ jobs:
 
     - name: Docker Push EXECUTOR latest
       run: docker push azbuilder/executor:latest
+      
+    - name: Docker tag UI Image 
+      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:$VERSION
+
+    - name: Docker tag UI Image latest
+      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:latest
+
+    - name: Docker Push UI Version
+      run: docker push azbuilder/terrakube-ui:$VERSION
+
+    - name: Docker Push UI Latest
+      run: docker push azbuilder/terrakube-ui:latest
