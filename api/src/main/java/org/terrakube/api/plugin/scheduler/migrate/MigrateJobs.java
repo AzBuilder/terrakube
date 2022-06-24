@@ -1,14 +1,15 @@
 package org.terrakube.api.plugin.scheduler.migrate;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.scheduler.ScheduleVcsService;
 import org.terrakube.api.plugin.vcs.TokenService;
@@ -25,30 +26,27 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class MigrateJobs implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final String DEPRECATED_PREFIX_JOB_VCS = "Terrakube_Vcs_";
     private static final String DEPRECATED_PREFIX_JOB_TRIGGER = "Terrakube_Trigger_";
     private static final String DEPRECATED_PREFIX_JOB_CONTEXT = "Terrakube_Job_";
-    @Autowired
+
     Scheduler scheduler;
 
-    @Autowired
     ScheduleVcsService scheduleVcsService;
 
-    @Autowired
     ScheduleJobService scheduleJobService;
 
-    @Autowired
     VcsRepository vcsRepository;
 
-    @Autowired
     ScheduleRepository scheduleRepository;
 
-    @Autowired
     JobRepository jobRepository;
 
     @Override
+    @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
             log.info("Migrating Quartz Jobs");
@@ -73,7 +71,7 @@ public class MigrateJobs implements ApplicationListener<ContextRefreshedEvent> {
         }
     }
 
-    private void rescheduleVcs(String jobKey) {
+    public void rescheduleVcs(String jobKey) {
         log.info("Reschedule Vcs JobKey {}", jobKey);
         int minutes = Calendar.getInstance().get(Calendar.MINUTE);
         String vcsId = jobKey.replace(DEPRECATED_PREFIX_JOB_VCS, "");
@@ -103,7 +101,7 @@ public class MigrateJobs implements ApplicationListener<ContextRefreshedEvent> {
         }
     }
 
-    private void rescheduleJob(String jobKey) {
+    public void rescheduleJob(String jobKey) {
         log.info("Reschedule Job Context {}", jobKey);
         int jobId = Integer.parseInt(jobKey.replace(DEPRECATED_PREFIX_JOB_CONTEXT, ""));
         Job job = jobRepository.getById(jobId);
@@ -115,7 +113,7 @@ public class MigrateJobs implements ApplicationListener<ContextRefreshedEvent> {
         }
     }
 
-    private void rescheduleJobTrigger(String jobKey) {
+    public void rescheduleJobTrigger(String jobKey) {
         log.info("Reschedule Job Trigger {}", jobKey);
         String scheduleId = jobKey.replace(DEPRECATED_PREFIX_JOB_TRIGGER, "");
         Schedule schedule = scheduleRepository.getById(UUID.fromString(scheduleId));
