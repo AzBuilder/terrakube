@@ -17,6 +17,8 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
+    - name: Update POM Version
+      run: mvn -pl "api,registry,executor" versions:set-property -Dproperty=revision -DnewVersion=$VERSION -DgenerateBackupPoms=false
     - name: Build Image with Maven
       run: mvn -pl "api,registry,executor" spring-boot:build-image -B  --file pom.xml -s $GITHUB_WORKSPACE/.github/workflows/maven-settings.xml
       env:

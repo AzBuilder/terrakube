@@ -17,8 +17,8 @@ import java.text.ParseException;
 @Service
 public class ScheduleJobService {
 
-    public static final String PREFIX_JOB = "Terrakube_Trigger_";
-    public static final String PREFIX_JOB_CONTEXT = "Terrakube_Job_";
+    public static final String PREFIX_JOB = "TerrakubeV2_Trigger_";
+    public static final String PREFIX_JOB_CONTEXT = "TerrakubeV2_Job_";
     public static final String CRON_SCHEDULE = "0 * * ? * *"; //CHECK EVERY MINUTES
 
     Scheduler scheduler;

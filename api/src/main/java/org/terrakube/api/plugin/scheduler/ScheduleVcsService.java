@@ -12,7 +12,7 @@ import java.text.ParseException;
 @Slf4j
 public class ScheduleVcsService {
 
-    private static final String PREFIX_JOB = "Terrakube_Vcs_";
+    public static final String PREFIX_JOB = "TerrakubeV2_Vcs_";
 
     Scheduler scheduler;
 

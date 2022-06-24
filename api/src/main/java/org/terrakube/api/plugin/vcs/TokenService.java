@@ -28,8 +28,8 @@ import java.util.*;
 @Service
 public class TokenService {
 
-    private static final String QUARTZ_EVERY_60_MINUTES = "0 0 0/1 ? * *";
-    private static final String QUARTZ_EVERY_30_MINUTES = "0 0/30 * ? * *";
+    public static final String QUARTZ_EVERY_60_MINUTES = "0 0 0/1 ? * *";
+    public static final String QUARTZ_EVERY_30_MINUTES = "0 0/30 * ? * *";
 
     VcsRepository vcsRepository;
     GitHubTokenService gitHubTokenService;
@@ -40,7 +40,7 @@ public class TokenService {
 
     @Transactional
     public boolean generateAccessToken(String vcsId, String tempCode) {
-        Vcs vcs = vcsRepository.getOne(UUID.fromString(vcsId));
+        Vcs vcs = vcsRepository.getById(UUID.fromString(vcsId));
         int minutes = Calendar.getInstance().get(Calendar.MINUTE);
         try {
             switch (vcs.getVcsType()) {
