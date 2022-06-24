@@ -23,7 +23,7 @@
 		<okhttp.version>4.9.1</okhttp.version>
 		<azure-storage-blob.version>12.16.0</azure-storage-blob.version>
 		<jgit.version>5.12.0.202106070339-r</jgit.version>
-		<lombok.version>1.18.20</lombok.version>
+		<lombok.version>1.18.24</lombok.version>
 		<groovy.version>3.0.7</groovy.version>
 		<ivy.version>2.5.0</ivy.version>
 		<jcolor.version>5.2.0</jcolor.version>
@@ -45,11 +45,6 @@
 					<artifactId>spring-boot-starter-logging</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
