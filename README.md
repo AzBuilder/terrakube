@@ -133,3 +133,17 @@ For more detail information about how to use azb-server json:api please check th
 
 * [Postman Collection](postman/azb-server.postman_collection.json)
 * [Postman Environments](postman/AzBuilderEnvironment.postman_environment.json)
+
+### Sponsors
+
+Any company can become a sponsor by donating or providing any benefit to the project or the team helping improve Terrakube.
+
+#### JetBrains
+
+Thank you to [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains" width="32"> JetBrains](https://jb.gg/OpenSource.)
+for providing us with free licenses to their great tools.
+
+* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/IntelliJ_IDEA_icon.svg" alt="IDEA" width="32"> IDEA](https://www.jetbrains.com/idea/)
+* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/GoLand_icon.svg" alt="GoLand" width="32"> GoLand](https://www.jetbrains.com/go/)
+* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/WebStorm_icon.svg" alt="WebStorm" width="32"> WebStorm](https://www.jetbrains.com/webstorm/)
+* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/DataGrip_icon.svg" alt="DataGrip" width="32"> DataGrip](https://www.jetbrains.com/datagrip/)
