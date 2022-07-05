@@ -32,7 +32,7 @@ public class TeamApproveJob extends OperationCheck<Job> {
             if (isServiceAccount)
                 return groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), job.getApprovalTeam());
             else
-                return groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), job.getApprovalTeam());
+                return groupService.isMember(requestScope.getUser(), job.getApprovalTeam());
 
         }
     }

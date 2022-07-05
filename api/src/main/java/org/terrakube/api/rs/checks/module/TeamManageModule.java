@@ -37,7 +37,7 @@ public class TeamManageModule extends OperationCheck<Module> {
                     return true;
                 }
             } else {
-                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageModule())
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageModule())
                     return true;
             }
         }

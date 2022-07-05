@@ -45,11 +45,8 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
     private boolean isMemberOrganization(User user, Organization organization){
         boolean isServiceAccount=authenticatedUser.isServiceAccount(user);
         String applicationName="";
-        String userName="";
         if (isServiceAccount){
             applicationName = authenticatedUser.getApplication(user);
-        }else{
-            userName = authenticatedUser.getEmail(user);
         }
 
         List<Team> teamList = organization.getTeam();
@@ -60,8 +57,8 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
                     return true;
                 }
             } else {
-                log.info("isMember {} {}", team.getName(), groupService.isMember(userName, team.getName()));
-                if (groupService.isMember(userName, team.getName()))
+                log.info("isMember {} {}", team.getName(), groupService.isMember(user, team.getName()));
+                if (groupService.isMember(user, team.getName()))
                     return true;
             }
         }

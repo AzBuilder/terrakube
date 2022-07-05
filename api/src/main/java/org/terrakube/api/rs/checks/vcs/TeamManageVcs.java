@@ -36,7 +36,7 @@ public class TeamManageVcs extends OperationCheck<Vcs> {
                     return true;
                 }
             } else {
-                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageVcs())
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageVcs())
                     return true;
             }
         }

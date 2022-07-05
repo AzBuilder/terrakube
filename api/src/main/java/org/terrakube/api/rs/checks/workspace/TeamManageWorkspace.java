@@ -37,7 +37,7 @@ public class TeamManageWorkspace extends OperationCheck<Workspace> {
                     return true;
                 }
             } else {
-                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageWorkspace())
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageWorkspace())
                     return true;
             }
         }

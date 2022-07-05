@@ -2,13 +2,15 @@ package org.terrakube.api.plugin.security.user;
 
 import com.yahoo.elide.core.security.User;
 
+import java.util.List;
+
 public interface AuthenticatedUser {
 
     String getEmail(User user);
 
     String getApplication(User user);
 
-    public boolean isServiceAccount(User user);
+    boolean isServiceAccount(User user);
 
-    public boolean isSuperUser(User user);
+    boolean isSuperUser(User user);
 }

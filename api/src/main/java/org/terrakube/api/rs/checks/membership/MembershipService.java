@@ -30,7 +30,7 @@ public class MembershipService {
                 }
             } else {
                 String userName = authenticatedUser.getEmail(user);
-                if (groupService.isMember(userName, team.getName()))
+                if (groupService.isMember(user, team.getName()))
                     log.info("user {} is member of {}", userName, team.getName());
                 return true;
             }
