@@ -1,7 +1,6 @@
 package org.terrakube.api.plugin.security.groups.dex;
 
 import com.nimbusds.jose.shaded.json.JSONArray;
-import com.nimbusds.jose.util.JSONArrayUtils;
 import com.yahoo.elide.core.security.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

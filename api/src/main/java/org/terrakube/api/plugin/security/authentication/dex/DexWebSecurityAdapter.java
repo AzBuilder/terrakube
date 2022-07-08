@@ -1,27 +1,15 @@
 package org.terrakube.api.plugin.security.authentication.dex;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
-import org.springframework.security.oauth2.server.resource.authentication.OpaqueTokenAuthenticationProvider;
-import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,47 +22,38 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @ConditionalOnProperty(prefix = "org.terrakube.api.authentication", name = "type", havingValue = "DEX")
-public class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
+public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
     @Value("${org.terrakube.ui.url:http://localhost:3000}")
     private String uiURL;
 
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${org.terrakube.token.pat}")
+    private String patJwtSecret;
+
+    @Value("${org.terrakube.token.internal}")
+    private String internalJwtSecret;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        ApiKeyAuthFilter filter = new ApiKeyAuthFilter();
-        filter.setAuthenticationManager(new ApiKeyAuthManager());
-
-
         http.cors().and().authorizeRequests(authz -> authz
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/actuator/**").permitAll()
                         .antMatchers("/callback/v1/**").permitAll()
                         .antMatchers("/doc").permitAll()
-                        .antMatchers("/keys/v1/generate").permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> {
-                    log.info("{}", oauth2);
-                    oauth2.authenticationManagerResolver(this.tokenAuthenticationManagerResolver());
+                    AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver = DexAuthenticationManagerResolver
+                            .builder()
+                            .dexIssuerUri(this.issuerUri)
+                            .patJwtSecret(this.patJwtSecret)
+                            .internalJwtSecret(this.internalJwtSecret)
+                            .build();
+                    oauth2.authenticationManagerResolver(authenticationManagerResolver);
                 });
 
-    }
-
-    AuthenticationManagerResolver<HttpServletRequest> tokenAuthenticationManagerResolver() {
-        return request -> {
-            String token = request.getHeader("authorization");
-            log.info("Token {}", token);
-            int i = token.lastIndexOf('.');
-            String withoutSignature = token.substring(0, i+1);
-            Jwt<Header, Claims> untrusted = Jwts.parserBuilder().build().parseClaimsJwt(token.substring("Bearer ".length()));
-            log.info("Issuer {}", untrusted.getBody().getIssuer());
-            if (request.getHeader("API_KEY") != null) {
-                log.info("Custom resolver");
-                return new ApiKeyAuthManager();
-            } else {
-                log.info("JWT resolver");
-                return new ProviderManager(new JwtAuthenticationProvider(JwtDecoders.fromIssuerLocation("https://dexidp.aks.vse.aespana.me")));
-            }
-        };
     }
 
     @Bean

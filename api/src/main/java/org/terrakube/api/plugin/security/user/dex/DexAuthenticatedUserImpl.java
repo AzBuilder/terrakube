@@ -39,7 +39,8 @@ public class DexAuthenticatedUserImpl implements AuthenticatedUser {
     @Override
     public boolean isServiceAccount(User user) {
         log.info("isServiceAccount {}", user.getPrincipal().getClass().getName());
-        return false;
+        JwtAuthenticationToken principal = ((JwtAuthenticationToken) user.getPrincipal());
+        return principal.getTokenAttributes().get("iss").equals("TerrakubeInternal");
     }
 
     @Override
