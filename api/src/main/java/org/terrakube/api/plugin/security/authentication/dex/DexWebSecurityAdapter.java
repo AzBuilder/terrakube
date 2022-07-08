@@ -27,7 +27,7 @@ public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
     @Value("${org.terrakube.ui.url:http://localhost:3000}")
     private String uiURL;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    @Value("${org.terrakube.token.issuer-uri}")
     private String issuerUri;
 
     @Value("${org.terrakube.token.pat}")
