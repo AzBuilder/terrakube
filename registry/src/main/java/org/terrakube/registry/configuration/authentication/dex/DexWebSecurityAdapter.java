@@ -1,14 +1,14 @@
-package org.terrakube.registry.configuration.authentication.azure;
+package org.terrakube.registry.configuration.authentication.dex;
 
-import com.azure.spring.aad.webapi.AADResourceServerWebSecurityConfigurerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -16,28 +16,26 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-@ConditionalOnProperty(prefix = "org.terrakube.api.authentication", name = "type", havingValue = "AZURE")
 @Slf4j
-public class AADOAuth2ResourceServerSecurityConfig extends AADResourceServerWebSecurityConfigurerAdapter {
+@Configuration
+@EnableWebSecurity
+@ConditionalOnProperty(prefix = "org.terrakube.api.authentication", name = "type", havingValue = "DEX")
+public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
     @Value( "${org.terrakube.ui.fqdn:http://localhost:3000}" )
     private String uiDomain;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
-        http.cors().and().authorizeRequests()
-                .antMatchers("/.well-known/**").permitAll()
-                .antMatchers("/actuator/**").permitAll()
-                .antMatchers("/terraform/modules/v1/download/**").permitAll()
-                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .and()
-                .authorizeRequests()
-                .anyRequest()
-                .authenticated();
+        http.cors().and().authorizeRequests(authz -> authz
+                        .antMatchers("/.well-known/**").permitAll()
+                        .antMatchers("/actuator/**").permitAll()
+                        .antMatchers("/terraform/modules/v1/download/**").permitAll()
+                        .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt());
     }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         log.info("CORS for UI Domain {}", uiDomain);
