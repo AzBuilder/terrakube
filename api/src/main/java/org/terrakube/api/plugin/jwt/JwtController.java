@@ -41,7 +41,7 @@ public class JwtController {
                 .setAudience(ISSUER)
                 .claim("email", principalJwt.getTokenAttributes().get("email"))
                 .claim("email_verified", true)
-                .claim("name", principal.getName())
+                .claim("name", String.format("%s (Token)", principalJwt.getTokenAttributes().get("name")))
                 .claim("groups", principalJwt.getTokenAttributes().get("groups"))
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))

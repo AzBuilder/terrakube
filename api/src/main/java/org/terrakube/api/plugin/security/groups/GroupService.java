@@ -6,5 +6,5 @@ public interface GroupService {
 
     boolean isMember(User user, String group);
 
-    boolean isServiceMember(String application, String group);
+    boolean isServiceMember(User user, String group);
 }

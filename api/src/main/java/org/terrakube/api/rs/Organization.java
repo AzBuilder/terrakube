@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @ReadPermission(expression = "user belongs organization")
 @CreatePermission(expression = "user is a superuser")
-@UpdatePermission(expression = "user is a superuser ")
+@UpdatePermission(expression = "user is a superuser")
 @DeletePermission(expression = "user is a superuser")
 @Include
 @Getter

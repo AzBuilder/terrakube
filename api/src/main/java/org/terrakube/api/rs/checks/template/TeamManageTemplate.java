@@ -33,7 +33,7 @@ public class TeamManageTemplate extends OperationCheck<Template> {
         List<Team> teamList = template.getOrganization().getTeam();
         for (Team team : teamList) {
             if (isServiceAccount){
-                if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) && team.isManageTemplate() ){
+                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageTemplate() ){
                     return true;
                 }
             } else {

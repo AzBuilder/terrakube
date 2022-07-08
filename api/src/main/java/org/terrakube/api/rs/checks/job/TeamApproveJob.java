@@ -30,7 +30,7 @@ public class TeamApproveJob extends OperationCheck<Job> {
         else {
             boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
             if (isServiceAccount)
-                return groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), job.getApprovalTeam());
+                return groupService.isServiceMember(requestScope.getUser(), job.getApprovalTeam());
             else
                 return groupService.isMember(requestScope.getUser(), job.getApprovalTeam());
 

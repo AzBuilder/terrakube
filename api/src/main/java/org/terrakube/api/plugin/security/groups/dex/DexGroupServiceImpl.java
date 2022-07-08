@@ -27,8 +27,15 @@ public class DexGroupServiceImpl implements GroupService {
     }
 
     @Override
-    public boolean isServiceMember(String application, String group) {
-        return false;
+    public boolean isServiceMember(User user, String group) {
+        JwtAuthenticationToken principal = ((JwtAuthenticationToken) user.getPrincipal());
+        boolean isMember = principal.getTokenAttributes().get("iss").equals("TerrakubeInternal")? true: false;
+        for (String groupName : toStringArray((JSONArray) principal.getTokenAttributes().get("groups"))) {
+            if (groupName.equals(group))
+                isMember = true;
+        }
+        log.info("{} is member {} {}", principal.getTokenAttributes().get("name"), group, isMember);
+        return isMember;
     }
 
     private String[] toStringArray(JSONArray array) {

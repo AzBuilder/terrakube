@@ -52,8 +52,8 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
         List<Team> teamList = organization.getTeam();
         for (Team team : teamList) {
             if (isServiceAccount) {
-                log.info("isServiceMember {} {}", team.getName(), groupService.isServiceMember(applicationName, team.getName()));
-                if (groupService.isServiceMember(applicationName, team.getName())) {
+                log.info("isServiceMember {} {}", team.getName(), groupService.isServiceMember(user, team.getName()));
+                if (groupService.isServiceMember(user, team.getName())) {
                     return true;
                 }
             } else {

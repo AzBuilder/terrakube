@@ -24,7 +24,7 @@ public class MembershipService {
         for (Team team : teamList) {
             if (authenticatedUser.isServiceAccount(user)) {
                 String applicationName = authenticatedUser.getApplication(user);
-                if (groupService.isServiceMember(applicationName, team.getName())) {
+                if (groupService.isServiceMember(user, team.getName())) {
                     log.info("application {} is member of {}", applicationName, team.getName());
                     return true;
                 }

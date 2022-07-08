@@ -33,14 +33,14 @@ public class DexAuthenticatedUserImpl implements AuthenticatedUser {
 
     @Override
     public String getApplication(User user) {
-        return "dex";
+        log.info("isServiceAccount {}", user.getPrincipal().getClass().getName());
+        return (String) getSecurityPrincipal(user).getTokenAttributes().get("name");
     }
 
     @Override
     public boolean isServiceAccount(User user) {
         log.info("isServiceAccount {}", user.getPrincipal().getClass().getName());
-        JwtAuthenticationToken principal = ((JwtAuthenticationToken) user.getPrincipal());
-        return principal.getTokenAttributes().get("iss").equals("TerrakubeInternal");
+        return getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("Terrakube") || getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal");
     }
 
     @Override
