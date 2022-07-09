@@ -33,19 +33,32 @@ public class DexAuthenticatedUserImpl implements AuthenticatedUser {
 
     @Override
     public String getApplication(User user) {
-        log.info("isServiceAccount {}", user.getPrincipal().getClass().getName());
+        log.debug("isServiceAccount {}", user.getPrincipal().getClass().getName());
         return (String) getSecurityPrincipal(user).getTokenAttributes().get("name");
     }
 
     @Override
     public boolean isServiceAccount(User user) {
-        log.info("isServiceAccount {}", user.getPrincipal().getClass().getName());
+        log.info("isServiceAccount/PAT {}", getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("Terrakube") || getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal"));
         return getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("Terrakube") || getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal");
     }
 
     @Override
     public boolean isSuperUser(User user) {
-        return groupService.isMember(user,instanceOwner);
+        boolean isServiceAccount=isServiceAccount(user);
+        boolean isSuperUser;
+        String applicationName="";
+        String userName="";
+        if (isServiceAccount){
+            applicationName = getApplication(user);
+            isSuperUser = groupService.isServiceMember(user, instanceOwner);
+        }else{
+            userName = getEmail(user);
+            isSuperUser = groupService.isMember(user, instanceOwner);
+        }
+
+        log.info("{} is super user", isServiceAccount ? applicationName : userName);
+        return isSuperUser;
     }
 
 }

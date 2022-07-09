@@ -8,8 +8,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.security.groups.GroupService;
 
-import java.util.*;
-
 @Slf4j
 @Service
 @ConditionalOnProperty(prefix = "org.terrakube.api.groups", name = "type", havingValue = "DEX")
@@ -30,11 +28,15 @@ public class DexGroupServiceImpl implements GroupService {
     public boolean isServiceMember(User user, String group) {
         JwtAuthenticationToken principal = ((JwtAuthenticationToken) user.getPrincipal());
         boolean isMember = principal.getTokenAttributes().get("iss").equals("TerrakubeInternal")? true: false;
-        for (String groupName : toStringArray((JSONArray) principal.getTokenAttributes().get("groups"))) {
-            if (groupName.equals(group))
-                isMember = true;
+        if(!isMember) {
+            for (String groupName : toStringArray((JSONArray) principal.getTokenAttributes().get("groups"))) {
+                if (groupName.equals(group))
+                    isMember = true;
+            }
+            log.info("{} is member {} {}", principal.getTokenAttributes().get("name"), group, isMember);
+        }else{
+            log.info("TerrakubeInternal Client Service Group Membership");
         }
-        log.info("{} is member {} {}", principal.getTokenAttributes().get("name"), group, isMember);
         return isMember;
     }
 
