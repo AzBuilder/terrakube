@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@ConditionalOnProperty(prefix = "org.terrakube.api.authentication", name = "type", havingValue = "DEX")
+@ConditionalOnProperty(prefix = "org.terrakube.registry.authentication", name = "type", havingValue = "DEX")
 public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
     @Value( "${org.terrakube.ui.fqdn:http://localhost:3000}" )

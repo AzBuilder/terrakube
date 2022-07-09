@@ -15,9 +15,9 @@ public class WellKnownTests extends OpenRegistryApplicationTests{
             "  \"providers.v1\": \"http://localhost/terraform/providers/v1/\"," +
             "  \"login.v1\": {\n" +
             "    \"client\": \"sample\",\n" +
-            "    \"grant_types\": [\"authz_code\", \"sample\"],\n" +
-            "    \"authz\": \"https://login.microsoftonline.com/sample/oauth2/v2.0/authorize?scope=sample\",\n" +
-            "    \"token\": \"https://login.microsoftonline.com/sample/oauth2/v2.0/token\",\n" +
+            "    \"grant_types\": [\"authz_code\", \"openid\", \"profile\", \"email\", \"offline_access\", \"groups\"],\n" +
+            "    \"authz\": \"https://sample.com/auth?scope=openid+profile+email+offline_access+groups\",\n" +
+            "    \"token\": \"https://sample.com/token\",\n" +
             "    \"ports\": [10000, 10001]\n" +
             "    }"+
             "}";

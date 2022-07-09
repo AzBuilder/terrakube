@@ -16,9 +16,9 @@ public class WellKnownWebServiceImpl {
             "  \"providers.v1\": \"%s/terraform/providers/v1/\"," +
             "  \"login.v1\": {\n" +
             "    \"client\": \"%s\",\n" +
-            "    \"grant_types\": [\"authz_code\", \"%s\"],\n" +
-            "    \"authz\": \"https://login.microsoftonline.com/%s/oauth2/v2.0/authorize?scope=%s\",\n" +
-            "    \"token\": \"https://login.microsoftonline.com/%s/oauth2/v2.0/token\",\n" +
+            "    \"grant_types\": [\"authz_code\", \"openid\", \"profile\", \"email\", \"offline_access\", \"groups\"],\n" +
+            "    \"authz\": \"%s/auth?scope=openid+profile+email+offline_access+groups\",\n" +
+            "    \"token\": \"%s/token\",\n" +
             "    \"ports\": [10000, 10001]\n" +
             "    }"+
             "}";
@@ -33,10 +33,8 @@ public class WellKnownWebServiceImpl {
                         openRegistryProperties.getHostname(),
                         openRegistryProperties.getHostname(),
                         openRegistryProperties.getClientId(),
-                        openRegistryProperties.getScope(),
-                        openRegistryProperties.getTenantId(),
-                        openRegistryProperties.getScope(),
-                        openRegistryProperties.getTenantId()
+                        openRegistryProperties.getIssuerUri(),
+                        openRegistryProperties.getIssuerUri()
                 )
         );
     }
