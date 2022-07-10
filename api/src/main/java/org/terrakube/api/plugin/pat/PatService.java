@@ -1,61 +1,71 @@
-package org.terrakube.api.plugin.jwt;
+package org.terrakube.api.plugin.pat;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
+import org.terrakube.api.repository.PatRepository;
+import org.terrakube.api.rs.pat.Pat;
 
 import javax.crypto.SecretKey;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
-@RestController
-@RequestMapping("/keys/v1")
-public class JwtController {
+@Service
+public class PatService {
 
     @Value("${org.terrakube.token.pat}")
     private String base64Key;
     private static final String ISSUER = "Terrakube";
 
-    @GetMapping("/generate")
-    public ResponseEntity<InternalToken> generateToken(Principal principal) {
+    @Autowired
+    private PatRepository patRepository;
 
+    public String createToken(int days, String description, Principal principal) {
         JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
         log.info("{}", principalJwt);
 
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.base64Key));
+        UUID keyId = UUID.randomUUID();
+
+        log.info("Generated Pat {}", keyId);
 
         String jws = Jwts.builder()
                 .setIssuer(ISSUER)
                 .setSubject(String.format("%s (Token)", principalJwt.getTokenAttributes().get("name")))
                 .setAudience(ISSUER)
+                .setId(keyId.toString())
                 .claim("email", principalJwt.getTokenAttributes().get("email"))
                 .claim("email_verified", true)
                 .claim("name", String.format("%s (Token)", principalJwt.getTokenAttributes().get("name")))
                 .claim("groups", principalJwt.getTokenAttributes().get("groups"))
                 .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
+                .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
                 .signWith(key)
                 .compact();
 
-        InternalToken internalToken = new InternalToken();
-        internalToken.setToken(jws);
-        return new ResponseEntity<>(internalToken, HttpStatus.ACCEPTED);
+        Pat pat = new Pat();
+        pat.setId(keyId);
+        pat.setDays(days);
+        pat.setDescription(description);
+
+        patRepository.save(pat);
+
+        return jws;
     }
 
-    @Getter
-    @Setter
-    private class InternalToken {
-        private String token;
+
+    public List<Pat> searchToken(Principal principal) {
+        JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
+        return patRepository.findByCreatedBy((String) principalJwt.getTokenAttributes().get("email"));
     }
 }
