@@ -33,11 +33,11 @@ public class TeamManageProvider extends OperationCheck<Provider> {
         List<Team> teamList = provider.getOrganization().getTeam();
         for (Team team : teamList) {
             if (isServiceAccount){
-                if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) && team.isManageProvider() ){
+                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageProvider() ){
                     return true;
                 }
             } else {
-                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageProvider())
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageProvider())
                     return true;
             }
         }

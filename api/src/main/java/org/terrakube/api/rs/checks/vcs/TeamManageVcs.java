@@ -32,11 +32,11 @@ public class TeamManageVcs extends OperationCheck<Vcs> {
         List<Team> teamList = vcs.getOrganization().getTeam();
         for (Team team : teamList) {
             if (isServiceAccount){
-                if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) && team.isManageVcs() ){
+                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageVcs() ){
                     return true;
                 }
             } else {
-                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageVcs())
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageVcs())
                     return true;
             }
         }

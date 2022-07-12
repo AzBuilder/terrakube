@@ -17,7 +17,7 @@
 		<azure.version>3.13.1</azure.version>
 		<java.version>11</java.version>
 		<lombok.version>1.18.20</lombok.version>
-		<terrakube-client-starter.version>0.8.5</terrakube-client-starter.version>
+		<terrakube-client-starter.version>0.9.0</terrakube-client-starter.version>
 		<jgit.version>5.12.0.202106070339-r</jgit.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<azure-storage-blob.version>12.14.3</azure-storage-blob.version>
@@ -82,10 +82,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.azure.spring</groupId>
-			<artifactId>azure-spring-boot-starter-active-directory</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>

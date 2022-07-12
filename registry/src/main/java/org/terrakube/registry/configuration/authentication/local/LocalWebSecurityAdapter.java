@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @Configuration
 @EnableWebSecurity
-@ConditionalOnProperty(prefix = "org.terrakube.api.authentication", name = "type", havingValue = "LOCAL")
+@ConditionalOnProperty(prefix = "org.terrakube.registry.authentication", name = "type", havingValue = "LOCAL")
 public class LocalWebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
     @Override

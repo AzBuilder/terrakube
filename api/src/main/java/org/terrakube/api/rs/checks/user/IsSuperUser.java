@@ -27,9 +27,9 @@ public class IsSuperUser extends UserCheck {
     @Override
     public boolean ok(User user) {
         if (authenticatedUser.isServiceAccount(user)){
-            return groupService.isServiceMember(authenticatedUser.getApplication(user), instanceOwner);
+            return groupService.isServiceMember(user, instanceOwner);
         }else{
-            return groupService.isMember(authenticatedUser.getEmail(user), instanceOwner);
+            return groupService.isMember(user, instanceOwner);
         }
     }
 }

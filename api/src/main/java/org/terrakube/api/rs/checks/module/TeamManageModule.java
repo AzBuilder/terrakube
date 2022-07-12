@@ -33,11 +33,11 @@ public class TeamManageModule extends OperationCheck<Module> {
         List<Team> teamList = module.getOrganization().getTeam();
         for (Team team : teamList) {
             if (isServiceAccount){
-                if (groupService.isServiceMember(authenticatedUser.getApplication(requestScope.getUser()), team.getName()) && team.isManageModule() ){
+                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageModule() ){
                     return true;
                 }
             } else {
-                if (groupService.isMember(authenticatedUser.getEmail(requestScope.getUser()), team.getName()) && team.isManageModule())
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageModule())
                     return true;
             }
         }

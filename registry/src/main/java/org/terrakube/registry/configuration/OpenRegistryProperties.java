@@ -16,6 +16,5 @@ public class OpenRegistryProperties {
 
     private String hostname;
     private String clientId;
-    private String tenantId;
-    private String scope;
+    private String issuerUri;
 }
