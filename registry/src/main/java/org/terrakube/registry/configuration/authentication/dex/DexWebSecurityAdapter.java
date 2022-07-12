@@ -45,11 +45,11 @@ public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> {
-                    AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver = DexAuthenticationManagerResolver
+                    AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver = RegistryAuthenticationManagerResolver
                             .builder()
-                            .dexIssuerUri(this.issuerUri)
-                            .patJwtSecret(this.patJwtSecret)
-                            .internalJwtSecret(this.internalJwtSecret)
+                            .issuerUri(this.issuerUri)
+                            .patSecret(this.patJwtSecret)
+                            .internalSecret(this.internalJwtSecret)
                             .build();
                     oauth2.authenticationManagerResolver(authenticationManagerResolver);
                 });
