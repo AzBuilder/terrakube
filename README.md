@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/AzBuilder/azb-server/blob/main/LICENSE)
 [![gitbook](https://raw.githubusercontent.com/aleen42/badges/master/src/gitbook_2.svg)](https://azbuilder.gitbook.io/azb-builder/)
 
-Open source tool to handle remote terraform workspace in organizations and handle all the lifecycle (plan, apply, destroy).
+Open source Terraform Automation and Collaboration Software.
 
 The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expose a [JSON:API](https://jsonapi.org/) or [GraphQL](https://graphql.org/).
 
@@ -26,6 +26,7 @@ Expose a JSON:API or GraphQL API providing endpoints to handle:
   - Global Variables
   - Workspace Schedules
   - State History
+  - Personal Access Token
 * **Terrakube Executor**:
   - Service that executes the terraform operations, updates the status using the Terrakube API and save the results using different cloud storage providers.
 * **Terrakube Registry**:
@@ -80,11 +81,8 @@ This project contains three modules describe below:
 
 ## Security - Authentication
 
-By default, Azure Active Directory protects the API authentication. To better understand Azure Active directory authentication please refer to these links:
-
-* [Azure AD Spring Boot Starter](https://github.com/MicrosoftDocs/azure-dev-docs/blob/main/articles/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-active-directory.md)
-* [OAuth 2.0 authorization code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
-* [Accessing a resource server](https://github.com/Azure-Samples/azure-spring-boot-samples/tree/main/aad/spring-cloud-azure-starter-active-directory/web-client-access-resource-server/aad-resource-server)
+Terrakube uses [DEX](https://dexidp.io/docs/connectors/) to handle authentication. Dex is an identity service that uses OpenID Connect to drive authentication for other apps.
+Dex acts as a portal to other identity providers through “connectors.” This lets Terrakube defer authentication to LDAP servers, SAML providers, or established identity providers like GitHub, Google, and Active Directory.
 
 ## Supported Databases
 To run the api you need the following environment variables:
