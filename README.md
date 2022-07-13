@@ -5,7 +5,7 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=AzBuilder_azb-server&metric=coverage)](https://sonarcloud.io/dashboard?id=AzBuilder_azb-server)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/AzBuilder/azb-server/blob/main/LICENSE)
 [![gitbook](https://raw.githubusercontent.com/aleen42/badges/master/src/gitbook_2.svg)](https://azbuilder.gitbook.io/azb-builder/)
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://github.com/AzBuilder/terrakube)
+[![gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://github.com/AzBuilder/terrakube)
 
 Open source Terraform Automation and Collaboration Software.
 
