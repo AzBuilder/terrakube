@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  dex-service:
+    image: ghcr.io/dexidp/dex:v2.32.0
+    container_name: dex-service
+    volumes:
+    - ./config-ldap.yaml:/etc/dex/config.docker.yaml
+    ports:
+      - 5556:5556
+  ldap:
+    image: osixia/openldap:1.4.0
+    # Copying is required because the entrypoint modifies the *.ldif files.
+    # For verbose output, use:  command: ["--copy-service", "--loglevel", "debug"]
+    command: ["--copy-service"]
+    environment:
+      # Required if using LDAPS:
+      # Since Dex doesn't use a client TLS certificate, downgrade from "demand" to "try".
+      LDAP_TLS_VERIFY_CLIENT: try
+    # The hostname is required if using LDAPS with certificate validation.
+    # In Dex, use the same hostname (with port) for `connectors[].config.host`.
+    #hostname: YOUR-HOSTNAME
+    #
+    # https://github.com/osixia/docker-openldap#seed-ldap-database-with-ldif
+    # Option 1: Add custom seed file -> mount to         /container/service/slapd/assets/config/bootstrap/ldif/custom/
+    # Option 2: Overwrite default seed file -> mount to  /container/service/slapd/assets/config/bootstrap/ldif/
+    volumes:
+    - ./config-ldap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/config-ldap.ldif
+    ports:
+    - 389:389
+    - 636:636
