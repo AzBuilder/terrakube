@@ -7,7 +7,9 @@ services:
     - ./config-ldap.yaml:/etc/dex/config.docker.yaml
     ports:
       - 5556:5556
-  ldap:
+    networks:
+      - dex
+  ldap-service:
     image: osixia/openldap:1.4.0
     # Copying is required because the entrypoint modifies the *.ldif files.
     # For verbose output, use:  command: ["--copy-service", "--loglevel", "debug"]
@@ -28,3 +30,9 @@ services:
     ports:
     - 389:389
     - 636:636
+    networks:
+      - dex
+
+networks:
+  dex:
+    name: dex
