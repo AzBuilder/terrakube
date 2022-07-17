@@ -16,15 +16,14 @@ tasks:
       cp .gitpod/template/dex/template-config-ldap.yaml .gitpod/setup/dex/config-ldap.yaml
       jwtIssuer=$(gp url 5556)
       sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" .gitpod/setup/dex/config-ldap.yaml
-      docker-compose -f .gitpod/setup/dex/docker-compose up -d
+    command: docker-compose -f .gitpod/setup/dex/docker-compose.yaml up -d
   
   - name: Maven Install
-    init: |
-      mvn install -DskipTests=false
+    command: mvn install -DskipTests=false
 
   - name: Yarn Install
-    init: |
-      yarn install
+    init: cd ui 
+    command: yarn install
 
   - name: Dex Authentication Url
     init: |
