@@ -13,10 +13,8 @@ tasks:
   #  command: echo 'Terraform Terminal'
   - name: Dex Environment Setup
     init: |
-      cp .gitpod/template/dex/template-config-ldap.yaml .gitpod/setup/dex/config-ldap.yaml
-      jwtIssuer=$(gp url 5556)
-      sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" .gitpod/setup/dex/config-ldap.yaml
-    command: docker-compose -f .gitpod/setup/dex/docker-compose.yaml up -d
+      chmod +x .gitpod/scripts/loadDex.sh
+    command: .gitpod/scripts/loadDex.sh
   
   - name: Maven Install
     command: mvn install -DskipTests=false
