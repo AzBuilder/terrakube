@@ -27,24 +27,26 @@ tasks:
   
   - name: Dependencies Backend
     init: |
-      chmod +x .gitpod/scripts/loadDependencies.sh
-      .gitpod/scripts/loadDependencies.sh
+      chmod +x .gitpod/scripts/loadDependencies.sh &&
+      .gitpod/scripts/loadDependencies.sh &&
+      gp sync-done dependencies-backend
     command: echo "Backend Dependencies installed, you can close this terminal"
 
   - name: Dependencies Frontend
     init: |
-      chmod +x .gitpod/scripts/loadDependenciesUI.sh
-      .gitpod/scripts/loadDependenciesUI.sh
+      chmod +x .gitpod/scripts/loadDependenciesUI.sh &&
+      .gitpod/scripts/loadDependenciesUI.sh &&
+      gp sync-done dependencies-frontend
     command: echo "Frontend Dependencies installed, you can close this terminal"
 
   - name: API
     init: |
-      chmod +x .gitpod/scripts/executeApi.sh
+      gp sync-await dependencies-backend && chmod +x .gitpod/scripts/executeApi.sh
     command: .gitpod/scripts/executeApi.sh
 
   - name: Registry
     init: |
-      chmod +x .gitpod/scripts/executeRgistry.sh
+      dependencies-backend && chmod +x .gitpod/scripts/executeRegistry.sh
     command: .gitpod/scripts/executeRegistry.sh
 
   - name: Dex Authentication Url
