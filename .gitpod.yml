@@ -46,7 +46,7 @@ tasks:
 
   - name: Registry
     init: |
-      dependencies-backend && chmod +x .gitpod/scripts/executeRegistry.sh
+      gp sync-await dependencies-backend && chmod +x .gitpod/scripts/executeRegistry.sh
     command: .gitpod/scripts/executeRegistry.sh
 
   - name: Dex Authentication Url
