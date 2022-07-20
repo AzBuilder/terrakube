@@ -4,12 +4,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
+import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.stream.Stream;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Builder
+@Getter
+@Setter
 @Slf4j
 public class LocalTerraformOutputImpl implements TerraformOutput {
 

@@ -22,6 +22,7 @@ import org.terrakube.client.model.organization.workspace.history.History;
 import org.terrakube.client.model.organization.workspace.history.HistoryAttributes;
 import org.terrakube.client.model.organization.workspace.history.HistoryRequest;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
+import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.service.mode.TerraformJob;
 
 @Slf4j
@@ -31,8 +32,9 @@ import org.terrakube.executor.service.mode.TerraformJob;
 public class LocalTerraformStateImpl implements TerraformState {
 
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
-    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/";
-    private static final String LOCAL_STATE_DIRECTORY = "/.terraform-spring-boot/local/state/";
+    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/" + TERRAFORM_PLAN_FILE;
+    private static final String LOCAL_STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
+    private static final String LOCAL_STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
     private static final String BACKEND_FILE_NAME = "localBackend.hcl";
     private static final String BACKEND_LOCAL_CONTENT = "\n\nterraform {\n" +
             "  backend \"local\" { }\n" +
@@ -41,17 +43,20 @@ public class LocalTerraformStateImpl implements TerraformState {
     @NonNull
     TerrakubeClient terrakubeClient;
 
+    @NonNull
+    TerraformStatePathService terraformStatePathService;
+
     @Override
     public String getBackendStateFile(String organizationId, String workspaceId, File workingDirectory) {
         String localBackend = BACKEND_FILE_NAME;
         try {
             String localBackendDirectory = FileUtils.getUserDirectoryPath().concat(
                     FilenameUtils.separatorsToSystem(
-                            LOCAL_BACKEND_DIRECTORY + String.join(File.separator, Stream.of(organizationId, workspaceId).toArray(String[]::new))
+                            String.format(LOCAL_BACKEND_DIRECTORY, organizationId, workspaceId)
                     ));
 
             TextStringBuilder localBackendHcl = new TextStringBuilder();
-            localBackendHcl.appendln("path                  = \"" + localBackendDirectory + "/terraform.tfstate" + "\"");
+            localBackendHcl.appendln("path                  = \"" + localBackendDirectory + "\"");
 
             File localBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
@@ -80,11 +85,11 @@ public class LocalTerraformStateImpl implements TerraformState {
     @Override
     public String saveTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId, File workingDirectory) {
 
-        String localStateFilePath = String.join(File.separator, Stream.of(organizationId, workspaceId, jobId, stepId, TERRAFORM_PLAN_FILE).toArray(String[]::new));
+        String localStateFilePath = String.format(LOCAL_STATE_DIRECTORY, organizationId, workspaceId, jobId, stepId);
 
         String stepStateDirectory = FileUtils.getUserDirectoryPath().concat(
                 FilenameUtils.separatorsToSystem(
-                        LOCAL_STATE_DIRECTORY + localStateFilePath
+                        localStateFilePath
                 ));
 
         File tfPlan = new File(String.join(File.separator, Stream.of(workingDirectory.getAbsolutePath(), TERRAFORM_PLAN_FILE).toArray(String[]::new)));
@@ -97,7 +102,7 @@ public class LocalTerraformStateImpl implements TerraformState {
                 log.error(e.getMessage());
             }
             log.info("Local state file saved to {}", stepStateDirectory);
-            return String.format("http://localhost:8090/state/%s", localStateFilePath);
+            return stepStateDirectory;
         } else {
             return null;
         }
@@ -110,8 +115,8 @@ public class LocalTerraformStateImpl implements TerraformState {
                 .ifPresent(stateFilePath -> {
                     try {
                         log.info("Copying state from {}:", stateFilePath);
-                        FileUtils.copyURLToFile(
-                                new URL(stateFilePath),
+                        FileUtils.copyFile(
+                                new File(stateFilePath),
                                 new File(
                                         String.join(
                                                 File.separator, Stream.of(workingDirectory.getAbsolutePath(), TERRAFORM_PLAN_FILE).toArray(String[]::new)
@@ -129,13 +134,14 @@ public class LocalTerraformStateImpl implements TerraformState {
     @Override
     public void saveStateJson(TerraformJob terraformJob, String applyJSON) {
         if (applyJSON != null) {
-            String stateFileName = String.join(File.separator, Stream.of(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), "state", UUID.randomUUID() + ".json").toArray(String[]::new));
+            String stateFilenameUUID = UUID.randomUUID().toString();
+            String stateFileName = String.format(LOCAL_STATE_DIRECTORY_JSON, terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilenameUUID) ;
             log.info("terraformStateFile: {}", stateFileName);
 
             File localStateFile = new File(FileUtils.getUserDirectoryPath()
                     .concat(
                             FilenameUtils.separatorsToSystem(
-                                    LOCAL_STATE_DIRECTORY + stateFileName
+                                stateFileName
                             )
                     )
             );
@@ -143,7 +149,7 @@ public class LocalTerraformStateImpl implements TerraformState {
             try {
                 FileUtils.writeStringToFile(localStateFile, applyJSON, Charset.defaultCharset());
 
-                String stateURL = String.format("http://localhost:8080/state/%s", stateFileName);
+                String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename);
 
                 HistoryRequest historyRequest = new HistoryRequest();
                 History newHistory = new History();
