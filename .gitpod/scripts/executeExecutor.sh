@@ -12,6 +12,9 @@ export TerrakubeToolsBranch=main
 export TerrakubeRegistryDomain=$(gp url 8075)
 export TerrakubeApiUrl=$(gp url 8080)
 export JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
+executorId=$(jps | grep "ExecutorApplication" | sed "s/ExecutorApplication//gi") 
+
+if [ -z "$executorId" ]; then echo "Executor not running"; else kill $executorId; fi
 
 cd executor
 mvn spring-boot:run -Djvm.options=-Xmx512

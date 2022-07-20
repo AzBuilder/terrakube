@@ -12,7 +12,9 @@ export RegistryStorageType=Local
 export AppClientId=example-app
 export AppIssuerUri="$(gp url 5556)/dex"
 export JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
+registryId=$(jps | grep "OpenRegistryApplication" | sed "s/OpenRegistryApplication//gi") 
 
+if [ -z "$registryId" ]; then echo "Registry not running"; else kill $registryId; fi
 cd registry
 mvn spring-boot:run
 

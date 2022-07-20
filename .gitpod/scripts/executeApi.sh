@@ -13,6 +13,10 @@ export StorageType="LOCAL"
 export TerrakubeUiURL=$(gp url 3000)
 export JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
 
+apiId=$(jps | grep "ServerApplication" | sed "s/ServerApplication//gi") 
+
+if [ -z "$apiId" ]; then echo "API not running"; else kill $apiId; fi
+
 cd api
 mvn spring-boot:run
 
