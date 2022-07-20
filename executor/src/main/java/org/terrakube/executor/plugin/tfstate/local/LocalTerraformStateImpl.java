@@ -149,7 +149,7 @@ public class LocalTerraformStateImpl implements TerraformState {
             try {
                 FileUtils.writeStringToFile(localStateFile, applyJSON, Charset.defaultCharset());
 
-                String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename);
+                String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilenameUUID);
 
                 HistoryRequest historyRequest = new HistoryRequest();
                 History newHistory = new History();

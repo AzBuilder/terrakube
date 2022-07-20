@@ -101,10 +101,14 @@ public class TerraformOutputAutoConfiguration {
                     }
                     break;
                 default:
-                    terraformOutput = LocalTerraformOutputImpl.builder().setTerraformOutputPathService(terraformOutputPathService).build();
+                    terraformOutput = LocalTerraformOutputImpl.builder()
+                            .terraformOutputPathService(terraformOutputPathService)
+                            .build();
             }
         else
-            terraformOutput = new LocalTerraformOutputImpl();
+            terraformOutput = LocalTerraformOutputImpl.builder()
+                    .terraformOutputPathService(terraformOutputPathService)
+                    .build();
         return terraformOutput;
     }
 }
