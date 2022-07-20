@@ -49,6 +49,11 @@ tasks:
       gp sync-await dependencies-backend && chmod +x .gitpod/scripts/executeRegistry.sh
     command: .gitpod/scripts/executeRegistry.sh
 
+  - name: Executor
+    init: |
+      gp sync-await dependencies-backend && chmod +x .gitpod/scripts/executeExecutor.sh
+    command: .gitpod/scripts/executeRegistry.sh
+
   - name: Dex Authentication Url
     init: |
       dexURL=$(gp url 5556)
@@ -70,6 +75,9 @@ ports:
     onOpen: ignore
   - name: TerrakubeRegistry 
     port: 8075
+    onOpen: ignore
+  - name: TerrakubeExecutor 
+    port: 8090
     onOpen: ignore
   #- name: TerrakubeUI 
   #  port: 3000

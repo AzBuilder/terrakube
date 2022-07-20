@@ -11,6 +11,7 @@ export InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
 export RegistryStorageType=Local
 export AppClientId=example-app
 export AppIssuerUri="$(gp url 5556)/dex"
+export JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
 
 cd registry
 mvn spring-boot:run
