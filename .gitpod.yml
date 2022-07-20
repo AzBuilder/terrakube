@@ -25,15 +25,27 @@ tasks:
       chmod +x .gitpod/scripts/loadDex.sh
     command: .gitpod/scripts/loadDex.sh
   
-  - name: Install Backend Dependencies
+  - name: Dependencies Backend
     init: |
       chmod +x .gitpod/scripts/loadDependencies.sh
+      .gitpod/scripts/loadDependencies.sh
     command: echo "Backend Dependencies installed, you can close this terminal"
 
-  - name: Install Frontend Dependencies
+  - name: Dependencies Frontend
     init: |
       chmod +x .gitpod/scripts/loadDependenciesUI.sh
+      .gitpod/scripts/loadDependenciesUI.sh
     command: echo "Frontend Dependencies installed, you can close this terminal"
+
+  - name: API
+    init: |
+      chmod +x .gitpod/scripts/executeApi.sh
+    command: .gitpod/scripts/executeApi.sh
+
+  - name: Registry
+    init: |
+      chmod +x .gitpod/scripts/executeRgistry.sh
+    command: .gitpod/scripts/executeRegistry.sh
 
   - name: Dex Authentication Url
     init: |
@@ -50,6 +62,12 @@ ports:
     onOpen: ignore
   - name: OpenLDAP 
     port: 636
+    onOpen: ignore
+  - name: TerrakubeAPI 
+    port: 8080
+    onOpen: ignore
+  - name: TerrakubeRegistry 
+    port: 8075
     onOpen: ignore
   #- name: TerrakubeUI 
   #  port: 3000
