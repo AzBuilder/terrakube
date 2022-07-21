@@ -26,4 +26,5 @@ echo "InternalSecret=$InternalSecret" >> .gitpod/scripts/.envApi
 echo "DexIssuerUri=$DexIssuerUri" >> .gitpod/scripts/.envApi
 echo "StorageType=$StorageType" >> .gitpod/scripts/.envApi
 echo "TerrakubeUiURL=$TerrakubeUiURL" >> .gitpod/scripts/.envApi
+echo "spring_profiles_active=demo" >> .gitpod/scripts/.envApi
 
