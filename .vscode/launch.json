@@ -36,7 +36,7 @@
             "name": "Terrakube UI",
             "runtimeExecutable": "yarn",
             "cwd": "${workspaceFolder}/ui",
-            "runtimeArgs": ["start:debug"],
+            "runtimeArgs": ["dev"],
             "envFile": "${workspaceFolder}/.gitpod/scripts/.envUi"
         }
     ]

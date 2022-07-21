@@ -33,3 +33,4 @@ target
 .gitpod/scripts/.envApi
 .gitpod/scripts/.envExecutor
 .gitpod/scripts/.envRegistry
+.gitpod/scripts/.envUi

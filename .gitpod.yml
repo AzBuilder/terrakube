@@ -52,10 +52,20 @@ tasks:
       chmod +x .gitpod/scripts/generateDefaultRegistryVars.sh
     command: .gitpod/scripts/generateDefaultRegistryVars.sh
 
-  - name: Executor
+  - name: Executor Variables
     init: |
       chmod +x .gitpod/scripts/generateDefaultExecutorVars.sh
     command: .gitpod/scripts/generateDefaultExecutorVars.sh
+
+  - name: UI Variables
+    init: |
+      chmod +x .gitpod/scripts/generateDefaultUiVars.sh
+      chmod +x ui/env.sh
+      chmod +x ui/setupEnv.sh
+    command: |
+      .gitpod/scripts/generateDefaultUiVars.sh 
+      cd ui
+      ./setupEnv.sh
 
   - name: Dex Authentication Url
     init: |
@@ -82,6 +92,6 @@ ports:
   - name: TerrakubeExecutor 
     port: 8090
     onOpen: ignore
-  #- name: TerrakubeUI 
-  #  port: 3000
-  #  onOpen: ignore
+  - name: TerrakubeUI 
+    port: 3000
+    onOpen: ignore
