@@ -29,6 +29,15 @@
             "projectName": "executor",
             "args": "-Xmx512m -Xms256m",
             "envFile": "${workspaceFolder}/.gitpod/scripts/.envExecutor"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Terrakube UI",
+            "runtimeExecutable": "yarn",
+            "cwd": "${workspaceFolder}/ui",
+            "runtimeArgs": ["start:debug"],
+            "envFile": "${workspaceFolder}/.gitpod/scripts/.envUi"
         }
     ]
 }

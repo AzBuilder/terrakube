@@ -5,4 +5,4 @@ jwtIssuer=$(gp url 5556)
 sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" .gitpod/setup/dex/config-ldap.yaml
 docker-compose -f .gitpod/setup/dex/docker-compose.yaml up -d
 clear
-echo "Dex Enviroment setup completd, you can close this terminal"
+echo "Dex Enviroment setup completed, you can close this terminal"
