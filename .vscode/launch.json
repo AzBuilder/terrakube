@@ -39,5 +39,11 @@
             "runtimeArgs": ["dev"],
             "envFile": "${workspaceFolder}/.gitpod/scripts/.envUi"
         }
+    ],
+    "compounds": [
+        {
+            "name": "Terrakube Platform",
+            "configurations": ["Terrakube API", "Terrakube Registry", "Terrakube Executor", "Terrakube UI"]
+        }
     ]
 }
