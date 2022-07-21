@@ -3,7 +3,6 @@ package org.terrakube.api.rs.vcs;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.Organization;
 import org.hibernate.annotations.Type;
@@ -13,7 +12,6 @@ import java.util.Date;
 import java.util.UUID;
 
 
-@Slf4j
 @ReadPermission(expression = "team view vcs")
 @CreatePermission(expression = "team manage vcs")
 @UpdatePermission(expression = "team manage vcs")

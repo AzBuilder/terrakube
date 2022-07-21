@@ -2,7 +2,6 @@ package org.terrakube.executor.plugin.tfstate.local;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.UUID;

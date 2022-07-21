@@ -3,7 +3,6 @@ package org.terrakube.api.rs.provider;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.provider.implementation.Version;
 import org.hibernate.annotations.Type;
@@ -16,7 +15,6 @@ import java.util.UUID;
 @CreatePermission(expression = "team manage provider")
 @UpdatePermission(expression = "team manage provider")
 @DeletePermission(expression = "team manage provider")
-@Slf4j
 @Include(rootLevel = false)
 @Getter
 @Setter

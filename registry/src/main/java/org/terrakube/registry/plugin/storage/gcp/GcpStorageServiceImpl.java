@@ -20,7 +20,6 @@ public class GcpStorageServiceImpl implements StorageService {
 
     private static String gcpZipModuleLocation = "registry/%s/%s/%s/%s/module.zip";
     private static String gcpDownloadModuleLocation = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
-    private static final String gcpErrorLog = "S3 Not found: {}";
 
     @NonNull
     private String registryHostname;

@@ -1,8 +1,5 @@
 package org.terrakube.executor.service.workspace.registry;
 
-import feign.Feign;
-import feign.form.FormEncoder;
-import feign.gson.GsonDecoder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,8 +8,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.terrakube.client.dex.DexCredentialAuthentication;
-import org.terrakube.client.dex.DexCredentialType;
 import org.terrakube.client.spring.autoconfigure.RestClientProperties;
 
 import javax.crypto.SecretKey;

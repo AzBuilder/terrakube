@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ServerApplication<api-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.terrakube.api.ServerApplication",
+            "projectName": "api-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

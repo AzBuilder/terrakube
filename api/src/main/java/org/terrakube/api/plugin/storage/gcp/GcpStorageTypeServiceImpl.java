@@ -15,7 +15,6 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     private static final String GCP_LOCATION_OUTPUT = "tfoutput/%s/%s/%s.tfoutput";
     private static final String GCP_STATE_LOCATION  = "tfstate/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String GCP_STATE_JSON      = "tfstate/%s/%s/state/%s.json";
-    private static final String GCP_ERROR_LOG = "File Not found: {}";
 
     @NonNull
     private String bucketName;

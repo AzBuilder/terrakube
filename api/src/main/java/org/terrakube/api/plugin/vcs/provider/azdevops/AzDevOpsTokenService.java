@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.vcs.provider.azdevops;
 
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -11,7 +10,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Slf4j
 @Service
 public class AzDevOpsTokenService {
 

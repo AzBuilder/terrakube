@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.vcs.provider.bitbucket;
 
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.provider.GetAccessToken;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
 
-@Slf4j
 @Service
 public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
 

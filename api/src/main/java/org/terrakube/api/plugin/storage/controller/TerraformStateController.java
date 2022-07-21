@@ -1,13 +1,11 @@
 package org.terrakube.api.plugin.storage.controller;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
-@Slf4j
 @RestController
 @RequestMapping("/tfstate/v1")
 public class TerraformStateController {

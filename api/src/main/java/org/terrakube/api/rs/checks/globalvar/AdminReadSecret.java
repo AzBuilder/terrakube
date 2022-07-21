@@ -4,14 +4,12 @@ import com.yahoo.elide.annotation.SecurityCheck;
 import com.yahoo.elide.core.security.ChangeSpec;
 import com.yahoo.elide.core.security.RequestScope;
 import com.yahoo.elide.core.security.checks.OperationCheck;
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.security.user.AuthenticatedUser;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-@Slf4j
 @SecurityCheck(AdminReadSecret.RULE)
 public class AdminReadSecret extends OperationCheck<Globalvar> {
 

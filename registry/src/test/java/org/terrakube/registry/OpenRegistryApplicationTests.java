@@ -3,7 +3,6 @@ package org.terrakube.registry;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.boot.test.context.SpringBootTest;
