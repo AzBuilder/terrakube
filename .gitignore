@@ -30,3 +30,6 @@ hs_err_pid*
 target
 
 .gitpod/setup/dex/config-ldap.yaml
+.gitpod/scripts/.envApi
+.gitpod/scripts/.envExecutor
+.gitpod/scripts/.envRegistry

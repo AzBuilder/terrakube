@@ -42,20 +42,20 @@ tasks:
       gp sync-done dependencies-frontend
     command: echo "Frontend Dependencies installed, you can close this terminal"
 
-  - name: API
+  - name: API Variables
     init: |
-      gp sync-await dependencies-backend && chmod +x .gitpod/scripts/executeApi.sh
-    command: .gitpod/scripts/executeApi.sh
+      chmod +x .gitpod/scripts/generateDefaultApiVars.sh
+    command: .gitpod/scripts/generateDefaultApiVars.sh
 
-  - name: Registry
+  - name: Registry Variables
     init: |
-      gp sync-await dependencies-backend && chmod +x .gitpod/scripts/executeRegistry.sh
-    command: .gitpod/scripts/executeRegistry.sh
+      chmod +x .gitpod/scripts/generateDefaultRegistryVars.sh
+    command: .gitpod/scripts/generateDefaultRegistryVars.sh
 
   - name: Executor
     init: |
-      gp sync-await dependencies-backend && chmod +x .gitpod/scripts/executeExecutor.sh
-    command: .gitpod/scripts/executeRegistry.sh
+      chmod +x .gitpod/scripts/generateDefaultExecutorVars.sh
+    command: .gitpod/scripts/generateDefaultExecutorVars.sh
 
   - name: Dex Authentication Url
     init: |

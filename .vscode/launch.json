@@ -2,13 +2,33 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Spring Boot-ServerApplication<api-server>",
+            "name": "Terrakube API",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "org.terrakube.api.ServerApplication",
             "projectName": "api-server",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "args": "-Xmx512m -Xms256m",
+            "envFile": "${workspaceFolder}/.gitpod/scripts/.envApi"
+        },
+        {
+            "type": "java",
+            "name": "Terrakube Registry",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.terrakube.registry.OpenRegistryApplication",
+            "projectName": "open-registry",
+            "args": "-Xmx512m -Xms256m",
+            "envFile": "${workspaceFolder}/.gitpod/scripts/.envRegistry"
+        },
+        {
+            "type": "java",
+            "name": "Terrakube Executor",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.terrakube.executor.ExecutorApplication",
+            "projectName": "executor",
+            "args": "-Xmx512m -Xms256m",
+            "envFile": "${workspaceFolder}/.gitpod/scripts/.envExecutor"
         }
     ]
 }
