@@ -17,7 +17,7 @@
         <java.version>11</java.version>
         <elide.version>6.1.5</elide.version>
         <liquibase-core.version>4.8.0</liquibase-core.version>
-        <azure.version>3.13.1</azure.version>
+        <azure.version>4.0.0</azure.version>
         <mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>
         <msal4j.version>1.11.2</msal4j.version>
         <lombok.version>1.18.20</lombok.version>
@@ -25,13 +25,13 @@
         <rest-assured.version>4.4.0</rest-assured.version>
         <junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
         <groovy.version>3.0.8</groovy.version>
-        <azure-identity.version>1.4.6</azure-identity.version>
+        <azure-identity.version>1.5.3</azure-identity.version>
         <microsoft-graph.version>5.16.0</microsoft-graph.version>
         <postgresql.version>42.3.3</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <snakeyaml.version>1.29</snakeyaml.version>
         <quartz.version>2.3.2</quartz.version>
-        <azure-storage-blob.version>12.14.3</azure-storage-blob.version>
+        <azure-storage-blob.version>12.18.0</azure-storage-blob.version>
         <aws-sdk.version>1.12.204</aws-sdk.version>
         <gcp-libraries-bom.version>25.4.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
