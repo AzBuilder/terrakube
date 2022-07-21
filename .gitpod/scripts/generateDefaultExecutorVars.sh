@@ -24,7 +24,7 @@ echo "ExecutorFlagBatch=$ExecutorFlagBatch" >> .gitpod/scripts/.envExecutor
 echo "ExecutorFlagDisableAcknowledge=$ExecutorFlagDisableAcknowledge" >> .gitpod/scripts/.envExecutor
 echo "TerrakubeToolsRepository=$TerrakubeToolsRepository" >> .gitpod/scripts/.envExecutor
 echo "TerrakubeToolsBranch=$TerrakubeToolsBranch" >> .gitpod/scripts/.envExecutor
-echo "TerrakubeApiUrl=$TerrakubeApiUrl" >> .gitpod/scripts/.envExecutor
+echo "TerrakubeRegistryDomain=$TerrakubeRegistryDomain" >> .gitpod/scripts/.envExecutor
 echo "TerrakubeApiUrl=$TerrakubeApiUrl" >> .gitpod/scripts/.envExecutor
 echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .gitpod/scripts/.envExecutor
 
