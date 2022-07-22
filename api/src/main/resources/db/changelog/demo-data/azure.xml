@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet author="demo-data" id="demo-0">
+        <insert tableName="organization">
+            <column name="id"          value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+            <column name="name"        value="azure" />
+            <column name="description" value="azure sample organization" />
+        </insert>
+
+
+        <insert tableName="team">
+            <column name="id"              value="d8fbad03-7c69-4c8b-812a-1e507af4fb34" />
+            <column name="name"            value="azure" />
+            <column name="manageWorkspace" value="true" />
+            <column name="manageModule"    value="true" />
+            <column name="manageProvider"  value="true" />
+            <column name="manageVcs"       value="true" />
+            <column name="manageTemplate"  value="true" />
+            <column name="organization_id" value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+
+
+        <insert tableName="module">
+            <column name="id"                value="26a1e3d1-a60b-4170-b700-ffcb76873de6" />
+            <column name="name"              value="network" />
+            <column name="provider"          value="azurerm" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-network.git" />
+            <column name="download_quantity" value="10" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="2e7bb76b-a6e5-456d-9542-c8b46020f136" />
+            <column name="name"              value="compute" />
+            <column name="provider"          value="azurerm" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-compute.git" />
+            <column name="download_quantity" value="20" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="c342cdd2-45b4-4aef-8f93-5093eefd9e19" />
+            <column name="name"              value="database" />
+            <column name="provider"          value="azurerm" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-database.git" />
+            <column name="download_quantity" value="30" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="14861d5d-838e-42be-9064-8ab6545b48f5" />
+            <column name="name"              value="cosmosdb" />
+            <column name="provider"          value="azurerm" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-cosmosdb.git" />
+            <column name="download_quantity" value="40" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="319a1163-0620-4a36-8693-caf1ef6f9d8e" />
+            <column name="name"              value="manageddisk" />
+            <column name="provider"          value="azurerm" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-manageddisk.git" />
+            <column name="download_quantity" value="50" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+
+
+        <insert tableName="workspace">
+            <column name="id"                value="17fce91b-e217-4c91-b780-92ba522e1380" />
+            <column name="name"              value="sample_network" />
+            <column name="description"       value="sample workspace for network" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-network.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.5" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="0d013ebe-9b9c-4132-9d0d-2eb25942766e" />
+            <column name="name"              value="sample_compute" />
+            <column name="description"       value="sample workspace for compute" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-compute.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.4" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="9441c065-cc0e-4895-884b-db850794e2df" />
+            <column name="name"              value="sample_database" />
+            <column name="description"       value="sample workspace for database" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-database.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.3" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="0beb7db4-b073-4bd4-9a98-94fe7e2d9939" />
+            <column name="name"              value="sample_cosmosdb" />
+            <column name="description"       value="sample workspace for cosmosdb" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-cosmosdb.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.2" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="9f44f5e2-c7ac-4b91-9a41-7a89b973bfb0" />
+            <column name="name"              value="sample_manageddisk" />
+            <column name="description"       value="sample workspace for manageddisk" />
+            <column name="source"            value="https://github.com/Azure/terraform-azurerm-manageddisk.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.1" />
+            <column name="organization_id"   value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

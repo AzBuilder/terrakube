@@ -10,21 +10,37 @@ dn: ou=People,dc=example,dc=org
 objectClass: organizationalUnit
 ou: People
 
-dn: cn=jane,ou=People,dc=example,dc=org
+dn: cn=lester,ou=People,dc=example,dc=org
 objectClass: person
 objectClass: inetOrgPerson
-sn: doe
-cn: jane
-mail: janedoe@example.com
-userpassword: foo
+sn: Lester
+cn: Parkinson
+mail: admin@example.com
+userpassword: admin
 
-dn: cn=john,ou=People,dc=example,dc=org
+dn: cn=grady,ou=People,dc=example,dc=org
 objectClass: person
 objectClass: inetOrgPerson
-sn: doe
-cn: john
-mail: johndoe@example.com
-userpassword: bar
+sn: Grady
+cn: Chambers
+mail: azure@example.com
+userpassword: azure
+
+dn: cn=saarah,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+sn: Saarah
+cn: Lott
+mail: aws@example.com
+userpassword: aws
+
+dn: cn=eugene,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+sn: Eugene
+cn: Monaghan
+mail: gcp@example.com
+userpassword: gcp
 
 # Group definitions.
 
@@ -32,13 +48,22 @@ dn: ou=Groups,dc=example,dc=org
 objectClass: organizationalUnit
 ou: Groups
 
-dn: cn=admins,ou=Groups,dc=example,dc=org
+dn: cn=TERRAKUBE_ADMINISTRATORS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
-cn: admins
-member: cn=john,ou=People,dc=example,dc=org
+cn: TERRAKUBE_ADMINISTRATORS
+member: cn=lester,ou=People,dc=example,dc=org
+
+dn: cn=AZURE_DEVELOPERS,ou=Groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: AZURE_DEVELOPERS
+member: cn=saarah,ou=People,dc=example,dc=org
+
+dn: cn=AWS_DEVELOPERS,ou=Groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: AWS_DEVELOPERS
 member: cn=jane,ou=People,dc=example,dc=org
 
-dn: cn=developers,ou=Groups,dc=example,dc=org
+dn: cn=GCP_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
-cn: developers
+cn: GCP_DEVELOPERS
 member: cn=jane,ou=People,dc=example,dc=org

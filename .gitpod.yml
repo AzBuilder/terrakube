@@ -76,6 +76,7 @@ ports:
     description: Dex Authentication Endpoint
     port: 5556
     onOpen: ignore
+    visibility: public
   - name: OpenLDAP 
     port: 389
     onOpen: ignore

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet author="demo-data" id="demo-0">
+        <insert tableName="organization">
+            <column name="id" value="4db158e0-00b0-48d0-aa71-6e8c95ba039e" />
+            <column name="name" value="aws" />
+            <column name="description" value="aws sample organization" />
+        </insert>
+        <insert tableName="team">
+            <column name="id" value="93601a50-1584-440b-8719-a237bb04e8ba" />
+            <column name="name" value="azure" />
+            <column name="manageWorkspace" value="azure sample organization" />
+            <column name="manageModule" value="azure sample organization" />
+            <column name="manageProvider" value="azure sample organization" />
+            <column name="manageVcs" value="azure sample organization" />
+            <column name="manageTemplate" value="azure sample organization" />
+            <column name="organization_id" value="azure sample organization" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>
