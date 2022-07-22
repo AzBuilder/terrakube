@@ -86,9 +86,11 @@ ports:
   - name: TerrakubeAPI 
     port: 8080
     onOpen: ignore
+    visibility: public
   - name: TerrakubeRegistry 
     port: 8075
     onOpen: ignore
+    visibility: public
   - name: TerrakubeExecutor 
     port: 8090
     onOpen: ignore
