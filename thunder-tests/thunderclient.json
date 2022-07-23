@@ -8,7 +8,7 @@
     "method": "POST",
     "sortNum": 10000,
     "created": "2022-07-22T21:25:36.069Z",
-    "modified": "2022-07-23T18:04:08.385Z",
+    "modified": "2022-07-23T18:11:53.228Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -18,14 +18,21 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp\",\r\n      \"description\": \"hashicorp organization\"\r\n    }\r\n  }\r\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"organization\",\n    \"attributes\": {\n      \"name\": \"hashicorp2\",\n      \"description\": \"hashicorp organization\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
       "type": "bearer",
       "bearer": "{{access_token}}"
     },
-    "tests": []
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.id",
+        "action": "setto",
+        "value": "{{organizationId}}"
+      }
+    ]
   },
   {
     "_id": "c49079c2-3186-4d7b-9ff6-6bafe58b429a",
@@ -68,16 +75,16 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "6e63a8fb-4e4c-4c08-b97c-a3eb5d979955",
     "name": "search org by name",
-    "url": "{{terrakubeApi}}/api/v1/organization?filter[organization]=name==Terrakube",
+    "url": "{{terrakubeApi}}/api/v1/organization?filter[organization]=name==azure",
     "method": "GET",
     "sortNum": 40000,
     "created": "2022-07-22T21:25:36.072Z",
-    "modified": "2022-07-22T23:24:15.000Z",
+    "modified": "2022-07-23T18:12:23.861Z",
     "headers": [],
     "params": [
       {
         "name": "filter[organization]",
-        "value": "name==Terrakube",
+        "value": "name==azure",
         "isPath": false
       }
     ],
