@@ -25,47 +25,27 @@ github:
 tasks:
   - name: Dex Environment Setup
     init: |
-      chmod +x .gitpod/scripts/loadDex.sh
-    command: .gitpod/scripts/loadDex.sh
+      chmod +x scripts/dependencies/loadDex.sh
+    command: scripts/dependencies/loadDex.sh
   
   - name: Dependencies Backend
     init: |
-      chmod +x .gitpod/scripts/loadDependencies.sh &&
-      .gitpod/scripts/loadDependencies.sh &&
+      chmod +x scripts/dependencies/loadDependencies.sh &&
+      scripts/dependencies/loadDependencies.sh &&
       gp sync-done dependencies-backend
     command: echo "Backend Dependencies installed, you can close this terminal"
 
   - name: Dependencies Frontend
     init: |
-      chmod +x .gitpod/scripts/loadDependenciesUI.sh &&
-      .gitpod/scripts/loadDependenciesUI.sh &&
+      chmod +x scripts/dependencies/loadDependenciesUI.sh &&
+      scripts/dependencies/loadDependenciesUI.sh &&
       gp sync-done dependencies-frontend
     command: echo "Frontend Dependencies installed, you can close this terminal"
 
-  - name: API Variables
+  - name: Setup Development Environment
     init: |
-      chmod +x .gitpod/scripts/generateDefaultApiVars.sh
-    command: .gitpod/scripts/generateDefaultApiVars.sh
-
-  - name: Registry Variables
-    init: |
-      chmod +x .gitpod/scripts/generateDefaultRegistryVars.sh
-    command: .gitpod/scripts/generateDefaultRegistryVars.sh
-
-  - name: Executor Variables
-    init: |
-      chmod +x .gitpod/scripts/generateDefaultExecutorVars.sh
-    command: .gitpod/scripts/generateDefaultExecutorVars.sh
-
-  - name: UI Variables
-    init: |
-      chmod +x .gitpod/scripts/generateDefaultUiVars.sh
-      chmod +x ui/env.sh
-      chmod +x ui/setupEnv.sh
-    command: |
-      .gitpod/scripts/generateDefaultUiVars.sh 
-      cd ui
-      ./setupEnv.sh
+      chmod +x scripts/setupDevelopmentEnvironmnet.sh
+    command: scripts/setupDevelopmentEnvironmnet.sh
 
   - name: Dex Authentication Url
     command: |

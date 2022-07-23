@@ -29,8 +29,9 @@ hs_err_pid*
 **.DS_Store
 target
 
-.gitpod/setup/dex/config-ldap.yaml
-.gitpod/scripts/.envApi
-.gitpod/scripts/.envExecutor
-.gitpod/scripts/.envRegistry
-.gitpod/scripts/.envUi
+thunder-tests/thunderEnvironment.json
+scripts/setup/dex/config-ldap.yaml
+.envApi
+.envExecutor
+.envRegistry
+.envUi

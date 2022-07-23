@@ -2,48 +2,48 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Terrakube API",
+            "name": "Run API",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "org.terrakube.api.ServerApplication",
             "projectName": "api-server",
             "args": "-Xmx512m -Xms256m",
-            "envFile": "${workspaceFolder}/.gitpod/scripts/.envApi"
+            "envFile": "${workspaceFolder}/.envApi"
         },
         {
             "type": "java",
-            "name": "Terrakube Registry",
+            "name": "Run Registry",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "org.terrakube.registry.OpenRegistryApplication",
             "projectName": "open-registry",
             "args": "-Xmx512m -Xms256m",
-            "envFile": "${workspaceFolder}/.gitpod/scripts/.envRegistry"
+            "envFile": "${workspaceFolder}/.envRegistry"
         },
         {
             "type": "java",
-            "name": "Terrakube Executor",
+            "name": "Run Executor",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "org.terrakube.executor.ExecutorApplication",
             "projectName": "executor",
             "args": "-Xmx512m -Xms256m",
-            "envFile": "${workspaceFolder}/.gitpod/scripts/.envExecutor"
+            "envFile": "${workspaceFolder}/.envExecutor"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Terrakube UI",
+            "name": "Run UI",
             "runtimeExecutable": "yarn",
             "cwd": "${workspaceFolder}/ui",
-            "runtimeArgs": ["dev"],
-            "envFile": "${workspaceFolder}/.gitpod/scripts/.envUi"
+            "runtimeArgs": ["start"],
+            "envFile": "${workspaceFolder}/.envUi"
         }
     ],
     "compounds": [
         {
-            "name": "Terrakube Platform",
-            "configurations": ["Terrakube API", "Terrakube Registry", "Terrakube Executor", "Terrakube UI"]
+            "name": "Terrakube",
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"]
         }
     ]
 }

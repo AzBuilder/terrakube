@@ -106,7 +106,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${parent.version}</version>
                         <configuration>
-                            <mainClass>org.azbuilder.api.ServerApplication</mainClass>
+                            <mainClass>org.terrakube.api.ServerApplication</mainClass>
                             <excludes>
                                 <exclude>
                                     <groupId>org.projectlombok</groupId>
