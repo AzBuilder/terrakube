@@ -150,7 +150,7 @@ function generateUiVars(){
 
 function generateUiConfigFile(){
   # Recreate config file
-  rm -rf ui/env-config.js
+  rm -f ui/env-config.js
   touch ui/env-config.js
 
   # Add assignment
@@ -173,7 +173,7 @@ function generateUiConfigFile(){
 
     # Append configuration property to JS file
     echo "  $varname: \"$value\"," >> ui/env-config.js
-  done < .envUI
+  done < .envUi
 
   echo "}" >> ui/env-config.js
 
@@ -198,10 +198,30 @@ function generateDexConfiguration(){
 
 }
 
+function generateThunderClientConfiguration(){
+  USER=$(whoami)
+  if [ "$USER" = "gitpod" ]; then
+    jwtIssuer="$(gp url 5556)/dex"
+    terrakubeApi=$(gp url 8080)
+    terrakubeRegistry=$(gp url 8075)
+  else
+    jwtIssuer="http://localhost:5556"
+    terrakubeApi="http://localhost:8080"
+    terrakubeRegistry="http://localhost:8075"
+  fi
+
+  rm -f thunder-tests/thunderEnvironment.json
+  cp scripts/template/thunder-tests/thunderEnvironment.json thunder-tests/
+  sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" thunder-tests/thunderEnvironment.json
+  sed -i "s+TEMPLATE_GITPOD_API+$terrakubeApi+gi" thunder-tests/thunderEnvironment.json
+  sed -i "s+TEMPLATE_GITPOD_REGISTRY+$terrakubeRegistry+gi" thunder-tests/thunderEnvironment.json
+}
+
 generateApiVars
 generateRegistryVars
 generateExecutorVars
 generateUiVars
 generateDexConfiguration
+generateThunderClientConfiguration
 
 echo "Setup Development Environment Completed"

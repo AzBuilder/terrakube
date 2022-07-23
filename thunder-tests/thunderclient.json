@@ -4,11 +4,11 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "6e63a8fb-4e4c-4c08-b97c-a3eb5d979955",
     "name": "create organization",
-    "url": "{{server}}/api/v1/organization",
+    "url": "{{terrakubeApi}}/api/v1/organization",
     "method": "POST",
     "sortNum": 10000,
     "created": "2022-07-22T21:25:36.069Z",
-    "modified": "2022-07-22T23:23:23.667Z",
+    "modified": "2022-07-23T17:35:03.117Z",
     "headers": [
       {
         "name": "Content-Type",

@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "13fbb766-8ca9-4040-91ec-6c6c56a3bb3b",
+    "name": "(Global Env)",
+    "default": false,
+    "global": true,
+    "sortNum": -1,
+    "created": "2022-07-23T17:20:32.872Z",
+    "modified": "2022-07-23T17:22:47.097Z",
+    "data": [
+      {
+        "name": "terrakubeDex",
+        "value": "TEMPLATE_GITPOD_JWT_ISSUER"
+      },
+      {
+        "name": "terrakubeApi",
+        "value": "TEMPLATE_GITPOD_API"
+      },
+      {
+        "name": "terrakubeRegsitry",
+        "value": "TEMPLATE_GITPOD_REGISTRY"
+      },
+      {
+        "name": "client_id",
+        "value": "example-app"
+      }
+    ]
+  }
+]
