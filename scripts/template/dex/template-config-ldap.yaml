@@ -68,4 +68,5 @@ staticClients:
   - 'TEMPLATE_GITPOD_REDIRECT'
   - '/device/callback'
   name: 'Example App'
-  secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+  #secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+  public: true
