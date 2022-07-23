@@ -103,7 +103,7 @@
     "method": "POST",
     "sortNum": 50000,
     "created": "2022-07-22T21:25:36.073Z",
-    "modified": "2022-07-22T23:24:53.718Z",
+    "modified": "2022-07-23T18:18:05.957Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -113,7 +113,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"Terrakube_Team\",\n      \"manageWorkspace\": true,\n      \"manageModule\": true,\n      \"manageProvider\": true,\n      \"manageVcs\": true,\n      \"manageTemplate\": true\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"team\",\n    \"attributes\": {\n      \"name\": \"TERRAKUBE_DEVELOPERS\",\n      \"manageWorkspace\": true,\n      \"manageModule\": true,\n      \"manageProvider\": true,\n      \"manageVcs\": true,\n      \"manageTemplate\": true\n    }\n  }\n}",
       "form": []
     },
     "auth": {
