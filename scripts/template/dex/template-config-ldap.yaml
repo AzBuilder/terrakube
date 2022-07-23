@@ -4,6 +4,10 @@ storage:
   type: memory
 web:
   http: 0.0.0.0:5556
+  allowedOrigins: ['*']
+
+oauth2:
+  responseTypes: ["code", "token", "id_token"] 
 
 connectors:
 - type: ldap
@@ -62,5 +66,6 @@ staticClients:
 - id: example-app
   redirectURIs:
   - 'TEMPLATE_GITPOD_REDIRECT'
+  - '/device/callback'
   name: 'Example App'
   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
