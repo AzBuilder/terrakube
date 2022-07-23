@@ -48,9 +48,9 @@ dn: ou=Groups,dc=example,dc=org
 objectClass: organizationalUnit
 ou: Groups
 
-dn: cn=TERRAKUBE_ADMINISTRATORS,ou=Groups,dc=example,dc=org
+dn: cn=TERRAKUBE_ADMIN,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
-cn: TERRAKUBE_ADMINISTRATORS
+cn: TERRAKUBE_ADMIN
 member: cn=lester,ou=People,dc=example,dc=org
 
 dn: cn=AZURE_DEVELOPERS,ou=Groups,dc=example,dc=org

@@ -8,7 +8,7 @@
     "method": "POST",
     "sortNum": 10000,
     "created": "2022-07-22T21:25:36.069Z",
-    "modified": "2022-07-23T17:56:14.210Z",
+    "modified": "2022-07-23T18:04:08.385Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -16,6 +16,11 @@
       }
     ],
     "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\r\n  \"data\": {\r\n    \"type\": \"organization\",\r\n    \"attributes\": {\r\n      \"name\": \"hashicorp\",\r\n      \"description\": \"hashicorp organization\"\r\n    }\r\n  }\r\n}",
+      "form": []
+    },
     "auth": {
       "type": "bearer",
       "bearer": "{{access_token}}"
