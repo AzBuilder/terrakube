@@ -127,15 +127,16 @@ function generateUiVars(){
     REACT_CONFIG_TERRAKUBE_URL=$(gp url 8080) 
     REDIRECT=$(gp url 3000)
     REACT_CONFIG_REGISTRY_URI=$(gp url 8075)  
+    REACT_CONFIG_AUTHORITY="$(gp url 5556)/dex"
   else
     REACT_CONFIG_TERRAKUBE_URL="http://localhost:8080"
     REDIRECT="http://localhost:3000"
-    REACT_CONFIG_REGISTRY_URI="http://localhost:8075" 
+    REACT_CONFIG_REGISTRY_URI="http://localhost:8075"
+    REACT_CONFIG_AUTHORITY="http://localhost:5556/dex"
   fi
 
   REACT_CONFIG_CLIENT_ID="example-app"
-  REACT_CONFIG_AUTHORITY="https://login.microsoftonline.com/89a1b398-5a8d-4060-b3e4-9d7b849527a9"
-  REACT_CONFIG_SCOPE="api://azbuilder/Builder.Default "
+  REACT_CONFIG_SCOPE="email openid profile offline_access groups"
 
   rm -f .envUi
 

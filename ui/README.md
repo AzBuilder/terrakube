@@ -71,12 +71,12 @@ services:
     image: azbuilder/terrakube-ui:latest
     container_name: terrakube-ui
     environment:
-      - REACT_APP_TERRAKUBE_API_URL=https://XXXXXXXX/api/v1/
-      - REACT_APP_CLIENT_ID=XXXXXX
-      - REACT_APP_AUTHORITY=https://login.microsoftonline.com/XXXXX
-      - REACT_APP_REDIRECT_URI=http://localhost:8080
-      - REACT_APP_REGISTRY_URI=https://registry.XXXX.com
-      - REACT_APP_SCOPE=api://XXXX/XXX
+      - REACT_APP_TERRAKUBE_API_URL=https://terrakubeUrl/api/v1/
+      - REACT_APP_CLIENT_ID=terrakube-app
+      - REACT_APP_AUTHORITY=https://dexUrl.com
+      - REACT_APP_REDIRECT_URI=http://localhost:3000
+      - REACT_APP_REGISTRY_URI=https://registryUrl.com
+      - REACT_APP_SCOPE=email openid profile offline_access groups
     ports:
       - 8080:8080 
 ```
