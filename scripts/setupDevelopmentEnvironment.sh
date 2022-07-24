@@ -124,13 +124,13 @@ function generateExecutorVars(){
 function generateUiVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
-    REACT_CONFIG_TERRAKUBE_URL=$(gp url 8080) 
-    REDIRECT=$(gp url 3000)
+    REACT_CONFIG_TERRAKUBE_URL="$(gp url 8080)/api/v1/" 
+    REACT_CONFIG_REDIRECT=$(gp url 3000)
     REACT_CONFIG_REGISTRY_URI=$(gp url 8075)  
     REACT_CONFIG_AUTHORITY="$(gp url 5556)/dex"
   else
-    REACT_CONFIG_TERRAKUBE_URL="http://localhost:8080"
-    REDIRECT="http://localhost:3000"
+    REACT_CONFIG_TERRAKUBE_URL="http://localhost:8080/api/v1/"
+    REACT_CONFIG_REDIRECT="http://localhost:3000"
     REACT_CONFIG_REGISTRY_URI="http://localhost:8075"
     REACT_CONFIG_AUTHORITY="http://localhost:5556/dex"
   fi
@@ -140,11 +140,12 @@ function generateUiVars(){
 
   rm -f .envUi
 
-  echo "REACT_CONFIG_TERRAKUBE_URL=$REACT_CONFIG_TERRAKUBE_URL" >> .envUi
-  echo "REACT_CONFIG_CLIENT_ID=$REACT_CONFIG_CLIENT_ID" >> .envUi
-  echo "REACT_CONFIG_AUTHORITY=$REACT_CONFIG_AUTHORITY" >> .envUi
-  echo "REACT_CONFIG_REGISTRY_URI=$REACT_CONFIG_REGISTRY_URI" >> .envUi
-  echo "REACT_CONFIG_SCOPE=$REACT_CONFIG_SCOPE" >> .envUi
+  echo "REACT_APP_TERRAKUBE_API_URL=$REACT_CONFIG_TERRAKUBE_URL" >> .envUi;
+  echo "REACT_APP_CLIENT_ID=$REACT_CONFIG_CLIENT_ID" >> .envUi;
+  echo "REACT_APP_AUTHORITY=$REACT_CONFIG_AUTHORITY" >> .envUi;
+  echo "REACT_APP_REDIRECT_URI=$REACT_CONFIG_REDIRECT" >>.envUi;
+  echo "REACT_APP_REGISTRY_URI=$REACT_CONFIG_REGISTRY_URI" >>.envUi;
+  echo "REACT_APP_SCOPE"=$REACT_CONFIG_SCOPE >>.envUi
 
   generateUiConfigFile
 }
