@@ -1,13 +1,11 @@
 import React from 'react';
 import { MicrosoftLoginButton } from 'react-social-login-buttons';
-import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../../config/authConfig";
 import './Login.css';
-import axiosInstance from "../../config/axiosConfig";
 import { Card ,Space} from "antd";
 import logo from './logo.jpg';
+import { mgr } from "../../config/authConfig";
+import { Button } from "antd";
 const Login = () => {
-  const { instance } = useMsal();
 
   return (
     <div className='login-container'>
@@ -16,7 +14,7 @@ const Login = () => {
         <Card title={<img alt="logo"  className="loginLogo" src={logo} />}>
           <Space direction="vertical">
           Sign in to Terrakube
-          <MicrosoftLoginButton onClick={() => handleLogin(instance)} />
+          <Button type="primary" onClick={() => App()}>Login</Button>
           </Space>
         </Card>
 
@@ -24,16 +22,9 @@ const Login = () => {
   )
 }
 
-function handleLogin(instance) {
-  instance.loginPopup(loginRequest).then(response => {
-    console.log(response);
-    localStorage.setItem('azureProfile', response.account);
-    localStorage.setItem('azureAccessToken', response.accessToken);
-    axiosInstance.defaults.headers.common['Authorization'] = response.accessToken;
-  })
-    .catch(e => {
-      console.error(e);
-    });
+function App() {
+  console.log(mgr);
+  mgr.signinRedirect();
 }
 
 export default Login;
