@@ -2,14 +2,14 @@ import { React ,useEffect,useState} from 'react';
 import 'antd/dist/antd.css';
 import "./Home.css"
 import {  Avatar ,Dropdown,Menu,message} from 'antd';
-import axios from 'axios';
 import { UserOutlined, PoweroffOutlined, QuestionCircleOutlined} from '@ant-design/icons';
-import { mgr } from "../../config/authConfig";
 import getUserFromStorage from "../../config/authUser";
+import { useAuth } from '../../config/authConfig'; 
 
 export const ProfilePicture = (props) => {
   //const [imageUrl, setImageUrl] = useState(null);
   const [username, setUsername] = useState(null);
+  const auth = useAuth();
 
   const userMenu = (
     <Menu theme="dark">
@@ -27,7 +27,7 @@ export const ProfilePicture = (props) => {
     </Menu>
   );
   const signOutClickHandler= () => {
-    mgr.signoutRedirect()
+    auth.removeUser();
   }
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export const ProfilePicture = (props) => {
    }, [])
  
    const GetProfileImage = () => {
- 
+
     const user = getUserFromStorage();
     console.log(user)
     setUsername(user.profile.name);

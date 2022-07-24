@@ -4,8 +4,6 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
-    "@azure/msal-browser": "^2.15.0",
-    "@azure/msal-react": "^1.0.1",
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
     "@monaco-editor/react": "^4.3.1",

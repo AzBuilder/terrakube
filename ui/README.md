@@ -7,11 +7,11 @@ Define the following environment variables in your local machine:
 |Name                         | Description                                                          |
 |:----------------------------|----------------------------------------------------------------------|
 |REACT_CONFIG_TERRAKUBE_URL   | Terrakube API URL Example: https://someURL/terrakube-api/api/v1/     | 
-|REACT_CONFIG_CLIENT_ID       | Azure Active Directory Application Id                                |
-|REACT_CONFIG_AUTHORITY       | https://login.microsoftonline.com/(Azure Active Directory Tenant ID) |
+|REACT_CONFIG_CLIENT_ID       | Dex Issuer Application ID                                            |
+|REACT_CONFIG_AUTHORITY       | Dex Issuer (From http://dexURl/.well-knownopenid-configuration)      |
 |REACT_CONFIG_REDIRECT        | Redirct URL. Example: http://localhost:3000                          |
 |REACT_CONFIG_REGISTRY_URI    | Terrakube Registry url. Example: https://someurl/open-registry/      |
-|REACT_CONFIG_SCOPE           | Azure Ad API Scope Example: api://azbuilder/Builder.Default          |
+|REACT_CONFIG_SCOPE           | Dex Scope (email openid profile offline_access groups)               |
 
 Run the script to generate .env file in your local
 
@@ -22,12 +22,12 @@ Run the script to generate .env file in your local
 The above script will generate a .env file with the following structure:
 
 ```
-REACT_APP_TERRAKUBE_API_URL=https://someURL.com/XXXX/api/v1/
-REACT_APP_CLIENT_ID=7a567a36-e18b-4754-a9fb-03a97e082fc4
-REACT_APP_AUTHORITY=https://login.microsoftonline.com/59b1b67-5a8d-4060-b3e2-9d7b849527a8
-REACT_APP_REDIRECT_URI=http://localhost:8080
-REACT_APP_REGISTRY_URI=https://registry.someURL.com
-REACT_APP_SCOPE=api://azbuilder/Builder.Default
+REACT_APP_TERRAKUBE_API_URL=https://terrakubeUrl/api/v1/
+REACT_APP_CLIENT_ID=terrakube-app
+REACT_APP_AUTHORITY=https://dexUrl.com
+REACT_APP_REDIRECT_URI=http://localhost:3000
+REACT_APP_REGISTRY_URI=https://registryUrl.com
+REACT_APP_SCOPE=email openid profile offline_access groups
 ```
 
 > Values are only examples
