@@ -3,17 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './domain/Home/App';
 import reportWebVitals from './reportWebVitals';
-
-import { MsalProvider } from "@azure/msal-react";
-import {msalInstance } from "./config/authConfig";
-
-
+import { AuthProvider } from "react-oidc-context";
+import { oidcConfig } from './config/authConfig'
 
 ReactDOM.render(
   <React.StrictMode>
-    <MsalProvider instance={msalInstance}>
+   <AuthProvider {...oidcConfig}>
       <App />
-    </MsalProvider>
+    </AuthProvider>,
   </React.StrictMode>,
   document.getElementById('root')
 );

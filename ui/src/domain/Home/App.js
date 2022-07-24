@@ -3,7 +3,6 @@ import './App.css';
 import Login from '../Login/Login'
 import MainMenu from '../Home/MainMenu'
 import { Layout} from 'antd';
-import { useIsAuthenticated } from "@azure/msal-react";
 import logo from './white_logo.png';
 import {
   BrowserRouter as Router,
@@ -20,12 +19,13 @@ import { ModuleList } from '../Modules/List';
 import { ModuleDetails } from '../Modules/Details';
 import { OrganizationSettings } from '../Settings/Settings';
 import { ProfilePicture } from './ProfilePicture';
+import { useAuth } from '../../config/authConfig'; 
 const { Header, Footer } = Layout;
 const App = () => {
-  const isAuthenticated = useIsAuthenticated();
+  const auth = useAuth();
   const [organizationName, setOrganizationName] = useState("...");
   
-  if (!isAuthenticated) {
+  if (!auth.isAuthenticated) {
     return (
        <Login />
     )
