@@ -8,7 +8,6 @@
             <column name="description" value="azure sample organization" />
         </insert>
 
-
         <insert tableName="team">
             <column name="id"              value="d8fbad03-7c69-4c8b-812a-1e507af4fb34" />
             <column name="name"            value="azure" />
@@ -20,6 +19,25 @@
             <column name="organization_id" value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
         </insert>
 
+        <insert tableName="team">
+            <column name="id"              value="4871110e-2069-4b27-9143-d00f27bd8b7e" />
+            <column name="name"            value="TERRAKUBE_DEVELOPERS" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id" value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="1126c6a6-dedd-4754-96f2-a75d96278ed6" />
+            <column name="name"             value="plan_apply" />
+            <column name="description"      value="Terraform Plan Apply" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=" />
+            <column name="organization_id"  value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
 
         <insert tableName="module">
             <column name="id"                value="26a1e3d1-a60b-4170-b700-ffcb76873de6" />

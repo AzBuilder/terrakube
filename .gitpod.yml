@@ -74,6 +74,7 @@ ports:
   - name: TerrakubeExecutor 
     port: 8090
     onOpen: ignore
+    visibility: public
   - name: TerrakubeUI 
     port: 3000
     onOpen: ignore
