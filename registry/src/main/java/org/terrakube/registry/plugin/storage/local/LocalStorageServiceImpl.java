@@ -1,12 +1,11 @@
 package org.terrakube.registry.plugin.storage.local;
 
-import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobContainerClient;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.bouncycastle.pqc.crypto.ExchangePair;
 import org.terrakube.registry.plugin.storage.StorageService;
 import org.terrakube.registry.service.git.GitService;
 import org.zeroturnaround.zip.ZipUtil;
@@ -20,7 +19,7 @@ import java.io.IOException;
 public class LocalStorageServiceImpl implements StorageService {
 
     private static String DOWNLOAD_MODULE_LOCATION = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
-    private static String MODULE_LOCATION = "/.terraform-spring-boot/local/modules/%s/%s/%s/%s/module.zip";
+    private static String MODULE_LOCATION_ZIP = "/.terraform-spring-boot/local/modules/%s/%s/%s/%s/module.zip";
 
     @NonNull
     GitService gitService;
@@ -28,22 +27,36 @@ public class LocalStorageServiceImpl implements StorageService {
     String registryHostname;
 
     @Override
-    public synchronized String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
-        String moduleFilePath = String.format(MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion);
-        log.info("blobName: {}", moduleFilePath);
+    public synchronized String searchModule(String organizationName, String moduleName, String providerName,
+            String moduleVersion, String source, String vcsType, String accessToken) {
+        String moduleFilePath = String.format(MODULE_LOCATION_ZIP, organizationName, moduleName, providerName,
+                moduleVersion);
+        log.info("moduleZip: {}", moduleFilePath);
         File moduleFile = new File(FileUtils.getUserDirectoryPath().concat(moduleFilePath));
-        if (moduleFile.exists()) {
-            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken);
-            File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
-            ZipUtil.pack(gitCloneDirectory, moduleZip);
+    
+        try {
+            FileUtils.forceMkdirParent(moduleFile);
+            if (!moduleFile.exists()) {
+                File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType,
+                        accessToken);
+                log.info("Git Clone Directory {}", gitCloneDirectory.getAbsolutePath());
+                log.info("moduleZip {}", moduleFile.getAbsolutePath());
+                ZipUtil.pack(gitCloneDirectory, moduleFile);
+                FileUtils.cleanDirectory(gitCloneDirectory);
+            }
+        } catch (IOException ex) {
+            log.error(ex.getLocalizedMessage());
+            ex.printStackTrace();
         }
 
-        return String.format(MODULE_LOCATION, registryHostname, organizationName, moduleName, providerName, moduleVersion);
+        return String.format(DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName, providerName,
+                moduleVersion);
     }
 
     @Override
-    public byte[] downloadModule(String organizationName, String moduleName, String providerName, String moduleVersion) {
-        String pathModule = String.format(MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion);
+    public byte[] downloadModule(String organizationName, String moduleName, String providerName,
+            String moduleVersion) {
+        String pathModule = String.format(MODULE_LOCATION_ZIP, organizationName, moduleName, providerName, moduleVersion);
         File localOutputDirectory = new File(FileUtils.getUserDirectoryPath().concat(pathModule));
         try {
             return IOUtils.toByteArray(new FileInputStream(localOutputDirectory));
