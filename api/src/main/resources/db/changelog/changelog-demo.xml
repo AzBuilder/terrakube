@@ -9,4 +9,7 @@
         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd ">
     <include file="/db/changelog/changelog.xml"/>
     <include file="/db/changelog/demo-data/azure.xml"/>
+    <include file="/db/changelog/demo-data/aws.xml"/>
+    <include file="/db/changelog/demo-data/gcp.xml"/>
+    <include file="/db/changelog/demo-data/simple.xml"/>
 </databaseChangeLog>

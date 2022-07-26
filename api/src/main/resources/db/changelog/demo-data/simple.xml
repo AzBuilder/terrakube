@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet author="demo-data" id="demo-3">
+         <!--
+        ******************    
+        ***ORGANIZATION***
+        ******************
+        -->
+        <insert tableName="organization">
+            <column name="id"          value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+            <column name="name"        value="simple" />
+            <column name="description" value="simple sample organization" />
+        </insert>
+
+        <!--
+        ***********    
+        ***TEAMS***
+        ***********
+        -->
+        <insert tableName="team">
+            <column name="id"               value="58529721-425e-44d7-8b0d-1d515043c2f7" />
+            <column name="name"             value="TERRAKUBE_DEVELOPERS" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="team">
+            <column name="id"               value="0d7e4a6a-560e-40f1-a6dd-c7433a04f088" />
+            <column name="name"             value="azure" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="team">
+            <column name="id"               value="2edcb0b0-3d25-453b-bcbc-21baa7780cf7" />
+            <column name="name"             value="aws" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="team">
+            <column name="id"               value="89f11ea7-322d-43f4-9575-2544d56d9614" />
+            <column name="name"             value="gcp" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <!--
+        ***************   
+        ***TEMPLATES***
+        ***************
+        -->
+        <insert tableName="template">
+            <column name="id"               value="42201234-a5e2-4c62-b2fc-9729ca6b4515" />
+            <column name="name"             value="Terraform-Plan" />
+            <column name="description"      value="Running terraformn plan" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAK" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="2db36f7c-f549-4341-a789-315d47eb061d" />
+            <column name="name"             value="Terraform-Plan/Apply" />
+            <column name="description"      value="Running terraform plan and apply" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="d944e19d-bc3e-41b0-bdf9-1881e1a459c4" />
+            <column name="name"             value="Terraform-Destroy" />
+            <column name="description"      value="Running terraform destroy" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1EZXN0cm95IgogICAgc3RlcDogMTAwCg==" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <!--
+        ***************    
+        ***WORKSPACE***
+        ***************
+        -->
+        <insert tableName="workspace">
+            <column name="id"                value="5ed411ca-7ab8-4d2f-b591-02d0d5788afc" />
+            <column name="name"              value="sample_simple" />
+            <column name="description"       value="sample workspace" />
+            <column name="source"            value="https://github.com/AzBuilder/terrakube-docker-compose.git" />
+            <column name="branch"            value="main" />
+            <column name="terraform_version" value="1.2.5" />
+            <column name="organization_id"   value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

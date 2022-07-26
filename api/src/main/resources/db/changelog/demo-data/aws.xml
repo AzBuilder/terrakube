@@ -1,21 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
-    <changeSet author="demo-data" id="demo-0">
+    <changeSet author="demo-data" id="demo-2">
+        <!--
+        ******************    
+        ***ORGANIZATION***
+        ******************
+        -->
         <insert tableName="organization">
-            <column name="id" value="4db158e0-00b0-48d0-aa71-6e8c95ba039e" />
-            <column name="name" value="aws" />
+            <column name="id"          value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+            <column name="name"        value="aws" />
             <column name="description" value="aws sample organization" />
         </insert>
+
+        <!--
+        ***********    
+        ***TEAMS***
+        ***********
+        -->
         <insert tableName="team">
-            <column name="id" value="93601a50-1584-440b-8719-a237bb04e8ba" />
-            <column name="name" value="azure" />
-            <column name="manageWorkspace" value="azure sample organization" />
-            <column name="manageModule" value="azure sample organization" />
-            <column name="manageProvider" value="azure sample organization" />
-            <column name="manageVcs" value="azure sample organization" />
-            <column name="manageTemplate" value="azure sample organization" />
-            <column name="organization_id" value="azure sample organization" />
+            <column name="id"               value="7c3a259b-197f-4894-aabe-62fd59d28547" />
+            <column name="name"             value="aws" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+
+        <insert tableName="team">
+            <column name="id"               value="59922bf0-838b-4523-8b3e-191c04395192" />
+            <column name="name"             value="TERRAKUBE_DEVELOPERS" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+
+        <!--
+        ***************   
+        ***TEMPLATES***
+        ***************
+        -->
+        <insert tableName="template">
+            <column name="id"               value="a112f536-23e2-4fa3-bbde-8929c49f87cb" />
+            <column name="name"             value="Terraform-Plan" />
+            <column name="description"      value="Running terraformn plan" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAK" />
+            <column name="organization_id"  value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="c67171c6-1f45-4c97-af5c-8ec4818688b3" />
+            <column name="name"             value="Terraform-Plan/Apply" />
+            <column name="description"      value="Running terraform plan and apply" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=" />
+            <column name="organization_id"  value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="1cf54790-a23d-4c19-afe0-a4db072ea70c" />
+            <column name="name"             value="Terraform-Destroy" />
+            <column name="description"      value="Running terraform destroy" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1EZXN0cm95IgogICAgc3RlcDogMTAwCg==" />
+            <column name="organization_id"  value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+
+        <!--
+        *************    
+        ***MODULES***
+        *************
+        -->
+        <insert tableName="module">
+            <column name="id"                value="25778e8a-6989-4792-9f38-17bb3f09543b" />
+            <column name="name"              value="vpc" />
+            <column name="provider"          value="aws" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-vpc.git" />
+            <column name="download_quantity" value="10" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="e59339ab-51d5-4927-baf7-d9559ad58997" />
+            <column name="name"              value="security-group" />
+            <column name="provider"          value="aws" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-security-group.git" />
+            <column name="download_quantity" value="20" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="74196ed8-63ff-4521-805d-621251bf1f84" />
+            <column name="name"              value="iam" />
+            <column name="provider"          value="aws" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-iam.git" />
+            <column name="download_quantity" value="30" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="46864117-c272-412c-a497-3a4588d075f6" />
+            <column name="name"              value="eks" />
+            <column name="provider"          value="aws" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-eks.git" />
+            <column name="download_quantity" value="40" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="b4e46feb-2514-4fa7-9be1-f0e78cb60bb0" />
+            <column name="name"              value="rds" />
+            <column name="provider"          value="aws" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-rds.git" />
+            <column name="download_quantity" value="50" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+
+        <!--
+        ***************    
+        ***WORKSPACE***
+        ***************
+        -->
+        <insert tableName="workspace">
+            <column name="id"                value="92d938ab-569f-48c3-825d-596818d5947f" />
+            <column name="name"              value="sample_vpc" />
+            <column name="description"       value="sample workspace for vpc" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-vpc.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.5" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="4938014b-efce-4f7d-863c-7c3ab164d274" />
+            <column name="name"              value="sample_security_group" />
+            <column name="description"       value="sample workspace for security group" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-security-group.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.4" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="15262bbc-f633-4aa7-9555-aee178b65e57" />
+            <column name="name"              value="sample_iam" />
+            <column name="description"       value="sample workspace for iam" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-iam.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.3" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="9896791f-6794-404f-b60e-ed74bf90f941" />
+            <column name="name"              value="sample_eks" />
+            <column name="description"       value="sample workspace for eks" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-eks.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.2" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="f5c0e915-0c99-46c4-b266-2e86240da3b6" />
+            <column name="name"              value="sample_rds" />
+            <column name="description"       value="sample workspace for rds" />
+            <column name="source"            value="https://github.com/terraform-aws-modules/terraform-aws-rds.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.1" />
+            <column name="organization_id"   value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
         </insert>
     </changeSet>
 </databaseChangeLog>
