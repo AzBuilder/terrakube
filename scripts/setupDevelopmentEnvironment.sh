@@ -45,7 +45,7 @@ function generateRegistryVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderApiUrl=$(gp url 8080)
-    TerrakubeRegistryDomain=$(gp url 8075)
+    TerrakubeRegistryDomain=$(gp url 8075 | sed "s+https://++g")
     TerrakubeApiUrl=$(gp url 8080)
   else
     AzBuilderApiUrl="http://localhost:8080"
