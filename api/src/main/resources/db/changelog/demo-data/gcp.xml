@@ -20,7 +20,7 @@
         -->
         <insert tableName="team">
             <column name="id"               value="6dee85c5-ec7c-42bd-8b17-5dd303244d7f" />
-            <column name="name"             value="gcp" />
+            <column name="name"             value="GCP_DEVELOPERS" />
             <column name="manage_workspace" value="true" />
             <column name="manage_module"    value="true" />
             <column name="manage_provider"  value="true" />

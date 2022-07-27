@@ -31,7 +31,7 @@
 
         <insert tableName="team">
             <column name="id"               value="0d7e4a6a-560e-40f1-a6dd-c7433a04f088" />
-            <column name="name"             value="azure" />
+            <column name="name"             value="AZURE_DEVELOPERS" />
             <column name="manage_workspace" value="true" />
             <column name="manage_module"    value="true" />
             <column name="manage_provider"  value="true" />
@@ -42,7 +42,7 @@
 
         <insert tableName="team">
             <column name="id"               value="2edcb0b0-3d25-453b-bcbc-21baa7780cf7" />
-            <column name="name"             value="aws" />
+            <column name="name"             value="AWS_DEVELOPERS" />
             <column name="manage_workspace" value="true" />
             <column name="manage_module"    value="true" />
             <column name="manage_provider"  value="true" />
@@ -53,7 +53,7 @@
 
         <insert tableName="team">
             <column name="id"               value="89f11ea7-322d-43f4-9575-2544d56d9614" />
-            <column name="name"             value="gcp" />
+            <column name="name"             value="GCP_DEVELOPERS" />
             <column name="manage_workspace" value="true" />
             <column name="manage_module"    value="true" />
             <column name="manage_provider"  value="true" />

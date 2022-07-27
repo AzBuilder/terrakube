@@ -20,7 +20,7 @@
         -->
         <insert tableName="team">
             <column name="id"               value="7c3a259b-197f-4894-aabe-62fd59d28547" />
-            <column name="name"             value="aws" />
+            <column name="name"             value="AWS_DEVELOPERS" />
             <column name="manage_workspace" value="true" />
             <column name="manage_module"    value="true" />
             <column name="manage_provider"  value="true" />
