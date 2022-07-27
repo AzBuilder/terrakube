@@ -219,11 +219,35 @@ function generateThunderClientConfiguration(){
   sed -i "s+TEMPLATE_GITPOD_REGISTRY+$terrakubeRegistry+gi" thunder-tests/thunderEnvironment.json
 }
 
+function generateWorkspaceInformation(){
+  rm -f GITPO.md
+  cp scripts/template/gitpod/GITPOD_TEMPLATE.md GITPOD.md
+
+  WORKSPACE_API=$(gp url 8080)
+  WORKSPACE_REGISTRY=$(gp url 8075)
+  WORKSPACE_EXECUTOR=$(gp url 8090)
+  WORKSPACE_UI=$(gp url 3000)
+  WORKSPACE_DEX=$(gp url 5556)
+  WORKSPACE_LOGIN_REGISTRY=$(gp url 8075 | sed "s+https://++g")
+
+  sed -i "s+GITPOD_WORKSPACE_UI+$WORKSPACE_UI+gi" GITPOD.md
+  sed -i "s+GITPOD_WORKSPACE_API+$WORKSPACE_API+gi" GITPOD.md
+  sed -i "s+GITPOD_WORKSPACE_REGISTRY+$WORKSPACE_REGISTRY+gi" GITPOD.md
+  sed -i "s+GITPOD_WORKSPACE_EXECUTOR+$WORKSPACE_EXECUTOR+gi" GITPOD.md
+  sed -i "s+GITPOD_WORKSPACE_DEX+$WORKSPACE_DEX+gi" GITPOD.md
+  sed -i "s+GITPOD_LOGIN_REGISTRY+$WORKSPACE_LOGIN_REGISTRY+gi" GITPOD.md
+}
+
 generateApiVars
 generateRegistryVars
 generateExecutorVars
 generateUiVars
 generateDexConfiguration
 generateThunderClientConfiguration
+
+USER=$(whoami)
+if [ "$USER" = "gitpod" ]; then
+  generateWorkspaceInformation
+fi
 
 echo "Setup Development Environment Completed"

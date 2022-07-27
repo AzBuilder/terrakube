@@ -1879,5 +1879,22 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "01fff7b4-8617-4879-84c0-da6f33f311df",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b949b43c-92b7-4944-8c89-8ad3ed46ce89",
+    "name": "well-known-endpoint",
+    "url": "{{terrakubeDex}}/.well-known/openid-configuration",
+    "method": "GET",
+    "sortNum": 720000,
+    "created": "2022-07-27T22:41:57.765Z",
+    "modified": "2022-07-27T22:43:02.175Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "none"
+    },
+    "tests": []
   }
 ]

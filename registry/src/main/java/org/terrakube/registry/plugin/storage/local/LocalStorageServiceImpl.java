@@ -5,7 +5,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.pqc.crypto.ExchangePair;
 import org.terrakube.registry.plugin.storage.StorageService;
 import org.terrakube.registry.service.git.GitService;
 import org.zeroturnaround.zip.ZipUtil;
@@ -46,7 +45,6 @@ public class LocalStorageServiceImpl implements StorageService {
             }
         } catch (IOException ex) {
             log.error(ex.getLocalizedMessage());
-            ex.printStackTrace();
         }
 
         return String.format(DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName, providerName,
