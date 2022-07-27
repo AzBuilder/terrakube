@@ -1844,5 +1844,40 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "f2b6fab0-da3a-471d-ac81-fcec355efadd",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "f3af12a0-fbd6-4048-ba04-d15d49817678",
+    "name": "JSON specification",
+    "url": "{{terrakubeApi}}/doc",
+    "method": "GET",
+    "sortNum": 700000,
+    "created": "2022-07-27T21:33:38.095Z",
+    "modified": "2022-07-27T21:34:22.810Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "none"
+    },
+    "tests": []
+  },
+  {
+    "_id": "1e3d4426-5997-46fc-ba7d-0d306bb39597",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "534daa31-a5a5-4c71-b7a1-8bd269030458",
+    "name": "Get Readme Module",
+    "url": "{{terrakubeRegistry}}/terraform/readme/v1/gcp/kubernetes-engine/google/v22.0.0/download",
+    "method": "GET",
+    "sortNum": 710000,
+    "created": "2022-07-27T21:35:14.307Z",
+    "modified": "2022-07-27T21:36:22.801Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]
