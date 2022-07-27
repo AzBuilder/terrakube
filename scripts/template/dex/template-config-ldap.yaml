@@ -67,6 +67,8 @@ staticClients:
   redirectURIs:
   - 'TEMPLATE_GITPOD_REDIRECT'
   - '/device/callback'
+  - 'http://localhost:10000/login'
+  - 'http://localhost:10001/login'
   name: 'Example App'
   #secret: ZXhhbXBsZS1hcHAtc2VjcmV0
   public: true

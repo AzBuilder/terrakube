@@ -17,7 +17,7 @@
         "value": "TEMPLATE_GITPOD_API"
       },
       {
-        "name": "terrakubeRegsitry",
+        "name": "terrakubeRegistry",
         "value": "TEMPLATE_GITPOD_REGISTRY"
       },
       {
