@@ -118,11 +118,13 @@ public class TerraformStateAutoConfiguration {
                 default:
                     terraformState = LocalTerraformStateImpl.builder()
                             .terrakubeClient(terrakubeClient)
+                            .terraformStatePathService(terraformStatePathService)
                             .build();
             }
         else
             terraformState = LocalTerraformStateImpl.builder()
                     .terrakubeClient(terrakubeClient)
+                    .terraformStatePathService(terraformStatePathService)
                     .build();
         return terraformState;
     }

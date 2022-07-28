@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 public class WellKnownTests extends OpenRegistryApplicationTests{
 

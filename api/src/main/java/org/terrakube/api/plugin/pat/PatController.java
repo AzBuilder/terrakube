@@ -2,7 +2,6 @@ package org.terrakube.api.plugin.pat;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,6 @@ import org.terrakube.api.rs.pat.Pat;
 import java.security.Principal;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/pat/v1")
 public class PatController {

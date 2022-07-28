@@ -4,25 +4,35 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
+import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.stream.Stream;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
+@Builder
+@Getter
+@Setter
 @Slf4j
 public class LocalTerraformOutputImpl implements TerraformOutput {
 
-    private static final String LOCAL_OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/";
+    private static final String LOCAL_OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";
+
+    @NonNull
+    TerraformOutputPathService terraformOutputPathService;
 
     @Override
     public String save(String organizationId, String jobId, String stepId, String output, String outputError) {
-        String outputFilePath = String.join(File.separator, Stream.of(organizationId, jobId, stepId + ".tfoutput").toArray(String[]::new));
+        String outputFilePath = String.format(LOCAL_OUTPUT_DIRECTORY, organizationId, jobId , stepId);
         log.info("blobName: {}", outputFilePath);
 
         File localOutputDirectory = new File(FileUtils.getUserDirectoryPath().concat(
                 FilenameUtils.separatorsToSystem(
-                        LOCAL_OUTPUT_DIRECTORY + outputFilePath
+                        outputFilePath
                 )));
 
         log.info("Creating Output File: {}", localOutputDirectory.getAbsolutePath());
@@ -32,7 +42,7 @@ public class LocalTerraformOutputImpl implements TerraformOutput {
             log.error(e.getMessage());
         }
 
-        return String.format("http://localhost:8090/output/%s", outputFilePath);
+        return terraformOutputPathService.getOutputPath(organizationId, jobId, stepId);
 
     }
 }

@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.vcs.provider.github;
 
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.provider.GetAccessToken;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;
 import org.springframework.http.HttpHeaders;
@@ -8,7 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Slf4j
 @Service
 public class GitHubTokenService implements GetAccessToken<GitHubToken> {
     public GitHubToken getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException {

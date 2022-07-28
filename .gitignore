@@ -28,3 +28,11 @@ hs_err_pid*
 
 **.DS_Store
 target
+
+thunder-tests/thunderEnvironment.json
+scripts/setup/dex/config-ldap.yaml
+.envApi
+.envExecutor
+.envRegistry
+.envUi
+GITPOD.md

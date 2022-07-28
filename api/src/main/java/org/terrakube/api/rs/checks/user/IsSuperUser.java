@@ -3,13 +3,11 @@ package org.terrakube.api.rs.checks.user;
 import com.yahoo.elide.annotation.SecurityCheck;
 import com.yahoo.elide.core.security.User;
 import com.yahoo.elide.core.security.checks.UserCheck;
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.security.groups.GroupService;
 import org.terrakube.api.plugin.security.user.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-@Slf4j
 @SecurityCheck(IsSuperUser.RULE)
 public class IsSuperUser extends UserCheck {
 

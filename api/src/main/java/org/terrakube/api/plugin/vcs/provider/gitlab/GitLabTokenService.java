@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.vcs.provider.gitlab;
 
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -8,7 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Slf4j
 @Service
 public class GitLabTokenService {
 

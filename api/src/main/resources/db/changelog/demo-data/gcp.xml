@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet author="demo-data" id="demo-3">
+         <!--
+        ******************    
+        ***ORGANIZATION***
+        ******************
+        -->
+        <insert tableName="organization">
+            <column name="id"          value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+            <column name="name"        value="gcp" />
+            <column name="description" value="gcp sample organization" />
+        </insert>
+
+        <!--
+        ***********    
+        ***TEAMS***
+        ***********
+        -->
+        <insert tableName="team">
+            <column name="id"               value="6dee85c5-ec7c-42bd-8b17-5dd303244d7f" />
+            <column name="name"             value="GCP_DEVELOPERS" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+
+        <insert tableName="team">
+            <column name="id"               value="dcf56f0d-4258-4a4e-89a7-1e14198752c1" />
+            <column name="name"             value="TERRAKUBE_DEVELOPERS" />
+            <column name="manage_workspace" value="true" />
+            <column name="manage_module"    value="true" />
+            <column name="manage_provider"  value="true" />
+            <column name="manage_vcs"       value="true" />
+            <column name="manage_template"  value="true" />
+            <column name="organization_id"  value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+
+        <!--
+        ***************   
+        ***TEMPLATES***
+        ***************
+        -->
+        <insert tableName="template">
+            <column name="id"               value="68d2cafa-9d6c-4c6a-939e-f6f43fbe59f7" />
+            <column name="name"             value="Terraform-Plan" />
+            <column name="description"      value="Running terraformn plan" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAK" />
+            <column name="organization_id"  value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="26421b0d-ad07-43e0-adca-c939b0e71a0e" />
+            <column name="name"             value="Terraform-Plan/Apply" />
+            <column name="description"      value="Running terraform plan and apply" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=" />
+            <column name="organization_id"  value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="17aadd37-3ba3-4af2-87d4-88a3c12d7679" />
+            <column name="name"             value="Terraform-Destroy" />
+            <column name="description"      value="Running terraform destroy" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1EZXN0cm95IgogICAgc3RlcDogMTAwCg==" />
+            <column name="organization_id"  value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+
+        <!--
+        *************    
+        ***MODULES***
+        *************
+        -->
+        <insert tableName="module">
+            <column name="id"                value="4e92ff1e-9937-400f-848d-f0ea367927bf" />
+            <column name="name"              value="kubernetes-engine" />
+            <column name="provider"          value="google" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git" />
+            <column name="download_quantity" value="10" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="e69db15f-46f9-4177-ace7-262e16612edd" />
+            <column name="name"              value="iam" />
+            <column name="provider"          value="google" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-iam.git" />
+            <column name="download_quantity" value="20" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="66c42d3a-1e52-49c6-aed8-d1becd0d70e1" />
+            <column name="name"              value="network" />
+            <column name="provider"          value="google" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-network.git" />
+            <column name="download_quantity" value="30" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="00e3fce8-c99b-48a1-8ae2-a2c8b61cdde6" />
+            <column name="name"              value="cloud-storage" />
+            <column name="provider"          value="google" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-cloud-storage.git" />
+            <column name="download_quantity" value="40" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="module">
+            <column name="id"                value="3c8d06a9-5077-4328-b02c-2adf1bca2c43" />
+            <column name="name"              value="vm" />
+            <column name="provider"          value="google" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-vm.git" />
+            <column name="download_quantity" value="50" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+
+        <!--
+        ***************    
+        ***WORKSPACE***
+        ***************
+        -->
+        <insert tableName="workspace">
+            <column name="id"                value="c1ef3727-9617-467a-b467-c08a57e54b97" />
+            <column name="name"              value="sample_gcp_k8s" />
+            <column name="description"       value="sample workspace for k8s" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.5" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="ea97ca9f-f64f-41b1-b172-a77c994edb1b" />
+            <column name="name"              value="sample_gcp_iam" />
+            <column name="description"       value="sample workspace for gcp_iam" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-iam.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.4" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="fe23d513-988a-455a-9e72-cb179ca5017b" />
+            <column name="name"              value="sample_gcp_network" />
+            <column name="description"       value="sample workspace for network" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-network.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.3" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="6bbb7d83-d2d6-4cbf-a8ef-a6b1545e2acb" />
+            <column name="name"              value="sample_gcp_storage" />
+            <column name="description"       value="sample workspace for storage" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-cloud-storage.git" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.2" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+        <insert tableName="workspace">
+            <column name="id"                value="81db56cd-f6dd-4760-b0d9-e880eeb9b34c" />
+            <column name="name"              value="sample_gcp_vm" />
+            <column name="description"       value="sample workspace for vm" />
+            <column name="source"            value="https://github.com/terraform-google-modules/terraform-google-vm.gitt" />
+            <column name="branch"            value="master" />
+            <column name="terraform_version" value="1.2.1" />
+            <column name="organization_id"   value="f5365c9e-bc11-4781-b649-45a281ccdd4a" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

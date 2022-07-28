@@ -114,7 +114,10 @@ public class StorageAutoConfiguration {
 
                 break;
             case Local:
-                storageService = new LocalStorageServiceImpl();
+                storageService = LocalStorageServiceImpl.builder()
+                        .gitService(new GitServiceImpl())
+                        .registryHostname(openRegistryProperties.getHostname())
+                        .build();
                 break;
             default:
                 storageService = null;

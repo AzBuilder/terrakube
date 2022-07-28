@@ -1,6 +1,5 @@
 package org.terrakube.registry.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.registry.controller.model.provider.FileDTO;
 import org.terrakube.registry.controller.model.provider.VersionsDTO;
 import org.terrakube.registry.controller.model.provider.VersionDTO;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/terraform/providers/v1")
 public class ProviderWebServiceImpl {

@@ -3,7 +3,6 @@ package org.terrakube.api.plugin.scheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.TokenService;
 import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.vcs.Vcs;
@@ -21,7 +20,6 @@ import java.util.UUID;
 @Component
 @Getter
 @Setter
-@Slf4j
 public class ScheduleVcs implements org.quartz.Job {
 
     public static final String VCS_ID = "vcsId";

@@ -11,7 +11,6 @@ import org.terrakube.api.plugin.storage.StorageTypeService;
 @Builder
 public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
-    private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
     private static final String CONTAINER_NAME_STATE = "tfstate";
     private static final String CONTAINER_NAME_OUTPUT = "tfoutput";
 

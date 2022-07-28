@@ -1,0 +1,49 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run API",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.terrakube.api.ServerApplication",
+            "projectName": "api-server",
+            "args": "-Xmx512m -Xms256m",
+            "envFile": "${workspaceFolder}/.envApi"
+        },
+        {
+            "type": "java",
+            "name": "Run Registry",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.terrakube.registry.OpenRegistryApplication",
+            "projectName": "open-registry",
+            "args": "-Xmx512m -Xms256m",
+            "envFile": "${workspaceFolder}/.envRegistry"
+        },
+        {
+            "type": "java",
+            "name": "Run Executor",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.terrakube.executor.ExecutorApplication",
+            "projectName": "executor",
+            "args": "-Xmx512m -Xms256m",
+            "envFile": "${workspaceFolder}/.envExecutor"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run UI",
+            "runtimeExecutable": "yarn",
+            "cwd": "${workspaceFolder}/ui",
+            "runtimeArgs": ["start"],
+            "envFile": "${workspaceFolder}/.envUi"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Terrakube",
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"]
+        }
+    ]
+}

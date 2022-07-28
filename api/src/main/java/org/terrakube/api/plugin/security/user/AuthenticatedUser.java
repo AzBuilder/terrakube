@@ -2,8 +2,6 @@ package org.terrakube.api.plugin.security.user;
 
 import com.yahoo.elide.core.security.User;
 
-import java.util.List;
-
 public interface AuthenticatedUser {
 
     String getEmail(User user);

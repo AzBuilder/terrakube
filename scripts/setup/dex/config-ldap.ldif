@@ -1,0 +1,74 @@
+# Already included in default config of Docker image osixia/openldap:1.4.0.
+#
+# dn: dc=example,dc=org
+# objectClass: dcObject
+# objectClass: organization
+# o: Example Company
+# dc: example
+
+dn: ou=People,dc=example,dc=org
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=lester,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+sn: Parkinson
+cn: Lester
+mail: admin@example.com
+userpassword: admin
+
+dn: cn=grady,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+sn: Chambers
+cn: Grady
+mail: aws@example.com
+userpassword: azure
+
+dn: cn=saarah,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+sn: Lott
+cn: Saarah
+mail: azure@example.com
+userpassword: aws
+
+dn: cn=eugene,ou=People,dc=example,dc=org
+objectClass: person
+objectClass: inetOrgPerson
+sn: Monaghan
+cn: Eugene
+mail: gcp@example.com
+userpassword: gcp
+
+# Group definitions.
+
+dn: ou=Groups,dc=example,dc=org
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=TERRAKUBE_ADMIN,ou=Groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: TERRAKUBE_ADMIN
+member: cn=lester,ou=People,dc=example,dc=org
+
+dn: cn=TERRAKUBE_DEVELOPERS,ou=Groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: TERRAKUBE_DEVELOPERS
+member: cn=lester,ou=People,dc=example,dc=org
+
+dn: cn=AZURE_DEVELOPERS,ou=Groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: AZURE_DEVELOPERS
+member: cn=saarah,ou=People,dc=example,dc=org
+
+dn: cn=AWS_DEVELOPERS,ou=Groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: AWS_DEVELOPERS
+member: cn=grady,ou=People,dc=example,dc=org
+
+dn: cn=GCP_DEVELOPERS,ou=Groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: GCP_DEVELOPERS
+member: cn=eugene,ou=People,dc=example,dc=org
