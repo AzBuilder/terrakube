@@ -1,4 +1,4 @@
-# Terrakube Platform [![gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://github.com/AzBuilder/terrakube)
+# Terrakube Platform [![gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
 
 [![Gitter](https://badges.gitter.im/AzBuilder/community.svg)](https://gitter.im/AzBuilder/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml/badge.svg)](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml)
