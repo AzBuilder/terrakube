@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Community
+    url: https://gitter.im/AzBuilder/community
+    about: Please ask and answer usage questions here.
