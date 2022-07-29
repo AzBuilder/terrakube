@@ -1,5 +1,4 @@
 ## Terrakube Ready to Code.
-
 We use Gitpod to develop the platform. You can have a complete development environment to test all the components and features with one click using the following button.
 
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
@@ -9,8 +8,8 @@ Running Terrakube in Gitpod is like running the platform in any Kubernetes distr
 > Terrakube API uses an in memory database, it will be deleted and preloaded with default information in every startup.
 
 ### Gitpod Environment Information.
-
 A file called ***GITPOD.md*** will have the information for the entire workspace
+
 ![image](https://user-images.githubusercontent.com/4461895/181385377-c25610e5-f39b-48f4-aa5c-3bfafce54794.png)
 
 The configuration is generated dynamically using the following bash script. This is executed by Gitpod in the environment startup process.
@@ -39,8 +38,11 @@ The development environment will have the following information:
 
 ### Start Development Environment
 To run all the Terrakube components run the following task:
+
 ![image](https://user-images.githubusercontent.com/4461895/181374024-a8f546ba-dbf7-4ac9-a74b-04ff8759f165.png)
+
 After a couple of seconds all the components will be running, you can start/stop/restart any component as needed.
+
 ![image](https://user-images.githubusercontent.com/4461895/181374080-c7486a32-b4f2-41d3-9112-5861e3fdc8d9.png)
 
 ### Login Development Environment
@@ -49,6 +51,7 @@ After the application startup is completed, we can login to the development envi
 gp url 3000
 ```
 The Terrakube login will look like this example:
+
 ![image](https://user-images.githubusercontent.com/4461895/181138967-401c142a-9366-4d1b-8506-1c667f5ab543.png)
 
 ### Dex Authentication.
@@ -109,6 +112,7 @@ api/src/main/resources/db/changelog/demo-data/simple.xml
 
 ### API Testing
 Gitpod has the ***thunder-client*** installed to easily test the API without using the UI.
+
 ![image](https://user-images.githubusercontent.com/4461895/181368786-86e18f0f-f04a-49cd-a7c3-345329f2550e.png)
 
 All the environment variables for the collection are generated on each Gitpod workspace startup
