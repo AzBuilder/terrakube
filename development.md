@@ -69,6 +69,7 @@ The template that is used to generate the Dex configuration file can be found in
 scripts/template/dex/template-config-ldap.yaml
 ```
 Dex login page should look like this example:
+
 ![image](https://user-images.githubusercontent.com/4461895/181138996-f6ae507f-c3cf-460a-bc12-60ed6cb2e159.png)
 
 ### Sample Organizations
@@ -146,16 +147,20 @@ Now you can call any method available in the API without the UI
 ![image](https://user-images.githubusercontent.com/4461895/181369869-eddae1d5-0b13-4e6a-b484-3fcefc665d4d.png)
 
 ### Terraform Login Protocol
-
 Terraform login protocol can be tested using the ***thunder-client*** collection:
+
 ![image](https://user-images.githubusercontent.com/4461895/181377967-b0178cf5-9378-4305-a6c8-d516c6882f12.png)
+
 The response should look similar to the following:
+
 ![image](https://user-images.githubusercontent.com/4461895/181378021-61ec1041-842c-4b58-bcb3-14df2aeb3ad3.png)
 
 ### Terraform Module Protocol
 
-There is one example of terraform module protocol inside the ***thunder-client*** collection that you can be used for testing purposes executing the following two request
+There is one example of terraform module protocol inside the ***thunder-client*** collection that you can be used for testing purposes executing the following two request.
+
 ![image](https://user-images.githubusercontent.com/4461895/181378277-c58250be-1dec-4351-a91e-ae66e0417826.png)
+
 The response should look like the following:
 
 - Getting versions for the module
@@ -166,4 +171,5 @@ The response should look like the following:
 
 ### OpenAPI Spec
 The specification can be obtained using the following request:
+
 ![image](https://user-images.githubusercontent.com/4461895/181378782-4cd46efc-a4ea-472f-9547-9e1d22cc91e5.png)
