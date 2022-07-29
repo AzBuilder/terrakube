@@ -1,0 +1,19 @@
+name: Feature request 💡
+description: Suggest an idea for this project
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Before raising an issue, please search for [existing issues](https://github.com/AzBuilder/terrakube/labels/enhancement) to avoid creating duplicates. For questions, please use [Gitter](https://gitter.im/AzBuilder/community).
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature description 💡
+      description: Summarize the new feature
+    validations:
+      required: true
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else?
+      description: Let us know if you have any additional feedback!

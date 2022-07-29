@@ -1,0 +1,14 @@
+name: Feedback Issue 🔍
+description: Open a feedback issue to gather feedback, suggestions, and experiences from users.
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: Before raising a feedback issue, please search for [existing feedback issues](https://github.com/AzBuilder/terrakube/labels/feedback) to avoid creating duplicates.
+  - type: textarea
+    id: objective
+    attributes:
+      label: Feedback
+      description: Include the objective of this issue and any relevant features
+    validations:
+      required: true
