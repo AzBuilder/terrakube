@@ -8,7 +8,7 @@ body:
   - type: textarea
     id: objective
     attributes:
-      label: Objective
+      label: Feedback
       description: Include the objective of this issue and any relevant features
     validations:
       required: true
