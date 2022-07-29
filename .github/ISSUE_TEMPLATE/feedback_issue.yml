@@ -1,6 +1,5 @@
 name: Feedback Issue 🔍
 description: Open a feedback issue to gather feedback, suggestions, and experiences from users.
-title: "Feedback Issue: "
 labels: ["feedback"]
 body:
   - type: markdown
