@@ -1,4 +1,4 @@
-# How to contribute
+# How to contribute to Terrakube
 First, thanks for taking the time to contribute to our project! There are many ways you can help out.
 
 ### Questions
