@@ -27,7 +27,7 @@
         <groovy.version>3.0.8</groovy.version>
         <azure-identity.version>1.5.3</azure-identity.version>
         <microsoft-graph.version>5.16.0</microsoft-graph.version>
-        <postgresql.version>42.3.3</postgresql.version>
+        <postgresql.version>42.4.1</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <snakeyaml.version>1.29</snakeyaml.version>
         <quartz.version>2.3.2</quartz.version>
