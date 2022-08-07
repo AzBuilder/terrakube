@@ -23,7 +23,7 @@
         </createTable>
         <addColumn tableName="module" >
             <column name="ssh_id" type="varchar(36)">
-                <constraints nullable="true" foreignKeyName="fk_ssh_vcs" references="vcs(id)"/>
+                <constraints nullable="true" foreignKeyName="fk_module_ssh" references="ssh(id)"/>
             </column>
         </addColumn>
     </changeSet>
