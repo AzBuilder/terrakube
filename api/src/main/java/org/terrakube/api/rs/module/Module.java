@@ -66,6 +66,7 @@ public class Module extends GenericAuditFields {
         try {
             CredentialsProvider credentialsProvider = null;
             TransportConfigCallback transportConfigCallback = null;
+            Map<String, Ref> tags = null;
             if (vcs != null) {
                 log.info("vcs using {}", vcs.getVcsType());
                 switch (vcs.getVcsType()) {
@@ -85,6 +86,12 @@ public class Module extends GenericAuditFields {
                         credentialsProvider = null;
                         break;
                 }
+
+                tags = Git.lsRemoteRepository()
+                        .setTags(true)
+                        .setRemote(source)
+                        .setCredentialsProvider(credentialsProvider)
+                        .callAsMap();
             }
 
             if (ssh != null){
@@ -104,14 +111,15 @@ public class Module extends GenericAuditFields {
                         }
                     }
                 };
-            }
 
-            Map<String, Ref> tags = Git.lsRemoteRepository()
-                    .setTags(true)
-                    .setRemote(source)
-                    .setCredentialsProvider(credentialsProvider)
-                    .setTransportConfigCallback(transportConfigCallback)
-                    .callAsMap();
+                tags = Git.lsRemoteRepository()
+                        .setTags(true)
+                        .setRemote(source)
+                        .setCredentialsProvider(credentialsProvider)
+                        .setTransportConfigCallback(transportConfigCallback)
+                        .callAsMap();
+            }
+            
             tags.forEach((key, value) -> {
                 versionList.add(key.replace("refs/tags/", ""));
             });
