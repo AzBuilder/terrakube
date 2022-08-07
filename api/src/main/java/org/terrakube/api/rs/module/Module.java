@@ -119,7 +119,14 @@ public class Module extends GenericAuditFields {
                         .setTransportConfigCallback(transportConfigCallback)
                         .callAsMap();
             }
-            
+
+            if (ssh == null && vcs == null){
+                tags = Git.lsRemoteRepository()
+                        .setTags(true)
+                        .setRemote(source)
+                        .callAsMap();
+            }
+
             tags.forEach((key, value) -> {
                 versionList.add(key.replace("refs/tags/", ""));
             });
