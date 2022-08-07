@@ -193,6 +193,13 @@
         "containerId": "",
         "created": "2022-07-27T22:41:44.007Z",
         "sortNum": 300000
+      },
+      {
+        "_id": "003bb224-853c-4e33-a0e8-1620307cbdae",
+        "name": "Step 11 - SSH Support",
+        "containerId": "",
+        "created": "2022-08-07T15:49:55.301Z",
+        "sortNum": 132461
       }
     ],
     "settings": {

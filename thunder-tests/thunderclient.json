@@ -8,7 +8,7 @@
     "method": "POST",
     "sortNum": 10000,
     "created": "2022-07-22T21:25:36.069Z",
-    "modified": "2022-07-23T18:11:53.228Z",
+    "modified": "2022-08-07T15:55:46.567Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -18,7 +18,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"organization\",\n    \"attributes\": {\n      \"name\": \"hashicorp2\",\n      \"description\": \"hashicorp organization\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"organization\",\n    \"attributes\": {\n      \"name\": \"hashicorp\",\n      \"description\": \"hashicorp organization\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -1332,68 +1332,93 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "670da35d-59c7-429d-8dd0-3eeea2b429cd",
     "name": "create module without vcs",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/module",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/module",
     "method": "POST",
     "sortNum": 450000,
     "created": "2022-07-22T21:25:36.114Z",
-    "modified": "2022-07-22T21:25:36.114Z",
+    "modified": "2022-08-07T16:41:58.664Z",
     "headers": [
       {
         "name": "Content-Type",
         "value": "application/vnd.api+json"
       }
     ],
+    "params": [],
     "body": {
       "type": "json",
-      "raw": "{\r\n  \"data\": {\r\n    \"type\": \"module\",\r\n    \"attributes\": {\r\n      \"name\": \"sample\",\r\n      \"description\": \"Sample module\",\r\n      \"provider\": \"azurerm\",\r\n      \"source\": \"https://github.com/AzBuilder/terrakube-docker-compose.git\"\r\n    }\r\n  }\r\n}"
-    }
+      "raw": "{\n  \"data\": {\n    \"type\": \"module\",\n    \"attributes\": {\n      \"name\": \"sample\",\n      \"description\": \"Sample module\",\n      \"provider\": \"azurerm\",\n      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-cloud-storage.git\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "25eaf62e-6bb6-44e6-a3c2-229e5b8fd532",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "670da35d-59c7-429d-8dd0-3eeea2b429cd",
     "name": "search modules",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/module",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/module",
     "method": "GET",
     "sortNum": 460000,
     "created": "2022-07-22T21:25:36.115Z",
-    "modified": "2022-07-22T21:25:36.115Z",
-    "headers": []
+    "modified": "2022-08-07T16:43:47.168Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "3383ab80-2d33-4c5d-8faa-a68a81ad3383",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "670da35d-59c7-429d-8dd0-3eeea2b429cd",
     "name": "search module by id",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}",
     "method": "GET",
     "sortNum": 470000,
     "created": "2022-07-22T21:25:36.116Z",
-    "modified": "2022-07-22T21:25:36.116Z",
-    "headers": []
+    "modified": "2022-08-07T16:44:08.434Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "161d4ee1-bb8b-492f-a560-2bf5676913a0",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "670da35d-59c7-429d-8dd0-3eeea2b429cd",
     "name": "delete module by id",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/module/{{moduleId}}",
     "method": "DELETE",
     "sortNum": 480000,
     "created": "2022-07-22T21:25:36.117Z",
-    "modified": "2022-07-22T21:25:36.117Z",
-    "headers": []
+    "modified": "2022-08-07T16:29:19.946Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "23bbfa3f-cae6-4e0f-a676-63a702abffae",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "670da35d-59c7-429d-8dd0-3eeea2b429cd",
     "name": "search module by name,provider and organization",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/module?filter[module]=name==azure;provider==azurerm",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/module?filter[module]=name==azure;provider==azurerm",
     "method": "GET",
     "sortNum": 490000,
     "created": "2022-07-22T21:25:36.118Z",
-    "modified": "2022-07-22T21:25:36.118Z",
+    "modified": "2022-08-07T16:29:47.538Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -1403,9 +1428,15 @@
     "params": [
       {
         "name": "filter[module]",
-        "value": "name==azure;provider==azurerm"
+        "value": "name==azure;provider==azurerm",
+        "isPath": false
       }
-    ]
+    ],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "ea503013-e1bd-4aff-95ec-2179da6e7cd6",
@@ -1894,6 +1925,69 @@
     "params": [],
     "auth": {
       "type": "none"
+    },
+    "tests": []
+  },
+  {
+    "_id": "ba24cc2f-3b48-40aa-be4b-745fc831f3e5",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "003bb224-853c-4e33-a0e8-1620307cbdae",
+    "name": "create ssh key",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/ssh",
+    "method": "POST",
+    "sortNum": 730000,
+    "created": "2022-08-07T15:50:12.597Z",
+    "modified": "2022-08-07T16:53:22.417Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"ssh\",\n    \"attributes\": {\n      \"name\": \"Sample SSH Key\",\n      \"description\": \"SSH Key Description\",\n      \"privateKey\": \"{{sshPrivateKey}}\",\n      \"sshType\": \"{{sshKeyType}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.id",
+        "action": "setto",
+        "value": "{{sshId}}"
+      }
+    ]
+  },
+  {
+    "_id": "25c584a9-c9b9-43e5-862b-7563846365bf",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "003bb224-853c-4e33-a0e8-1620307cbdae",
+    "name": "create module with ssh",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/module",
+    "method": "POST",
+    "sortNum": 740000,
+    "created": "2022-08-07T16:13:18.969Z",
+    "modified": "2022-08-07T16:19:47.931Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"module\",\n    \"attributes\": {\n      \"name\": \"SSH Module\",\n      \"description\": \"Sample SSH module\",\n      \"provider\": \"azurerm\",\n      \"source\": \"{{sshModuleRepo}}\"\n    },\n    \"relationships\": {\n      \"ssh\": {\n        \"data\": {\n          \"type\": \"ssh\",\n          \"id\": \"{{sshId}}\"\n        }\n      }\n  }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
     },
     "tests": []
   }

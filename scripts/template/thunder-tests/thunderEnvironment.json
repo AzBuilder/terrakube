@@ -34,7 +34,18 @@
     "created": "2022-07-23T17:50:06.873Z",
     "modified": "2022-07-23T17:50:11.500Z",
     "data": [
-      
+      {
+        "name": "sshKeyType",
+        "value": ""
+      },
+      {
+        "name": "sshPrivateKey",
+        "value": ""
+      },
+      {
+        "name": "sshModuleRepo",
+        "value": ""
+      }
     ]
   }
 ]
