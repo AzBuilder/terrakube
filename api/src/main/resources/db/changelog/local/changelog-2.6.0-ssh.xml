@@ -26,5 +26,10 @@
                 <constraints nullable="true" foreignKeyName="fk_module_ssh" references="ssh(id)"/>
             </column>
         </addColumn>
+        <addColumn tableName="workspace" >
+            <column name="ssh_id" type="varchar(36)">
+                <constraints nullable="true" foreignKeyName="fk_workspace_ssh" references="ssh(id)"/>
+            </column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

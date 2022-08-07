@@ -115,7 +115,6 @@ public class Module extends GenericAuditFields {
                 tags = Git.lsRemoteRepository()
                         .setTags(true)
                         .setRemote(source)
-                        .setCredentialsProvider(credentialsProvider)
                         .setTransportConfigCallback(transportConfigCallback)
                         .callAsMap();
             }
