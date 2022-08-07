@@ -7,6 +7,7 @@ import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.module.Module;
 import org.terrakube.api.rs.provider.Provider;
+import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.vcs.Vcs;
@@ -63,6 +64,10 @@ public class Organization {
     @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Vcs> vcs;
+
+    @UpdatePermission(expression = "user belongs organization")
+    @OneToMany(mappedBy = "organization")
+    private List<Ssh> ssh;
 
     @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
