@@ -8,12 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.terrakube.api.plugin.security.user.AuthenticatedUser;
 import org.terrakube.api.rs.checks.membership.MembershipService;
-import org.terrakube.api.rs.checks.vcs.TeamViewVcs;
 import org.terrakube.api.rs.ssh.Ssh;
 import java.util.Optional;
 
 @Slf4j
-@SecurityCheck(TeamViewVcs.RULE)
+@SecurityCheck(TeamViewSsh.RULE)
 public class TeamViewSsh extends OperationCheck<Ssh> {
     public static final String RULE = "team view ssh";
 

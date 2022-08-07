@@ -6,12 +6,11 @@ import com.yahoo.elide.core.security.RequestScope;
 import com.yahoo.elide.core.security.checks.OperationCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.terrakube.api.plugin.security.user.AuthenticatedUser;
-import org.terrakube.api.rs.checks.vcs.ReadAccessToken;
 import org.terrakube.api.rs.ssh.Ssh;
 
 import java.util.Optional;
 
-@SecurityCheck(ReadAccessToken.RULE)
+@SecurityCheck(ReadPrivateKey.RULE)
 public class ReadPrivateKey extends OperationCheck<Ssh> {
     public static final String RULE = "read private key";
     @Autowired

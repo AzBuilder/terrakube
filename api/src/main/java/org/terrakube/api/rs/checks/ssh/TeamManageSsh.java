@@ -11,7 +11,6 @@ import org.terrakube.api.plugin.security.user.AuthenticatedUser;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.team.Team;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
