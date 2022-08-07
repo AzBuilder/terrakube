@@ -10,10 +10,10 @@ import org.terrakube.api.rs.Organization;
 import javax.persistence.*;
 import java.util.UUID;
 
-@ReadPermission(expression = "team view vcs")
-@CreatePermission(expression = "team manage vcs")
-@UpdatePermission(expression = "team manage vcs")
-@DeletePermission(expression = "team manage vcs")
+@ReadPermission(expression = "team view ssh")
+@CreatePermission(expression = "team manage ssh")
+@UpdatePermission(expression = "team manage ssh")
+@DeletePermission(expression = "team manage ssh")
 @Include(rootLevel = false)
 @Getter
 @Setter
@@ -31,7 +31,7 @@ public class Ssh extends GenericAuditFields {
     @Column(name = "description")
     private String description;
 
-    @ReadPermission(expression = "read access token")
+    @ReadPermission(expression = "read private key")
     @Column(name = "private_key")
     private String privateKey;
 
