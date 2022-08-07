@@ -21,7 +21,7 @@
                 <constraints nullable="false" foreignKeyName="fk_ssh_org" references="organization(id)"/>
             </column>
         </createTable>
-        <addColumn tableName="workspace" >
+        <addColumn tableName="module" >
             <column name="ssh_id" type="varchar(36)">
                 <constraints nullable="true" foreignKeyName="fk_ssh_vcs" references="vcs(id)"/>
             </column>
