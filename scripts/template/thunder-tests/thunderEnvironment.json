@@ -45,6 +45,10 @@
       {
         "name": "sshModuleRepo",
         "value": ""
+      },
+      {
+        "name": "sshWorkspaceRepo",
+        "value": ""
       }
     ]
   }

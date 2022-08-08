@@ -177,7 +177,7 @@
     "method": "POST",
     "sortNum": 80000,
     "created": "2022-07-22T21:25:36.076Z",
-    "modified": "2022-07-22T23:28:54.643Z",
+    "modified": "2022-08-08T00:04:52.559Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -187,7 +187,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"template\",\n    \"attributes\": {\n      \"name\": \"plan_apply\",\n      \"description\": \"Terraform Plan Apply\",\n      \"version\": \"1.0.0\",\n      \"tcl\": \"ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"template\",\n    \"attributes\": {\n      \"name\": \"plan_apply\",\n      \"description\": \"Terraform Plan Apply\",\n      \"version\": \"1.0.0\",\n      \"tcl\": \"ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAK\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -1099,7 +1099,7 @@
     "method": "POST",
     "sortNum": 380000,
     "created": "2022-07-22T21:25:36.107Z",
-    "modified": "2022-07-22T23:49:26.221Z",
+    "modified": "2022-08-08T00:15:47.193Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -1109,7 +1109,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"job\",\n    \"attributes\": {\n      \"tcl\": \"{{template_plan_apply_id}}\"\n    },\n    \"relationships\":{\n        \"workspace\":{\n            \"data\":{\n                \"type\": \"workspace\",\n                \"id\": \"{{workspaceId}}\"\n            }\n        }\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"job\",\n    \"attributes\": {\n      \"templateReference\": \"{{template_plan_apply_id}}\"\n    },\n    \"relationships\":{\n        \"workspace\":{\n            \"data\":{\n                \"type\": \"workspace\",\n                \"id\": \"{{workspaceId}}\"\n            }\n        }\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -1990,5 +1990,40 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "3e8aa1a2-d273-4dd3-b711-fc61b610763c",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "003bb224-853c-4e33-a0e8-1620307cbdae",
+    "name": "create wokspace with ssh",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace",
+    "method": "POST",
+    "sortNum": 750000,
+    "created": "2022-08-07T23:30:33.035Z",
+    "modified": "2022-08-07T23:41:18.501Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"data\": {\n        \"type\": \"workspace\",\n        \"attributes\": {\n            \"branch\": \"main\",\n            \"name\": \"Sample-Workspace SSH\",\n            \"source\":  \"{{sshWorkspaceRepo}}\",\n            \"terraformVersion\": \"1.0.11\"\n        },\n        \"relationships\": {\n            \"ssh\": {\n                \"data\": {\n                    \"type\": \"ssh\",\n                    \"id\": \"{{sshId}}\"\n                }\n            }\n        }\n    }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.id",
+        "action": "setto",
+        "value": "{{workspaceId}}"
+      }
+    ]
   }
 ]
