@@ -98,10 +98,10 @@ public class ExecutorService {
     }
 
     private boolean sendToExecutor(Job job, ExecutorContext executorContext) {
-        log.info("Sending Job: /n {}", executorContext);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(this.executorUrl, executorContext, ExecutorContext.class);
-
+        executorContext.setAccessToken("****");
+        log.info("Sending Job: /n {}", executorContext);
         log.info("Response Status: {}", response.getStatusCode().value());
 
         if (response.getStatusCode().equals(HttpStatus.ACCEPTED)) {
