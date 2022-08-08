@@ -1845,11 +1845,11 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "965fa789-1b7c-48e1-a252-8c7487f9333d",
     "name": "Search Versions",
-    "url": "{{terrakubeRegistry}}/terraform/modules/v1/gcp/kubernetes-engine/google/versions",
+    "url": "{{terrakubeRegistry}}/terraform/modules/v1/{{registryModuleOrg}}/{{registryModuleName}}/{{registryModuleProvider}}/versions",
     "method": "GET",
     "sortNum": 680000,
     "created": "2022-07-27T21:25:40.248Z",
-    "modified": "2022-07-27T21:31:01.960Z",
+    "modified": "2022-08-08T22:11:50.150Z",
     "headers": [],
     "params": [],
     "auth": {
@@ -1863,11 +1863,11 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "965fa789-1b7c-48e1-a252-8c7487f9333d",
     "name": "Download Version",
-    "url": "{{terrakubeRegistry}}/terraform/modules/v1/gcp/kubernetes-engine/google/v22.0.0/download",
+    "url": "{{terrakubeRegistry}}/terraform/modules/v1/{{registryModuleOrg}}/{{registryModuleName}}/{{registryModuleProvider}}/{{registryModuleVersion}}/download",
     "method": "GET",
     "sortNum": 690000,
     "created": "2022-07-27T21:25:47.998Z",
-    "modified": "2022-07-27T21:29:31.957Z",
+    "modified": "2022-08-08T22:12:19.939Z",
     "headers": [],
     "params": [],
     "auth": {
@@ -1972,7 +1972,7 @@
     "method": "POST",
     "sortNum": 740000,
     "created": "2022-08-07T16:13:18.969Z",
-    "modified": "2022-08-07T16:19:47.931Z",
+    "modified": "2022-08-08T21:59:34.782Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -1982,7 +1982,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"module\",\n    \"attributes\": {\n      \"name\": \"SSH Module\",\n      \"description\": \"Sample SSH module\",\n      \"provider\": \"azurerm\",\n      \"source\": \"{{sshModuleRepo}}\"\n    },\n    \"relationships\": {\n      \"ssh\": {\n        \"data\": {\n          \"type\": \"ssh\",\n          \"id\": \"{{sshId}}\"\n        }\n      }\n  }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"module\",\n    \"attributes\": {\n      \"name\": \"sshsample\",\n      \"description\": \"Sample SSH module\",\n      \"provider\": \"azurerm\",\n      \"source\": \"{{sshModuleRepo}}\"\n    },\n    \"relationships\": {\n      \"ssh\": {\n        \"data\": {\n          \"type\": \"ssh\",\n          \"id\": \"{{sshId}}\"\n        }\n      }\n  }\n  }\n}",
       "form": []
     },
     "auth": {

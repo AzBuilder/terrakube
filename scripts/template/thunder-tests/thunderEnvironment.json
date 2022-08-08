@@ -49,6 +49,22 @@
       {
         "name": "sshWorkspaceRepo",
         "value": ""
+      },
+      {
+        "name": "registryModuleOrg",
+        "value": "gcp"
+      },
+      {
+        "name": "registryModuleName",
+        "value": "kubernetes-engine"
+      },
+      {
+        "name": "registryModuleProvider",
+        "value": "google"
+      },
+      {
+        "name": "registryModuleVersion",
+        "value": "v22.1.0"
       }
     ]
   }

@@ -6,6 +6,7 @@ import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.module.Module;
 import org.terrakube.client.model.organization.module.ModuleAttributes;
 import org.terrakube.client.model.organization.module.ModuleRequest;
+import org.terrakube.client.model.organization.ssh.Ssh;
 import org.terrakube.client.model.organization.vcs.Vcs;
 import org.terrakube.registry.plugin.storage.StorageService;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,15 @@ import java.util.List;
 @Service
 public class ModuleServiceImpl implements ModuleService {
 
-    TerrakubeClient restClient;
+    TerrakubeClient terrakubeClient;
     StorageService storageService;
 
     @Override
     public List<String> getAvailableVersions(String organizationName, String moduleName, String providerName) {
-        String organizationId = restClient.getOrganizationByName(organizationName).getData().get(0).getId();
+        String organizationId = terrakubeClient.getOrganizationByName(organizationName).getData().get(0).getId();
 
         log.info("Search Organization: {} {}", organizationName, organizationId);
-        List<String> versionList = restClient.getModuleByNameAndProvider(organizationId, moduleName, providerName).getData().get(0).getAttributes().getVersions();
+        List<String> versionList = terrakubeClient.getModuleByNameAndProvider(organizationId, moduleName, providerName).getData().get(0).getAttributes().getVersions();
         log.info("Search Module: {} {}", moduleName, providerName);
         List<String> definitionVersions = new ArrayList<>();
 
@@ -41,8 +42,8 @@ public class ModuleServiceImpl implements ModuleService {
     public String getModuleVersionPath(String organizationName, String moduleName, String providerName, String version, boolean countDownload) {
         String moduleVersionPath = "";
 
-        String organizationId = restClient.getOrganizationByName(organizationName).getData().get(0).getId();
-        Module module = restClient.getModuleByNameAndProvider(organizationId, moduleName, providerName).getData().get(0);
+        String organizationId = terrakubeClient.getOrganizationByName(organizationName).getData().get(0).getId();
+        Module module = terrakubeClient.getModuleByNameAndProvider(organizationId, moduleName, providerName).getData().get(0);
         String moduleSource = module.getAttributes().getSource();
         String vcsType = "PUBLIC";
         String accessToken = null;
@@ -50,6 +51,12 @@ public class ModuleServiceImpl implements ModuleService {
             Vcs vcsInformation = getVcsInformation(organizationId, module.getRelationships().getVcs().getData().getId());
             vcsType = vcsInformation.getAttributes().getVcsType();
             accessToken = vcsInformation.getAttributes().getAccessToken();
+        }
+
+        if (module.getRelationships().getSsh().getData() != null) {
+            Ssh sshInformation = getSshInformation(organizationId, module.getRelationships().getSsh().getData().getId());
+            vcsType = "SSH~" + sshInformation.getAttributes().getSshType();
+            accessToken = sshInformation.getAttributes().getPrivateKey();
         }
 
         moduleVersionPath = storageService.searchModule(
@@ -71,10 +78,14 @@ public class ModuleServiceImpl implements ModuleService {
         module.setAttributes(moduleAttributes);
         moduleRequest.setData(module);
 
-        restClient.updateModule(moduleRequest, organizationId, module.getId());
+        terrakubeClient.updateModule(moduleRequest, organizationId, module.getId());
     }
 
     private Vcs getVcsInformation(String organizationId, String vcsId) {
-        return restClient.getVcsById(organizationId, vcsId).getData();
+        return terrakubeClient.getVcsById(organizationId, vcsId).getData();
+    }
+
+    private Ssh getSshInformation(String organizationId, String sshId) {
+        return terrakubeClient.getSshById(organizationId, sshId).getData();
     }
 }
