@@ -45,6 +45,9 @@ The platform support public and private repositories in the following providers:
 * Bitbucket.com
 * Gitlab.com
 * Azure DevOps
+* SSH Keys 
+  - RSA
+  - ED25519
 
 ### Requirements
 
