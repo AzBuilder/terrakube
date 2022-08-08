@@ -39,12 +39,16 @@ This project contains three modules describe below:
 | ui       | React JS terrakube front end                                     |
 
 ### Version Control Services
-The platform support public and private repositories in the following providers:
+The platform support public and private repositories for modules and workspaces in the following providers:
 
 * GitHub.com
 * Bitbucket.com
 * Gitlab.com
 * Azure DevOps
+
+For private repositories you need to use one of the following methods for authentication:
+
+* oAuth Applications (GitHub, Bitbucket, Gitlab and Azure Devops)
 * SSH Keys 
   - RSA
   - ED25519
