@@ -325,10 +325,10 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         <td>
                           {renderVCSLogo(vcsProvider)}{" "}
                           <a
-                            href={module.data.attributes.source}
+                            href={module.data.attributes.source.replace(":","/").replace("git@","https://")}
                             target="_blank"
                           >
-                            {new URL(module.data.attributes.source)?.pathname
+                            {new URL(module.data.attributes.source.replace(":","/").replace("git@","https://"))?.pathname
                               ?.replace(".git", "")
                               ?.substring(1)}
                           </a>
