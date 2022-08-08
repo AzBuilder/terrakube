@@ -181,9 +181,9 @@ export const OrganizationDetails = ({
                           &nbsp;&nbsp;{item.terraformVersion}
                         </span>
                         <span>
-                          {renderVCSLogo(new URL(item.source).hostname)}&nbsp;{" "}
-                          <a href={item.source} target="_blank">
-                            {new URL(item.source)?.pathname
+                          {renderVCSLogo(new URL(item.source.replace(":","/").replace("git@","https://")).hostname)}&nbsp;{" "}
+                          <a href={item.source.replace(":","/").replace("git@","https://")} target="_blank">
+                            {new URL(item.source.replace(":","/").replace("git@","https://"))?.pathname
                               ?.replace(".git", "")
                               ?.substring(1)}
                           </a>
