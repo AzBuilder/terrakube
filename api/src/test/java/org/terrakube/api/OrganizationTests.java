@@ -43,6 +43,7 @@ class OrganizationTests extends ServerApplicationTests {
                                                 relation("job"),
                                                 relation("module"),
                                                 relation("provider"),
+                                                relation("ssh"),
                                                 relation("team"),
                                                 relation("template"),
                                                 relation("vcs"),

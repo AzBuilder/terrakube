@@ -49,6 +49,7 @@ class WorkspaceTests extends ServerApplicationTests{
                                                         )
                                                 ),
                                                 relation("schedule"),
+                                                relation("ssh", true),
                                                 relation("variable"),
                                                 relation("vcs",true,
                                                         resource(
