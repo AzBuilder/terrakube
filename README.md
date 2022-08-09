@@ -21,7 +21,7 @@ If you want to develop or test Terrakube click in the following button to open a
 
 [![gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
 
-For more information about the test environment please refer to the following [document](development.md)and to learn about the API check the following [document](https://docs.terrakube.org/api/methods)
+For more information about the test environment please refer to the following [file](development.md) and to learn about the API check the following [api information](https://docs.terrakube.org/api/methods)
 
 ### Security - Authentication
 
@@ -39,12 +39,19 @@ This project contains three modules describe below:
 | ui       | React JS terrakube front end                                     |
 
 ### Version Control Services
-The platform support public and private repositories in the following providers:
+The platform support public and private repositories for modules and workspaces in the following providers:
 
 * GitHub.com
 * Bitbucket.com
 * Gitlab.com
 * Azure DevOps
+
+For private repositories you need to use one of the following methods for authentication:
+
+* oAuth Applications (GitHub, Bitbucket, Gitlab and Azure Devops)
+* SSH Keys 
+  - RSA
+  - ED25519
 
 ### Requirements
 

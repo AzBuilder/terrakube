@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="15" author="alfespa17@gmail.com">
+        <createTable tableName="ssh">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(64)"/>
+            <column name="description" type="varchar2(64)"/>
+            <column name="private_key" type="clob"/>
+            <column name="ssh_type" type="varchar2(32)"/>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_ssh_org" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addColumn tableName="module" >
+            <column name="ssh_id" type="varchar(36)">
+                <constraints nullable="true" foreignKeyName="fk_module_ssh" references="ssh(id)"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="workspace" >
+            <column name="ssh_id" type="varchar(36)">
+                <constraints nullable="true" foreignKeyName="fk_workspace_ssh" references="ssh(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

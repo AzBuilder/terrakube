@@ -6,6 +6,7 @@ import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.parameters.Category;
 import org.terrakube.api.rs.workspace.parameters.Variable;
@@ -46,6 +47,11 @@ public class ExecutorService {
             executorContext.setVcsType(vcs.getVcsType().toString());
             executorContext.setAccessToken(vcs.getAccessToken());
             log.info("Private Repository {}", executorContext.getVcsType());
+        } else if (job.getWorkspace().getSsh() != null) {
+            Ssh ssh = job.getWorkspace().getSsh();
+            executorContext.setVcsType(String.format("SSH~%s", ssh.getSshType().getFileName()));
+            executorContext.setAccessToken(ssh.getPrivateKey());
+            log.info("Private Repository using SSH private key");
         } else {
             executorContext.setVcsType("PUBLIC");
             log.info("Public Repository");
@@ -67,8 +73,8 @@ public class ExecutorService {
                 log.info("Variable Key: {} Value {}", variable.getKey(), variable.isSensitive() ? "sensitive" : variable.getValue());
             }
 
-        if(globalvarList != null)
-            for(Globalvar globalvar : globalvarList){
+        if (globalvarList != null)
+            for (Globalvar globalvar : globalvarList) {
                 if (globalvar.getCategory().equals(Category.TERRAFORM)) {
                     log.info("Adding terraform");
                     variables.putIfAbsent(globalvar.getKey(), globalvar.getValue());
@@ -92,10 +98,10 @@ public class ExecutorService {
     }
 
     private boolean sendToExecutor(Job job, ExecutorContext executorContext) {
-        log.info("Sending Job: /n {}", executorContext);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(this.executorUrl, executorContext, ExecutorContext.class);
-
+        executorContext.setAccessToken("****");
+        log.info("Sending Job: /n {}", executorContext);
         log.info("Response Status: {}", response.getStatusCode().value());
 
         if (response.getStatusCode().equals(HttpStatus.ACCEPTED)) {

@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.parameters.Variable;
 import org.terrakube.api.rs.job.Job;
@@ -64,4 +65,7 @@ public class Workspace {
 
     @OneToOne
     private Vcs vcs;
+
+    @OneToOne
+    private Ssh ssh;
 }

@@ -181,9 +181,9 @@ export const OrganizationDetails = ({
                           &nbsp;&nbsp;{item.terraformVersion}
                         </span>
                         <span>
-                          {renderVCSLogo(new URL(item.source).hostname)}&nbsp;{" "}
-                          <a href={item.source} target="_blank">
-                            {new URL(item.source)?.pathname
+                          {renderVCSLogo(new URL(fixSshURL(item.source)).hostname)}&nbsp;{" "}
+                          <a href={fixSshURL(item.source)} target="_blank">
+                            {new URL(fixSshURL(item.source))?.pathname
                               ?.replace(".git", "")
                               ?.substring(1)}
                           </a>
@@ -200,6 +200,14 @@ export const OrganizationDetails = ({
     </Content>
   );
 };
+
+function fixSshURL(source){
+  if(source.startsWith("git@")){
+      return source.replace(":","/").replace("git@","https://")
+  } else {
+      return source
+  }
+}
 
 function setupOrganizationIncludes(includes, setWorkspaces) {
   let workspaces = [];

@@ -325,10 +325,10 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         <td>
                           {renderVCSLogo(vcsProvider)}{" "}
                           <a
-                            href={module.data.attributes.source}
+                            href={fixSshURL(module.data.attributes.source)}
                             target="_blank"
                           >
-                            {new URL(module.data.attributes.source)?.pathname
+                            {new URL(fixSshURL(module.data.attributes.source))?.pathname
                               ?.replace(".git", "")
                               ?.substring(1)}
                           </a>
@@ -562,3 +562,12 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     </Content>
   );
 };
+
+
+function fixSshURL(source){
+  if(source.startsWith("git@")){
+      return source.replace(":","/").replace("git@","https://")
+  } else {
+      return source
+  }
+}

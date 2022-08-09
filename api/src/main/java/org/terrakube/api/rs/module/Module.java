@@ -5,21 +5,20 @@ import com.yahoo.elide.core.RequestScope;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jgit.api.TransportConfigCallback;
+import org.eclipse.jgit.transport.*;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.plugin.ssh.TerrakubeSshdSessionFactory;
 import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @ReadPermission(expression = "team view module")
 @CreatePermission(expression = "team manage module")
@@ -66,6 +65,8 @@ public class Module extends GenericAuditFields {
         List<String> versionList = new ArrayList<>();
         try {
             CredentialsProvider credentialsProvider = null;
+            TransportConfigCallback transportConfigCallback = null;
+            Map<String, Ref> tags = null;
             if (vcs != null) {
                 log.info("vcs using {}", vcs.getVcsType());
                 switch (vcs.getVcsType()) {
@@ -85,12 +86,46 @@ public class Module extends GenericAuditFields {
                         credentialsProvider = null;
                         break;
                 }
+
+                tags = Git.lsRemoteRepository()
+                        .setTags(true)
+                        .setRemote(source)
+                        .setCredentialsProvider(credentialsProvider)
+                        .callAsMap();
             }
-            Map<String, Ref> tags = Git.lsRemoteRepository()
-                    .setTags(true)
-                    .setRemote(source)
-                    .setCredentialsProvider(credentialsProvider)
-                    .callAsMap();
+
+            if (ssh != null){
+                log.info("vcs using ssh {}", ssh.getId());
+
+                transportConfigCallback = transport -> {
+                    if(transport instanceof SshTransport) {
+                        if( transport instanceof SshTransport) {
+                            SshTransport sshTransportSSh = (SshTransport) transport;
+                            TerrakubeSshdSessionFactory terrakubeSshdSessionFactory = TerrakubeSshdSessionFactory
+                                    .builder()
+                                    .sshId(ssh.getId().toString())
+                                    .sshFileName(ssh.getSshType().getFileName())
+                                    .privateKey(ssh.getPrivateKey())
+                                    .build();
+                            ((SshTransport) transport).setSshSessionFactory(terrakubeSshdSessionFactory.getSshdSessionFactory());
+                        }
+                    }
+                };
+
+                tags = Git.lsRemoteRepository()
+                        .setTags(true)
+                        .setRemote(source)
+                        .setTransportConfigCallback(transportConfigCallback)
+                        .callAsMap();
+            }
+
+            if (ssh == null && vcs == null){
+                tags = Git.lsRemoteRepository()
+                        .setTags(true)
+                        .setRemote(source)
+                        .callAsMap();
+            }
+
             tags.forEach((key, value) -> {
                 versionList.add(key.replace("refs/tags/", ""));
             });
@@ -102,4 +137,7 @@ public class Module extends GenericAuditFields {
 
     @OneToOne
     private Vcs vcs;
+
+    @OneToOne
+    private Ssh ssh;
 }

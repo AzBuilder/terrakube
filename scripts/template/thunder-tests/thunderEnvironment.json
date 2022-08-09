@@ -34,7 +34,38 @@
     "created": "2022-07-23T17:50:06.873Z",
     "modified": "2022-07-23T17:50:11.500Z",
     "data": [
-      
+      {
+        "name": "sshKeyType",
+        "value": ""
+      },
+      {
+        "name": "sshPrivateKey",
+        "value": ""
+      },
+      {
+        "name": "sshModuleRepo",
+        "value": ""
+      },
+      {
+        "name": "sshWorkspaceRepo",
+        "value": ""
+      },
+      {
+        "name": "registryModuleOrg",
+        "value": "gcp"
+      },
+      {
+        "name": "registryModuleName",
+        "value": "kubernetes-engine"
+      },
+      {
+        "name": "registryModuleProvider",
+        "value": "google"
+      },
+      {
+        "name": "registryModuleVersion",
+        "value": "v22.1.0"
+      }
     ]
   }
 ]

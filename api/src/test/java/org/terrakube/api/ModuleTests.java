@@ -54,6 +54,7 @@ class ModuleTests extends ServerApplicationTests{
                                                                 id("a42f538b-8c75-4311-8e73-ea2c0f2fb577")
                                                         )
                                                 ),
+                                                relation("ssh", true),
                                                 relation("vcs",true,
                                                         resource(
                                                                 type("vcs"),

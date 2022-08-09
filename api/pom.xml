@@ -21,7 +21,7 @@
         <mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>
         <msal4j.version>1.11.2</msal4j.version>
         <lombok.version>1.18.20</lombok.version>
-        <jgit.version>5.12.0.202106070339-r</jgit.version>
+        <jgit.version>6.2.0.202206071550-r</jgit.version>
         <rest-assured.version>4.4.0</rest-assured.version>
         <junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
         <groovy.version>3.0.8</groovy.version>
@@ -129,6 +129,11 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
+            <version>${jgit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit.ssh.apache</artifactId>
             <version>${jgit.version}</version>
         </dependency>
         <dependency>
