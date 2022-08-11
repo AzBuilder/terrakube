@@ -309,7 +309,7 @@ export const CreateWorkspace = () => {
               <Form.Item name="branch" label="VCS branch" placeholder="(default branch)" extra=" The branch from which to import new versions. This defaults to the value your version control provides as the default branch for this repository." rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
-              <Form.Item name="folder" label="Workspace folder" placeholder="/" extra=" Default workspace directory." rules={[{ required: true }]}>
+              <Form.Item name="folder" label="Workspace folder" placeholder="/" extra=" Default workspace directory. Use / for the root folder" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
               <Form.Item name="terraformVersion" label="Terraform Version" rules={[{ required: true }]} extra="The version of Terraform to use for this workspace. It will not upgrade automatically.">
