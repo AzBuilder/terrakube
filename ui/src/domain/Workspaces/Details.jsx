@@ -178,6 +178,7 @@ export const WorkspaceDetails = (props) => {
         attributes: {
           name: values.name,
           description: values.description,
+          folder: values.folder,
           terraformVersion: values.terraformVersion,
         },
       },
@@ -339,6 +340,8 @@ export const WorkspaceDetails = (props) => {
                         initialValues={{
                           name: workspace.data.attributes.name,
                           description: workspace.data.attributes.description,
+                          folder: workspace.data.attributes.folder
+
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -356,6 +359,12 @@ export const WorkspaceDetails = (props) => {
                           label="Description"
                         >
                           <Input.TextArea placeholder="Workspace description" />
+                        </Form.Item>
+                        <Form.Item
+                          name="folder"
+                          label="Workspace Repository Folder"
+                        >
+                          <Input />
                         </Form.Item>
                         <Form.Item
                           name="terraformVersion"
