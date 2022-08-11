@@ -1,59 +1,87 @@
 package org.terrakube.api;
 
-import com.yahoo.elide.core.exceptions.HttpStatus;
+import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.http.HttpStatus;
 
-import static com.yahoo.elide.test.jsonapi.JsonApiDSL.*;
-import static io.restassured.RestAssured.when;
-import static org.hamcrest.Matchers.equalTo;
+import static io.restassured.RestAssured.given;
 
 class VcsTests extends ServerApplicationTests{
 
     @Test
-    @Sql(statements = {
-            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
-            "INSERT INTO organization (id, name, description) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
-            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO vcs (id, name, description, vcs_type, client_id, client_secret, access_token, status, organization_id) VALUES\n" +
-                    "\t\t('0f21ba16-16d4-4ac7-bce0-3484024ee6bf','publicConnection', 'publicConnection', 'PUBLIC', 'sampleId', 'sampleSecret', 'sampleToken', 'PENDING', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');"
-    })
-    void moduleApiGetTest() {
-        when()
-                .get("/api/v1/organization/a42f538b-8c75-4311-8e73-ea2c0f2fb577/vcs")
+    void searchVcsAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/vcs")
                 .then()
-                .log().all()
-                .body(equalTo(
-                        data(
-                                resource(
-                                        type( "vcs"),
-                                        id("0f21ba16-16d4-4ac7-bce0-3484024ee6bf"),
-                                        attributes(
-                                                attr("accessToken", "sampleToken"),
-                                                attr("clientId", "sampleId"),
-                                                attr("createdBy", null),
-                                                attr("createdDate", null),
-                                                attr("description", "publicConnection"),
-                                                attr("name", "publicConnection"),
-                                                attr("status", "PENDING"),
-                                                attr("updatedBy", null),
-                                                attr("updatedDate", null),
-                                                attr("vcsType", "PUBLIC")
-                                        ),
-                                        relationships(
-                                                relation("organization",true,
-                                                        resource(
-                                                                type("organization"),
-                                                                id("a42f538b-8c75-4311-8e73-ea2c0f2fb577")
-                                                        )
-                                                )
-                                        )
-                                )
-                        ).toJSON())
-                )
-                .log().all()
-                .statusCode(HttpStatus.SC_OK);
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
+    @Test
+    void searchVcsAsNonOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/vcs")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void createVcsAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"vcs\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"githubConnection\",\n" +
+                        "      \"description\": \"vcsGitHubDescription\",\n" +
+                        "      \"vcsType\": \"GITHUB\",\n" +
+                        "      \"clientId\": \"12345\",\n" +
+                        "      \"clientSecret\": \"12345\",\n" +
+                        "      \"accessToken\": \"12345\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/vcs")
+                .then()
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("githubConnection"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value());
+    }
+    @Test
+    void createVcsAsNonOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"vcs\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"githubConnection\",\n" +
+                        "      \"description\": \"vcsGitHubDescription\",\n" +
+                        "      \"vcsType\": \"GITHUB\",\n" +
+                        "      \"clientId\": \"12345\",\n" +
+                        "      \"clientSecret\": \"12345\",\n" +
+                        "      \"accessToken\": \"12345\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/vcs")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 }

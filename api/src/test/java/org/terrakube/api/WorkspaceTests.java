@@ -1,205 +1,264 @@
 package org.terrakube.api;
 
-import com.yahoo.elide.core.exceptions.HttpStatus;
+import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.http.HttpStatus;
 
-import static com.yahoo.elide.test.jsonapi.JsonApiDSL.*;
-import static io.restassured.RestAssured.when;
-import static org.hamcrest.Matchers.equalTo;
+import static io.restassured.RestAssured.given;
 
-class WorkspaceTests extends ServerApplicationTests{
+class WorkspaceTests extends ServerApplicationTests {
 
     @Test
-    @Sql(statements = {
-            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
-            "INSERT INTO organization (id, name, description) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
-            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO vcs (id, name, description, vcs_type, organization_id) VALUES\n" +
-                    "\t\t('0f21ba16-16d4-4ac7-bce0-3484024ee6bf','publicConnection', 'publicConnection', 'PUBLIC', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id, vcs_id, description) VALUES\n" +
-                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577', '0f21ba16-16d4-4ac7-bce0-3484024ee6bf', 'Description');"
-    })
-    void workspaceApiGetTest() {
-        when()
-                .get("/api/v1/organization/a42f538b-8c75-4311-8e73-ea2c0f2fb577/workspace")
+    void searchWorkspaceAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc")
                 .then()
-                .log().all()
-                .body(equalTo(
-                        data(
-                                resource(
-                                        type( "workspace"),
-                                        id("c05da917-81a3-4da3-9619-20b240cbd7f7"),
-                                        attributes(
-                                                attr("branch", "main"),
-                                                attr("description", "Description"),
-                                                attr("name", "Workspace"),
-                                                attr("source", "https://github.com/AzBuilder/terraform-sample-repository.git"),
-                                                attr("terraformVersion", "0.15.2")
-                                        ),
-                                        relationships(
-                                                relation("history"),
-                                                relation("job"),
-                                                relation("organization",true,
-                                                        resource(
-                                                                type("organization"),
-                                                                id("a42f538b-8c75-4311-8e73-ea2c0f2fb577")
-                                                        )
-                                                ),
-                                                relation("schedule"),
-                                                relation("ssh", true),
-                                                relation("variable"),
-                                                relation("vcs",true,
-                                                        resource(
-                                                                type("vcs"),
-                                                                id("0f21ba16-16d4-4ac7-bce0-3484024ee6bf")
-                                                        )
-                                                )
-                                        )
-                                )
-                        ).toJSON())
-                )
-                .log().all()
-                .statusCode(HttpStatus.SC_OK);
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("sample_simple"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
-    @Sql(statements = {
-            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
-            "INSERT INTO organization (id, name, description) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
-            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
-                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO variable (id, variable_key, variable_value, variable_category, sensitive, workspace_id, variable_description, hcl) VALUES\n" +
-                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889','variableKey','variableValue', 'TERRAFORM', false, 'c05da917-81a3-4da3-9619-20b240cbd7f7', 'someDescription', true);"
-    })
-    void variableApiGetTest() {
-        when()
-                .get("/api/v1/organization/a42f538b-8c75-4311-8e73-ea2c0f2fb577/workspace/c05da917-81a3-4da3-9619-20b240cbd7f7/variable")
+    void searchWorkspaceAsNonOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc")
                 .then()
-                .log().all()
-                .body(equalTo(
-                        data(
-                                resource(
-                                        type( "variable"),
-                                        id("4ea7855d-ab07-4080-934c-3aab429da889"),
-                                        attributes(
-                                                attr("category", "TERRAFORM"),
-                                                attr("description", "someDescription"),
-                                                attr("hcl", true),
-                                                attr("key", "variableKey"),
-                                                attr("sensitive", false),
-                                                attr("value", "variableValue")
-                                        ),
-                                        relationships(
-                                                relation("workspace",true,
-                                                        resource(
-                                                                type("workspace"),
-                                                                id("c05da917-81a3-4da3-9619-20b240cbd7f7")
-                                                        )
-                                                )
-                                        )
-                                )
-                        ).toJSON())
-                )
-                .log().all()
-                .statusCode(HttpStatus.SC_OK);
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
-    @Sql(statements = {
-            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
-            "INSERT INTO organization (id, name, description) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
-            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
-                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO history (id, output, workspace_id, job_reference) VALUES\n" +
-                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889','sampleOutput', 'c05da917-81a3-4da3-9619-20b240cbd7f7','1');"
-    })
-    void stateApiGetTest() {
-        when()
-                .get("/api/v1/organization/a42f538b-8c75-4311-8e73-ea2c0f2fb577/workspace/c05da917-81a3-4da3-9619-20b240cbd7f7/history")
+    void searchVariableAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/variable")
                 .then()
                 .log().all()
-                .body(equalTo(
-                        data(
-                                resource(
-                                        type( "history"),
-                                        id("4ea7855d-ab07-4080-934c-3aab429da889"),
-                                        attributes(
-                                                attr("createdBy", null),
-                                                attr("createdDate", null),
-                                                attr("jobReference", "1"),
-                                                attr("output", "sampleOutput"),
-                                                attr("updatedBy", null),
-                                                attr("updatedDate", null)
-                                        ),
-                                        relationships(
-                                                relation("workspace",true,
-                                                        resource(
-                                                                type("workspace"),
-                                                                id("c05da917-81a3-4da3-9619-20b240cbd7f7")
-                                                        )
-                                                )
-                                        )
-                                )
-                        ).toJSON())
-                )
-                .log().all()
-                .statusCode(HttpStatus.SC_OK);
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
-    @Sql(statements = {
-            "DELETE SCHEDULE; DELETE step; DELETE  history; DELETE job; DELETE variable; DELETE workspace; DELETE implementation; DELETE version; DELETE module; DELETE vcs; DELETE FROM provider; DELETE FROM team; DELETE FROM organization;",
-            "INSERT INTO organization (id, name, description) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb577','Organization','Description');",
-            "INSERT INTO team (id, name, manage_workspace, manage_module, manage_provider, organization_id) VALUES\n" +
-                    "\t\t('a42f538b-8c75-4311-8e73-ea2c0f2fb579','sample_team', true, true, true, 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO workspace (id, name, source, branch, terraform_version, organization_id) VALUES\n" +
-                    "\t\t('c05da917-81a3-4da3-9619-20b240cbd7f7','Workspace','https://github.com/AzBuilder/terraform-sample-repository.git', 'main', '0.15.2', 'a42f538b-8c75-4311-8e73-ea2c0f2fb577');",
-            "INSERT INTO schedule (id, template_reference, cron, tcl, enabled, description, workspace_id) VALUES\n" +
-                    "\t\t('4ea7855d-ab07-4080-934c-3aab429da889', 'c05da917-81a3-4da3-9619-20b240cbd7f7' ,'0/30 0/1 * 1/1 * ? *', 'sampleSchedule', true, 'sampleDescription', 'c05da917-81a3-4da3-9619-20b240cbd7f7');"
-    })
-    void scheduleApiGetTest() {
-        when()
-                .get("/api/v1/organization/a42f538b-8c75-4311-8e73-ea2c0f2fb577/workspace/c05da917-81a3-4da3-9619-20b240cbd7f7/schedule")
+    void searchVariableAsNonOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/variable")
                 .then()
-                .log().all()
-                .body(equalTo(
-                        data(
-                                resource(
-                                        type( "schedule"),
-                                        id("4ea7855d-ab07-4080-934c-3aab429da889"),
-                                        attributes(
-                                                attr("createdBy", null),
-                                                attr("createdDate", null),
-                                                attr("cron", "0/30 0/1 * 1/1 * ? *"),
-                                                attr("description", "sampleDescription"),
-                                                attr("enabled", true),
-                                                attr("tcl", "sampleSchedule"),
-                                                attr("templateReference", "c05da917-81a3-4da3-9619-20b240cbd7f7"),
-                                                attr("updatedBy", null),
-                                                attr("updatedDate", null)
-                                        ),
-                                        relationships(
-                                                relation("workspace",true,
-                                                        resource(
-                                                                type("workspace"),
-                                                                id("c05da917-81a3-4da3-9619-20b240cbd7f7")
-                                                        )
-                                                )
-                                        )
-                                )
-                        ).toJSON())
-                )
-                .log().all()
-                .statusCode(HttpStatus.SC_OK);
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void createVariableAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"variable\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"key\": \"random_key\",\n" +
+                        "      \"value\": \"random_key\",\n" +
+                        "      \"sensitive\": true,\n" +
+                        "      \"hcl\": false,\n" +
+                        "      \"category\": \"ENV\",\n" +
+                        "      \"description\": \"random_description\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/variable")
+                .then()
+                .body("data.attributes.key", IsEqual.equalTo("random_key"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    void createScheduleAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"schedule\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"cron\": \"0 0/1 * * * ?\",\n" +
+                        "      \"templateReference\": \"42201234-a5e2-4c62-b2fc-9729ca6b4515\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/schedule")
+                .then()
+                .body("data.attributes.cron", IsEqual.equalTo("0 0/1 * * * ?"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    void createVariableAsNonOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"variable\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"key\": \"random_key\",\n" +
+                        "      \"value\": \"random_key\",\n" +
+                        "      \"sensitive\": true,\n" +
+                        "      \"hcl\": false,\n" +
+                        "      \"category\": \"ENV\",\n" +
+                        "      \"description\": \"random_description\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/variable")
+                .then()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void searchHistoryAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/history")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void createHistoryAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"),"Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"history\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"output\": \"sampleOutput\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/history")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void createHistoryAsInternalService() {
+        given()
+                .headers("Authorization", "Bearer " + generateSystemToken(),"Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"history\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"output\": \"sampleOutput\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/history")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    void searchHistoryAsNonOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/history")
+                .then()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void searchScheduleAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/schedule")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void createWorkspaceAsOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"workspace\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"TestWorkspace\",\n" +
+                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-app-registration.git\",\n" +
+                        "      \"branch\": \"main\",\n" +
+                        "      \"terraformVersion\": \"1.0.11\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace")
+                .then()
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("TestWorkspace"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    void createWorkspaceAsNonOrgMember() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"workspace\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"WorkspaceCreateTest\",\n" +
+                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-app-registration.git\",\n" +
+                        "      \"branch\": \"main\",\n" +
+                        "      \"terraformVersion\": \"1.0.11\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 }

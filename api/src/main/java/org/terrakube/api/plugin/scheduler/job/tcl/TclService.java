@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.FlowConfig;
 import org.terrakube.api.repository.JobRepository;
@@ -23,7 +24,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 @AllArgsConstructor
-@Component
+@Service
 @Getter
 @Setter
 @Slf4j
