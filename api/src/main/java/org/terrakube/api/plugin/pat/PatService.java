@@ -30,9 +30,7 @@ public class PatService {
     @Autowired
     private PatRepository patRepository;
 
-    public String createToken(int days, String description, Principal principal) {
-        JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
-        log.info("{}", principalJwt);
+    public String createToken(int days, String description, Object name, Object email, Object groups) {
 
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.base64Key));
         UUID keyId = UUID.randomUUID();
@@ -41,13 +39,13 @@ public class PatService {
 
         String jws = Jwts.builder()
                 .setIssuer(ISSUER)
-                .setSubject(String.format("%s (Token)", principalJwt.getTokenAttributes().get("name")))
+                .setSubject(String.format("%s (Token)", name))
                 .setAudience(ISSUER)
                 .setId(keyId.toString())
-                .claim("email", principalJwt.getTokenAttributes().get("email"))
+                .claim("email", email)
                 .claim("email_verified", true)
-                .claim("name", String.format("%s (Token)", principalJwt.getTokenAttributes().get("name")))
-                .claim("groups", principalJwt.getTokenAttributes().get("groups"))
+                .claim("name", String.format("%s (Token)", name))
+                .claim("groups", groups)
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
                 .signWith(key)

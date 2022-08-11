@@ -6,53 +6,52 @@ import org.springframework.http.HttpStatus;
 
 import static io.restassured.RestAssured.given;
 
-class ModuleTests extends ServerApplicationTests {
+public class SshTests extends ServerApplicationTests {
 
     @Test
-    void searchModuleAsOrgMember() {
+    void searchSshAsOrgMember() {
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
                 .when()
-                .get("/api/v1/organization/f5365c9e-bc11-4781-b649-45a281ccdd4a/module/4e92ff1e-9937-400f-848d-f0ea367927bf")
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/ssh")
                 .then()
                 .assertThat()
-                .body("data.attributes.name", IsEqual.equalTo("kubernetes-engine"))
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
     }
 
     @Test
-    void createModuleAsOrgMember() {
+    void createSshAsOrgMember() {
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
                 .body("{\n" +
                         "  \"data\": {\n" +
-                        "    \"type\": \"module\",\n" +
+                        "    \"type\": \"ssh\",\n" +
                         "    \"attributes\": {\n" +
-                        "      \"name\": \"terrakube-storage\",\n" +
-                        "      \"description\": \"Terrakube Storage Module\",\n" +
-                        "      \"provider\": \"azurerm\",\n" +
-                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-cloud-storage.git\"\n" +
+                        "      \"name\": \"SSH RANDOM DATA\",\n" +
+                        "      \"description\": \"SSH KEY DESCRIPTION\",\n" +
+                        "      \"privateKey\": \"12345\", \n" +
+                        "      \"sshType\": \"rsa\"\n" +
                         "    }\n" +
                         "  }\n" +
                         "}")
                 .when()
-                .post("/api/v1/organization/f5365c9e-bc11-4781-b649-45a281ccdd4a/module")
+                .post("/api/v1/organization/f5365c9e-bc11-4781-b649-45a281ccdd4a/ssh")
                 .then()
                 .assertThat()
-                .body("data.attributes.name", IsEqual.equalTo("terrakube-storage"))
+                .body("data.attributes.name", IsEqual.equalTo("SSH RANDOM DATA"))
                 .log()
                 .all()
                 .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
-    void searchModuleAsNonOrgMember() {
+    void searchSshAsNonOrgMember() {
         given()
                 .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"))
                 .when()
-                .get("/api/v1/organization/f5365c9e-bc11-4781-b649-45a281ccdd4a/module/4e92ff1e-9937-400f-848d-f0ea367927bf")
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/ssh")
                 .then()
                 .assertThat()
                 .log()
@@ -61,22 +60,22 @@ class ModuleTests extends ServerApplicationTests {
     }
 
     @Test
-    void createModuleAsNonOrgMember() {
+    void createSshAsNonOrgMember() {
         given()
                 .headers("Authorization", "Bearer " + generatePAT("FAKE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
                 .body("{\n" +
                         "  \"data\": {\n" +
-                        "    \"type\": \"module\",\n" +
+                        "    \"type\": \"ssh\",\n" +
                         "    \"attributes\": {\n" +
-                        "      \"name\": \"terrakube-storage-fake\",\n" +
-                        "      \"description\": \"Terrakube Storage Module\",\n" +
-                        "      \"provider\": \"azurerm\",\n" +
-                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-cloud-storage.git\"\n" +
+                        "      \"name\": \"SSH KEY NAME\",\n" +
+                        "      \"description\": \"SSH KEY DESCRIPTION\",\n" +
+                        "      \"privateKey\": \"{{sshPrivateKey}}\", \n" +
+                        "      \"sshType\": \"{{sshKeyType}}\"\n" +
                         "    }\n" +
                         "  }\n" +
                         "}")
                 .when()
-                .post("/api/v1/organization/f5365c9e-bc11-4781-b649-45a281ccdd4a/module")
+                .post("/api/v1/organization/f5365c9e-bc11-4781-b649-45a281ccdd4a/ssh")
                 .then()
                 .assertThat()
                 .log()
