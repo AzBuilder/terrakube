@@ -93,7 +93,7 @@ public class ExecutorService {
         executorContext.setTerraformVersion(job.getWorkspace().getTerraformVersion());
         executorContext.setSource(job.getWorkspace().getSource());
         executorContext.setBranch(job.getWorkspace().getBranch());
-
+        executorContext.setFolder(job.getWorkspace().getFolder());
         return sendToExecutor(job, executorContext);
     }
 

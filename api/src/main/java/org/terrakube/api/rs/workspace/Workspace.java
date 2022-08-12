@@ -44,6 +44,9 @@ public class Workspace {
     @Column(name = "branch")
     private String branch;
 
+    @Column(name = "folder")
+    private String folder;
+
     @Column(name = "terraform_version")
     private String terraformVersion;
 

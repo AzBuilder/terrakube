@@ -21,6 +21,7 @@ public class TerraformJob {
     private String terraformVersion;
     private String source;
     private String branch;
+    private String folder;
     private String vcsType;
     private String accessToken;
     private String terraformOutput;

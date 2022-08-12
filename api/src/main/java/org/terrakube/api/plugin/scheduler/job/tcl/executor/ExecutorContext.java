@@ -21,6 +21,7 @@ public class ExecutorContext {
     private String terraformVersion;
     private String source;
     private String branch;
+    private String folder;
     private String vcsType;
     private String accessToken;
     private HashMap<String, String> environmentVariables;

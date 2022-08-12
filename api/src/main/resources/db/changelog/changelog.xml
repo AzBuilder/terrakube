@@ -23,4 +23,5 @@
     <include file="/db/changelog/local/changelog-2.4.0.xml"/>
     <include file="/db/changelog/local/changelog-2.6.0-pat.xml"/>
     <include file="/db/changelog/local/changelog-2.6.0-ssh.xml"/>
+    <include file="/db/changelog/local/changelog-2.6.0-workspace-folder.xml"/>
 </databaseChangeLog>
