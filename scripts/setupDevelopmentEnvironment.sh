@@ -20,6 +20,7 @@ function generateApiVars(){
   AuthenticationValidationType="DEX"
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
+  TERRAKUBE_ADMIN_GROUP="CUSTOM_ADMIN_NAME"
 
   StorageType="LOCAL"
 
@@ -39,6 +40,7 @@ function generateApiVars(){
   echo "StorageType=$StorageType" >> .envApi
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
+  echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
 function generateRegistryVars(){
