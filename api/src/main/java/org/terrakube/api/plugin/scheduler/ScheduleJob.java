@@ -10,6 +10,7 @@ import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.FlowType;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.StepRepository;
+import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.step.Step;
@@ -19,6 +20,7 @@ import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.rs.workspace.Workspace;
 
 import java.util.Optional;
 
@@ -38,6 +40,8 @@ public class ScheduleJob implements org.quartz.Job {
     StepRepository stepRepository;
     TclService tclService;
     ExecutorService executorService;
+
+    WorkspaceRepository workspaceRepository;
 
     @Transactional
     @Override
@@ -64,6 +68,7 @@ public class ScheduleJob implements org.quartz.Job {
                 } catch (SchedulerException e) {
                     log.error(e.getMessage());
                 }
+                unlockWorkspace(job);
                 break;
             case cancelled:
             case failed:
@@ -75,6 +80,7 @@ public class ScheduleJob implements org.quartz.Job {
                 } catch (SchedulerException e) {
                     log.error(e.getMessage());
                 }
+                unlockWorkspace(job);
                 break;
             default:
                 log.info("Job {} Status {}", job.getId(), job.getStatus());
@@ -141,5 +147,12 @@ public class ScheduleJob implements org.quartz.Job {
                 stepRepository.save(step);
             }
         }
+    }
+
+    private void unlockWorkspace(Job job){
+        Workspace workspace = job.getWorkspace();
+        workspace.setLocked(false);
+        log.info("Unlock workspace {} in job {}", workspace.getId(), job.getId());
+        workspaceRepository.save(workspace);
     }
 }

@@ -2,13 +2,16 @@ package org.terrakube.api.plugin.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.StepRepository;
+import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.step.Step;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.rs.workspace.Workspace;
 
 import java.text.ParseException;
 
@@ -24,6 +27,8 @@ public class ScheduleJobService {
     Scheduler scheduler;
 
     StepRepository stepRepository;
+
+    WorkspaceRepository workspaceRepository;
 
     public void createJobTrigger(String cronExpression, String triggerId) throws ParseException, SchedulerException {
 
@@ -70,6 +75,10 @@ public class ScheduleJobService {
                 .build();
 
         log.info("Create Job Context {}", jobDetail.getKey());
+
+        Workspace workspace = job.getWorkspace();
+        workspace.setLocked(true);
+        workspaceRepository.save(workspace);
         scheduler.scheduleJob(jobDetail, trigger);
     }
 

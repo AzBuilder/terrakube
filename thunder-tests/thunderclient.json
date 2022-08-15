@@ -393,7 +393,7 @@
     "method": "POST",
     "sortNum": 150000,
     "created": "2022-07-22T21:25:36.084Z",
-    "modified": "2022-07-22T23:35:43.811Z",
+    "modified": "2022-08-15T20:36:26.776Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -403,7 +403,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"schedule\",\n    \"attributes\": {\n      \"cron\": \"0 0/30 * * * ?\",\n      \"templateReference\": \"{{template_plan_apply_id}}\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"schedule\",\n    \"attributes\": {\n      \"cron\": \"0 * * ? * *\",\n      \"templateReference\": \"{{template_plan_apply_id}}\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -502,7 +502,7 @@
     "method": "POST",
     "sortNum": 190000,
     "created": "2022-07-22T21:25:36.088Z",
-    "modified": "2022-07-22T23:31:33.226Z",
+    "modified": "2022-08-15T22:58:35.385Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -512,7 +512,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"attributes\": {\n      \"name\": \"Docker Compose Sample\",\n      \"source\": \"https://github.com/AzBuilder/terrakube-docker-compose.git\",\n      \"branch\": \"main\",\n      \"terraformVersion\": \"1.0.11\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"attributes\": {\n      \"name\": \"Docker Compose Sample\",\n      \"source\": \"https://github.com/AzBuilder/terrakube-docker-compose.git\",\n      \"branch\": \"main\",\n      \"folder\": \"/\",\n      \"locked\": \"true\",\n      \"terraformVersion\": \"1.0.11\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -2118,6 +2118,41 @@
         "custom": "json.data.id",
         "action": "setto",
         "value": "{{sshId}}"
+      }
+    ]
+  },
+  {
+    "_id": "3fe44be5-1a25-4b7b-8f82-60b1f3cdd2e4",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "1e847596-c3bf-42d4-90d4-26e522a90d0d",
+    "name": "update workspace",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace/{{workspaceId}}",
+    "method": "PATCH",
+    "sortNum": 195000,
+    "created": "2022-08-15T20:38:10.125Z",
+    "modified": "2022-08-15T20:46:09.677Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"id\": \"{{workspaceId}}\",\n    \"attributes\": {\n      \"locked\": \"true\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.id",
+        "action": "setto",
+        "value": "{{workspaceId}}"
       }
     ]
   }

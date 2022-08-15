@@ -42,33 +42,38 @@ public class ScheduleJobTrigger implements org.quartz.Job {
         String triggerId = jobExecutionContext.getJobDetail().getJobDataMap().getString(TRIGGER_ID);
         Schedule schedule = scheduleRepository.getById(UUID.fromString(triggerId));
 
-        log.info("Creating new job for triggerId: {}", triggerId);
-        Job job = new Job();
-        job.setWorkspace(schedule.getWorkspace());
-        job.setOrganization(schedule.getWorkspace().getOrganization());
-        if(schedule.getTemplateReference() != null){
-            Template template = templateRepository.getById(UUID.fromString(schedule.getTemplateReference()));
-            job.setTcl(template.getTcl());
-            job.setTemplateReference(schedule.getTemplateReference());
-        }else {
-            job.setTcl(schedule.getTcl());
-        }
-        job.setStatus(JobStatus.pending);
-        job.setCreatedBy("serviceAccount");
-        job.setUpdatedBy("serviceAccount");
-        Date triggerDate = new Date(System.currentTimeMillis());
-        job.setCreatedDate(triggerDate);
-        job.setUpdatedDate(triggerDate);
+        if (!schedule.getWorkspace().isLocked()) {
+            log.info("Creating new job for triggerId: {}", triggerId);
+            Job job = new Job();
+            job.setWorkspace(schedule.getWorkspace());
+            job.setOrganization(schedule.getWorkspace().getOrganization());
+            if (schedule.getTemplateReference() != null) {
+                Template template = templateRepository.getById(UUID.fromString(schedule.getTemplateReference()));
+                job.setTcl(template.getTcl());
+                job.setTemplateReference(schedule.getTemplateReference());
+            } else {
+                job.setTcl(schedule.getTcl());
+            }
+            job.setStatus(JobStatus.pending);
+            job.setCreatedBy("serviceAccount");
+            job.setUpdatedBy("serviceAccount");
+            Date triggerDate = new Date(System.currentTimeMillis());
+            job.setCreatedDate(triggerDate);
+            job.setUpdatedDate(triggerDate);
 
-        job = jobRepository.save(job);
-        log.info("New jobId: {}", job.getId());
-        try {
-            log.info("Creating Job Context: {}", job.getId());
-            scheduleJobService.createJobContext(job);
-        } catch (ParseException e) {
-            log.error(e.getMessage());
-        } catch (SchedulerException e) {
-            log.error(e.getMessage());
+            job = jobRepository.save(job);
+            log.info("New jobId: {}", job.getId());
+            try {
+                log.info("Creating Job Context: {}", job.getId());
+                scheduleJobService.createJobContext(job);
+            } catch (ParseException e) {
+                log.error(e.getMessage());
+            } catch (SchedulerException e) {
+                log.error(e.getMessage());
+            }
+        } else {
+            log.warn("Workspace {} {} is locked, new jobs can not be created until the lock is released", schedule.getWorkspace().getId(), schedule.getWorkspace().getName());
         }
     }
+
 }
