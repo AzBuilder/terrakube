@@ -47,6 +47,9 @@ public class Workspace {
     @Column(name = "folder")
     private String folder;
 
+    @Column(name = "locked")
+    private boolean locked;
+
     @Column(name = "terraform_version")
     private String terraformVersion;
 

@@ -18,6 +18,7 @@ import {
   Select,
   message,
   Spin,
+  Switch
 } from "antd";
 import { compareVersions } from "./Workspaces";
 import { CreateJob } from "../Jobs/Create";
@@ -32,6 +33,7 @@ import {
   SyncOutlined,
   ExclamationCircleOutlined,
   StopOutlined,
+  InfoCircleOutlined
 } from "@ant-design/icons";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
@@ -179,6 +181,7 @@ export const WorkspaceDetails = (props) => {
           name: values.name,
           description: values.description,
           folder: values.folder,
+          locked: values.locked,
           terraformVersion: values.terraformVersion,
         },
       },
@@ -340,7 +343,8 @@ export const WorkspaceDetails = (props) => {
                         initialValues={{
                           name: workspace.data.attributes.name,
                           description: workspace.data.attributes.description,
-                          folder: workspace.data.attributes.folder
+                          folder: workspace.data.attributes.folder,
+                          locked: workspace.data.attributes.locked
 
                         }}
                         layout="vertical"
@@ -365,6 +369,9 @@ export const WorkspaceDetails = (props) => {
                           label="Workspace Repository Folder"
                         >
                           <Input />
+                        </Form.Item>
+                        <Form.Item name="locked" valuePropName="checked" label="Lock Workspace" tooltip={{ title: 'Lock Workspace', icon: <InfoCircleOutlined /> }} >
+                          <Switch />
                         </Form.Item>
                         <Form.Item
                           name="terraformVersion"

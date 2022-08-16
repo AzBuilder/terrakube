@@ -1,9 +1,6 @@
 package org.terrakube.api.rs.job;
 
-import com.yahoo.elide.annotation.CreatePermission;
-import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.annotation.LifeCycleHookBinding;
-import com.yahoo.elide.annotation.UpdatePermission;
+import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
@@ -17,6 +14,9 @@ import java.util.List;
 
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)
+@ReadPermission(expression = "team view job")
+@CreatePermission(expression = "team manage job")
+@UpdatePermission(expression = "team manage job OR user is a super service")
 @Include(rootLevel = false)
 @Getter
 @Setter
