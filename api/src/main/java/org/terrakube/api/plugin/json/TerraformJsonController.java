@@ -22,7 +22,7 @@ public class TerraformJsonController {
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        String terraformIndex = client.post()
+        String terraformIndex = client.get()
                 .uri("/terraform/index.json")
                 .retrieve()
                 .bodyToMono(String.class)
