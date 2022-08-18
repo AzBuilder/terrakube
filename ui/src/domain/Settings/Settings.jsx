@@ -6,6 +6,7 @@ import { TeamSettings } from "./Teams"
 import { VCSSettings } from "./VCS";
 import { TemplatesSettings } from "./Templates";
 import {ORGANIZATION_NAME} from '../../config/actionTypes';
+import { SSHKeysSettings } from "./SSHKeys";
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
@@ -35,6 +36,9 @@ export const OrganizationSettings = ({ selectedTab ,vcsMode}) => {
           </TabPane>
           <TabPane tab="Templates" key="4">
             <TemplatesSettings key={key} />
+          </TabPane>
+          <TabPane tab="SSH Keys" key="5">
+            <SSHKeysSettings />
           </TabPane>
         </Tabs>
       </div>
