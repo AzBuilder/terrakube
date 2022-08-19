@@ -25,4 +25,5 @@
     <include file="/db/changelog/local/changelog-2.6.0-ssh.xml"/>
     <include file="/db/changelog/local/changelog-2.6.0-workspace-folder.xml"/>
     <include file="/db/changelog/local/changelog-2.6.0-workspace-lock.xml"/>
+    <include file="/db/changelog/local/changelog-2.6.0-team-update.xml"/>
 </databaseChangeLog>
