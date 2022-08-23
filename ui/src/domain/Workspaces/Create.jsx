@@ -25,13 +25,15 @@ export const CreateWorkspace = () => {
   const [organizationName, setOrganizationName] = useState([]);
   const [terraformVersions, setTerraformVersions] = useState([]);
   const [vcs, setVCS] = useState([]);
+  const [sshKeys, setSSHKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
   const [vcsId, setVcsId] = useState("");
-  const terraformVersionsApi = "https://releases.hashicorp.com/terraform/index.json";
+  const terraformVersionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/terraform/index.json`;
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep3Hidden] = useState(true);
   const [step2Hidden, setStep2Hidden] = useState(true);
+  const [sshKeysVisible,setSSHKeysVisible] = useState(false);
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
   const history = useHistory();
   useEffect(() => {
@@ -50,15 +52,25 @@ export const CreateWorkspace = () => {
 
       }
     );
+    loadSSHKeys();
     loadVCS();
+  
   }, [terraformVersionsApi]);
   const handleClick = e => {
     setCurrent(1);
   };
 
   const handleGitClick = (id) => {
+
+    if(id ==="git"){
+       setSSHKeysVisible(true);
+    }
+    else{
+      setSSHKeysVisible(false);
+      setVcsId(id);
+
+    }
     setCurrent(2);
-    setVcsId(id);
     setStep2Hidden(false);
   };
 
@@ -98,6 +110,14 @@ export const CreateWorkspace = () => {
       });
   }
 
+  const loadSSHKeys = () => {
+    axiosInstance.get(`organization/${organizationId}/ssh`)
+      .then(response => {
+        console.log(response.data.data);
+        setSSHKeys(response.data.data);
+      });
+  }
+
   const [form] = Form.useForm();
   const handleGitContinueClick = e => {
     setCurrent(3);
@@ -123,7 +143,13 @@ export const CreateWorkspace = () => {
     let body = {
       data: {
         type: "workspace",
-        attributes: values
+        attributes: {
+          source: values.source,
+          folder: values.folder,
+          name: values.name,
+          terraformVersion: values.terraformVersion,
+          branch: values.branch
+        }
       }
     }
 
@@ -131,12 +157,42 @@ export const CreateWorkspace = () => {
       body = {
         data: {
           type: "workspace",
-          attributes: values,
+          attributes: {
+            source: values.source,
+            folder: values.folder,
+            name: values.name,
+            terraformVersion: values.terraformVersion,
+            branch: values.branch
+          },
           relationships: {
             vcs: {
               data: {
                 type: "vcs",
                 id: vcsId
+              }
+            }
+          }
+        }
+      }
+    }
+
+    alert(values.sshKey);
+    if (values.sshKey != ""){
+      body = {
+        data: {
+          type: "workspace",
+          attributes: {
+            source: values.source,
+            folder: values.folder,
+            name: values.name,
+            terraformVersion: values.terraformVersion,
+            branch: values.branch
+          },
+          relationships: {
+            vcs: {
+              data: {
+                type: "ssh",
+                id: values.sshKey
               }
             }
           }
@@ -250,7 +306,7 @@ export const CreateWorkspace = () => {
               {vcsButtonsVisible ?  (
               <div>
               <Space direction="horizontal">
-                <Button icon={<SiGit />} onClick={() => { handleGitClick(""); }} size="large">&nbsp;Git</Button>
+                <Button icon={<SiGit />} onClick={() => { handleGitClick("git"); }} size="large">&nbsp;Git</Button>
                 {loading || !vcs.data ? (
                   <p>Data loading...</p>
                 ) : (
@@ -286,7 +342,7 @@ export const CreateWorkspace = () => {
               <div className="workflowDescription2 App-text">
                 Choose the repository that hosts your Terraform source code.
               </div>
-              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/Terrakube/terraform-sample-repository.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true }, { type: 'url' }]}>
+              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/Terrakube/terraform-sample-repository.git or git@github.com:AzBuilder/terraform-azurerm-webapp-sample.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true, pattern:"/((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?/g" }]}>
                 <Input />
               </Form.Item>
               <Form.Item>
@@ -309,13 +365,20 @@ export const CreateWorkspace = () => {
               <Form.Item name="branch" label="VCS branch" placeholder="(default branch)" extra=" The branch from which to import new versions. This defaults to the value your version control provides as the default branch for this repository." rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
-              <Form.Item name="folder" label="Workspace folder" placeholder="/" extra=" Default workspace directory. Use / for the root folder" rules={[{ required: true }]}>
+              <Form.Item name="folder" label="Terraform Working Directory" placeholder="/" extra=" Default workspace directory. Use / for the root folder" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
               <Form.Item name="terraformVersion" label="Terraform Version" rules={[{ required: true }]} extra="The version of Terraform to use for this workspace. It will not upgrade automatically.">
                 <Select placeholder="select version" style={{ width: 250 }} >
                   {terraformVersions.map(function (name, index) {
                     return <Option key={name}>{name}</Option>;
+                  })}
+                </Select>
+              </Form.Item>
+              <Form.Item hidden={!sshKeysVisible} name="sshKey" label="SSH Key" tooltip="Select an SSH Key that will be used to clone this repo." extra="To use the SSH support in modules the source should be used like git@github.com:AzBuilder/terrakube-docker-compose.git" rules={[{ required: false }]}>
+               <Select placeholder="select SSH Key" style={{ width: 250 }} >
+                  {sshKeys.map(function (sshKey, index) {
+                    return <Option key={sshKey?.id}>{sshKey?.attributes?.name}</Option>;
                   })}
                 </Select>
               </Form.Item>

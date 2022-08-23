@@ -72,7 +72,7 @@ export const WorkspaceDetails = (props) => {
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const terraformVersionsApi =
-    "https://releases.hashicorp.com/terraform/index.json";
+    `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/terraform/index.json`;
   const handleClick = (id) => {
     changeJob(id);
   };
