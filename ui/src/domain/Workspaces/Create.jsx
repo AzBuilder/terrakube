@@ -175,9 +175,7 @@ export const CreateWorkspace = () => {
         }
       }
     }
-
-    alert(values.sshKey);
-    if (values.sshKey != ""){
+    if (values.sshKey){
       body = {
         data: {
           type: "workspace",
@@ -189,7 +187,7 @@ export const CreateWorkspace = () => {
             branch: values.branch
           },
           relationships: {
-            vcs: {
+            ssh: {
               data: {
                 type: "ssh",
                 id: values.sshKey
@@ -342,7 +340,7 @@ export const CreateWorkspace = () => {
               <div className="workflowDescription2 App-text">
                 Choose the repository that hosts your Terraform source code.
               </div>
-              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/Terrakube/terraform-sample-repository.git or git@github.com:AzBuilder/terraform-azurerm-webapp-sample.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true, pattern:"/((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?/g" }]}>
+              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/Terrakube/terraform-sample-repository.git or git@github.com:AzBuilder/terraform-azurerm-webapp-sample.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true, pattern: "((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)(/)?" }]}>
                 <Input />
               </Form.Item>
               <Form.Item>
