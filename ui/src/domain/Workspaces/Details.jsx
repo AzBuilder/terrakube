@@ -18,7 +18,8 @@ import {
   Select,
   message,
   Spin,
-  Switch
+  Switch,
+  Typography,
 } from "antd";
 import { compareVersions } from "./Workspaces";
 import { CreateJob } from "../Jobs/Create";
@@ -33,11 +34,12 @@ import {
   SyncOutlined,
   ExclamationCircleOutlined,
   StopOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
 const { Option } = Select;
+const { Paragraph } = Typography;
 const include = {
   VARIABLE: "variable",
   JOB: "job",
@@ -70,35 +72,11 @@ export const WorkspaceDetails = (props) => {
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const terraformVersionsApi =
-    "https://releases.hashicorp.com/terraform/index.json";
+    `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/terraform/index.json`;
   const handleClick = (id) => {
     changeJob(id);
   };
 
-  const elements = [
-    {
-      id: "1",
-      type: "input", // input node
-      data: { label: "Input Node" },
-      position: { x: 250, y: 25 },
-    },
-    // default node
-    {
-      id: "2",
-      // you can also pass a React component as a label
-      data: { label: <div>Default Node</div> },
-      position: { x: 100, y: 125 },
-    },
-    {
-      id: "3",
-      type: "output", // output node
-      data: { label: "Output Node" },
-      position: { x: 250, y: 250 },
-    },
-    // animated edge
-    { id: "e1-2", source: "1", target: "2", animated: true },
-    { id: "e2-3", source: "2", target: "3" },
-  ];
   const handleStatesClick = (key) => {
     switchKey(key);
   };
@@ -344,14 +322,15 @@ export const WorkspaceDetails = (props) => {
                           name: workspace.data.attributes.name,
                           description: workspace.data.attributes.description,
                           folder: workspace.data.attributes.folder,
-                          locked: workspace.data.attributes.locked
-
+                          locked: workspace.data.attributes.locked,
                         }}
                         layout="vertical"
                         name="form-settings"
                       >
                         <Form.Item name="id" label="ID">
-                          <div className="App-text">{id}</div>
+                          <Paragraph copyable={{ tooltips: false }}>
+                            <span className="App-text"> {id}</span>
+                          </Paragraph>
                         </Form.Item>
                         <Form.Item name="name" label="Name">
                           <Input />
@@ -365,17 +344,12 @@ export const WorkspaceDetails = (props) => {
                           <Input.TextArea placeholder="Workspace description" />
                         </Form.Item>
                         <Form.Item
-                          name="folder"
-                          label="Workspace Repository Folder"
-                        >
-                          <Input />
-                        </Form.Item>
-                        <Form.Item name="locked" valuePropName="checked" label="Lock Workspace" tooltip={{ title: 'Lock Workspace', icon: <InfoCircleOutlined /> }} >
-                          <Switch />
-                        </Form.Item>
-                        <Form.Item
                           name="terraformVersion"
                           label="Terraform Version"
+                          extra="The version of Terraform to use for this workspace.
+                          Upon creating this workspace, the latest version was
+                          selected and will be used until it is changed
+                          manually. It will not upgrade automatically."
                         >
                           <Select
                             defaultValue={
@@ -387,13 +361,26 @@ export const WorkspaceDetails = (props) => {
                               return <Option key={name}>{name}</Option>;
                             })}
                           </Select>
-                          <div className="App-text">
-                            The version of Terraform to use for this workspace.
-                            Upon creating this workspace, the latest version was
-                            selected and will be used until it is changed
-                            manually. It will not upgrade automatically.
-                          </div>
                         </Form.Item>
+                        <Form.Item
+                          name="folder"
+                          label="Terraform Working Directory"
+                          extra="The directory that Terraform will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                          name="locked"
+                          valuePropName="checked"
+                          label="Lock Workspace"
+                          tooltip={{
+                            title: "Lock Workspace",
+                            icon: <InfoCircleOutlined />,
+                          }}
+                        >
+                          <Switch />
+                        </Form.Item>
+
                         <Form.Item>
                           <Button type="primary" htmlType="submit">
                             Save settings

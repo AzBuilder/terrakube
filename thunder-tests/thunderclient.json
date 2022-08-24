@@ -2155,5 +2155,23 @@
         "value": "{{workspaceId}}"
       }
     ]
+  },
+  {
+    "_id": "ab05de64-dc49-45c1-9e4c-44923f42d413",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "05bfce07-b1e7-4742-85b0-b0ac6dad7cc6",
+    "name": "Terraform Versions",
+    "url": "{{terrakubeApi}}/terraform/index.json",
+    "method": "GET",
+    "sortNum": 760000,
+    "created": "2022-08-18T17:29:29.791Z",
+    "modified": "2022-08-18T17:30:09.212Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]

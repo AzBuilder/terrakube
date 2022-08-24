@@ -1,5 +1,5 @@
 import { React, useState,useEffect } from 'react';
-import { Form, Input, Button, Breadcrumb, Layout, Steps, Space } from "antd";
+import { Form, Input, Button, Breadcrumb, Layout, Steps, Space ,Select} from "antd";
 import { ORGANIZATION_ARCHIVE,ORGANIZATION_NAME } from '../../config/actionTypes';
 import axiosInstance from "../../config/axiosConfig";
 import { GithubOutlined, GitlabOutlined } from '@ant-design/icons';
@@ -29,15 +29,24 @@ export const CreateModule = () => {
   const history = useHistory();
   const [vcsId, setVcsId] = useState("");
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
+  const [sshKeys, setSSHKeys] = useState([]);
+  const [sshKeysVisible,setSSHKeysVisible] = useState(false);
 
   useEffect(() => {
-     
+    loadSSHKeys();
     loadVCSProviders();
   },[organizationId]);
 
  const handleGitClick = (id) => {
+
+   if(id ==="git"){
+      setSSHKeysVisible(true);
+   }
+   else{
+     setSSHKeysVisible(false);
+     setVcsId(id);
+   }
     setCurrent(1);
-    setVcsId(id);
     setStep2Hidden(false);
   };
 
@@ -94,6 +103,14 @@ export const CreateModule = () => {
       });
   }
 
+  const loadSSHKeys = () => {
+    axiosInstance.get(`organization/${organizationId}/ssh`)
+      .then(response => {
+        console.log(response.data.data);
+        setSSHKeys(response.data.data);
+      });
+  }
+
   const onFinish = (values) => {
     let body = {
       data: {
@@ -128,6 +145,28 @@ export const CreateModule = () => {
         }
       }
 
+    }
+
+    if (values.sshKey){
+      body = {
+        data: {
+          type: "module",
+          attributes: {
+            name: values.name,
+            description: values.description,
+            provider: values.provider,
+            source: values.source
+          },
+          relationships: {
+            ssh: {
+              data: {
+                type: "ssh",
+                id: values.sshKey
+              }
+            }
+          }
+        }
+      }
     }
     console.log(body);
 
@@ -191,7 +230,7 @@ export const CreateModule = () => {
               {vcsButtonsVisible ?  (
               <div>
               <Space direction="horizontal">
-                <Button icon={<SiGit />} onClick={() => { handleGitClick(""); }}  size="large">&nbsp;Git</Button>
+                <Button icon={<SiGit />} onClick={() => { handleGitClick("git"); }}  size="large">&nbsp;Git</Button>
                 {loading || !vcs.data ? (
                   <p>Data loading...</p>
                 ) : (
@@ -252,6 +291,13 @@ export const CreateModule = () => {
               </Form.Item>
               <Form.Item name="provider" tooltip="e.g. azurerm,aws,google"  label="Provider" rules={[{ required: true }]} extra="The name of a remote system that the module is primarily written to target.">
                   <Input />
+              </Form.Item>
+              <Form.Item hidden={!sshKeysVisible} name="sshKey" label="SSH Key" tooltip="Select an SSH Key that will be used to clone this repo." extra="To use the SSH support in modules the source should be used like git@github.com:AzBuilder/terrakube-docker-compose.git" rules={[{ required: false }]}>
+               <Select placeholder="select SSH Key" style={{ width: 250 }} >
+                  {sshKeys.map(function (sshKey, index) {
+                    return <Select.Option key={sshKey?.id}>{sshKey?.attributes?.name}</Select.Option>;
+                  })}
+                </Select>
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
