@@ -211,8 +211,8 @@ export const SSHKeysSettings = () => {
               rules={[{ required: true }]}
             >
               <Select placeholder="Please select a ssh type">
-                <Option value="rsa">RSA</Option>
-                <Option value="ed25519">ED25519</Option>
+                <Select.Option value="rsa">RSA</Select.Option>
+                <Select.Option value="ed25519">ED25519</Select.Option>
               </Select>
             </Form.Item>
             <Form.Item
