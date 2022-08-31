@@ -177,7 +177,7 @@
     "method": "POST",
     "sortNum": 80000,
     "created": "2022-07-22T21:25:36.076Z",
-    "modified": "2022-08-08T00:04:52.559Z",
+    "modified": "2022-08-31T22:32:59.849Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -187,7 +187,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"template\",\n    \"attributes\": {\n      \"name\": \"plan_apply\",\n      \"description\": \"Terraform Plan Apply\",\n      \"version\": \"1.0.0\",\n      \"tcl\": \"ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAK\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"template\",\n    \"attributes\": {\n      \"name\": \"plan_apply\",\n      \"description\": \"Terraform Plan Apply\",\n      \"version\": \"1.0.0\",\n      \"tcl\": \"ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -317,7 +317,7 @@
     "method": "POST",
     "sortNum": 120000,
     "created": "2022-07-22T21:25:36.081Z",
-    "modified": "2022-07-22T23:30:34.087Z",
+    "modified": "2022-08-31T22:39:15.008Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -325,6 +325,11 @@
       }
     ],
     "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\r\n  \"data\": {\r\n    \"type\": \"template\",\r\n    \"attributes\": {\r\n      \"name\": \"Snyk\",\r\n      \"description\": \"Check vulnerabilities with Snyk\",\r\n      \"version\": \"1.0.0\",\r\n      \"tcl\": \"ZmxvdzoKICAtIHR5cGU6ICJjdXN0b21TY3JpcHRzIgogICAgc3RlcDogMTAwCiAgICBjb21tYW5kczoKICAgICAgLSBydW50aW1lOiAiR1JPT1ZZIgogICAgICAgIHByaW9yaXR5OiAxMDAKICAgICAgICBhZnRlcjogdHJ1ZQogICAgICAgIHNjcmlwdDogfAogICAgICAgICAgaW1wb3J0IFNueWsKCiAgICAgICAgICBuZXcgU255aygpLmxvYWRUb29sKAogICAgICAgICAgICAiJHdvcmtpbmdEaXJlY3RvcnkiLAogICAgICAgICAgICAiJGJhc2hUb29sc0RpcmVjdG9yeSIsCiAgICAgICAgICAgICIxLjgzMS4wIikKICAgICAgICAgICJTbnlrIERvd25sb2FkIENvbXBsZXRlZC4uLiIKICAgICAgLSBydW50aW1lOiAiQkFTSCIKICAgICAgICBwcmlvcml0eTogMjAwCiAgICAgICAgYWZ0ZXI6IHRydWUKICAgICAgICBzY3JpcHQ6IHwKICAgICAgICAgIGNkICR3b3JraW5nRGlyZWN0b3J5OwogICAgICAgICAgc255ayBpYWMgdGVzdCAuOwo=\"\r\n    }\r\n  }\r\n}",
+      "form": []
+    },
     "auth": {
       "type": "bearer",
       "bearer": "{{access_token}}"
@@ -502,7 +507,7 @@
     "method": "POST",
     "sortNum": 190000,
     "created": "2022-07-22T21:25:36.088Z",
-    "modified": "2022-08-15T22:58:35.385Z",
+    "modified": "2022-08-31T23:07:49.415Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -512,7 +517,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"attributes\": {\n      \"name\": \"Docker Compose Sample\",\n      \"source\": \"https://github.com/AzBuilder/terrakube-docker-compose.git\",\n      \"branch\": \"main\",\n      \"folder\": \"/\",\n      \"locked\": \"true\",\n      \"terraformVersion\": \"1.0.11\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"attributes\": {\n      \"name\": \"Docker Compose Sample2\",\n      \"source\": \"https://github.com/AzBuilder/terrakube-docker-compose.git\",\n      \"branch\": \"main\",\n      \"folder\": \"/\",\n      \"locked\": \"false\",\n      \"terraformVersion\": \"1.0.11\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
