@@ -44,11 +44,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> output = getStringConsumer(jobOutput);
             Consumer<String> errorOutput = getStringConsumer(jobErrorOutput);
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
-            HashMap<String, String> environmentVariables = getWorkspaceParameters(
-                    terraformJob.getEnvironmentVariables());
+            HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
+
             boolean execution = false;
             boolean scriptBeforeSuccess;
-            boolean scriptAfterSuccess = false;
+            boolean scriptAfterSuccess;
 
             String backendFile = executeTerraformInit(
                     terraformJob,
@@ -56,20 +56,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     output,
                     errorOutput);
 
-            if (terraformJob.getCommandList() != null)
-                scriptBeforeSuccess = scriptEngineService.execute(
-                        terraformJob,
-                        terraformJob
-                                .getCommandList()
-                                .stream()
-                                .filter(command -> command.isBefore())
-                                .collect(Collectors.toCollection(LinkedList::new)),
-                        workingDirectory,
-                        output);
-            else {
-                log.warn("No commands to run before plan Job {}", terraformJob.getJobId());
-                scriptBeforeSuccess = true;
-            }
+            scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, output);
 
             showTerraformMessage("PLAN", output);
             if (scriptBeforeSuccess)
@@ -90,9 +77,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
                     : "");
 
-            result.setSuccessfulExecution(scriptAfterSuccess);
-            result.setOutputLog(jobOutput.toString());
-            result.setOutputErrorLog(jobErrorOutput.toString());
+            result = generateJobResult(scriptAfterSuccess, jobOutput.toString(), jobErrorOutput.toString());
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
         }
@@ -102,7 +87,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     @Override
     public ExecutorJobResult apply(TerraformJob terraformJob, File workingDirectory) {
-        ExecutorJobResult result = new ExecutorJobResult();
+        ExecutorJobResult result;
 
         TextStringBuilder terraformOutput = new TextStringBuilder();
         TextStringBuilder terraformErrorOutput = new TextStringBuilder();
@@ -110,11 +95,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> output = getStringConsumer(terraformOutput);
             Consumer<String> errorOutput = getStringConsumer(terraformErrorOutput);
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
-            HashMap<String, String> environmentVariables = getWorkspaceParameters(
-                    terraformJob.getEnvironmentVariables());
+            HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
+
             boolean execution = false;
             boolean scriptBeforeSuccess;
-            boolean scriptAfterSuccess = false;
+            boolean scriptAfterSuccess;
 
             String backendFile = executeTerraformInit(
                     terraformJob,
@@ -122,20 +107,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     output,
                     errorOutput);
 
-            if (terraformJob.getCommandList() != null)
-                scriptBeforeSuccess = scriptEngineService.execute(
-                        terraformJob,
-                        terraformJob
-                                .getCommandList()
-                                .stream()
-                                .filter(command -> command.isBefore())
-                                .collect(Collectors.toCollection(LinkedList::new)),
-                        workingDirectory,
-                        output);
-            else {
-                log.warn("No commands to run before apply Job {}", terraformJob.getJobId());
-                scriptBeforeSuccess = true;
-            }
+            scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, output);
 
             showTerraformMessage("APPLY", output);
             if (scriptBeforeSuccess) {
@@ -157,9 +129,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             log.warn("Terraform apply Executed Successfully: {}", execution);
             scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, output, execution);
 
-            result.setSuccessfulExecution(scriptAfterSuccess);
-            result.setOutputLog(terraformOutput.toString());
-            result.setOutputErrorLog(terraformErrorOutput.toString());
+            result = generateJobResult(scriptAfterSuccess, terraformOutput.toString(), terraformErrorOutput.toString());
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
         }
@@ -168,7 +138,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     @Override
     public ExecutorJobResult destroy(TerraformJob terraformJob, File workingDirectory) {
-        ExecutorJobResult result = new ExecutorJobResult();
+        ExecutorJobResult result;
 
         TextStringBuilder jobOutput = new TextStringBuilder();
         TextStringBuilder jobErrorOutput = new TextStringBuilder();
@@ -176,11 +146,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> output = getStringConsumer(jobOutput);
             Consumer<String> errorOutput = getStringConsumer(jobErrorOutput);
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
-            HashMap<String, String> environmentVariables = getWorkspaceParameters(
-                    terraformJob.getEnvironmentVariables());
+            HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
+
             boolean execution = false;
             boolean scriptBeforeSuccess;
-            boolean scriptAfterSuccess = false;
+            boolean scriptAfterSuccess;
 
             String backendFile = executeTerraformInit(
                     terraformJob,
@@ -188,20 +158,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     output,
                     errorOutput);
 
-            if (terraformJob.getCommandList() != null)
-                scriptBeforeSuccess = scriptEngineService.execute(
-                        terraformJob,
-                        terraformJob
-                                .getCommandList()
-                                .stream()
-                                .filter(command -> command.isBefore())
-                                .collect(Collectors.toCollection(LinkedList::new)),
-                        workingDirectory,
-                        output);
-            else {
-                log.warn("No commands to run before destroy Job {}", terraformJob.getJobId());
-                scriptBeforeSuccess = true;
-            }
+            scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, output);
 
             showTerraformMessage("DESTROY", output);
             if (scriptBeforeSuccess) {
@@ -220,13 +177,39 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             log.warn("Terraform destroy Executed Successfully: {}", execution);
             scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, output, execution);
 
-            result.setSuccessfulExecution(scriptAfterSuccess);
-            result.setOutputLog(jobOutput.toString());
-            result.setOutputErrorLog(jobErrorOutput.toString());
+            result = generateJobResult(scriptAfterSuccess, jobOutput.toString(), jobErrorOutput.toString());
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
         }
         return result;
+    }
+
+    private ExecutorJobResult generateJobResult(boolean scriptAfterSuccess, String jobOutput, String jobErrorOutput) {
+        ExecutorJobResult jobResult = new ExecutorJobResult();
+        jobResult.setSuccessfulExecution(scriptAfterSuccess);
+        jobResult.setOutputLog(jobOutput);
+        jobResult.setOutputErrorLog(jobErrorOutput);
+
+        return jobResult;
+    }
+
+    private boolean executePrepOperationScripts(TerraformJob terraformJob, File workingDirectory, Consumer<String> output) {
+        boolean scriptBeforeSuccess;
+        if (terraformJob.getCommandList() != null)
+            scriptBeforeSuccess = scriptEngineService.execute(
+                    terraformJob,
+                    terraformJob
+                            .getCommandList()
+                            .stream()
+                            .filter(command -> command.isBefore())
+                            .collect(Collectors.toCollection(LinkedList::new)),
+                    workingDirectory,
+                    output);
+        else {
+            log.warn("No commands to run before terraform operation Job {}", terraformJob.getJobId());
+            scriptBeforeSuccess = true;
+        }
+        return scriptBeforeSuccess;
     }
 
     private boolean executePostOperationScripts(TerraformJob terraformJob, File workingDirectory, Consumer<String> output, boolean execution) {
@@ -249,7 +232,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             scriptAfterSuccess = false;
         }
 
-        log.warn("Job Execute Successfully {}", scriptAfterSuccess);
+        log.warn("No commands to run after terraform operation Job {}", scriptAfterSuccess);
         return scriptAfterSuccess;
     }
 
@@ -293,10 +276,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     }
 
     private ExecutorJobResult setError(Exception exception) {
-        ExecutorJobResult error = new ExecutorJobResult();
-        error.setSuccessfulExecution(false);
-        error.setOutputLog("");
-        error.setOutputErrorLog(exception.getMessage());
+        ExecutorJobResult error = generateJobResult(false, "", exception.getMessage());
         log.error(exception.getMessage());
 
         if (exception instanceof InterruptedException)
@@ -305,7 +285,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     }
 
     private String executeTerraformInit(TerraformJob terraformJob, File workingDirectory, Consumer<String> output,
-            Consumer<String> errorOutput) throws IOException, ExecutionException, InterruptedException {
+                                        Consumer<String> errorOutput) throws IOException, ExecutionException, InterruptedException {
 
         initBanner(terraformJob, output);
 
