@@ -1,5 +1,6 @@
 package org.terrakube.executor.service.scripts.bash;
 
+import com.diogonunes.jcolor.AnsiFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -19,6 +20,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static com.diogonunes.jcolor.Ansi.colorize;
+import static com.diogonunes.jcolor.Attribute.*;
 
 @Slf4j
 @Service
@@ -42,7 +46,14 @@ public class BashEngine implements CommandExecution {
             FileUtils.writeStringToFile(bashScript, script, Charset.defaultCharset());
 
             ProcessLauncher processLauncher = setupBashProcess(terraformJob, workingDirectory, bashScript, output, output);
-            processLauncher.launch().get();
+            Integer exitCode = processLauncher.launch().get();
+            log.info("Exit code {}", exitCode);
+            if(exitCode != 0) {
+                log.error("Script Exit Code {} \n Script \n {}", terraformJob.getJobId(), script);
+                AnsiFormat colorError = new AnsiFormat(RED_TEXT(), BLACK_BACK(), BOLD());
+                output.accept(colorize("Script Exit Code ==>" + exitCode, colorError));
+                executeSuccess = false;
+            }
         } catch (IOException e) {
             log.error(e.getMessage());
             executeSuccess = false;

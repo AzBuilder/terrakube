@@ -77,7 +77,7 @@ public class ScriptEngineService {
                 log.error(e.getMessage());
             }
         }
-        return true;
+        return executeSuccess.get();
 
     }
 
