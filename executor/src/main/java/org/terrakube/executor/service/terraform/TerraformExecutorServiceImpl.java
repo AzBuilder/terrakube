@@ -73,11 +73,10 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             scriptAfterSuccessPlan = executePostOperationScripts(terraformJob, workingDirectory, outputPlan, executionPlan);
 
-            result.setPlanFile(executionPlan ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
-                    terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
-                    : "");
-
             result = generateJobResult(scriptAfterSuccessPlan, jobOutput.toString(), jobErrorOutput.toString());
+            result.setPlanFile(executionPlan ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
+            terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
+            : "");
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
         }
