@@ -83,28 +83,13 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                         errorOutput).get();
 
             log.warn("Terraform plan Executed Successfully: {}", execution);
-            if (execution) {
-                if (terraformJob.getCommandList() != null) {
-                    scriptAfterSuccess = scriptEngineService.execute(
-                            terraformJob,
-                            terraformJob
-                                    .getCommandList()
-                                    .stream()
-                                    .filter(command -> command.isAfter())
-                                    .collect(Collectors.toCollection(LinkedList::new)),
-                            workingDirectory,
-                            output);
-                } else {
-                    scriptAfterSuccess = true;
-                }
-            } else {
-                scriptAfterSuccess = false;
-            }
 
-            log.warn("Job Execute Successfully {}", scriptAfterSuccess);
+            scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, output, execution);
+
             result.setPlanFile(execution ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
                     terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
                     : "");
+
             result.setSuccessfulExecution(scriptAfterSuccess);
             result.setOutputLog(jobOutput.toString());
             result.setOutputErrorLog(jobErrorOutput.toString());
@@ -170,25 +155,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             }
 
             log.warn("Terraform apply Executed Successfully: {}", execution);
-            if (execution) {
-                if (terraformJob.getCommandList() != null) {
-                    scriptAfterSuccess = scriptEngineService.execute(
-                            terraformJob,
-                            terraformJob
-                                    .getCommandList()
-                                    .stream()
-                                    .filter(command -> command.isAfter())
-                                    .collect(Collectors.toCollection(LinkedList::new)),
-                            workingDirectory,
-                            output);
-                } else {
-                    scriptAfterSuccess = true;
-                }
-            } else {
-                scriptAfterSuccess = false;
-            }
+            scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, output, execution);
 
-            log.warn("Job Execute Successfully {}", scriptAfterSuccess);
             result.setSuccessfulExecution(scriptAfterSuccess);
             result.setOutputLog(terraformOutput.toString());
             result.setOutputErrorLog(terraformErrorOutput.toString());
@@ -250,25 +218,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             }
 
             log.warn("Terraform destroy Executed Successfully: {}", execution);
-            if (execution) {
-                if (terraformJob.getCommandList() != null) {
-                    scriptAfterSuccess = scriptEngineService.execute(
-                            terraformJob,
-                            terraformJob
-                                    .getCommandList()
-                                    .stream()
-                                    .filter(command -> command.isAfter())
-                                    .collect(Collectors.toCollection(LinkedList::new)),
-                            workingDirectory,
-                            output);
-                } else {
-                    scriptAfterSuccess = true;
-                }
-            } else {
-                scriptAfterSuccess = false;
-            }
+            scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, output, execution);
 
-            log.warn("Job Execute Successfully {}", scriptAfterSuccess);
             result.setSuccessfulExecution(scriptAfterSuccess);
             result.setOutputLog(jobOutput.toString());
             result.setOutputErrorLog(jobErrorOutput.toString());
@@ -276,6 +227,30 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             result = setError(exception);
         }
         return result;
+    }
+
+    private boolean executePostOperationScripts(TerraformJob terraformJob, File workingDirectory, Consumer<String> output, boolean execution) {
+        boolean scriptAfterSuccess;
+        if (execution) {
+            if (terraformJob.getCommandList() != null) {
+                scriptAfterSuccess = scriptEngineService.execute(
+                        terraformJob,
+                        terraformJob
+                                .getCommandList()
+                                .stream()
+                                .filter(command -> command.isAfter())
+                                .collect(Collectors.toCollection(LinkedList::new)),
+                        workingDirectory,
+                        output);
+            } else {
+                scriptAfterSuccess = true;
+            }
+        } else {
+            scriptAfterSuccess = false;
+        }
+
+        log.warn("Job Execute Successfully {}", scriptAfterSuccess);
+        return scriptAfterSuccess;
     }
 
     private void handleTerraformStateChange(TerraformJob terraformJob, File workingDirectory)
