@@ -7,11 +7,9 @@ import com.yahoo.elide.core.security.RequestScope;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
-import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.quartz.SchedulerException;
-import org.terrakube.api.rs.workspace.Workspace;
 
 import java.text.ParseException;
 import java.util.Optional;
@@ -21,8 +19,6 @@ import java.util.Optional;
 public class JobManageHook implements LifeCycleHook<Job> {
 
     private ScheduleJobService scheduleJobService;
-
-    private WorkspaceRepository workspaceRepository;
 
     @Override
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase transactionPhase, Job job, RequestScope requestScope, Optional<ChangeSpec> optional) {
@@ -34,9 +30,7 @@ public class JobManageHook implements LifeCycleHook<Job> {
                     break;
                 case UPDATE:
                     if(job.getStatus().equals(JobStatus.cancelled)) {
-                        Workspace workspace = workspaceRepository.getById(job.getWorkspace().getId());
-                        workspace.setLocked(false);
-                        workspaceRepository.save(workspace);
+                        scheduleJobService.unlockWorkpace(job.getWorkspace().getId());
                         scheduleJobService.deleteJobContext(job.getId());
                     }
                     break;

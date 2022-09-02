@@ -117,20 +117,24 @@ public class BashEngine implements CommandExecution {
                 .map(bash -> bash.getParentFile().getAbsolutePath())
                 .collect(Collectors.joining(":"));
 
+        String externalToolsCompletePath = "";
+
         // Search all external tools inside folder /.terrakube/tools
-        Collection<File> externalTools = FileUtils.listFilesAndDirs(
+        if(getBashToolsDirectory(workingDirectory).exists()){
+            Collection<File> externalTools = FileUtils.listFilesAndDirs(
                 getBashToolsDirectory(workingDirectory),
                 new NotFileFilter(TrueFileFilter.INSTANCE),
                 TrueFileFilter.TRUE
-        );
+            );
 
-        // Show folders with tools
-        externalTools.forEach(tool -> log.info("External: {}", tool.getName()));
+            // Show folders with tools
+            externalTools.forEach(tool -> log.info("External: {}", tool.getName()));
 
-        // Load to the process PATH
-        String externalToolsCompletePath = externalTools.stream()
-                .map(externalTool -> externalTool.getAbsolutePath())
-                .collect(Collectors.joining(":"));
+            // Load to the process PATH
+            externalToolsCompletePath = externalTools.stream()
+            .map(externalTool -> externalTool.getAbsolutePath())
+            .collect(Collectors.joining(":"));
+        }
 
         bashToolsCompletePath = String.join(":", externalToolsCompletePath, bashToolsCompletePath);
         return bashToolsCompletePath;
