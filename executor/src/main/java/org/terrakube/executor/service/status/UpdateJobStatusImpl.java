@@ -42,7 +42,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     @Override
     public void setCompletedStatus(boolean successful, TerraformJob terraformJob, String jobOutput, String jobErrorOutput, String jobPlan) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
-            updateStepStatus(terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput);
+            updateStepStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput);
             if(!isJobCancelled(terraformJob))
                 updateJobStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput, jobPlan);
         }
@@ -78,10 +78,10 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
     }
 
-    private void updateStepStatus(String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput) {
+    private void updateStepStatus(boolean status, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput) {
         StepAttributes stepAttributes = new StepAttributes();
         stepAttributes.setOutput(this.terraformOutput.save(organizationId, jobId, stepId, jobOutput, jobErrorOutput));
-        stepAttributes.setStatus("completed");
+        stepAttributes.setStatus(status ? "completed": "failed");
 
         Step step = new Step();
         step.setId(stepId);

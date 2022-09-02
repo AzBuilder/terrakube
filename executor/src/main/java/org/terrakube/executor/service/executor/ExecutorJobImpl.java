@@ -61,15 +61,17 @@ public class ExecutorJobImpl implements ExecutorJob {
                 executionSuccess = scriptEngineService.execute(terraformJob, terraformJob.getCommandList(), workspaceFolder, output);
                 terraformResult.setOutputLog(scriptOutput.toString());
                 terraformResult.setOutputErrorLog(scriptErrorOutput.toString());
+                terraformResult.setSuccessfulExecution(executionSuccess);
                 break;
             default:
-                executionSuccess = false;
                 terraformResult = new ExecutorJobResult();
                 terraformResult.setOutputLog("Command Completed");
                 terraformResult.setOutputErrorLog("Command type not defined");
+                terraformResult.setSuccessfulExecution(false);
                 break;
         }
 
+        executionSuccess = terraformResult.isSuccessfulExecution();
         updateJobStatus.setCompletedStatus(executionSuccess, terraformJob, terraformResult.getOutputLog(), terraformResult.getOutputErrorLog(), terraformResult.getPlanFile());
 
         try {

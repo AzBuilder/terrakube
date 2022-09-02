@@ -83,6 +83,13 @@ export const DetailsJob = ({ jobId }) => {
         return (
           <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} />
         );
+      case "failed":
+          return (
+            <CloseCircleTwoTone
+              twoToneColor="#FB0136"
+              style={{ fontSize: "20px" }}
+            />
+          );
       case "cancelled":
         return (
           <CloseCircleTwoTone
@@ -201,6 +208,8 @@ export const DetailsJob = ({ jobId }) => {
                   <ExclamationCircleOutlined />
                 ) : job.data.attributes.status === "cancelled" ? (
                   <StopOutlined />
+                ) : job.data.attributes.status === "failed" ? (
+                    <StopOutlined />
                 ) : (
                   <ClockCircleOutlined />
                 )
@@ -213,6 +222,8 @@ export const DetailsJob = ({ jobId }) => {
                   : job.data.attributes.status == "waitingApproval"
                   ? "#fa8f37"
                   : job.data.attributes.status == "rejected"
+                  ? "#FB0136"
+                  : job.data.attributes.status == "failed"
                   ? "#FB0136"
                   : ""
               }
