@@ -36,7 +36,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     @Override
     public ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory) {
-        ExecutorJobResult result = new ExecutorJobResult();
+        ExecutorJobResult result;
 
         TextStringBuilder jobOutput = new TextStringBuilder();
         TextStringBuilder jobErrorOutput = new TextStringBuilder();

@@ -77,7 +77,7 @@ public class ScriptEngineService {
                 log.error(e.getMessage());
             }
         }
-        return true;
+        return executeSuccess.get();
 
     }
 
@@ -100,6 +100,7 @@ public class ScriptEngineService {
     }
 
     private void createToolsDirectory(File workingDirectory) throws IOException {
+        FileUtils.deleteDirectory(getToolsRepository(workingDirectory));
         FileUtils.forceMkdir(getToolsRepository(workingDirectory));
 
         try {
