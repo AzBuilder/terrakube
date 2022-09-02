@@ -159,6 +159,8 @@ export const OrganizationDetails = ({
                               <CloseCircleOutlined />
                             ) : item.lastStatus === "cancelled" ? (
                               <StopOutlined />
+                            ) : item.lastStatus === "failed" ? (
+                              <StopOutlined />
                             ) : (
                               <ClockCircleOutlined />
                             )
@@ -236,6 +238,8 @@ function setupOrganizationIncludes(includes, setWorkspaces) {
               : lastStatus == "waitingApproval"
               ? "#fa8f37"
               : lastStatus === "rejected"
+              ? "#FB0136"
+              : lastStatus === "failed"
               ? "#FB0136"
               : "",
           ...element.attributes,

@@ -44,7 +44,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> output = getStringConsumer(jobOutput);
             Consumer<String> errorOutput = getStringConsumer(jobErrorOutput);
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
-            HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
+            HashMap<String, String> environmentVariables = getWorkspaceParameters(
+                    terraformJob.getEnvironmentVariables());
             boolean execution = false;
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess = false;
@@ -81,19 +82,29 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                         output,
                         errorOutput).get();
 
+            log.warn("Terraform plan Executed Successfully: {}", execution);
+            if (execution) {
+                if (terraformJob.getCommandList() != null) {
+                    scriptAfterSuccess = scriptEngineService.execute(
+                            terraformJob,
+                            terraformJob
+                                    .getCommandList()
+                                    .stream()
+                                    .filter(command -> command.isAfter())
+                                    .collect(Collectors.toCollection(LinkedList::new)),
+                            workingDirectory,
+                            output);
+                } else {
+                    scriptAfterSuccess = true;
+                }
+            } else {
+                scriptAfterSuccess = false;
+            }
 
-            if (execution && terraformJob.getCommandList() != null)
-                scriptAfterSuccess = scriptEngineService.execute(
-                        terraformJob,
-                        terraformJob
-                                .getCommandList()
-                                .stream()
-                                .filter(command -> command.isAfter())
-                                .collect(Collectors.toCollection(LinkedList::new)),
-                        workingDirectory,
-                        output);
-
-            result.setPlanFile(execution ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory) : "");
+            log.warn("Job Execute Successfully {}", scriptAfterSuccess);
+            result.setPlanFile(execution ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
+                    terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
+                    : "");
             result.setSuccessfulExecution(scriptAfterSuccess);
             result.setOutputLog(jobOutput.toString());
             result.setOutputErrorLog(jobErrorOutput.toString());
@@ -114,7 +125,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> output = getStringConsumer(terraformOutput);
             Consumer<String> errorOutput = getStringConsumer(terraformErrorOutput);
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
-            HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
+            HashMap<String, String> environmentVariables = getWorkspaceParameters(
+                    terraformJob.getEnvironmentVariables());
             boolean execution = false;
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess = false;
@@ -146,7 +158,9 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                         terraformJob.getTerraformVersion(),
                         workingDirectory,
                         backendFile,
-                        (terraformState.downloadTerraformPlan(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory) ? new HashMap<>() : terraformParameters),
+                        (terraformState.downloadTerraformPlan(terraformJob.getOrganizationId(),
+                                terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(),
+                                workingDirectory) ? new HashMap<>() : terraformParameters),
                         environmentVariables,
                         output,
                         errorOutput).get();
@@ -155,18 +169,26 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             }
 
+            log.warn("Terraform apply Executed Successfully: {}", execution);
+            if (execution) {
+                if (terraformJob.getCommandList() != null) {
+                    scriptAfterSuccess = scriptEngineService.execute(
+                            terraformJob,
+                            terraformJob
+                                    .getCommandList()
+                                    .stream()
+                                    .filter(command -> command.isAfter())
+                                    .collect(Collectors.toCollection(LinkedList::new)),
+                            workingDirectory,
+                            output);
+                } else {
+                    scriptAfterSuccess = true;
+                }
+            } else {
+                scriptAfterSuccess = false;
+            }
 
-            if (execution && terraformJob.getCommandList() != null)
-                scriptAfterSuccess = scriptEngineService.execute(
-                        terraformJob,
-                        terraformJob
-                                .getCommandList()
-                                .stream()
-                                .filter(command -> command.isAfter())
-                                .collect(Collectors.toCollection(LinkedList::new)),
-                        workingDirectory,
-                        output);
-
+            log.warn("Job Execute Successfully {}", scriptAfterSuccess);
             result.setSuccessfulExecution(scriptAfterSuccess);
             result.setOutputLog(terraformOutput.toString());
             result.setOutputErrorLog(terraformErrorOutput.toString());
@@ -186,7 +208,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> output = getStringConsumer(jobOutput);
             Consumer<String> errorOutput = getStringConsumer(jobErrorOutput);
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
-            HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
+            HashMap<String, String> environmentVariables = getWorkspaceParameters(
+                    terraformJob.getEnvironmentVariables());
             boolean execution = false;
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess = false;
@@ -226,17 +249,26 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 handleTerraformStateChange(terraformJob, workingDirectory);
             }
 
-            if (execution && terraformJob.getCommandList() != null)
-                scriptAfterSuccess = scriptEngineService.execute(
-                        terraformJob,
-                        terraformJob
-                                .getCommandList()
-                                .stream()
-                                .filter(command -> command.isAfter())
-                                .collect(Collectors.toCollection(LinkedList::new)),
-                        workingDirectory,
-                        output);
+            log.warn("Terraform destroy Executed Successfully: {}", execution);
+            if (execution) {
+                if (terraformJob.getCommandList() != null) {
+                    scriptAfterSuccess = scriptEngineService.execute(
+                            terraformJob,
+                            terraformJob
+                                    .getCommandList()
+                                    .stream()
+                                    .filter(command -> command.isAfter())
+                                    .collect(Collectors.toCollection(LinkedList::new)),
+                            workingDirectory,
+                            output);
+                } else {
+                    scriptAfterSuccess = true;
+                }
+            } else {
+                scriptAfterSuccess = false;
+            }
 
+            log.warn("Job Execute Successfully {}", scriptAfterSuccess);
             result.setSuccessfulExecution(scriptAfterSuccess);
             result.setOutputLog(jobOutput.toString());
             result.setOutputErrorLog(jobErrorOutput.toString());
@@ -246,11 +278,13 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         return result;
     }
 
-    private void handleTerraformStateChange(TerraformJob terraformJob, File workingDirectory) throws IOException, ExecutionException, InterruptedException {
+    private void handleTerraformStateChange(TerraformJob terraformJob, File workingDirectory)
+            throws IOException, ExecutionException, InterruptedException {
         log.info("Running Terraform show");
         TextStringBuilder jsonState = new TextStringBuilder();
         Consumer<String> applyJSON = getStringConsumer(jsonState);
-        if (terraformClient.show(terraformJob.getTerraformVersion(), workingDirectory, null, applyJSON, applyJSON).get()) {
+        if (terraformClient.show(terraformJob.getTerraformVersion(), workingDirectory, null, applyJSON, applyJSON)
+                .get()) {
             log.info("Uploading terraform state json");
             terraformState.saveStateJson(terraformJob, jsonState.toString());
 
@@ -258,7 +292,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> terraformJsonOutput = getStringConsumer(jsonOutput);
 
             log.info("Checking terraform output json");
-            if (terraformClient.output(terraformJob.getTerraformVersion(), workingDirectory, terraformJsonOutput, terraformJsonOutput).get())
+            if (terraformClient.output(terraformJob.getTerraformVersion(), workingDirectory, terraformJsonOutput,
+                    terraformJsonOutput).get())
                 terraformJob.setTerraformOutput(jsonOutput.toString());
         }
     }
@@ -294,14 +329,16 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         return error;
     }
 
-
-    private String executeTerraformInit(TerraformJob terraformJob, File workingDirectory, Consumer<String> output, Consumer<String> errorOutput) throws IOException, ExecutionException, InterruptedException {
+    private String executeTerraformInit(TerraformJob terraformJob, File workingDirectory, Consumer<String> output,
+            Consumer<String> errorOutput) throws IOException, ExecutionException, InterruptedException {
 
         initBanner(terraformJob, output);
 
-        String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), workingDirectory);
+        String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
+                terraformJob.getWorkspaceId(), workingDirectory);
 
-        terraformClient.init(terraformJob.getTerraformVersion(), workingDirectory, backendFile, output, errorOutput).get();
+        terraformClient.init(terraformJob.getTerraformVersion(), workingDirectory, backendFile, output, errorOutput)
+                .get();
         return backendFile;
     }
 
@@ -320,7 +357,9 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     private void initBanner(TerraformJob terraformJob, Consumer<String> output) {
         AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
-        output.accept(colorize("Initializing Terrakube Job " + terraformJob.getJobId() + " Step " + terraformJob.getStepId(), colorMessage));
+        output.accept(
+                colorize("Initializing Terrakube Job " + terraformJob.getJobId() + " Step " + terraformJob.getStepId(),
+                        colorMessage));
         output.accept(colorize("Running Terraform " + terraformJob.getTerraformVersion(), colorMessage));
         output.accept(colorize("\n\n" + STEP_SEPARATOR, colorMessage));
         output.accept(colorize("Running Terraform Init: ", colorMessage));

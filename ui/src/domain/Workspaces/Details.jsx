@@ -253,6 +253,8 @@ export const WorkspaceDetails = (props) => {
                                       <ExclamationCircleOutlined />
                                     ) : item.status === "cancelled" ? (
                                       <StopOutlined />
+                                    ) : item.status === "failed" ? (
+                                      <StopOutlined />
                                     ) : (
                                       <ClockCircleOutlined />
                                     )
@@ -426,6 +428,9 @@ function setupWorkspaceIncludes(
           case "rejected":
             finalColor = "#FB0136";
             break;
+          case "failed":
+              finalColor = "#FB0136";
+              break;
           case "running":
             finalColor = "#108ee9";
             break;
