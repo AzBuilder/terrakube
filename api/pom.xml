@@ -30,7 +30,7 @@
         <postgresql.version>42.4.1</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
-        <snakeyaml.version>1.29</snakeyaml.version>
+        <snakeyaml.version>1.31</snakeyaml.version>
         <quartz.version>2.3.2</quartz.version>
         <azure-storage-blob.version>12.18.0</azure-storage-blob.version>
         <aws-sdk.version>1.12.261</aws-sdk.version>
