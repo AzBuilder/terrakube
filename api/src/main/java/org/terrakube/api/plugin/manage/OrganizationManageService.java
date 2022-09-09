@@ -63,19 +63,20 @@ public class OrganizationManageService {
 
     @Transactional
     public void postCreationSetup(Organization organization){
-        templateRepository.save(generateTemplate("Terraform-Plan", "Running Terraform plan", Base64.getEncoder().encodeToString(TEMPLATE_PLAN.getBytes())));
-        templateRepository.save(generateTemplate("Terraform-Plan/Apply", "Running Terraform plan and apply", Base64.getEncoder().encodeToString(TEMPLATE_APPLY.getBytes())));
-        templateRepository.save(generateTemplate("Terraform-Destroy", "Running Terraform destroy", Base64.getEncoder().encodeToString(TEMPLATE_DESTROY.getBytes())));
-        templateRepository.save(generateTemplate("Security Review (Terrascan)", "Running standard security review with Terrascan", Base64.getEncoder().encodeToString(TEMPLATE_SECURITY_TERRASCAN.getBytes())));
+        templateRepository.save(generateTemplate("Terraform-Plan", "Running Terraform plan", Base64.getEncoder().encodeToString(TEMPLATE_PLAN.getBytes()), organization));
+        templateRepository.save(generateTemplate("Terraform-Plan/Apply", "Running Terraform plan and apply", Base64.getEncoder().encodeToString(TEMPLATE_APPLY.getBytes()), organization));
+        templateRepository.save(generateTemplate("Terraform-Destroy", "Running Terraform destroy", Base64.getEncoder().encodeToString(TEMPLATE_DESTROY.getBytes()), organization));
+        templateRepository.save(generateTemplate("Security Review (Terrascan)", "Running standard security review with Terrascan", Base64.getEncoder().encodeToString(TEMPLATE_SECURITY_TERRASCAN.getBytes()), organization));
     }
 
-    private Template generateTemplate(String name, String description, String tcl){
+    private Template generateTemplate(String name, String description, String tcl, Organization organization){
         Template template = new Template();
         template.setId(UUID.randomUUID());
         template.setName(name);
         template.setDescription(description);
         template.setVersion("1.0.0");
         template.setTcl(tcl);
+        template.setOrganization(organization);
         return template;
     }
 }
