@@ -237,7 +237,7 @@ export const WorkspaceDetails = (props) => {
                       <List
                         itemLayout="horizontal"
                         dataSource={jobs
-                          .sort((a, b) => a.id.localeCompare(b.id))
+                          .sort((a, b) => a.id - b.id)
                           .reverse()}
                         renderItem={(item) => (
                           <List.Item
