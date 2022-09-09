@@ -53,7 +53,7 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
     - name: Add Git to Executor
-      run: docker run --user="root" --entrypoint launcher $(docker images executor -q) "apt-get update && apt-get install git -y"
+      run: docker run --user="root" --entrypoint launcher $(docker images executor -q) "apt-get update && apt-get install git jq curl -y"
 
     - name: Restore default user and entrypoint
       run: docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER cnb' $(docker ps -lq) executortemp
