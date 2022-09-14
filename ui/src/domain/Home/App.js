@@ -18,6 +18,7 @@ import { CreateModule } from '../Modules/Create';
 import { ModuleList } from '../Modules/List';
 import { ModuleDetails } from '../Modules/Details';
 import { OrganizationSettings } from '../Settings/Settings';
+import { UserSettings } from '../UserSettings/UserSettings';
 import { ProfilePicture } from './ProfilePicture';
 import { useAuth } from '../../config/authConfig'; 
 const { Header, Footer } = Layout;
@@ -75,6 +76,9 @@ const App = () => {
           </Route>
           <Route exact path="/organizations/:orgid/settings/vcs/new/:vcsName">
              <OrganizationSettings selectedTab="3" vcsMode="new" />
+          </Route>
+          <Route exact path="/settings/tokens">
+             <UserSettings />
           </Route>
 
         </Switch>
