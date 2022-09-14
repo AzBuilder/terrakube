@@ -5,19 +5,22 @@ import {  Avatar ,Dropdown,Menu,message} from 'antd';
 import { UserOutlined, PoweroffOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import getUserFromStorage from "../../config/authUser";
 import { useAuth } from '../../config/authConfig'; 
+import { useHistory } from "react-router-dom";
 
 export const ProfilePicture = (props) => {
-  //const [imageUrl, setImageUrl] = useState(null);
   const [username, setUsername] = useState(null);
   const auth = useAuth();
-
+  const history = useHistory();
+  const handleUserSettings = e => {
+    history.push(`/settings/tokens`);
+  };
   const userMenu = (
     <Menu theme="dark">
       <Menu.Item  onClick={() => message.info("Coming Soon")}  key="user-id">
         Signed in as <br/><b>{username}</b>
       </Menu.Item>
       <Menu.Divider/>
-      <Menu.Item icon={<UserOutlined/>} onClick={() => message.info("Coming Soon")} key="user-settings">User Settings</Menu.Item>
+      <Menu.Item icon={<UserOutlined/>} onClick={handleUserSettings} key="user-settings">User Settings</Menu.Item>
       <Menu.Item icon={<QuestionCircleOutlined/>} key="help">
         <a target="_blank" rel="noopener noreferrer" href="https://docs.terrakube.org/">
             Help
