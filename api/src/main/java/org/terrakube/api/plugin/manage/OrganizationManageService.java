@@ -35,30 +35,6 @@ public class OrganizationManageService {
             "    step: 100" +
             "";
 
-    private static String TEMPLATE_SECURITY_TERRASCAN="flow:\n" +
-            "  - type: \"customScripts\"\n" +
-            "    name: \"Security Review with Terrascan\"\n" +
-            "    step: 100\n" +
-            "    commands:\n" +
-            "      - runtime: \"GROOVY\"\n" +
-            "        priority: 100\n" +
-            "        after: true\n" +
-            "        script: |\n" +
-            "          import Terrascan\n" +
-            "\n" +
-            "          new Terrascan().loadTool(\n" +
-            "            \"$workingDirectory\",\n" +
-            "            \"$bashToolsDirectory\",\n" +
-            "            \"1.15.2\")\n" +
-            "          \"Terrascan Download Completed...\"\n" +
-            "      - runtime: \"BASH\"\n" +
-            "        priority: 200\n" +
-            "        after: true\n" +
-            "        script: |\n" +
-            "          cd $workingDirectory;\n" +
-            "          terrascan scan -i terraform" +
-            "";
-
     TemplateRepository templateRepository;
 
     @Transactional
@@ -66,7 +42,6 @@ public class OrganizationManageService {
         templateRepository.save(generateTemplate("Terraform-Plan", "Running Terraform plan", Base64.getEncoder().encodeToString(TEMPLATE_PLAN.getBytes()), organization));
         templateRepository.save(generateTemplate("Terraform-Plan/Apply", "Running Terraform plan and apply", Base64.getEncoder().encodeToString(TEMPLATE_APPLY.getBytes()), organization));
         templateRepository.save(generateTemplate("Terraform-Destroy", "Running Terraform destroy", Base64.getEncoder().encodeToString(TEMPLATE_DESTROY.getBytes()), organization));
-        templateRepository.save(generateTemplate("Security Review (Terrascan)", "Running standard security review with Terrascan", Base64.getEncoder().encodeToString(TEMPLATE_SECURITY_TERRASCAN.getBytes()), organization));
     }
 
     private Template generateTemplate(String name, String description, String tcl, Organization organization){
