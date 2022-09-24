@@ -15,7 +15,7 @@
     <description>Spring Boot Terrakube API</description>
     <properties>
         <java.version>11</java.version>
-        <elide.version>6.1.7</elide.version>
+        <elide.version>6.1.8</elide.version>
         <liquibase-core.version>4.8.0</liquibase-core.version>
         <azure.version>4.0.0</azure.version>
         <mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>
@@ -30,7 +30,7 @@
         <postgresql.version>42.4.1</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
-        <snakeyaml.version>1.31</snakeyaml.version>
+        <snakeyaml.version>1.32</snakeyaml.version>
         <quartz.version>2.3.2</quartz.version>
         <azure-storage-blob.version>12.18.0</azure-storage-blob.version>
         <aws-sdk.version>1.12.261</aws-sdk.version>
