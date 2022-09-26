@@ -11,6 +11,7 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+      # MINIO_BROWSER_REDIRECT_URL: "https://9001-azbuilder-terrakube-wgh07jmpo99.ws-us67.gitpod.io"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
