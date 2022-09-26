@@ -27,6 +27,11 @@ tasks:
     init: |
       chmod +x scripts/dependencies/loadDex.sh
     command: scripts/dependencies/loadDex.sh
+
+  - name: Minio Environment Setup
+    init: |
+      chmod +x scripts/dependencies/loadMinio.sh
+    command: scripts/dependencies/loadMinio.sh
   
   - name: Dependencies Backend
     init: |
@@ -77,6 +82,14 @@ ports:
     visibility: public
   - name: TerrakubeUI 
     port: 3000
+    onOpen: ignore
+    visibility: public
+  - name: Minio 
+    port: 9000
+    onOpen: ignore
+    visibility: public
+  - name: MinioConsole 
+    port: 9001
     onOpen: ignore
     visibility: public
 
