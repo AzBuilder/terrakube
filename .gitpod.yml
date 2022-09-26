@@ -49,7 +49,8 @@ tasks:
 
   - name: Setup Development Environment
     init: |
-      chmod +x scripts/setupDevelopmentEnvironment.sh
+      chmod +x scripts/setupDevelopmentEnvironment.sh &&
+      chmod +x scripts/setupDevelopmentEnvironmentMinio.sh
     command: scripts/setupDevelopmentEnvironment.sh
 
   - name: Dex Authentication Url

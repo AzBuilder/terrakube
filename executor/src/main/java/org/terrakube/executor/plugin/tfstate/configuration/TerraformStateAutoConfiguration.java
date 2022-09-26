@@ -1,8 +1,10 @@
 package org.terrakube.executor.plugin.tfstate.configuration;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -74,15 +76,29 @@ public class TerraformStateAutoConfiguration {
                             awsTerraformStateProperties.getAccessKey(),
                             awsTerraformStateProperties.getSecretKey()
                     );
+                    AmazonS3 s3client = null;
 
-                    AmazonS3 s3client = AmazonS3ClientBuilder
-                            .standard()
-                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                            .withRegion(Regions.fromName(awsTerraformStateProperties.getRegion()))
-                            .build();
+                    if (awsTerraformStateProperties.getEndpoint() != "" && awsTerraformStateProperties.getEndpoint() != "${AwsEndpoint}") {
+                        ClientConfiguration clientConfiguration = new ClientConfiguration();
+                        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
+
+                        s3client = AmazonS3ClientBuilder
+                                .standard()
+                                .withClientConfiguration(clientConfiguration)
+                                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsTerraformStateProperties.getEndpoint(), awsTerraformStateProperties.getRegion()))
+                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                                .withPathStyleAccessEnabled(true)
+                                .build();
+                    } else
+                        s3client = AmazonS3ClientBuilder
+                                .standard()
+                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                                .withRegion(Regions.fromName(awsTerraformStateProperties.getRegion()))
+                                .build();
 
                     terraformState = AwsTerraformStateImpl.builder()
                             .s3client(s3client)
+                            .endpoint(awsTerraformStateProperties.getEndpoint() != "" && awsTerraformStateProperties.getEndpoint() != "${AwsEndpoint}"? awsTerraformStateProperties.getEndpoint(): null)
                             .bucketName(awsTerraformStateProperties.getBucketName())
                             .accessKey(awsTerraformStateProperties.getAccessKey())
                             .secretKey(awsTerraformStateProperties.getSecretKey())

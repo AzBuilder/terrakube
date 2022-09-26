@@ -55,6 +55,8 @@ public class AwsTerraformStateImpl implements TerraformState {
 
     private String secretKey;
 
+    private String endpoint;
+
     @NonNull
     TerrakubeClient terrakubeClient;
 
@@ -71,6 +73,14 @@ public class AwsTerraformStateImpl implements TerraformState {
             awsBackendHcl.appendln("key        = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
             awsBackendHcl.appendln("access_key = \"" + accessKey + "\"");
             awsBackendHcl.appendln("secret_key = \"" + secretKey + "\"");
+
+            if(endpoint != null){
+                awsBackendHcl.appendln("endpoint  = \"" + endpoint + "\"");
+                awsBackendHcl.appendln("skip_credentials_validation  = true");
+                awsBackendHcl.appendln("skip_metadata_api_check      = true");
+                awsBackendHcl.appendln("skip_region_validation       = true");
+                awsBackendHcl.appendln("force_path_style             = true");
+            }
 
             File awsBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
@@ -123,11 +133,12 @@ public class AwsTerraformStateImpl implements TerraformState {
                     try {
                         log.info("Downloading state from {}:", stateUrl);
 
-                        log.info("Generating pre-signed URL. {}", new URL(stateUrl).getPath().replace("/tfstate","tfstate"));
+                        log.info("Generating pre-signed URL. {}", new URL(stateUrl).getPath().replace(endpoint != null ? bucketName + "/tfstate" :"/tfstate","tfstate"));
 
                         GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                                new GeneratePresignedUrlRequest(bucketName, new URL(stateUrl).getPath().replace("/tfstate","tfstate"))
+                                new GeneratePresignedUrlRequest(bucketName, new URL(stateUrl).getPath().replace(endpoint != null ? bucketName + "/tfstate" :"/tfstate","tfstate"))
                                         .withMethod(HttpMethod.GET)
+                                        
                                         .withExpiration(getExpiration());
 
                         URL blobUrl = s3client.generatePresignedUrl(generatePresignedUrlRequest);
