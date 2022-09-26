@@ -85,11 +85,11 @@ ports:
     onOpen: ignore
     visibility: public
   - name: Minio 
-    port: 9000
+    port: 8000
     onOpen: ignore
     visibility: public
   - name: MinioConsole 
-    port: 9001
+    port: 8001
     onOpen: ignore
     visibility: public
 

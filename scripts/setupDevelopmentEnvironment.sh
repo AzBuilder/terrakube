@@ -230,8 +230,8 @@ function generateWorkspaceInformation(){
   WORKSPACE_EXECUTOR=$(gp url 8090)
   WORKSPACE_UI=$(gp url 3000)
   WORKSPACE_DEX=$(gp url 5556)
-  WORKSPACE_MINIO=$(gp url 9000)
-  WORKSPACE_CONSOLE_MINIO=$(gp url 9001)
+  WORKSPACE_MINIO=$(gp url 8000)
+  WORKSPACE_CONSOLE_MINIO=$(gp url 8001)
   WORKSPACE_LOGIN_REGISTRY=$(gp url 8075 | sed "s+https://++g")
 
   sed -i "s+GITPOD_WORKSPACE_UI+$WORKSPACE_UI+gi" GITPOD.md
