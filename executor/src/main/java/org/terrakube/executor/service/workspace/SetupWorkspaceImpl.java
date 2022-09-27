@@ -2,8 +2,6 @@ package org.terrakube.executor.service.workspace;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.ivy.util.FileUtil;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.sshd.JGitKeyCache;
 import org.eclipse.jgit.transport.sshd.ServerKeyDatabase;
@@ -23,9 +21,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;

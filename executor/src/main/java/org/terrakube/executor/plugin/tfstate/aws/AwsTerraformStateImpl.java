@@ -1,9 +1,7 @@
 package org.terrakube.executor.plugin.tfstate.aws;
 
-import com.amazonaws.HttpMethod;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.Builder;
@@ -28,8 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -136,9 +132,10 @@ public class AwsTerraformStateImpl implements TerraformState {
                     try {
                         log.info("Downloading state from {}", stateUrl);
 
-                        log.info("Buket location: {}", new URL(stateUrl).getPath().replace(endpoint != null ? bucketName + "/tfstate" :"/tfstate","tfstate").substring(1));
+                        //log.info("Buket location: {}", new URL(stateUrl).getPath().replace(endpoint != null ? bucketName + "/tfstate" :"/tfstate","tfstate").substring(1));
+                        log.info("Buket location: {}", "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
 
-                        S3Object s3object = s3client.getObject(bucketName, new URL(stateUrl).getPath().replace(endpoint != null ? bucketName + "/tfstate" :"/tfstate","tfstate").substring(1));
+                        S3Object s3object = s3client.getObject(bucketName, "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
                         S3ObjectInputStream inputStream = s3object.getObjectContent();
                         byte[] data = inputStream.getDelegateStream().readAllBytes();
 
