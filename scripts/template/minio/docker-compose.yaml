@@ -11,6 +11,7 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
       MINIO_SERVER_URL: 'GITPOD_MINIO_URL'
       MINIO_BROWSER_REDIRECT_URL: 'GITPOD_MINIO_CONSOLE_URL'
+      MINIO_DEFAULT_BUCKETS: 'sample'
     volumes:
       - 'minio_data:/data'
 
