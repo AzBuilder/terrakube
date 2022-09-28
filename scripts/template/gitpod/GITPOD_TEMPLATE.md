@@ -17,6 +17,12 @@ Executor:
 Dex Authentication:
 - GITPOD_WORKSPACE_DEX
 
+Minio Endpoint:
+- GITPOD_WORKSPACE_MINIO
+
+Minio Console:
+- GITPOD_WORKSPACE_CONSOLE_MINIO
+
 Terraform Protocols
 
 - terraform login GITPOD_LOGIN_REGISTRY

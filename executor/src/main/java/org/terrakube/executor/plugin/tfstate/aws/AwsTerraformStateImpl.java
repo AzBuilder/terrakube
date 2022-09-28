@@ -1,9 +1,9 @@
 package org.terrakube.executor.plugin.tfstate.aws;
 
-import com.amazonaws.HttpMethod;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -21,12 +21,11 @@ import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.service.mode.TerraformJob;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,6 +54,8 @@ public class AwsTerraformStateImpl implements TerraformState {
 
     private String secretKey;
 
+    private String endpoint;
+
     @NonNull
     TerrakubeClient terrakubeClient;
 
@@ -71,6 +72,14 @@ public class AwsTerraformStateImpl implements TerraformState {
             awsBackendHcl.appendln("key        = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
             awsBackendHcl.appendln("access_key = \"" + accessKey + "\"");
             awsBackendHcl.appendln("secret_key = \"" + secretKey + "\"");
+
+            if(endpoint != null){
+                awsBackendHcl.appendln("endpoint  = \"" + endpoint + "\"");
+                awsBackendHcl.appendln("skip_credentials_validation  = true");
+                awsBackendHcl.appendln("skip_metadata_api_check      = true");
+                awsBackendHcl.appendln("skip_region_validation       = true");
+                awsBackendHcl.appendln("force_path_style             = true");
+            }
 
             File awsBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
@@ -121,24 +130,18 @@ public class AwsTerraformStateImpl implements TerraformState {
         Optional.ofNullable(terrakubeClient.getJobById(organizationId, jobId).getData().getAttributes().getTerraformPlan())
                 .ifPresent(stateUrl -> {
                     try {
-                        log.info("Downloading state from {}:", stateUrl);
+                        log.info("Downloading state from {}", stateUrl);
 
-                        log.info("Generating pre-signed URL. {}", new URL(stateUrl).getPath().replace("/tfstate","tfstate"));
+                        //log.info("Buket location: {}", new URL(stateUrl).getPath().replace(endpoint != null ? bucketName + "/tfstate" :"/tfstate","tfstate").substring(1));
+                        log.info("Buket location: {}", "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
 
-                        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                                new GeneratePresignedUrlRequest(bucketName, new URL(stateUrl).getPath().replace("/tfstate","tfstate"))
-                                        .withMethod(HttpMethod.GET)
-                                        .withExpiration(getExpiration());
+                        S3Object s3object = s3client.getObject(bucketName, "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
+                        S3ObjectInputStream inputStream = s3object.getObjectContent();
+                        byte[] data = inputStream.getDelegateStream().readAllBytes();
 
-                        URL blobUrl = s3client.generatePresignedUrl(generatePresignedUrlRequest);
-
-                        log.info("Pre-Signed URL: " + blobUrl.toString());
-
-                        FileUtils.copyURLToFile(
-                                blobUrl,
-                                new File(workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE),
-                                30000,
-                                30000);
+                        FileUtils.copyToFile(
+                                new ByteArrayInputStream(data),
+                                new File(workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE));
                         planExists.set(true);
                     } catch (IOException e) {
                         log.error(e.getMessage());
@@ -176,15 +179,6 @@ public class AwsTerraformStateImpl implements TerraformState {
 
             terrakubeClient.createHistory(historyRequest, terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
         }
-    }
-
-    private Date getExpiration() {
-        // Set the presigned URL to expire after 5 minutes.
-        java.util.Date expiration = new java.util.Date();
-        long expTimeMillis = Instant.now().toEpochMilli();
-        expTimeMillis += 1000 * 60 * 5;
-        expiration.setTime(expTimeMillis);
-        return expiration;
     }
 
 }

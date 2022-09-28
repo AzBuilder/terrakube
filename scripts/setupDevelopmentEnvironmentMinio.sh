@@ -21,8 +21,13 @@ function generateApiVars(){
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
   TERRAKUBE_ADMIN_GROUP="CUSTOM_ADMIN_NAME"
+  AwsStorageAccessKey="minioadmin"
+  AwsStorageSecretKey="minioadmin"
+  AwsStorageBucketName="sample"
+  AwsStorageRegion="us-east-1"
+  AwsEndpoint=$(gp url 9000)
 
-  StorageType="LOCAL"
+  StorageType="AWS"
 
   JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
 
@@ -38,12 +43,17 @@ function generateApiVars(){
   echo "InternalSecret=$InternalSecret" >> .envApi
   echo "DexIssuerUri=$DexIssuerUri" >> .envApi
   echo "StorageType=$StorageType" >> .envApi
+  echo "AwsStorageAccessKey=$AwsStorageAccessKey" >> .envApi
+  echo "AwsStorageSecretKey=$AwsStorageSecretKey" >> .envApi
+  echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envApi
+  echo "AwsStorageRegion=$AwsStorageRegion" >> .envApi
+  echo "AwsEndpoint=$AwsEndpoint" >> .envApi
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
-function generateRegistryVars(){
+function generateExecutorVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderApiUrl=$(gp url 8080)
@@ -57,8 +67,21 @@ function generateRegistryVars(){
 
   TerrakubeEnableSecurity=true
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  TerraformStateType=LocalTerraformStateImpl
-  TerraformOutputType=LocalTerraformOutputImpl
+  
+  TerraformStateType=AwsTerraformStateImpl
+  AwsTerraformStateAccessKey="minioadmin"
+  AwsTerraformStateSecretKey="minioadmin"
+  AwsTerraformStateBucketName="sample"
+  AwsTerraformStateRegion="us-east-1"
+  AwsEndpoint=$(gp url 9000)
+
+  TerraformOutputType=AwsTerraformOutputImpl
+  AwsTerraformOutputAccessKey="minioadmin"
+  AwsTerraformOutputSecretKey="minioadmin"
+  AwsTerraformOutputBucketName="sample"
+  AwsTerraformOutputRegion="us-east-1"
+  
+
   ExecutorFlagBatch=false
   ExecutorFlagDisableAcknowledge=false
   TerrakubeToolsRepository=https://github.com/AzBuilder/terrakube-extensions.git
@@ -70,8 +93,24 @@ function generateRegistryVars(){
 
   echo "TerrakubeEnableSecurity=$TerrakubeEnableSecurity" >> .envExecutor
   echo "InternalSecret=$InternalSecret" >> .envExecutor
+  
   echo "TerraformStateType=$TerraformStateType" >> .envExecutor
+  
+  echo "AwsTerraformStateAccessKey=$AwsTerraformStateAccessKey" >> .envExecutor
+  echo "AwsTerraformStateSecretKey=$AwsTerraformStateSecretKey" >> .envExecutor
+  echo "AwsTerraformStateBucketName=$AwsTerraformStateBucketName" >> .envExecutor
+  echo "AwsTerraformStateRegion=$AwsTerraformStateRegion" >> .envExecutor
+  echo "AwsEndpoint=$AwsEndpoint" >> .envExecutor
+
+  
   echo "TerraformOutputType=$TerraformOutputType" >> .envExecutor
+
+  echo "AwsTerraformOutputAccessKey=$AwsTerraformOutputAccessKey" >> .envExecutor
+  echo "AwsTerraformOutputSecretKey=$AwsTerraformOutputSecretKey" >> .envExecutor
+  echo "AwsTerraformOutputBucketName=$AwsTerraformOutputBucketName" >> .envExecutor
+  echo "AwsTerraformOutputRegion=$AwsTerraformOutputRegion" >> .envExecutor
+
+
   echo "AzBuilderApiUrl=$AzBuilderApiUrl" >> .envExecutor
   echo "ExecutorFlagBatch=$ExecutorFlagBatch" >> .envExecutor
   echo "ExecutorFlagDisableAcknowledge=$ExecutorFlagDisableAcknowledge" >> .envExecutor
@@ -82,7 +121,7 @@ function generateRegistryVars(){
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
 }
 
-function generateExecutorVars(){
+function generateRegistryVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderRegistry=$(gp url 8075)
@@ -102,7 +141,14 @@ function generateExecutorVars(){
   TerrakubeEnableSecurity=true
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  RegistryStorageType=Local
+  RegistryStorageType=AwsStorageImpl
+
+  AwsStorageAccessKey="minioadmin"
+  AwsStorageSecretKey="minioadmin"
+  AwsStorageBucketName="sample"
+  AwsStorageRegion="us-east-1"
+  AwsEndpoint=$(gp url 9000)
+
   AppClientId=example-app
 
   JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
@@ -117,7 +163,17 @@ function generateExecutorVars(){
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envRegistry
   echo "PatSecret=$PatSecret" >> .envRegistry
   echo "InternalSecret=$InternalSecret" >> .envRegistry
+
   echo "RegistryStorageType=$RegistryStorageType" >> .envRegistry
+
+  echo "AwsStorageAccessKey=$AwsStorageAccessKey" >> .envRegistry
+  echo "AwsStorageSecretKey=$AwsStorageSecretKey" >> .envRegistry
+  echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envRegistry
+  echo "AwsStorageRegion=$AwsStorageRegion" >> .envRegistry
+  echo "AwsEndpoint=$AwsEndpoint" >> .envRegistry
+
+
+
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry

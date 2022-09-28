@@ -18,4 +18,5 @@ public class AwsTerraformStateProperties {
     private String secretKey;
     private String bucketName;
     private String region;
+    private String endpoint;
 }

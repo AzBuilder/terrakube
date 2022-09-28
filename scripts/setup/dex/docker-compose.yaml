@@ -36,3 +36,6 @@ services:
 networks:
   dex:
     name: dex
+
+volumes:
+  data1-1:

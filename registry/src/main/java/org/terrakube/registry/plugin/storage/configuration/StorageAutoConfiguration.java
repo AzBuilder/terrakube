@@ -1,8 +1,10 @@
 package org.terrakube.registry.plugin.storage.configuration;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -70,11 +72,24 @@ public class StorageAutoConfiguration {
                         awsStorageServiceProperties.getSecretKey()
                 );
 
-                AmazonS3 s3client = AmazonS3ClientBuilder
-                        .standard()
-                        .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                        .withRegion(Regions.fromName(awsStorageServiceProperties.getRegion()))
-                        .build();
+                AmazonS3 s3client;
+                if (awsStorageServiceProperties.getEndpoint() != "") {
+                    ClientConfiguration clientConfiguration = new ClientConfiguration();
+                    clientConfiguration.setSignerOverride("AWSS3V4SignerType");
+                    
+                    s3client = AmazonS3ClientBuilder
+                            .standard()
+                            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsStorageServiceProperties.getEndpoint(), awsStorageServiceProperties.getRegion()))
+                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                            .withClientConfiguration(clientConfiguration)
+                            .withPathStyleAccessEnabled(true)
+                            .build();
+                } else
+                    s3client = AmazonS3ClientBuilder
+                            .standard()
+                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                            .withRegion(Regions.fromName(awsStorageServiceProperties.getRegion()))
+                            .build();
 
                 storageService = AwsStorageServiceImpl.builder()
                         .s3client(s3client)
