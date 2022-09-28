@@ -73,7 +73,7 @@ public class StorageAutoConfiguration {
                 );
 
                 AmazonS3 s3client;
-                if (awsStorageServiceProperties.getEndpoint() != "" && awsStorageServiceProperties.getEndpoint() != "${AwsEndpoint}") {
+                if (awsStorageServiceProperties.getEndpoint() != "") {
                     ClientConfiguration clientConfiguration = new ClientConfiguration();
                     clientConfiguration.setSignerOverride("AWSS3V4SignerType");
                     

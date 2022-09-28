@@ -78,7 +78,7 @@ public class TerraformStateAutoConfiguration {
                     );
                     AmazonS3 s3client = null;
 
-                    if (awsTerraformStateProperties.getEndpoint() != "" && awsTerraformStateProperties.getEndpoint() != "${AwsEndpoint}") {
+                    if (awsTerraformStateProperties.getEndpoint() != "") {
                         ClientConfiguration clientConfiguration = new ClientConfiguration();
                         clientConfiguration.setSignerOverride("AWSS3V4SignerType");
 
@@ -98,7 +98,7 @@ public class TerraformStateAutoConfiguration {
 
                     terraformState = AwsTerraformStateImpl.builder()
                             .s3client(s3client)
-                            .endpoint(awsTerraformStateProperties.getEndpoint() != "" && awsTerraformStateProperties.getEndpoint() != "${AwsEndpoint}"? awsTerraformStateProperties.getEndpoint(): null)
+                            .endpoint(awsTerraformStateProperties.getEndpoint() != "" ? awsTerraformStateProperties.getEndpoint(): null)
                             .bucketName(awsTerraformStateProperties.getBucketName())
                             .accessKey(awsTerraformStateProperties.getAccessKey())
                             .secretKey(awsTerraformStateProperties.getSecretKey())

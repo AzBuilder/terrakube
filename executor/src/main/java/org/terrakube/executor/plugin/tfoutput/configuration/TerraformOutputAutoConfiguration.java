@@ -69,7 +69,7 @@ public class TerraformOutputAutoConfiguration {
                     );
 
                     AmazonS3 s3client = null;
-                    if (awsTerraformOutputProperties.getEndpoint() != "" && awsTerraformOutputProperties.getEndpoint() != "${AwsEndpoint}") {
+                    if (awsTerraformOutputProperties.getEndpoint() != "") {
                         ClientConfiguration clientConfiguration = new ClientConfiguration();
                         clientConfiguration.setSignerOverride("AWSS3V4SignerType");
 
