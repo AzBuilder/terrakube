@@ -30,6 +30,28 @@
 		<gcp-libraries-bom.version>25.4.0</gcp-libraries-bom.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                <image>
+                    <bindings>
+                        <binding>${basedir}/../bindings/ca-certificates:/platform/bindings/ca-certificates</binding>
+                    </bindings>
+                </image>
+            </configuration>
+            <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-image</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
