@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 # Install Java Dependencies
 mvn clean install
 
@@ -18,11 +16,8 @@ docker run --user="root" --entrypoint launcher $(docker images executor -q) "apt
 docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER cnb' $(docker ps -lq) executortemp
 
 # Setup docker tags
-docker tag $(docker images api-server -q) azbuilder/api-server:$VERSION
 docker tag $(docker images api-server -q) azbuilder/api-server:latest
-docker tag $(docker images open-registry -q) azbuilder/open-registry:$VERSION
 docker tag $(docker images open-registry -q) azbuilder/open-registry:latest
-docker tag $(docker images executortemp -q) azbuilder/executor:$VERSION
 docker tag $(docker images executortemp -q) azbuilder/executor:latest
 
 # Build Terrakube UI Image
@@ -35,5 +30,4 @@ yarn install
 docker build -t terrakube-ui:latest  . 
 
 # Setup tags for UI
-docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:$VERSION
 docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:latest
