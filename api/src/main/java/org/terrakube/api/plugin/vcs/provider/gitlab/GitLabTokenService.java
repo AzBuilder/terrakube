@@ -13,26 +13,26 @@ public class GitLabTokenService {
     @Value("${org.terrakube.hostname}")
     private String hostname;
 
-    public GitLabToken getAccessToken(String vcsId, String clientId, String clientSecret, String tempCode) throws TokenException {
+    public GitLabToken getAccessToken(String vcsId, String clientId, String clientSecret, String tempCode, String callback) throws TokenException {
         GitLabToken gitLabToken = getWebClient().post().uri(uriBuilder -> uriBuilder.path("/oauth/token")
                         .queryParam("client_id", clientId)
                         .queryParam("client_secret", clientSecret)
                         .queryParam("code",tempCode)
                         .queryParam("grant_type", "authorization_code")
-                        .queryParam("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, vcsId))
+                        .queryParam("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, callback == null ? vcsId: callback))
                         .build())
                 .retrieve().bodyToMono(GitLabToken.class).block();
 
         return validateNewToken(gitLabToken);
     }
 
-    public GitLabToken refreshAccessToken(String vcsId, String clientId, String clientSecret, String refreshToken) throws TokenException {
+    public GitLabToken refreshAccessToken(String vcsId, String clientId, String clientSecret, String refreshToken, String callback) throws TokenException {
         GitLabToken gitLabToken = getWebClient().post().uri(uriBuilder -> uriBuilder.path("/oauth/token")
                         .queryParam("client_id", clientId)
                         .queryParam("client_secret", clientSecret)
                         .queryParam("refresh_token", refreshToken)
                         .queryParam("grant_type", "refresh_token")
-                        .queryParam("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, vcsId))
+                        .queryParam("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, callback == null ? vcsId: callback))
                         .build())
                 .retrieve().bodyToMono(GitLabToken.class).block();
 

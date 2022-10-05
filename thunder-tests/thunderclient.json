@@ -8,7 +8,7 @@
     "method": "POST",
     "sortNum": 10000,
     "created": "2022-07-22T21:25:36.069Z",
-    "modified": "2022-08-07T15:55:46.567Z",
+    "modified": "2022-10-05T22:58:37.177Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -18,7 +18,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"organization\",\n    \"attributes\": {\n      \"name\": \"hashicorp\",\n      \"description\": \"hashicorp organization\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"organization\",\n    \"attributes\": {\n      \"name\": \"hashicorp2\",\n      \"description\": \"hashicorp organization\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -1468,97 +1468,131 @@
     "_id": "156569f7-f8dc-4b3c-ac9e-ce30327290a4",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
-    "name": "create vcs GitHub",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+    "name": "GitHub Custom Callback",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
     "method": "POST",
     "sortNum": 510000,
     "created": "2022-07-22T21:25:36.120Z",
-    "modified": "2022-07-22T21:25:36.120Z",
+    "modified": "2022-10-05T21:56:42.189Z",
     "headers": [
       {
         "name": "Content-Type",
         "value": "application/vnd.api+json"
       }
     ],
+    "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitHub\",\n      \"description\": \"vcsGitHubDescription\",\n      \"vcsType\": \"GITHUB\",\n      \"clientId\": \"{{githubClientId}}\",\n      \"clientSecret\": \"{{githubClientSecret}}\",\n      \"accessToken\": \"{{githubAccessToken}}\"\n    }\n  }\n}"
-    }
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitHubCustom\",\n      \"description\": \"vcsGitHubDescription\",\n      \"vcsType\": \"GITHUB\",\n      \"clientId\": \"{{githubClientId}}\",\n      \"clientSecret\": \"{{githubClientSecret}}\",\n      \"callback\": \"{{githubCallback}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "33b6e9b9-502e-4ebf-886d-78ebb96489e4",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
-    "name": "create vcs Bitbucket",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+    "name": "Bitbucket Custom Callback",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
     "method": "POST",
     "sortNum": 520000,
     "created": "2022-07-22T21:25:36.121Z",
-    "modified": "2022-07-22T21:25:36.121Z",
+    "modified": "2022-10-05T23:02:50.987Z",
     "headers": [
       {
         "name": "Content-Type",
         "value": "application/vnd.api+json"
       }
     ],
+    "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsBitbucket\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"BITBUCKET\",\n      \"clientId\": \"{{bitbucketClientId}}\",\n      \"clientSecret\": \"{{bitbucketSecret}}\"\n    }\n  }\n}"
-    }
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsBitbucketCustom\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"BITBUCKET\",\n      \"clientId\": \"{{bitbucketClientId}}\",\n      \"clientSecret\": \"{{bitbucketClientSecret}}\",\n      \"callback\": \"{{bitbuketCallback}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "1cd4141d-ca34-42e9-ab3e-2a99d9653d95",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
-    "name": "create vcs GitLab",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+    "name": "GitLab Default Callback",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
     "method": "POST",
     "sortNum": 530000,
     "created": "2022-07-22T21:25:36.122Z",
-    "modified": "2022-07-22T21:25:36.122Z",
+    "modified": "2022-10-05T23:32:32.337Z",
     "headers": [
       {
         "name": "Content-Type",
         "value": "application/vnd.api+json"
       }
     ],
+    "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitLab\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"GITLAB\",\n      \"clientId\": \"{{gitlabClientId}}\",\n      \"clientSecret\": \"{{gitlabSecretId}}\"\n    }\n  }\n}"
-    }
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitLab\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"GITLAB\",\n      \"clientId\": \"{{gitlabClientId}}\",\n      \"clientSecret\": \"{{gitlabClientSecret}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "3fa5cd78-6b12-4364-9514-df4c9589e22c",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
-    "name": "create vcs Azure DevOps",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+    "name": "Azure DevOps Default Callback",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
     "method": "POST",
     "sortNum": 540000,
     "created": "2022-07-22T21:25:36.123Z",
-    "modified": "2022-07-22T21:25:36.123Z",
+    "modified": "2022-10-05T23:35:38.049Z",
     "headers": [
       {
         "name": "Content-Type",
         "value": "application/vnd.api+json"
       }
     ],
+    "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsAzDevOps\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"AZURE_DEVOPS\",\n      \"clientId\": \"{{azDevOpsClientId}}\",\n      \"clientSecret\": \"{{azDevOpsClientSecret}}\"\n    }\n  }\n}"
-    }
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsAzDevOps\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"AZURE_DEVOPS\",\n      \"clientId\": \"{{azDevOpsClientId}}\",\n      \"clientSecret\": \"{{azDevOpsClientSecret}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "8437eda1-5950-46e7-8a08-3f3384093b46",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
     "name": "search vcs",
-    "url": "{{server}}/api/v1/organization/{{organizationId}}/vcs",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
     "method": "GET",
     "sortNum": 550000,
     "created": "2022-07-22T21:25:36.124Z",
-    "modified": "2022-07-22T21:25:36.124Z",
-    "headers": []
+    "modified": "2022-10-05T21:44:50.394Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   },
   {
     "_id": "72d76e5b-423f-46e2-a875-ec6f4eed82ae",
@@ -2173,6 +2207,118 @@
     "modified": "2022-08-18T17:30:09.212Z",
     "headers": [],
     "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "1e69c61c-3fc1-4c9e-881c-ca60eb8e076e",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
+    "name": "GitHub Default Callback",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
+    "method": "POST",
+    "sortNum": 515000,
+    "created": "2022-10-05T21:56:31.461Z",
+    "modified": "2022-10-05T21:56:36.992Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitHub\",\n      \"description\": \"vcsGitHubDescription\",\n      \"vcsType\": \"GITHUB\",\n      \"clientId\": \"{{githubClientId}}\",\n      \"clientSecret\": \"{{githubClientSecret}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "20751b5e-ead3-4762-8d1c-6fd850d69b76",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
+    "name": "Bitbucket Default Callback",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
+    "method": "POST",
+    "sortNum": 525000,
+    "created": "2022-10-05T23:02:40.182Z",
+    "modified": "2022-10-05T23:15:48.452Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsBitbucket\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"BITBUCKET\",\n      \"clientId\": \"{{bitbucketClientId}}\",\n      \"clientSecret\": \"{{bitbucketClientSecret}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "c1c7f8e7-14da-4a75-a212-9cc68d0320c6",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
+    "name": "GitLab Custom Callback",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
+    "method": "POST",
+    "sortNum": 535000,
+    "created": "2022-10-05T23:20:04.760Z",
+    "modified": "2022-10-05T23:30:30.107Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsGitLabCustom\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"GITLAB\",\n      \"clientId\": \"{{gitlabClientId}}\",\n      \"clientSecret\": \"{{gitlabClientSecret}}\",\n      \"callback\": \"{{gitlabCallback}}\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "fe3bed63-da62-478c-99be-c82f57692ac5",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "f8b2bd0a-44ee-431d-8cfc-391c6d951a2b",
+    "name": "Azure DevOps Default Callback Copy",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/vcs",
+    "method": "POST",
+    "sortNum": 545000,
+    "created": "2022-10-05T23:35:29.661Z",
+    "modified": "2022-10-05T23:35:29.661Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"vcs\",\n    \"attributes\": {\n      \"name\": \"vcsAzDevOps\",\n      \"description\": \"vcsDescription\",\n      \"vcsType\": \"AZURE_DEVOPS\",\n      \"clientId\": \"{{azDevOpsClientId}}\",\n      \"clientSecret\": \"{{azDevOpsClientSecret}}\",\n      \"callback\": \"{{devopsCallback}}\"\n    }\n  }\n}",
+      "form": []
+    },
     "auth": {
       "type": "bearer",
       "bearer": "{{access_token}}"

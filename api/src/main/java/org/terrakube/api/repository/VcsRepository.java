@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface VcsRepository extends JpaRepository<Vcs, UUID> {
+
+    Vcs findByCallback(String callback);
 }

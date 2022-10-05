@@ -16,7 +16,7 @@ import java.time.Duration;
 public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
 
     @Override
-    public BitBucketToken getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException {
+    public BitBucketToken getAccessToken(String clientId, String clientSecret, String tempCode, String callback) throws TokenException {
         WebClient client = WebClient.builder()
                 .baseUrl("https://bitbucket.org")
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

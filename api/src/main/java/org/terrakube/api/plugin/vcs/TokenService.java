@@ -40,16 +40,22 @@ public class TokenService {
 
     @Transactional
     public boolean generateAccessToken(String vcsId, String tempCode) {
-        Vcs vcs = vcsRepository.getById(UUID.fromString(vcsId));
+        Vcs vcs = vcsRepository.findByCallback(vcsId);
+        if (vcs == null){
+            log.info("Searching VCS by Id");
+            vcs = vcsRepository.getById(UUID.fromString(vcsId));
+        } else {
+            log.info("VCS found with custom callback");
+        }
         int minutes = Calendar.getInstance().get(Calendar.MINUTE);
         try {
             switch (vcs.getVcsType()) {
                 case GITHUB:
-                    GitHubToken gitHubToken = gitHubTokenService.getAccessToken(vcs.getClientId(), vcs.getClientSecret(), tempCode);
+                    GitHubToken gitHubToken = gitHubTokenService.getAccessToken(vcs.getClientId(), vcs.getClientSecret(), tempCode, null);
                     vcs.setAccessToken(gitHubToken.getAccess_token());
                     break;
                 case BITBUCKET:
-                    BitBucketToken bitBucketToken = bitbucketTokenService.getAccessToken(vcs.getClientId(), vcs.getClientSecret(), tempCode);
+                    BitBucketToken bitBucketToken = bitbucketTokenService.getAccessToken(vcs.getClientId(), vcs.getClientSecret(), tempCode, null);
                     vcs.setAccessToken(bitBucketToken.getAccess_token());
                     vcs.setRefreshToken(bitBucketToken.getRefresh_token());
                     vcs.setTokenExpiration(new Date(System.currentTimeMillis() + bitBucketToken.getExpires_in() * 1000));
@@ -57,7 +63,7 @@ public class TokenService {
                     scheduleVcsService.createTask(String.format(QUARTZ_EVERY_60_MINUTES, minutes), vcsId);
                     break;
                 case GITLAB:
-                    GitLabToken gitLabToken = gitLabTokenService.getAccessToken(vcs.getId().toString(), vcs.getClientId(), vcs.getClientSecret(), tempCode);
+                    GitLabToken gitLabToken = gitLabTokenService.getAccessToken(vcs.getId().toString(), vcs.getClientId(), vcs.getClientSecret(), tempCode, vcs.getCallback());
                     vcs.setAccessToken(gitLabToken.getAccess_token());
                     vcs.setRefreshToken(gitLabToken.getRefresh_token());
                     vcs.setTokenExpiration(new Date(System.currentTimeMillis() + gitLabToken.getExpires_in() * 1000));
@@ -65,7 +71,7 @@ public class TokenService {
                     scheduleVcsService.createTask(String.format(QUARTZ_EVERY_60_MINUTES, minutes), vcsId);
                     break;
                 case AZURE_DEVOPS:
-                    AzDevOpsToken azDevOpsToken = azDevOpsTokenService.getAccessToken(vcs.getId().toString(), vcs.getClientSecret(), tempCode);
+                    AzDevOpsToken azDevOpsToken = azDevOpsTokenService.getAccessToken(vcs.getId().toString(), vcs.getClientSecret(), tempCode, vcs.getCallback());
                     vcs.setAccessToken(azDevOpsToken.getAccess_token());
                     vcs.setRefreshToken(azDevOpsToken.getRefresh_token());
                     vcs.setTokenExpiration(new Date(System.currentTimeMillis() + azDevOpsToken.getExpires_in() * 1000));
@@ -90,9 +96,10 @@ public class TokenService {
         return true;
     }
 
-    public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId, String clientSecret, String refreshToken) {
+    public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId, String clientSecret, String refreshToken, String callback) {
         Map<String, Object> tokenInformation = new HashMap<>();
         log.info("Renew Token before: {} {}", tokenExpiration, vcsId);
+
         switch (vcsType) {
             case BITBUCKET:
                 try {
@@ -106,7 +113,7 @@ public class TokenService {
                 break;
             case GITLAB:
                 try {
-                    GitLabToken gitLabToken = gitLabTokenService.refreshAccessToken(vcsId, clientId, clientSecret, refreshToken);
+                    GitLabToken gitLabToken = gitLabTokenService.refreshAccessToken(vcsId, clientId, clientSecret, refreshToken, callback);
                     tokenInformation.put("accessToken", gitLabToken.getAccess_token());
                     tokenInformation.put("refreshToken", gitLabToken.getRefresh_token());
                     tokenInformation.put("tokenExpiration", new Date(System.currentTimeMillis() + gitLabToken.getExpires_in() * 1000));
@@ -116,7 +123,7 @@ public class TokenService {
                 break;
             case AZURE_DEVOPS:
                 try {
-                    AzDevOpsToken azDevOpsToken = azDevOpsTokenService.refreshAccessToken(vcsId, clientSecret, refreshToken);
+                    AzDevOpsToken azDevOpsToken = azDevOpsTokenService.refreshAccessToken(vcsId, clientSecret, refreshToken, callback);
                     tokenInformation.put("accessToken", azDevOpsToken.getAccess_token());
                     tokenInformation.put("refreshToken", azDevOpsToken.getRefresh_token());
                     tokenInformation.put("tokenExpiration", new Date(System.currentTimeMillis() + azDevOpsToken.getExpires_in() * 1000));

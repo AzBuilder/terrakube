@@ -40,7 +40,8 @@ public class ScheduleVcs implements org.quartz.Job {
                     vcs.getTokenExpiration(),
                     vcs.getClientId(),
                     vcs.getClientSecret(),
-                    vcs.getRefreshToken());
+                    vcs.getRefreshToken(),
+                    vcs.getCallback());
 
             if (!newTokenInformation.isEmpty()) {
                 Vcs tempVcs = vcsRepository.getById(vcs.getId());
