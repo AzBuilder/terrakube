@@ -16,13 +16,13 @@ public class AzDevOpsTokenService {
     @Value("${org.terrakube.hostname}")
     private String hostname;
 
-    public AzDevOpsToken getAccessToken(String vcsId, String clientSecret, String tempCode) throws TokenException {
+    public AzDevOpsToken getAccessToken(String vcsId, String clientSecret, String tempCode, String callback) throws TokenException {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         formData.add("client_assertion", clientSecret);
         formData.add("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
         formData.add("assertion", tempCode);
-        formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, vcsId));
+        formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, callback == null ? vcsId: callback));
 
         AzDevOpsToken azDevOpsToken = getWebClient().post()
                 .uri("/oauth2/token")
@@ -34,13 +34,13 @@ public class AzDevOpsTokenService {
         return validateNewToken(azDevOpsToken);
     }
 
-    public AzDevOpsToken refreshAccessToken(String vcsId, String clientSecret, String refreshToken) throws TokenException {
+    public AzDevOpsToken refreshAccessToken(String vcsId, String clientSecret, String refreshToken, String callback) throws TokenException {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         formData.add("client_assertion", clientSecret);
         formData.add("grant_type", "refresh_token");
         formData.add("assertion", refreshToken);
-        formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, vcsId));
+        formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, callback == null ? vcsId: callback));
 
         AzDevOpsToken azDevOpsToken  = getWebClient().post()
                 .uri("/oauth2/token")

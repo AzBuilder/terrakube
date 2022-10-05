@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class GitHubTokenService implements GetAccessToken<GitHubToken> {
-    public GitHubToken getAccessToken(String clientId, String clientSecret, String tempCode) throws TokenException {
+    public GitHubToken getAccessToken(String clientId, String clientSecret, String tempCode, String callback) throws TokenException {
         WebClient client = WebClient.builder()
                 .baseUrl("https://github.com")
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

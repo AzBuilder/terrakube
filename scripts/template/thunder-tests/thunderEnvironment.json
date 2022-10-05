@@ -65,6 +65,54 @@
       {
         "name": "registryModuleVersion",
         "value": "v22.1.0"
+      },
+      {
+        "name": "githubClientId",
+        "value": ""
+      },
+      {
+        "name": "githubClientSecret",
+        "value": ""
+      },
+      {
+        "name": "githubCallback",
+        "value": "61c17182-f9dc-48c8-91d0-668f957a8941"
+      },
+      {
+        "name": "bitbucketClientId",
+        "value": ""
+      },
+      {
+        "name": "bitbucketClientSecret",
+        "value": ""
+      },
+      {
+        "name": "bitbucketCallback",
+        "value": "6350bbdd-4c4c-457a-a662-7c4a60bdb28a"
+      },
+      {
+        "name": "gitlabClientId",
+        "value": ""
+      },
+      {
+        "name": "gitlabClientSecret",
+        "value": ""
+      },
+      {
+        "name": "gitlabCallback",
+        "value": "254d9612-9bfa-4f0d-b712-00bc792a9789"
+      },
+      {
+        "name": "azdevopsClientId",
+        "value": ""
+      },
+      {
+        "name": "azdevopsClientSecret",
+        "value": ""
+      },
+      {
+        "name": "azdevopsCallback",
+        "value": "359f7079-74b2-4afc-9475-201e477d4648"
       }
     ]
   }
