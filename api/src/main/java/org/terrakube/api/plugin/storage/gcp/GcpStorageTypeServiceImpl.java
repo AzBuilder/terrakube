@@ -50,4 +50,14 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
                         String.format(GCP_STATE_JSON, organizationId, workspaceId, stateFileName)))
                 .getContent();
     }
+
+    @Override
+    public String saveContext(int jobId, String jobContext) {
+        return "";
+    }
+
+    @Override
+    public String getContext(int jobId) {
+        return "";
+    }
 }

@@ -72,4 +72,14 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
         }
         return data;
     }
+
+    @Override
+    public String saveContext(int jobId, String jobContext) {
+        return "";
+    }
+
+    @Override
+    public String getContext(int jobId) {
+        return "";
+    }
 }

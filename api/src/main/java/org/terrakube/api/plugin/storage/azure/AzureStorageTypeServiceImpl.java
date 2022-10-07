@@ -37,4 +37,14 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
         log.info("Searching: /tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
         return containerClient.getBlobClient(String.format("%s/%s/state/%s.json", organizationId, workspaceId, stateFileName)).downloadContent().toBytes();
     }
+
+    @Override
+    public String saveContext(int jobId, String jobContext) {
+        return "";
+    }
+
+    @Override
+    public String getContext(int jobId) {
+        return "";
+    }
 }
