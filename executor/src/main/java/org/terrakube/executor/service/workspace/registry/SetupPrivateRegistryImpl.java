@@ -42,7 +42,8 @@ public class SetupPrivateRegistryImpl implements SetupPrivateRegistry {
         this.internalSecret = internalSecret;
     }
 
-    private String generateAccessToken() {
+    @Override
+    public String generateAccessToken() {
         log.error("Generate Dex Authentication Private Token");
         String newToken = "";
 

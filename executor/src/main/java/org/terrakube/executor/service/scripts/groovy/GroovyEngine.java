@@ -7,6 +7,7 @@ import groovy.util.ScriptException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.terrakube.client.TerrakubeClient;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.scripts.CommandExecution;
@@ -14,6 +15,7 @@ import org.terrakube.executor.service.scripts.ScriptEngineService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.workspace.registry.SetupPrivateRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +34,14 @@ public class GroovyEngine implements CommandExecution {
 
     private TerrakubeClient terrakubeClient;
 
-    @Autowired
-    public GroovyEngine(TerrakubeClient terrakubeClient) {
+    private String terrakubeApi;
+
+    private SetupPrivateRegistry setupPrivateRegistry;
+
+    public GroovyEngine(TerrakubeClient terrakubeClient,SetupPrivateRegistry setupPrivateRegistry, @Value("${org.terrakube.api.url}") String terrakubeApi) {
         this.terrakubeClient = terrakubeClient;
+        this.terrakubeApi = terrakubeApi;
+        this.setupPrivateRegistry = setupPrivateRegistry;
     }
 
     @Override
@@ -94,6 +101,8 @@ public class GroovyEngine implements CommandExecution {
         sharedData.setVariable("terraformVersion", terraformJob.getTerraformVersion());
         sharedData.setVariable("source", terraformJob.getSource());
         sharedData.setVariable("branch", terraformJob.getBranch());
+        sharedData.setVariable("terrakubeApi", this.terrakubeApi);
+        sharedData.setVariable("terrakubeToken", setupPrivateRegistry.generateAccessToken());
         sharedData.setVariable("vcsType", terraformJob.getVcsType() != null ? terraformJob.getVcsType() : "");
         sharedData.setVariable("accessToken", terraformJob.getAccessToken() != null ? terraformJob.getAccessToken() : "");
 

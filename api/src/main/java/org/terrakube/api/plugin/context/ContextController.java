@@ -1,5 +1,7 @@
 package org.terrakube.api.plugin.context;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,14 @@ public class ContextController {
 
     @PostMapping(value= "/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> saveContext(@PathVariable("jobId") int jobId, @RequestBody String context) throws IOException {
-        String savedContext = storageTypeService.saveContext(jobId, context);
+        String savedContext = "{}";
+        try {
+            new ObjectMapper().readTree(context);
+            savedContext = storageTypeService.saveContext(jobId, context);
+        } catch (JacksonException e) {
+            log.error(e.getMessage());
+        }
+
         return new ResponseEntity<>(savedContext, HttpStatus.OK);
     }
 }
