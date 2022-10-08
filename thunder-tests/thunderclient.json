@@ -2135,11 +2135,11 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "c1a81dd8-d9bf-4164-9db5-334d4f40cae1",
     "name": "search PAT",
-    "url": "{{terrakubeApi}}/pat/v1",
+    "url": "{{terrakubeApi}}/context/v1/7",
     "method": "GET",
     "sortNum": 735000,
     "created": "2022-08-11T00:45:45.083Z",
-    "modified": "2022-08-11T00:48:44.875Z",
+    "modified": "2022-10-08T17:25:57.476Z",
     "headers": [
       {
         "name": "Content-Type",
