@@ -72,7 +72,7 @@ public class GroovyEngine implements CommandExecution {
 
             log.info("Groovy output script \n{}", terrakubeOutputString);
             output.accept(terrakubeOutputString != null ? terrakubeOutputString : "Groovy Script completed\n");
-        } catch (IOException | ResourceException | ScriptException exception) {
+        } catch (Exception exception) {
             log.error(exception.getMessage());
             executeSuccess = false;
             output.accept(exception.getMessage());
