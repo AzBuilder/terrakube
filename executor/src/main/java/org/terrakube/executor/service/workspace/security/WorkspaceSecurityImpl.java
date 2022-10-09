@@ -1,4 +1,4 @@
-package org.terrakube.executor.service.workspace.registry;
+package org.terrakube.executor.service.workspace.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -20,7 +20,7 @@ import java.util.Date;
 
 @Slf4j
 @Service
-public class SetupPrivateRegistryImpl implements SetupPrivateRegistry {
+public class WorkspaceSecurityImpl implements WorkspaceSecurity {
 
     private static final String ISSUER = "TerrakubeInternal";
     private static final String SUBJECT = "TerrakubeInternal (TOKEN)";
@@ -36,7 +36,7 @@ public class SetupPrivateRegistryImpl implements SetupPrivateRegistry {
 
     String internalSecret;
 
-    public SetupPrivateRegistryImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.client.secretKey}") String internalSecret) {
+    public WorkspaceSecurityImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.client.secretKey}") String internalSecret) {
         this.clientProperties = restClientProperties;
         this.registryDomain = registryDomain;
         this.internalSecret = internalSecret;
@@ -50,12 +50,12 @@ public class SetupPrivateRegistryImpl implements SetupPrivateRegistry {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.internalSecret));
 
         newToken = Jwts.builder()
-                .setIssuer(SetupPrivateRegistryImpl.ISSUER)
-                .setSubject(SetupPrivateRegistryImpl.SUBJECT)
-                .setAudience(SetupPrivateRegistryImpl.ISSUER)
-                .claim("email", SetupPrivateRegistryImpl.EMAIL)
+                .setIssuer(WorkspaceSecurityImpl.ISSUER)
+                .setSubject(WorkspaceSecurityImpl.SUBJECT)
+                .setAudience(WorkspaceSecurityImpl.ISSUER)
+                .claim("email", WorkspaceSecurityImpl.EMAIL)
                 .claim("email_verified", true)
-                .claim("name", SetupPrivateRegistryImpl.NAME)
+                .claim("name", WorkspaceSecurityImpl.NAME)
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
                 .signWith(key)
@@ -65,7 +65,24 @@ public class SetupPrivateRegistryImpl implements SetupPrivateRegistry {
     }
 
     @Override
-    public void addCredentials(File workingDirectory) {
+    public String generateAccessToken(int minutes) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.internalSecret));
+
+        return Jwts.builder()
+                .setIssuer(WorkspaceSecurityImpl.ISSUER)
+                .setSubject(WorkspaceSecurityImpl.SUBJECT)
+                .setAudience(WorkspaceSecurityImpl.ISSUER)
+                .claim("email", WorkspaceSecurityImpl.EMAIL)
+                .claim("email_verified", true)
+                .claim("name", WorkspaceSecurityImpl.NAME)
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(Date.from(Instant.now().plus(minutes, ChronoUnit.MINUTES)))
+                .signWith(key)
+                .compact();
+    }
+
+    @Override
+    public void addTerraformCredentials(File workingDirectory) {
 
         String token = generateAccessToken();
         String credentialFileContent = String.format(CREDENTIALS_CONTENT, registryDomain, token);
@@ -76,7 +93,9 @@ public class SetupPrivateRegistryImpl implements SetupPrivateRegistry {
                             FileUtils.getUserDirectoryPath().concat(CREDENTIALS_FILE_NAME)
                     )
             );
-            FileUtils.writeStringToFile(credentialFile, credentialFileContent, Charset.defaultCharset(), false);
+            synchronized (this) {
+                FileUtils.writeStringToFile(credentialFile, credentialFileContent, Charset.defaultCharset(), false);
+            }
         } catch (IOException e) {
             log.error(e.getMessage());
         }

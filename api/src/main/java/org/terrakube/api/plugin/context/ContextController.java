@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.storage.StorageTypeService;
+import org.terrakube.api.repository.JobRepository;
+import org.terrakube.api.rs.job.Job;
+import org.terrakube.api.rs.job.JobStatus;
 
 import java.io.IOException;
 
@@ -19,18 +22,22 @@ import java.io.IOException;
 public class ContextController {
     StorageTypeService storageTypeService;
 
-    @GetMapping(value= "/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    JobRepository jobRepository;
+
+    @GetMapping(value = "/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getContext(@PathVariable("jobId") int jobId) throws IOException {
         String context = storageTypeService.getContext(jobId);
         return new ResponseEntity<>(context, HttpStatus.OK);
     }
 
-    @PostMapping(value= "/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> saveContext(@PathVariable("jobId") int jobId, @RequestBody String context) throws IOException {
         String savedContext = "{}";
         try {
             new ObjectMapper().readTree(context);
-            savedContext = storageTypeService.saveContext(jobId, context);
+            Job job = jobRepository.getById(jobId);
+            if (job !=null && job.getStatus().equals(JobStatus.running))
+                savedContext = storageTypeService.saveContext(jobId, context);
         } catch (JacksonException e) {
             log.error(e.getMessage());
         }
