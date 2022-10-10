@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.repository.JobRepository;
@@ -30,15 +31,17 @@ public class ContextController {
         return new ResponseEntity<>(context, HttpStatus.OK);
     }
 
+    @Transactional
     @PostMapping(value = "/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> saveContext(@PathVariable("jobId") int jobId, @RequestBody String context) throws IOException {
         String savedContext = "{}";
         try {
             new ObjectMapper().readTree(context);
             Job job = jobRepository.getById(jobId);
+            log.info("Job exists {}", job == null ? true: false);
             if (job !=null && job.getStatus().equals(JobStatus.running))
                 savedContext = storageTypeService.saveContext(jobId, context);
-        } catch (JacksonException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 

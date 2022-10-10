@@ -2329,12 +2329,12 @@
     "_id": "4d2f9787-810f-4416-b5d1-27df85868daf",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "194c7fe2-cbc3-4f20-a153-5e1593fd7a85",
-    "name": "create PAT",
-    "url": "{{terrakubeApi}}/pat/v1",
+    "name": "set context",
+    "url": "{{terrakubeApi}}/context/v1/1",
     "method": "POST",
     "sortNum": 730000,
     "created": "2022-10-08T17:29:54.771Z",
-    "modified": "2022-10-08T17:29:54.771Z",
+    "modified": "2022-10-09T23:23:20.141Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -2351,25 +2351,18 @@
       "type": "bearer",
       "bearer": "{{access_token}}"
     },
-    "tests": [
-      {
-        "type": "set-env-var",
-        "custom": "json.data.id",
-        "action": "setto",
-        "value": "{{sshId}}"
-      }
-    ]
+    "tests": []
   },
   {
     "_id": "c46fa6ae-eb6d-4e5f-9c47-60711fdb7dc4",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "194c7fe2-cbc3-4f20-a153-5e1593fd7a85",
-    "name": "search PAT",
-    "url": "{{terrakubeApi}}/context/v1/{{jobId}}",
+    "name": "search context",
+    "url": "{{terrakubeApi}}/context/v1/3",
     "method": "GET",
     "sortNum": 735000,
     "created": "2022-10-08T17:29:54.772Z",
-    "modified": "2022-10-08T17:30:35.972Z",
+    "modified": "2022-10-10T00:01:53.162Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -2381,13 +2374,6 @@
       "type": "bearer",
       "bearer": "{{access_token}}"
     },
-    "tests": [
-      {
-        "type": "set-env-var",
-        "custom": "json.data.id",
-        "action": "setto",
-        "value": "{{sshId}}"
-      }
-    ]
+    "tests": []
   }
 ]

@@ -97,9 +97,9 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3Object s3object = s3client.getObject(bucketName, String.format(CONTEXT_JSON, jobId));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = new String(inputStream.getDelegateStream().readAllBytes(), StandardCharsets.UTF_8);;
-        } catch (IOException e) {
-            log.error(S3_ERROR_LOG,e.getMessage());
-            data = "";
+        } catch (Exception e) {
+            log.error(S3_ERROR_LOG, e.getMessage());
+            data = "{}";
         }
         return data;
     }
