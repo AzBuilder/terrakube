@@ -36,6 +36,7 @@ scripts/setup/minio/docker-compose.yaml
 .envExecutor
 .envRegistry
 .envUi
+.envAzure
 GITPOD.md
 
 terrakubeDemo1.key

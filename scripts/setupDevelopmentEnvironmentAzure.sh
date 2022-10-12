@@ -22,7 +22,7 @@ function generateApiVars(){
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
   TERRAKUBE_ADMIN_GROUP="CUSTOM_ADMIN_NAME"
 
-  StorageType="LOCAL"
+  StorageType="AZURE"
 
   JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
 
@@ -38,12 +38,16 @@ function generateApiVars(){
   echo "InternalSecret=$InternalSecret" >> .envApi
   echo "DexIssuerUri=$DexIssuerUri" >> .envApi
   echo "StorageType=$StorageType" >> .envApi
+
+  echo "AzureAccountName=$AZURE_STORAGE_NAME" >> .envApi
+  echo "AzureAccountKey=$AZURE_STORAGE_KEY" >> .envApi
+
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
-function generateRegistryVars(){
+function generateExecutorVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderApiUrl=$(gp url 8080)
@@ -57,8 +61,10 @@ function generateRegistryVars(){
 
   TerrakubeEnableSecurity=true
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  TerraformStateType=LocalTerraformStateImpl
-  TerraformOutputType=LocalTerraformOutputImpl
+  
+  TerraformStateType="AzureTerraformStateImpl"
+  TerraformOutputType="AzureTerraformOutputImpl"
+  
   ExecutorFlagBatch=false
   ExecutorFlagDisableAcknowledge=false
   TerrakubeToolsRepository=https://github.com/AzBuilder/terrakube-extensions.git
@@ -70,8 +76,17 @@ function generateRegistryVars(){
 
   echo "TerrakubeEnableSecurity=$TerrakubeEnableSecurity" >> .envExecutor
   echo "InternalSecret=$InternalSecret" >> .envExecutor
+  
   echo "TerraformStateType=$TerraformStateType" >> .envExecutor
+  echo "AzureTerraformStateResourceGroup=$AZURE_STORAGE_RG" >> .envExecutor
+  echo "AzureTerraformStateStorageAccountName=$AZURE_STORAGE_NAME" >> .envExecutor
+  echo "AzureTerraformStateStorageContainerName=tfstate" >> .envExecutor
+  echo "AzureTerraformStateStorageAccessKey=$AZURE_STORAGE_KEY" >> .envExecutor
+
   echo "TerraformOutputType=$TerraformOutputType" >> .envExecutor
+  echo "AzureTerraformOutputAccountName=$AZURE_STORAGE_NAME" >> .envExecutor
+  echo "AzureTerraformOutputAccountKey=$AZURE_STORAGE_KEY" >> .envExecutor
+
   echo "AzBuilderApiUrl=$AzBuilderApiUrl" >> .envExecutor
   echo "ExecutorFlagBatch=$ExecutorFlagBatch" >> .envExecutor
   echo "ExecutorFlagDisableAcknowledge=$ExecutorFlagDisableAcknowledge" >> .envExecutor
@@ -82,7 +97,7 @@ function generateRegistryVars(){
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
 }
 
-function generateExecutorVars(){
+function generateRegistryVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderRegistry=$(gp url 8075)
@@ -102,7 +117,8 @@ function generateExecutorVars(){
   TerrakubeEnableSecurity=true
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  RegistryStorageType=Local
+  RegistryStorageType=AzureStorageImpl
+
   AppClientId=example-app
 
   JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
@@ -117,7 +133,11 @@ function generateExecutorVars(){
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envRegistry
   echo "PatSecret=$PatSecret" >> .envRegistry
   echo "InternalSecret=$InternalSecret" >> .envRegistry
+
   echo "RegistryStorageType=$RegistryStorageType" >> .envRegistry
+  echo "AzureAccountName=$AZURE_STORAGE_NAME" >> .envRegistry
+  echo "AzureAccountKey=$AZURE_STORAGE_KEY" >> .envRegistry
+
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
@@ -244,6 +264,8 @@ function generateWorkspaceInformation(){
   sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
 }
 
+source .envAzure
+
 generateApiVars
 generateRegistryVars
 generateExecutorVars
@@ -256,5 +278,4 @@ if [ "$USER" = "gitpod" ]; then
   generateWorkspaceInformation
 fi
 
-cp ./scripts/template/azure/.envAzureSample .envAzure
 echo "Setup Development Environment Completed"
