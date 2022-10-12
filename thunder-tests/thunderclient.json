@@ -2358,11 +2358,11 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "194c7fe2-cbc3-4f20-a153-5e1593fd7a85",
     "name": "search context",
-    "url": "{{terrakubeApi}}/context/v1/3",
+    "url": "{{terrakubeApi}}/context/v1/1",
     "method": "GET",
     "sortNum": 735000,
     "created": "2022-10-08T17:29:54.772Z",
-    "modified": "2022-10-10T00:01:53.162Z",
+    "modified": "2022-10-12T23:26:27.539Z",
     "headers": [
       {
         "name": "Content-Type",

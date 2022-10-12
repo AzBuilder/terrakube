@@ -15,7 +15,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String CONTAINER_NAME_STATE = "tfstate";
     private static final String CONTAINER_NAME_OUTPUT = "tfoutput";
-    private static final String CONTEXT_FILE = "tfoutput/context/%s/context.json";
+    private static final String CONTEXT_FILE = "context/%s/context.json";
 
     @NonNull
     BlobServiceClient blobServiceClient;
@@ -55,14 +55,17 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
         BinaryData binaryData = BinaryData.fromBytes(jobContext.getBytes());
         blobClient.upload(binaryData, true);
-        return blobClient.getBlobUrl();
-
+        return jobContext;
     }
 
     @Override
     public String getContext(int jobId) {
-        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_OUTPUT);
         log.info("Searching: /tfoutput/context/{}/context.json", jobId);
-        return containerClient.getBlobClient(String.format(CONTEXT_FILE, jobId)).downloadContent().toString();
+        if (containerClient.getBlobClient(String.format(CONTEXT_FILE, jobId)).exists()) {
+            return containerClient.getBlobClient(String.format(CONTEXT_FILE, jobId)).downloadContent().toString();
+        } else {
+            return "{}";
+        }
     }
 }
