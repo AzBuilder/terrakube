@@ -256,4 +256,6 @@ if [ "$USER" = "gitpod" ]; then
   generateWorkspaceInformation
 fi
 
+cp ./scripts/template/azure/.envAzureSample .envAzure
+cp ./scripts/template/google/.envGcpSample .envGcp
 echo "Setup Development Environment Completed"

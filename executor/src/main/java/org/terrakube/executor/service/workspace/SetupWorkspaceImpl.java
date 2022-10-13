@@ -9,7 +9,7 @@ import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
 import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder;
 import org.eclipse.jgit.util.FS;
 import org.terrakube.executor.service.mode.TerraformJob;
-import org.terrakube.executor.service.workspace.registry.SetupPrivateRegistry;
+import org.terrakube.executor.service.workspace.security.WorkspaceSecurity;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -35,12 +35,12 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     private static final String SSH_EXECUTOR_JOB = "%s/.terraform-spring-boot/ssh/executor/%s";
 
     OkHttpClient httpClient;
-    SetupPrivateRegistry setupPrivateRegistry;
+    WorkspaceSecurity workspaceSecurity;
     boolean enableRegistrySecurity;
 
-    public SetupWorkspaceImpl(OkHttpClient httpClient, SetupPrivateRegistry setupPrivateRegistry, @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity) {
+    public SetupWorkspaceImpl(OkHttpClient httpClient, WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity) {
         this.httpClient = httpClient;
-        this.setupPrivateRegistry = setupPrivateRegistry;
+        this.workspaceSecurity = workspaceSecurity;
         this.enableRegistrySecurity = enableRegistrySecurity;
     }
 
@@ -51,7 +51,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
             downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
             if (enableRegistrySecurity)
-                setupPrivateRegistry.addCredentials(workspaceCloneFolder);
+                workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
         } catch (IOException e) {
             log.error(e.getMessage());
         }

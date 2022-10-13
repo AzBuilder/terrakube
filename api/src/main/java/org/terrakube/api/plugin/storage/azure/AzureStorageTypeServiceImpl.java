@@ -1,5 +1,7 @@
 package org.terrakube.api.plugin.storage.azure;
 
+import com.azure.core.util.BinaryData;
+import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import lombok.Builder;
@@ -13,6 +15,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String CONTAINER_NAME_STATE = "tfstate";
     private static final String CONTAINER_NAME_OUTPUT = "tfoutput";
+    private static final String CONTEXT_FILE = "context/%s/context.json";
 
     @NonNull
     BlobServiceClient blobServiceClient;
@@ -21,7 +24,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_OUTPUT);
         log.info("Searching: /tfoutput/{}/{}/{}.tfoutput", organizationId, jobId, stepId);
-        return containerClient.getBlobClient(String.format("%s/%s/%s.tfoutput",organizationId, jobId, stepId)).downloadContent().toBytes();
+        return containerClient.getBlobClient(String.format("%s/%s/%s.tfoutput", organizationId, jobId, stepId)).downloadContent().toBytes();
     }
 
     @Override
@@ -36,5 +39,33 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
         log.info("Searching: /tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
         return containerClient.getBlobClient(String.format("%s/%s/state/%s.json", organizationId, workspaceId, stateFileName)).downloadContent().toBytes();
+    }
+
+    @Override
+    public String saveContext(int jobId, String jobContext) {
+        BlobContainerClient contextContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_OUTPUT);
+
+        log.info("contextContainerClient.exists {}", contextContainerClient.exists());
+        if (!contextContainerClient.exists()) {
+            contextContainerClient.create();
+        }
+        String blobName = String.format(CONTEXT_FILE, jobId);
+        log.info("Context file: {}", blobName);
+        BlobClient blobClient = contextContainerClient.getBlobClient(blobName);
+
+        BinaryData binaryData = BinaryData.fromBytes(jobContext.getBytes());
+        blobClient.upload(binaryData, true);
+        return jobContext;
+    }
+
+    @Override
+    public String getContext(int jobId) {
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_OUTPUT);
+        log.info("Searching: /tfoutput/context/{}/context.json", jobId);
+        if (containerClient.getBlobClient(String.format(CONTEXT_FILE, jobId)).exists()) {
+            return containerClient.getBlobClient(String.format(CONTEXT_FILE, jobId)).downloadContent().toString();
+        } else {
+            return "{}";
+        }
     }
 }

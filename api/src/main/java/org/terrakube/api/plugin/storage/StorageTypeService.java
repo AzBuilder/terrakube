@@ -7,4 +7,8 @@ public interface StorageTypeService {
     byte[] getTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId);
 
     byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName);
+
+    String saveContext(int jobId, String jobContext);
+
+    String getContext(int jobId);
 }

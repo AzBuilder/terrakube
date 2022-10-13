@@ -2,21 +2,19 @@ package org.terrakube.executor.service.scripts.groovy;
 
 import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.terrakube.client.TerrakubeClient;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.scripts.CommandExecution;
 import org.terrakube.executor.service.scripts.ScriptEngineService;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.workspace.security.WorkspaceSecurity;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -32,9 +30,14 @@ public class GroovyEngine implements CommandExecution {
 
     private TerrakubeClient terrakubeClient;
 
-    @Autowired
-    public GroovyEngine(TerrakubeClient terrakubeClient) {
+    private String terrakubeApi;
+
+    private WorkspaceSecurity workspaceSecurity;
+
+    public GroovyEngine(TerrakubeClient terrakubeClient, WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.api.url}") String terrakubeApi) {
         this.terrakubeClient = terrakubeClient;
+        this.terrakubeApi = terrakubeApi;
+        this.workspaceSecurity = workspaceSecurity;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class GroovyEngine implements CommandExecution {
 
             log.info("Groovy output script \n{}", terrakubeOutputString);
             output.accept(terrakubeOutputString != null ? terrakubeOutputString : "Groovy Script completed\n");
-        } catch (IOException | ResourceException | ScriptException exception) {
+        } catch (Exception exception) {
             log.error(exception.getMessage());
             executeSuccess = false;
             output.accept(exception.getMessage());
@@ -94,6 +97,8 @@ public class GroovyEngine implements CommandExecution {
         sharedData.setVariable("terraformVersion", terraformJob.getTerraformVersion());
         sharedData.setVariable("source", terraformJob.getSource());
         sharedData.setVariable("branch", terraformJob.getBranch());
+        sharedData.setVariable("terrakubeApi", this.terrakubeApi);
+        sharedData.setVariable("terrakubeToken", workspaceSecurity.generateAccessToken(5));
         sharedData.setVariable("vcsType", terraformJob.getVcsType() != null ? terraformJob.getVcsType() : "");
         sharedData.setVariable("accessToken", terraformJob.getAccessToken() != null ? terraformJob.getAccessToken() : "");
 
