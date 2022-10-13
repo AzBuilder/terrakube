@@ -278,4 +278,4 @@ if [ "$USER" = "gitpod" ]; then
   generateWorkspaceInformation
 fi
 
-echo "Setup Development Environment Completed"
+echo "Setup Development Environment Azure Completed"
