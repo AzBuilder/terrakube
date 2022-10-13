@@ -22,9 +22,10 @@ function generateApiVars(){
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
   TERRAKUBE_ADMIN_GROUP="CUSTOM_ADMIN_NAME"
 
-  StorageType="LOCAL"
+  StorageType="GCP"
 
   JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
+  GCP_CREDENTIALS_JSON_B64=$(echo $GCP_CREDENTIALS_JSON | base64  -w 0)
 
   rm -f .envApi
 
@@ -38,12 +39,17 @@ function generateApiVars(){
   echo "InternalSecret=$InternalSecret" >> .envApi
   echo "DexIssuerUri=$DexIssuerUri" >> .envApi
   echo "StorageType=$StorageType" >> .envApi
+
+  echo "GcpStorageProjectId=$GCP_PROJECT_ID" >> .envApi
+  echo "GcpStorageBucketName=$GCP_BUCKET_NAME" >> .envApi
+  echo "GcpStorageCredentialsBase64=$GCP_CREDENTIALS_JSON_B64" >> .envApi
+
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
-function generateRegistryVars(){
+function generateExecutorVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderApiUrl=$(gp url 8080)
@@ -57,8 +63,11 @@ function generateRegistryVars(){
 
   TerrakubeEnableSecurity=true
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  TerraformStateType=LocalTerraformStateImpl
-  TerraformOutputType=LocalTerraformOutputImpl
+  
+  TerraformStateType="GcpTerraformStateImpl"
+  TerraformOutputType="GcpTerraformOutputImpl"
+  GCP_CREDENTIALS_JSON_B64=$(echo $GCP_CREDENTIALS_JSON | base64  -w 0)
+  
   ExecutorFlagBatch=false
   ExecutorFlagDisableAcknowledge=false
   TerrakubeToolsRepository=https://github.com/AzBuilder/terrakube-extensions.git
@@ -70,8 +79,17 @@ function generateRegistryVars(){
 
   echo "TerrakubeEnableSecurity=$TerrakubeEnableSecurity" >> .envExecutor
   echo "InternalSecret=$InternalSecret" >> .envExecutor
+  
   echo "TerraformStateType=$TerraformStateType" >> .envExecutor
+  echo "GcpTerraformStateProjectId=$GCP_PROJECT_ID" >> .envExecutor
+  echo "GcpTerraformStateBucketName=$GCP_BUCKET_NAME" >> .envExecutor
+  echo "GcpTerraformStateCredentials=$GCP_CREDENTIALS_JSON_B64" >> .envExecutor
+
   echo "TerraformOutputType=$TerraformOutputType" >> .envExecutor
+  echo "GcpTerraformOutputProjectId=$GCP_PROJECT_ID" >> .envExecutor
+  echo "GcpTerraformOutputBucketName=$GCP_BUCKET_NAME" >> .envExecutor
+  echo "GcpTerraformOutputCredentials=$GCP_CREDENTIALS_JSON_B64" >> .envExecutor
+
   echo "AzBuilderApiUrl=$AzBuilderApiUrl" >> .envExecutor
   echo "ExecutorFlagBatch=$ExecutorFlagBatch" >> .envExecutor
   echo "ExecutorFlagDisableAcknowledge=$ExecutorFlagDisableAcknowledge" >> .envExecutor
@@ -82,7 +100,7 @@ function generateRegistryVars(){
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
 }
 
-function generateExecutorVars(){
+function generateRegistryVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderRegistry=$(gp url 8075)
@@ -102,7 +120,9 @@ function generateExecutorVars(){
   TerrakubeEnableSecurity=true
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  RegistryStorageType=Local
+  RegistryStorageType=GcpStorageImpl
+  GCP_CREDENTIALS_JSON_B64=$(echo $GCP_CREDENTIALS_JSON | base64  -w 0)
+
   AppClientId=example-app
 
   JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
@@ -117,7 +137,12 @@ function generateExecutorVars(){
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envRegistry
   echo "PatSecret=$PatSecret" >> .envRegistry
   echo "InternalSecret=$InternalSecret" >> .envRegistry
+
   echo "RegistryStorageType=$RegistryStorageType" >> .envRegistry
+  echo "GcpStorageProjectId=$GCP_PROJECT_ID" >> .envRegistry
+  echo "GcpStorageBucketName=$GCP_BUCKET_NAME" >> .envRegistry
+  echo "GcpStorageCredentialsBase64=$GCP_CREDENTIALS_JSON_B64" >> .envRegistry
+
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
@@ -244,6 +269,8 @@ function generateWorkspaceInformation(){
   sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
 }
 
+source .envGcp
+
 generateApiVars
 generateRegistryVars
 generateExecutorVars
@@ -256,6 +283,4 @@ if [ "$USER" = "gitpod" ]; then
   generateWorkspaceInformation
 fi
 
-cp ./scripts/template/azure/.envAzureSample .envAzure
-cp ./scripts/template/google/.envGcpSample .envGcp
 echo "Setup Development Environment Completed"

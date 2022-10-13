@@ -52,6 +52,7 @@ tasks:
       chmod +x scripts/setupDevelopmentEnvironment.sh &&
       chmod +x scripts/setupDevelopmentEnvironmentMinio.sh &&
       chmod +x scripts/setupDevelopmentEnvironmentAzure.sh &&
+      chmod +x scripts/setupDevelopmentEnvironmentGcp.sh &&
       chmod +x scripts/build/terrakubeBuild.sh &&
       chmod +x scripts/build/generateSampleCaCerts.sh 
     command: scripts/setupDevelopmentEnvironment.sh
