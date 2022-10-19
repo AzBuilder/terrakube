@@ -59,6 +59,7 @@ public class ExecutorService {
 
         HashMap<String, String> variables = new HashMap<>();
         HashMap<String, String> environmentVariables = new HashMap<>();
+        environmentVariables.put("TF_IN_AUTOMATION","1");
         List<Variable> variableList = job.getWorkspace().getVariable();
         List<Globalvar> globalvarList = job.getOrganization().getGlobalvar();
         if (variableList != null)
