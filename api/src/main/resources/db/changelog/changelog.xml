@@ -27,4 +27,5 @@
     <include file="/db/changelog/local/changelog-2.6.0-workspace-lock.xml"/>
     <include file="/db/changelog/local/changelog-2.6.0-team-update.xml"/>
     <include file="/db/changelog/local/changelog-2.8.0-vcs-callback.xml"/>
+    <include file="/db/changelog/local/changelog-2.8.0-commit-id.xml"/>
 </databaseChangeLog>

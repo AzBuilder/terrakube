@@ -37,6 +37,9 @@ public class Job extends GenericAuditFields {
     @Column(name = "output")
     private String output;
 
+    @Column(name = "commit_id")
+    private String commitId;
+
     @Column(name = "terraform_plan")
     private String terraformPlan;
 
