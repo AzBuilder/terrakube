@@ -2,6 +2,7 @@ package org.terrakube.executor.service.workspace;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.sshd.JGitKeyCache;
 import org.eclipse.jgit.transport.sshd.ServerKeyDatabase;
@@ -92,6 +93,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .call();
             }
 
+            getCommitId(gitCloneFolder);
 
             log.info("Copy files from folder {} to {}", gitCloneFolder.getPath() + workspaceFolder, gitCloneFolder.getParentFile().getPath());
             File finalWorkspaceFolder = new File(gitCloneFolder.getPath() + workspaceFolder);
@@ -110,6 +112,26 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
         } catch (GitAPIException ex) {
             log.error(ex.getMessage());
+        }
+    }
+
+    private void getCommitId(File gitCloneFolder){
+        RevCommit latestCommit = null;
+        try {
+            latestCommit = Git.init().setDirectory(gitCloneFolder).call().
+                    log().
+                    setMaxCount(1).
+                    call().
+                    iterator().
+                    next();
+            String latestCommitHash = latestCommit.getName();
+            log.info("Commit Id: {}", latestCommitHash);
+            String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getParentFile().getPath());
+            log.info("Writing commit id to {}", commitInfoFile);
+            FileUtils.writeStringToFile(new File(commitInfoFile), latestCommitHash, Charset.defaultCharset());
+
+        } catch (GitAPIException | IOException e) {
+            log.error(e.getMessage());
         }
     }
 
