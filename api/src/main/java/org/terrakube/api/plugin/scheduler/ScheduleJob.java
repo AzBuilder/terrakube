@@ -53,7 +53,7 @@ public class ScheduleJob implements org.quartz.Job {
 
         switch (job.getStatus()) {
             case pending:
-                executePendingJob(job);
+                executePendingJob(job, jobExecutionContext);
                 break;
             case approved:
                 executeApprovedJobs(job);
@@ -62,12 +62,7 @@ public class ScheduleJob implements org.quartz.Job {
                 log.info("Job {} running", job.getId());
                 break;
             case completed:
-                try {
-                    log.info("Deleting Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
-                    jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
-                } catch (SchedulerException e) {
-                    log.error(e.getMessage());
-                }
+                removeJobContext(job, jobExecutionContext);
                 unlockWorkspace(job);
                 break;
             case cancelled:
@@ -88,7 +83,7 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
-    private void executePendingJob(Job job) {
+    private void executePendingJob(Job job, JobExecutionContext jobExecutionContext) {
         job = tclService.initJobConfiguration(job);
 
         Optional<Flow> flow = Optional.ofNullable(tclService.getNextFlow(job));
@@ -121,9 +116,24 @@ public class ScheduleJob implements org.quartz.Job {
                     break;
             }
         } else {
-            job.setStatus(JobStatus.completed);
-            jobRepository.save(job);
-            log.info("Update Job {} to completed", job.getId());
+            completeJob(job);
+            removeJobContext(job, jobExecutionContext);
+            unlockWorkspace(job);
+        }
+    }
+
+    private void completeJob(Job job){
+        job.setStatus(JobStatus.completed);
+        jobRepository.save(job);
+        log.info("Update Job {} to completed", job.getId());
+    }
+
+    private void removeJobContext(Job job, JobExecutionContext jobExecutionContext){
+        try {
+            log.info("Deleting Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
+            jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+        } catch (SchedulerException e) {
+            log.error(e.getMessage());
         }
     }
 
