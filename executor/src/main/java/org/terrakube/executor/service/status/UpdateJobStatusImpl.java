@@ -27,10 +27,11 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     ExecutorFlagsProperties executorFlagsProperties;
 
     @Override
-    public void setRunningStatus(TerraformJob terraformJob) {
+    public void setRunningStatus(TerraformJob terraformJob, String commitId) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
             Job job = terrakubeClient.getJobById(terraformJob.getOrganizationId(), terraformJob.getJobId()).getData();
             job.getAttributes().setStatus("running");
+            job.getAttributes().setCommitId(commitId);
 
             JobRequest jobRequest = new JobRequest();
             jobRequest.setData(job);
@@ -40,11 +41,11 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     }
 
     @Override
-    public void setCompletedStatus(boolean successful, TerraformJob terraformJob, String jobOutput, String jobErrorOutput, String jobPlan) {
+    public void setCompletedStatus(boolean successful, TerraformJob terraformJob, String jobOutput, String jobErrorOutput, String jobPlan, String commitId) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
             updateStepStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput);
             if(!isJobCancelled(terraformJob))
-                updateJobStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput, jobPlan);
+                updateJobStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput, jobPlan, commitId);
         }
     }
 
@@ -60,7 +61,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         }
     }
 
-    private void updateJobStatus(boolean successful, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput, String jobPlan) {
+    private void updateJobStatus(boolean successful, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput, String jobPlan, String commitId) {
         Job job = terrakubeClient.getJobById(organizationId, jobId).getData();
         job.getAttributes().setStatus(successful ? "pending" : "failed");
 
@@ -71,6 +72,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
                 job.getAttributes().getOutput() == null ? "" : job.getAttributes().getOutput() + " Step " + stepId + " completed\n"
         );
         job.getAttributes().setTerraformPlan(jobPlan);
+        job.getAttributes().setCommitId(commitId);
 
         JobRequest jobRequest = new JobRequest();
         jobRequest.setData(job);

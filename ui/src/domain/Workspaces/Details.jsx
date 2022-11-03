@@ -286,7 +286,7 @@ export const WorkspaceDetails = (props) => {
                               description={
                                 <span>
                                   {" "}
-                                  #job-{item.id} | <b>{item.createdBy}</b>{" "}
+                                  #job-{item.id} | commitId {item.commitId?.substring(0,6)} | <b>{item.createdBy}</b> {" "}
                                   triggered via UI
                                 </span>
                               }
@@ -445,6 +445,7 @@ function setupWorkspaceIncludes(
           id: element.id,
           title: "Queue manually using Terraform",
           statusColor: finalColor,
+          commitId: element.attributes.commitId,
           latestChange: DateTime.fromISO(
             element.attributes.createdDate
           ).toRelative(),
