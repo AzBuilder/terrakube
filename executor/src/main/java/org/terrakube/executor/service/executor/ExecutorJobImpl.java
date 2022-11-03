@@ -3,6 +3,7 @@ package org.terrakube.executor.service.executor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.TextStringBuilder;
 import org.terrakube.executor.configuration.ExecutorFlagsProperties;
 import org.terrakube.executor.service.mode.TerraformJob;
@@ -14,8 +15,8 @@ import org.terrakube.executor.service.terraform.TerraformExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
@@ -36,8 +37,8 @@ public class ExecutorJobImpl implements ExecutorJob {
         log.info("Create Job for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
         boolean executionSuccess = true;
         File workspaceFolder = setupWorkspace.prepareWorkspace(terraformJob);
-
-        updateJobStatus.setRunningStatus(terraformJob);
+        String commitId = getCommitId(workspaceFolder);
+        updateJobStatus.setRunningStatus(terraformJob, commitId);
         ExecutorJobResult terraformResult = new ExecutorJobResult();
         switch (terraformJob.getType()) {
             case "terraformPlan":
@@ -71,8 +72,10 @@ public class ExecutorJobImpl implements ExecutorJob {
                 break;
         }
 
+
+
         executionSuccess = terraformResult.isSuccessfulExecution();
-        updateJobStatus.setCompletedStatus(executionSuccess, terraformJob, terraformResult.getOutputLog(), terraformResult.getOutputErrorLog(), terraformResult.getPlanFile());
+        updateJobStatus.setCompletedStatus(executionSuccess, terraformJob, terraformResult.getOutputLog(), terraformResult.getOutputErrorLog(), terraformResult.getPlanFile(), commitId);
 
         try {
             FileUtils.cleanDirectory(workspaceFolder);
@@ -82,5 +85,17 @@ public class ExecutorJobImpl implements ExecutorJob {
 
         if (executorFlagsProperties.isBatch())
             shutdownService.shutdownApplication();
+    }
+
+    private static String getCommitId(File workspaceFolder) {
+        String commitId = "";
+        try {
+            final File commitInformation = new File(String.format("%s/commitHash.info", workspaceFolder.getPath()));
+            final InputStream commitIdStream = new DataInputStream(new FileInputStream(commitInformation));
+            commitId = IOUtils.toString(commitIdStream, Charset.defaultCharset());
+        }catch (IOException e){
+            log.error(e.getMessage());
+        }
+        return commitId;
     }
 }
