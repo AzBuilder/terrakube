@@ -266,7 +266,7 @@ export const CreateModule = () => {
               <div className="workflowDescription2 App-text">
               Choose the repository that hosts your module source code. The format of your repository name should be <b>{"terraform-<PROVIDER>-<NAME>"}</b>.
               </div>
-              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/Terrakube/terraform-sample-repository.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true },{ type: 'url'}]}>
+              <Form.Item name="source" label="Git repo" tooltip="e.g. https://github.com/Terrakube/terraform-sample-repository.git or git@github.com:AzBuilder/terraform-azurerm-webapp-sample.git" extra=" Git repo must be a valid git url using either https or ssh protocol." rules={[{ required: true , pattern: "((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)(/)?" }]}>
                 <Input />
               </Form.Item>
               <Form.Item>
