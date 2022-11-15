@@ -11,6 +11,7 @@ import {
   Breadcrumb,
   Tabs,
   List,
+  Space,
   Avatar,
   Tag,
   Form,
@@ -20,6 +21,7 @@ import {
   Spin,
   Switch,
   Typography,
+  Popconfirm
 } from "antd";
 import { compareVersions } from "./Workspaces";
 import { CreateJob } from "../Jobs/Create";
@@ -35,6 +37,7 @@ import {
   ExclamationCircleOutlined,
   StopOutlined,
   InfoCircleOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
@@ -184,7 +187,6 @@ export const WorkspaceDetails = (props) => {
   };
 
   const onDelete = (values) => {
-    setWaiting(true);
     const body = {
       data: {
         type: "workspace",
@@ -204,11 +206,12 @@ export const WorkspaceDetails = (props) => {
       .then((response) => {
         console.log(response);
         if (response.status == "204") {
+          console.log(response);
           message.success("Workspace deleted successfully");
+          history.push(`/organizations/${organizationId}/workspaces`);
         } else {
           message.error("Workspace deletion failed");
         }
-        setWaiting(false);
       });
   };
 
@@ -419,18 +422,32 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
                       </Form>
                     </Spin>
-                    <h1>Delete this Workspace</h1>
+                    <h1>Delete Workspace</h1>
                     <div className="App-Text">Deleting the workspace will permanently delete the information. Please be certain that you understand this. This action cannot be undone.</div>
-                    <Form
-                        onFinish={onDelete}
-                        layout="vertical"
-                        name="form-settings"
+                    <Popconfirm
+                        onConfirm={() => {
+                          onDelete(id);
+                        }}
+                        style={{ width: "100%" }}
+                        title={
+                          <p>
+                            Workspace will be
+                            permanently deleted <br /> from this organization.
+                            <br />
+                            Are you sure?
+                          </p>
+                        }
+                        okText="Yes"
+                        cancelText="No"
+                        placement="bottom"
                       >
-                        <Form.Item>
-                          <Button type="primary" danger htmlType="submit">Delete this Workspace</Button>
-                        </Form.Item>
-
-                    </Form>
+                        <Button type="default" danger style={{ width: "100%" }}>
+                          <Space>
+                            <DeleteOutlined />
+                            Delete from Terrakube
+                          </Space>
+                        </Button>
+                      </Popconfirm>
                   </div>
                 </TabPane>
               </Tabs>
