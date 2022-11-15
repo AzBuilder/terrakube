@@ -11,6 +11,7 @@ import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.workspace.history.History;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Where(clause = "deleted = 0")
 public class Workspace {
 
     @Id
@@ -49,6 +51,9 @@ public class Workspace {
 
     @Column(name = "locked")
     private boolean locked;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 
     @Column(name = "terraform_version")
     private String terraformVersion;

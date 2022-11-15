@@ -183,6 +183,35 @@ export const WorkspaceDetails = (props) => {
       });
   };
 
+  const onDelete = (values) => {
+    setWaiting(true);
+    const body = {
+      data: {
+        type: "workspace",
+        id: id,
+        attributes: {
+          deleted: "true"
+        },
+      },
+    };
+
+    axiosInstance
+      .patch(`organization/${organizationId}/workspace/${id}`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        if (response.status == "204") {
+          message.success("Workspace deleted successfully");
+        } else {
+          message.error("Workspace deletion failed");
+        }
+        setWaiting(false);
+      });
+  };
+
   return (
     <Content style={{ padding: "0 50px" }}>
       <Breadcrumb style={{ margin: "16px 0" }}>
@@ -390,6 +419,18 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
                       </Form>
                     </Spin>
+                    <h1>Delete this Workspace</h1>
+                    <div className="App-Text">Deleting the workspace will permanently delete the information. Please be certain that you understand this. This action cannot be undone.</div>
+                    <Form
+                        onFinish={onDelete}
+                        layout="vertical"
+                        name="form-settings"
+                      >
+                        <Form.Item>
+                          <Button type="primary" danger htmlType="submit">Delete this Workspace</Button>
+                        </Form.Item>
+
+                    </Form>
                   </div>
                 </TabPane>
               </Tabs>
