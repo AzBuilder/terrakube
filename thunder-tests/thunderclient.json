@@ -2375,5 +2375,56 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "a7e6b907-b6cc-4629-921e-8838cc21b0d3",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "dc4da6d0-04b3-4c6a-bd75-485987136150",
+    "name": "create globalvar",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/globalvar",
+    "method": "POST",
+    "sortNum": 730000,
+    "created": "2022-11-24T23:15:27.654Z",
+    "modified": "2022-11-24T23:17:59.571Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\r\n  \"data\": {\r\n    \"type\": \"globalvar\",\r\n    \"attributes\": {\r\n      \"key\": \"SAMPLE\",\r\n      \"value\": \"HolaMundo\",\r\n      \"sensitive\": false,\r\n      \"hcl\": false,\r\n      \"category\": \"ENV\",\r\n      \"description\": \"Sample Environment Variable\"\r\n    }\r\n  }\r\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "7a201728-d273-4254-9737-b024754a4583",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "dc4da6d0-04b3-4c6a-bd75-485987136150",
+    "name": "search all globalvars",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/globalvar",
+    "method": "GET",
+    "sortNum": 735000,
+    "created": "2022-11-24T23:15:27.655Z",
+    "modified": "2022-11-24T23:21:10.664Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]

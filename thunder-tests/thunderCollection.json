@@ -214,6 +214,13 @@
         "containerId": "",
         "created": "2022-10-08T17:29:54.771Z",
         "sortNum": 132490.3
+      },
+      {
+        "_id": "dc4da6d0-04b3-4c6a-bd75-485987136150",
+        "name": "Step 14 - Global Variable",
+        "containerId": "",
+        "created": "2022-11-24T23:15:27.654Z",
+        "sortNum": 132495.1
       }
     ],
     "settings": {
