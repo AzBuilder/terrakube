@@ -4,6 +4,8 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
+import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.parameters.Variable;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @CreatePermission(expression = "team manage workspace")
 @UpdatePermission(expression = "team manage workspace")
 @DeletePermission(expression = "team manage workspace")
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = WorkspaceManageHook.class)
 @Include
 @Getter
 @Setter
