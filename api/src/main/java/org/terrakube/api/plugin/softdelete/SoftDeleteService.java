@@ -36,6 +36,8 @@ public class SoftDeleteService {
     }
 
     public void disableOrganization(Organization organization){
-
+        for(Workspace workspace: organization.getWorkspace()){
+            deleteWorkspace(workspace);
+        }
     }
 }
