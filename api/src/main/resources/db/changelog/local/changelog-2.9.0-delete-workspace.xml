@@ -9,7 +9,7 @@
             <column name="deleted" type="boolean" defaultValueBoolean="false"/>
         </addColumn>
         <update tableName="workspace">
-            <column name="locked" valueBoolean="false"/>
+            <column name="deleted" valueBoolean="false"/>
         </update>
     </changeSet>
 </databaseChangeLog>

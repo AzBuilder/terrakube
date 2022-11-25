@@ -26,7 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Where(clause = "deleted = 0")
+@Where(clause = "deleted = false")
 public class Workspace {
 
     @Id
