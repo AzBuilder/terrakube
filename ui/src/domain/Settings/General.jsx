@@ -1,7 +1,10 @@
 import { React, useState, useEffect } from "react";
-import { Button, Form,Input,message,Spin} from "antd";
+import { Button, Form,Input,message,Spin, Popconfirm, Space} from "antd";
 import axiosInstance from "../../config/axiosConfig";
 import {useParams} from "react-router-dom";
+import {
+  DeleteOutlined,
+} from "@ant-design/icons";
 import './Settings.css';
 
 export const GeneralSettings = () => {
@@ -51,6 +54,35 @@ export const GeneralSettings = () => {
         setWaiting(false);
 
       })
+  }
+  
+  const onDelete = (values) => {
+    const body = {
+      data: {
+        type: "organization",
+        id: orgid,
+        attributes: {
+          disabled: "true"
+        },
+      },
+    };
+
+    axiosInstance
+      .patch(`organization/${orgid}`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        if (response.status == "204") {
+          console.log(response);
+          message.success("Organization deleted successfully, please logout and login to Terrakube");
+          history.push(`/organizations/${orgid}`);
+        } else {
+          message.error("Organization deletion failed");
+        }
+      });
   };
   
   return (
@@ -75,11 +107,32 @@ export const GeneralSettings = () => {
       </Form></Spin>)}
       <h1>Delete this Organization</h1>
       <div className="App-text">
-        Deleting the devops-mindset organization will permanently delete all workspaces associated with it. Please be certain that you understand this. This action cannot be undone.
+        Deleting the organization will permanently delete all workspaces associated with it. Please be certain that you understand this.
       </div>
-      <Button type="primary" danger htmlType="submit">
-        Delete this organization
-      </Button>
+      <Popconfirm
+                        onConfirm={() => {
+                          onDelete(orgid);
+                        }}
+                        style={{ width: "100%" }}
+                        title={
+                          <p>
+                            Organization will be
+                            permanently deleted and all workspaces will be marked as deleted <br />
+                            <br />
+                            Are you sure?
+                          </p>
+                        }
+                        okText="Yes"
+                        cancelText="No"
+                        placement="bottom"
+                      >
+                        <Button type="default" danger style={{ width: "100%" }}>
+                          <Space>
+                            <DeleteOutlined />
+                            Delete from Terrakube
+                          </Space>
+                        </Button>
+                      </Popconfirm>
     </div>
   );
 }

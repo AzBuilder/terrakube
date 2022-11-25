@@ -100,7 +100,6 @@ public class Module extends GenericAuditFields {
                 transportConfigCallback = transport -> {
                     if(transport instanceof SshTransport) {
                         if( transport instanceof SshTransport) {
-                            SshTransport sshTransportSSh = (SshTransport) transport;
                             TerrakubeSshdSessionFactory terrakubeSshdSessionFactory = TerrakubeSshdSessionFactory
                                     .builder()
                                     .sshId(ssh.getId().toString())

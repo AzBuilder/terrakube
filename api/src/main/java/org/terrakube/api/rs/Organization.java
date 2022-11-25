@@ -3,6 +3,7 @@ package org.terrakube.api.rs;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.hooks.organization.OrganizationManageHook;
 import org.terrakube.api.rs.job.Job;
@@ -24,10 +25,12 @@ import java.util.UUID;
 @UpdatePermission(expression = "user is a superuser")
 @DeletePermission(expression = "user is a superuser")
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = OrganizationManageHook.class)
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = OrganizationManageHook.class)
 @Include
 @Getter
 @Setter
 @Entity
+@Where(clause = "disabled = false")
 public class Organization {
 
     @Id

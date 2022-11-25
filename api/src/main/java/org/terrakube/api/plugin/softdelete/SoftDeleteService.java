@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.repository.ScheduleRepository;
+import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
@@ -22,8 +23,10 @@ public class SoftDeleteService {
 
     ScheduleRepository scheduleRepository;
 
+    WorkspaceRepository workspaceRepository;
+
     @Transactional
-    public void deleteWorkspace(Workspace workspace){
+    public void disableWorkspaceSchedules(Workspace workspace){
         for(Schedule schedule: workspace.getSchedule()){
             try {
                 scheduleJobService.deleteJobTrigger(schedule.getId().toString());
@@ -37,7 +40,10 @@ public class SoftDeleteService {
 
     public void disableOrganization(Organization organization){
         for(Workspace workspace: organization.getWorkspace()){
-            deleteWorkspace(workspace);
+            disableWorkspaceSchedules(workspace);
+            workspace.setDeleted(true);
+            workspaceRepository.save(workspace);
         }
+
     }
 }
