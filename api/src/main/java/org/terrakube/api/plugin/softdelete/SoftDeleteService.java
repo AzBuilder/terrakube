@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.repository.ScheduleRepository;
+import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
@@ -22,8 +22,9 @@ public class SoftDeleteService {
 
     ScheduleRepository scheduleRepository;
 
-    @Transactional
-    public void deleteWorkspace(Workspace workspace){
+    WorkspaceRepository workspaceRepository;
+
+    public void disableWorkspaceSchedules(Workspace workspace){
         for(Schedule schedule: workspace.getSchedule()){
             try {
                 scheduleJobService.deleteJobTrigger(schedule.getId().toString());
@@ -36,8 +37,13 @@ public class SoftDeleteService {
     }
 
     public void disableOrganization(Organization organization){
+        log.info("Disable Organization Id: {}", organization.getId().toString());
         for(Workspace workspace: organization.getWorkspace()){
-            deleteWorkspace(workspace);
+            log.info("Disable Workspace: {}", workspace.getId().toString());
+            disableWorkspaceSchedules(workspace);
+            workspace.setDeleted(true);
+            workspaceRepository.save(workspace);
         }
+
     }
 }

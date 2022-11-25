@@ -23,7 +23,7 @@ public class WorkspaceManageHook implements LifeCycleHook<Workspace> {
         switch (operation){
             case UPDATE:
                 if(workspace.isDeleted()){
-                    softDeleteService.deleteWorkspace(workspace);
+                    softDeleteService.disableWorkspaceSchedules(workspace);
                 }
                 break;
             default:
