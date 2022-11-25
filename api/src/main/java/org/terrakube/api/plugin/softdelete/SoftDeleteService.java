@@ -39,7 +39,9 @@ public class SoftDeleteService {
     }
 
     public void disableOrganization(Organization organization){
+        log.info("Disable Organization Id: {}", organization.getId().toString());
         for(Workspace workspace: organization.getWorkspace()){
+            log.info("Disable Workspace: {}", workspace.getId().toString());
             disableWorkspaceSchedules(workspace);
             workspace.setDeleted(true);
             workspaceRepository.save(workspace);
