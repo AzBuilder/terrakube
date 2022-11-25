@@ -507,7 +507,7 @@
     "method": "POST",
     "sortNum": 190000,
     "created": "2022-07-22T21:25:36.088Z",
-    "modified": "2022-08-31T23:07:49.415Z",
+    "modified": "2022-11-15T13:32:44.434Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -517,7 +517,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"attributes\": {\n      \"name\": \"Docker Compose Sample2\",\n      \"source\": \"https://github.com/AzBuilder/terrakube-docker-compose.git\",\n      \"branch\": \"main\",\n      \"folder\": \"/\",\n      \"locked\": \"false\",\n      \"terraformVersion\": \"1.0.11\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"attributes\": {\n      \"name\": \"Docker Compose Sample22\",\n      \"source\": \"https://github.com/AzBuilder/terrakube-docker-compose.git\",\n      \"branch\": \"main\",\n      \"folder\": \"/\",\n      \"locked\": \"false\",\n      \"terraformVersion\": \"1.0.11\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {
@@ -2169,7 +2169,7 @@
     "method": "PATCH",
     "sortNum": 195000,
     "created": "2022-08-15T20:38:10.125Z",
-    "modified": "2022-08-15T20:46:09.677Z",
+    "modified": "2022-11-15T13:32:05.212Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -2179,7 +2179,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"id\": \"{{workspaceId}}\",\n    \"attributes\": {\n      \"locked\": \"true\"\n    }\n  }\n}",
+      "raw": "{\n  \"data\": {\n    \"type\": \"workspace\",\n    \"id\": \"{{workspaceId}}\",\n    \"attributes\": {\n      \"deleted\": \"true\"\n    }\n  }\n}",
       "form": []
     },
     "auth": {

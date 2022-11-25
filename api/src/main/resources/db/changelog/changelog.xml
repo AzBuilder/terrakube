@@ -28,4 +28,5 @@
     <include file="/db/changelog/local/changelog-2.6.0-team-update.xml"/>
     <include file="/db/changelog/local/changelog-2.8.0-vcs-callback.xml"/>
     <include file="/db/changelog/local/changelog-2.8.0-commit-id.xml"/>
+    <include file="/db/changelog/local/changelog-2.9.0-delete-workspace.xml"/>
 </databaseChangeLog>

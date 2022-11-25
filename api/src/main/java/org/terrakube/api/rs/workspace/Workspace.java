@@ -4,6 +4,8 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
+import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.parameters.Variable;
@@ -11,6 +13,7 @@ import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.workspace.history.History;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,10 +24,12 @@ import java.util.UUID;
 @CreatePermission(expression = "team manage workspace")
 @UpdatePermission(expression = "team manage workspace")
 @DeletePermission(expression = "team manage workspace")
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = WorkspaceManageHook.class)
 @Include
 @Getter
 @Setter
 @Entity
+@Where(clause = "deleted = false")
 public class Workspace {
 
     @Id
@@ -49,6 +54,9 @@ public class Workspace {
 
     @Column(name = "locked")
     private boolean locked;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 
     @Column(name = "terraform_version")
     private String terraformVersion;
