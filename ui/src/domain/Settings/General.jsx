@@ -78,7 +78,6 @@ export const GeneralSettings = () => {
         if (response.status == "204") {
           console.log(response);
           message.success("Organization deleted successfully, please logout and login to Terrakube");
-          history.push(`/organizations/${orgid}`);
         } else {
           message.error("Organization deletion failed");
         }
