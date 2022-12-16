@@ -14,7 +14,7 @@ public class WellKnownWebServiceImpl {
             "  \"state.v2\": \"%s/terrakube/state/v1/\"\n" +
             "}";
 
-    @Value("org.terrakube.hostname")
+    @Value("${org.terrakube.hostname}s")
     String hostname;
 
     @GetMapping(produces = "application/json")
