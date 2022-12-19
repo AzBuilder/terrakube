@@ -9,6 +9,5 @@ import java.util.Map;
 @Setter
 public class OrganizationAttributes {
     private String name;
-    private String description;
     private Map<String,Boolean> permissions;
 }
