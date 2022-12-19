@@ -12,21 +12,21 @@ public class WellKnownWebServiceImpl {
 
     private static final String terraformJsonContent = "{\n" +
             "  \"login.v1\": {\n" +
-            "    \"client\": \"12345\",\n" +
+            "    \"client\": \"%s\",\n" +
             "    \"grant_types\": [\"authz_code\", \"openid\", \"profile\", \"email\", \"offline_access\", \"groups\"],\n" +
-            "    \"authz\": \"/auth?scope=openid+profile+email+offline_access+groups\",\n" +
+            "    \"authz\": \"/dex/auth?scope=openid+profile+email+offline_access+groups\",\n" +
             "    \"token\": \"/token\",\n" +
             "    \"ports\": [10000, 10001]\n" +
             "    }, \n"+
-            "  \"state.v2\": \"/terrakube/state/v1/\"\n," +
-            "  \"tfe.v2.1\": \"/terrakube/tfe/v1/\"\n" +
+            "  \"state.v2\": \"/remote/state/v2/\"\n," +
+            "  \"tfe.v2.1\": \"/remote/tfe/v2/\"\n" +
             "}";
 
-    @Value("${org.terrakube.hostname}")
-    String hostname;
+    @Value("${org.terrakube.token.client-id}")
+    String dexClientId;
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<String> terraformJson() {
-        return ResponseEntity.ok(terraformJsonContent);
+        return ResponseEntity.ok(String.format(terraformJsonContent,dexClientId));
     }
 }
