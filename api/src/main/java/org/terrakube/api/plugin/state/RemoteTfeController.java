@@ -6,6 +6,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
 
@@ -20,7 +21,7 @@ public class RemoteTfeController {
     RemoteTfeService remoteTfeService;
 
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/entitlement-set")
-    public ResponseEntity<EntitlementModel> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
+    public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName)));
     }
 

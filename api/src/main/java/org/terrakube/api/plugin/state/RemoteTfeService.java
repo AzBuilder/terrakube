@@ -3,6 +3,7 @@ package org.terrakube.api.plugin.state;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.organization.OrganizationAttributes;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
@@ -21,7 +22,7 @@ public class RemoteTfeService {
 
     OrganizationRepository organizationRepository;
 
-    EntitlementModel getOrgEntitlementSet(String organizationName) {
+    EntitlementData getOrgEntitlementSet(String organizationName) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
         if (organization != null) {
             EntitlementModel entitlementModel = new EntitlementModel();
@@ -43,7 +44,9 @@ public class RemoteTfeService {
             entitlementModel.setAttributes(entitlementAttributes);
             entitlementModel.setId(UUID.randomUUID().toString());
             entitlementModel.setType("entitlement-sets");
-            return entitlementModel;
+            EntitlementData entitlementData = new EntitlementData();
+            entitlementData.setData(entitlementModel);
+            return entitlementData;
         } else {
             return null;
         }
