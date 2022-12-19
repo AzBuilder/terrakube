@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.organization.OrganizationAttributes;
+import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
 import org.terrakube.api.repository.OrganizationRepository;
@@ -53,7 +54,7 @@ public class RemoteTfeService {
 
     }
 
-    OrganizationModel getOrgInformation(String organizationName) {
+    OrganizationData getOrgInformation(String organizationName) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
         if (organization != null) {
             OrganizationModel organizationModel = new OrganizationModel();
@@ -86,7 +87,9 @@ public class RemoteTfeService {
             attributeList.put("can-create-provider", false);
             organizationAttributes.setPermissions(attributeList);
             organizationModel.setAttributes(organizationAttributes);
-            return organizationModel;
+            OrganizationData organizationData = new OrganizationData();
+            organizationData.setData(organizationModel);
+            return organizationData;
         } else {
             return null;
         }
