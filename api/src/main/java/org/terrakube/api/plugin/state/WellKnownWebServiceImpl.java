@@ -15,7 +15,7 @@ public class WellKnownWebServiceImpl {
             "    \"client\": \"%s\",\n" +
             "    \"grant_types\": [\"authz_code\", \"openid\", \"profile\", \"email\", \"offline_access\", \"groups\"],\n" +
             "    \"authz\": \"%s/auth?scope=openid+profile+email+offline_access+groups\",\n" +
-            "    \"token\": \"/token\",\n" +
+            "    \"token\": \"%s/token\",\n" +
             "    \"ports\": [10000, 10001]\n" +
             "    }, \n" +
             "  \"state.v2\": \"/remote/state/v2/\"\n," +
@@ -30,6 +30,6 @@ public class WellKnownWebServiceImpl {
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<String> terraformJson() {
-        return ResponseEntity.ok(String.format(terraformJsonContent, dexClientId, dexIssuerUri));
+        return ResponseEntity.ok(String.format(terraformJsonContent, dexClientId, dexIssuerUri, dexIssuerUri));
     }
 }
