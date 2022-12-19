@@ -76,6 +76,7 @@ public class RemoteTfeService {
             attributeList.put("can-read-run-tasks",true);
             attributeList.put("can-create-provider",false);
             organizationAttributes.setPermissions(attributeList);
+            organizationModel.setAttributes(organizationAttributes);
             return organizationModel;
         } else {
             return null;
