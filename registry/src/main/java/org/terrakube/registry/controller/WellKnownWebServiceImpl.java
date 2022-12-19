@@ -20,7 +20,9 @@ public class WellKnownWebServiceImpl {
             "    \"authz\": \"%s/auth?scope=openid+profile+email+offline_access+groups\",\n" +
             "    \"token\": \"%s/token\",\n" +
             "    \"ports\": [10000, 10001]\n" +
-            "    }"+
+            "    },\n"+
+            "  \"state.v2\": \"%s/terrakube/state/v1/\"\n," +
+            "  \"tfe.v2.1\": \"%s/terrakube/tfe/v1/\"\n" +
             "}";
 
     @Autowired
@@ -34,7 +36,9 @@ public class WellKnownWebServiceImpl {
                         openRegistryProperties.getHostname(),
                         openRegistryProperties.getClientId(),
                         openRegistryProperties.getIssuerUri(),
-                        openRegistryProperties.getIssuerUri()
+                        openRegistryProperties.getIssuerUri(),
+                        openRegistryProperties.getHostname(),
+                        openRegistryProperties.getHostname()
                 )
         );
     }
