@@ -1,4 +1,4 @@
-package org.terrakube.api.plugin.state.model.organization;
+package org.terrakube.api.plugin.state.model.entitlement;
 
 import lombok.Getter;
 import lombok.Setter;

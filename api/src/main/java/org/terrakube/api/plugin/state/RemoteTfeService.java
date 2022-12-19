@@ -3,15 +3,15 @@ package org.terrakube.api.plugin.state;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.terrakube.api.plugin.state.model.organization.EntitlementModel;
-import org.terrakube.api.plugin.state.model.organization.EntitlementAttributes;
+import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
+import org.terrakube.api.plugin.state.model.entitlement.EntitlementAttributes;
 import org.terrakube.api.plugin.state.model.organization.OrganizationAttributes;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
+import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
 import org.terrakube.api.repository.OrganizationRepository;
 import org.terrakube.api.rs.Organization;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -82,4 +82,10 @@ public class RemoteTfeService {
             return null;
         }
     }
+
+    WorkspaceModel createWorkspace(){
+        return null;
+    }
+
+
 }
