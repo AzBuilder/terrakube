@@ -126,19 +126,5 @@ public class Testing {
             "  }\n" +
             "}";
 
-    @GetMapping(produces = "application/vnd.api+json", path = "/organizations/sample/entitlement-set")
-    public ResponseEntity<String> terraformJson() {
-        return ResponseEntity.ok(response1);
-    }
 
-
-    @GetMapping(produces = "application/vnd.api+json", path = "organizations/sample")
-    public ResponseEntity<String> terraformJson2() {
-        return ResponseEntity.ok(response2);
-    }
-
-    @PostMapping (produces = "application/vnd.api+json", path = "/organizations/sample/workspaces")
-    public ResponseEntity<String> terraformJson3() {
-        return ResponseEntity.ok(response3);
-    }
 }

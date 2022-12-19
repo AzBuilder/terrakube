@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-class OrganizationTests extends ServerApplicationTests {
+class OrganizationModelTests extends ServerApplicationTests {
 
     @Test
     void searchOrganizationAsAdmin() {
