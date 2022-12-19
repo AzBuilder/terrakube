@@ -27,7 +27,6 @@ public class RemoteTfeService {
             EntitlementModel entitlementModel = new EntitlementModel();
             entitlementModel.setId(UUID.randomUUID().toString());
             Map<String, String> entitlementAttributes = new HashMap();
-            entitlementAttributes.put("", "true");
             entitlementAttributes.put("operations", "true");
             entitlementAttributes.put("private-module-registry", "true");
             entitlementAttributes.put("sentinel", "false");
