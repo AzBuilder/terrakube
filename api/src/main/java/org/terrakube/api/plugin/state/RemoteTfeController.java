@@ -22,24 +22,47 @@ public class RemoteTfeController {
     RemoteTfeService remoteTfeService;
 
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/entitlement-set")
-    public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
+    public ResponseEntity<?> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName)));
+        
+        /* 
+        return ResponseEntity.ok("{\n" +
+        "  \"data\": {\n" +
+        "    \"id\": \"org-simple\",\n" +
+        "    \"type\": \"entitlement-sets\",\n" +
+        "    \"attributes\": {\n" +
+        "    }\n" +
+        "  }\n" +
+        "}");*/
+        
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}")
-    public ResponseEntity<OrganizationData> getOrgInformation(@PathVariable("organizationName") String organizationName) {
+    public ResponseEntity<?> getOrgInformation(@PathVariable("organizationName") String organizationName) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgInformation(organizationName)));
+        /*
+        return ResponseEntity.ok("{\n" +
+        "  \"data\": {\n" +
+        "    \"id\": \"simple\",\n" +
+        "    \"type\": \"organizations\",\n" +
+        "    \"attributes\": {\n" +
+        "      \"name\": \"simple\"\n" +
+        "    },\n" +
+        "  }\n" +
+        "}");*/
     }
 
-    @GetMapping (produces = "application/vnd.api+json", path = "organizations/{organization}/workspaces/{workspaceName}")
+    //@GetMapping (produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces/{workspaceName}")
     public ResponseEntity<?> terraformJson3(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
         log.info("Searching: {} {}", organizationName, workspaceName);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping(produces = "application/vnd.api+json", path = "organizations/{organization}/workspaces")
+    @PostMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
     public ResponseEntity<String> terraformJson4(@PathVariable("organizationName") String organizationName, HttpEntity<String> httpEntity) {
         log.info("Body create \n {}", httpEntity.getBody());
+        // CLI is sending {"data":{"type":"workspaces","attributes":{"name":"workspace1","terraform-version":"1.1.3"}}}
+
         String response = "{\n" +
                 "  \"data\": {\n" +
                 "    \"attributes\": {\n" +

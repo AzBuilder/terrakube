@@ -26,7 +26,7 @@ public class RemoteTfeService {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
         if (organization != null) {
             EntitlementModel entitlementModel = new EntitlementModel();
-            entitlementModel.setId(UUID.randomUUID().toString());
+            entitlementModel.setId("org-"+organizationName);
             Map<String, String> entitlementAttributes = new HashMap();
             entitlementAttributes.put("operations", "true");
             entitlementAttributes.put("private-module-registry", "true");
@@ -42,10 +42,11 @@ public class RemoteTfeService {
             entitlementAttributes.put("agents", "false");
             entitlementAttributes.put("sso", "false");
             entitlementModel.setAttributes(entitlementAttributes);
-            entitlementModel.setId(UUID.randomUUID().toString());
             entitlementModel.setType("entitlement-sets");
             EntitlementData entitlementData = new EntitlementData();
             entitlementData.setData(entitlementModel);
+
+            log.info(entitlementData.toString());
             return entitlementData;
         } else {
             return null;
@@ -86,25 +87,25 @@ public class RemoteTfeService {
 
             Map<String, Object> attributes = new HashMap();
             attributes.put("permissions", permissionMap);
-            attributes.put("external-id","org-"+organizationName);
-            attributes.put("created-at", "2020-03-26T22:13:38.456Z");
-            attributes.put("email", "user@example.com");
-            attributes.put("session-timeout", null);
-            attributes.put("session-remember", null);
-            attributes.put("collaborator-auth-policy", "password");
-            attributes.put("plan-expired", false);
-            attributes.put("plan-expires-at", null);
-            attributes.put("plan-is-trial", false);
-            attributes.put("plan-is-enterprise", false);
-            attributes.put("cost-estimation-enabled", false);
-            attributes.put("send-passing-statuses-for-untriggered-speculative-plans", false);
-            attributes.put("allow-force-delete-workspaces", false);
+            //attributes.put("external-id","org-"+organizationName);
+            //attributes.put("created-at", "2020-03-26T22:13:38.456Z");
+            //attributes.put("email", "user@example.com");
+            //attributes.put("session-timeout", null);
+            //attributes.put("session-remember", null);
+            //attributes.put("collaborator-auth-policy", "password");
+            //attributes.put("plan-expired", false);
+            //attributes.put("plan-expires-at", null);
+            //attributes.put("plan-is-trial", false);
+            //attributes.put("plan-is-enterprise", false);
+            //attributes.put("cost-estimation-enabled", false);
+            //attributes.put("send-passing-statuses-for-untriggered-speculative-plans", false);
+            //attributes.put("allow-force-delete-workspaces", false);
             attributes.put("name", organizationName);
-            attributes.put("fair-run-queuing-enabled", false);
-            attributes.put("saml-enabled", false);
-            attributes.put("owners-team-saml-role-id", null);
-            attributes.put("two-factor-conformant", false);
-            attributes.put("assessments-enforced", false);
+            //attributes.put("fair-run-queuing-enabled", false);
+            //attributes.put("saml-enabled", false);
+            //attributes.put("owners-team-saml-role-id", null);
+            //attributes.put("two-factor-conformant", false);
+            //attributes.put("assessments-enforced", false);
             organizationModel.setAttributes(attributes);
 
             OrganizationData organizationData = new OrganizationData();

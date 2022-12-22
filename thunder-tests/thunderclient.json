@@ -2426,5 +2426,59 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "dd51259d-370a-4e95-9011-620dbee4a867",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "well-known",
+    "url": "{{terrakubeApi}}/.well-known/terraform.json",
+    "method": "GET",
+    "sortNum": 770000,
+    "created": "2022-12-19T20:36:09.439Z",
+    "modified": "2022-12-19T23:11:19.766Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "2d1259a3-24ed-4268-9b20-243da58223bd",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "Organization Entitlement",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/organizations/simple/entitlement-set",
+    "method": "GET",
+    "sortNum": 780000,
+    "created": "2022-12-19T20:38:49.528Z",
+    "modified": "2022-12-19T23:13:35.542Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "c2a28b79-a811-43e3-8340-6cab0069688b",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "Organization Information",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/organizations/simple",
+    "method": "GET",
+    "sortNum": 790000,
+    "created": "2022-12-19T20:40:19.271Z",
+    "modified": "2022-12-19T20:40:54.256Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]
