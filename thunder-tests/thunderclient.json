@@ -2480,5 +2480,23 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "aa6cdc08-1c57-4341-be15-1f0454cb83b3",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "Workspace Information",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/organizations/simple/workspaces/workspace1",
+    "method": "GET",
+    "sortNum": 800000,
+    "created": "2022-12-22T16:29:20.855Z",
+    "modified": "2022-12-23T15:48:59.571Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]

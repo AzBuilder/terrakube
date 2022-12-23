@@ -9,5 +9,5 @@ import java.util.Map;
 @Getter
 @Setter
 public class EntitlementModel extends Resource {
-    Map<String, String> attributes;
+    Map<String, Object> attributes;
 }
