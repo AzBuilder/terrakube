@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.springframework.http.HttpEntity;
@@ -156,10 +157,9 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/configuration-versions")
-    public ResponseEntity<?> createConfigurationVersion(@PathVariable("workspaceId") String workspaceId) {
+    public ResponseEntity<?> createConfigurationVersion(@PathVariable("workspaceId") String workspaceId, @RequestBody ConfigurationData configurationData) {
         log.info("Creating Configuration Version for worspaceId {}", workspaceId);
-        // CLI is sending {"data":{"type":"workspaces","attributes":{"name":"workspace1","terraform-version":"1.1.3"}}}
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, false)));
+        return ResponseEntity.status(201).body(remoteTfeService.createConfigurationVersion(workspaceId, configurationData));
     }
 
     @Transactional

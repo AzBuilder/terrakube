@@ -252,7 +252,7 @@ public class RemoteTfeService {
         return response;
     }
 
-    ConfigurationData createConfigurationVersion(ConfigurationData configurationData) {
+    ConfigurationData createConfigurationVersion(String workspaceId, ConfigurationData configurationData) {
         log.info("Create Configuration Version {}", configurationData.toString());
         log.info("Speculative {}", configurationData.getData().getAttributes().get("speculative"));
         log.info("Auto Queue Runs {}", configurationData.getData().getAttributes().get("auto-queue-runs"));
@@ -263,7 +263,7 @@ public class RemoteTfeService {
         content.setStatus("pending");
         content.setSource("tfe-api");
         content.setSpeculative((boolean) configurationData.getData().getAttributes().get("speculative"));
-
+        content.setWorkspace(workspaceRepository.getById(UUID.fromString(workspaceId)));
 
         contentRepository.save(content);
         configurationData.getData().setId(contentId.toString());
