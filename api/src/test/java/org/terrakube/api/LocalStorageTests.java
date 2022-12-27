@@ -22,7 +22,7 @@ public class LocalStorageTests extends ServerApplicationTests {
                 new File(
                         String.format(STATE_DIRECTORY_JSON, FileUtils.getUserDirectoryPath(), "1", "1", "1")),
                 "SAMPLE",
-                Charset.defaultCharset()
+                Charset.defaultCharset().toString()
         );
 
         given()
@@ -43,7 +43,7 @@ public class LocalStorageTests extends ServerApplicationTests {
                 new File(
                         String.format(STATE_DIRECTORY, FileUtils.getUserDirectoryPath(), "2", "2", "2", "2")),
                 "SAMPLE",
-                Charset.defaultCharset()
+                Charset.defaultCharset().toString()
         );
 
         given()
@@ -64,7 +64,7 @@ public class LocalStorageTests extends ServerApplicationTests {
                 new File(
                         String.format(OUTPUT_DIRECTORY, FileUtils.getUserDirectoryPath(), "3", "3", "3")),
                 "SAMPLE",
-                Charset.defaultCharset()
+                Charset.defaultCharset().toString()
         );
 
         given()

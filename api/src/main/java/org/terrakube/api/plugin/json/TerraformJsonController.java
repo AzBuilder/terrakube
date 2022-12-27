@@ -18,7 +18,7 @@ public class TerraformJsonController {
 
     @GetMapping(value= "/index.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createToken() throws IOException {
-        String terraformIndex = IOUtils.toString(URI.create("https://releases.hashicorp.com/terraform/index.json"), Charset.defaultCharset());
+        String terraformIndex = IOUtils.toString(URI.create("https://releases.hashicorp.com/terraform/index.json"), Charset.defaultCharset().toString());
         return new ResponseEntity<>(terraformIndex, HttpStatus.OK);
     }
 }

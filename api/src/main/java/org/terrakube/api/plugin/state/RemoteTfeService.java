@@ -272,6 +272,7 @@ public class RemoteTfeService {
         configurationData.getData().getAttributes().put("error-message", null);
         configurationData.getData().getAttributes().put("status", "pending");
         configurationData.getData().getAttributes().put("upload-url", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, contentId));
+        log.info("upload-url {}", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, contentId.toString()));
         return configurationData;
     }
 
