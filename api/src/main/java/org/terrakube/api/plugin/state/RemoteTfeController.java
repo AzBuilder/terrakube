@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.springframework.http.HttpEntity;
@@ -152,4 +153,29 @@ public class RemoteTfeController {
         "    }\n" +
         "}");
     }
+
+    @Transactional
+    @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/configuration-versions")
+    public ResponseEntity<?> createConfigurationVersion(@PathVariable("workspaceId") String workspaceId) {
+        log.info("Creating Configuration Version for worspaceId {}", workspaceId);
+        // CLI is sending {"data":{"type":"workspaces","attributes":{"name":"workspace1","terraform-version":"1.1.3"}}}
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, false)));
+    }
+
+    @Transactional
+    @PutMapping (produces = "application/vnd.api+json", path = "/configuration-versions/{configurationid}")
+    public ResponseEntity<?> uploadConfiguration(@RequestParam("file") MultipartFile file, @PathVariable("configurationid") String configurationId) {
+        log.info("Uploading Id {} file {}", configurationId, file.getName());
+        remoteTfeService.uploadFile(configurationId, file);
+        return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    @PutMapping (produces = "application/vnd.api+json", path = "/runs")
+    public ResponseEntity<?> createRun(HttpEntity<String> httpEntity) {
+        log.info("{}", httpEntity.getBody());
+        return ResponseEntity.internalServerError().build();
+    }
+
+
 }

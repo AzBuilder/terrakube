@@ -2,7 +2,12 @@ package org.terrakube.api.plugin.state;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
+import org.terrakube.api.plugin.state.model.configuration.ConfigurationModel;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
@@ -11,13 +16,17 @@ import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
+import org.terrakube.api.plugin.storage.StorageTypeService;
+import org.terrakube.api.repository.ContentRepository;
 import org.terrakube.api.repository.HistoryRepository;
 import org.terrakube.api.repository.OrganizationRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.Workspace;
+import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 
+import java.lang.module.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,18 +34,26 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class RemoteTfeService {
-
+    @Autowired
+    ContentRepository contentRepository;
+    @Autowired
     OrganizationRepository organizationRepository;
+    @Autowired
     WorkspaceRepository workspaceRepository;
+    @Autowired
     HistoryRepository historyRepository;
+
+    @Value("${org.terrakube.hostname}")
+    String hostname;
+
+    StorageTypeService storageTypeService;
 
     EntitlementData getOrgEntitlementSet(String organizationName) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
         if (organization != null) {
             EntitlementModel entitlementModel = new EntitlementModel();
-            entitlementModel.setId("org-"+organizationName);
+            entitlementModel.setId("org-" + organizationName);
             Map<String, Object> entitlementAttributes = new HashMap();
             entitlementAttributes.put("operations", true);
             entitlementAttributes.put("private-module-registry", true);
@@ -129,10 +146,10 @@ public class RemoteTfeService {
     WorkspaceData getWorkspace(String organizationName, String workspaceName, Map<String, Object> otherAttributes) {
         Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getByOrganizationNameAndName(organizationName, workspaceName));
 
-        if(workspace.isPresent()){
-            log.info("Found Workspace Id: {} Terraform: {}",workspace.get().getId().toString(), workspace.get().getTerraformVersion());
+        if (workspace.isPresent()) {
+            log.info("Found Workspace Id: {} Terraform: {}", workspace.get().getId().toString(), workspace.get().getTerraformVersion());
             WorkspaceData workspaceData = new WorkspaceData();
-            
+
             WorkspaceModel workspaceModel = new WorkspaceModel();
             workspaceModel.setId(workspace.get().getId().toString());
             workspaceModel.setType("workspaces");
@@ -140,51 +157,49 @@ public class RemoteTfeService {
             attributes.put("name", workspaceName);
             attributes.put("terraform-version", workspace.get().getTerraformVersion());
             attributes.put("locked", workspace.get().isLocked());
-            
+
             Map<String, Boolean> defaultAttributes = new HashMap();
-                defaultAttributes.put("can-create-state-versions", true);
-                defaultAttributes.put("can-destroy", true);
-                defaultAttributes.put("can-force-unlock", true);
-                defaultAttributes.put("can-lock", true);
-                defaultAttributes.put("can-manage-run-tasks", true);
-                defaultAttributes.put("can-manage-tags", true);
-                defaultAttributes.put("can-queue-apply", true);
-                defaultAttributes.put("can-queue-destroy", true);
-                defaultAttributes.put("can-queue-run", true);
-                defaultAttributes.put("can-read-settings", true);
-                defaultAttributes.put("can-read-state-versions", true);
-                defaultAttributes.put("can-read-variable", true);
-                defaultAttributes.put("can-unlock", true);
-                defaultAttributes.put("can-update", true);
-                defaultAttributes.put("can-update-variable", true);
-                defaultAttributes.put("can-read-assessment-result", true);
-                defaultAttributes.put("can-force-delete", true);
+            defaultAttributes.put("can-create-state-versions", true);
+            defaultAttributes.put("can-destroy", true);
+            defaultAttributes.put("can-force-unlock", true);
+            defaultAttributes.put("can-lock", true);
+            defaultAttributes.put("can-manage-run-tasks", true);
+            defaultAttributes.put("can-manage-tags", true);
+            defaultAttributes.put("can-queue-apply", true);
+            defaultAttributes.put("can-queue-destroy", true);
+            defaultAttributes.put("can-queue-run", true);
+            defaultAttributes.put("can-read-settings", true);
+            defaultAttributes.put("can-read-state-versions", true);
+            defaultAttributes.put("can-read-variable", true);
+            defaultAttributes.put("can-unlock", true);
+            defaultAttributes.put("can-update", true);
+            defaultAttributes.put("can-update-variable", true);
+            defaultAttributes.put("can-read-assessment-result", true);
+            defaultAttributes.put("can-force-delete", true);
 
-                attributes.put("permissions", defaultAttributes);
+            attributes.put("permissions", defaultAttributes);
 
-            otherAttributes.forEach((key,value)->{
+            otherAttributes.forEach((key, value) -> {
                 attributes.putIfAbsent(key, value);
             });
 
-                
 
             workspaceModel.setAttributes(attributes);
             workspaceData.setData(workspaceModel);
 
             return workspaceData;
-        }
-        else{
+        } else {
             return null;
         }
 
     }
 
-    WorkspaceData createWorkspace(String organizationName, WorkspaceData workspaceData ) {
+    WorkspaceData createWorkspace(String organizationName, WorkspaceData workspaceData) {
         Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getByOrganizationNameAndName(organizationName, workspaceData.getData().getAttributes().get("name").toString()));
 
-        if(workspace.isEmpty()){
+        if (workspace.isEmpty()) {
             log.info("Creating new workspace {} in {}", workspaceData.getData().getAttributes().get("name").toString(), organizationName);
-        
+
             Organization organization = organizationRepository.getOrganizationByName(organizationName);
             Workspace newWorkspace = new Workspace();
             newWorkspace.setId(UUID.randomUUID());
@@ -195,7 +210,7 @@ public class RemoteTfeService {
             newWorkspace.setOrganization(organization);
             workspaceRepository.save(newWorkspace);
         }
-        Map<String,Object> otherAttributes = new HashMap();
+        Map<String, Object> otherAttributes = new HashMap();
         otherAttributes.put("locked", false);
         return getWorkspace(organizationName, workspaceData.getData().getAttributes().get("name").toString(), otherAttributes);
     }
@@ -207,13 +222,13 @@ public class RemoteTfeService {
         workspace.setLocked(locked);
         workspaceRepository.save(workspace);
         String organizationName = workspace.getOrganization().getName();
-        Map<String,Object> otherAttributes = new HashMap();
+        Map<String, Object> otherAttributes = new HashMap();
 
         otherAttributes.put("locked", false);
-        return getWorkspace(organizationName, workspace.getName() ,otherAttributes);
+        return getWorkspace(organizationName, workspace.getName(), otherAttributes);
     }
 
-    StateData createWorkspaceState(String workspaceId, StateData stateData){
+    StateData createWorkspaceState(String workspaceId, StateData stateData) {
         Workspace workspace = workspaceRepository.getById(UUID.fromString(workspaceId));
         History history = new History();
         UUID historyId = UUID.randomUUID();
@@ -235,6 +250,57 @@ public class RemoteTfeService {
         responseAttributes.put("serial", 1);
         response.getData().setAttributes(responseAttributes);
         return response;
+    }
+
+    ConfigurationData createConfigurationVersion(ConfigurationData configurationData) {
+        log.info("Create Configuration Version {}", configurationData.toString());
+        log.info("Speculative {}", configurationData.getData().getAttributes().get("speculative"));
+        log.info("Auto Queue Runs {}", configurationData.getData().getAttributes().get("auto-queue-runs"));
+        UUID contentId = UUID.randomUUID();
+
+        Content content = new Content();
+        content.setId(contentId);
+        content.setStatus("pending");
+        content.setSource("tfe-api");
+        content.setSpeculative((boolean) configurationData.getData().getAttributes().get("speculative"));
+
+
+        contentRepository.save(content);
+        configurationData.getData().setId(contentId.toString());
+        configurationData.getData().setType("configuration-versions");
+        configurationData.getData().getAttributes().put("error", null);
+        configurationData.getData().getAttributes().put("error-message", null);
+        configurationData.getData().getAttributes().put("status", "pending");
+        configurationData.getData().getAttributes().put("upload-url", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, contentId));
+        return configurationData;
+    }
+
+    ConfigurationData uploadFile(String contentId, MultipartFile multipartFile) {
+        storageTypeService.createContentFile(contentId, multipartFile);
+        Content content = contentRepository.getById(UUID.fromString(contentId));
+        content.setStatus("uploaded");
+        contentRepository.save(content);
+        return searchConfiguration(contentId);
+    }
+
+    ConfigurationData searchConfiguration(String contentId) {
+        Content content = contentRepository.getById(UUID.fromString(contentId));
+        ConfigurationData configurationData = new ConfigurationData();
+        ConfigurationModel configurationModel = new ConfigurationModel();
+        configurationModel.setType("configuration-versions");
+        configurationModel.setId(content.getId().toString());
+        Map<String, Object> attributes = new HashMap();
+        configurationData.getData().getAttributes().put("error", null);
+        configurationData.getData().getAttributes().put("error-message", null);
+        configurationData.getData().getAttributes().put("error-message", null);
+        configurationData.getData().getAttributes().put("source", content.getSource());
+        configurationData.getData().getAttributes().put("status", content.getStatus());
+        configurationData.getData().getAttributes().put("speculative", content.isSpeculative());
+        configurationData.getData().getAttributes().put("auto-queue-runs", content.isAutoQueueRuns());
+        configurationModel.setAttributes(attributes);
+        configurationData.setData(configurationModel);
+
+        return configurationData;
     }
 
 
