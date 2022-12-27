@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
@@ -102,7 +103,7 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
-    public void createContentFile(String contentId, MultipartFile multipartFile) {
+    public void createContentFile(String contentId, InputStream inputStream) {
 
     }
 }

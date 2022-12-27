@@ -11,6 +11,7 @@ import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.springframework.http.HttpEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -163,10 +164,10 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @PutMapping (produces = "application/vnd.api+json", path = "/configuration-versions/{configurationid}")
-    public ResponseEntity<?> uploadConfiguration(@RequestParam("file") MultipartFile file, @PathVariable("configurationid") String configurationId) {
-        log.info("Uploading Id {} file {}", configurationId, file.getName());
-        remoteTfeService.uploadFile(configurationId, file);
+    @PutMapping (path = "/configuration-versions/{configurationid}",consumes = "")
+    public ResponseEntity<?> uploadConfiguration(HttpServletRequest httpServletRequest, @PathVariable("configurationid") String configurationId) {
+        log.info("Uploading Id {} file", configurationId );
+        remoteTfeService.uploadFile(configurationId, httpServletRequest.getInputStream());
         return ResponseEntity.ok().build();
     }
 

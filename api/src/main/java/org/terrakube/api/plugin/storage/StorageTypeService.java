@@ -2,6 +2,8 @@ package org.terrakube.api.plugin.storage;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+
 public interface StorageTypeService {
 
     byte[] getStepOutput(String organizationId, String jobId, String stepId);
@@ -14,5 +16,5 @@ public interface StorageTypeService {
 
     String getContext(int jobId);
 
-    void createContentFile(String contentId, MultipartFile multipartFile);
+    void createContentFile(String contentId, InputStream inputStream);
 }

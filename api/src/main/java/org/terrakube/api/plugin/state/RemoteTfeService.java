@@ -26,6 +26,7 @@ import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 
+import java.io.InputStream;
 import java.lang.module.Configuration;
 import java.util.HashMap;
 import java.util.Map;
@@ -272,11 +273,12 @@ public class RemoteTfeService {
         configurationData.getData().getAttributes().put("error-message", null);
         configurationData.getData().getAttributes().put("status", "pending");
         configurationData.getData().getAttributes().put("upload-url", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, contentId));
+        log.info("upload-url {}", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, contentId));
         return configurationData;
     }
 
-    ConfigurationData uploadFile(String contentId, MultipartFile multipartFile) {
-        storageTypeService.createContentFile(contentId, multipartFile);
+    ConfigurationData uploadFile(String contentId, InputStream inputStream) {
+        storageTypeService.createContentFile(contentId, inputStream);
         Content content = contentRepository.getById(UUID.fromString(contentId));
         content.setStatus("uploaded");
         contentRepository.save(content);

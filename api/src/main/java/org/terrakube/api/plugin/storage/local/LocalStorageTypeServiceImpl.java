@@ -10,6 +10,7 @@ import org.terrakube.api.plugin.storage.StorageTypeService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -94,13 +95,13 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
 
     @Override
-    public void createContentFile(String contentId, MultipartFile multipartFile){
+    public void createContentFile(String contentId, InputStream inputStream){
         try {
-            String contentFile = String.format(CONTENT_DIRECTORY, contentId, multipartFile.getOriginalFilename());
+            String contentFile = String.format(CONTENT_DIRECTORY, contentId, contentId+"tar.gz");
             log.info("contentFile: {}", contentFile);
             File context = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(contentFile)));
             FileUtils.forceMkdir(context.getParentFile());
-            FileUtils.writeByteArrayToFile(context, multipartFile.getBytes());
+            FileUtils.writeByteArrayToFile(context, inputStream.readAllBytes());
         } catch (IOException e) {
             log.error(e.getMessage());
         }

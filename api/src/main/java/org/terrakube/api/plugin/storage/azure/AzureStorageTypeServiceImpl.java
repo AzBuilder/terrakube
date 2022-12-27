@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
+import java.io.InputStream;
+
 @Slf4j
 @Builder
 public class AzureStorageTypeServiceImpl implements StorageTypeService {
@@ -71,7 +73,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
-    public void createContentFile(String contentId, MultipartFile multipartFile) {
+    public void createContentFile(String contentId, InputStream inputStream) {
 
     }
 }
