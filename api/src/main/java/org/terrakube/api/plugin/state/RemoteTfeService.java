@@ -26,6 +26,7 @@ import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 
+import java.io.InputStream;
 import java.lang.module.Configuration;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class RemoteTfeService {
     @Value("${org.terrakube.hostname}")
     String hostname;
 
+    @Autowired
     StorageTypeService storageTypeService;
 
     EntitlementData getOrgEntitlementSet(String organizationName) {
@@ -256,28 +258,29 @@ public class RemoteTfeService {
         log.info("Create Configuration Version {}", configurationData.toString());
         log.info("Speculative {}", configurationData.getData().getAttributes().get("speculative"));
         log.info("Auto Queue Runs {}", configurationData.getData().getAttributes().get("auto-queue-runs"));
-        UUID contentId = UUID.randomUUID();
 
         Content content = new Content();
-        content.setId(contentId);
         content.setStatus("pending");
         content.setSource("tfe-api");
         content.setSpeculative((boolean) configurationData.getData().getAttributes().get("speculative"));
         content.setWorkspace(workspaceRepository.getById(UUID.fromString(workspaceId)));
 
-        contentRepository.save(content);
-        configurationData.getData().setId(contentId.toString());
+        content = contentRepository.save(content);
+        log.info("New content with id {} saved", content.getId().toString());
+        configurationData.getData().setId(content.getId().toString());
         configurationData.getData().setType("configuration-versions");
         configurationData.getData().getAttributes().put("error", null);
         configurationData.getData().getAttributes().put("error-message", null);
         configurationData.getData().getAttributes().put("status", "pending");
-        configurationData.getData().getAttributes().put("upload-url", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, contentId));
-        log.info("upload-url {}", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, contentId.toString()));
+        configurationData.getData().getAttributes().put("upload-url", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, content.getId().toString()));
+        log.info("upload-url {}", String.format("https://%s/remote/tfe/v2/configuration-versions/%s", hostname, content.getId().toString()));
         return configurationData;
     }
 
-    ConfigurationData uploadFile(String contentId, MultipartFile multipartFile) {
-        storageTypeService.createContentFile(contentId, multipartFile);
+    ConfigurationData uploadFile(String contentId, InputStream inputStream) {
+        storageTypeService.createContentFile(contentId, inputStream);
+        log.info("Searching Content Id {}", contentId);
+
         Content content = contentRepository.getById(UUID.fromString(contentId));
         content.setStatus("uploaded");
         contentRepository.save(content);
@@ -290,7 +293,9 @@ public class RemoteTfeService {
         ConfigurationModel configurationModel = new ConfigurationModel();
         configurationModel.setType("configuration-versions");
         configurationModel.setId(content.getId().toString());
-        Map<String, Object> attributes = new HashMap();
+        configurationModel.setAttributes(new HashMap());
+        configurationData.setData(configurationModel);
+        
         configurationData.getData().getAttributes().put("error", null);
         configurationData.getData().getAttributes().put("error-message", null);
         configurationData.getData().getAttributes().put("error-message", null);
@@ -298,8 +303,6 @@ public class RemoteTfeService {
         configurationData.getData().getAttributes().put("status", content.getStatus());
         configurationData.getData().getAttributes().put("speculative", content.isSpeculative());
         configurationData.getData().getAttributes().put("auto-queue-runs", content.isAutoQueueRuns());
-        configurationModel.setAttributes(attributes);
-        configurationData.setData(configurationModel);
 
         return configurationData;
     }

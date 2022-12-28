@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -18,7 +18,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";
 
-    private static final String CONTENT_DIRECTORY = "/.terraform-spring-boot/local/content/%s/%s";
+    private static final String CONTENT_DIRECTORY = "/.terraform-spring-boot/local/content/%s/terraformContent.tar.gz";
     private static final String CONTEXT_DIRECTORY = "/.terraform-spring-boot/local/output/context/%s/context.json";
     private static final String STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/terraformLibrary.tfPlan";
     private static final String STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
@@ -94,13 +94,14 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
 
     @Override
-    public void createContentFile(String contentId, MultipartFile multipartFile){
+    public void createContentFile(String contentId, InputStream inputStream){
         try {
-            String contentFile = String.format(CONTENT_DIRECTORY, contentId, multipartFile.getOriginalFilename());
+            String contentFile = String.format(CONTENT_DIRECTORY, contentId);
             log.info("contentFile: {}", contentFile);
             File context = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(contentFile)));
             FileUtils.forceMkdir(context.getParentFile());
-            FileUtils.writeByteArrayToFile(context, multipartFile.getBytes());
+            FileUtils.writeByteArrayToFile(context, inputStream.readAllBytes());
+            log.info("Write File Completed", contentFile);
         } catch (IOException e) {
             log.error(e.getMessage());
         }

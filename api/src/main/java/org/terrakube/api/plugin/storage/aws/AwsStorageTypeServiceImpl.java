@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
@@ -106,7 +107,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
-    public void createContentFile(String contentId, MultipartFile multipartFile) {
+    public void createContentFile(String contentId, InputStream inputStream) {
 
     }
 }

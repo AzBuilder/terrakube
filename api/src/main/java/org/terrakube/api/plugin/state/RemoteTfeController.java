@@ -11,6 +11,9 @@ import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.springframework.http.HttpEntity;
 
+import javax.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -163,15 +166,23 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @PutMapping (produces = "application/vnd.api+json", path = "/configuration-versions/{configurationid}")
-    public ResponseEntity<?> uploadConfiguration(@RequestParam("file") MultipartFile file, @PathVariable("configurationid") String configurationId) {
-        log.info("Uploading Id {} file {}", configurationId, file.getName());
-        remoteTfeService.uploadFile(configurationId, file);
+    @GetMapping(produces = "application/vnd.api+json", path = "/configuration-versions/{configurationId}")
+    public ResponseEntity<?> getConfigurationVersion(@PathVariable("configurationId") String configurationId) {
+        log.info("Searching Configuration Version Id {}", configurationId);
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.searchConfiguration(configurationId)));
+    }
+
+    @Transactional
+    @PutMapping (path = "/configuration-versions/{configurationid}")
+    public ResponseEntity<?> uploadConfiguration(HttpServletRequest httpServletRequest, @PathVariable("configurationid") String configurationId) throws IOException {
+        log.info("Uploading Id {} file", configurationId );
+        remoteTfeService.uploadFile(configurationId, httpServletRequest.getInputStream());
+        log.info("File created");
         return ResponseEntity.ok().build();
     }
 
     @Transactional
-    @PutMapping (produces = "application/vnd.api+json", path = "/runs")
+    @PostMapping (produces = "application/vnd.api+json", path = "/runs")
     public ResponseEntity<?> createRun(HttpEntity<String> httpEntity) {
         log.info("{}", httpEntity.getBody());
         return ResponseEntity.internalServerError().build();
