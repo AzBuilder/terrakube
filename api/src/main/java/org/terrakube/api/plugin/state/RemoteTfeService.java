@@ -12,16 +12,18 @@ import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
+import org.terrakube.api.plugin.state.model.runs.RunsData;
+import org.terrakube.api.plugin.state.model.runs.RunsModel;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
 import org.terrakube.api.plugin.storage.StorageTypeService;
-import org.terrakube.api.repository.ContentRepository;
-import org.terrakube.api.repository.HistoryRepository;
-import org.terrakube.api.repository.OrganizationRepository;
-import org.terrakube.api.repository.WorkspaceRepository;
+import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.job.Job;
+import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
@@ -37,6 +39,8 @@ import java.util.UUID;
 @Service
 public class RemoteTfeService {
     @Autowired
+    private JobRepository jobRepository;
+    @Autowired
     ContentRepository contentRepository;
     @Autowired
     OrganizationRepository organizationRepository;
@@ -44,6 +48,9 @@ public class RemoteTfeService {
     WorkspaceRepository workspaceRepository;
     @Autowired
     HistoryRepository historyRepository;
+
+    @Autowired
+    TemplateRepository templateRepository;
 
     @Value("${org.terrakube.hostname}")
     String hostname;
@@ -305,6 +312,35 @@ public class RemoteTfeService {
         configurationData.getData().getAttributes().put("auto-queue-runs", content.isAutoQueueRuns());
 
         return configurationData;
+    }
+
+    RunsData createRun(RunsData runsData){
+        log.info("Creating new Terrakube Job");
+        log.info("Workspace {} Configuration {}", runsData.getData().getRelationships().getWorkspace().getData().getId(), runsData.getData().getRelationships().getConfigurationVersion().getData().getId());
+        String workspaceId = runsData.getData().getRelationships().getWorkspace().getData().getId();
+        String configurationId = runsData.getData().getRelationships().getConfigurationVersion().getData().getId();
+        Workspace workspace = workspaceRepository.getById(UUID.fromString(workspaceId));
+        Template template = templateRepository.getByName("Terraform-Plan");
+        Job job = new Job();
+        job.setWorkspace(workspace);
+        job.setOrganization(workspace.getOrganization());
+        job.setStatus(JobStatus.pending);
+        job.setComments("terraform-cli");
+        job.setTemplateReference(template.getId().toString());
+        jobRepository.save(job);
+
+        return getRun(job.getId());
+    }
+
+    RunsData getRun(int runId){
+        RunsData runsData = new RunsData();
+        RunsModel runsModel = new RunsModel();
+        runsModel.setId(String.valueOf(runId));
+        runsModel.setType("runs");
+        runsModel.setAttributes(new HashMap());
+        runsModel.getAttributes().put("status","planning");
+        runsData.setData(runsModel);
+        return runsData;
     }
 
 

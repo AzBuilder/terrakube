@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
+import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.springframework.http.HttpEntity;
@@ -183,9 +184,65 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping (produces = "application/vnd.api+json", path = "/runs")
-    public ResponseEntity<?> createRun(HttpEntity<String> httpEntity) {
-        log.info("{}", httpEntity.getBody());
-        return ResponseEntity.internalServerError().build();
+    public ResponseEntity<?> createRun(@RequestBody RunsData runsData) {
+        /*
+        {
+   "data":{
+      "type":"runs",
+      "attributes":{
+         "refresh":true
+      },
+      "relationships":{
+         "configuration-version":{
+            "data":{
+               "type":"configuration-versions",
+               "id":"3ff92d0c-aefc-499d-8d0a-b72c9c4eecca"
+            }
+         },
+         "workspace":{
+            "data":{
+               "type":"workspaces",
+               "id":"6c4505fa-358e-491e-b021-63806d43264f"
+            }
+         }
+      }
+   }
+}
+         */
+        log.info("Create new run");
+        return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
+    }
+
+    @Transactional
+    @GetMapping (produces = "application/vnd.api+json", path = "/runs/{runId}")
+    //public ResponseEntity<?> getRun(HttpEntity<String> httpEntity) {
+    //    log.info("{}", httpEntity.getBody());
+    public ResponseEntity<?> getRun(@PathVariable("runId") int runId) {
+        /*
+        {
+   "data":{
+      "type":"runs",
+      "attributes":{
+         "refresh":true
+      },
+      "relationships":{
+         "configuration-version":{
+            "data":{
+               "type":"configuration-versions",
+               "id":"3ff92d0c-aefc-499d-8d0a-b72c9c4eecca"
+            }
+         },
+         "workspace":{
+            "data":{
+               "type":"workspaces",
+               "id":"6c4505fa-358e-491e-b021-63806d43264f"
+            }
+         }
+      }
+   }
+}
+         */
+        return ResponseEntity.ok(remoteTfeService.getRun(runId));
     }
 
 
