@@ -327,7 +327,7 @@ public class RemoteTfeService {
         job.setStatus(JobStatus.pending);
         job.setComments("terraform-cli");
         job.setTemplateReference(template.getId().toString());
-        jobRepository.save(job);
+        job = jobRepository.save(job);
 
         return getRun(job.getId());
     }
