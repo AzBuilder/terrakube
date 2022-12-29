@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface TemplateRepository extends JpaRepository<Template, UUID> {
 
-    Template getByName(String name);
+    Template getByOrganizationNameAndName(String organizationName, String name);
 }

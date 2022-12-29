@@ -320,7 +320,8 @@ public class RemoteTfeService {
         String workspaceId = runsData.getData().getRelationships().getWorkspace().getData().getId();
         String configurationId = runsData.getData().getRelationships().getConfigurationVersion().getData().getId();
         Workspace workspace = workspaceRepository.getById(UUID.fromString(workspaceId));
-        Template template = templateRepository.getByName("Terraform-Plan");
+        Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(),"Terraform-Plan");
+        log.info("Creating Job");
         Job job = new Job();
         job.setWorkspace(workspace);
         job.setOrganization(workspace.getOrganization());
@@ -328,11 +329,12 @@ public class RemoteTfeService {
         job.setComments("terraform-cli");
         job.setTemplateReference(template.getId().toString());
         job = jobRepository.save(job);
-
+        log.info("Job Created");
         return getRun(job.getId());
     }
 
     RunsData getRun(int runId){
+        log.info("Searching Run {}", runId);
         RunsData runsData = new RunsData();
         RunsModel runsModel = new RunsModel();
         runsModel.setId(String.valueOf(runId));
