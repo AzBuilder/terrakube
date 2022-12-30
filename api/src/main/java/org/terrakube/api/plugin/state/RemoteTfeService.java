@@ -12,6 +12,8 @@ import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
+import org.terrakube.api.plugin.state.model.plans.PlansData;
+import org.terrakube.api.plugin.state.model.plans.PlansModel;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.runs.RunsModel;
 import org.terrakube.api.plugin.state.model.state.StateData;
@@ -29,7 +31,6 @@ import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 
 import java.io.InputStream;
-import java.lang.module.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -343,6 +344,23 @@ public class RemoteTfeService {
         runsModel.getAttributes().put("status","planning");
         runsData.setData(runsModel);
         return runsData;
+    }
+
+    PlansData getPlan(int planId){
+        log.info("Searching Plans Log read url {}", planId);
+        PlansData plansData = new PlansData();
+        PlansModel plansModel = new PlansModel();
+        plansModel.setId(String.valueOf(planId));
+        plansModel.setType("plans");
+        plansModel.setAttributes(new HashMap());
+        plansModel.getAttributes().put("log-read-url",String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
+        plansData.setData(plansModel);
+        return plansData;
+    }
+
+    String getPlanLogs(int planId){
+        log.info("Searching Run {}", planId);
+        return "Hello World!\nHello World2!\n";
     }
 
 

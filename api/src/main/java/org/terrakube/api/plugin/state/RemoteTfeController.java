@@ -246,4 +246,23 @@ public class RemoteTfeController {
     }
 
 
+    @Transactional
+    @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}")
+    //public ResponseEntity<?> getRun(HttpEntity<String> httpEntity) {
+    //    log.info("{}", httpEntity.getBody());
+    public ResponseEntity<?> getPlan(@PathVariable("planId") int planId) {
+        log.info("Checking plan data");
+        return ResponseEntity.ok(remoteTfeService.getPlan(planId));
+    }
+
+    @Transactional
+    @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}/logs")
+    //public ResponseEntity<?> getRun(HttpEntity<String> httpEntity) {
+    //    log.info("{}", httpEntity.getBody());
+    public ResponseEntity<?> getPlanLogs(@PathVariable("planId") int planId) {
+        log.info("Checking plan data logs");
+        return ResponseEntity.ok(remoteTfeService.getPlanLogs(planId));
+    }
+
+
 }
