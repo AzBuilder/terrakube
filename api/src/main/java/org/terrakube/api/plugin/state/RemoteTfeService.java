@@ -353,6 +353,7 @@ public class RemoteTfeService {
         planModel.getData().setId(String.valueOf(runId));
         relationships.setPlan(planModel);
         runsData.getData().setRelationships(relationships);
+        log.info("{}", runsData.toString());
         return runsData;
     }
 
