@@ -35,6 +35,7 @@ import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -367,6 +368,7 @@ public class RemoteTfeService {
         plansModel.setId(String.valueOf(planId));
         plansModel.setType("plans");
         plansModel.setAttributes(new HashMap());
+        plansModel.getAttributes().put("status", "finished");
         plansModel.getAttributes().put("log-read-url",String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
         plansData.setData(plansModel);
         return plansData;
@@ -374,11 +376,8 @@ public class RemoteTfeService {
 
     byte[] getPlanLogs(int planId) throws IOException {
         log.info("Searching Run {}", planId);
-        File logs = new File("/workspace/terrakube/LICENSE");
-        InputStream in = getClass()
-                .getResourceAsStream("/workspace/terrakube/LICENSE");
-        return IOUtils.toByteArray(in);
+        File initialFile = new File("/workspace/terrakube/LICENSE");
+        InputStream targetStream = new FileInputStream(initialFile);
+        return null;
     }
-
-
 }

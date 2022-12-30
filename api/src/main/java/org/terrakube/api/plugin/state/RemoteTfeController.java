@@ -261,7 +261,7 @@ public class RemoteTfeController {
     //    log.info("{}", httpEntity.getBody());
     public ResponseEntity<?> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
         log.info("Checking plan data logs");
-        return ResponseEntity.ok(remoteTfeService.getPlanLogs(planId));
+        return ResponseEntity.noContent().build();
     }
 
 
