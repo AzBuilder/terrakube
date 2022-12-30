@@ -11,4 +11,5 @@ public class Relationships {
     @JsonProperty("configuration-version")
     ConfigurationModel configurationVersion;
     WorkspaceModel workspace;
+    PlanModel plan;
 }

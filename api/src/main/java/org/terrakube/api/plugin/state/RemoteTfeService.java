@@ -10,10 +10,13 @@ import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationModel;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
+import org.terrakube.api.plugin.state.model.generic.Resource;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
 import org.terrakube.api.plugin.state.model.plans.PlansData;
 import org.terrakube.api.plugin.state.model.plans.PlansModel;
+import org.terrakube.api.plugin.state.model.runs.PlanModel;
+import org.terrakube.api.plugin.state.model.runs.Relationships;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.runs.RunsModel;
 import org.terrakube.api.plugin.state.model.state.StateData;
@@ -343,6 +346,13 @@ public class RemoteTfeService {
         runsModel.setAttributes(new HashMap());
         runsModel.getAttributes().put("status","planning");
         runsData.setData(runsModel);
+        Relationships relationships = new Relationships();
+        PlanModel planModel = new PlanModel();
+        planModel.setData(new Resource());
+        planModel.getData().setType("plans");
+        planModel.getData().setId(String.valueOf(runId));
+        relationships.setPlan(planModel);
+        runsData.getData().setRelationships(relationships);
         return runsData;
     }
 
