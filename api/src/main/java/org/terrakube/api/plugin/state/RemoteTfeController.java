@@ -259,7 +259,7 @@ public class RemoteTfeController {
     @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}/logs")
     //public ResponseEntity<?> getRun(HttpEntity<String> httpEntity) {
     //    log.info("{}", httpEntity.getBody());
-    public ResponseEntity<?> getPlanLogs(@PathVariable("planId") int planId) {
+    public ResponseEntity<?> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
         log.info("Checking plan data logs");
         return ResponseEntity.ok(remoteTfeService.getPlanLogs(planId));
     }

@@ -2,6 +2,7 @@ package org.terrakube.api.plugin.state;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -369,9 +372,12 @@ public class RemoteTfeService {
         return plansData;
     }
 
-    String getPlanLogs(int planId){
+    byte[] getPlanLogs(int planId) throws IOException {
         log.info("Searching Run {}", planId);
-        return "Hello World!\nHello World2!\n";
+        File logs = new File("/workspace/terrakube/LICENSE");
+        InputStream in = getClass()
+                .getResourceAsStream("/workspace/terrakube/LICENSE");
+        return IOUtils.toByteArray(in);
     }
 
 
