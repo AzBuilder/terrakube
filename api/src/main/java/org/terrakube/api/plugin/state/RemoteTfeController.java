@@ -2,6 +2,8 @@ package org.terrakube.api.plugin.state;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +13,13 @@ import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.springframework.http.HttpEntity;
+import org.terrakube.api.plugin.storage.StorageTypeService;
+import org.terrakube.api.repository.ContentRepository;
 
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -23,6 +28,7 @@ import java.util.Optional;
 @RequestMapping("/remote/tfe/v2/")
 @AllArgsConstructor
 public class RemoteTfeController {
+    private final ContentRepository contentRepository;
 
     RemoteTfeService remoteTfeService;
 
@@ -184,7 +190,7 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping (produces = "application/vnd.api+json", path = "/runs")
-    public ResponseEntity<?> createRun(@RequestBody RunsData runsData) {
+    public ResponseEntity<?> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
         /*
         {
    "data":{
@@ -261,7 +267,15 @@ public class RemoteTfeController {
     //    log.info("{}", httpEntity.getBody());
     public ResponseEntity<?> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
         log.info("Checking plan data logs");
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getPlanLogs(planId)));
+    }
+
+    @GetMapping(
+            value = "configuration-versions/{planId}/terraformContent.tar.gz",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public @ResponseBody byte[] getTerraformPlanBinary(@PathVariable("planId") int contentId) {
+        return remoteTfeService.getContentFile(contentId);
     }
 
 

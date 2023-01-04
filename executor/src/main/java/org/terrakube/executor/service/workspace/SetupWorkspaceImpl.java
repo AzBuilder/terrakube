@@ -48,15 +48,16 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     @Override
     public File prepareWorkspace(TerraformJob terraformJob) {
         File workspaceCloneFolder = null;
-        try {
-            workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-            downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
-            if (enableRegistrySecurity)
-                workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-        return workspaceCloneFolder != null ? workspaceCloneFolder.getParentFile() : new File("/tmp/"+UUID.randomUUID());
+        if (!terraformJob.getBranch().equals("remote-content"))
+            try {
+                workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+                downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
+                if (enableRegistrySecurity)
+                    workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        return workspaceCloneFolder != null ? workspaceCloneFolder.getParentFile() : new File("/tmp/" + UUID.randomUUID());
     }
 
     private File setupWorkspaceDirectory(String organizationId, String workspaceId) throws IOException {
@@ -115,7 +116,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         }
     }
 
-    private void getCommitId(File gitCloneFolder){
+    private void getCommitId(File gitCloneFolder) {
         RevCommit latestCommit = null;
         try {
             latestCommit = Git.init().setDirectory(gitCloneFolder).call().

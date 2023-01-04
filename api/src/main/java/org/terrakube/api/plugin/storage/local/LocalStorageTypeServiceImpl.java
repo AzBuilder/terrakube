@@ -106,4 +106,21 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             log.error(e.getMessage());
         }
     }
+
+    @Override
+    public byte[] getContentFile(String contentId) {
+        String contentFile = String.format(CONTENT_DIRECTORY, contentId);
+        log.info("contentFile: {}", contentFile);
+        File content = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(contentFile)));
+        if (content.exists()) {
+            try {
+                return IOUtils.toByteArray(new FileInputStream(content));
+            } catch (IOException e) {
+                log.error(e.getMessage());
+                return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);
+            }
+        } else {
+            return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);
+        }
+    }
 }

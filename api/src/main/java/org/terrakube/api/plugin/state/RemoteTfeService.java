@@ -3,10 +3,12 @@ package org.terrakube.api.plugin.state;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationModel;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
@@ -29,6 +31,7 @@ import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.step.Step;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
@@ -38,10 +41,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.text.ParseException;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -59,6 +60,9 @@ public class RemoteTfeService {
 
     @Autowired
     TemplateRepository templateRepository;
+
+    @Autowired
+    ScheduleJobService scheduleJobService;
 
     @Value("${org.terrakube.hostname}")
     String hostname;
@@ -223,7 +227,7 @@ public class RemoteTfeService {
             newWorkspace.setName(workspaceData.getData().getAttributes().get("name").toString());
             newWorkspace.setTerraformVersion(workspaceData.getData().getAttributes().get("terraform-version").toString());
             newWorkspace.setSource("empty");
-            newWorkspace.setBranch("empty");
+            newWorkspace.setBranch("remote-content");
             newWorkspace.setOrganization(organization);
             workspaceRepository.save(newWorkspace);
         }
@@ -302,6 +306,10 @@ public class RemoteTfeService {
         return searchConfiguration(contentId);
     }
 
+    byte[] getContentFile(int contentId) {
+        return storageTypeService.getContentFile(String.valueOf(contentId));
+    }
+
     ConfigurationData searchConfiguration(String contentId) {
         Content content = contentRepository.getById(UUID.fromString(contentId));
         ConfigurationData configurationData = new ConfigurationData();
@@ -322,12 +330,14 @@ public class RemoteTfeService {
         return configurationData;
     }
 
-    RunsData createRun(RunsData runsData){
+    RunsData createRun(RunsData runsData) throws SchedulerException, ParseException {
         log.info("Creating new Terrakube Job");
         log.info("Workspace {} Configuration {}", runsData.getData().getRelationships().getWorkspace().getData().getId(), runsData.getData().getRelationships().getConfigurationVersion().getData().getId());
         String workspaceId = runsData.getData().getRelationships().getWorkspace().getData().getId();
         String configurationId = runsData.getData().getRelationships().getConfigurationVersion().getData().getId();
         Workspace workspace = workspaceRepository.getById(UUID.fromString(workspaceId));
+        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/{planId}/terraformContent.tar.gz", hostname,runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
+        workspace = workspaceRepository.save(workspace);
         Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(),"Terraform-Plan");
         log.info("Creating Job");
         Job job = new Job();
@@ -338,6 +348,8 @@ public class RemoteTfeService {
         job.setTemplateReference(template.getId().toString());
         job = jobRepository.save(job);
         log.info("Job Created");
+        scheduleJobService.createJobContext(job);
+        log.info("Job Context Created");
         return getRun(job.getId());
     }
 
@@ -348,7 +360,33 @@ public class RemoteTfeService {
         runsModel.setId(String.valueOf(runId));
         runsModel.setType("runs");
         runsModel.setAttributes(new HashMap());
-        runsModel.getAttributes().put("status","planning");
+
+
+        String planStatus = "running";
+        Job job = jobRepository.getById(Integer.valueOf(runId));
+        if(!job.getStep().isEmpty()){
+            List<Step> stepList = job.getStep();
+            for(Step step: stepList){
+                if(step.getStepNumber() == 100){
+                    switch (step.getStatus()){
+                        case completed:
+                            planStatus="finished";
+                            break;
+                        case running:
+                            planStatus="running";
+                            break;
+                        case failed:
+                            planStatus="errored";
+                            break;
+                        case queue:
+                            planStatus="pending";
+                            break;
+                    }
+                }
+            }
+        }
+
+        runsModel.getAttributes().put("status",planStatus);
         runsData.setData(runsModel);
         Relationships relationships = new Relationships();
         PlanModel planModel = new PlanModel();
@@ -376,8 +414,18 @@ public class RemoteTfeService {
 
     byte[] getPlanLogs(int planId) throws IOException {
         log.info("Searching Run {}", planId);
-        File initialFile = new File("/workspace/terrakube/LICENSE");
-        InputStream targetStream = new FileInputStream(initialFile);
-        return null;
+        Job job = jobRepository.getById(Integer.valueOf(planId));
+        byte[] logs = "".getBytes();
+        if(!job.getStep().isEmpty()){
+            for(Step step: job.getStep()){
+                log.info("Current Job State {}", job.getStatus());
+                if(step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)){
+                    //logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(),String.valueOf(planId), "100");
+
+                    logs = "Terrakube Job is completed".getBytes();
+                }
+            }
+        }
+        return logs;
     }
 }

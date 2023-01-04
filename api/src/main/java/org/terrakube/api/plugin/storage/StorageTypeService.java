@@ -17,4 +17,6 @@ public interface StorageTypeService {
     String getContext(int jobId);
 
     void createContentFile(String contentId, InputStream inputStream);
+
+    byte[] getContentFile(String contentId);
 }

@@ -110,4 +110,9 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
     public void createContentFile(String contentId, InputStream inputStream) {
 
     }
+
+    @Override
+    public byte[] getContentFile(String contentId) {
+        return new byte[0];
+    }
 }
