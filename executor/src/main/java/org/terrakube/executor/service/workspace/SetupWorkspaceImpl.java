@@ -49,19 +49,18 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     @Override
     public File prepareWorkspace(TerraformJob terraformJob) {
         File workspaceCloneFolder = null;
-        if (!terraformJob.getBranch().equals("remote-content"))
-            try {
-                workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                if (!terraformJob.getBranch().equals("remote-content")) {
-                    downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
-                } else {
-                    downloadWorkspaceTarGz(workspaceCloneFolder.getParentFile(), terraformJob.getSource());
-                }
-                if (enableRegistrySecurity)
-                    workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
-            } catch (IOException e) {
-                log.error(e.getMessage());
+        try {
+            workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+            if (!terraformJob.getBranch().equals("remote-content")) {
+                downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
+            } else {
+                downloadWorkspaceTarGz(workspaceCloneFolder.getParentFile(), terraformJob.getSource());
             }
+            if (enableRegistrySecurity)
+                workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
         return workspaceCloneFolder != null ? workspaceCloneFolder.getParentFile() : new File("/tmp/" + UUID.randomUUID());
     }
 
@@ -124,17 +123,17 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     private void downloadWorkspaceTarGz(File tarGzFolder, String source) throws IOException {
         File terraformTarGz = new File(tarGzFolder.getPath() + "/terraformContent.tar.gz");
         FileUtils.copyURLToFile(new URL(source), terraformTarGz, 10000, 10000);
-        extractTarGZ(new FileInputStream(terraformTarGz));
+        extractTarGZ(new FileInputStream(terraformTarGz), tarGzFolder.getPath().toString());
     }
 
-    public void extractTarGZ(InputStream in) throws IOException {
+    public void extractTarGZ(InputStream in, String destinationFilePath) throws IOException {
         GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
             TarArchiveEntry entry;
 
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
-                    File f = new File(entry.getName());
+                    File f = new File(destinationFilePath + "/" + entry.getName());
                     boolean created = f.mkdir();
                     if (!created) {
                         log.info("Unable to create directory '{}', during extraction of archive contents.\n", f.getAbsolutePath());
@@ -142,7 +141,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 } else {
                     int count;
                     byte data[] = new byte[2048];
-                    FileOutputStream fos = new FileOutputStream(entry.getName(), false);
+                    FileOutputStream fos = new FileOutputStream(destinationFilePath + "/" + entry.getName(), false);
+                    log.info("Adding file {} to workspace context", destinationFilePath + "/" + entry.getName());
                     try (BufferedOutputStream dest = new BufferedOutputStream(fos, 2048)) {
                         while ((count = tarIn.read(data, 0, 2048)) != -1) {
                             dest.write(data, 0, count);

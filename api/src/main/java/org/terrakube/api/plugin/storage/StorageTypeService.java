@@ -1,7 +1,5 @@
 package org.terrakube.api.plugin.storage;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.InputStream;
 
 public interface StorageTypeService {

@@ -2498,5 +2498,41 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "2730cea5-fd66-42ad-82f4-edc4160b226d",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "Workspace Plan",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/plans/1",
+    "method": "GET",
+    "sortNum": 810000,
+    "created": "2023-01-09T22:46:06.607Z",
+    "modified": "2023-01-09T22:46:43.573Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "4bd6724d-184c-4aad-8988-030a9d5eaa0a",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "Logs URL",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/plans/1/logs",
+    "method": "GET",
+    "sortNum": 820000,
+    "created": "2023-01-09T22:46:54.206Z",
+    "modified": "2023-01-09T22:47:18.922Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]

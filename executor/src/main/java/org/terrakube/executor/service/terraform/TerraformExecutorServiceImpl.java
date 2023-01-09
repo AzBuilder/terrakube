@@ -63,7 +63,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 executionPlan = terraformClient.plan(
                         terraformJob.getTerraformVersion(),
                         workingDirectory,
-                        backendFile,
+                        null,
                         terraformParametersPlan,
                         environmentVariablesPlan,
                         outputPlan,
@@ -293,7 +293,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
                 terraformJob.getWorkspaceId(), workingDirectory);
 
-        terraformClient.init(terraformJob.getTerraformVersion(), workingDirectory, backendFile, output, errorOutput)
+        terraformClient.init(terraformJob.getTerraformVersion(), workingDirectory, null, output, errorOutput)
                 .get();
         return backendFile;
     }

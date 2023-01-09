@@ -22,7 +22,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     private static final String CONTEXT_DIRECTORY = "/.terraform-spring-boot/local/output/context/%s/context.json";
     private static final String STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/terraformLibrary.tfPlan";
     private static final String STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
-    private static final String NO_DATA_FOUND = "NO DATA FOUND IN LOCAL STORAGE";
+    private static final String NO_DATA_FOUND = "";
     private static final String NO_CONTEXT_FOUND = "{}";
 
     @Override

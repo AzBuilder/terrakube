@@ -266,7 +266,6 @@ public class RemoteTfeController {
     //public ResponseEntity<?> getRun(HttpEntity<String> httpEntity) {
     //    log.info("{}", httpEntity.getBody());
     public ResponseEntity<?> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
-        log.info("Checking plan data logs");
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getPlanLogs(planId)));
     }
 
@@ -274,8 +273,8 @@ public class RemoteTfeController {
             value = "configuration-versions/{planId}/terraformContent.tar.gz",
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public @ResponseBody byte[] getTerraformPlanBinary(@PathVariable("planId") int contentId) {
-        return remoteTfeService.getContentFile(contentId);
+    public @ResponseBody byte[] getTerraformPlanBinary(@PathVariable("planId") String planId) {
+        return remoteTfeService.getContentFile(planId);
     }
 
 

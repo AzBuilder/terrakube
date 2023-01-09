@@ -34,10 +34,7 @@ public class LocalTerraformStateImpl implements TerraformState {
     private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String LOCAL_STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String LOCAL_STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
-    private static final String BACKEND_FILE_NAME = "localBackend.hcl";
-    private static final String BACKEND_LOCAL_CONTENT = "\n\nterraform {\n" +
-            "  backend \"local\" { }\n" +
-            "}";
+    private static final String BACKEND_FILE_NAME = "terrakube_override.tf";
 
     @NonNull
     TerrakubeClient terrakubeClient;
@@ -55,7 +52,11 @@ public class LocalTerraformStateImpl implements TerraformState {
                     ));
 
             TextStringBuilder localBackendHcl = new TextStringBuilder();
-            localBackendHcl.appendln("path                  = \"" + localBackendDirectory + "\"");
+            localBackendHcl.appendln("terraform {");
+            localBackendHcl.appendln("  backend \"local\" {");
+            localBackendHcl.appendln("    path                  = \"" + localBackendDirectory + "\"");
+            localBackendHcl.appendln("  }");
+            localBackendHcl.appendln("}");
 
             File localBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
@@ -65,15 +66,6 @@ public class LocalTerraformStateImpl implements TerraformState {
 
             log.info("Creating Local Backend File: {}", localBackendFile.getAbsolutePath());
             FileUtils.writeStringToFile(localBackendFile, localBackendHcl.toString(), Charset.defaultCharset());
-
-            File localBackendMainTf = new File(
-                    FilenameUtils.separatorsToSystem(
-                            workingDirectory.getAbsolutePath().concat("/main.tf")
-                    )
-            );
-
-            FileUtils.writeStringToFile(localBackendMainTf, BACKEND_LOCAL_CONTENT, Charset.defaultCharset(), true);
-
         } catch (IOException e) {
             log.error(e.getMessage());
             localBackend = null;

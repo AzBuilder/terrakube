@@ -306,8 +306,8 @@ public class RemoteTfeService {
         return searchConfiguration(contentId);
     }
 
-    byte[] getContentFile(int contentId) {
-        return storageTypeService.getContentFile(String.valueOf(contentId));
+    byte[] getContentFile(String contentId) {
+        return storageTypeService.getContentFile(contentId);
     }
 
     ConfigurationData searchConfiguration(String contentId) {
@@ -336,7 +336,7 @@ public class RemoteTfeService {
         String workspaceId = runsData.getData().getRelationships().getWorkspace().getData().getId();
         String configurationId = runsData.getData().getRelationships().getConfigurationVersion().getData().getId();
         Workspace workspace = workspaceRepository.getById(UUID.fromString(workspaceId));
-        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/{planId}/terraformContent.tar.gz", hostname,runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
+        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz", hostname,runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
         workspace = workspaceRepository.save(workspace);
         Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(),"Terraform-Plan");
         log.info("Creating Job");
@@ -362,9 +362,9 @@ public class RemoteTfeService {
         runsModel.setAttributes(new HashMap());
 
 
-        String planStatus = "pending";
+        String planStatus = "running";
         Job job = jobRepository.getById(Integer.valueOf(runId));
-        if(!job.getStep().isEmpty()){
+        if(job.getStep() != null && !job.getStep().isEmpty()){
             List<Step> stepList = job.getStep();
             for(Step step: stepList){
                 if(step.getStepNumber() == 100){
@@ -379,7 +379,7 @@ public class RemoteTfeService {
                             planStatus="errored";
                             break;
                         case queue:
-                            planStatus="pending";
+                            planStatus="running";
                             break;
                     }
                 }
@@ -416,15 +416,16 @@ public class RemoteTfeService {
         log.info("Searching Run {}", planId);
         Job job = jobRepository.getById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
-        if(!job.getStep().isEmpty()){
+        if(job.getStep() != null && !job.getStep().isEmpty()){
             for(Step step: job.getStep()){
                 log.info("Current Job State {}", job.getStatus());
                 if(step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)){
-                    //logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(),String.valueOf(planId), "100");
-
-                    logs = "Terrakube Job is completed".getBytes();
+                    log.info("Get Logs for Step {}", step.getId().toString());
+                    logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(),String.valueOf(planId), step.getId().toString());
                 }
             }
+        } else {
+            logs = "Running in Terrakube please wait...".getBytes();
         }
         return logs;
     }
