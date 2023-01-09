@@ -38,50 +38,45 @@ public class ExecutorJobImpl implements ExecutorJob {
         boolean executionSuccess = true;
         File workspaceFolder = setupWorkspace.prepareWorkspace(terraformJob);
 
-        String commitId = "";
+        String commitId = "000000000";
         ExecutorJobResult terraformResult = new ExecutorJobResult();
-        if(terraformJob.getBranch().equals("remote-content")){
-            log.error("Remote Conent from {} ", terraformJob.getSource());
-            terraformResult = new ExecutorJobResult();
-            terraformResult.setOutputLog("not supported");
-            terraformResult.setOutputErrorLog("not supported");
-            commitId = "empty";
-        } else {
-            commitId = getCommitId(workspaceFolder);
-            updateJobStatus.setRunningStatus(terraformJob, commitId);
-            switch (terraformJob.getType()) {
-                case "terraformPlan":
-                    log.info("Execute Plan for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                    terraformResult = terraformExecutor.plan(terraformJob, workspaceFolder);
-                    break;
-                case "terraformApply":
-                    log.info("Execute Apply for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                    terraformResult = terraformExecutor.apply(terraformJob, workspaceFolder);
-                    break;
-                case "terraformDestroy":
-                    log.info("Execute Destroy for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                    terraformResult = terraformExecutor.destroy(terraformJob, workspaceFolder);
-                    break;
-                case "customScripts":
-                case "approval":
-                    log.info("Execute Groovy Script for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                    TextStringBuilder scriptOutput = new TextStringBuilder();
-                    TextStringBuilder scriptErrorOutput = new TextStringBuilder();
-                    Consumer<String> output = outputScripts -> scriptOutput.appendln(outputScripts);
-                    executionSuccess = scriptEngineService.execute(terraformJob, terraformJob.getCommandList(), workspaceFolder, output);
-                    terraformResult.setOutputLog(scriptOutput.toString());
-                    terraformResult.setOutputErrorLog(scriptErrorOutput.toString());
-                    terraformResult.setSuccessfulExecution(executionSuccess);
-                    break;
-                default:
-                    terraformResult = new ExecutorJobResult();
-                    terraformResult.setOutputLog("Command Completed");
-                    terraformResult.setOutputErrorLog("Command type not defined");
-                    terraformResult.setSuccessfulExecution(false);
-                    break;
-            }
-        }
 
+        if (!terraformJob.getBranch().equals("remote-content"))
+            commitId = getCommitId(workspaceFolder);
+
+        updateJobStatus.setRunningStatus(terraformJob, commitId);
+
+        switch (terraformJob.getType()) {
+            case "terraformPlan":
+                log.info("Execute Plan for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+                terraformResult = terraformExecutor.plan(terraformJob, workspaceFolder);
+                break;
+            case "terraformApply":
+                log.info("Execute Apply for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+                terraformResult = terraformExecutor.apply(terraformJob, workspaceFolder);
+                break;
+            case "terraformDestroy":
+                log.info("Execute Destroy for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+                terraformResult = terraformExecutor.destroy(terraformJob, workspaceFolder);
+                break;
+            case "customScripts":
+            case "approval":
+                log.info("Execute Groovy Script for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+                TextStringBuilder scriptOutput = new TextStringBuilder();
+                TextStringBuilder scriptErrorOutput = new TextStringBuilder();
+                Consumer<String> output = outputScripts -> scriptOutput.appendln(outputScripts);
+                executionSuccess = scriptEngineService.execute(terraformJob, terraformJob.getCommandList(), workspaceFolder, output);
+                terraformResult.setOutputLog(scriptOutput.toString());
+                terraformResult.setOutputErrorLog(scriptErrorOutput.toString());
+                terraformResult.setSuccessfulExecution(executionSuccess);
+                break;
+            default:
+                terraformResult = new ExecutorJobResult();
+                terraformResult.setOutputLog("Command Completed");
+                terraformResult.setOutputErrorLog("Command type not defined");
+                terraformResult.setSuccessfulExecution(false);
+                break;
+        }
 
 
         executionSuccess = terraformResult.isSuccessfulExecution();
@@ -103,7 +98,7 @@ public class ExecutorJobImpl implements ExecutorJob {
             final File commitInformation = new File(String.format("%s/commitHash.info", workspaceFolder.getPath()));
             final InputStream commitIdStream = new DataInputStream(new FileInputStream(commitInformation));
             commitId = IOUtils.toString(commitIdStream, Charset.defaultCharset());
-        }catch (IOException e){
+        } catch (IOException e) {
             log.error(e.getMessage());
         }
         return commitId;

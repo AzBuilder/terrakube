@@ -362,7 +362,7 @@ public class RemoteTfeService {
         runsModel.setAttributes(new HashMap());
 
 
-        String planStatus = "running";
+        String planStatus = "pending";
         Job job = jobRepository.getById(Integer.valueOf(runId));
         if(!job.getStep().isEmpty()){
             List<Step> stepList = job.getStep();

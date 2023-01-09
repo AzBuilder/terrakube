@@ -1,7 +1,9 @@
 package org.terrakube.executor.service.workspace;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.sshd.JGitKeyCache;
@@ -21,6 +23,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.PublicKey;
 import java.util.Collections;
@@ -35,12 +38,10 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     private static final String SSH_DIRECTORY = "%s/.terraform-spring-boot/ssh/executor/%s/%s/%s";
     private static final String SSH_EXECUTOR_JOB = "%s/.terraform-spring-boot/ssh/executor/%s";
 
-    OkHttpClient httpClient;
     WorkspaceSecurity workspaceSecurity;
     boolean enableRegistrySecurity;
 
-    public SetupWorkspaceImpl(OkHttpClient httpClient, WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity) {
-        this.httpClient = httpClient;
+    public SetupWorkspaceImpl(WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity) {
         this.workspaceSecurity = workspaceSecurity;
         this.enableRegistrySecurity = enableRegistrySecurity;
     }
@@ -51,7 +52,11 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         if (!terraformJob.getBranch().equals("remote-content"))
             try {
                 workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
+                if (!terraformJob.getBranch().equals("remote-content")) {
+                    downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
+                } else {
+                    downloadWorkspaceTarGz(workspaceCloneFolder.getParentFile(), terraformJob.getSource());
+                }
                 if (enableRegistrySecurity)
                     workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
             } catch (IOException e) {
@@ -113,6 +118,40 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
         } catch (GitAPIException ex) {
             log.error(ex.getMessage());
+        }
+    }
+
+    private void downloadWorkspaceTarGz(File tarGzFolder, String source) throws IOException {
+        File terraformTarGz = new File(tarGzFolder.getPath() + "/terraformContent.tar.gz");
+        FileUtils.copyURLToFile(new URL(source), terraformTarGz, 10000, 10000);
+        extractTarGZ(new FileInputStream(terraformTarGz));
+    }
+
+    public void extractTarGZ(InputStream in) throws IOException {
+        GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
+        try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
+            TarArchiveEntry entry;
+
+            while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
+                if (entry.isDirectory()) {
+                    File f = new File(entry.getName());
+                    boolean created = f.mkdir();
+                    if (!created) {
+                        log.info("Unable to create directory '{}', during extraction of archive contents.\n", f.getAbsolutePath());
+                    }
+                } else {
+                    int count;
+                    byte data[] = new byte[2048];
+                    FileOutputStream fos = new FileOutputStream(entry.getName(), false);
+                    try (BufferedOutputStream dest = new BufferedOutputStream(fos, 2048)) {
+                        while ((count = tarIn.read(data, 0, 2048)) != -1) {
+                            dest.write(data, 0, count);
+                        }
+                    }
+                }
+            }
+
+            log.info("Untar completed successfully!");
         }
     }
 
