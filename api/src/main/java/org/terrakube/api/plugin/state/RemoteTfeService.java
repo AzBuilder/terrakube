@@ -373,13 +373,11 @@ public class RemoteTfeService {
                             planStatus="finished";
                             break;
                         case running:
+                        case queue:
                             planStatus="running";
                             break;
                         case failed:
                             planStatus="errored";
-                            break;
-                        case queue:
-                            planStatus="running";
                             break;
                     }
                 }
@@ -406,7 +404,31 @@ public class RemoteTfeService {
         plansModel.setId(String.valueOf(planId));
         plansModel.setType("plans");
         plansModel.setAttributes(new HashMap());
-        plansModel.getAttributes().put("status", "finished");
+        String planStatus = "pending";
+
+        Job job = jobRepository.getById(Integer.valueOf(planId));
+        if(job.getStep() != null && !job.getStep().isEmpty()){
+            for(Step step: job.getStep()){
+                if(step.getStepNumber() == 100){
+                    switch (step.getStatus()){
+                        case pending:
+                            planStatus="pending";
+                            break;
+                        case queue:
+                        case running:
+                            planStatus="running";
+                            break;
+                        case completed:
+                            planStatus="finished";
+                            break;
+                        case failed:
+                            planStatus="errored";
+                            break;
+                    }
+                }
+            }
+        }
+        plansModel.getAttributes().put("status", planStatus);
         plansModel.getAttributes().put("log-read-url",String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
         plansData.setData(plansModel);
         return plansData;
