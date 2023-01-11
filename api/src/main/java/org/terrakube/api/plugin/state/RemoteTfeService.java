@@ -70,6 +70,8 @@ public class RemoteTfeService {
     @Autowired
     StorageTypeService storageTypeService;
 
+    HashMap<String,String> logStatus = new HashMap();
+
     EntitlementData getOrgEntitlementSet(String organizationName) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
         if (organization != null) {
@@ -344,7 +346,7 @@ public class RemoteTfeService {
         job.setWorkspace(workspace);
         job.setOrganization(workspace.getOrganization());
         job.setStatus(JobStatus.pending);
-        job.setComments("terraform-cli");
+        job.setComments("terraform-cli ");
         job.setTemplateReference(template.getId().toString());
         job = jobRepository.save(job);
         log.info("Job Created");
@@ -419,7 +421,16 @@ public class RemoteTfeService {
                             planStatus="running";
                             break;
                         case completed:
-                            planStatus="finished";
+                            //Temporal status info
+                            if(!logStatus.containsKey("plan"+planId)) {
+                                logStatus.put("plan" + planId, "1");
+                            }
+
+                            if(logStatus.get("plan" + planId).equals("2"))
+                                planStatus="finished";
+                            else
+                                planStatus="running";
+
                             break;
                         case failed:
                             planStatus="errored";
@@ -438,16 +449,16 @@ public class RemoteTfeService {
         log.info("Searching Run {}", planId);
         Job job = jobRepository.getById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
+        if(logStatus.containsKey("plan"+planId) && logStatus.get("plan"+planId).equals("1"))
         if(job.getStep() != null && !job.getStep().isEmpty()){
             for(Step step: job.getStep()){
                 log.info("Current Job State {}", job.getStatus());
                 if(step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)){
                     log.info("Get Logs for Step {}", step.getId().toString());
                     logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(),String.valueOf(planId), step.getId().toString());
+                    logStatus.put("plan"+planId,"2");
                 }
             }
-        } else {
-            logs = "Running in Terrakube please wait...".getBytes();
         }
         return logs;
     }
