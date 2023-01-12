@@ -7,10 +7,11 @@ import com.azure.storage.blob.BlobServiceClient;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Builder
@@ -18,7 +19,11 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String CONTAINER_NAME_STATE = "tfstate";
     private static final String CONTAINER_NAME_OUTPUT = "tfoutput";
+
+    private static final String CONTAINER_TERRAFORM_CONTENT = "content";
     private static final String CONTEXT_FILE = "context/%s/context.json";
+
+    private static final String TERRAFORM_TAR_GZ = "content/%s/terraformContent.tar.gz";
 
     @NonNull
     BlobServiceClient blobServiceClient;
@@ -74,11 +79,35 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public void createContentFile(String contentId, InputStream inputStream) {
+        BlobContainerClient contentContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_TERRAFORM_CONTENT);
 
+        log.info("contentContainerClient.exists {}", contentContainerClient.exists());
+
+        if (!contentContainerClient.exists()) {
+            contentContainerClient.create();
+        }
+
+        String blobName = String.format(TERRAFORM_TAR_GZ, contentId);
+        log.info("Content file: {}", blobName);
+        BlobClient blobClient = contentContainerClient.getBlobClient(blobName);
+
+        BinaryData binaryData = null;
+        try {
+            binaryData = BinaryData.fromBytes(inputStream.readAllBytes());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        blobClient.upload(binaryData, true);
     }
 
     @Override
     public byte[] getContentFile(String contentId) {
-        return new byte[0];
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_TERRAFORM_CONTENT);
+        log.info("Searching: /content/{}/terraformContent.tar.gz", contentId);
+        if (containerClient.getBlobClient(String.format(TERRAFORM_TAR_GZ, contentId)).exists()) {
+            return containerClient.getBlobClient(String.format(TERRAFORM_TAR_GZ, contentId)).downloadContent().toBytes();
+        } else {
+            return "".getBytes(StandardCharsets.UTF_8);
+        }
     }
 }
