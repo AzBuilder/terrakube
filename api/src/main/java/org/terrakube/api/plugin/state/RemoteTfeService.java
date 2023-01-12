@@ -44,31 +44,39 @@ import java.util.*;
 @Slf4j
 @Service
 public class RemoteTfeService {
-    @Autowired
     private JobRepository jobRepository;
-    @Autowired
-    ContentRepository contentRepository;
-    @Autowired
-    OrganizationRepository organizationRepository;
-    @Autowired
-    WorkspaceRepository workspaceRepository;
-    @Autowired
-    HistoryRepository historyRepository;
+    private ContentRepository contentRepository;
+    private OrganizationRepository organizationRepository;
+    private WorkspaceRepository workspaceRepository;
+    private HistoryRepository historyRepository;
+    private TemplateRepository templateRepository;
+    private ScheduleJobService scheduleJobService;
+    private String hostname;
+    private StorageTypeService storageTypeService;
+    private StepRepository stepRepository;
 
-    @Autowired
-    TemplateRepository templateRepository;
+    public RemoteTfeService(JobRepository jobRepository,
+                            ContentRepository contentRepository,
+                            OrganizationRepository organizationRepository,
+                            WorkspaceRepository workspaceRepository,
+                            HistoryRepository historyRepository,
+                            TemplateRepository templateRepository,
+                            ScheduleJobService scheduleJobService,
+                            @Value("${org.terrakube.hostname}") String hostname,
+                            StorageTypeService storageTypeService,
+                            StepRepository stepRepository){
+        this.jobRepository = jobRepository;
+        this.contentRepository = contentRepository;
+        this.organizationRepository = organizationRepository;
+        this.workspaceRepository = workspaceRepository;
+        this.historyRepository = historyRepository;
+        this.templateRepository = templateRepository;
+        this.scheduleJobService = scheduleJobService;
+        this.hostname = hostname;
+        this.storageTypeService = storageTypeService;
+        this.stepRepository = stepRepository;
 
-    @Autowired
-    ScheduleJobService scheduleJobService;
-
-    @Value("${org.terrakube.hostname}")
-    String hostname;
-
-    @Autowired
-    StorageTypeService storageTypeService;
-
-    @Autowired
-    StepRepository stepRepository;
+    }
 
 
     EntitlementData getOrgEntitlementSet(String organizationName) {
@@ -136,25 +144,7 @@ public class RemoteTfeService {
 
             Map<String, Object> attributes = new HashMap();
             attributes.put("permissions", permissionMap);
-            //attributes.put("external-id","org-"+organizationName);
-            //attributes.put("created-at", "2020-03-26T22:13:38.456Z");
-            //attributes.put("email", "user@example.com");
-            //attributes.put("session-timeout", null);
-            //attributes.put("session-remember", null);
-            //attributes.put("collaborator-auth-policy", "password");
-            //attributes.put("plan-expired", false);
-            //attributes.put("plan-expires-at", null);
-            //attributes.put("plan-is-trial", false);
-            //attributes.put("plan-is-enterprise", false);
-            //attributes.put("cost-estimation-enabled", false);
-            //attributes.put("send-passing-statuses-for-untriggered-speculative-plans", false);
-            //attributes.put("allow-force-delete-workspaces", false);
             attributes.put("name", organizationName);
-            //attributes.put("fair-run-queuing-enabled", false);
-            //attributes.put("saml-enabled", false);
-            //attributes.put("owners-team-saml-role-id", null);
-            //attributes.put("two-factor-conformant", false);
-            //attributes.put("assessments-enforced", false);
             organizationModel.setAttributes(attributes);
 
             OrganizationData organizationData = new OrganizationData();
@@ -399,7 +389,6 @@ public class RemoteTfeService {
     }
 
     PlansData getPlan(int planId) {
-        log.info("Searching Plans Log read url {}", planId);
         PlansData plansData = new PlansData();
         PlansModel plansModel = new PlansModel();
         plansModel.setId(String.valueOf(planId));
@@ -472,7 +461,6 @@ public class RemoteTfeService {
     }
 
     byte[] getPlanLogs(int planId) throws IOException {
-        log.info("Searching Run {}", planId);
         Job job = jobRepository.getById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         if (checkPlanLogStatus(planId).equals(LogStatus.BEGIN))
