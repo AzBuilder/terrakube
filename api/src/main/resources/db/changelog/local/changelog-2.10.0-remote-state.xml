@@ -25,6 +25,8 @@
                 <constraints nullable="true" foreignKeyName="fk_content_workspace" references="workspace(id)"/>
             </column>
         </createTable>
-
+        <addColumn tableName="step" >
+            <column name="log_status" type="varchar(32)" defaultValue="UNKNOWN"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

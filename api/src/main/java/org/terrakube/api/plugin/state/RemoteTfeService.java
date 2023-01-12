@@ -1,13 +1,10 @@
 package org.terrakube.api.plugin.state;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationModel;
@@ -31,16 +28,16 @@ import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.LogStatus;
 import org.terrakube.api.rs.job.step.Step;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 
@@ -70,7 +67,9 @@ public class RemoteTfeService {
     @Autowired
     StorageTypeService storageTypeService;
 
-    HashMap<String,String> logStatus = new HashMap();
+    @Autowired
+    StepRepository stepRepository;
+
 
     EntitlementData getOrgEntitlementSet(String organizationName) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
@@ -320,7 +319,7 @@ public class RemoteTfeService {
         configurationModel.setId(content.getId().toString());
         configurationModel.setAttributes(new HashMap());
         configurationData.setData(configurationModel);
-        
+
         configurationData.getData().getAttributes().put("error", null);
         configurationData.getData().getAttributes().put("error-message", null);
         configurationData.getData().getAttributes().put("error-message", null);
@@ -338,9 +337,9 @@ public class RemoteTfeService {
         String workspaceId = runsData.getData().getRelationships().getWorkspace().getData().getId();
         String configurationId = runsData.getData().getRelationships().getConfigurationVersion().getData().getId();
         Workspace workspace = workspaceRepository.getById(UUID.fromString(workspaceId));
-        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz", hostname,runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
+        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz", hostname, runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
         workspace = workspaceRepository.save(workspace);
-        Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(),"Terraform-Plan");
+        Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), "Terraform-Plan");
         log.info("Creating Job");
         Job job = new Job();
         job.setWorkspace(workspace);
@@ -355,7 +354,7 @@ public class RemoteTfeService {
         return getRun(job.getId());
     }
 
-    RunsData getRun(int runId){
+    RunsData getRun(int runId) {
         log.info("Searching Run {}", runId);
         RunsData runsData = new RunsData();
         RunsModel runsModel = new RunsModel();
@@ -366,27 +365,27 @@ public class RemoteTfeService {
 
         String planStatus = "running";
         Job job = jobRepository.getById(Integer.valueOf(runId));
-        if(job.getStep() != null && !job.getStep().isEmpty()){
+        if (job.getStep() != null && !job.getStep().isEmpty()) {
             List<Step> stepList = job.getStep();
-            for(Step step: stepList){
-                if(step.getStepNumber() == 100){
-                    switch (step.getStatus()){
+            for (Step step : stepList) {
+                if (step.getStepNumber() == 100) {
+                    switch (step.getStatus()) {
                         case completed:
-                            planStatus="finished";
+                            planStatus = "finished";
                             break;
                         case running:
                         case queue:
-                            planStatus="running";
+                            planStatus = "running";
                             break;
                         case failed:
-                            planStatus="errored";
+                            planStatus = "errored";
                             break;
                     }
                 }
             }
         }
 
-        runsModel.getAttributes().put("status",planStatus);
+        runsModel.getAttributes().put("status", planStatus);
         runsData.setData(runsModel);
         Relationships relationships = new Relationships();
         PlanModel planModel = new PlanModel();
@@ -399,7 +398,7 @@ public class RemoteTfeService {
         return runsData;
     }
 
-    PlansData getPlan(int planId){
+    PlansData getPlan(int planId) {
         log.info("Searching Plans Log read url {}", planId);
         PlansData plansData = new PlansData();
         PlansModel plansModel = new PlansModel();
@@ -409,57 +408,87 @@ public class RemoteTfeService {
         String planStatus = "pending";
 
         Job job = jobRepository.getById(Integer.valueOf(planId));
-        if(job.getStep() != null && !job.getStep().isEmpty()){
-            for(Step step: job.getStep()){
-                if(step.getStepNumber() == 100){
-                    switch (step.getStatus()){
+        if (job.getStep() != null && !job.getStep().isEmpty()) {
+            for (Step step : job.getStep()) {
+                if (step.getStepNumber() == 100) {
+                    switch (step.getStatus()) {
                         case pending:
-                            planStatus="pending";
+                            planStatus = "pending";
                             break;
                         case queue:
                         case running:
-                            planStatus="running";
+                            planStatus = "running";
                             break;
                         case completed:
-                            //Temporal status info
-                            if(!logStatus.containsKey("plan"+planId)) {
-                                logStatus.put("plan" + planId, "1");
+                            //LOGIC TO ENABLE READING LOGS
+                            switch (checkPlanLogStatus(planId)) {
+                                case UNKNOWN:
+                                    updatePlanLogStatus(planId, LogStatus.BEGIN);
+                                    planStatus = "running";
+                                    break;
+                                case COMPLETED:
+                                    planStatus = "finished";
+                                    break;
+                                default:
+                                    planStatus = "running";
                             }
-
-                            if(logStatus.get("plan" + planId).equals("2"))
-                                planStatus="finished";
-                            else
-                                planStatus="running";
 
                             break;
                         case failed:
-                            planStatus="errored";
+                            planStatus = "errored";
                             break;
                     }
                 }
             }
         }
         plansModel.getAttributes().put("status", planStatus);
-        plansModel.getAttributes().put("log-read-url",String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
+        plansModel.getAttributes().put("log-read-url", String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
         plansData.setData(plansModel);
         return plansData;
+    }
+
+    private LogStatus checkPlanLogStatus(int planId) {
+        Job job = jobRepository.getById(Integer.valueOf(planId));
+        for (Step step : job.getStep()) {
+            if (step.getStepNumber() == 100 && step.getLogStatus() != null && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {
+                return step.getLogStatus();
+            }
+        }
+
+        return LogStatus.UNKNOWN;
+    }
+
+    private boolean updatePlanLogStatus(int planId, LogStatus logStatus) {
+        Job job = jobRepository.getById(Integer.valueOf(planId));
+        for (Step step : job.getStep()) {
+            if (step.getStepNumber() == 100) {
+                step.setLogStatus(logStatus);
+                stepRepository.save(step);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     byte[] getPlanLogs(int planId) throws IOException {
         log.info("Searching Run {}", planId);
         Job job = jobRepository.getById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
-        if(logStatus.containsKey("plan"+planId) && logStatus.get("plan"+planId).equals("1"))
-        if(job.getStep() != null && !job.getStep().isEmpty()){
-            for(Step step: job.getStep()){
-                log.info("Current Job State {}", job.getStatus());
-                if(step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)){
-                    log.info("Get Logs for Step {}", step.getId().toString());
-                    logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(),String.valueOf(planId), step.getId().toString());
-                    logStatus.put("plan"+planId,"2");
+        if (checkPlanLogStatus(planId).equals(LogStatus.BEGIN))
+            if (job.getStep() != null && !job.getStep().isEmpty()) {
+                for (Step step : job.getStep()) {
+                    log.info("Current Job State {}", job.getStatus());
+                    if (step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {
+                        log.info("Get Logs for Step {}", step.getId().toString());
+                        logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(), String.valueOf(planId), step.getId().toString());
+                        String logsFinal = new String(logs, StandardCharsets.UTF_8);
+
+                        logs = ("Terrakube Remote Plan Execution\n\n" + logsFinal.split("Running Terraform PLAN")[1].substring(54)).getBytes();
+                        updatePlanLogStatus(planId, LogStatus.COMPLETED);
+                    }
                 }
             }
-        }
         return logs;
     }
 }
