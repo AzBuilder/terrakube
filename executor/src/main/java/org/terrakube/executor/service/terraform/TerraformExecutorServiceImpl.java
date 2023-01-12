@@ -50,7 +50,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> outputPlan = getStringConsumer(jobOutput);
             Consumer<String> errorOutputPlan = getStringConsumer(jobErrorOutput);
 
-            String backendFile = executeTerraformInit(
+            executeTerraformInit(
                     terraformJob,
                     workingDirectory,
                     outputPlan,
@@ -100,7 +100,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess;
 
-            String backendFile = executeTerraformInit(
+            executeTerraformInit(
                     terraformJob,
                     workingDirectory,
                     output,
@@ -113,7 +113,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 execution = terraformClient.apply(
                         terraformJob.getTerraformVersion(),
                         workingDirectory,
-                        backendFile,
+                        null,
                         (terraformState.downloadTerraformPlan(terraformJob.getOrganizationId(),
                                 terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(),
                                 workingDirectory) ? new HashMap<>() : terraformParameters),
@@ -152,7 +152,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess;
 
-            String backendFile = executeTerraformInit(
+            executeTerraformInit(
                     terraformJob,
                     workingDirectory,
                     outputDestroy,
@@ -165,7 +165,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 execution = terraformClient.destroy(
                         terraformJob.getTerraformVersion(),
                         workingDirectory,
-                        backendFile,
+                        null,
                         terraformParameters,
                         environmentVariables,
                         outputDestroy,
