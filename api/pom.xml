@@ -22,7 +22,7 @@
         <msal4j.version>1.11.2</msal4j.version>
         <lombok.version>1.18.20</lombok.version>
         <jgit.version>6.2.0.202206071550-r</jgit.version>
-        <rest-assured.version>4.4.0</rest-assured.version>
+        <rest-assured.version>4.5.1</rest-assured.version>
         <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
         <groovy.version>3.0.8</groovy.version>
         <azure-identity.version>1.5.3</azure-identity.version>
