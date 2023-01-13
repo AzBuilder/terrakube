@@ -23,6 +23,7 @@ function generateApiVars(){
   TERRAKUBE_ADMIN_GROUP="CUSTOM_ADMIN_NAME"
 
   StorageType="AZURE"
+  DexClientId="example-app"
 
   JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
 
@@ -44,6 +45,7 @@ function generateApiVars(){
 
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
+    echo "DexClientId=$DexClientId" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
