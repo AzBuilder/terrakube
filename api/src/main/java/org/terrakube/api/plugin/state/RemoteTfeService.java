@@ -2,7 +2,6 @@ package org.terrakube.api.plugin.state;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
-import org.terrakube.api.repository.ContentRepository;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,7 +23,6 @@ import java.util.Optional;
 @RequestMapping("/remote/tfe/v2/")
 @AllArgsConstructor
 public class RemoteTfeController {
-    private final ContentRepository contentRepository;
 
     RemoteTfeService remoteTfeService;
 
