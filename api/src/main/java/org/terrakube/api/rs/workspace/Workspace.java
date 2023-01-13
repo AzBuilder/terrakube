@@ -3,6 +3,7 @@ package org.terrakube.api.rs.workspace;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
@@ -30,7 +31,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Where(clause = "deleted = false")
-public class Workspace {
+public class Workspace extends GenericAuditFields {
 
     @Id
     @Type(type="uuid-char")
