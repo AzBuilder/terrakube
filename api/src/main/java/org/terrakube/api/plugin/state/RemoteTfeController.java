@@ -43,14 +43,13 @@ public class RemoteTfeController {
     @GetMapping (produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces/{workspaceName}")
     public ResponseEntity<WorkspaceData> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
         log.info("Searching: {} {}", organizationName, workspaceName);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap<String, Object>())));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap<>())));
     }
 
     
     @PostMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
     public ResponseEntity<WorkspaceData> createWorkspace(@PathVariable("organizationName") String organizationName, @RequestBody WorkspaceData workspaceData) {
         log.info("Create {}", workspaceData.toString());
-        // CLI is sending {"data":{"type":"workspaces","attributes":{"name":"workspace1","terraform-version":"1.1.3"}}}
         Optional<WorkspaceData> newWorkspace = Optional.ofNullable(remoteTfeService.createWorkspace(organizationName, workspaceData));
         if(newWorkspace.isPresent()){
             log.info("Created: {}", newWorkspace.get().toString());
@@ -76,7 +75,7 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/state-versions")
-    public ResponseEntity<?> createWorkspaceState(@PathVariable("workspaceId") String workspaceId, @RequestBody String StateData) {
+    public ResponseEntity<String> createWorkspaceState(@PathVariable("workspaceId") String workspaceId, @RequestBody String StateData) {
         log.info("Create State /remote/tfe/v2/ {}", workspaceId);
         log.info("Body: {}", StateData);
 

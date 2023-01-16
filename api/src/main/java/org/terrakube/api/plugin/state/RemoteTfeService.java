@@ -83,7 +83,7 @@ public class RemoteTfeService {
         if (organization != null) {
             EntitlementModel entitlementModel = new EntitlementModel();
             entitlementModel.setId("org-" + organizationName);
-            Map<String, Object> entitlementAttributes = new HashMap<String, Object>();
+            Map<String, Object> entitlementAttributes = new HashMap<>();
             entitlementAttributes.put("operations", true);
             entitlementAttributes.put("private-module-registry", true);
             entitlementAttributes.put("sentinel", false);
@@ -117,7 +117,7 @@ public class RemoteTfeService {
             organizationModel.setId(organizationName);
             organizationModel.setType("organizations");
 
-            Map<String, Object> permissionMap = new HashMap<String, Object>();
+            Map<String, Object> permissionMap = new HashMap<>();
             permissionMap.put("can-update", true);
             permissionMap.put("can-destroy", true);
             permissionMap.put("can-access-via-teams", false);
@@ -141,7 +141,7 @@ public class RemoteTfeService {
             permissionMap.put("can-read-run-tasks", true);
             permissionMap.put("can-create-provider", false);
 
-            Map<String, Object> attributes = new HashMap<String, Object>();
+            Map<String, Object> attributes = new HashMap<>();
             attributes.put("permissions", permissionMap);
             attributes.put("name", organizationName);
             organizationModel.setAttributes(attributes);
@@ -164,7 +164,7 @@ public class RemoteTfeService {
             WorkspaceModel workspaceModel = new WorkspaceModel();
             workspaceModel.setId(workspace.get().getId().toString());
             workspaceModel.setType("workspaces");
-            Map<String, Object> attributes = new HashMap<String, Object>();
+            Map<String, Object> attributes = new HashMap<>();
             attributes.put("name", workspaceName);
             attributes.put("terraform-version", workspace.get().getTerraformVersion());
             attributes.put("locked", workspace.get().isLocked());
@@ -219,7 +219,7 @@ public class RemoteTfeService {
             newWorkspace.setOrganization(organization);
             workspaceRepository.save(newWorkspace);
         }
-        Map<String, Object> otherAttributes = new HashMap<String, Object>();
+        Map<String, Object> otherAttributes = new HashMap<>();
         otherAttributes.put("locked", false);
         return getWorkspace(organizationName, workspaceData.getData().getAttributes().get("name").toString(), otherAttributes);
     }
@@ -231,7 +231,7 @@ public class RemoteTfeService {
         workspace.setLocked(locked);
         workspaceRepository.save(workspace);
         String organizationName = workspace.getOrganization().getName();
-        Map<String, Object> otherAttributes = new HashMap<String, Object>();
+        Map<String, Object> otherAttributes = new HashMap<>();
 
         otherAttributes.put("locked", false);
         return getWorkspace(organizationName, workspace.getName(), otherAttributes);
@@ -251,7 +251,7 @@ public class RemoteTfeService {
         response.getData().setId(historyId.toString());
         response.getData().setType("state-versions");
 
-        Map<String, Object> responseAttributes = new HashMap<String, Object>();
+        Map<String, Object> responseAttributes = new HashMap<>();
         responseAttributes.put("vcs-commit-sha", null);
         responseAttributes.put("vcs-commit-url", null);
         responseAttributes.put("hosted-state-download-url", "https://archivist.terraform.io/v1/object/4fde7951-93c0-4414-9a40-f3abc4bac490");
@@ -304,7 +304,7 @@ public class RemoteTfeService {
         ConfigurationModel configurationModel = new ConfigurationModel();
         configurationModel.setType("configuration-versions");
         configurationModel.setId(content.getId().toString());
-        configurationModel.setAttributes(new HashMap<String, Object>());
+        configurationModel.setAttributes(new HashMap<>());
         configurationData.setData(configurationModel);
 
         configurationData.getData().getAttributes().put("error", null);
@@ -346,7 +346,7 @@ public class RemoteTfeService {
         RunsModel runsModel = new RunsModel();
         runsModel.setId(String.valueOf(runId));
         runsModel.setType("runs");
-        runsModel.setAttributes(new HashMap<String, Object>());
+        runsModel.setAttributes(new HashMap<>());
 
 
         String planStatus = "running";
@@ -389,7 +389,7 @@ public class RemoteTfeService {
         PlansModel plansModel = new PlansModel();
         plansModel.setId(String.valueOf(planId));
         plansModel.setType("plans");
-        plansModel.setAttributes(new HashMap<String, Object>());
+        plansModel.setAttributes(new HashMap<>());
         String planStatus = "pending";
 
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
@@ -460,7 +460,7 @@ public class RemoteTfeService {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         if (checkPlanLogStatus(planId).equals(LogStatus.BEGIN))
-            if (job.getStep() != null && !job.getStep().isEmpty()) {
+            if (job.getStep() != null && !job.getStep().isEmpty()) 
                 for (Step step : job.getStep()) {
                     log.info("Current Job State {}", job.getStatus());
                     if (step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {
@@ -472,7 +472,6 @@ public class RemoteTfeService {
                         updatePlanLogStatus(planId, LogStatus.COMPLETED);
                     }
                 }
-            }
         return logs;
     }
 }

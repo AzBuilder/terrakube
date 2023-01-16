@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
 import java.io.IOException;
@@ -124,7 +123,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getContentFile(String contentId) {
-        byte data[];
+        byte[] data;
         try {
             log.info("Searching: content/{}/terraformContent.tar.gz", contentId);
             S3Object s3object = s3client.getObject(bucketName, String.format(TERRAFORM_TAR_GZ, contentId));

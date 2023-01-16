@@ -133,7 +133,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
-                    File f = new File(destinationFilePath + "/" + entry.getName());
+                    File f = new File(String.format("%s/%s", destinationFilePath, entry.getName()));
                     String canonicalDestinationPath = f.getCanonicalPath();
 
                     if( !canonicalDestinationPath.startsWith(destinationFilePath)){
@@ -147,7 +147,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 } else {
                     int count;
                     byte data[] = new byte[2048];
-                    File f = new File(destinationFilePath + "/" + entry.getName());
+                    File f = new File(String.format("%s/%s", destinationFilePath, entry.getName()));
                     String canonicalDestinationPath = f.getCanonicalPath();
 
                     if( !canonicalDestinationPath.startsWith(destinationFilePath)){
