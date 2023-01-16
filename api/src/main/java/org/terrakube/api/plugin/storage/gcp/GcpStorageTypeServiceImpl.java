@@ -8,9 +8,11 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
@@ -25,6 +27,8 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     private static final String GCP_STATE_LOCATION = "tfstate/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String GCP_STATE_JSON = "tfstate/%s/%s/state/%s.json";
     private static final String CONTEXT_JSON = "tfoutput/context/%s/context.json";
+
+    private static final String TERRAFORM_TAR_GZ = "content/%s/terraformContent.tar.gz";
 
     @NonNull
     private String bucketName;
@@ -98,5 +102,44 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
                     .getContent(), StandardCharsets.UTF_8);
         else
             return "{}";
+    }
+
+    @Override
+    public void createContentFile(String contentId, InputStream inputStream) {
+        String blobKey = String.format(TERRAFORM_TAR_GZ, contentId);
+        log.info("context file: {}", blobKey);
+
+        BlobId blobId = BlobId.of(bucketName, blobKey);
+        Blob blob = storage.get(blobId);
+        if (blob != null) {
+            try {
+                WritableByteChannel channel = blob.writer();
+                channel.write(ByteBuffer.wrap(inputStream.readAllBytes()));
+                channel.close();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        } else {
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+            try {
+                storage.create(blobInfo, inputStream.readAllBytes());
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public byte[] getContentFile(String contentId) {
+        log.info("context {}", String.format(TERRAFORM_TAR_GZ, contentId));
+
+        if (storage.get(BlobId.of(bucketName, String.format(TERRAFORM_TAR_GZ, contentId))) != null)
+            return storage.get(
+                            BlobId.of(
+                                    bucketName,
+                                    String.format(TERRAFORM_TAR_GZ, contentId)))
+                    .getContent();
+        else
+            return "".getBytes(Charset.defaultCharset());
     }
 }

@@ -42,6 +42,7 @@ public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/actuator/**").permitAll()
                         .antMatchers("/callback/v1/**").permitAll()
+                        .antMatchers("configuration-versions/*/terraformContent.tar.gz").permitAll()
                         .antMatchers("/doc").permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> {

@@ -37,9 +37,15 @@ public class ExecutorJobImpl implements ExecutorJob {
         log.info("Create Job for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
         boolean executionSuccess = true;
         File workspaceFolder = setupWorkspace.prepareWorkspace(terraformJob);
-        String commitId = getCommitId(workspaceFolder);
-        updateJobStatus.setRunningStatus(terraformJob, commitId);
+
+        String commitId = "000000000";
         ExecutorJobResult terraformResult = new ExecutorJobResult();
+
+        if (!terraformJob.getBranch().equals("remote-content"))
+            commitId = getCommitId(workspaceFolder);
+
+        updateJobStatus.setRunningStatus(terraformJob, commitId);
+
         switch (terraformJob.getType()) {
             case "terraformPlan":
                 log.info("Execute Plan for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
@@ -73,7 +79,6 @@ public class ExecutorJobImpl implements ExecutorJob {
         }
 
 
-
         executionSuccess = terraformResult.isSuccessfulExecution();
         updateJobStatus.setCompletedStatus(executionSuccess, terraformJob, terraformResult.getOutputLog(), terraformResult.getOutputErrorLog(), terraformResult.getPlanFile(), commitId);
 
@@ -93,7 +98,7 @@ public class ExecutorJobImpl implements ExecutorJob {
             final File commitInformation = new File(String.format("%s/commitHash.info", workspaceFolder.getPath()));
             final InputStream commitIdStream = new DataInputStream(new FileInputStream(commitInformation));
             commitId = IOUtils.toString(commitIdStream, Charset.defaultCharset());
-        }catch (IOException e){
+        } catch (IOException e) {
             log.error(e.getMessage());
         }
         return commitId;

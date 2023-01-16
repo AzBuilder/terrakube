@@ -41,10 +41,7 @@ public class AzureTerraformStateImpl implements TerraformState {
 
     private static final String CONTAINER_NAME = "tfstate";
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
-    private static final String BACKEND_FILE_NAME = "azureBackend.hcl";
-    private static final String BACKEND_AZURE_CONTENT = "\n\nterraform {\n" +
-            "  backend \"azurerm\" { }\n" +
-            "}";
+    private static final String BACKEND_FILE_NAME = "azure_backend_override.tf";
     private String resourceGroupName;
     private String storageAccountName;
     private String storageContainerName;
@@ -64,11 +61,15 @@ public class AzureTerraformStateImpl implements TerraformState {
         String azureBackend = BACKEND_FILE_NAME;
         try {
             TextStringBuilder azureBackendHcl = new TextStringBuilder();
-            azureBackendHcl.appendln("resource_group_name  = \"" + resourceGroupName + "\"");
-            azureBackendHcl.appendln("storage_account_name = \"" + storageAccountName + "\"");
-            azureBackendHcl.appendln("container_name       = \"" + storageContainerName + "\"");
-            azureBackendHcl.appendln("key                  = \"" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
-            azureBackendHcl.appendln("access_key           = \"" + storageAccessKey + "\"");
+            azureBackendHcl.appendln("terraform {");
+            azureBackendHcl.appendln("  backend \"azurerm\" {");
+            azureBackendHcl.appendln("      resource_group_name  = \"" + resourceGroupName + "\"");
+            azureBackendHcl.appendln("      storage_account_name = \"" + storageAccountName + "\"");
+            azureBackendHcl.appendln("      container_name       = \"" + storageContainerName + "\"");
+            azureBackendHcl.appendln("      key                  = \"" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
+            azureBackendHcl.appendln("      access_key           = \"" + storageAccessKey + "\"");
+            azureBackendHcl.appendln("  }");
+            azureBackendHcl.appendln("}");
 
             File azureBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
@@ -76,14 +77,6 @@ public class AzureTerraformStateImpl implements TerraformState {
                     )
             );
             FileUtils.writeStringToFile(azureBackendFile, azureBackendHcl.toString(), Charset.defaultCharset());
-
-            File azureBackendMainTf = new File(
-                    FilenameUtils.separatorsToSystem(
-                            workingDirectory.getAbsolutePath().concat("/main.tf")
-                    )
-            );
-
-            FileUtils.writeStringToFile(azureBackendMainTf, BACKEND_AZURE_CONTENT, Charset.defaultCharset(), true);
 
         } catch (IOException e) {
             log.error(e.getMessage());

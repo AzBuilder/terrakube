@@ -1,5 +1,7 @@
 package org.terrakube.api.plugin.storage;
 
+import java.io.InputStream;
+
 public interface StorageTypeService {
 
     byte[] getStepOutput(String organizationId, String jobId, String stepId);
@@ -11,4 +13,8 @@ public interface StorageTypeService {
     String saveContext(int jobId, String jobContext);
 
     String getContext(int jobId);
+
+    void createContentFile(String contentId, InputStream inputStream);
+
+    byte[] getContentFile(String contentId);
 }

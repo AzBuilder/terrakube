@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.Organization;
-import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
 import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
+import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.parameters.Variable;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.workspace.history.History;
@@ -77,6 +77,10 @@ public class Workspace extends GenericAuditFields {
 
     @OneToMany(mappedBy = "workspace")
     private List<Job> job;
+
+    @Exclude
+    @OneToMany(mappedBy = "workspace")
+    private List<Content> content;
 
     @OneToOne
     private Vcs vcs;

@@ -9,6 +9,7 @@ import org.terrakube.api.plugin.storage.StorageTypeService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -16,10 +17,12 @@ import java.nio.charset.StandardCharsets;
 public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";
+
+    private static final String CONTENT_DIRECTORY = "/.terraform-spring-boot/local/content/%s/terraformContent.tar.gz";
     private static final String CONTEXT_DIRECTORY = "/.terraform-spring-boot/local/output/context/%s/context.json";
     private static final String STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/terraformLibrary.tfPlan";
     private static final String STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
-    private static final String NO_DATA_FOUND = "NO DATA FOUND IN LOCAL STORAGE";
+    private static final String NO_DATA_FOUND = "";
     private static final String NO_CONTEXT_FOUND = "{}";
 
     @Override
@@ -50,7 +53,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             log.info("contextFile: {}", contextFilename);
             File context = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(contextFilename)));
             FileUtils.forceMkdir(context.getParentFile());
-            FileUtils.writeStringToFile(context, jobContext, Charset.defaultCharset());
+            FileUtils.writeStringToFile(context, jobContext, Charset.defaultCharset().toString());
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -80,6 +83,38 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
         if (localOutputDirectory.exists()) {
             try {
                 return IOUtils.toByteArray(new FileInputStream(localOutputDirectory));
+            } catch (IOException e) {
+                log.error(e.getMessage());
+                return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);
+            }
+        } else {
+            return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);
+        }
+    }
+
+
+    @Override
+    public void createContentFile(String contentId, InputStream inputStream){
+        try {
+            String contentFile = String.format(CONTENT_DIRECTORY, contentId);
+            log.info("contentFile: {}", contentFile);
+            File context = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(contentFile)));
+            FileUtils.forceMkdir(context.getParentFile());
+            FileUtils.writeByteArrayToFile(context, inputStream.readAllBytes());
+            log.info("Write File Completed", contentFile);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public byte[] getContentFile(String contentId) {
+        String contentFile = String.format(CONTENT_DIRECTORY, contentId);
+        log.info("contentFile: {}", contentFile);
+        File content = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(contentFile)));
+        if (content.exists()) {
+            try {
+                return IOUtils.toByteArray(new FileInputStream(content));
             } catch (IOException e) {
                 log.error(e.getMessage());
                 return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);

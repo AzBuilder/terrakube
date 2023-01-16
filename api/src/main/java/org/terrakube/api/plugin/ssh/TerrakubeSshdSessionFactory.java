@@ -64,8 +64,8 @@ public class TerrakubeSshdSessionFactory {
         try {
             if(!sshFile.exists()) {
                 log.info("Creating new SSH folder for {}", this.sshId);
-                FileUtils.forceMkdirParent(sshFile);
-                FileUtils.writeStringToFile(sshFile, this.privateKey, Charset.defaultCharset());
+                FileUtils.forceMkdir(sshFile);
+                FileUtils.writeStringToFile(sshFile, this.privateKey, Charset.defaultCharset().toString());
             } else {
                 log.info("SSH folder for {} already exists", this.sshId);
             }

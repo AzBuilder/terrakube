@@ -37,10 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AwsTerraformStateImpl implements TerraformState {
 
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
-    private static final String BACKEND_FILE_NAME = "awsBackend.hcl";
-    private static final String BACKEND_AWS_CONTENT = "\n\nterraform {\n" +
-            "  backend \"s3\" {}\n" +
-            "}";
+    private static final String BACKEND_FILE_NAME = "azure_backend_override.tf";
 
     @NonNull
     private AmazonS3 s3client;
@@ -67,19 +64,24 @@ public class AwsTerraformStateImpl implements TerraformState {
         String awsBackend = BACKEND_FILE_NAME;
         try {
             TextStringBuilder awsBackendHcl = new TextStringBuilder();
-            awsBackendHcl.appendln("bucket     = \"" + bucketName + "\"");
-            awsBackendHcl.appendln("region     = \"" + region.getName() + "\"");
-            awsBackendHcl.appendln("key        = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
-            awsBackendHcl.appendln("access_key = \"" + accessKey + "\"");
-            awsBackendHcl.appendln("secret_key = \"" + secretKey + "\"");
+            awsBackendHcl.appendln("terraform {");
+            awsBackendHcl.appendln("  backend \"s3\" {");
+            awsBackendHcl.appendln("    bucket     = \"" + bucketName + "\"");
+            awsBackendHcl.appendln("    region     = \"" + region.getName() + "\"");
+            awsBackendHcl.appendln("    key        = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
+            awsBackendHcl.appendln("    access_key = \"" + accessKey + "\"");
+            awsBackendHcl.appendln("    secret_key = \"" + secretKey + "\"");
 
             if(endpoint != null){
-                awsBackendHcl.appendln("endpoint  = \"" + endpoint + "\"");
-                awsBackendHcl.appendln("skip_credentials_validation  = true");
-                awsBackendHcl.appendln("skip_metadata_api_check      = true");
-                awsBackendHcl.appendln("skip_region_validation       = true");
-                awsBackendHcl.appendln("force_path_style             = true");
+                awsBackendHcl.appendln("    endpoint  = \"" + endpoint + "\"");
+                awsBackendHcl.appendln("    skip_credentials_validation  = true");
+                awsBackendHcl.appendln("    skip_metadata_api_check      = true");
+                awsBackendHcl.appendln("    skip_region_validation       = true");
+                awsBackendHcl.appendln("    force_path_style             = true");
             }
+
+            awsBackendHcl.appendln("  }");
+            awsBackendHcl.appendln("}");
 
             File awsBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
@@ -87,14 +89,6 @@ public class AwsTerraformStateImpl implements TerraformState {
                     )
             );
             FileUtils.writeStringToFile(awsBackendFile, awsBackendHcl.toString(), Charset.defaultCharset());
-
-            File azureBackendMainTf = new File(
-                    FilenameUtils.separatorsToSystem(
-                            workingDirectory.getAbsolutePath().concat("/awsBackend.tf")
-                    )
-            );
-
-            FileUtils.writeStringToFile(azureBackendMainTf, BACKEND_AWS_CONTENT, Charset.defaultCharset(), true);
 
         } catch (IOException e) {
             log.error(e.getMessage());

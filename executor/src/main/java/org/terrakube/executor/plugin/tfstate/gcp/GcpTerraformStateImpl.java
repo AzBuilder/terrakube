@@ -35,11 +35,7 @@ public class GcpTerraformStateImpl implements TerraformState {
 
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
     private static final String GCP_CREDENTIALS_FILE = "GCP_CREDENTIALS_FILE.json";
-    private static final String BACKEND_FILE_NAME = "gcpBackend.hcl";
-
-    private static final String BACKEND_GCP_CONTENT = "\n\nterraform {\n" +
-            "  backend \"gcs\" {}\n" +
-            "}";
+    private static final String BACKEND_FILE_NAME = "gcp_backend_override.tf";
 
     @NonNull
     private Storage storage;
@@ -60,9 +56,13 @@ public class GcpTerraformStateImpl implements TerraformState {
         String gcpBackend = BACKEND_FILE_NAME;
         try {
             TextStringBuilder gcpBackendHcl = new TextStringBuilder();
-            gcpBackendHcl.appendln("bucket      = \"" + bucketName + "\"");
-            gcpBackendHcl.appendln("prefix      = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
-            gcpBackendHcl.appendln("credentials = \"" + GCP_CREDENTIALS_FILE + "\"");
+            gcpBackendHcl.appendln("terraform {");
+            gcpBackendHcl.appendln("  backend \"gcs\" {");
+            gcpBackendHcl.appendln("    bucket      = \"" + bucketName + "\"");
+            gcpBackendHcl.appendln("    prefix      = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
+            gcpBackendHcl.appendln("    credentials = \"" + GCP_CREDENTIALS_FILE + "\"");
+            gcpBackendHcl.appendln("  }");
+            gcpBackendHcl.appendln("}");
 
             File gcpBackendCredentials = new File(
                     FilenameUtils.separatorsToSystem(
@@ -77,14 +77,6 @@ public class GcpTerraformStateImpl implements TerraformState {
             );
             FileUtils.writeStringToFile(gcpBackendCredentials, new String(Base64.decodeBase64(credentials), StandardCharsets.UTF_8), Charset.defaultCharset());
             FileUtils.writeStringToFile(gcpBackendFile, gcpBackendHcl.toString(), Charset.defaultCharset());
-
-            File gcpBackendMainTf = new File(
-                    FilenameUtils.separatorsToSystem(
-                            workingDirectory.getAbsolutePath().concat("/gcpBackend.tf")
-                    )
-            );
-
-            FileUtils.writeStringToFile(gcpBackendMainTf, BACKEND_GCP_CONTENT, Charset.defaultCharset(), true);
 
         } catch (IOException e) {
             log.error(e.getMessage());
