@@ -8,8 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
+import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
+import org.terrakube.api.plugin.state.model.organization.OrganizationData;
+import org.terrakube.api.plugin.state.model.plans.PlansData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,24 +31,24 @@ public class RemoteTfeController {
     RemoteTfeService remoteTfeService;
 
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/entitlement-set")
-    public ResponseEntity<?> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
+    public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName)));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}")
-    public ResponseEntity<?> getOrgInformation(@PathVariable("organizationName") String organizationName) {
+    public ResponseEntity<OrganizationData> getOrgInformation(@PathVariable("organizationName") String organizationName) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgInformation(organizationName)));
     }
 
     @GetMapping (produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces/{workspaceName}")
-    public ResponseEntity<?> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
+    public ResponseEntity<WorkspaceData> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
         log.info("Searching: {} {}", organizationName, workspaceName);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap())));
     }
 
     
     @PostMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
-    public ResponseEntity<?> createWorkspace(@PathVariable("organizationName") String organizationName, @RequestBody WorkspaceData workspaceData) {
+    public ResponseEntity<WorkspaceData> createWorkspace(@PathVariable("organizationName") String organizationName, @RequestBody WorkspaceData workspaceData) {
         log.info("Create {}", workspaceData.toString());
         // CLI is sending {"data":{"type":"workspaces","attributes":{"name":"workspace1","terraform-version":"1.1.3"}}}
         Optional<WorkspaceData> newWorkspace = Optional.ofNullable(remoteTfeService.createWorkspace(organizationName, workspaceData));
@@ -52,20 +56,20 @@ public class RemoteTfeController {
             log.info("Created: {}", newWorkspace.get().toString());
             return ResponseEntity.status(201).body(newWorkspace.get());
         }else{
-            return ResponseEntity.status(500).body("");
+            return ResponseEntity.status(500).body(new WorkspaceData());
         }
     }
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/lock")
-    public ResponseEntity<?> lockWorkspace(@PathVariable("workspaceId") String workspaceId) {
+    public ResponseEntity<WorkspaceData> lockWorkspace(@PathVariable("workspaceId") String workspaceId) {
         log.info("Lock {}", workspaceId);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, true)));
     }
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/unlock")
-    public ResponseEntity<?> unlockWorkspace(@PathVariable("workspaceId") String workspaceId) {
+    public ResponseEntity<WorkspaceData> unlockWorkspace(@PathVariable("workspaceId") String workspaceId) {
         log.info("Unlock {}", workspaceId);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, false)));
     }
@@ -97,51 +101,51 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/configuration-versions")
-    public ResponseEntity<?> createConfigurationVersion(@PathVariable("workspaceId") String workspaceId, @RequestBody ConfigurationData configurationData) {
+    public ResponseEntity<ConfigurationData> createConfigurationVersion(@PathVariable("workspaceId") String workspaceId, @RequestBody ConfigurationData configurationData) {
         log.info("Creating Configuration Version for worspaceId {}", workspaceId);
         return ResponseEntity.status(201).body(remoteTfeService.createConfigurationVersion(workspaceId, configurationData));
     }
 
     @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "/configuration-versions/{configurationId}")
-    public ResponseEntity<?> getConfigurationVersion(@PathVariable("configurationId") String configurationId) {
+    public ResponseEntity<ConfigurationData> getConfigurationVersion(@PathVariable("configurationId") String configurationId) {
         log.info("Searching Configuration Version Id {}", configurationId);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.searchConfiguration(configurationId)));
     }
 
     @Transactional
     @PutMapping (path = "/configuration-versions/{configurationid}")
-    public ResponseEntity<?> uploadConfiguration(HttpServletRequest httpServletRequest, @PathVariable("configurationid") String configurationId) throws IOException {
+    public ResponseEntity<String> uploadConfiguration(HttpServletRequest httpServletRequest, @PathVariable("configurationid") String configurationId) throws IOException {
         log.info("Uploading Id {} file", configurationId );
         remoteTfeService.uploadFile(configurationId, httpServletRequest.getInputStream());
         log.info("File created");
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("");
     }
 
     @Transactional
     @PostMapping (produces = "application/vnd.api+json", path = "/runs")
-    public ResponseEntity<?> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
+    public ResponseEntity<RunsData> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
         log.info("Create new run");
         return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
     }
 
     @Transactional
     @GetMapping (produces = "application/vnd.api+json", path = "/runs/{runId}")
-    public ResponseEntity<?> getRun(@PathVariable("runId") int runId) {
+    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId) {
         return ResponseEntity.ok(remoteTfeService.getRun(runId));
     }
 
 
     @Transactional
     @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}")
-    public ResponseEntity<?> getPlan(@PathVariable("planId") int planId) {
+    public ResponseEntity<PlansData> getPlan(@PathVariable("planId") int planId) {
         return ResponseEntity.ok(remoteTfeService.getPlan(planId));
     }
 
     @Transactional
     @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}/logs")
-    public ResponseEntity<?> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getPlanLogs(planId)));
+    public ResponseEntity<String> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
+        return ResponseEntity.of(Optional.ofNullable(new String(remoteTfeService.getPlanLogs(planId), StandardCharsets.UTF_8)));
     }
 
     @GetMapping(
