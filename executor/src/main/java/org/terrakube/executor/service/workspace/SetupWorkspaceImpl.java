@@ -123,7 +123,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     private void downloadWorkspaceTarGz(File tarGzFolder, String source) throws IOException {
         File terraformTarGz = new File(tarGzFolder.getPath() + "/terraformContent.tar.gz");
         FileUtils.copyURLToFile(new URL(source), terraformTarGz, 10000, 10000);
-        extractTarGZ(new FileInputStream(terraformTarGz), tarGzFolder.getPath().toString());
+        extractTarGZ(new FileInputStream(terraformTarGz), tarGzFolder.getPath());
     }
 
     public void extractTarGZ(InputStream in, String destinationFilePath) throws IOException {
