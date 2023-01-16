@@ -134,6 +134,12 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
                     File f = new File(destinationFilePath + "/" + entry.getName());
+                    String canonicalDestinationPath = f.getCanonicalPath();
+
+                    if( !canonicalDestinationPath.startsWith(destinationFilePath)){
+                        throw new IOException("Entry is outside of the target directory");
+                    }
+
                     boolean created = f.mkdir();
                     if (!created) {
                         log.info("Unable to create directory '{}', during extraction of archive contents.\n", f.getAbsolutePath());
@@ -141,7 +147,13 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 } else {
                     int count;
                     byte data[] = new byte[2048];
-                    FileOutputStream fos = new FileOutputStream(destinationFilePath + "/" + entry.getName(), false);
+                    File f = new File(destinationFilePath + "/" + entry.getName());
+                    String canonicalDestinationPath = f.getCanonicalPath();
+
+                    if( !canonicalDestinationPath.startsWith(destinationFilePath)){
+                        throw new IOException("Entry is outside of the target directory");
+                    }
+                    FileOutputStream fos = new FileOutputStream(f.getCanonicalPath(), false);
                     log.info("Adding file {} to workspace context", destinationFilePath + "/" + entry.getName());
                     try (BufferedOutputStream dest = new BufferedOutputStream(fos, 2048)) {
                         while ((count = tarIn.read(data, 0, 2048)) != -1) {
