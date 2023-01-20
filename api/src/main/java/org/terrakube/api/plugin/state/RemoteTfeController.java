@@ -11,6 +11,7 @@ import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
+import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import java.nio.charset.StandardCharsets;
@@ -135,7 +136,7 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @GetMapping (produces = "application/vnd.api+json", path = "/runs/{runId}/actions/apply")
+    @PostMapping (produces = "application/vnd.api+json", path = "/runs/{runId}/actions/apply")
     public ResponseEntity<RunsData> runApply(@PathVariable("runId") int runId) {
         return ResponseEntity.ok(remoteTfeService.runApply(runId));
     }
@@ -145,6 +146,12 @@ public class RemoteTfeController {
     @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}")
     public ResponseEntity<PlanRunData> getPlan(@PathVariable("planId") int planId) {
         return ResponseEntity.ok(remoteTfeService.getPlan(planId));
+    }
+
+    @Transactional
+    @GetMapping (produces = "application/vnd.api+json", path = "/applies/{applyId}")
+    public ResponseEntity<ApplyRunData> getApply(@PathVariable("applyId") int applyId) {
+        return ResponseEntity.ok(remoteTfeService.getApply(applyId));
     }
 
     @Transactional

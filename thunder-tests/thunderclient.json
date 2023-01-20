@@ -2534,5 +2534,41 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "518c6288-98e0-4c73-8744-1f6dacd24d0f",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "Runs",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/runs/1",
+    "method": "GET",
+    "sortNum": 815000,
+    "created": "2023-01-19T21:49:14.332Z",
+    "modified": "2023-01-19T21:49:26.645Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "0c3d0252-f20a-4c31-9b0a-cddd90db4ade",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "b2926de7-9ea1-4cdc-8cd2-0e2eafc41c20",
+    "name": "Workspace apply",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/applies/1",
+    "method": "GET",
+    "sortNum": 812500,
+    "created": "2023-01-20T16:51:46.403Z",
+    "modified": "2023-01-20T16:52:03.407Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]
