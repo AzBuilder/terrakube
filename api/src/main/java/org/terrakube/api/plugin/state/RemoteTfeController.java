@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
-import org.terrakube.api.plugin.state.model.plans.PlansData;
+import org.terrakube.api.plugin.state.model.plan.PlanRunData;
+import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import java.nio.charset.StandardCharsets;
@@ -134,17 +135,35 @@ public class RemoteTfeController {
         return ResponseEntity.ok(remoteTfeService.getRun(runId));
     }
 
+    @Transactional
+    @PostMapping (produces = "application/vnd.api+json", path = "/runs/{runId}/actions/apply")
+    public ResponseEntity<RunsData> runApply(@PathVariable("runId") int runId) {
+        return ResponseEntity.ok(remoteTfeService.runApply(runId));
+    }
+
 
     @Transactional
     @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}")
-    public ResponseEntity<PlansData> getPlan(@PathVariable("planId") int planId) {
+    public ResponseEntity<PlanRunData> getPlan(@PathVariable("planId") int planId) {
         return ResponseEntity.ok(remoteTfeService.getPlan(planId));
+    }
+
+    @Transactional
+    @GetMapping (produces = "application/vnd.api+json", path = "/applies/{applyId}")
+    public ResponseEntity<ApplyRunData> getApply(@PathVariable("applyId") int applyId) {
+        return ResponseEntity.ok(remoteTfeService.getApply(applyId));
     }
 
     @Transactional
     @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}/logs")
     public ResponseEntity<String> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
         return ResponseEntity.of(Optional.ofNullable(new String(remoteTfeService.getPlanLogs(planId), StandardCharsets.UTF_8)));
+    }
+
+    @Transactional
+    @GetMapping (produces = "application/vnd.api+json", path = "/applies/{applyId}/logs")
+    public ResponseEntity<String> getApplyLogs(@PathVariable("applyId") int planId) throws IOException {
+        return ResponseEntity.of(Optional.ofNullable(new String(remoteTfeService.getApplyLogs(planId), StandardCharsets.UTF_8)));
     }
 
     @GetMapping(

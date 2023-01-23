@@ -94,6 +94,15 @@
             <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
         </insert>
 
+        <insert tableName="template">
+            <column name="id"               value="92773b8d-f0f5-43ab-99b8-9ce64208d881" />
+            <column name="name"             value="Terraform-Plan/Apply-Cli" />
+            <column name="description"      value="Running terraform plan and apply using remote backend" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbiIKICBzdGVwOiAxMDAKLSB0eXBlOiAiYXBwcm92YWwiCiAgc3RlcDogMTUwCiAgdGVhbTogIlRFUlJBRk9STV9DTEkiCi0gdHlwZTogInRlcnJhZm9ybUFwcGx5IgogIHN0ZXA6IDIwMAo=" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
         <!--
         ***************    
         ***WORKSPACE***

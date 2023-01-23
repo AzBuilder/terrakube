@@ -5,6 +5,8 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
+import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
+import org.terrakube.api.plugin.state.model.apply.ApplyRunModel;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationModel;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
@@ -12,12 +14,9 @@ import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.generic.Resource;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
-import org.terrakube.api.plugin.state.model.plans.PlansData;
-import org.terrakube.api.plugin.state.model.plans.PlansModel;
-import org.terrakube.api.plugin.state.model.runs.PlanModel;
-import org.terrakube.api.plugin.state.model.runs.Relationships;
-import org.terrakube.api.plugin.state.model.runs.RunsData;
-import org.terrakube.api.plugin.state.model.runs.RunsModel;
+import org.terrakube.api.plugin.state.model.plan.PlanRunData;
+import org.terrakube.api.plugin.state.model.plan.PlanRunModel;
+import org.terrakube.api.plugin.state.model.runs.*;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
@@ -168,6 +167,7 @@ public class RemoteTfeService {
             attributes.put("name", workspaceName);
             attributes.put("terraform-version", workspace.get().getTerraformVersion());
             attributes.put("locked", workspace.get().isLocked());
+            attributes.put("auto-apply", false);
 
             Map<String, Boolean> defaultAttributes = new HashMap<String, Boolean>();
             defaultAttributes.put("can-create-state-versions", true);
@@ -325,19 +325,30 @@ public class RemoteTfeService {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
         workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz", hostname, runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
         workspace = workspaceRepository.save(workspace);
-        Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), "Terraform-Plan");
+        Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), getTemplateName(runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
         log.info("Creating Job");
         Job job = new Job();
         job.setWorkspace(workspace);
         job.setOrganization(workspace.getOrganization());
         job.setStatus(JobStatus.pending);
-        job.setComments("terraform-cli ");
+        job.setComments("terraform-cli");
         job.setTemplateReference(template.getId().toString());
         job = jobRepository.save(job);
         log.info("Job Created");
         scheduleJobService.createJobContext(job);
         log.info("Job Context Created");
         return getRun(job.getId());
+    }
+
+
+    private String getTemplateName(String configurationId){
+        // get run speculative if false get Terraform Plan/Apply else just Plan
+        Content content = contentRepository.getReferenceById(UUID.fromString(configurationId));
+        if(content.isSpeculative()){
+            return "Terraform-Plan";
+        } else {
+            return "Terraform-Plan/Apply-Cli";
+        }
     }
 
     RunsData getRun(int runId) {
@@ -351,7 +362,7 @@ public class RemoteTfeService {
 
         String planStatus = "running";
         Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
-        if (job.getStep() != null && !job.getStep().isEmpty()) {
+        /*if (job.getStep() != null && !job.getStep().isEmpty()) {
             List<Step> stepList = job.getStep();
             for (Step step : stepList) {
                 if (step.getStepNumber() == 100) {
@@ -369,27 +380,81 @@ public class RemoteTfeService {
                     }
                 }
             }
+        }*/
+        switch (job.getStatus()) {
+            case completed:
+                planStatus = "finished";
+                break;
+            case running:
+            case queue:
+                planStatus = "running";
+                break;
+            case failed:
+                planStatus = "errored";
+                break;
         }
 
+
         runsModel.getAttributes().put("status", planStatus);
+        runsModel.getAttributes().put("has-changes", true);
+            runsModel.getAttributes().put("resource-additions", 1);
+            runsModel.getAttributes().put("resource-changes", 1);
+            runsModel.getAttributes().put("resource-destructions", 0);
+
+
+            HashMap<String, Object> actions = new HashMap<>();
+            actions.put("is-confirmable", true);
+            actions.put("is-discardable", false);
+            runsModel.getAttributes().put("actions", actions);
+
+
+            HashMap<String, Object> permissions = new HashMap<>();
+            permissions.put("can-apply", true);
+            runsModel.getAttributes().put("permissions", permissions);
+
+
         runsData.setData(runsModel);
         Relationships relationships = new Relationships();
-        PlanModel planModel = new PlanModel();
+        org.terrakube.api.plugin.state.model.runs.PlanModel planModel = new org.terrakube.api.plugin.state.model.runs.PlanModel();
         planModel.setData(new Resource());
         planModel.getData().setType("plans");
         planModel.getData().setId(String.valueOf(runId));
         relationships.setPlan(planModel);
+
+        ApplyModel applyModel = new ApplyModel();
+        applyModel.setData(new Resource());
+        applyModel.getData().setType("applies");
+        applyModel.getData().setId(String.valueOf(runId));
+        relationships.setApply(applyModel);
+
         runsData.getData().setRelationships(relationships);
         log.info("{}", runsData.toString());
         return runsData;
     }
 
-    PlansData getPlan(int planId) {
-        PlansData plansData = new PlansData();
-        PlansModel plansModel = new PlansModel();
-        plansModel.setId(String.valueOf(planId));
-        plansModel.setType("plans");
-        plansModel.setAttributes(new HashMap<>());
+    RunsData runApply(int runId) {
+        Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
+        if (job.getStep() != null && !job.getStep().isEmpty()) {
+            for (Step step : job.getStep()) {
+                if (step.getStepNumber() == 150) {
+                    step.setStatus(JobStatus.completed);
+                    step.setOutput(String.format("https://%s/tfoutput/v1/organization/%s/job/%s/step/%s", this.hostname, job.getOrganization().getId().toString(), job.getId(), step.getId()));
+                    stepRepository.save(step);
+                    job.setStatus(JobStatus.pending);
+                    jobRepository.save(job);
+                    break;
+                }
+            }
+        }
+        return getRun(runId);
+    }
+
+    PlanRunData getPlan(int planId) {
+        PlanRunData plansData = new PlanRunData();
+        PlanRunModel planRunModel = new PlanRunModel();
+        planRunModel.setId(String.valueOf(planId));
+        planRunModel.setType("plans");
+        planRunModel.setAttributes(new HashMap<>());
         String planStatus = "pending";
 
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
@@ -426,10 +491,64 @@ public class RemoteTfeService {
                 }
             }
         }
-        plansModel.getAttributes().put("status", planStatus);
-        plansModel.getAttributes().put("log-read-url", String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
-        plansData.setData(plansModel);
+
+        HashMap<String, Object> actions = new HashMap<>();
+        actions.put("is-confirmable", true);
+        actions.put("is-discardable", false);
+        planRunModel.getAttributes().put("actions", actions);
+
+        planRunModel.getAttributes().put("status", planStatus);
+        planRunModel.getAttributes().put("log-read-url", String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
+        plansData.setData(planRunModel);
         return plansData;
+    }
+
+    ApplyRunData getApply(int planId) {
+        ApplyRunData applyRunData = new ApplyRunData();
+        ApplyRunModel applyModel = new ApplyRunModel();
+        applyModel.setId(String.valueOf(planId));
+        applyModel.setType("applies");
+        applyModel.setAttributes(new HashMap<>());
+        String applyStatus = "pending";
+
+        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
+        if (job.getStep() != null && !job.getStep().isEmpty()) {
+            for (Step step : job.getStep()) {
+                if (step.getStepNumber() == 200) {
+                    switch (step.getStatus()) {
+                        case pending:
+                            applyStatus = "pending";
+                            break;
+                        case queue:
+                        case running:
+                            applyStatus = "running";
+                            break;
+                        case completed:
+                            //LOGIC TO ENABLE READING LOGS
+                            switch (checkApplyLogStatus(planId)) {
+                                case UNKNOWN:
+                                    updateApplyLogStatus(planId, LogStatus.BEGIN);
+                                    applyStatus = "running";
+                                    break;
+                                case COMPLETED:
+                                    applyStatus = "finished";
+                                    break;
+                                default:
+                                    applyStatus = "running";
+                            }
+
+                            break;
+                        case failed:
+                            applyStatus = "errored";
+                            break;
+                    }
+                }
+            }
+        }
+        applyModel.getAttributes().put("status", applyStatus);
+        applyModel.getAttributes().put("log-read-url", String.format("https://%s/remote/tfe/v2/applies/%s/logs", hostname, planId));
+        applyRunData.setData(applyModel);
+        return applyRunData;
     }
 
     private LogStatus checkPlanLogStatus(int planId) {
@@ -443,10 +562,34 @@ public class RemoteTfeService {
         return LogStatus.UNKNOWN;
     }
 
+    private LogStatus checkApplyLogStatus(int planId) {
+        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
+        for (Step step : job.getStep()) {
+            if (step.getStepNumber() == 200 && step.getLogStatus() != null && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {
+                return step.getLogStatus();
+            }
+        }
+
+        return LogStatus.UNKNOWN;
+    }
+
     private boolean updatePlanLogStatus(int planId, LogStatus logStatus) {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         for (Step step : job.getStep()) {
             if (step.getStepNumber() == 100) {
+                step.setLogStatus(logStatus);
+                stepRepository.save(step);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean updateApplyLogStatus(int planId, LogStatus logStatus) {
+        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
+        for (Step step : job.getStep()) {
+            if (step.getStepNumber() == 200) {
                 step.setLogStatus(logStatus);
                 stepRepository.save(step);
                 return true;
@@ -470,6 +613,25 @@ public class RemoteTfeService {
 
                         logs = ("Terrakube Remote Plan Execution\n\n" + logsFinal.split("Running Terraform PLAN")[1].substring(54)).getBytes();
                         updatePlanLogStatus(planId, LogStatus.COMPLETED);
+                    }
+                }
+        return logs;
+    }
+
+    byte[] getApplyLogs(int planId) throws IOException {
+        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
+        byte[] logs = "".getBytes();
+        if (checkApplyLogStatus(planId).equals(LogStatus.BEGIN))
+            if (job.getStep() != null && !job.getStep().isEmpty())
+                for (Step step : job.getStep()) {
+                    log.info("Current Job State {}", job.getStatus());
+                    if (step.getStepNumber() == 200 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {
+                        log.info("Get Logs for Step Apply{}", step.getId().toString());
+                        logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(), String.valueOf(planId), step.getId().toString());
+                        String logsFinal = new String(logs, StandardCharsets.UTF_8);
+
+                        logs = ("Terrakube Remote Plan Execution\n\n" + logsFinal.split("Running Terraform APPLY")[1].substring(54)).getBytes();
+                        updateApplyLogStatus(planId, LogStatus.COMPLETED);
                     }
                 }
         return logs;

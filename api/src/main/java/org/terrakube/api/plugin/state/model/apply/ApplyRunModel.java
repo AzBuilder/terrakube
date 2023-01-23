@@ -1,4 +1,5 @@
-package org.terrakube.api.plugin.state.model.plans;
+package org.terrakube.api.plugin.state.model.apply;
+
 
 import lombok.Setter;
 import lombok.Getter;
@@ -8,7 +9,6 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class PlansModel extends Resource {
-
+public class ApplyRunModel extends Resource {
     Map<String, Object> attributes;
 }
