@@ -35,7 +35,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     ScriptEngineService scriptEngineService;
 
     @Override
-    public ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory) {
+    public ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory, boolean isDestroy) {
         ExecutorJobResult result;
 
         TextStringBuilder jobOutput = new TextStringBuilder();
@@ -60,14 +60,26 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             showTerraformMessage("PLAN", outputPlan);
             if (scriptBeforeSuccessPlan)
-                executionPlan = terraformClient.plan(
-                        terraformJob.getTerraformVersion(),
-                        workingDirectory,
-                        null,
-                        terraformParametersPlan,
-                        environmentVariablesPlan,
-                        outputPlan,
-                        errorOutputPlan).get();
+                if (isDestroy) {
+                    log.warn("Executor running a plan to destroy resources...");
+                    executionPlan = terraformClient.planDestroy(
+                            terraformJob.getTerraformVersion(),
+                            workingDirectory,
+                            null,
+                            terraformParametersPlan,
+                            environmentVariablesPlan,
+                            outputPlan,
+                            errorOutputPlan).get();
+                }
+                else
+                    executionPlan = terraformClient.plan(
+                            terraformJob.getTerraformVersion(),
+                            workingDirectory,
+                            null,
+                            terraformParametersPlan,
+                            environmentVariablesPlan,
+                            outputPlan,
+                            errorOutputPlan).get();
 
             log.warn("Terraform plan Executed Successfully: {}", executionPlan);
 
@@ -75,8 +87,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             result = generateJobResult(scriptAfterSuccessPlan, jobOutput.toString(), jobErrorOutput.toString());
             result.setPlanFile(executionPlan ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
-            terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
-            : "");
+                    terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
+                    : "");
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
         }

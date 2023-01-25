@@ -47,9 +47,10 @@ public class ExecutorJobImpl implements ExecutorJob {
         updateJobStatus.setRunningStatus(terraformJob, commitId);
 
         switch (terraformJob.getType()) {
+            case "terraformPlanDestroy":
             case "terraformPlan":
                 log.info("Execute Plan for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                terraformResult = terraformExecutor.plan(terraformJob, workspaceFolder);
+                terraformResult = terraformExecutor.plan(terraformJob, workspaceFolder, terraformJob.getType().equals("terraformPlanDestroy"));
                 break;
             case "terraformApply":
                 log.info("Execute Apply for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());

@@ -7,7 +7,7 @@ import java.io.File;
 
 public interface TerraformExecutor {
 
-    ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory);
+    ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory, boolean isDestroy);
 
     ExecutorJobResult apply(TerraformJob terraformJob, File workingDirectory);
 
