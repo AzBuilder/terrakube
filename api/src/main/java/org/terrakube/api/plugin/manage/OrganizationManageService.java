@@ -35,6 +35,32 @@ public class OrganizationManageService {
             "    step: 100" +
             "";
 
+    private static String TEMPLATE_APPLY_CLI ="flow:\n" +
+            "- type: \"terraformPlan\"\n" +
+            "  name: \"Terraform Plan from Terraform CLI\"\n" +
+            "  step: 100\n" +
+            "- type: \"approval\"\n" +
+            "  name: \"Approve Plan from Terraform CLI\"\n" +
+            "  step: 150\n" +
+            "  team: \"TERRAFORM_CLI\"\n" +
+            "- type: \"terraformApply\"\n" +
+            "  name: \"Terraform Apply from Terraform CLI\"\n" +
+            "  step: 200\n";
+
+    private static String TEMPLATE_DESTROY_CLI ="flow:\n" +
+            "- type: \"terraformPlanDestroy\"\n" +
+            "  name: \"Terraform Plan Destroy from Terraform CLI\"\n" +
+            "  step: 100\n" +
+            "- type: \"approval\"\n" +
+            "  name: \"Approve Plan from Terraform CLI\"\n" +
+            "  step: 150\n" +
+            "  team: \"TERRAFORM_CLI\"\n" +
+            "- type: \"terraformApply\"\n" +
+            "  name: \"Terraform Apply from Terraform CLI\"\n" +
+            "  step: 200\n";
+
+
+
     TemplateRepository templateRepository;
 
     @Transactional
@@ -42,6 +68,8 @@ public class OrganizationManageService {
         templateRepository.save(generateTemplate("Terraform-Plan", "Running Terraform plan", Base64.getEncoder().encodeToString(TEMPLATE_PLAN.getBytes()), organization));
         templateRepository.save(generateTemplate("Terraform-Plan/Apply", "Running Terraform plan and apply", Base64.getEncoder().encodeToString(TEMPLATE_APPLY.getBytes()), organization));
         templateRepository.save(generateTemplate("Terraform-Destroy", "Running Terraform destroy", Base64.getEncoder().encodeToString(TEMPLATE_DESTROY.getBytes()), organization));
+        templateRepository.save(generateTemplate("Terraform-Plan/Apply-Cli", "Running Terraform apply from Terraform CLI", Base64.getEncoder().encodeToString(TEMPLATE_APPLY_CLI.getBytes()), organization));
+        templateRepository.save(generateTemplate("Terraform-Plan/Destroy-Cli", "Running Terraform destroy from Terraform CLI", Base64.getEncoder().encodeToString(TEMPLATE_DESTROY_CLI.getBytes()), organization));
     }
 
     private Template generateTemplate(String name, String description, String tcl, Organization organization){
