@@ -40,6 +40,24 @@
             <column name="organization_id"  value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
         </insert>
 
+        <insert tableName="template">
+            <column name="id"               value="d6efb260-ce6b-4df5-ad6a-32bfeb852b6f" />
+            <column name="name"             value="Terraform-Plan/Apply-Cli" />
+            <column name="description"      value="Running terraform plan and apply using remote backend" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbiIKICBuYW1lOiAiVGVycmFmb3JtIFBsYW4gZnJvbSBUZXJyYWZvcm0gQ0xJIgogIHN0ZXA6IDEwMAotIHR5cGU6ICJhcHByb3ZhbCIKICBuYW1lOiAiQXBwcm92ZSBQbGFuIGZyb20gVGVycmFmb3JtIENMSSIKICBzdGVwOiAxNTAKICB0ZWFtOiAiVEVSUkFGT1JNX0NMSSIKLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgbmFtZTogIlRlcnJhZm9ybSBBcHBseSBmcm9tIFRlcnJhZm9ybSBDTEkiCiAgc3RlcDogMjAwCg==" />
+            <column name="organization_id"  value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+
+        <insert tableName="template">
+            <column name="id"               value="d6e8a100-7f5a-4d03-bc52-0975479d8b7e" />
+            <column name="name"             value="Terraform-Plan/Destroy-Cli" />
+            <column name="description"      value="Running terraform plan and destroy using remote backend" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbiIKICBuYW1lOiAiVGVycmFmb3JtIFBsYW4gZnJvbSBUZXJyYWZvcm0gQ0xJIgogIHN0ZXA6IDEwMAotIHR5cGU6ICJhcHByb3ZhbCIKICBuYW1lOiAiQXBwcm92ZSBQbGFuIGZyb20gVGVycmFmb3JtIENMSSIKICBzdGVwOiAxNTAKICB0ZWFtOiAiVEVSUkFGT1JNX0NMSSIKLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgbmFtZTogIlRlcnJhZm9ybSBBcHBseSBmcm9tIFRlcnJhZm9ybSBDTEkiCiAgc3RlcDogMjAwCg" />
+            <column name="organization_id"  value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
+        </insert>
+
         <!--
         ***************   
         ***TEMPLATES***
