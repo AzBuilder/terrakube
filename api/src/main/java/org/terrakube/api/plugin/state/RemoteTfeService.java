@@ -62,7 +62,7 @@ public class RemoteTfeService {
                             ScheduleJobService scheduleJobService,
                             @Value("${org.terrakube.hostname}") String hostname,
                             StorageTypeService storageTypeService,
-                            StepRepository stepRepository){
+                            StepRepository stepRepository) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -319,13 +319,18 @@ public class RemoteTfeService {
     }
 
     RunsData createRun(RunsData runsData) throws SchedulerException, ParseException {
-        log.info("Creating new Terrakube Job");
-        log.info("Workspace {} Configuration {}", runsData.getData().getRelationships().getWorkspace().getData().getId(), runsData.getData().getRelationships().getConfigurationVersion().getData().getId());
         String workspaceId = runsData.getData().getRelationships().getWorkspace().getData().getId();
+        String configurationId = runsData.getData().getRelationships().getConfigurationVersion().getData().getId();
+        boolean isDestroy =  runsData.getData().getAttributes().get("is-destroy") != null ? (boolean) runsData.getData().getAttributes().get("is-destroy"): false;
+        log.info("Creating new Terrakube Job");
+        log.info("Workspace {} Configuration {}",workspaceId, configurationId);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
-        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz", hostname, runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
+        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz", hostname, configurationId));
         workspace = workspaceRepository.save(workspace);
-        Template template = templateRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), getTemplateName(runsData.getData().getRelationships().getConfigurationVersion().getData().getId()));
+        Template template = templateRepository.getByOrganizationNameAndName(
+                workspace.getOrganization().getName(),
+                getTemplateName(configurationId, isDestroy)
+        );
         log.info("Creating Job");
         Job job = new Job();
         job.setWorkspace(workspace);
@@ -341,10 +346,12 @@ public class RemoteTfeService {
     }
 
 
-    private String getTemplateName(String configurationId){
-        // get run speculative if false get Terraform Plan/Apply else just Plan
+    private String getTemplateName(String configurationId, boolean isDestroy) {
+        // get run speculative if false get Terraform Plan/Apply else just Plan or destroy
         Content content = contentRepository.getReferenceById(UUID.fromString(configurationId));
-        if(content.isSpeculative()){
+        if (isDestroy) {
+            return "Terraform-Plan/Destroy-Cli";
+        } else if (content.isSpeculative()) {
             return "Terraform-Plan";
         } else {
             return "Terraform-Plan/Apply-Cli";
@@ -397,20 +404,20 @@ public class RemoteTfeService {
 
         runsModel.getAttributes().put("status", planStatus);
         runsModel.getAttributes().put("has-changes", true);
-            runsModel.getAttributes().put("resource-additions", 1);
-            runsModel.getAttributes().put("resource-changes", 1);
-            runsModel.getAttributes().put("resource-destructions", 0);
+        runsModel.getAttributes().put("resource-additions", 1);
+        runsModel.getAttributes().put("resource-changes", 1);
+        runsModel.getAttributes().put("resource-destructions", 0);
 
 
-            HashMap<String, Object> actions = new HashMap<>();
-            actions.put("is-confirmable", true);
-            actions.put("is-discardable", false);
-            runsModel.getAttributes().put("actions", actions);
+        HashMap<String, Object> actions = new HashMap<>();
+        actions.put("is-confirmable", true);
+        actions.put("is-discardable", false);
+        runsModel.getAttributes().put("actions", actions);
 
 
-            HashMap<String, Object> permissions = new HashMap<>();
-            permissions.put("can-apply", true);
-            runsModel.getAttributes().put("permissions", permissions);
+        HashMap<String, Object> permissions = new HashMap<>();
+        permissions.put("can-apply", true);
+        runsModel.getAttributes().put("permissions", permissions);
 
 
         runsData.setData(runsModel);
@@ -603,7 +610,7 @@ public class RemoteTfeService {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         if (checkPlanLogStatus(planId).equals(LogStatus.BEGIN))
-            if (job.getStep() != null && !job.getStep().isEmpty()) 
+            if (job.getStep() != null && !job.getStep().isEmpty())
                 for (Step step : job.getStep()) {
                     log.info("Current Job State {}", job.getStatus());
                     if (step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {

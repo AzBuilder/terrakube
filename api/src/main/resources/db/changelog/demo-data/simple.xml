@@ -103,6 +103,15 @@
             <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
         </insert>
 
+        <insert tableName="template">
+            <column name="id"               value="cc8de820-4734-4fec-b1a5-a4014da6c846" />
+            <column name="name"             value="Terraform-Plan/Destroy-Cli" />
+            <column name="description"      value="Running terraform plan and destroy using remote backend" />
+            <column name="version"          value="1.0.0" />
+            <column name="tcl"              value="ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbkRlc3Ryb3kiCiAgc3RlcDogMTAwCi0gdHlwZTogImFwcHJvdmFsIgogIHN0ZXA6IDE1MAogIHRlYW06ICJURVJSQUZPUk1fQ0xJIgotIHR5cGU6ICJ0ZXJyYWZvcm1BcHBseSIKICBzdGVwOiAyMDAK" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
         <!--
         ***************    
         ***WORKSPACE***

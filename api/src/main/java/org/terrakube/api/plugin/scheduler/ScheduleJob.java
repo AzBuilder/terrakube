@@ -93,6 +93,7 @@ public class ScheduleJob implements org.quartz.Job {
             FlowType tempFlowType = FlowType.valueOf(flow.get().getType());
 
             switch (tempFlowType) {
+                case terraformPlanDestroy:
                 case terraformPlan:
                 case terraformApply:
                 case terraformDestroy:
