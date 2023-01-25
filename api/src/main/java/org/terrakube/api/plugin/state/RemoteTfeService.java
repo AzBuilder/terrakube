@@ -321,7 +321,7 @@ public class RemoteTfeService {
     RunsData createRun(RunsData runsData) throws SchedulerException, ParseException {
         String workspaceId = runsData.getData().getRelationships().getWorkspace().getData().getId();
         String configurationId = runsData.getData().getRelationships().getConfigurationVersion().getData().getId();
-        boolean isDestroy = (boolean) runsData.getData().getAttributes().get("is-destroy");
+        boolean isDestroy =  runsData.getData().getAttributes().get("is-destroy") != null ? (boolean) runsData.getData().getAttributes().get("is-destroy"): false;
         log.info("Creating new Terrakube Job");
         log.info("Workspace {} Configuration {}",workspaceId, configurationId);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
