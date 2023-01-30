@@ -6,10 +6,10 @@ components:
   - name: minio
     container:
       endpoints:
-        - name: http
+        - name: http00
           targetPort: 9000
           exposure: public
-        - name: http
+        - name: http01
           targetPort: 9001
           exposure: public
       image: docker.io/bitnami/minio:2022
