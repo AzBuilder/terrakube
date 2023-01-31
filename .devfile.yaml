@@ -5,28 +5,28 @@ metadata:
 components:
   - name: minio
     container:
-      endpoints:
-        - name: http00
-          targetPort: 9000
-          exposure: public
-        - name: http01
-          targetPort: 9001
-          exposure: public
+      #endpoints:
+      #  - name: http00
+      #    targetPort: 9000
+      #    exposure: public
+      #  - name: http01
+      #    targetPort: 9001
+      #    exposure: public
       image: bitnami/minio:2022
-      memoryLimit: 512Mi
-      env:
-        - name: MINIO_ROOT_USER
-          value: minioadmin
-        - name: MINIO_ROOT_PASSWORD
-          value: minioadmin
-        - name: MINIO_DEFAULT_BUCKETS
-          value: sample
-      volumeMounts:
-        - name: minio-volume
-          path: /data
-  - name: minio-volume
-    volume:
-      size: 100Mi
+      memoryLimit: 256Mi
+      #env:
+      #  - name: MINIO_ROOT_USER
+      #    value: minioadmin
+      #  - name: MINIO_ROOT_PASSWORD
+      #    value: minioadmin
+      #  - name: MINIO_DEFAULT_BUCKETS
+      #    value: sample
+      #volumeMounts:
+      #  - name: minio-volume
+      #    path: /data
+  #- name: minio-volume
+  #  volume:
+  #    size: 100Mi
 commands:
   - id: execute-minio
     apply:
