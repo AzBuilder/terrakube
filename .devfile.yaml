@@ -13,7 +13,7 @@ components:
           targetPort: 9001
           exposure: public
       image: bitnami/minio:2022
-      memoryLimit: 256Mi
+      memoryLimit: 512Mi
       env:
         - name: MINIO_ROOT_USER
           value: minioadmin
