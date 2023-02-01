@@ -456,6 +456,19 @@ public class RemoteTfeService {
         return getRun(runId);
     }
 
+    RunsData runDiscard(int runId) {
+        try {
+            Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
+            job.setStatus(JobStatus.cancelled);
+            jobRepository.save(job);
+            scheduleJobService.unlockWorkpace(job.getWorkspace().getId());
+            scheduleJobService.deleteJobContext(job.getId());
+        } catch (ParseException | SchedulerException e) {
+            throw new RuntimeException(e);
+        }
+        return getRun(runId);
+    }
+
     PlanRunData getPlan(int planId) {
         PlanRunData plansData = new PlanRunData();
         PlanRunModel planRunModel = new PlanRunModel();
