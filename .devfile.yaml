@@ -15,7 +15,7 @@ components:
         - name: MINIO_DEFAULT_BUCKETS
           value: sample
       volumeMounts:
-        - name: minio-volume
+        - name: miniovol
           path: /data
   - name: miniovol
     volume:
