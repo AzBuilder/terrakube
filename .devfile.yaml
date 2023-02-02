@@ -1,3 +1,22 @@
 schemaVersion: 2.1.0
 metadata:
   name: python-hello-world
+components:
+  - name: python
+    container:
+      image: quay.io/minio/minio:latest
+      memoryLimit: 512Mi
+      #mountSources: true
+      env:
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+        - name: MINIO_DEFAULT_BUCKETS
+          value: sample
+      volumeMounts:
+        - name: minio-volume
+          path: /data
+  - name: miniovol
+    volume:
+      size: 256Mi
