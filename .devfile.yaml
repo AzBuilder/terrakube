@@ -6,7 +6,7 @@ attributes:
 components:
   - name: python
     container:
-      image: quay.io/devfile/base-developer-image:ubi8-7bd4fe3
+      image: quay.io/minio/minio:latest
       volumeMounts:
         - name: venv
           path: /home/user/.venv
