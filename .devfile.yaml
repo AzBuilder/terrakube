@@ -1,34 +1,17 @@
-schemaVersion: 2.2.0
+schemaVersion: 2.1.0
 metadata:
-  name: mydevfile
+  name: python-hello-world
+attributes:
+  che-theia.eclipse.org/sidecar-policy: USE_DEV_CONTAINER
 components:
-  - name: go
+  - name: python
     container:
-      image: golang
+      image: quay.io/devfile/base-developer-image:ubi8-7bd4fe3
+      volumeMounts:
+        - name: venv
+          path: /home/user/.venv
       memoryLimit: 512Mi
       mountSources: true
-      command: ['sleep', 'infinity']
-      env:
-        - name: gopath
-          value: $(PROJECTS_ROOT)/go
-        - name: gocache
-          value: /tmp/go-cache
-      endpoints:
-        - name: web
-          targetPort: 8080
-          exposure: public
-  - name: postgres
-    container:
-      image: postgres
-      memoryLimit: 512Mi
-      env:
-        - name: postgres_user
-          value: user
-        - name: postgres_password
-          value: password
-        - name: postgres_db
-          value: database
-      endpoints:
-        - name: postgres
-          targetPort: 5432
-          exposure: none
+  - name: venv
+    volume:
+      size: 1G
