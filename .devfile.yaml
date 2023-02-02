@@ -7,9 +7,6 @@ components:
   - name: python
     container:
       image: quay.io/minio/minio:latest
-      volumeMounts:
-        - name: venv
-          path: /home/user/.venv
       memoryLimit: 512Mi
       mountSources: true
   - name: venv
