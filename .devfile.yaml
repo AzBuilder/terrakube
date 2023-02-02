@@ -1,46 +1,34 @@
 schemaVersion: 2.2.0
 metadata:
-  name: terrakube
+  name: mydevfile
 components:
-  - name: myk8deploy
-    kubernetes:
-      inlined:
-        apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
-        kind: Deployment
-        metadata:
-          # This name uniquely identifies the Deployment
-          name: minio-deployment
-        spec:
-          selector:
-            matchLabels:
-              app: minio
-          strategy:
-            type: Recreate
-          template:
-            metadata:
-              labels:
-                # Label is used as selector in the service.
-                app: minio
-            spec:
-              # Refer to the PVC created earlier
-              volumes:
-                - name: storage
-                  persistentVolumeClaim:
-                    # Name of the PVC created earlier
-                    claimName: minio-pv-claim
-              containers:
-                - name: minio
-                  # Pulls the default Minio image from Docker Hub
-                  image: minio/minio:latest
-                  args:
-                    - server
-                    - /storage
-                  env:
-                    # Minio access key and secret key
-                    - name: MINIO_ACCESS_KEY
-                      value: "minio"
-                    - name: MINIO_SECRET_KEY
-                      value: "minio123"
-                  ports:
-                    - containerPort: 9000
-                      hostPort: 9000
+  - name: go
+    container:
+      image: golang
+      memoryLimit: 512Mi
+      mountSources: true
+      command: ['sleep', 'infinity']
+      env:
+        - name: gopath
+          value: $(PROJECTS_ROOT)/go
+        - name: gocache
+          value: /tmp/go-cache
+      endpoints:
+        - name: web
+          targetPort: 8080
+          exposure: public
+  - name: postgres
+    container:
+      image: postgres
+      memoryLimit: 512Mi
+      env:
+        - name: postgres_user
+          value: user
+        - name: postgres_password
+          value: password
+        - name: postgres_db
+          value: database
+      endpoints:
+        - name: postgres
+          targetPort: 5432
+          exposure: none
