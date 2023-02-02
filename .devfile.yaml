@@ -4,6 +4,5 @@ metadata:
 components:
   - name: go
     container:
-      image: golang
+      image: nginx:stable
       memoryLimit: 512Mi
-      command: ['sleep', 'infinity']
