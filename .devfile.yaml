@@ -27,7 +27,7 @@ components:
   #- name: minio-volume
   #  volume:
   #    size: 100Mi
-commands:
-  - id: execute-minio
-    apply:
-      component: minio
+#commands:
+#  - id: execute-minio
+#    apply:
+#      component: minio
