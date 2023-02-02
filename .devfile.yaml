@@ -1,8 +1,6 @@
 schemaVersion: 2.1.0
 metadata:
   name: python-hello-world
-attributes:
-  che-theia.eclipse.org/sidecar-policy: USE_DEV_CONTAINER
 components:
   - name: python
     container:
