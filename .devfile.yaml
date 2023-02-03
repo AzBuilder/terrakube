@@ -18,7 +18,7 @@ components:
         - name: minio-server
           targetPort: 9000
           protocol: https
-          secure: 'true'
+          secure: true
           exposure: public
       volumeMounts:
         - name: miniovol
