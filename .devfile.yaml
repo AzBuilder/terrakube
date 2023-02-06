@@ -4,7 +4,7 @@ metadata:
 components:
   - name: minio
     container:
-      image: quay.io/minio/minio:latest
+      image: bitnami/minio:2022
       memoryLimit: 512Mi
       #mountSources: true
       env:
