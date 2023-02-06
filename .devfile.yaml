@@ -4,7 +4,7 @@ metadata:
 components:
   - name: minio
     container:
-      image: bitnami/minio:latest
+      image: nginx
       memoryLimit: 512Mi
       #mountSources: true
       env:
@@ -20,7 +20,7 @@ components:
           value: "https://9001-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
       endpoints:
         - name: minio-server
-          targetPort: 9000
+          targetPort: 80
           protocol: https
           secure: true
           exposure: public
