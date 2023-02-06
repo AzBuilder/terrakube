@@ -1,32 +1,31 @@
 schemaVersion: 2.2.0
 metadata:
-  name: terrakube-project
+  name: terrakube
 components:
-  - name: minio
+  - name: maven
     container:
-      image: bitnami/minio:2022
-      memoryLimit: 512Mi
-      #mountSources: true
+    image: eclipse/maven-jdk8:latest
+    volumeMounts:
+      - name: mavenrepo
+        path: /root/.m2
       env:
-        - name: MINIO_ROOT_USER
-          value: minioadmin
-        - name: MINIO_ROOT_PASSWORD
-          value: minioadmin
-        - name: MINIO_DEFAULT_BUCKETS
-          value: sample
+        - name: ENV_VAR
+          value: value
       endpoints:
-        - name: minio-server
-          targetPort: 9000
+        - name: maven-server
+          targetPort: 3101
           protocol: https
-          secure: true
+          secure: 'true'
           exposure: public
-      volumeMounts:
-        - name: miniovol
-          path: /data
-  - name: miniovol
-    volume:
-      size: 256Mi
+      memoryRequest: 256M
+      memoryLimit: 1536M
+      cpuRequest: 0.1
+      cpuLimit: 0.5
+      command: ['tail']
+      args: ['-f', '/dev/null']
 commands:
-  - id: run-minio
-    apply:
-      component: minio
+  - id: build
+    exec:
+    component: maven
+    commandLine: mvn clean
+    workingDir: /projects/terrakube
