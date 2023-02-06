@@ -1,31 +1,34 @@
 schemaVersion: 2.2.0
 metadata:
-  name: terrakube
+  name: terrakube-project
 components:
-  - name: maven
+  - name: minio
     container:
-    image: eclipse/maven-jdk8:latest
-    volumeMounts:
-      - name: mavenrepo
-        path: /root/.m2
+      image: quay.io/minio/minio:latest
+      memoryLimit: 512Mi
+      #mountSources: true
       env:
-        - name: ENV_VAR
-          value: value
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+        - name: MINIO_DEFAULT_BUCKETS
+          value: sample
       endpoints:
-        - name: maven-server
-          targetPort: 3101
+        - name: minio-server
+          targetPort: 9000
           protocol: https
-          secure: 'true'
+          secure: true
           exposure: public
-      memoryRequest: 256M
-      memoryLimit: 1536M
-      cpuRequest: 0.1
-      cpuLimit: 0.5
-      command: ['tail']
-      args: ['-f', '/dev/null']
+      volumeMounts:
+        - name: miniovol
+          path: /data
+  - name: miniovol
+    volume:
+      size: 256Mi
 commands:
-  - id: build
+  - id: min-io
     exec:
-    component: maven
-    commandLine: mvn clean
-    workingDir: /projects/terrakube
+      component: minio
+      commandLine: 'minio server'
+      #workingDir: '${PROJECTS_ROOT}/src/github.com/acme/my-go-project'
