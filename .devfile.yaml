@@ -6,7 +6,7 @@ components:
     container:
       image: golang
       memoryLimit: 512Mi
-      mountSources: true
+      mountSources: false
       command: ['sleep', 'infinity']
       env:
         - name: gopath
@@ -17,18 +17,3 @@ components:
         - name: web
           targetPort: 8080
           exposure: public
-  - name: postgres
-    container:
-      image: postgres
-      memoryLimit: 512Mi
-      env:
-        - name: postgres_user
-          value: user
-        - name: postgres_password
-          value: password
-        - name: postgres_db
-          value: database
-      endpoints:
-        - name: postgres
-          targetPort: 5432
-          exposure: none
