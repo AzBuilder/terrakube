@@ -10,11 +10,6 @@ metadata:
   projectType: Maven
   language: Java
   icon: https://raw.githubusercontent.com/devfile-samples/devfile-stack-icons/main/java-maven.jpg
-starterProjects:
-  - name: springbootproject
-    git:
-      remotes:
-        origin: 'https://github.com/odo-devfiles/springboot-ex.git'
 components:
   - name: tools
     container:
