@@ -1,31 +1,63 @@
-schemaVersion: 2.2.0
+schemaVersion: 2.1.0
 metadata:
-  name: terrakube-project
+  name: java-maven
+  version: 1.2.0
+  displayName: Maven Java
+  description: Upstream Maven and OpenJDK 11
+  tags:
+    - Java
+    - Maven
+  projectType: Maven
+  language: Java
+  icon: https://raw.githubusercontent.com/devfile-samples/devfile-stack-icons/main/java-maven.jpg
+starterProjects:
+  - name: springbootproject
+    git:
+      remotes:
+        origin: 'https://github.com/odo-devfiles/springboot-ex.git'
 components:
-  - name: maven
+  - name: tools
     container:
-    image: eclipse/maven-jdk8:latest
-    volumeMounts:
-      - name: mavenrepo
-        path: /root/.m2
-    env:
-      - name: ENV_VAR
-        value: value
-    endpoints:
-      - name: maven-server
-        targetPort: 3101
-        protocol: https
-        secure: 'true'
-        exposure: public
-    memoryRequest: 256M
-    memoryLimit: 1536M
-    cpuRequest: 0.1
-    cpuLimit: 0.5
-    command: ['tail']
-    args: ['-f', '/dev/null']
+      image: registry.access.redhat.com/ubi8/openjdk-11:latest
+      command: ["tail", "-f", "/dev/null"]
+      memoryLimit: 512Mi
+      mountSources: true
+      endpoints:
+        - name: http-maven
+          targetPort: 8080
+        - exposure: none
+          name: debug
+          targetPort: 5858
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      env:
+        - name: DEBUG_PORT
+          value: '5858'
+  - name: m2
+    volume: {}
 commands:
-  - id: build
+  - id: mvn-package
     exec:
-      component: mysql
-      commandLine: mvn clean
-      workingDir: /projects/spring-petclinic
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: 'mvn -Dmaven.repo.local=/home/user/.m2/repository package'
+      group:
+        kind: build
+        isDefault: true
+  - id: run
+    exec:
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: 'java -jar target/*.jar'
+      group:
+        kind: run
+        isDefault: true
+  - id: debug
+    exec:
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: 'java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=${DEBUG_PORT},suspend=n -jar target/*.jar'
+      group:
+        kind: debug
+        isDefault: true
