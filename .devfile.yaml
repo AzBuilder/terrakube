@@ -4,7 +4,7 @@ metadata:
 components:
   - name: minio
     container:
-      image: docker.io/bitnami/minio:2022 #quay.io/minio/minio:latest
+      image: quay.io/minio/minio:latest
       memoryLimit: 512Mi
       #mountSources: true
       env:
@@ -16,7 +16,7 @@ components:
           value: sample
       endpoints:
         - name: minio-server
-          targetPort: 3100
+          targetPort: 9000
           protocol: https
           secure: true
           exposure: public
