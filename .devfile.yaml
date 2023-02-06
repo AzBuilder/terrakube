@@ -2,33 +2,33 @@ schemaVersion: 2.2.0
 metadata:
   name: terrakube-project
 components:
-  - name: minio
+  - name: go
     container:
-      image: quay.io/minio/minio:latest
+      image: golang
       memoryLimit: 512Mi
-      #mountSources: true
+      mountSources: true
+      command: ['sleep', 'infinity']
       env:
-        - name: MINIO_ROOT_USER
-          value: minioadmin
-        - name: MINIO_ROOT_PASSWORD
-          value: minioadmin
-        - name: MINIO_DEFAULT_BUCKETS
-          value: sample
+        - name: gopath
+          value: $(PROJECTS_ROOT)/go
+        - name: gocache
+          value: /tmp/go-cache
       endpoints:
-        - name: minio-server
-          targetPort: 9000
-          protocol: https
-          secure: true
+        - name: web
+          targetPort: 8080
           exposure: public
-      volumeMounts:
-        - name: miniovol
-          path: /data
-  - name: miniovol
-    volume:
-      size: 256Mi
-commands:
-  - id: min-io
-    exec:
-      component: minio
-      commandLine: 'minio server'
-      #workingDir: '${PROJECTS_ROOT}/src/github.com/acme/my-go-project'
+  - name: postgres
+    container:
+      image: postgres
+      memoryLimit: 512Mi
+      env:
+        - name: postgres_user
+          value: user
+        - name: postgres_password
+          value: password
+        - name: postgres_db
+          value: database
+      endpoints:
+        - name: postgres
+          targetPort: 5432
+          exposure: none
