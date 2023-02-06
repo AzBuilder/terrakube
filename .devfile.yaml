@@ -1,58 +1,36 @@
-schemaVersion: 2.1.0
+schemaVersion: 2.2.0
 metadata:
-  name: java-maven
-  version: 1.2.0
-  displayName: Maven Java
-  description: Upstream Maven and OpenJDK 11
-  tags:
-    - Java
-    - Maven
-  projectType: Maven
-  language: Java
-  icon: https://raw.githubusercontent.com/devfile-samples/devfile-stack-icons/main/java-maven.jpg
+  name: terrakube-project
 components:
-  - name: tools
+  - name: postgresql
     container:
-      image: registry.access.redhat.com/ubi8/openjdk-11:latest
-      command: ["tail", "-f", "/dev/null"]
+      image: bitnami/postgresql:latest
       memoryLimit: 512Mi
-      mountSources: true
-      endpoints:
-        - name: http-maven
-          targetPort: 8080
-        - exposure: none
-          name: debug
-          targetPort: 5858
-      volumeMounts:
-        - name: m2
-          path: /home/user/.m2
+      #mountSources: true
       env:
-        - name: DEBUG_PORT
-          value: '5858'
-  - name: m2
-    volume: {}
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+        - name: MINIO_DEFAULT_BUCKETS
+          value: sample
+        - name: MINIO_SERVER_URL
+          value: "https://9000-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: "https://9001-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
+      endpoints:
+        - name: postgresql-server
+          targetPort: 5432
+          protocol: https
+          secure: true
+          exposure: public
+      #volumeMounts:
+      #  - name: miniovol
+      #    path: /data
+  #- name: miniovol
+  #  volume:
+  #    size: 256Mi
 commands:
-  - id: mvn-package
-    exec:
-      component: tools
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: 'mvn -Dmaven.repo.local=/home/user/.m2/repository package'
-      group:
-        kind: build
-        isDefault: true
-  - id: run
-    exec:
-      component: tools
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: 'java -jar target/*.jar'
-      group:
-        kind: run
-        isDefault: true
-  - id: debug
-    exec:
-      component: tools
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: 'java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=${DEBUG_PORT},suspend=n -jar target/*.jar'
-      group:
-        kind: debug
-        isDefault: true
+- id: run-postgresql
+  apply:
+    component: postgresql
