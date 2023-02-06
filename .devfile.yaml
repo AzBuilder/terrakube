@@ -2,18 +2,35 @@ schemaVersion: 2.2.0
 metadata:
   name: terrakube-project
 components:
-  - name: go
+  - name: minio
     container:
-      image: golang
+      image: bitnami/minio:latest
       memoryLimit: 512Mi
-      mountSources: false
-      command: ['sleep', 'infinity']
+      #mountSources: true
       env:
-        - name: gopath
-          value: $(PROJECTS_ROOT)/go
-        - name: gocache
-          value: /tmp/go-cache
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+        - name: MINIO_DEFAULT_BUCKETS
+          value: sample
+        - name: MINIO_SERVER_URL
+          value: "https://9000-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: "https://9001-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
       endpoints:
-        - name: web
-          targetPort: 8080
+        - name: minio-server
+          targetPort: 9000
+          protocol: https
+          secure: true
           exposure: public
+      volumeMounts:
+        - name: miniovol
+          path: /data
+  - name: miniovol
+    volume:
+      size: 256Mi
+commands:
+  - id: deployk8s
+    apply:
+      component: outerloop-deploy
