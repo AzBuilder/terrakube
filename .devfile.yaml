@@ -19,7 +19,7 @@ components:
         - name: MINIO_BROWSER_REDIRECT_URL
           value: "https://9001-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
       endpoints:
-        - name: postgresql-server
+        - name: postgresqlrun
           targetPort: 5432
           protocol: https
           secure: true
