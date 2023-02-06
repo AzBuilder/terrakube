@@ -31,6 +31,6 @@ components:
     volume:
       size: 256Mi
 commands:
-  - id: deployk8s
+  - id: runminio
     apply:
-      component: outerloop-deploy
+      component: minio
