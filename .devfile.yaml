@@ -1,8 +1,8 @@
-schemaVersion: 2.1.0
+schemaVersion: 2.2.0
 metadata:
-  name: python-hello-world
+  name: terrakube-project
 components:
-  - name: python
+  - name: minio
     container:
       image: quay.io/minio/minio:latest
       memoryLimit: 512Mi
@@ -26,3 +26,7 @@ components:
   - name: miniovol
     volume:
       size: 256Mi
+commands:
+  - id: run-minio
+    apply:
+      component: minio
