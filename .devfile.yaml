@@ -1,36 +1,112 @@
-schemaVersion: 2.2.0
+schemaVersion: 2.1.0
 metadata:
-  name: terrakube-project
+  name: spring-petclinic
 components:
-  - name: postgresql
+
+  - name: tools
     container:
-      image: bitnami/postgresql:latest
-      memoryLimit: 512Mi
-      #mountSources: true
-      env:
-        - name: MINIO_ROOT_USER
-          value: minioadmin
-        - name: MINIO_ROOT_PASSWORD
-          value: minioadmin
-        - name: MINIO_DEFAULT_BUCKETS
-          value: sample
-        - name: MINIO_SERVER_URL
-          value: "https://9000-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
-        - name: MINIO_BROWSER_REDIRECT_URL
-          value: "https://9001-azbuilder-terrakube-ayk6g817pmv.ws-us85.gitpod.io"
+      image: quay.io/devfile/universal-developer-image:ubi8-0e189d9
+      memoryLimit: 3Gi
       endpoints:
-        - name: postgresqlrun
-          targetPort: 5432
-          protocol: https
-          secure: true
-          exposure: public
-      #volumeMounts:
-      #  - name: miniovol
-      #    path: /data
-  #- name: miniovol
-  #  volume:
-  #    size: 256Mi
+        - exposure: none
+          name: debug
+          protocol: tcp
+          targetPort: 5005
+        - exposure: public
+          name: 8080-tcp
+          protocol: http
+          targetPort: 8080
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+
+  - name: minio
+    container:
+      image: bitnami/minio:latest
+      memoryLimit: 1Gi
+      endpoints:
+        - exposure: none
+          name: debugmin
+          protocol: tcp
+          targetPort: 9001
+        - exposure: public
+          name: 8080-min
+          protocol: http
+          targetPort: 9000
+
+  - name: m2
+    volume:
+      size: 1G
+
+  - name: mariadb
+    container:
+      image: quay.io/eclipse/che--mariadb:10.7.1-5a8009369ee57c85b6f4a08406147bd9c505cde6b8250d16a27d2a5febfdead7
+      memoryLimit: 300Mi
+      endpoints:
+        - exposure: none
+          name: db
+          protocol: tcp
+          targetPort: 3306
+      env:
+        - name: MARIADB_USER
+          value: petclinic
+        - name: MARIADB_PASSWORD
+          value: petclinic
+        - name: MARIADB_DATABASE
+          value: petclinic
+        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+          value: allow
+        - name: PS1
+          value: $(echo ${0}) $
+      volumeMounts:
+        - name: mysqldata
+          path: /var/lib/mysql
+
+  - name: mysqldata
+    volume:
+      size: 256Mi
+
 commands:
-- id: run-postgresql
-  apply:
-    component: postgresql
+  - id: prepare-database
+    exec:
+      component: mariadb
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        mysql -u root < ${PROJECT_SOURCE}/src/main/resources/db/mysql/user.sql && \
+        mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/schema.sql && \
+        mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/data.sql && \
+        echo "\e[32mDone.\e[0m Database petclinic was configured"
+      group:
+        kind: run
+        isDefault: true
+
+  - id: maven-build
+    exec:
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: mvn clean install
+      group:
+        kind: build
+        isDefault: true
+
+  - id: run-with-hsqldb
+    exec:
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        mvn spring-boot:run -DskipTests \
+        -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
+      group:
+        kind: run
+        isDefault: true
+
+  - id: run-with-mysql
+    exec:
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        mvn spring-boot:run -DskipTests -Dspring-boot.run.profiles=mysql \
+        -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
+      group:
+        kind: run
+        isDefault: true
