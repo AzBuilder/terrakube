@@ -7,6 +7,7 @@ import { VCSSettings } from "./VCS";
 import { TemplatesSettings } from "./Templates";
 import {ORGANIZATION_NAME} from '../../config/actionTypes';
 import { SSHKeysSettings } from "./SSHKeys";
+import { GlobalVariablesSettings } from "./GlobalVariables";
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
@@ -31,13 +32,16 @@ export const OrganizationSettings = ({ selectedTab ,vcsMode}) => {
           <TabPane tab="Teams"  key="2">
             <TeamSettings />
           </TabPane>
-          <TabPane tab="VCS Providers"  key="3">
+          <TabPane tab="Global Variables"  key="3">
+            <GlobalVariablesSettings />
+          </TabPane>
+          <TabPane tab="VCS Providers"  key="4">
             <VCSSettings vcsMode={vcsMode} />
           </TabPane>
-          <TabPane tab="Templates" key="4">
+          <TabPane tab="Templates" key="5">
             <TemplatesSettings key={key} />
           </TabPane>
-          <TabPane tab="SSH Keys" key="5">
+          <TabPane tab="SSH Keys" key="6">
             <SSHKeysSettings />
           </TabPane>
         </Tabs>
