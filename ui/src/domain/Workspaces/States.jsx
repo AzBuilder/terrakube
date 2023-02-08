@@ -1,10 +1,10 @@
-import { React, useState, useRef, useEffect } from 'react';
+import { React, useState, useRef } from 'react';
 import { List, Space, Card, Row, Col, Avatar, Button } from "antd";
 import Editor from "@monaco-editor/react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import ReactFlow, { Controls, Background } from 'react-flow-renderer';
 import NodeResource from './NodeResource';
-import { RestTwoTone } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 
 
 export const States = ({ history, setStateDetailsVisible, stateDetailsVisible }) => {
@@ -157,7 +157,7 @@ export const States = ({ history, setStateDetailsVisible, stateDetailsVisible })
           )} />) : (
           <div style={{ paddingTop: "10px" }}>
             <Row>
-              <Col span={1}><Avatar shape="square" src="https://avatarfiles.alphacoders.com/128/thumb-128984.png" /></Col>
+              <Col span={1}><Avatar shape="square" icon={<UserOutlined />} /></Col>
               <Col span={21}><h3>{currentState.title}</h3>
                 <Space className="stateDetails" size={40} split="|">
                   <span>#{currentState.id}</span>

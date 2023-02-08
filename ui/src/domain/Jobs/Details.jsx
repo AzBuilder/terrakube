@@ -13,6 +13,7 @@ import {
   CommentOutlined,
   CloseCircleTwoTone,
   StopOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import Ansi from "ansi-to-react";
 const { DateTime } = require("luxon");
@@ -240,7 +241,7 @@ export const DetailsJob = ({ jobId }) => {
                   <Avatar
                     size="small"
                     shape="square"
-                    src="https://avatarfiles.alphacoders.com/128/thumb-128984.png"
+                    icon={<UserOutlined />}
                   />{" "}
                   <b>{job.data.attributes.createdBy}</b> triggered a run from UI{" "}
                   {DateTime.fromISO(

@@ -38,6 +38,7 @@ import {
   StopOutlined,
   InfoCircleOutlined,
   DeleteOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
@@ -307,7 +308,7 @@ export const WorkspaceDetails = (props) => {
                               avatar={
                                 <Avatar
                                   shape="square"
-                                  src="https://avatarfiles.alphacoders.com/128/thumb-128984.png"
+                                  icon={<UserOutlined />}
                                 />
                               }
                               title={
