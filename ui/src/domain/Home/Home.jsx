@@ -18,10 +18,12 @@ export const Home = () => {
         setOrganizations(orgs);
         if (orgs?.length === 1) {
           history.push(`/organizations/${orgs[0].id}/workspaces`);
+          history.go(0);
         }
       });
     } else {
       history.push(`/organizations/${orgId}/workspaces`);
+      history.go(0);
     }
   });
 
