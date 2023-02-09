@@ -4,9 +4,8 @@ import "./Home.css";
 import axiosInstance from "../../config/axiosConfig";
 import { Layout, Breadcrumb, List, Card } from "antd";
 import { useHistory } from "react-router-dom";
-const { Content } = Layout;
 import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
-
+const { Content } = Layout;
 export const Home = () => {
   const [organizations, setOrganizations] = useState([]);
   const history = useHistory();
