@@ -32,7 +32,7 @@ tasks:
     init: |
       chmod +x scripts/dependencies/loadMinio.sh
     command: scripts/dependencies/loadMinio.sh
-  
+
   - name: Dependencies Backend
     init: |
       chmod +x scripts/dependencies/loadDependencies.sh &&
@@ -54,7 +54,7 @@ tasks:
       chmod +x scripts/setupDevelopmentEnvironmentAzure.sh &&
       chmod +x scripts/setupDevelopmentEnvironmentGcp.sh &&
       chmod +x scripts/build/terrakubeBuild.sh &&
-      chmod +x scripts/build/generateSampleCaCerts.sh 
+      chmod +x scripts/build/generateSampleCaCerts.sh
     command: scripts/setupDevelopmentEnvironment.sh
 
   - name: Dex Authentication Url
@@ -67,33 +67,33 @@ ports:
     port: 5556
     onOpen: ignore
     visibility: public
-  - name: OpenLDAP 
+  - name: OpenLDAP
     port: 389
     onOpen: ignore
-  - name: OpenLDAP 
+  - name: OpenLDAP
     port: 636
     onOpen: ignore
-  - name: TerrakubeAPI 
+  - name: TerrakubeAPI
     port: 8080
     onOpen: ignore
     visibility: public
-  - name: TerrakubeRegistry 
+  - name: TerrakubeRegistry
     port: 8075
     onOpen: ignore
     visibility: public
-  - name: TerrakubeExecutor 
+  - name: TerrakubeExecutor
     port: 8090
     onOpen: ignore
     visibility: public
-  - name: TerrakubeUI 
+  - name: TerrakubeUI
     port: 3000
     onOpen: ignore
     visibility: public
-  - name: Minio 
+  - name: Minio
     port: 9000
     onOpen: ignore
     visibility: public
-  - name: MinioConsole 
+  - name: MinioConsole
     port: 9001
     onOpen: ignore
     visibility: public
@@ -101,3 +101,5 @@ ports:
 vscode:
   extensions:
     - rangav.vscode-thunder-client
+    - esbenp.prettier-vscode
+    - vscjava.vscode-java-pack

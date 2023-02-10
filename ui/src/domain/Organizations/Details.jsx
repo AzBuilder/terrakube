@@ -18,11 +18,10 @@ import {
   SyncOutlined,
   ExclamationCircleOutlined,
   InfoCircleOutlined,
-  CloseCircleTwoTone,
   CloseCircleOutlined,
   StopOutlined,
 } from "@ant-design/icons";
-
+import { BiTerminal } from "react-icons/bi";
 import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { IconContext } from "react-icons";
 import axiosInstance from "../../config/axiosConfig";
@@ -182,14 +181,31 @@ export const OrganizationDetails = ({
                           </IconContext.Provider>
                           &nbsp;&nbsp;{item.terraformVersion}
                         </span>
-                        <span>
-                          {renderVCSLogo(new URL(fixSshURL(item.source)).hostname)}&nbsp;{" "}
-                          <a href={fixSshURL(item.source)} target="_blank">
-                            {new URL(fixSshURL(item.source))?.pathname
-                              ?.replace(".git", "")
-                              ?.substring(1)}
-                          </a>
-                        </span>
+                        {item.branch !== "remote-content" ? (
+                          <span>
+                            {renderVCSLogo(
+                              new URL(fixSshURL(item.source)).hostname
+                            )}
+                            &nbsp;{" "}
+                            <a href={fixSshURL(item.source)} target="_blank">
+                              {new URL(fixSshURL(item.source))?.pathname
+                                ?.replace(".git", "")
+                                ?.substring(1)}
+                            </a>
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              verticalAlign: "middle",
+                              display: "inline-block",
+                            }}
+                          >
+                            <IconContext.Provider value={{ size: "1.4em" }}>
+                              <BiTerminal />
+                            </IconContext.Provider>
+                            &nbsp;&nbsp;cli/api driven workflow
+                          </span>
+                        )}
                       </Space>
                     </Space>
                   </Card>
@@ -203,11 +219,11 @@ export const OrganizationDetails = ({
   );
 };
 
-function fixSshURL(source){
-  if(source.startsWith("git@")){
-      return source.replace(":","/").replace("git@","https://")
+function fixSshURL(source) {
+  if (source.startsWith("git@")) {
+    return source.replace(":", "/").replace("git@", "https://");
   } else {
-      return source
+    return source;
   }
 }
 
