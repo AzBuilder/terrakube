@@ -3,6 +3,9 @@
 # Install Java Dependencies
 mvn clean install
 
+# Build skip spring boot docker image
+mvn clean install -Dspring-boot.build-image.skip=true
+
 # Update Terrakube Version
 mvn -pl "api,registry,executor" versions:set-property -Dproperty=revision -DnewVersion=$VERSION -DgenerateBackupPoms=false
 
@@ -31,3 +34,5 @@ docker build -t terrakube-ui:latest  .
 
 # Setup tags for UI
 docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:latest
+
+
