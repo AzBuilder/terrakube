@@ -75,17 +75,28 @@ public class TclService {
             FlowConfig temp = yaml.load(new String(Base64.getDecoder().decode(tcl)));
             log.info("FlowConfig: \n {}", temp);
             flowConfig = yaml.load(new String(Base64.getDecoder().decode(tcl)));
-        } catch (Exception ex){
+
+            if(flowConfig.getFlow().isEmpty()){
+                return setErrorFlowYaml("Yaml Template does not have any flow");
+            }
+        } catch (Exception ex) {
             log.error("Exception parsing yaml: {}", ex.getMessage());
-            flowConfig = new FlowConfig();
-            List<Flow> flowList = new ArrayList();
-            Flow errorFlow = new Flow();
-            errorFlow.setType(FlowType.yamlError.toString());
-            errorFlow.setStep(100);
-            errorFlow.setError(ex.getMessage());
-            flowList.add(errorFlow);
-            flowConfig.setFlow(flowList);
+            flowConfig = setErrorFlowYaml(ex.getMessage());
         }
+        return flowConfig;
+    }
+
+    private FlowConfig setErrorFlowYaml(String message) {
+        FlowConfig flowConfig = new FlowConfig();
+        List<Flow> flowList = new ArrayList();
+        Flow errorFlow = new Flow();
+        errorFlow.setType(FlowType.yamlError.toString());
+        errorFlow.setStep(100);
+        errorFlow.setError(message);
+        errorFlow.setName("Template Yaml Error");
+        flowList.add(errorFlow);
+        flowConfig.setFlow(flowList);
+
         return flowConfig;
     }
 
@@ -95,13 +106,13 @@ public class TclService {
         if (!map.isEmpty()) {
             log.info("Next Command: {}", map.firstKey());
 
-                Optional<Flow> nextFlow = getFlowConfig(job.getTcl())
-                        .getFlow()
-                        .stream()
-                        .filter(flow -> flow.getStep() == map.firstKey())
-                        .findFirst();
+            Optional<Flow> nextFlow = getFlowConfig(job.getTcl())
+                    .getFlow()
+                    .stream()
+                    .filter(flow -> flow.getStep() == map.firstKey())
+                    .findFirst();
 
-                return nextFlow.isPresent() ? nextFlow.get() : null;
+            return nextFlow.isPresent() ? nextFlow.get() : null;
         } else
             return null;
     }
