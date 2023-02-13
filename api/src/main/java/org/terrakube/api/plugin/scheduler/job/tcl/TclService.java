@@ -77,6 +77,7 @@ public class TclService {
             flowConfig = yaml.load(new String(Base64.getDecoder().decode(tcl)));
 
             if(flowConfig.getFlow().isEmpty()){
+                log.error("Exception parsing yaml: template with no flows");
                 return setErrorFlowYaml("Yaml Template does not have any flow");
             }
         } catch (Exception ex) {
