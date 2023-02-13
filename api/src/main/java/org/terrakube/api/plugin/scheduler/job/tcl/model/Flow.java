@@ -13,6 +13,8 @@ public class Flow {
     private String type;
     private String team;
     private String name;
+
+    private String error;
     private int step;
     List<Command> commands;
 }

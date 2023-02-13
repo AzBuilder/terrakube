@@ -112,6 +112,12 @@ public class ScheduleJob implements org.quartz.Job {
                     jobRepository.save(job);
                     log.info("Waiting Approval for Job {} Step Id {}", job.getId(), stepId);
                     break;
+                case yamlError:
+                    log.error("Terrakube Template error, please verify the template definition");
+                    job.setStatus(JobStatus.failed);
+                    job.setComments(flow.get().getError());
+                    jobRepository.save(job);
+                    break;
                 default:
                     log.error("FlowType not supported");
                     break;
