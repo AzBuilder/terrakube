@@ -402,9 +402,19 @@ export const WorkspaceDetails = (props) => {
                               description={
                                 <span>
                                   {" "}
-                                  #job-{item.id} | commitId{" "}
-                                  {item.commitId?.substring(0, 6)} |{" "}
-                                  <b>{item.createdBy}</b> triggered via UI
+                                  #job-{item.id} |
+                                  {item.commitId !== "000000000" ? (
+                                    <>
+                                      {" "}
+                                      commitId {item.commitId?.substring(
+                                        0,
+                                        6
+                                      )}{" "}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                  | <b>{item.createdBy}</b> triggered via UI
                                 </span>
                               }
                             />
