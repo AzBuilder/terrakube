@@ -94,7 +94,7 @@ public class TclService {
         errorFlow.setType(FlowType.yamlError.toString());
         errorFlow.setStep(100);
         errorFlow.setError(message);
-        errorFlow.setName("Template Yaml Error");
+        errorFlow.setName("Template Yaml Error, check API logs");
         flowList.add(errorFlow);
         flowConfig.setFlow(flowList);
 
