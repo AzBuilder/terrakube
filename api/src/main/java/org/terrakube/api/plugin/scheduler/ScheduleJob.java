@@ -115,7 +115,7 @@ public class ScheduleJob implements org.quartz.Job {
                 case yamlError:
                     log.error("Terrakube Template error, please verify the template definition");
                     job.setStatus(JobStatus.failed);
-                    job.setComments(flow.get().getError());
+                    job.setComments(flow.get().getError().substring(0,511));
                     jobRepository.save(job);
                     break;
                 default:
