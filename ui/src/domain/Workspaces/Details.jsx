@@ -603,6 +603,7 @@ function setupWorkspaceIncludes(
           title: "Queue manually using Terraform",
           statusColor: finalColor,
           commitId: element.attributes.commitId,
+          stepNumber: element.attributes.stepNumber,
           latestChange: DateTime.fromISO(
             element.attributes.createdDate
           ).toRelative(),
