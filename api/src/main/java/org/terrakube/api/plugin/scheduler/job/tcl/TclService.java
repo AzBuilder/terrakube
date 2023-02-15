@@ -125,8 +125,10 @@ public class TclService {
                 ImportComands importComands = finalFlow.getImportComands();
                 if (importComands != null) {
                     log.info("Import commands from {} branch {} folder {}", importComands.getRepository(), importComands.getBranch(), importComands.getFolder());
-                    nextFlow.get().setCommands(importCommands(importComands.getRepository(), importComands.getBranch(), importComands.getFolder()));
+                    finalFlow.setCommands(importCommands(importComands.getRepository(), importComands.getBranch(), importComands.getFolder()));
                 }
+
+                return finalFlow;
 
             } else
                 return null;
