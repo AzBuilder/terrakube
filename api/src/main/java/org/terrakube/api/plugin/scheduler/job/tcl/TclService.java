@@ -119,24 +119,29 @@ public class TclService {
                     .filter(flow -> flow.getStep() == map.firstKey())
                     .findFirst();
 
-            ImportComands importComands = nextFlow.get().getImportComands();
-            if (importComands != null) {
-                log.info("Import commands from {} branch {} folder {}", importComands.getRepository(), importComands.getBranch(), importComands.getFolder());
+            if (nextFlow.isPresent()) {
+                Flow finalFlow = nextFlow.get();
+                log.info("Checking import commands in YAML");
+                ImportComands importComands = finalFlow.getImportComands();
+                if (importComands != null) {
+                    log.info("Import commands from {} branch {} folder {}", importComands.getRepository(), importComands.getBranch(), importComands.getFolder());
+                    nextFlow.get().setCommands(importCommands(importComands.getRepository(), importComands.getBranch(), importComands.getFolder()));
+                }
 
-                nextFlow.get().setCommands(importCommands(importComands.getRepository(), importComands.getBranch(), importComands.getFolder()));
-            }
-
-            return nextFlow.isPresent() ? nextFlow.get() : null;
+            } else
+                return null;
         } else
             return null;
     }
 
     private List<Command> importCommands(String repository, String branch, String folder) {
-        List<Command> commands = new ArrayList();
+        List<Command> commands = new ArrayList<>();
         try {
             File importFolder = generateImportFolder();
+            log.info("Get commands text");
             String commandsText = getCommandList(repository, branch, folder, generateImportFolder());
 
+            log.info("Parsing yaml file");
             Yaml yaml = new Yaml(new Constructor(CommandConfig.class));
             CommandConfig temp = yaml.load(commandsText);
 
@@ -144,6 +149,7 @@ public class TclService {
 
             log.info("Importing commands \n{}\n", commandsText);
 
+            log.info("Cleaning temp directory");
             FileUtils.cleanDirectory(importFolder);
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -154,6 +160,7 @@ public class TclService {
     private String getCommandList(String repository, String branch, String folder, File folderImport) {
         String commandList = "";
         try {
+            log.info("Cloning template import repository")
             Git.cloneRepository()
                     .setURI(repository)
                     .setDirectory(folderImport)
@@ -166,6 +173,7 @@ public class TclService {
                 importData = new File(String.format("%s/%s/commands.yaml", folderImport.getCanonicalPath(), folder));
             }
 
+            log.info("Reading commands.yaml file");
             commandList = FileUtils.readFileToString(importData, Charset.defaultCharset());
         } catch (IOException | GitAPIException e) {
             log.error(e.getMessage());
@@ -174,6 +182,7 @@ public class TclService {
     }
 
     private File generateImportFolder() {
+        log.info("Creating import folder");
         String importCommandFolder = String.format(IMPORT_DIRECTORY, FileUtils.getUserDirectoryPath(), UUID.randomUUID());
         File importFolder = new File(importCommandFolder);
         try {
