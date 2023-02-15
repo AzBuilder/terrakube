@@ -130,8 +130,9 @@ public class TclService {
 
                 return finalFlow;
 
-            } else
+            } else {
                 return null;
+            }
         } else
             return null;
     }
@@ -162,7 +163,7 @@ public class TclService {
     private String getCommandList(String repository, String branch, String folder, File folderImport) {
         String commandList = "";
         try {
-            log.info("Cloning template import repository")
+            log.info("Cloning template import repository");
             Git.cloneRepository()
                     .setURI(repository)
                     .setDirectory(folderImport)
