@@ -60,6 +60,10 @@ components:
     volume:
       size: 1G
 
+  - name: config
+    volume:
+      size: 1G
+
   - name: mariadb
     container:
       image: quay.io/eclipse/che--mariadb:10.7.1-5a8009369ee57c85b6f4a08406147bd9c505cde6b8250d16a27d2a5febfdead7
