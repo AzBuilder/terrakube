@@ -121,10 +121,11 @@ commands:
       component: node
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        touch /platform/config/.envUi && \
-        touch /platform/config/.envApi && \
-        touch /platform/config/.envExecutor && \
-        touch /platform/config/.envRegistry && \
+        mkdir /home/user/.terrakubeConfig && \
+        touch /home/user/.terrakubeConfig/.envUi && \
+        touch /home/user/.terrakubeConfig/.envApi && \
+        touch /home/user/.terrakubeConfig/.envExecutor && \
+        touch /home/user/.terrakubeConfig/.envRegistry && \
         echo "REACT_APP_TERRAKUBE_API_URL=" >> /home/user/.terrakubeConfig/.envUi && \
         echo "REACT_APP_CLIENT_ID=" >> /home/user/.terrakubeConfig/.envUi && \
         echo "REACT_APP_AUTHORITY=" >> /home/user/.terrakubeConfig/.envUi && \
