@@ -34,6 +34,9 @@ components:
     container:
       image: docker.io/node:lts-bullseye-slim
       memoryLimit: 3Gi
+      volumeMounts:
+        - name: config
+          path: /home/user/config
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
@@ -103,7 +106,8 @@ commands:
     exec:
       component: maven
       workingDir: ${PROJECT_SOURCE}
-      commandLine: mvn clean install -Dspring-boot.build-image.skip=true
+      commandLine: |
+        mvn clean install -Dspring-boot.build-image.skip=true
       group:
         kind: build
         isDefault: false
@@ -112,7 +116,10 @@ commands:
     exec:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
-      commandLine: yarn install; yarn build;
+      commandLine: |
+        yarn install && \
+        yarn build && \
+        echo "\e[32mDone.\e[0m UI Build completed"
       group:
         kind: build
         isDefault: false
@@ -121,7 +128,8 @@ commands:
     exec:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
-      commandLine: yarn start;
+      commandLine: |
+        export $(cat /home/user/config/.envUi) && yarn start
       group:
         kind: build
         isDefault: false
