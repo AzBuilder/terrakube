@@ -112,7 +112,7 @@ commands:
     exec:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
-      commandLine: yarn build
+      commandLine: yarn install; yarn build;
       group:
         kind: build
         isDefault: false
