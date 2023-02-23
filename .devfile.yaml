@@ -135,7 +135,7 @@ commands:
       workingDir: ${PROJECT_SOURCE}/ui
       commandLine: |
         touch .yarnrc && \
-        sudo chown $USER .yarnrc && \
+        chown $USER .yarnrc && \
         chmod +r ~/.yarnrc && \
         yarn install && \
         yarn build && \
