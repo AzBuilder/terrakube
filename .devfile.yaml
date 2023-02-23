@@ -3,9 +3,9 @@ metadata:
   name: spring-petclinic
 components:
 
-  - name: maven
+  - name: tools
     container:
-      image: docker.io/maven:3.9.0-eclipse-temurin-17-focal
+      image: quay.io/devfile/universal-developer-image:ubi8-latest
       memoryLimit: 3Gi
       endpoints:
         - exposure: none
@@ -16,8 +16,6 @@ components:
           name: 8080-tcp
           protocol: http
           targetPort: 8080
-      command: [ 'tail' ]
-      args: [ '-f', '/dev/null' ]
       volumeMounts:
         - name: m2
           path: /home/user/.m2
@@ -86,12 +84,12 @@ commands:
 
   - id: maven-build
     exec:
-      component: maven
+      component: tools
       workingDir: ${PROJECT_SOURCE}
       commandLine: mvn clean install -Dspring-boot.build-image.skip=true
       group:
         kind: build
-        isDefault: false
+        isDefault: true
 
   - id: minio-start
     exec:
