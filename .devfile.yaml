@@ -33,7 +33,7 @@ components:
   - name: node
     container:
       image: docker.io/node:lts-bullseye-slim
-      memoryLimit: 2Gi
+      memoryLimit: 3Gi
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
@@ -113,6 +113,15 @@ commands:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
       commandLine: yarn install; yarn build;
+      group:
+        kind: build
+        isDefault: false
+
+  - id: yarn-start
+    exec:
+      component: node
+      workingDir: ${PROJECT_SOURCE}/ui
+      commandLine: yarn start;
       group:
         kind: build
         isDefault: false
