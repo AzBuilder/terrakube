@@ -36,7 +36,7 @@ components:
       memoryLimit: 3Gi
       volumeMounts:
         - name: config
-          path: /home/user/config
+          path: /platform/config
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
@@ -116,11 +116,27 @@ commands:
         kind: build
         isDefault: false
 
+  - id: config-build
+    exec:
+      component: node
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        touch /platform/config/.envUi && \
+        touch /platform/config/.envApi && \
+        touch /platform/config/.envExecutor && \
+        touch /platform/config/.envRegistry
+      group:
+        kind: build
+        isDefault: false
+
   - id: yarn-build
     exec:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
       commandLine: |
+        touch .yarnrc && \
+        sudo chown $USER .yarnrc && \
+        chmod +r ~/.yarnrc && \
         yarn install && \
         yarn build && \
         echo "\e[32mDone.\e[0m UI Build completed"
