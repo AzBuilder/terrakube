@@ -157,18 +157,13 @@ commands:
         kind: build
         isDefault: false
 
-  - id: setup-project
+  - id: run-api
     exec:
-      component: node
+      component: maven
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        chmod +x scripts/setupDevelopmentEnvironment.sh && \
-        chmod +x scripts/setupDevelopmentEnvironmentMinio.sh && \
-        chmod +x scripts/setupDevelopmentEnvironmentAzure.sh && \
-        chmod +x scripts/setupDevelopmentEnvironmentGcp.sh && \
-        chmod +x scripts/build/terrakubeBuild.sh && \
-        chmod +x scripts/build/generateSampleCaCerts.sh && \
-        scripts/setupDevelopmentEnvironment.sh
+        source .envApi && \
+        mvn spring-boot:run -f api/pom.xml -Dspring-boot.run.profiles=demo
       group:
         kind: build
         isDefault: false
