@@ -29,6 +29,33 @@ components:
           path: /home/user/.m2
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
+      env:
+        - name: ApiDataSourceType
+          value: H2
+        - name: GroupValidationType
+          value: DEX
+        - name: UserValidationType
+          value: DEX
+        - name: AuthenticationValidationType
+          value: DEX
+        - name: TerrakubeHostname
+          value: http://localhost:8080
+        - name: AzBuilderExecutorUrl
+          value: http://localhost:8090/api/v1/terraform-rs
+        - name: PatSecret
+          value: ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
+        - name: InternalSecret
+          value: S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
+        - name: DexIssuerUri
+          value: http://localhost:5556/dex
+        - name: StorageType
+          value: LOCAL
+        - name: TerrakubeUiURL
+          value: http://localhost:3000
+        - name: spring_profiles_active
+          value: demo
+        - name: DexClientId
+          value: example-app
 
   - name: node
     container:
@@ -163,33 +190,7 @@ commands:
       workingDir: ${PROJECT_SOURCE}/api
       commandLine: |
         mvn spring-boot:run -Dspring-boot.run.profiles=demo
-      env:
-        - name: ApiDataSourceType
-          value: H2
-        - name: GroupValidationType
-          value: DEX
-        - name: UserValidationType
-          value: DEX
-        - name: AuthenticationValidationType
-          value: DEX
-        - name: TerrakubeHostname
-          value: http://localhost:8080
-        - name: AzBuilderExecutorUrl
-          value: http://localhost:8090/api/v1/terraform-rs
-        - name: PatSecret
-          value: ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
-        - name: InternalSecret
-          value: S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-        - name: DexIssuerUri
-          value: http://localhost:5556/dex
-        - name: StorageType
-          value: LOCAL
-        - name: TerrakubeUiURL
-          value: http://localhost:3000
-        - name: spring_profiles_active
-          value: demo
-        - name: DexClientId
-          value: example-app
+
       group:
         kind: build
         isDefault: false
