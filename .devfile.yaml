@@ -5,7 +5,7 @@ components:
 
   - name: tools
     container:
-      image: quay.io/devfile/universal-developer-image:ubi8-latest
+      image: quay.io/devfile/universal-developer-image:ubi8-c63ad83
       memoryLimit: 3Gi
       endpoints:
         - exposure: none
@@ -19,6 +19,16 @@ components:
       volumeMounts:
         - name: m2
           path: /home/user/.m2
+
+  - name: maven
+    container:
+      image: docker.io/maven:3.9.0-eclipse-temurin-17
+      memoryLimit: 4Gi
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      command: [ 'tail' ]
+      args: [ '-f', '/dev/null' ]
 
   - name: minio
     container:
@@ -84,12 +94,12 @@ commands:
 
   - id: maven-build
     exec:
-      component: tools
+      component: maven
       workingDir: ${PROJECT_SOURCE}
       commandLine: mvn clean install -Dspring-boot.build-image.skip=true
       group:
         kind: build
-        isDefault: true
+        isDefault: false
 
   - id: minio-start
     exec:
