@@ -121,7 +121,6 @@ commands:
       component: node
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        mkdir /home/user/.terrakubeConfig && \
         touch /home/user/.terrakubeConfig/.envUi && \
         touch /home/user/.terrakubeConfig/.envApi && \
         touch /home/user/.terrakubeConfig/.envExecutor && \
