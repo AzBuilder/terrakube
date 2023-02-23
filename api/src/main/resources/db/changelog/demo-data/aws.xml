@@ -47,7 +47,7 @@
         -->
         <insert tableName="template">
             <column name="id"               value="a112f536-23e2-4fa3-bbde-8929c49f87cb" />
-            <column name="name"             value="Terraform-Plan" />
+            <column name="name"             value="Plan" />
             <column name="description"      value="Running terraformn plan" />
             <column name="version"          value="1.0.0" />
             <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAK" />
@@ -56,10 +56,10 @@
 
         <insert tableName="template">
             <column name="id"               value="c67171c6-1f45-4c97-af5c-8ec4818688b3" />
-            <column name="name"             value="Terraform-Plan/Apply" />
+            <column name="name"             value="Plan and apply" />
             <column name="description"      value="Running terraform plan and apply" />
             <column name="version"          value="1.0.0" />
-            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgICBuYW1lOiAiUGxhbiIKICAtIHR5cGU6ICJ0ZXJyYWZvcm1BcHBseSIKICAgIHN0ZXA6IDIwMAogICAgbmFtZTogIkFwcGx5Ig==" />
             <column name="organization_id"  value="3a130a1c-d96f-4f99-83b8-58d472567e3a" />
         </insert>
 

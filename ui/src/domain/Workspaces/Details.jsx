@@ -1,5 +1,6 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
+import { HiOutlineExternalLink } from "react-icons/hi";
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,
@@ -21,7 +22,7 @@ import {
   Spin,
   Switch,
   Typography,
-  Popconfirm
+  Popconfirm,
 } from "antd";
 import { compareVersions } from "./Workspaces";
 import { CreateJob } from "../Jobs/Create";
@@ -38,6 +39,7 @@ import {
   StopOutlined,
   InfoCircleOutlined,
   DeleteOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
@@ -74,8 +76,10 @@ export const WorkspaceDetails = (props) => {
   const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
-  const terraformVersionsApi =
-    `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/terraform/index.json`;
+
+  const terraformVersionsApi = `${
+    new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+  }/terraform/index.json`;
   const handleClick = (id) => {
     changeJob(id);
   };
@@ -100,15 +104,14 @@ export const WorkspaceDetails = (props) => {
     setLoading(true);
     loadWorkspace();
     axiosClient.get(terraformVersionsApi).then((resp) => {
-      console.log(resp);
       const tfVersions = [];
       for (const version in resp.data.versions) {
         if (!version.includes("-")) tfVersions.push(version);
       }
       setTerraformVersions(tfVersions.sort(compareVersions).reverse());
-      console.log(tfVersions);
     });
     setLoading(false);
+
     const interval = setInterval(() => {
       loadWorkspace();
     }, 15000);
@@ -132,8 +135,14 @@ export const WorkspaceDetails = (props) => {
             `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule`
           )
           .then((response) => {
-            console.log(response);
             setWorkspace(response.data);
+            if (
+              response.data.data.attributes.source === "empty" &&
+              response.data.data.attributes.branch === "remote-content"
+            ) {
+              switchKey("1");
+            }
+
             if (response.data.included) {
               setupWorkspaceIncludes(
                 response.data.included,
@@ -192,7 +201,7 @@ export const WorkspaceDetails = (props) => {
         type: "workspace",
         id: id,
         attributes: {
-          deleted: "true"
+          deleted: "true",
         },
       },
     };
@@ -255,11 +264,88 @@ export const WorkspaceDetails = (props) => {
               </div>
               <Tabs
                 activeKey={activeKey}
-                defaultActiveKey="1"
                 onTabClick={handleStatesClick}
                 tabBarExtraContent={<CreateJob changeJob={changeJob} />}
                 onChange={callback}
               >
+                {workspace.data.attributes.source === "empty" &&
+                  workspace.data.attributes.branch === "remote-content" && (
+                    <TabPane tab="Overview" key="1">
+                      <div>
+                        <h1>Waiting for configuration</h1>
+                        <div className="App-text">
+                          This workspace currently has no Terraform
+                          configuration files associated with it. Terrakube is
+                          waiting for the configuration to be uploaded.
+                        </div>
+                        <h3>CLI-driven workflow</h3>
+                        <div className="App-text">
+                          <ol>
+                            <li>
+                              Ensure you are properly authenticated into
+                              Terrakube by running{" "}
+                              <span className="code">terraform login</span> on
+                              the command line or by using a credentials block.
+                            </li>{" "}
+                            <br />
+                            <li>
+                              Add a code block to your Terraform configuration
+                              files to set up the remote backend . You can add
+                              this configuration block to any .tf file in the
+                              directory where you run Terraform. <br />
+                              <br />
+                              <b>Example Code</b>
+                              <pre className="moduleCode">
+                                terraform {"{"} <br />
+                                &nbsp;&nbsp;backend "remote" {"{"} <br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;organization = "
+                                {organizationName}" <br />
+                                <br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "
+                                {workspaceName}" <br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
+                                &nbsp;&nbsp;{"}"} <br />
+                                {"}"} <br />
+                              </pre>
+                            </li>
+                            <br />
+                            <li>
+                              Run <span className="code">terraform init</span>{" "}
+                              to initialize the workspace.
+                            </li>
+                            <br />
+                            <li>
+                              Run <span className="code">terraform apply</span>{" "}
+                              to start the first run for this workspace.
+                            </li>
+                          </ol>
+                          For more details, see the{" "}
+                          <Button
+                            className="link"
+                            target="_blank"
+                            href="https://docs.terrakube.org/user-guide/workspaces/cli-driven-workflow"
+                            type="link"
+                          >
+                            CLI workflow guide.&nbsp; <HiOutlineExternalLink />.
+                          </Button>
+                          <br /> <br />
+                          <h3>API-driven workflow</h3>
+                          Advanced users can follow{" "}
+                          <Button
+                            className="link"
+                            target="_blank"
+                            href="https://docs.terrakube.org/user-guide/workspaces/api-driven-workflow"
+                            type="link"
+                          >
+                            this guide.&nbsp; <HiOutlineExternalLink />.
+                          </Button>{" "}
+                          to set up their workspace.
+                        </div>
+                      </div>
+                    </TabPane>
+                  )}
+
                 <TabPane tab="Runs" key="2">
                   {jobVisible ? (
                     <DetailsJob jobId={jobId} />
@@ -268,9 +354,7 @@ export const WorkspaceDetails = (props) => {
                       <h3>Run List</h3>
                       <List
                         itemLayout="horizontal"
-                        dataSource={jobs
-                          .sort((a, b) => a.id - b.id)
-                          .reverse()}
+                        dataSource={jobs.sort((a, b) => a.id - b.id).reverse()}
                         renderItem={(item) => (
                           <List.Item
                             extra={
@@ -307,7 +391,7 @@ export const WorkspaceDetails = (props) => {
                               avatar={
                                 <Avatar
                                   shape="square"
-                                  src="https://avatarfiles.alphacoders.com/128/thumb-128984.png"
+                                  icon={<UserOutlined />}
                                 />
                               }
                               title={
@@ -318,8 +402,19 @@ export const WorkspaceDetails = (props) => {
                               description={
                                 <span>
                                   {" "}
-                                  #job-{item.id} | commitId {item.commitId?.substring(0,6)} | <b>{item.createdBy}</b> {" "}
-                                  triggered via UI
+                                  #job-{item.id} |
+                                  {item.commitId !== "000000000" ? (
+                                    <>
+                                      {" "}
+                                      commitId {item.commitId?.substring(
+                                        0,
+                                        6
+                                      )}{" "}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                  | <b>{item.createdBy}</b> triggered via UI
                                 </span>
                               }
                             />
@@ -423,31 +518,35 @@ export const WorkspaceDetails = (props) => {
                       </Form>
                     </Spin>
                     <h1>Delete Workspace</h1>
-                    <div className="App-Text">Deleting the workspace will permanently delete the information. Please be certain that you understand this. This action cannot be undone.</div>
+                    <div className="App-Text">
+                      Deleting the workspace will permanently delete the
+                      information. Please be certain that you understand this.
+                      This action cannot be undone.
+                    </div>
                     <Popconfirm
-                        onConfirm={() => {
-                          onDelete(id);
-                        }}
-                        style={{ width: "100%" }}
-                        title={
-                          <p>
-                            Workspace will be
-                            permanently deleted <br /> from this organization.
-                            <br />
-                            Are you sure?
-                          </p>
-                        }
-                        okText="Yes"
-                        cancelText="No"
-                        placement="bottom"
-                      >
-                        <Button type="default" danger style={{ width: "100%" }}>
-                          <Space>
-                            <DeleteOutlined />
-                            Delete from Terrakube
-                          </Space>
-                        </Button>
-                      </Popconfirm>
+                      onConfirm={() => {
+                        onDelete(id);
+                      }}
+                      style={{ width: "100%" }}
+                      title={
+                        <p>
+                          Workspace will be permanently deleted <br /> from this
+                          organization.
+                          <br />
+                          Are you sure?
+                        </p>
+                      }
+                      okText="Yes"
+                      cancelText="No"
+                      placement="bottom"
+                    >
+                      <Button type="default" danger style={{ width: "100%" }}>
+                        <Space>
+                          <DeleteOutlined />
+                          Delete from Terrakube
+                        </Space>
+                      </Button>
+                    </Popconfirm>
                   </div>
                 </TabPane>
               </Tabs>
@@ -487,8 +586,8 @@ function setupWorkspaceIncludes(
             finalColor = "#FB0136";
             break;
           case "failed":
-              finalColor = "#FB0136";
-              break;
+            finalColor = "#FB0136";
+            break;
           case "running":
             finalColor = "#108ee9";
             break;
@@ -504,6 +603,7 @@ function setupWorkspaceIncludes(
           title: "Queue manually using Terraform",
           statusColor: finalColor,
           commitId: element.attributes.commitId,
+          stepNumber: element.attributes.stepNumber,
           latestChange: DateTime.fromISO(
             element.attributes.createdDate
           ).toRelative(),

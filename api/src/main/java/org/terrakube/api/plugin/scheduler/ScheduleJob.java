@@ -112,6 +112,12 @@ public class ScheduleJob implements org.quartz.Job {
                     jobRepository.save(job);
                     log.info("Waiting Approval for Job {} Step Id {}", job.getId(), stepId);
                     break;
+                case yamlError:
+                    log.error("Terrakube Template error, please verify the template definition");
+                    job.setStatus(JobStatus.failed);
+                    jobRepository.save(job);
+                    cancelJobSteps(job.getId());
+                    break;
                 default:
                     log.error("FlowType not supported");
                     break;
@@ -123,13 +129,13 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
-    private void completeJob(Job job){
+    private void completeJob(Job job) {
         job.setStatus(JobStatus.completed);
         jobRepository.save(job);
         log.info("Update Job {} to completed", job.getId());
     }
 
-    private void removeJobContext(Job job, JobExecutionContext jobExecutionContext){
+    private void removeJobContext(Job job, JobExecutionContext jobExecutionContext) {
         try {
             log.info("Deleting Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
             jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
@@ -151,16 +157,17 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
-    private void cancelJobSteps(int jobId){
-        for(Step step: stepRepository.findByJobId(jobId)){
-            if(step.getStatus().equals(JobStatus.pending) || step.getStatus().equals(JobStatus.running)){
+    private void cancelJobSteps(int jobId) {
+        log.warn("Cancelling pending steps");
+        for (Step step : stepRepository.findByJobId(jobId)) {
+            if (step.getStatus().equals(JobStatus.pending) || step.getStatus().equals(JobStatus.running)) {
                 step.setStatus(JobStatus.cancelled);
                 stepRepository.save(step);
             }
         }
     }
 
-    private void unlockWorkspace(Job job){
+    private void unlockWorkspace(Job job) {
         Workspace workspace = job.getWorkspace();
         workspace.setLocked(false);
         log.info("Unlock workspace {} in job {}", workspace.getId(), job.getId());

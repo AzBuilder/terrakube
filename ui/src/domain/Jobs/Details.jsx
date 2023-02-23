@@ -1,5 +1,14 @@
 import { React, useState, useEffect } from "react";
-import { Tag, Space, Collapse, Avatar, Card, Button, message } from "antd";
+import {
+  Tag,
+  Space,
+  Collapse,
+  Avatar,
+  Card,
+  Button,
+  message,
+  Radio,
+} from "antd";
 import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import {
@@ -13,8 +22,11 @@ import {
   CommentOutlined,
   CloseCircleTwoTone,
   StopOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import Ansi from "ansi-to-react";
+import parse from "html-react-parser";
+
 const { DateTime } = require("luxon");
 const { Panel } = Collapse;
 
@@ -23,6 +35,8 @@ export const DetailsJob = ({ jobId }) => {
   const [loading, setLoading] = useState(false);
   const [job, setJob] = useState([]);
   const [steps, setSteps] = useState([]);
+  const [uiType, setUIType] = useState("structured");
+  const [uiTemplates, setUITemplates] = useState({});
   const outputLog = async (output, status) => {
     if (output != null) {
       const apiDomain = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL)
@@ -45,6 +59,10 @@ export const DetailsJob = ({ jobId }) => {
 
   const handleComingSoon = (e) => {
     message.info("Coming Soon!");
+  };
+
+  const onChange = (e) => {
+    setUIType(e.target.value);
   };
 
   const handleCancel = (e) => {
@@ -84,12 +102,12 @@ export const DetailsJob = ({ jobId }) => {
           <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} />
         );
       case "failed":
-          return (
-            <CloseCircleTwoTone
-              twoToneColor="#FB0136"
-              style={{ fontSize: "20px" }}
-            />
-          );
+        return (
+          <CloseCircleTwoTone
+            twoToneColor="#FB0136"
+            style={{ fontSize: "20px" }}
+          />
+        );
       case "cancelled":
         return (
           <CloseCircleTwoTone
@@ -154,11 +172,12 @@ export const DetailsJob = ({ jobId }) => {
 
   useEffect(() => {
     setLoading(true);
-    console.log(jobId);
     loadJob();
+    loadContext();
     setLoading(false);
     const interval = setInterval(() => {
       loadJob();
+      loadContext();
     }, 15000);
     return () => clearInterval(interval);
   }, [jobId]);
@@ -191,6 +210,18 @@ export const DetailsJob = ({ jobId }) => {
         })();
       });
   };
+
+  const loadContext = () => {
+    const api = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL);
+
+    axiosClient
+      .get(`${api.protocol}//${api.hostname}/context/v1/${jobId}`)
+      .then((response) => {
+        console.log("terrakube");
+        console.log(response?.data?.terrakubeUI);
+        setUITemplates(JSON.parse(response?.data?.terrakubeUI));
+      });
+  };
   return (
     <div style={{ marginTop: "14px" }}>
       {loading || !job.data || !steps ? (
@@ -209,7 +240,7 @@ export const DetailsJob = ({ jobId }) => {
                 ) : job.data.attributes.status === "cancelled" ? (
                   <StopOutlined />
                 ) : job.data.attributes.status === "failed" ? (
-                    <StopOutlined />
+                  <StopOutlined />
                 ) : (
                   <ClockCircleOutlined />
                 )
@@ -237,11 +268,7 @@ export const DetailsJob = ({ jobId }) => {
             <Panel
               header={
                 <span>
-                  <Avatar
-                    size="small"
-                    shape="square"
-                    src="https://avatarfiles.alphacoders.com/128/thumb-128984.png"
-                  />{" "}
+                  <Avatar size="small" shape="square" icon={<UserOutlined />} />{" "}
                   <b>{job.data.attributes.createdBy}</b> triggered a run from UI{" "}
                   {DateTime.fromISO(
                     job.data.attributes.createdDate
@@ -271,11 +298,43 @@ export const DetailsJob = ({ jobId }) => {
                   }
                   key="2"
                 >
-                  <div id="code-container">
-                    <div id="code-content">
-                      <Ansi>{item.outputLog}</Ansi>
+                  {console.log(uiTemplates)}
+                  {uiTemplates.hasOwnProperty(item.stepNumber) ? (
+                    <>
+                      <div
+                        style={{
+                          textAlign: "right",
+                          padding: "5px",
+                        }}
+                      >
+                        <Radio.Group
+                          onChange={onChange}
+                          value={uiType}
+                          size="small"
+                        >
+                          <Radio.Button value="structured">
+                            Structured
+                          </Radio.Button>
+                          <Radio.Button value="console">Console</Radio.Button>
+                        </Radio.Group>
+                      </div>{" "}
+                      {uiType === "structured" ? (
+                        <div>{parse(uiTemplates[item.stepNumber])}</div>
+                      ) : (
+                        <div id="code-container">
+                          <div id="code-content">
+                            <Ansi>{item.outputLog}</Ansi>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div id="code-container">
+                      <div id="code-content">
+                        <Ansi>{item.outputLog}</Ansi>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </Panel>
               </Collapse>
             ))

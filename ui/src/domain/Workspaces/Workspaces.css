@@ -101,3 +101,9 @@
   font-size: 13px;
   color: #6f7682;
 }
+
+.code {
+  background-color: #f1f2f3;
+  color: #000;
+  padding: 0.2em 0.4em; 
+}

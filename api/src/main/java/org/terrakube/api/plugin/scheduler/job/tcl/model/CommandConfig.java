@@ -9,14 +9,6 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-public class Flow {
-    private String type;
-    private String team;
-    private String name;
-
-    private String error;
-    private int step;
+public class CommandConfig {
     List<Command> commands;
-
-    ImportComands importComands;
 }

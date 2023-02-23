@@ -6,5 +6,7 @@ public enum FlowType {
     terraformApply,
     terraformDestroy,
     customScripts,
-    approval
+    approval,
+
+    yamlError
 }

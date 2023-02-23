@@ -47,7 +47,7 @@
         -->
         <insert tableName="template">
             <column name="id"               value="1126c6a6-dedd-4754-96f2-a75d96278ed6" />
-            <column name="name"             value="Terraform-Plan" />
+            <column name="name"             value="Plan" />
             <column name="description"      value="Running terraformn plan" />
             <column name="version"          value="1.0.0" />
             <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAK" />
@@ -56,16 +56,16 @@
 
         <insert tableName="template">
             <column name="id"               value="586ddf0d-e51f-4df1-93b6-607214078745" />
-            <column name="name"             value="Terraform-Plan/Apply" />
+            <column name="name"             value="Plan and apply" />
             <column name="description"      value="Running terraform plan and apply" />
             <column name="version"          value="1.0.0" />
-            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgLSB0eXBlOiAidGVycmFmb3JtQXBwbHkiCiAgICBzdGVwOiAyMDA=" />
+            <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgc3RlcDogMTAwCiAgICBuYW1lOiAiUGxhbiIKICAtIHR5cGU6ICJ0ZXJyYWZvcm1BcHBseSIKICAgIHN0ZXA6IDIwMAogICAgbmFtZTogIkFwcGx5Ig==" />
             <column name="organization_id"  value="1c839e0a-ca5d-49a9-9c78-7a569df534b7" />
         </insert>
 
         <insert tableName="template">
             <column name="id"               value="d8611cc1-9fc3-4ee6-b5bc-101ade42162e" />
-            <column name="name"             value="Terraform-Destroy" />
+            <column name="name"             value="Destroy" />
             <column name="description"      value="Running terraform destroy" />
             <column name="version"          value="1.0.0" />
             <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1EZXN0cm95IgogICAgc3RlcDogMTAwCg==" />
