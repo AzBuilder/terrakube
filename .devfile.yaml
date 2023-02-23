@@ -30,6 +30,13 @@ components:
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
+  - name: node
+    container:
+      image: docker.io/node:lts-bullseye-slim
+      memoryLimit: 4Gi
+      command: [ 'tail' ]
+      args: [ '-f', '/dev/null' ]
+
   - name: minio
     container:
       image: docker.io/bitnami/minio:2022
@@ -97,6 +104,15 @@ commands:
       component: maven
       workingDir: ${PROJECT_SOURCE}
       commandLine: mvn clean install -Dspring-boot.build-image.skip=true
+      group:
+        kind: build
+        isDefault: false
+
+  - id: yarn-build
+    exec:
+      component: node
+      workingDir: ${PROJECT_SOURCE}/ui
+      commandLine: yarn build
       group:
         kind: build
         isDefault: false
