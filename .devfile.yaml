@@ -36,7 +36,7 @@ components:
       memoryLimit: 3Gi
       volumeMounts:
         - name: config
-          path: /platform/config
+          path: /home/user/.terrakubeConfig
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
@@ -124,7 +124,13 @@ commands:
         touch /platform/config/.envUi && \
         touch /platform/config/.envApi && \
         touch /platform/config/.envExecutor && \
-        touch /platform/config/.envRegistry
+        touch /platform/config/.envRegistry && \
+        echo "REACT_APP_TERRAKUBE_API_URL=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_CLIENT_ID=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_AUTHORITY=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_REDIRECT_URI=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_REGISTRY_URI=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_SCOPE"= >>.envUi
       group:
         kind: build
         isDefault: false
