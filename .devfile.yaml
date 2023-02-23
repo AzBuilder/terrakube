@@ -22,17 +22,19 @@ components:
 
   - name: minio
     container:
-      image: bitnami/minio:latest
+      image: docker.io/bitnami/minio:2022
       memoryLimit: 1Gi
       endpoints:
-        - exposure: none
-          name: debugmin
-          protocol: tcp
-          targetPort: 9001
         - exposure: public
-          name: 8080-min
+          name: minio9000
           protocol: http
           targetPort: 9000
+        - exposure: public
+          name: minio9001
+          protocol: http
+          targetPort: 9001
+      command: ['tail']
+      args: ['-f', '/dev/null']
 
   - name: m2
     volume:
@@ -67,18 +69,18 @@ components:
       size: 256Mi
 
 commands:
-  - id: prepare-database
-    exec:
-      component: mariadb
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: |
-        mysql -u root < ${PROJECT_SOURCE}/src/main/resources/db/mysql/user.sql && \
-        mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/schema.sql && \
-        mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/data.sql && \
-        echo "\e[32mDone.\e[0m Database petclinic was configured"
-      group:
-        kind: run
-        isDefault: true
+  #- id: prepare-database
+  #  exec:
+  #    component: mariadb
+  #    workingDir: ${PROJECT_SOURCE}
+  #    commandLine: |
+  #      mysql -u root < ${PROJECT_SOURCE}/src/main/resources/db/mysql/user.sql && \
+  #      mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/schema.sql && \
+  #      mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/data.sql && \
+  #      echo "\e[32mDone.\e[0m Database petclinic was configured"
+  #    group:
+  #      kind: run
+  #      isDefault: true
 
   - id: maven-build
     exec:
@@ -89,24 +91,33 @@ commands:
         kind: build
         isDefault: true
 
-  - id: run-with-hsqldb
+  - id: minio-start
     exec:
-      component: tools
+      component: minio
       workingDir: ${PROJECT_SOURCE}
-      commandLine: |
-        mvn spring-boot:run -DskipTests \
-        -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
+      commandLine: minio server /data --console-address ":9001"
       group:
-        kind: run
-        isDefault: true
+        kind: build
+        isDefault: false
 
-  - id: run-with-mysql
-    exec:
-      component: tools
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: |
-        mvn spring-boot:run -DskipTests -Dspring-boot.run.profiles=mysql \
-        -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
-      group:
-        kind: run
-        isDefault: true
+  #- id: run-with-hsqldb
+  #  exec:
+  #    component: tools
+  #    workingDir: ${PROJECT_SOURCE}
+  #    commandLine: |
+  #      mvn spring-boot:run -DskipTests \
+  #      -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
+  #    group:
+  #      kind: run
+  #      isDefault: true
+
+  #- id: run-with-mysql
+  #  exec:
+  #    component: tools
+  #    workingDir: ${PROJECT_SOURCE}
+  #    commandLine: |
+  #      mvn spring-boot:run -DskipTests -Dspring-boot.run.profiles=mysql \
+  #      -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
+  #    group:
+  #      kind: run
+  #      isDefault: true
