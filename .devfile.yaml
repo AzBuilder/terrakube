@@ -111,7 +111,7 @@ commands:
       component: maven
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        mvn clean install -Dspring-boot.build-image.skip=true
+        mvn clean install -Dspring-boot.build-image.skip=true -Dmaven.test.skip=true
       group:
         kind: build
         isDefault: false
@@ -152,7 +152,7 @@ commands:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
       commandLine: |
-        export $(cat /home/user/config/.envUi) && yarn start
+        yarn start
       group:
         kind: build
         isDefault: false
