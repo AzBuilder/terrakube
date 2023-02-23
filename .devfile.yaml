@@ -157,6 +157,22 @@ commands:
         kind: build
         isDefault: false
 
+  - id: setup-project
+    exec:
+      component: node
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        chmod +x scripts/setupDevelopmentEnvironment.sh && \
+        chmod +x scripts/setupDevelopmentEnvironmentMinio.sh && \
+        chmod +x scripts/setupDevelopmentEnvironmentAzure.sh && \
+        chmod +x scripts/setupDevelopmentEnvironmentGcp.sh && \
+        chmod +x scripts/build/terrakubeBuild.sh && \
+        chmod +x scripts/build/generateSampleCaCerts.sh && \
+        scripts/setupDevelopmentEnvironment.sh
+      group:
+        kind: build
+        isDefault: false
+
   - id: minio-start
     exec:
       component: minio
