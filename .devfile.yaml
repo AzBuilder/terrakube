@@ -140,9 +140,6 @@ commands:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
       commandLine: |
-        touch .yarnrc && \
-        chown $USER .yarnrc && \
-        chmod +r ~/.yarnrc && \
         yarn install && \
         yarn build && \
         echo "\e[32mDone.\e[0m UI Build completed"
