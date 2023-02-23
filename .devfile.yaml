@@ -23,7 +23,7 @@ components:
   - name: maven
     container:
       image: docker.io/maven:3.9.0-eclipse-temurin-17
-      memoryLimit: 4Gi
+      memoryLimit: 2Gi
       volumeMounts:
         - name: m2
           path: /home/user/.m2
@@ -33,7 +33,7 @@ components:
   - name: node
     container:
       image: docker.io/node:lts-bullseye-slim
-      memoryLimit: 4Gi
+      memoryLimit: 2Gi
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
