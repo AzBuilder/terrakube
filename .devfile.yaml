@@ -26,9 +26,9 @@ components:
       memoryLimit: 2Gi
       endpoints:
         - exposure: public
-          name: 8080-api
+          name: 8000-api
           protocol: http
-          targetPort: 8080
+          targetPort: 8000
       volumeMounts:
         - name: m2
           path: /home/user/.m2
