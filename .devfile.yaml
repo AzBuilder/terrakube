@@ -194,7 +194,7 @@ commands:
       component: maven
       workingDir: ${PROJECT_SOURCE}/api
       commandLine: |
-        mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dserver.port = 8090
+        mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dserver.port = 8000
 
       group:
         kind: build
