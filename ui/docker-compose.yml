@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  terrakube-ui:
+    image: terrakube-ui:latest
+    container_name: terrakube-ui
+    volumes:
+      - ./env-config.js:/app/env-config.js
+    ports:
+      - 8080:8080 
