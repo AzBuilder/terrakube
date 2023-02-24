@@ -53,30 +53,18 @@ docker build -t terrakube-ui:latest  .
 
 > If you are a Windows user and face the following error when building the UI ***Bash script and /bin/bash^M: bad interpreter: No such file or directory*** run the following command to fix the issue ***sed -i -e 's/\r$//' env.sh***
 
-### Run Image
-
-```bash
-docker run -p 127.0.0.1:8080:8080/tcp -it --env-file=.env terrakube-ui:latest
-```
-
 > Make sure to run the script  **setupEnv.sh** first to generate the **.env** file
 
-### Docker Compose
+### Run the image with Docker Compose
 
 ```dockerfile
-
 version: "3.8"
 services:
   terrakube-ui:
-    image: azbuilder/terrakube-ui:latest
+    image: terrakube-ui:latest
     container_name: terrakube-ui
-    environment:
-      - REACT_APP_TERRAKUBE_API_URL=https://terrakubeUrl/api/v1/
-      - REACT_APP_CLIENT_ID=terrakube-app
-      - REACT_APP_AUTHORITY=https://dexUrl.com
-      - REACT_APP_REDIRECT_URI=http://localhost:3000
-      - REACT_APP_REGISTRY_URI=https://registryUrl.com
-      - REACT_APP_SCOPE=email openid profile offline_access groups
+    volumes:
+      - ./env-config.js:/app/env-config.js
     ports:
       - 8080:8080 
 ```
