@@ -24,6 +24,11 @@ components:
     container:
       image: docker.io/maven:3.9.0-eclipse-temurin-17
       memoryLimit: 2Gi
+      endpoints:
+        - exposure: public
+          name: 8080-api
+          protocol: http
+          targetPort: 8080
       volumeMounts:
         - name: m2
           path: /home/user/.m2
