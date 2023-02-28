@@ -23,6 +23,10 @@ If you want to develop or test Terrakube click in the following button to open a
 
 For more information about the test environment please refer to the following [file](development.md) and to learn about the API check the following [api information](https://docs.terrakube.org/api/methods)
 
+### Minikube
+
+To quickly test Terrakube in Minikube please follow [this](https://docs.terrakube.org/getting-started/deployment/minikube)
+
 ### Security - Authentication
 
 Terrakube uses [DEX](https://dexidp.io/docs/connectors/) to handle authentication. Dex is an identity service that uses OpenID Connect to drive authentication for other apps.
@@ -57,14 +61,14 @@ For private repositories you need to use one of the following methods for authen
 
 To compile and run the tool you will need the following:
 
-* Java 11
+* Java 17
 * Maven
 * Node
 
 ### Compiling
 
 ```bash
-mvn clean install
+mvn clean install -Dspring-boot.build-image.skip=true
 cd ui 
 yarn install
 ```
@@ -79,6 +83,14 @@ To run the api you need the following environment variables:
 | MySQL            | Supported   |
 | MariaDB          | Pending     |
 | Oracle           | Pending     |
+
+### Supported Storage Backend.
+
+The platform support the following storage backends.
+- Minio
+- Azure Storage Account
+- Google Cloud Storage
+- Amazon S3
 
 ### Build Docker Images
 
