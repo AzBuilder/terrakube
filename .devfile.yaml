@@ -23,9 +23,6 @@ components:
       image: docker.io/node:lts-bullseye-slim
       memoryLimit: 3Gi
       mountSources: true
-      volumeMounts:
-        - name: config
-          path: /home/user/.terrakubeConfig
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
