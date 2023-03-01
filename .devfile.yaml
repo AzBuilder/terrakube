@@ -6,6 +6,7 @@ components:
     container:
       image: docker.io/maven:3.9.0-eclipse-temurin-17
       memoryLimit: 4Gi
+      mountSources: true
       endpoints:
         - exposure: public
           name: 8000-api
@@ -21,6 +22,7 @@ components:
     container:
       image: docker.io/node:lts-bullseye-slim
       memoryLimit: 3Gi
+      mountSources: true
       volumeMounts:
         - name: config
           path: /home/user/.terrakubeConfig
@@ -31,6 +33,7 @@ components:
     container:
       image: docker.io/bitnami/minio:2022
       memoryLimit: 1Gi
+      mountSources: true
       endpoints:
         - exposure: public
           name: minio9000
@@ -82,7 +85,6 @@ commands:
     exec:
       component: maven
       workingDir: ${PROJECT_SOURCE}/api
-      mountSources: true
       commandLine: |
         chmod +x /projects/terrakube/scripts/run.sh && ./projects/terrakube/scripts/run.sh
 
@@ -94,7 +96,6 @@ commands:
     exec:
       component: maven
       workingDir: ${PROJECT_SOURCE}/registry
-      mountSources: true
       commandLine: |
         mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dserver.port=8000
 
@@ -106,7 +107,6 @@ commands:
     exec:
       component: maven
       workingDir: ${PROJECT_SOURCE}/executor
-      mountSources: true
       commandLine: |
         mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dserver.port=8000
 
