@@ -2,20 +2,6 @@ schemaVersion: 2.1.0
 metadata:
   name: terrakube-platform
 components:
-  - name: tools
-    container:
-      image: quay.io/devfile/universal-developer-image:ubi8-c63ad83
-      memoryLimit: 2Gi
-      endpoints:
-        - exposure: none
-          name: debug
-          protocol: tcp
-          targetPort: 5005
-        - exposure: public
-          name: 8080-tcp
-          protocol: http
-          targetPort: 8080
-
   - name: maven
     container:
       image: docker.io/maven:3.9.0-eclipse-temurin-17
