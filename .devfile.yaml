@@ -106,7 +106,7 @@ commands:
     exec:
       component: maven
       workingDir: ${PROJECT_SOURCE}/executor
-       mountSources: true
+      mountSources: true
       commandLine: |
         mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dserver.port=8000
 
