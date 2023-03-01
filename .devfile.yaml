@@ -63,9 +63,7 @@ commands:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
       commandLine: |
-        yarn install && \
-        yarn build && \
-        echo "\e[32mDone.\e[0m UI Build completed"
+        yarn install && yarn build 
       group:
         kind: build
         isDefault: false
@@ -124,25 +122,3 @@ commands:
       group:
         kind: build
         isDefault: false
-
-  #- id: run-with-hsqldb
-  #  exec:
-  #    component: tools
-  #    workingDir: ${PROJECT_SOURCE}
-  #    commandLine: |
-  #      mvn spring-boot:run -DskipTests \
-  #      -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
-  #    group:
-  #      kind: run
-  #      isDefault: true
-
-  #- id: run-with-mysql
-  #  exec:
-  #    component: tools
-  #    workingDir: ${PROJECT_SOURCE}
-  #    commandLine: |
-  #      mvn spring-boot:run -DskipTests -Dspring-boot.run.profiles=mysql \
-  #      -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
-  #    group:
-  #      kind: run
-  #      isDefault: true
