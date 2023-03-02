@@ -2,11 +2,28 @@ schemaVersion: 2.1.0
 metadata:
   name: terrakube-platform
 components:
+
+  - name: tools
+    container:
+      image: quay.io/devfile/universal-developer-image:ubi8-c63ad83
+      memoryLimit: 3Gi
+      endpoints:
+        - exposure: none
+          name: debug
+          protocol: tcp
+          targetPort: 5005
+        - exposure: public
+          name: 8080-tcp
+          protocol: http
+          targetPort: 8080
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+
   - name: maven
     container:
       image: docker.io/maven:3.9.0-eclipse-temurin-17
-      memoryLimit: 4Gi
-      mountSources: true
+      memoryLimit: 2Gi
       endpoints:
         - exposure: public
           name: 8000-api
@@ -17,12 +34,41 @@ components:
           path: /home/user/.m2
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
+      env:
+        - name: ApiDataSourceType
+          value: H2
+        - name: GroupValidationType
+          value: DEX
+        - name: UserValidationType
+          value: DEX
+        - name: AuthenticationValidationType
+          value: DEX
+        - name: TerrakubeHostname
+          value: http://localhost:8080
+        - name: AzBuilderExecutorUrl
+          value: http://localhost:8090/api/v1/terraform-rs
+        - name: PatSecret
+          value: ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
+        - name: InternalSecret
+          value: S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
+        - name: DexIssuerUri
+          value: http://localhost:5556/dex
+        - name: StorageType
+          value: LOCAL
+        - name: TerrakubeUiURL
+          value: http://localhost:3000
+        - name: spring_profiles_active
+          value: demo
+        - name: DexClientId
+          value: example-app
 
   - name: node
     container:
       image: docker.io/node:lts-bullseye-slim
       memoryLimit: 3Gi
-      mountSources: true
+      volumeMounts:
+        - name: config
+          path: /home/user/.terrakubeConfig
       command: [ 'tail' ]
       args: [ '-f', '/dev/null' ]
 
@@ -30,7 +76,6 @@ components:
     container:
       image: docker.io/bitnami/minio:2022
       memoryLimit: 1Gi
-      mountSources: true
       endpoints:
         - exposure: public
           name: minio9000
@@ -47,7 +92,52 @@ components:
     volume:
       size: 1G
 
+  - name: config
+    volume:
+      size: 1G
+
+  - name: mariadb
+    container:
+      image: quay.io/eclipse/che--mariadb:10.7.1-5a8009369ee57c85b6f4a08406147bd9c505cde6b8250d16a27d2a5febfdead7
+      memoryLimit: 300Mi
+      endpoints:
+        - exposure: none
+          name: db
+          protocol: tcp
+          targetPort: 3306
+      env:
+        - name: MARIADB_USER
+          value: petclinic
+        - name: MARIADB_PASSWORD
+          value: petclinic
+        - name: MARIADB_DATABASE
+          value: petclinic
+        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+          value: allow
+        - name: PS1
+          value: $(echo ${0}) $
+      volumeMounts:
+        - name: mysqldata
+          path: /var/lib/mysql
+
+  - name: mysqldata
+    volume:
+      size: 256Mi
+
 commands:
+  #- id: prepare-database
+  #  exec:
+  #    component: mariadb
+  #    workingDir: ${PROJECT_SOURCE}
+  #    commandLine: |
+  #      mysql -u root < ${PROJECT_SOURCE}/src/main/resources/db/mysql/user.sql && \
+  #      mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/schema.sql && \
+  #      mysql -u root petclinic < ${PROJECT_SOURCE}/src/main/resources/db/mysql/data.sql && \
+  #      echo "\e[32mDone.\e[0m Database petclinic was configured"
+  #    group:
+  #      kind: run
+  #      isDefault: true
+
   - id: maven-build
     exec:
       component: maven
@@ -58,12 +148,33 @@ commands:
         kind: build
         isDefault: false
 
+  - id: config-build
+    exec:
+      component: node
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        touch /home/user/.terrakubeConfig/.envUi && \
+        touch /home/user/.terrakubeConfig/.envApi && \
+        touch /home/user/.terrakubeConfig/.envExecutor && \
+        touch /home/user/.terrakubeConfig/.envRegistry && \
+        echo "REACT_APP_TERRAKUBE_API_URL=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_CLIENT_ID=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_AUTHORITY=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_REDIRECT_URI=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_REGISTRY_URI=" >> /home/user/.terrakubeConfig/.envUi && \
+        echo "REACT_APP_SCOPE"= >>.envUi
+      group:
+        kind: build
+        isDefault: false
+
   - id: yarn-build
     exec:
       component: node
       workingDir: ${PROJECT_SOURCE}/ui
       commandLine: |
-        yarn install && yarn build 
+        yarn install && \
+        yarn build && \
+        echo "\e[32mDone.\e[0m UI Build completed"
       group:
         kind: build
         isDefault: false
@@ -83,28 +194,6 @@ commands:
       component: maven
       workingDir: ${PROJECT_SOURCE}/api
       commandLine: |
-        chmod +x /projects/terrakube/scripts/run.sh && ./projects/terrakube/scripts/run.sh
-
-      group:
-        kind: build
-        isDefault: false
-
-  - id: run-registry
-    exec:
-      component: maven
-      workingDir: ${PROJECT_SOURCE}/registry
-      commandLine: |
-        mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dserver.port=8000
-
-      group:
-        kind: build
-        isDefault: false
-  
-  - id: run-exector
-    exec:
-      component: maven
-      workingDir: ${PROJECT_SOURCE}/executor
-      commandLine: |
         mvn spring-boot:run -Dspring-boot.run.profiles=demo -Dserver.port=8000
 
       group:
@@ -119,3 +208,25 @@ commands:
       group:
         kind: build
         isDefault: false
+
+  #- id: run-with-hsqldb
+  #  exec:
+  #    component: tools
+  #    workingDir: ${PROJECT_SOURCE}
+  #    commandLine: |
+  #      mvn spring-boot:run -DskipTests \
+  #      -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
+  #    group:
+  #      kind: run
+  #      isDefault: true
+
+  #- id: run-with-mysql
+  #  exec:
+  #    component: tools
+  #    workingDir: ${PROJECT_SOURCE}
+  #    commandLine: |
+  #      mvn spring-boot:run -DskipTests -Dspring-boot.run.profiles=mysql \
+  #      -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y'
+  #    group:
+  #      kind: run
+  #      isDefault: true
