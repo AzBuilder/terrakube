@@ -7,4 +7,4 @@ sdk install java 17.0.6-tem
 sdk install maven
 
 # Build
-mvn clean install -Dmaven.test.skip=true -f api/pom.xml 
+mvn clean install -Dmaven.test.skip=true -Dspring-boot.build-image.skip=true -f api/pom.xml 
