@@ -2,18 +2,7 @@
     "version": "2.0.0",
     "tasks": [
       {
-        "label": "docker-compose:dex",
-        "type": "docker-compose",
-        "dockerCompose": {
-          "up": {
-            "detached": true,
-            "build": false,
-            "services": ["dex-service", "ldap-service"]
-          },
-          "files": [
-            "${workspaceFolder}/scripts/setup/dex/docker-compose.yaml",
-          ]
-        }
+        
       }
     ]
   }
