@@ -21,6 +21,17 @@ components:
         - name: m2
           path: /home/user/.m2
 
+  - name: maven
+    container:
+      image: docker.io/maven:3.9.0-eclipse-temurin-17
+      memoryLimit: 2Gi
+      mountSources: true
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      command: [ 'tail' ]
+      args: [ '-f', '/dev/null' ]
+
   - name: node
     container:
       image: docker.io/node:lts-bullseye-slim
@@ -51,7 +62,7 @@ components:
 commands:
   - id: maven-build
     exec:
-      component: tools
+      component: maven
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
         bash /projects/terrakube/scripts/che/buildApi.sh
