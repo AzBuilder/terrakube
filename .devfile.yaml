@@ -6,58 +6,36 @@ components:
   - name: tools
     container:
       image: quay.io/devfile/universal-developer-image:ubi8-c63ad83
-      memoryLimit: 4Gi
+      memoryLimit: 8Gi
       mountSources: true
       endpoints:
-        - exposure: none
-          name: debug
-          protocol: tcp
-          targetPort: 5005
         - exposure: public
-          name: 8080-tcp
+          name: terrakube-api
           protocol: http
           targetPort: 8080
+        - exposure: public
+          name: terrakube-registry
+          protocol: http
+          targetPort: 8075
+        - exposure: public
+          name: terrakube-executor
+          protocol: http
+          targetPort: 8090
+        - exposure: public
+          name: terrakube-ui
+          protocol: http
+          targetPort: 3000
+        - exposure: public
+          name: terrakube-dex
+          protocol: http
+          targetPort: 5556
       volumeMounts:
         - name: m2
           path: /home/user/.m2
-
-  - name: maven
-    container:
-      image: docker.io/maven:3.9.0-eclipse-temurin-17
-      memoryLimit: 2Gi
-      mountSources: true
-      volumeMounts:
-        - name: m2
-          path: /home/user/.m2
-      command: [ 'tail' ]
-      args: [ '-f', '/dev/null' ]
-
-  - name: node
-    container:
-      image: docker.io/node:lts-bullseye-slim
-      memoryLimit: 3Gi
-      command: [ 'tail' ]
-      args: [ '-f', '/dev/null' ]
-
-  - name: minio
-    container:
-      image: docker.io/bitnami/minio:2022
-      memoryLimit: 1Gi
-      endpoints:
-        - exposure: public
-          name: minio9000
-          protocol: http
-          targetPort: 9000
-        - exposure: public
-          name: minio9001
-          protocol: http
-          targetPort: 9001
-      command: ['tail']
-      args: ['-f', '/dev/null']
 
   - name: m2
     volume:
-      size: 1G
+      size: 5G
 
 commands:
   - id: maven-build

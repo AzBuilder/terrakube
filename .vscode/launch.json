@@ -8,7 +8,8 @@
             "mainClass": "org.terrakube.api.ServerApplication",
             "projectName": "api-server",
             "args": "-Xmx512m -Xms256m",
-            "envFile": "${workspaceFolder}/.envApi"
+            "envFile": "${workspaceFolder}/.envApi",
+            "preLaunchTask": "setup-java"
         },
         {
             "type": "java",
@@ -18,7 +19,8 @@
             "mainClass": "org.terrakube.registry.OpenRegistryApplication",
             "projectName": "open-registry",
             "args": "-Xmx512m -Xms256m",
-            "envFile": "${workspaceFolder}/.envRegistry"
+            "envFile": "${workspaceFolder}/.envRegistry",
+            "preLaunchTask": "setup-java"
         },
         {
             "type": "java",
@@ -28,7 +30,8 @@
             "mainClass": "org.terrakube.executor.ExecutorApplication",
             "projectName": "executor",
             "args": "-Xmx512m -Xms256m",
-            "envFile": "${workspaceFolder}/.envExecutor"
+            "envFile": "${workspaceFolder}/.envExecutor",
+            "preLaunchTask": "setup-java"
         },
         {
             "type": "node",
@@ -37,7 +40,8 @@
             "runtimeExecutable": "yarn",
             "cwd": "${workspaceFolder}/ui",
             "runtimeArgs": ["start"],
-            "envFile": "${workspaceFolder}/.envUi"
+            "envFile": "${workspaceFolder}/.envUi",
+            "preLaunchTask": "yarn-install"
         }
     ],
     "compounds": [
