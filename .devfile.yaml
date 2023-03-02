@@ -54,7 +54,7 @@ commands:
       component: tools
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        ./projects/terrakube/scripts/che/buildApi.sh
+        bash /projects/terrakube/scripts/che/buildApi.sh
       group:
         kind: build
         isDefault: false
