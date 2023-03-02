@@ -122,7 +122,7 @@ function generateExecutorVars(){
   echo "TerrakubeToolsBranch=$TerrakubeToolsBranch" >> .envExecutor
   echo "TerrakubeRegistryDomain=$TerrakubeRegistryDomain" >> .envExecutor
   echo "TerrakubeApiUrl=$TerrakubeApiUrl" >> .envExecutor
-  echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
+  echo "#JAVA_TOOL_OPTIONS=\"$JAVA_TOOL_OPTIONS\"" >> .envExecutor
 }
 
 function generateRegistryVars(){
@@ -181,7 +181,7 @@ function generateRegistryVars(){
 
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
-  echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
+  echo "#JAVA_TOOL_OPTIONS=\"$JAVA_TOOL_OPTIONS\"" >> .envRegistry
 }
 
 function generateUiVars(){
