@@ -25,6 +25,12 @@ components:
           name: terrakube-ui
           protocol: http
           targetPort: 3000
+        - exposure: public
+          name: terrakube-dex
+          protocol: http
+          targetPort: 5556
+      command: ['sh']
+      args: ['/projects/terrakube/scripts/setupDevelopmentEnvironmentChe.sh']
       volumeMounts:
         - name: m2
           path: /home/user/.m2
@@ -34,11 +40,6 @@ components:
       image: ghcr.io/dexidp/dex
       memoryLimit: 256Mi
       mountSources: true
-      endpoints:
-        - exposure: public
-          name: terrakube-dex
-          protocol: http
-          targetPort: 5556
       command: ['sh']
       args: ['/projects/terrakube/scripts/dependencies/loadDex.sh']
 
