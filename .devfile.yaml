@@ -62,7 +62,7 @@ commands:
       component: dex
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
-        bash /projects/terrakube/scripts/che/buildApi.sh
+        bash /projects/terrakube/run/runCheDex.sh
       group:
         kind: build
         isDefault: false

@@ -1,0 +1,1 @@
+dex serve --web-http-addr 0.0.0.0:5556 /etc/dex/config.yaml
