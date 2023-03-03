@@ -29,11 +29,17 @@ components:
           name: terrakube-dex
           protocol: http
           targetPort: 5556
-      command: ['sh']
-      args: ['/projects/terrakube/scripts/setupDevelopmentEnvironmentChe.sh']
       volumeMounts:
         - name: m2
           path: /home/user/.m2
+  
+  - name: ubuntu
+    container:
+      image: ubuntu:jammy
+      memoryLimit: 512Mi
+      mountSources: true
+      command: ['bash']
+      args: ['/projects/terrakube/scripts/setupDevelopmentEnvironmentChe.sh']
 
   - name: dex
     container:
