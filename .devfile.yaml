@@ -36,10 +36,34 @@ components:
   - name: ubuntu
     container:
       image: ubuntu:jammy
-      memoryLimit: 512Mi
+      memoryLimit: 128Mi
       mountSources: true
       command: ['bash']
       args: ['/projects/terrakube/scripts/setupDevelopmentEnvironmentChe.sh']
+  
+  - name: openLDAP
+    container:
+      image: bitnami/openldap:2.6.4-debian-11-r3
+      memoryLimit: 256Mi
+      mountSources: true
+      env:
+        - name: "LDAP_ADMIN_USERNAME"
+          value: "admin"
+        - name: "LDAP_ADMIN_PASSWORD"
+          value: "admin"
+        - name: "LDAP_CONFIG_ADMIN_ENABLED"
+          value: "yes"
+        - name: "LDAP_CONFIG_ADMIN_USERNAME"
+          value: "admin"
+        - name: "LDAP_CONFIG_ADMIN_PASSWORD"
+          value: "admin"
+        - name: "LDAP_USERS"
+          value: "admin"
+        - name: "LDAP_PASSWORDS"
+          value: "admin"
+        - name: "LDAP_GROUP"
+          value: "TERRAKUBE_ADMIN"
+        
 
   - name: dex
     container:
