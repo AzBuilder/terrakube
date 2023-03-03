@@ -47,16 +47,7 @@ components:
       size: 5G
 
 commands:
-  - id: maven-build
-    exec:
-      component: maven
-      workingDir: ${PROJECT_SOURCE}
-      commandLine: "bash /projects/terrakube/scripts/che/buildApi.sh"
-      group:
-        kind: build
-        isDefault: false
-
-  - id: enable-dex
+  - id: dex
     exec:
       component: dex
       workingDir: ${PROJECT_SOURCE}
