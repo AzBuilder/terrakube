@@ -25,13 +25,22 @@ components:
           name: terrakube-ui
           protocol: http
           targetPort: 3000
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+
+  - name: dex
+    container:
+      image: ghcr.io/dexidp/dex
+      memoryLimit: 256Mi
+      mountSources: true
+      endpoints:
         - exposure: public
           name: terrakube-dex
           protocol: http
           targetPort: 5556
-      volumeMounts:
-        - name: m2
-          path: /home/user/.m2
+      command: ['tail']
+      args: ['-f', '/dev/null']
 
   - name: m2
     volume:
@@ -41,6 +50,16 @@ commands:
   - id: maven-build
     exec:
       component: maven
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        bash /projects/terrakube/scripts/che/buildApi.sh
+      group:
+        kind: build
+        isDefault: false
+
+  - id: enable-dex
+    exec:
+      component: dex
       workingDir: ${PROJECT_SOURCE}
       commandLine: |
         bash /projects/terrakube/scripts/che/buildApi.sh

@@ -148,7 +148,7 @@ function generateUiVars(){
   #REACT_CONFIG_REGISTRY_URI="http://localhost:8075"
   #REACT_CONFIG_AUTHORITY="http://localhost:5556/dex"
 
-  REACT_CONFIG_TERRAKUBE_URL=$(echo "http://$CHE_REGISTRY.$DOMAIN"/api/v1/)
+  REACT_CONFIG_TERRAKUBE_URL=$(echo "http://$CHE_API.$DOMAIN"/api/v1/)
   REACT_CONFIG_REDIRECT=$(echo "http://$CHE_UI.$DOMAIN")
   REACT_CONFIG_REGISTRY_URI=$(echo "http://$CHE_REGISTRY.$DOMAIN")
   REACT_CONFIG_AUTHORITY="http://localhost:5556/dex"
