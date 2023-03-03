@@ -51,8 +51,7 @@ commands:
     exec:
       component: maven
       workingDir: ${PROJECT_SOURCE}
-      commandLine: |
-        bash /projects/terrakube/scripts/che/buildApi.sh
+      commandLine: "bash /projects/terrakube/scripts/che/buildApi.sh"
       group:
         kind: build
         isDefault: false
@@ -61,8 +60,7 @@ commands:
     exec:
       component: dex
       workingDir: ${PROJECT_SOURCE}
-      commandLine: |
-        dex serve --web-http-addr 0.0.0.0:5556 /projects/terrakube/scripts/setup/dex/config-ldap.yaml
+      commandLine: "dex serve --web-http-addr 0.0.0.0:5556 /projects/terrakube/scripts/setup/dex/config-ldap.yaml"
       group:
         kind: build
         isDefault: false

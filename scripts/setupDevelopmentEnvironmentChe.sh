@@ -202,20 +202,15 @@ function generateUiConfigFile(){
 }
 
 function generateDexConfiguration(){
-  cp scripts/template/dex/template-config-ldap.yaml scripts/setup/dex/config-ldap.yaml
-  
-  USER=$(whoami)
-  if [ "$USER" = "gitpod" ]; then
-    jwtIssuer=$(gp url 5556)
-    uiRedirect=$(gp url 3000)  
-  else
-    jwtIssuer="http://localhost:5556"
-    uiRedirect="http://locahost:3000"
-  fi
-  
-  sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" scripts/setup/dex/config-ldap.yaml
-  sed -i "s+TEMPLATE_GITPOD_REDIRECT+$uiRedirect+gi" scripts/setup/dex/config-ldap.yaml
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-8)
+  CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
+  DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
 
+  cp scripts/template/dex/template-config-ldap.yaml scripts/setup/dex/config-ldap.yaml
+  jwtIssuer=$(echo "http://$CHE_DEX.$DOMAIN")
+  sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" scripts/setup/dex/config-ldap.yaml
+  uiRedirect=$(echo "http://$CHE_UI.$DOMAIN")
+  sed -i "s+TEMPLATE_GITPOD_REDIRECT+$uiRedirect+gi" scripts/setup/dex/config-ldap.yaml
 }
 
 function generateThunderClientConfiguration(){
@@ -264,7 +259,7 @@ generateApiVars
 generateRegistryVars
 generateExecutorVars
 generateUiVars
-#generateDexConfiguration
+generateDexConfiguration
 #generateThunderClientConfiguration
 
 USER=$(whoami)
@@ -274,8 +269,5 @@ fi
 
 cp ./scripts/template/azure/.envAzureSample .envAzure
 cp ./scripts/template/google/.envGcpSample .envGcp
-
-chmod +x dependencies/loadDexChe.sh
-bash ./dependencies/loadDexChe.sh
 
 echo "Setup Development Environment Che Completed"
