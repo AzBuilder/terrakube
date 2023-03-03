@@ -255,6 +255,8 @@ function generateWorkspaceInformation(){
   sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
 }
 
+cd /projects/terrakube/
+
 generateApiVars
 generateRegistryVars
 generateExecutorVars
