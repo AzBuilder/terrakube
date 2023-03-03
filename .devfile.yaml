@@ -34,19 +34,13 @@ components:
       image: ghcr.io/dexidp/dex
       memoryLimit: 256Mi
       mountSources: true
-      commandLine: |
-        while [ ! -f /projects/terrakube/scripts/setup/dex/config-ldap.yaml ]
-        do
-          sleep 2
-        done
-        dex serve --web-http-addr 0.0.0.0:5556 /projects/terrakube/scripts/setup/dex/config-ldap.yaml
       endpoints:
         - exposure: public
           name: terrakube-dex
           protocol: http
           targetPort: 5556
-      command: ['tail']
-      args: ['-f', '/dev/null']
+      command: ['sh']
+      args: ['/projects/terrakube/scripts/dependencies/loadDex.sh']
 
   - name: m2
     volume:
