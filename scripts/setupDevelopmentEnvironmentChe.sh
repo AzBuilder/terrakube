@@ -5,6 +5,7 @@ function generateApiVars(){
   CHE_REGISTRY=$(echo "$DEVWORKSPACE_ID"-2) 
   CHE_EXECUTOR=$(echo "$DEVWORKSPACE_ID"-3)
   CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-5)
   DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
 
   #TerrakubeHostname="http://localhost:8080"
@@ -14,7 +15,7 @@ function generateApiVars(){
 
   TerrakubeHostname=$(echo "http://$CHE_API.$DOMAIN")
   AzBuilderExecutorUrl=$(echo "$CHE_EXECUTOR/api/v1/terraform-rs")
-  DexIssuerUri="http://localhost:5556/dex"
+  DexIssuerUri="http://$CHE_DEX.$DOMAIN/dex"
   TerrakubeUiURL=$(echo "http://$CHE_UI.$DOMAIN")
 
   ApiDataSourceType="H2"
@@ -52,6 +53,7 @@ function generateRegistryVars(){
   CHE_API=$(echo "$DEVWORKSPACE_ID"-1)
   CHE_REGISTRY=$(echo "$DEVWORKSPACE_ID"-2) 
   CHE_EXECUTOR=$(echo "$DEVWORKSPACE_ID"-3)
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-5)
   CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
   DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
   USER=$(whoami)
@@ -95,6 +97,7 @@ function generateExecutorVars(){
   CHE_API=$(echo "$DEVWORKSPACE_ID"-1)
   CHE_REGISTRY=$(echo "$DEVWORKSPACE_ID"-2) 
   CHE_EXECUTOR=$(echo "$DEVWORKSPACE_ID"-3)
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-5)
   CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
   DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
 
@@ -106,9 +109,9 @@ function generateExecutorVars(){
 
   AzBuilderRegistry=$(echo "http://$CHE_REGISTRY.$DOMAIN")
   AzBuilderApiUrl=$(echo "http://$CHE_API.$DOMAIN")
-  DexIssuerUri="http://localhost:5556/dex"
+  DexIssuerUri="http://$CHE_DEX.$DOMAIN/dex"
   TerrakubeUiURL=$(echo "http://$CHE_UI.$DOMAIN")
-  AppIssuerUri="http://localhost:5556/dex"
+  AppIssuerUri="http://$CHE_DEX.$DOMAIN/dex"
   
 
   AuthenticationValidationTypeRegistry=DEX
@@ -141,6 +144,7 @@ function generateUiVars(){
   CHE_REGISTRY=$(echo "$DEVWORKSPACE_ID"-2) 
   CHE_EXECUTOR=$(echo "$DEVWORKSPACE_ID"-3)
   CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-5)
   DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
 
   #REACT_CONFIG_TERRAKUBE_URL="http://localhost:8080/api/v1/"
@@ -151,7 +155,7 @@ function generateUiVars(){
   REACT_CONFIG_TERRAKUBE_URL=$(echo "http://$CHE_API.$DOMAIN"/api/v1/)
   REACT_CONFIG_REDIRECT=$(echo "http://$CHE_UI.$DOMAIN")
   REACT_CONFIG_REGISTRY_URI=$(echo "http://$CHE_REGISTRY.$DOMAIN")
-  REACT_CONFIG_AUTHORITY="http://localhost:5556/dex"
+  REACT_CONFIG_AUTHORITY="http://$CHE_DEX.$DOMAIN/dex"
 
   REACT_CONFIG_CLIENT_ID="example-app"
   REACT_CONFIG_SCOPE="email openid profile offline_access groups"
@@ -202,7 +206,7 @@ function generateUiConfigFile(){
 }
 
 function generateDexConfiguration(){
-  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-8)
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-5)
   CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
   DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
 
