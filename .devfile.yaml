@@ -47,22 +47,22 @@ components:
       memoryLimit: 256Mi
       mountSources: true
       env:
-        - name: LDAP_ADMIN_USERNAME
+        - name: "LDAP_ADMIN_USERNAME"
+          value: "admin"
+        - name: "LDAP_ADMIN_PASSWORD"
           value: admin
-        - name: LDAP_ADMIN_PASSWORD
-          value: admin
-        - name: LDAP_CONFIG_ADMIN_ENABLED
-          value: yes
-        - name: LDAP_CONFIG_ADMIN_USERNAME
-          value: admin
-        - name: LDAP_CONFIG_ADMIN_PASSWORD
-          value: admin
-        - name: LDAP_USERS
-          value: admin
-        - name: LDAP_PASSWORDS
-          value: admin
-        - name: LDAP_GROUP
-          value: TERRAKUBE_ADMIN
+        - name: "LDAP_CONFIG_ADMIN_ENABLED"
+          value: "yes"
+        - name: "LDAP_CONFIG_ADMIN_USERNAME"
+          value: "admin"
+        - name: "LDAP_CONFIG_ADMIN_PASSWORD"
+          value: "admin"
+        - name: "LDAP_USERS"
+          value: "admin"
+        - name: "LDAP_PASSWORDS"
+          value: "admin"
+        - name: "LDAP_GROUP"
+          value: "TERRAKUBE_ADMIN"
 
   - name: dex
     container:
