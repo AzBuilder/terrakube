@@ -7,11 +7,13 @@ function generateApiVars(){
     AzBuilderExecutorUrl="$(gp url 8090)/api/v1/terraform-rs"
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
+    AwsEndpoint=$(gp url 9000)
   else
     TerrakubeHostname="http://localhost:8080"
     AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
     DexIssuerUri="http://localhost:5556/dex"
     TerrakubeUiURL="http://localhost:3000"
+    AwsEndpoint="http://localhost:9000"
   fi
 
   ApiDataSourceType="H2"
@@ -25,7 +27,6 @@ function generateApiVars(){
   AwsStorageSecretKey="minioadmin"
   AwsStorageBucketName="sample"
   AwsStorageRegion="us-east-1"
-  AwsEndpoint=$(gp url 9000)
 
   StorageType="AWS"
   DexClientId="example-app"
@@ -52,6 +53,7 @@ function generateApiVars(){
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
   echo "DexClientId=$DexClientId" >> .envApi
+  echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
@@ -61,10 +63,12 @@ function generateExecutorVars(){
     AzBuilderApiUrl=$(gp url 8080)
     TerrakubeRegistryDomain=$(gp url 8075 | sed "s+https://++g")
     TerrakubeApiUrl=$(gp url 8080)
+    AwsEndpoint=$(gp url 9000)
   else
     AzBuilderApiUrl="http://localhost:8080"
     TerrakubeRegistryDomain="http://localhost:8075"
     TerrakubeApiUrl="htp://localhost:8080"
+    AwsEndpoint="http://localhost:9000"
   fi
 
   TerrakubeEnableSecurity=true
@@ -75,7 +79,6 @@ function generateExecutorVars(){
   AwsTerraformStateSecretKey="minioadmin"
   AwsTerraformStateBucketName="sample"
   AwsTerraformStateRegion="us-east-1"
-  AwsEndpoint=$(gp url 9000)
 
   TerraformOutputType=AwsTerraformOutputImpl
   AwsTerraformOutputAccessKey="minioadmin"
@@ -120,7 +123,8 @@ function generateExecutorVars(){
   echo "TerrakubeToolsBranch=$TerrakubeToolsBranch" >> .envExecutor
   echo "TerrakubeRegistryDomain=$TerrakubeRegistryDomain" >> .envExecutor
   echo "TerrakubeApiUrl=$TerrakubeApiUrl" >> .envExecutor
-  echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
+  echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envExecutor
+  echo "#JAVA_TOOL_OPTIONS=\"$JAVA_TOOL_OPTIONS\"" >> .envExecutor
 }
 
 function generateRegistryVars(){
@@ -131,12 +135,14 @@ function generateRegistryVars(){
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
     AppIssuerUri="$(gp url 5556)/dex"
+    AwsEndpoint=$(gp url 9000)
   else
     AzBuilderRegistry="http://localhost:8075"
     AzBuilderApiUrl="http://localhost:8080"
     DexIssuerUri="http://localhost:5556/dex"
     TerrakubeUiURL="http://localhost:3000"
     AppIssuerUri="http://localhost:5556/dex"
+    AwsEndpoint="http://localhost:9000"
   fi
 
   AuthenticationValidationTypeRegistry=DEX
@@ -149,7 +155,6 @@ function generateRegistryVars(){
   AwsStorageSecretKey="minioadmin"
   AwsStorageBucketName="sample"
   AwsStorageRegion="us-east-1"
-  AwsEndpoint=$(gp url 9000)
 
   AppClientId=example-app
 
@@ -178,7 +183,7 @@ function generateRegistryVars(){
 
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
-  echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
+  echo "#JAVA_TOOL_OPTIONS=\"$JAVA_TOOL_OPTIONS\"" >> .envRegistry
 }
 
 function generateUiVars(){
