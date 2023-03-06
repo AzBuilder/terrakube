@@ -1,41 +1,35 @@
-# Already included in default config of Docker image osixia/openldap:1.4.0.
-#
-# dn: dc=example,dc=org
-# objectClass: dcObject
-# objectClass: organization
-# o: Example Company
-# dc: example
+dn: dc=example,dc=org
+dc: example
+objectClass: dcObject
+objectClass: organization
+o: Example, Inc
 
-dn: ou=People,dc=example,dc=org
-objectClass: organizationalUnit
-ou: People
+dn: ou=users,dc=example,dc=org
+ou: users
+objectClass: organizationalunit
 
-dn: cn=lester,ou=People,dc=example,dc=org
-objectClass: person
+dn: cn=lester,ou=users,dc=example,dc=org
 objectClass: inetOrgPerson
 sn: Parkinson
 cn: Lester
 mail: admin@example.com
 userpassword: admin
 
-dn: cn=grady,ou=People,dc=example,dc=org
-objectClass: person
+dn: cn=grady,ou=users,dc=example,dc=org
 objectClass: inetOrgPerson
 sn: Chambers
 cn: Grady
 mail: aws@example.com
 userpassword: azure
 
-dn: cn=saarah,ou=People,dc=example,dc=org
-objectClass: person
+dn: cn=saarah,ou=users,dc=example,dc=org
 objectClass: inetOrgPerson
 sn: Lott
 cn: Saarah
 mail: azure@example.com
 userpassword: aws
 
-dn: cn=eugene,ou=People,dc=example,dc=org
-objectClass: person
+dn: cn=eugene,ou=users,dc=example,dc=org
 objectClass: inetOrgPerson
 sn: Monaghan
 cn: Eugene
@@ -51,24 +45,24 @@ ou: Groups
 dn: cn=TERRAKUBE_ADMIN,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: TERRAKUBE_ADMIN
-member: cn=lester,ou=People,dc=example,dc=org
+member: cn=lester,ou=users,dc=example,dc=org
 
 dn: cn=TERRAKUBE_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: TERRAKUBE_DEVELOPERS
-member: cn=lester,ou=People,dc=example,dc=org
+member: cn=lester,ou=users,dc=example,dc=org
 
 dn: cn=AZURE_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: AZURE_DEVELOPERS
-member: cn=saarah,ou=People,dc=example,dc=org
+member: cn=saarah,ou=users,dc=example,dc=org
 
 dn: cn=AWS_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: AWS_DEVELOPERS
-member: cn=grady,ou=People,dc=example,dc=org
+member: cn=grady,ou=users,dc=example,dc=org
 
 dn: cn=GCP_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: GCP_DEVELOPERS
-member: cn=eugene,ou=People,dc=example,dc=org
+member: cn=eugene,ou=users,dc=example,dc=org
