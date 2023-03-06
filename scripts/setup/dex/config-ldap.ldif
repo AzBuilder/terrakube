@@ -45,24 +45,24 @@ ou: Groups
 dn: cn=TERRAKUBE_ADMIN,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: TERRAKUBE_ADMIN
-member: cn=lester,ou=People,dc=example,dc=org
+member: cn=lester,ou=users,dc=example,dc=org
 
 dn: cn=TERRAKUBE_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: TERRAKUBE_DEVELOPERS
-member: cn=lester,ou=People,dc=example,dc=org
+member: cn=lester,ou=users,dc=example,dc=org
 
 dn: cn=AZURE_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: AZURE_DEVELOPERS
-member: cn=saarah,ou=People,dc=example,dc=org
+member: cn=saarah,ou=users,dc=example,dc=org
 
 dn: cn=AWS_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: AWS_DEVELOPERS
-member: cn=grady,ou=People,dc=example,dc=org
+member: cn=grady,ou=users,dc=example,dc=org
 
 dn: cn=GCP_DEVELOPERS,ou=Groups,dc=example,dc=org
 objectClass: groupOfNames
 cn: GCP_DEVELOPERS
-member: cn=eugene,ou=People,dc=example,dc=org
+member: cn=eugene,ou=users,dc=example,dc=org

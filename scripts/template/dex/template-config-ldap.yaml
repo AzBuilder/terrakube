@@ -39,7 +39,7 @@ connectors:
     usernamePrompt: Email Address
 
     userSearch:
-      baseDN: ou=People,dc=example,dc=org
+      baseDN: ou=users,dc=example,dc=org
       filter: "(objectClass=person)"
       username: mail
       # "DN" (case sensitive) is a special attribute name. It indicates that
