@@ -14,7 +14,7 @@ function generateApiVars(){
   #TerrakubeUiURL="http://localhost:3000"
 
   TerrakubeHostname=$(echo "http://$CHE_API.$DOMAIN")
-  AzBuilderExecutorUrl=$(echo "http://$CHE_EXECUTOR/api/v1/terraform-rs")
+  AzBuilderExecutorUrl=$(echo "http://localhost:8090/api/v1/terraform-rs")
   DexIssuerUri="http://$CHE_DEX.$DOMAIN/dex"
   TerrakubeUiURL=$(echo "http://$CHE_UI.$DOMAIN")
 
