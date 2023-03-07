@@ -51,6 +51,10 @@ components:
         value: "admin"
       - name: "LDAP_ADMIN_PASSWORD"
         value: "admin"
+      - name: "LDAP_ROOT"
+        value: "dc=example,dc=org"
+      - name: "LDAP_CUSTOM_LDIF_DIR"
+        value: "/projects/terrakube/scripts/setup/dex/"
 
   - name: dex
     container:
