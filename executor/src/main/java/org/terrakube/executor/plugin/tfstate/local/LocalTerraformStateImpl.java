@@ -31,8 +31,10 @@ import org.terrakube.executor.service.mode.TerraformJob;
 public class LocalTerraformStateImpl implements TerraformState {
 
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
-    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/" + TERRAFORM_PLAN_FILE;
-    private static final String LOCAL_STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
+    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/"
+            + TERRAFORM_PLAN_FILE;
+    private static final String LOCAL_STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/"
+            + TERRAFORM_PLAN_FILE;
     private static final String LOCAL_STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
     private static final String BACKEND_FILE_NAME = "terrakube_override.tf";
 
@@ -48,8 +50,7 @@ public class LocalTerraformStateImpl implements TerraformState {
         try {
             String localBackendDirectory = FileUtils.getUserDirectoryPath().concat(
                     FilenameUtils.separatorsToSystem(
-                            String.format(LOCAL_BACKEND_DIRECTORY, organizationId, workspaceId)
-                    ));
+                            String.format(LOCAL_BACKEND_DIRECTORY, organizationId, workspaceId)));
 
             TextStringBuilder localBackendHcl = new TextStringBuilder();
             localBackendHcl.appendln("terraform {");
@@ -60,9 +61,8 @@ public class LocalTerraformStateImpl implements TerraformState {
 
             File localBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
-                            String.join(File.separator, Stream.of(workingDirectory.getAbsolutePath(), BACKEND_FILE_NAME).toArray(String[]::new))
-                    )
-            );
+                            String.join(File.separator, Stream.of(workingDirectory.getAbsolutePath(), BACKEND_FILE_NAME)
+                                    .toArray(String[]::new))));
 
             log.info("Creating Local Backend File: {}", localBackendFile.getAbsolutePath());
             FileUtils.writeStringToFile(localBackendFile, localBackendHcl.toString(), Charset.defaultCharset());
@@ -74,17 +74,19 @@ public class LocalTerraformStateImpl implements TerraformState {
     }
 
     @Override
-    public String saveTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId, File workingDirectory) {
+    public String saveTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId,
+            File workingDirectory) {
 
         String localStateFilePath = String.format(LOCAL_STATE_DIRECTORY, organizationId, workspaceId, jobId, stepId);
 
         String stepStateDirectory = FileUtils.getUserDirectoryPath().concat(
                 FilenameUtils.separatorsToSystem(
-                        localStateFilePath
-                ));
+                        localStateFilePath));
 
-        File tfPlan = new File(String.join(File.separator, Stream.of(workingDirectory.getAbsolutePath(), TERRAFORM_PLAN_FILE).toArray(String[]::new)));
-        log.info("terraformStateFile Path: {} {}", workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE, tfPlan.exists());
+        File tfPlan = new File(String.join(File.separator,
+                Stream.of(workingDirectory.getAbsolutePath(), TERRAFORM_PLAN_FILE).toArray(String[]::new)));
+        log.info("terraformStateFile Path: {} {}", workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE,
+                tfPlan.exists());
 
         if (tfPlan.exists()) {
             try {
@@ -100,9 +102,11 @@ public class LocalTerraformStateImpl implements TerraformState {
     }
 
     @Override
-    public boolean downloadTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId, File workingDirectory) {
+    public boolean downloadTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId,
+            File workingDirectory) {
         AtomicBoolean planExists = new AtomicBoolean(false);
-        Optional.ofNullable(terrakubeClient.getJobById(organizationId, jobId).getData().getAttributes().getTerraformPlan())
+        Optional.ofNullable(
+                terrakubeClient.getJobById(organizationId, jobId).getData().getAttributes().getTerraformPlan())
                 .ifPresent(stateFilePath -> {
                     try {
                         log.info("Copying state from {}:", stateFilePath);
@@ -110,10 +114,9 @@ public class LocalTerraformStateImpl implements TerraformState {
                                 new File(stateFilePath),
                                 new File(
                                         String.join(
-                                                File.separator, Stream.of(workingDirectory.getAbsolutePath(), TERRAFORM_PLAN_FILE).toArray(String[]::new)
-                                        )
-                                )
-                        );
+                                                File.separator,
+                                                Stream.of(workingDirectory.getAbsolutePath(), TERRAFORM_PLAN_FILE)
+                                                        .toArray(String[]::new))));
                         planExists.set(true);
                     } catch (IOException e) {
                         log.error(e.getMessage());
@@ -126,31 +129,32 @@ public class LocalTerraformStateImpl implements TerraformState {
     public void saveStateJson(TerraformJob terraformJob, String applyJSON) {
         if (applyJSON != null) {
             String stateFilenameUUID = UUID.randomUUID().toString();
-            String stateFileName = String.format(LOCAL_STATE_DIRECTORY_JSON, terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilenameUUID) ;
+            String stateFileName = String.format(LOCAL_STATE_DIRECTORY_JSON, terraformJob.getOrganizationId(),
+                    terraformJob.getWorkspaceId(), stateFilenameUUID);
             log.info("terraformStateFile: {}", stateFileName);
 
             File localStateFile = new File(FileUtils.getUserDirectoryPath()
                     .concat(
                             FilenameUtils.separatorsToSystem(
-                                stateFileName
-                            )
-                    )
-            );
+                                    stateFileName)));
 
             try {
                 FileUtils.writeStringToFile(localStateFile, applyJSON, Charset.defaultCharset());
 
-                String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilenameUUID);
+                String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(),
+                        terraformJob.getWorkspaceId(), stateFilenameUUID);
 
                 HistoryRequest historyRequest = new HistoryRequest();
                 History newHistory = new History();
                 newHistory.setType("history");
                 HistoryAttributes historyAttributes = new HistoryAttributes();
                 historyAttributes.setOutput(stateURL);
+                historyAttributes.setJobReference(terraformJob.getJobId());
                 newHistory.setAttributes(historyAttributes);
                 historyRequest.setData(newHistory);
 
-                terrakubeClient.createHistory(historyRequest, terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+                terrakubeClient.createHistory(historyRequest, terraformJob.getOrganizationId(),
+                        terraformJob.getWorkspaceId());
             } catch (IOException e) {
                 log.error(e.getMessage());
             }

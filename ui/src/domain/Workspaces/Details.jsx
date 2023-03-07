@@ -612,6 +612,7 @@ function setupWorkspaceIncludes(
         setLastRun(element.attributes.updatedDate);
         break;
       case include.HISTORY:
+        console.log(element);
         history.push({
           id: element.id,
           title: "Queue manually using Terraform",
