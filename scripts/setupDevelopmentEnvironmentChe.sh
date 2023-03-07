@@ -67,7 +67,7 @@ function generateRegistryVars(){
   TerrakubeRegistryDomain=$(echo "$CHE_REGISTRY.$DOMAIN")
   TerrakubeApiUrl=$(echo "http://$CHE_API.$DOMAIN")
 
-  TerrakubeEnableSecurity=false
+  TerrakubeEnableSecurity=true
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
   TerraformStateType=LocalTerraformStateImpl
   TerraformOutputType=LocalTerraformOutputImpl
