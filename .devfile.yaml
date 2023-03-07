@@ -6,7 +6,7 @@ components:
   - name: tools
     container:
       image: quay.io/devfile/universal-developer-image:ubi8-c63ad83
-      memoryLimit: 8Gi
+      memoryLimit: 6Gi
       mountSources: true
       endpoints:
         - exposure: public
@@ -44,7 +44,7 @@ components:
   - name: openldap
     container:
       image: bitnami/openldap:2.6.4-debian-11-r4
-      memoryLimit: 512Mi
+      memoryLimit: 1024Mi
       mountSources: true
 
   - name: dex
