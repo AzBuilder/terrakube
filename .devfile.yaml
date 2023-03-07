@@ -6,7 +6,7 @@ components:
   - name: tools
     container:
       image: quay.io/devfile/universal-developer-image:ubi8-c63ad83
-      memoryLimit: 8Gi
+      memoryLimit: 6Gi
       mountSources: true
       endpoints:
         - exposure: public
@@ -44,8 +44,13 @@ components:
   - name: openldap
     container:
       image: bitnami/openldap:2.6.3
-      memoryLimit: 1024Mi
+      memoryLimit: 256Mi
       mountSources: true
+      env:
+      - name: "LDAP_ADMIN_USERNAME"
+        value: "admin"
+      - name: "LDAP_ADMIN_PASSWORD"
+        value: "admin"
 
   - name: dex
     container:
