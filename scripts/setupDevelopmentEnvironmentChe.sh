@@ -215,6 +215,7 @@ function generateDexConfiguration(){
   sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" scripts/setup/dex/config-ldap.yaml
   uiRedirect=$(echo "http://$CHE_UI.$DOMAIN")
   sed -i "s+TEMPLATE_GITPOD_REDIRECT+$uiRedirect+gi" scripts/setup/dex/config-ldap.yaml
+  sed -i "s+ldap-service+localhost+gi" scripts/setup/dex/config-ldap.yaml
 }
 
 function generateThunderClientConfiguration(){
