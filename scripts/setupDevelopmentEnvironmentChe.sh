@@ -116,6 +116,7 @@ function generateExecutorVars(){
   AppIssuerUri="http://$CHE_DEX.$DOMAIN/dex"
   
 
+
   AuthenticationValidationTypeRegistry=DEX
   TerrakubeEnableSecurity=true
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
