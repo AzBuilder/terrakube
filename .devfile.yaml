@@ -46,11 +46,6 @@ components:
       image: bitnami/openldap:2.6.4-debian-11-r4
       memoryLimit: 256Mi
       mountSources: true
-      env:
-      - name: "LDAP_ADMIN_USERNAME"
-        value: "admin"
-      - name: "LDAP_ADMIN_PASSWORD"
-        value: "admin"
 
   - name: dex
     container:
