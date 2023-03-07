@@ -1,19 +1,25 @@
 {
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
-      {
-        "label": "docker-compose:dex",
-        "type": "docker-compose",
-        "dockerCompose": {
-          "up": {
-            "detached": true,
-            "build": false,
-            "services": ["dex-service", "ldap-service"]
-          },
-          "files": [
-            "${workspaceFolder}/scripts/setup/dex/docker-compose.yaml",
-          ]
+        {
+            "label": "setup-java",
+            "type": "shell",
+            "command": "source \"$HOME/.sdkman/bin/sdkman-init.sh\" && sdk install java 17.0.6-tem && sdk install maven",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "yarn-install",
+            "type": "shell",
+            "command": "cd ui && yarn install",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
-      }
     ]
-  }
+}

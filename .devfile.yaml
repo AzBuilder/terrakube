@@ -1,0 +1,79 @@
+schemaVersion: 2.1.0
+metadata:
+  name: terrakube-platform
+components:
+
+  - name: tools
+    container:
+      image: quay.io/devfile/universal-developer-image:ubi8-c63ad83
+      memoryLimit: 6Gi
+      mountSources: true
+      endpoints:
+        - exposure: public
+          name: terrakube-api
+          protocol: http
+          targetPort: 8080
+        - exposure: public
+          name: terrakube-registry
+          protocol: http
+          targetPort: 8075
+        - exposure: public
+          name: terrakube-executor
+          protocol: http
+          targetPort: 8090
+        - exposure: public
+          name: terrakube-ui
+          protocol: http
+          targetPort: 3000
+        - exposure: public
+          name: terrakube-dex
+          protocol: http
+          targetPort: 5556
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+  
+  - name: ubuntu
+    container:
+      image: ubuntu:jammy
+      memoryLimit: 256Mi
+      mountSources: true
+      command: ['bash']
+      args: ['/projects/terrakube/scripts/setupDevelopmentEnvironmentChe.sh']
+  
+  - name: openldap
+    container:
+      image: bitnami/openldap:2.6.3
+      memoryLimit: 256Mi
+      mountSources: true
+      env:
+      - name: "LDAP_ADMIN_USERNAME"
+        value: "admin"
+      - name: "LDAP_ADMIN_PASSWORD"
+        value: "admin"
+      - name: "LDAP_ROOT"
+        value: "dc=example,dc=org"
+      - name: "LDAP_CUSTOM_LDIF_DIR"
+        value: "/projects/terrakube/scripts/setup/dex/"
+
+  - name: dex
+    container:
+      image: ghcr.io/dexidp/dex
+      memoryLimit: 256Mi
+      mountSources: true
+      command: ['sh']
+      args: ['/projects/terrakube/scripts/dependencies/loadDex.sh']
+
+  - name: m2
+    volume:
+      size: 5G
+
+commands:
+  - id: dex
+    exec:
+      component: dex
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: "dex serve --web-http-addr 0.0.0.0:5556 /projects/terrakube/scripts/setup/dex/config-ldap.yaml"
+      group:
+        kind: build
+        isDefault: false
