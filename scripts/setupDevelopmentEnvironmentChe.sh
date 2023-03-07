@@ -221,16 +221,16 @@ function generateDexConfiguration(){
 }
 
 function generateThunderClientConfiguration(){
-  USER=$(whoami)
-  if [ "$USER" = "gitpod" ]; then
-    jwtIssuer="$(gp url 5556)/dex"
-    terrakubeApi=$(gp url 8080)
-    terrakubeRegistry=$(gp url 8075)
-  else
-    jwtIssuer="http://localhost:5556"
-    terrakubeApi="http://localhost:8080"
-    terrakubeRegistry="http://localhost:8075"
-  fi
+  CHE_API=$(echo "$DEVWORKSPACE_ID"-1)
+  CHE_REGISTRY=$(echo "$DEVWORKSPACE_ID"-2) 
+  CHE_EXECUTOR=$(echo "$DEVWORKSPACE_ID"-3)
+  CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-5)
+  DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
+
+  jwtIssuer=$(echo "http://$CHE_DEX.$DOMAIN/dex")
+  terrakubeApi=$(echo "http://$CHE_API.$DOMAIN")
+  terrakubeRegistry=$(echo "http://$CHE_REGISTRY.$DOMAIN")
 
   rm -f thunder-tests/thunderEnvironment.json
   cp scripts/template/thunder-tests/thunderEnvironment.json thunder-tests/
@@ -240,26 +240,33 @@ function generateThunderClientConfiguration(){
 }
 
 function generateWorkspaceInformation(){
-  rm -f GITPO.md
-  cp scripts/template/gitpod/GITPOD_TEMPLATE.md GITPOD.md
+  CHE_API=$(echo "$DEVWORKSPACE_ID"-1)
+  CHE_REGISTRY=$(echo "$DEVWORKSPACE_ID"-2) 
+  CHE_EXECUTOR=$(echo "$DEVWORKSPACE_ID"-3)
+  CHE_UI=$(echo "$DEVWORKSPACE_ID"-4)
+  CHE_DEX=$(echo "$DEVWORKSPACE_ID"-5)
+  DOMAIN=$(echo $CHE_DASHBOARD_URL | sed "s+https://++g")
 
-  WORKSPACE_API=$(gp url 8080)
-  WORKSPACE_REGISTRY=$(gp url 8075)
-  WORKSPACE_EXECUTOR=$(gp url 8090)
-  WORKSPACE_UI=$(gp url 3000)
-  WORKSPACE_DEX=$(gp url 5556)
-  WORKSPACE_MINIO=$(gp url 9000)
-  WORKSPACE_CONSOLE_MINIO=$(gp url 9001)
-  WORKSPACE_LOGIN_REGISTRY=$(gp url 8075 | sed "s+https://++g")
+  rm -f CHE.md
+  cp scripts/template/gitpod/GITPOD_TEMPLATE.md CHE.md
 
-  sed -i "s+GITPOD_WORKSPACE_UI+$WORKSPACE_UI+gi" GITPOD.md
-  sed -i "s+GITPOD_WORKSPACE_API+$WORKSPACE_API+gi" GITPOD.md
-  sed -i "s+GITPOD_WORKSPACE_REGISTRY+$WORKSPACE_REGISTRY+gi" GITPOD.md
-  sed -i "s+GITPOD_WORKSPACE_EXECUTOR+$WORKSPACE_EXECUTOR+gi" GITPOD.md
-  sed -i "s+GITPOD_WORKSPACE_DEX+$WORKSPACE_DEX+gi" GITPOD.md
-  sed -i "s+GITPOD_LOGIN_REGISTRY+$WORKSPACE_LOGIN_REGISTRY+gi" GITPOD.md
-  sed -i "s+GITPOD_WORKSPACE_MINIO+$WORKSPACE_MINIO+gi" GITPOD.md
-  sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
+  WORKSPACE_API=$(echo "http://$CHE_API.$DOMAIN")
+  WORKSPACE_REGISTRY=$(echo "http://$CHE_REGISTRY.$DOMAIN")
+  WORKSPACE_EXECUTOR=$(echo "http://$CHE_EXECUTOR.$DOMAIN")
+  WORKSPACE_UI=$(echo "http://$CHE_UI.$DOMAIN")
+  WORKSPACE_DEX=$(echo "http://$CHE_DEX.$DOMAIN/dex/.well-known/openid-configuration")
+  #WORKSPACE_MINIO=$(gp url 9000)
+  #WORKSPACE_CONSOLE_MINIO=$(gp url 9001)
+  #WORKSPACE_LOGIN_REGISTRY=$(gp url 8075 | sed "s+https://++g")
+
+  sed -i "s+GITPOD_WORKSPACE_UI+$WORKSPACE_UI+gi" CHE.md
+  sed -i "s+GITPOD_WORKSPACE_API+$WORKSPACE_API+gi" CHE.md
+  sed -i "s+GITPOD_WORKSPACE_REGISTRY+$WORKSPACE_REGISTRY+gi" CHE.md
+  sed -i "s+GITPOD_WORKSPACE_EXECUTOR+$WORKSPACE_EXECUTOR+gi" CHE.md
+  sed -i "s+GITPOD_WORKSPACE_DEX+$WORKSPACE_DEX+gi" CHE.md
+  #sed -i "s+GITPOD_LOGIN_REGISTRY+$WORKSPACE_LOGIN_REGISTRY+gi" GITPOD.md
+  #sed -i "s+GITPOD_WORKSPACE_MINIO+$WORKSPACE_MINIO+gi" GITPOD.md
+  #sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
 }
 
 cd /projects/terrakube/
@@ -269,12 +276,8 @@ generateRegistryVars
 generateExecutorVars
 generateUiVars
 generateDexConfiguration
-#generateThunderClientConfiguration
-
-USER=$(whoami)
-if [ "$USER" = "gitpod" ]; then
-  generateWorkspaceInformation
-fi
+generateThunderClientConfiguration
+generateWorkspaceInformation
 
 cp ./scripts/template/azure/.envAzureSample .envAzure
 cp ./scripts/template/google/.envGcpSample .envGcp
