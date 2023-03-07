@@ -44,7 +44,7 @@ components:
   - name: openldap
     container:
       image: bitnami/openldap:2.6.4-debian-11-r4
-      memoryLimit: 256Mi
+      memoryLimit: 512Mi
       mountSources: true
 
   - name: dex
