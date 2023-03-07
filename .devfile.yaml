@@ -43,7 +43,8 @@ components:
   
   - name: openldap
     container:
-      image: bitnami/openldap:2.5.14
+      image: bitnami/openldap:2.6.5
+      memoryLimit: 512Mi
 
   - name: dex
     container:
