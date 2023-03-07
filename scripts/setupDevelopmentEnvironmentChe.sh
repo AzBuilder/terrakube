@@ -46,6 +46,7 @@ function generateApiVars(){
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
   echo "DexClientId=$DexClientId" >> .envApi
+  echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
@@ -63,10 +64,10 @@ function generateRegistryVars(){
   #TerrakubeApiUrl="htp://localhost:8080"
 
   AzBuilderApiUrl=$(echo "http://$CHE_API.$DOMAIN")
-  TerrakubeRegistryDomain=$(echo "http://$CHE_REGISTRY.$DOMAIN")
+  TerrakubeRegistryDomain=$(echo "$CHE_REGISTRY.$DOMAIN")
   TerrakubeApiUrl=$(echo "http://$CHE_API.$DOMAIN")
 
-  TerrakubeEnableSecurity=true
+  TerrakubeEnableSecurity=false
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
   TerraformStateType=LocalTerraformStateImpl
   TerraformOutputType=LocalTerraformOutputImpl
@@ -90,6 +91,7 @@ function generateRegistryVars(){
   echo "TerrakubeToolsBranch=$TerrakubeToolsBranch" >> .envExecutor
   echo "TerrakubeRegistryDomain=$TerrakubeRegistryDomain" >> .envExecutor
   echo "TerrakubeApiUrl=$TerrakubeApiUrl" >> .envExecutor
+  echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envExecutor
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
 }
 
