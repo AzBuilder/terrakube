@@ -47,9 +47,16 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                 <image>
+                    <buildpacks>
+                        <buildpack>gcr.io/paketo-buildpacks/java</buildpack>
+                        <buildpack>gcr.io/paketo-buildpacks/opentelemetry</buildpack>
+                    </buildpacks>
                     <bindings>
                         <binding>${basedir}/../bindings/ca-certificates:/platform/bindings/ca-certificates</binding>
                     </bindings>
+                    <env>
+                        <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
+                    </env>
                 </image>
             </configuration>
             <executions>
