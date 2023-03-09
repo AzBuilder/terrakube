@@ -37,6 +37,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                 <image>
+				    <builder>paketobuildpacks/builder-jammy-base</builder>
                     <buildpacks>
                         <buildpack>gcr.io/paketo-buildpacks/java</buildpack>
                         <buildpack>gcr.io/paketo-buildpacks/opentelemetry</buildpack>
