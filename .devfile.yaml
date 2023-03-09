@@ -62,7 +62,7 @@ components:
       memoryLimit: 256Mi
       mountSources: true
       command: ['sh']
-      args: ['/projects/terrakube/scripts/dependencies/loadDex.sh']
+      args: ['/projects/terrakube/scripts/dependencies/loadDexChe.sh']
 
   - name: m2
     volume:
