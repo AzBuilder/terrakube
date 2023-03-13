@@ -29,7 +29,7 @@ To quickly test Terrakube in Minikube please follow [this](https://docs.terrakub
 
 ### Docker-Compose
 
-To quickly test Terrakube in docker compose please follow [this](https://docs.terrakube.org/getting-started/deployment/minikube)
+To quickly test Terrakube in docker compose please follow [this](https://docs.terrakube.org/getting-started/docker-compose)
 
 ### Security - Authentication
 
