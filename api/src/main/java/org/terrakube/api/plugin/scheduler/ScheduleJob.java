@@ -125,6 +125,10 @@ public class ScheduleJob implements org.quartz.Job {
                     removeJobContext(job, jobExecutionContext);
                     log.warn("Unlock workspace");
                     unlockWorkspace(job);
+                    log.warn("Update workspace deleted to true");
+                    Workspace workspace = job.getWorkspace();
+                    workspace.setDeleted(true);
+                    workspaceRepository.save(workspace);
                     break;
                 case yamlError:
                     log.error("Terrakube Template error, please verify the template definition");
