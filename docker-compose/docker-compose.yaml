@@ -1,0 +1,64 @@
+version: "3.8"
+services:
+  terrakube-api:
+    image: azbuilder/api-server:2.11.2
+    ports: 
+      - 8080:8080
+    env_file:
+      - api.env
+  terrakube-ui:
+    image: azbuilder/terrakube-ui:2.11.2
+    ports: 
+      - 3000:8080
+    volumes:
+    - ./env-config.js:/app/env-config.js
+    env_file:
+      - ui.env 
+  terrakube-executor:
+    image: azbuilder/executor:2.11.2
+    ports: 
+    - 8090:8090
+    env_file:
+      - executor.env 
+  terrakube-registry:
+    image: azbuilder/open-registry:2.11.2
+    ports: 
+    - 8075:8075
+    env_file:
+      - registry.env 
+  terrakube-dex:
+    image: ghcr.io/dexidp/dex:v2.32.0
+    container_name: dex-service
+    volumes:
+    - ./config-ldap.yaml:/etc/dex/config.docker.yaml
+    ports:
+      - 5556:5556
+  ldap-service:
+    image: bitnami/openldap:2.6.4-debian-11-r4
+    environment:
+      LDAP_TLS_VERIFY_CLIENT: try
+      LDAP_ADMIN_USERNAME: "admin"
+      LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_ROOT: "dc=example,dc=org"
+      LDAP_CUSTOM_LDIF_DIR: "/ldifs"
+    volumes:
+    - ./config-ldap.ldif:/ldifs/config-ldap.ldif
+    ports:
+    - 1389:1389
+  minio:
+    image: docker.io/bitnami/minio:2022
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_DEFAULT_BUCKETS: 'sample'
+    volumes:
+      - 'minio_data:/data'
+
+volumes:
+  minio_data:
+    driver: bridge
+
+

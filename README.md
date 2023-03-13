@@ -27,6 +27,10 @@ For more information about the test environment please refer to the following [f
 
 To quickly test Terrakube in Minikube please follow [this](https://docs.terrakube.org/getting-started/deployment/minikube)
 
+### Docker-Compose
+
+To quickly test Terrakube in docker compose please follow [this](https://docs.terrakube.org/getting-started/deployment/minikube)
+
 ### Security - Authentication
 
 Terrakube uses [DEX](https://dexidp.io/docs/connectors/) to handle authentication. Dex is an identity service that uses OpenID Connect to drive authentication for other apps.
