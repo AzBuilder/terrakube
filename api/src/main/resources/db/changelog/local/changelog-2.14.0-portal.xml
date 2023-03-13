@@ -10,6 +10,7 @@
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(1024)"/>
+            <column name="definition" type="clob"/>
             <column name="organization_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_portal_organization" references="organization(id)"/>
             </column>

@@ -26,6 +26,9 @@ public class Portal {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "definition")
+    private String definition;
+
     @ManyToOne
     private Organization organization;
 }

@@ -15,6 +15,7 @@ import { ModuleList } from "../Modules/List";
 import { ModuleDetails } from "../Modules/Details";
 import { OrganizationSettings } from "../Settings/Settings";
 import { UserSettings } from "../UserSettings/UserSettings";
+import { Portal } from "../Portals/Portal";
 import { ProfilePicture } from "./ProfilePicture";
 import { useAuth } from "../../config/authConfig";
 const { Header, Footer } = Layout;
@@ -95,6 +96,9 @@ const App = () => {
           </Route>
           <Route exact path="/settings/tokens">
             <UserSettings />
+          </Route>
+          <Route exact path="/portal/:portalid">
+            <Portal />
           </Route>
         </Switch>
         <Footer style={{ textAlign: "center" }}>Terrakube ©2023</Footer>

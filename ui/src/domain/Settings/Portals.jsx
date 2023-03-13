@@ -7,83 +7,76 @@ import {
   Modal,
   Space,
   Input,
-  Switch,
   Avatar,
-  Divider,
 } from "antd";
 import "./Settings.css";
+import { Buffer } from "buffer";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
 import {
   InfoCircleOutlined,
-  TeamOutlined,
+  LayoutOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+
+const { TextArea } = Input;
+
 export const PortalSettings = () => {
   const { orgid } = useParams();
   const [portals, setPortals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [teamName, setTeamName] = useState(false);
+  const [portalName, setPortalName] = useState("");
   const [mode, setMode] = useState("create");
-  const [teamId, setTeamId] = useState([]);
+  const [portalId, setPortalId] = useState([]);
   const [form] = Form.useForm();
   const onCancel = () => {
     setVisible(false);
   };
   const onEdit = (id) => {
     setMode("edit");
-    setTeamId(id);
+    setPortalId(id);
     setVisible(true);
-    axiosInstance.get(`organization/${orgid}/team/${id}`).then((response) => {
+    axiosInstance.get(`organization/${orgid}/portal/${id}`).then((response) => {
       console.log(response);
-      setTeamName(response.data.data.attributes.name);
-      form.setFieldsValue({
-        manageProvider: response.data.data.attributes.manageProvider,
-        manageModule: response.data.data.attributes.manageModule,
-        manageWorkspace: response.data.data.attributes.manageWorkspace,
-        manageVcs: response.data.data.attributes.manageVcs,
-        manageTemplate: response.data.data.attributes.manageTemplate,
-      });
+      setPortalName(response.data.data.attributes.name);
+      let buff = new Buffer(response.data.data.attributes.definition, "base64");
+      form.setFieldsValue({ definition: buff.toString("ascii") });
     });
   };
 
   const onNew = () => {
     form.resetFields();
     setVisible(true);
-    setTeamName("");
+    setPortalName("");
     setMode("create");
   };
 
   const onDelete = (id) => {
     console.log("deleted " + id);
     axiosInstance
-      .delete(`organization/${orgid}/team/${id}`)
+      .delete(`organization/${orgid}/portal/${id}`)
       .then((response) => {
         console.log(response);
-        loadTeams();
+        loadPortals();
       });
   };
 
   const onCreate = (values) => {
     const body = {
       data: {
-        type: "team",
+        type: "portal",
         attributes: {
           name: values.name,
-          manageWorkspace: values.manageWorkspace,
-          manageModule: values.manageModule,
-          manageProvider: values.manageProvider,
-          manageVcs: values.manageVcs,
-          manageTemplate: values.manageTemplate,
+          definition: Buffer.from(values.definition).toString("base64"),
         },
       },
     };
     console.log(body);
 
     axiosInstance
-      .post(`organization/${orgid}/team`, body, {
+      .post(`organization/${orgid}/portal`, body, {
         headers: {
           "Content-Type": "application/vnd.api+json",
         },
@@ -99,21 +92,16 @@ export const PortalSettings = () => {
   const onUpdate = (values) => {
     const body = {
       data: {
-        type: "team",
-        id: teamId,
+        type: "portal",
+        id: portalId,
         attributes: {
-          manageWorkspace: values.manageWorkspace,
-          manageModule: values.manageModule,
-          manageProvider: values.manageProvider,
-          manageVcs: values.manageVcs,
-          manageTemplate: values.manageTemplate,
+          definition: Buffer.from(values.definition).toString("base64"),
         },
       },
     };
-    console.log(body);
 
     axiosInstance
-      .patch(`organization/${orgid}/team/${teamId}`, body, {
+      .patch(`organization/${orgid}/portal/${portalId}`, body, {
         headers: {
           "Content-Type": "application/vnd.api+json",
         },
@@ -140,14 +128,13 @@ export const PortalSettings = () => {
 
   return (
     <div className="setting">
-      <h1>Team Management</h1>
+      <h1>Portals</h1>
       <div className="App-text">
-        Teams let you group users into specific categories to enable finer
-        grained access control policies. For example, your developers could be
-        on a dev team that only has access to run jobs.
+        Portals let you define cloud agnostic service catalogs for your
+        infrastructure using Terraform modules.
       </div>
       <Button type="primary" onClick={onNew} htmlType="button">
-        Create team
+        Create portal
       </Button>
       <br></br>
 
@@ -177,9 +164,7 @@ export const PortalSettings = () => {
                   style={{ width: "20px" }}
                   title={
                     <p>
-                      This will permanently delete this team <br />
-                      and any permissions associated with it. <br />
-                      Are you sure?
+                      This will permanently delete this portal. Are you sure?
                     </p>
                   }
                   okText="Yes"
@@ -196,11 +181,19 @@ export const PortalSettings = () => {
                 avatar={
                   <Avatar
                     style={{ backgroundColor: "#1890ff" }}
-                    icon={<TeamOutlined />}
+                    icon={<LayoutOutlined />}
                   ></Avatar>
                 }
                 title={item.attributes.name}
-                description={<span> </span>}
+                description={
+                  <a>
+                    {location.protocol +
+                      "//" +
+                      location.host +
+                      "/portal/" +
+                      item.id}
+                  </a>
+                }
               />
             </List.Item>
           )}
@@ -210,8 +203,10 @@ export const PortalSettings = () => {
       <Modal
         width="600px"
         visible={visible}
-        title={mode === "edit" ? "Edit team " + teamName : "Create new team"}
-        okText="Save team"
+        title={
+          mode === "edit" ? "Edit portal " + portalName : "Create new portal"
+        }
+        okText="Save portal"
         onCancel={onCancel}
         cancelText="Cancel"
         onOk={() => {
@@ -227,7 +222,7 @@ export const PortalSettings = () => {
         }}
       >
         <Space style={{ width: "100%" }} direction="vertical">
-          <Form name="team" form={form} layout="vertical">
+          <Form name="portal" form={form} layout="vertical">
             {mode === "create" ? (
               <Form.Item
                 name="name"
@@ -244,64 +239,15 @@ export const PortalSettings = () => {
               ""
             )}
             <Form.Item
-              name="manageWorkspace"
-              valuePropName="checked"
-              label="Manage Workspaces"
+              name="definition"
+              rules={[{ required: true }]}
               tooltip={{
-                title:
-                  "Allow members to create and administrate all workspaces within the organization",
+                title: "Must be a valid Yaml definition",
                 icon: <InfoCircleOutlined />,
               }}
+              label="Definition"
             >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageModule"
-              valuePropName="checked"
-              label="Manage Modules"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all modules within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageProvider"
-              valuePropName="checked"
-              label="Manage Providers"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all providers within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageVcs"
-              valuePropName="checked"
-              label="Manage VCS Settings"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all VCS Settings within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageTemplate"
-              valuePropName="checked"
-              label="Manage Templates"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all Templates within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
+              <TextArea rows={8} />
             </Form.Item>
           </Form>
         </Space>
