@@ -8,5 +8,7 @@ public enum FlowType {
     customScripts,
     approval,
 
-    yamlError
+    yamlError,
+
+    disableWorkspace
 }

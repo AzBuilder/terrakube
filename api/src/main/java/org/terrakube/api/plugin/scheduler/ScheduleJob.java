@@ -8,6 +8,7 @@ import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.FlowType;
+import org.terrakube.api.plugin.softdelete.SoftDeleteService;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.StepRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
@@ -43,6 +44,8 @@ public class ScheduleJob implements org.quartz.Job {
 
     WorkspaceRepository workspaceRepository;
 
+    SoftDeleteService softDeleteService;
+
     @Transactional
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -70,7 +73,7 @@ public class ScheduleJob implements org.quartz.Job {
             case rejected:
                 try {
                     log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
-                    cancelJobSteps(job.getId());
+                    updateJobStepsWithStatus(job.getId(), JobStatus.failed);
                     jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
                 } catch (SchedulerException e) {
                     log.error(e.getMessage());
@@ -112,11 +115,26 @@ public class ScheduleJob implements org.quartz.Job {
                     jobRepository.save(job);
                     log.info("Waiting Approval for Job {} Step Id {}", job.getId(), stepId);
                     break;
+                case disableWorkspace:
+                    log.warn("Disable workspace {} updating status to COMPLETED", job.getId());
+                    job.setStatus(JobStatus.completed);
+                    jobRepository.save(job);
+                    log.warn("Disable workspace scheduler for {} {}", job.getWorkspace().getId(), job.getWorkspace().getName());
+                    softDeleteService.disableWorkspaceSchedules(job.getWorkspace());
+                    log.warn("Remove current job context");
+                    removeJobContext(job, jobExecutionContext);
+                    log.warn("Unlock workspace");
+                    unlockWorkspace(job);
+                    log.warn("Update workspace deleted to true");
+                    Workspace workspace = job.getWorkspace();
+                    workspace.setDeleted(true);
+                    workspaceRepository.save(workspace);
+                    break;
                 case yamlError:
                     log.error("Terrakube Template error, please verify the template definition");
                     job.setStatus(JobStatus.failed);
                     jobRepository.save(job);
-                    cancelJobSteps(job.getId());
+                    updateJobStepsWithStatus(job.getId(), JobStatus.failed);
                     break;
                 default:
                     log.error("FlowType not supported");
@@ -157,11 +175,11 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
-    private void cancelJobSteps(int jobId) {
+    private void updateJobStepsWithStatus(int jobId, JobStatus jobStatus) {
         log.warn("Cancelling pending steps");
         for (Step step : stepRepository.findByJobId(jobId)) {
             if (step.getStatus().equals(JobStatus.pending) || step.getStatus().equals(JobStatus.running)) {
-                step.setStatus(JobStatus.cancelled);
+                step.setStatus(jobStatus);
                 stepRepository.save(step);
             }
         }
