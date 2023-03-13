@@ -15,7 +15,7 @@
     <description>Spring Boot Terrakube API</description>
     <properties>
         <java.version>17</java.version>
-        <elide.version>6.1.10</elide.version>
+        <elide.version>6.1.12</elide.version>
         <liquibase-core.version>4.8.0</liquibase-core.version>
         <azure.version>4.0.0</azure.version>
         <mssql-jdbc.version>9.2.1.jre11</mssql-jdbc.version>
