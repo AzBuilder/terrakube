@@ -16,7 +16,7 @@ Update the /etc/hosts file adding the following entries:
 
 ```bash
 git clone https://github.com/AzBuilder/terrakube.git
-cd docker-compose
+cd terrakube/docker-compose
 docker-compose up -d
 ```
 
