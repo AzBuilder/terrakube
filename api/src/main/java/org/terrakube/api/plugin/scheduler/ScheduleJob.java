@@ -107,6 +107,12 @@ public class ScheduleJob implements org.quartz.Job {
                         log.error("Error when sending context to executor marking job {} as failed", job.getId());
                         job.setStatus(JobStatus.failed);
                         jobRepository.save(job);
+                        for(Step step: job.getStep()){
+                            if(step.getStatus().equals(JobStatus.pending)) {
+                                step.setName("Error sending job, please check logs");
+                                stepRepository.save(step);
+                            }
+                        }
                     }
                     break;
                 case approval:
