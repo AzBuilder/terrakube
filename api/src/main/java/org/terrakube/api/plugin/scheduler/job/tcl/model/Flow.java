@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 
 @ToString
 @Getter
@@ -17,6 +18,10 @@ public class Flow {
     private String error;
     private int step;
     List<Command> commands;
+
+    Map<String, String> inputsEnv;
+
+    Map<String, String> inputsTerraform;
 
     ImportComands importComands;
 }

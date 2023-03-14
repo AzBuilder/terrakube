@@ -60,11 +60,10 @@ public class ExecutorService {
 
         HashMap<String, String> variables = new HashMap<>();
         HashMap<String, String> environmentVariables = new HashMap<>();
-        environmentVariables.put("TF_IN_AUTOMATION","1");
+        environmentVariables.put("TF_IN_AUTOMATION", "1");
         environmentVariables.put("workspaceName", job.getWorkspace().getName());
         environmentVariables.put("organizationName", job.getOrganization().getName());
         List<Variable> variableList = job.getWorkspace().getVariable();
-        List<Globalvar> globalvarList = job.getOrganization().getGlobalvar();
         if (variableList != null)
             for (Variable variable : variableList) {
                 if (variable.getCategory().equals(Category.TERRAFORM)) {
@@ -77,17 +76,8 @@ public class ExecutorService {
                 log.info("Variable Key: {} Value {}", variable.getKey(), variable.isSensitive() ? "sensitive" : variable.getValue());
             }
 
-        if (globalvarList != null)
-            for (Globalvar globalvar : globalvarList) {
-                if (globalvar.getCategory().equals(Category.TERRAFORM)) {
-                    log.info("Adding terraform");
-                    variables.putIfAbsent(globalvar.getKey(), globalvar.getValue());
-                } else {
-                    log.info("Adding environment variable");
-                    environmentVariables.putIfAbsent(globalvar.getKey(), globalvar.getValue());
-                }
-                log.info("Global Variable Key: {} Value {}", globalvar.getKey(), globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
-            }
+        environmentVariables = loadEnvironmentVariables(job, flow, variables);
+        variables = loadTerraformVariables(job, flow, variables);
 
         executorContext.setVariables(variables);
         executorContext.setEnvironmentVariables(environmentVariables);
@@ -116,11 +106,40 @@ public class ExecutorService {
                 executed = true;
             } else
                 executed = false;
-        } catch( RestClientException ex){
+        } catch (RestClientException ex) {
             log.error(ex.getMessage());
             executed = false;
         }
-        
+
         return executed;
+    }
+
+    private HashMap<String, String> loadEnvironmentVariables(Job job, Flow flow, HashMap<String, String> workspaceEnvVariables) {
+        if (flow.getInputsEnv() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsEnv() != null)) {
+
+        } else {
+            workspaceEnvVariables = loadDefault(job, Category.ENV, workspaceEnvVariables);
+        }
+        return workspaceEnvVariables;
+    }
+
+    private HashMap<String, String> loadTerraformVariables(Job job, Flow flow, HashMap<String, String> workspaceTerraformVariables) {
+        if (flow.getInputsTerraform() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsTerraform() != null)) {
+
+        } else {
+            workspaceTerraformVariables = loadDefault(job, Category.TERRAFORM, workspaceTerraformVariables);
+        }
+        return workspaceTerraformVariables;
+    }
+
+    private HashMap<String, String> loadDefault(Job job, Category category, HashMap<String, String> workspaceData){
+        if (job.getOrganization().getGlobalvar() != null)
+            for (Globalvar globalvar : job.getOrganization().getGlobalvar()) {
+                if (globalvar.getCategory().equals(category)) {
+                    workspaceData.putIfAbsent(globalvar.getKey(), globalvar.getValue());
+                }
+                log.info("Adding {} Variable Key: {} Value {}", category, globalvar.getKey(), globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
+            }
+        return workspaceData;
     }
 }
