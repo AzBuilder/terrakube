@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.terrakube.api.plugin.scheduler.ScheduleJobService.PREFIX_JOB_CONTEXT;
 
@@ -104,9 +105,12 @@ public class ScheduleJob implements org.quartz.Job {
                     if (executorService.execute(job, stepId, flow.get()))
                         log.info("Executing Job {} Step Id {}", job.getId(), stepId);
                     else {
-                        log.error("Error when sending context to executor marking job {} as failed", job.getId());
+                        log.error("Error when sending context to executor marking job {} as failed, step count {}", job.getId(), job.getStep().size());
                         job.setStatus(JobStatus.failed);
                         jobRepository.save(job);
+                        Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
+                        step.setName("Error sending to executor, check logs");
+                        stepRepository.save(step);                     
                     }
                     break;
                 case approval:

@@ -1,6 +1,7 @@
 package org.terrakube.api.plugin.scheduler.job.tcl.executor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestClientException;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.rs.globalvar.Globalvar;
@@ -102,16 +103,24 @@ public class ExecutorService {
 
     private boolean sendToExecutor(Job job, ExecutorContext executorContext) {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(this.executorUrl, executorContext, ExecutorContext.class);
-        executorContext.setAccessToken("****");
-        log.info("Sending Job: /n {}", executorContext);
-        log.info("Response Status: {}", response.getStatusCode().value());
+        boolean executed = false;
+        try {
+            ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(this.executorUrl, executorContext, ExecutorContext.class);
+            executorContext.setAccessToken("****");
+            log.info("Sending Job: /n {}", executorContext);
+            log.info("Response Status: {}", response.getStatusCode().value());
 
-        if (response.getStatusCode().equals(HttpStatus.ACCEPTED)) {
-            job.setStatus(JobStatus.queue);
-            jobRepository.save(job);
-            return true;
-        } else
-            return false;
+            if (response.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+                job.setStatus(JobStatus.queue);
+                jobRepository.save(job);
+                executed = true;
+            } else
+                executed = false;
+        } catch( RestClientException ex){
+            log.error(ex.getMessage());
+            executed = false;
+        }
+        
+        return executed;
     }
 }
