@@ -12,6 +12,7 @@ import org.terrakube.api.rs.provider.Provider;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.template.Template;
+import org.terrakube.api.rs.portal.Portal;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
@@ -34,7 +35,7 @@ import java.util.UUID;
 public class Organization {
 
     @Id
-    @Type(type="uuid-char")
+    @Type(type = "uuid-char")
     @GeneratedValue
     private UUID id;
 
@@ -80,4 +81,7 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<Globalvar> globalvar;
+
+    @OneToMany(mappedBy = "organization")
+    private List<Portal> portal;
 }

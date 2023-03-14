@@ -20,6 +20,7 @@ const { SubMenu } = Menu;
 
 export const RegistryMenu = (props) => {
   const [orgs, setOrgs] = useState([]);
+  const [menuHidden, setMenuHidden] = useState(false);
   const [defaultSelected, setDefaultSelected] = useState(["registry"]);
   const { organizationName, setOrganizationName, history } = props;
   const location = useLocation();
@@ -31,13 +32,16 @@ export const RegistryMenu = (props) => {
         localStorage.getItem(ORGANIZATION_NAME) || "select organization"
       );
     });
-    console.log(location.pathname.includes("registry"));
     if (location.pathname.includes("registry")) {
       setDefaultSelected(["registry"]);
     } else if (location.pathname.includes("settings")) {
       setDefaultSelected(["settings"]);
     } else {
       setDefaultSelected(["workspaces"]);
+    }
+
+    if (location.pathname.includes("portal")) {
+      setMenuHidden(true);
     }
   }, [organizationId]);
 
@@ -67,7 +71,12 @@ export const RegistryMenu = (props) => {
 
   return (
     <>
-      <Menu selectedKeys={defaultSelected} theme="dark" mode="horizontal">
+      <Menu
+        hidden={menuHidden}
+        selectedKeys={defaultSelected}
+        theme="dark"
+        mode="horizontal"
+      >
         <SubMenu
           key="organization-name"
           icon={<DownCircleOutlined />}
