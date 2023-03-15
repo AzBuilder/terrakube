@@ -122,11 +122,11 @@ public class ExecutorService {
     private HashMap<String, String> loadOtherEnvironmentVariables(Job job, Flow flow, HashMap<String, String> workspaceEnvVariables) {
         if (flow.getInputsEnv() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsEnv() != null)) {
             if (flow.getImportComands() != null && flow.getImportComands().getInputsEnv() != null) {
-                workspaceEnvVariables = loadInputData(job, Category.ENV, flow.getImportComands().getInputsEnv(), workspaceEnvVariables);
+                workspaceEnvVariables = loadInputData(job, Category.ENV, new HashMap(flow.getImportComands().getInputsEnv()), workspaceEnvVariables);
             }
 
             if (flow.getInputsEnv() != null) {
-                workspaceEnvVariables = loadInputData(job, Category.ENV, flow.getInputsEnv(), workspaceEnvVariables);
+                workspaceEnvVariables = loadInputData(job, Category.ENV, new HashMap(flow.getInputsEnv()), workspaceEnvVariables);
             }
 
         } else {
@@ -138,11 +138,11 @@ public class ExecutorService {
     private HashMap<String, String> loadOtherTerraformVariables(Job job, Flow flow, HashMap<String, String> workspaceTerraformVariables) {
         if (flow.getInputsTerraform() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsTerraform() != null)) {
             if (flow.getImportComands() != null && flow.getImportComands().getInputsTerraform() != null) {
-                workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, flow.getImportComands().getInputsTerraform(), workspaceTerraformVariables);
+                workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, new HashMap(flow.getImportComands().getInputsTerraform()), workspaceTerraformVariables);
             }
 
             if (flow.getInputsEnv() != null) {
-                workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, flow.getInputsTerraform(), workspaceTerraformVariables);
+                workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, new HashMap(flow.getInputsTerraform()), workspaceTerraformVariables);
             }
 
         } else {
