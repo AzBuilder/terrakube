@@ -16,6 +16,9 @@ import {
 import YAML from "yaml";
 import axiosInstance from "../../config/axiosConfig";
 import { unzip } from "unzipit";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -62,6 +65,23 @@ export const Portal = () => {
     variables:
       time:
          label: "My label"
+  - name: "Lab 1"
+    moduleSource: "azure/repository/sample"
+    moduleVersion: "1.0.0"
+    title: " "
+    description: |
+      ### Register to Lab
+      <details>
+      <summary>See steps</summary>
+      1. Navigate to the registration URL that you received from the lab creator. <br/>
+      2. Sign in to the service using your organizational or school account to complete the registration. <br/>
+      <img src="https://learn.microsoft.com/en-us/azure/lab-services/media/tutorial-connect-vm-in-classroom-lab/register-lab.png"/>
+      </details>
+      
+    iconUrl: "https://arunpotti.files.wordpress.com/2021/12/microsoft_azure.svg_.png"
+    variables:
+      time:
+         hidden: true
   `;
 
   const resources = [
@@ -183,8 +203,18 @@ export const Portal = () => {
         ) : (
           <>
             {" "}
-            <Title level={4}>Create a {service.name}</Title>
-            <div className="App-text">{service?.description}</div>
+            <Title level={4}>
+              {service?.title || "Create a " + service.name}
+            </Title>
+            <div className="App-text">
+              {" "}
+              <ReactMarkdown
+                rehypePlugins={[rehypeRaw]}
+                remarkPlugins={[remarkGfm]}
+              >
+                {service?.description}
+              </ReactMarkdown>
+            </div>
             {loading ? (
               <p>Loading fields...</p>
             ) : (
@@ -198,6 +228,7 @@ export const Portal = () => {
                             service?.variables[variable]?.label || variable
                           }
                           name={variable}
+                          hidden={service?.variables[variable]?.hidden || false}
                         >
                           {(() => {
                             switch (service?.variables[variable]?.type) {
