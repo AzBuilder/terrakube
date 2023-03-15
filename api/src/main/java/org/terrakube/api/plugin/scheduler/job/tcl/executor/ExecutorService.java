@@ -3,6 +3,7 @@ package org.terrakube.api.plugin.scheduler.job.tcl.executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestClientException;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
+import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -31,6 +33,9 @@ public class ExecutorService {
 
     @Autowired
     JobRepository jobRepository;
+
+    @Autowired
+    GlobalVarRepository globalVarRepository;
 
     @Transactional
     public boolean execute(Job job, String stepId, Flow flow) {
@@ -58,7 +63,7 @@ public class ExecutorService {
             log.info("Public Repository");
         }
 
-        HashMap<String, String> variables = new HashMap<>();
+        HashMap<String, String> terraformVariables = new HashMap<>();
         HashMap<String, String> environmentVariables = new HashMap<>();
         environmentVariables.put("TF_IN_AUTOMATION", "1");
         environmentVariables.put("workspaceName", job.getWorkspace().getName());
@@ -68,7 +73,7 @@ public class ExecutorService {
             for (Variable variable : variableList) {
                 if (variable.getCategory().equals(Category.TERRAFORM)) {
                     log.info("Adding terraform");
-                    variables.put(variable.getKey(), variable.getValue());
+                    terraformVariables.put(variable.getKey(), variable.getValue());
                 } else {
                     log.info("Adding environment variable");
                     environmentVariables.put(variable.getKey(), variable.getValue());
@@ -76,10 +81,10 @@ public class ExecutorService {
                 log.info("Variable Key: {} Value {}", variable.getKey(), variable.isSensitive() ? "sensitive" : variable.getValue());
             }
 
-        environmentVariables = loadEnvironmentVariables(job, flow, variables);
-        variables = loadTerraformVariables(job, flow, variables);
+        environmentVariables = loadOtherEnvironmentVariables(job, flow, environmentVariables);
+        terraformVariables = loadOtherTerraformVariables(job, flow, terraformVariables);
 
-        executorContext.setVariables(variables);
+        executorContext.setVariables(terraformVariables);
         executorContext.setEnvironmentVariables(environmentVariables);
 
         executorContext.setCommandList(flow.getCommands());
@@ -114,8 +119,15 @@ public class ExecutorService {
         return executed;
     }
 
-    private HashMap<String, String> loadEnvironmentVariables(Job job, Flow flow, HashMap<String, String> workspaceEnvVariables) {
+    private HashMap<String, String> loadOtherEnvironmentVariables(Job job, Flow flow, HashMap<String, String> workspaceEnvVariables) {
         if (flow.getInputsEnv() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsEnv() != null)) {
+            if (flow.getImportComands() != null && flow.getImportComands().getInputsEnv() != null) {
+                workspaceEnvVariables = loadInputData(job, Category.ENV, flow.getImportComands().getInputsEnv(), workspaceEnvVariables);
+            }
+
+            if (flow.getInputsEnv() != null) {
+                workspaceEnvVariables = loadInputData(job, Category.ENV, flow.getInputsEnv(), workspaceEnvVariables);
+            }
 
         } else {
             workspaceEnvVariables = loadDefault(job, Category.ENV, workspaceEnvVariables);
@@ -123,8 +135,15 @@ public class ExecutorService {
         return workspaceEnvVariables;
     }
 
-    private HashMap<String, String> loadTerraformVariables(Job job, Flow flow, HashMap<String, String> workspaceTerraformVariables) {
+    private HashMap<String, String> loadOtherTerraformVariables(Job job, Flow flow, HashMap<String, String> workspaceTerraformVariables) {
         if (flow.getInputsTerraform() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsTerraform() != null)) {
+            if (flow.getImportComands() != null && flow.getImportComands().getInputsTerraform() != null) {
+                workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, flow.getImportComands().getInputsTerraform(), workspaceTerraformVariables);
+            }
+
+            if (flow.getInputsEnv() != null) {
+                workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, flow.getInputsTerraform(), workspaceTerraformVariables);
+            }
 
         } else {
             workspaceTerraformVariables = loadDefault(job, Category.TERRAFORM, workspaceTerraformVariables);
@@ -132,7 +151,21 @@ public class ExecutorService {
         return workspaceTerraformVariables;
     }
 
-    private HashMap<String, String> loadDefault(Job job, Category category, HashMap<String, String> workspaceData){
+    private HashMap<String, String> loadInputData(Job job, Category categoryVar, HashMap<String, String> importFrom, HashMap<String, String> importTo) {
+        Map<String, String> finalWorkspaceEnvVariables = importTo;
+        importFrom.forEach((key, value) -> {
+            java.lang.String searchValue = value.replace("$", "");
+            Globalvar globalvar = globalVarRepository.getGlobalvarByOrganizationAndCategoryAndKey(job.getOrganization(), categoryVar, searchValue);
+            log.info("Searching globalvar {} ({}) in Org {} found {}", searchValue, categoryVar, job.getOrganization().getName(), (globalvar != null) ? true : false);
+            if (globalvar != null) {
+                finalWorkspaceEnvVariables.putIfAbsent(key, globalvar.getValue());
+            }
+        });
+
+        return new HashMap(finalWorkspaceEnvVariables);
+    }
+
+    private HashMap<String, String> loadDefault(Job job, Category category, HashMap<String, String> workspaceData) {
         if (job.getOrganization().getGlobalvar() != null)
             for (Globalvar globalvar : job.getOrganization().getGlobalvar()) {
                 if (globalvar.getCategory().equals(category)) {
