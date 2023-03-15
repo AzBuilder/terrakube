@@ -36,17 +36,32 @@ export const Portal = () => {
     iconUrl: "https://pbs.twimg.com/media/FPk1KFTXIAYrBC6.png"
   - name: "Grafana"
     moduleSource: "azure/repository/sample"
-    moduleVersion: "1.0.0"
+    moduleVersion: "1.1.0"
     description: "Create a virtual machine that runs Linux or Windows. Select an image from Azure marketplace or use your own customized image."
     iconUrl: "https://cdn.worldvectorlogo.com/logos/grafana.svg"
+    variables:
+      time:
+         type: "inputNumber"
   - name: "Service 3"
     moduleSource: "azure/repository/sample"
-    moduleVersion: "1.0.0"
+    moduleVersion: "1.1.0"
     iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfOAminWvMkr1_XtolJpSX-uRnvnvdcNwh-w&usqp=CAU"
+    variables:
+      time:
+         label: "Time label"
+         type: "inputNumber"
+      name:
+         type: "select"
+         options:
+            - "Size 1"
+            - "Size 2"
   - name: "Cloud Storage"
     moduleSource: "azure/repository/sample"
     moduleVersion: "1.0.0"
     iconUrl: "https://download.logo.wine/logo/Google_Storage/Google_Storage-Logo.wine.png"
+    variables:
+      time:
+         label: "My label"
   `;
 
   const resources = [
@@ -61,15 +76,6 @@ export const Portal = () => {
     },
   ];
 
-  const variables = {
-    time: {
-      type: "inputNumber",
-    },
-    name: {
-      type: "select",
-      options: ["size 1", "size 2"],
-    },
-  };
   const handleClick = (item) => {
     setLoading(true);
     setService(item);
@@ -186,10 +192,15 @@ export const Portal = () => {
                 {moduleVariables.map((variable) => {
                   return (
                     <>
-                      {variables.hasOwnProperty(variable) ? (
-                        <Form.Item label={variable} name={variable}>
+                      {service?.variables?.hasOwnProperty(variable) ? (
+                        <Form.Item
+                          label={
+                            service?.variables[variable]?.label || variable
+                          }
+                          name={variable}
+                        >
                           {(() => {
-                            switch (variables[variable]?.type) {
+                            switch (service?.variables[variable]?.type) {
                               case "input":
                                 return <Input />;
                               case "inputNumber":
@@ -197,7 +208,7 @@ export const Portal = () => {
                               case "select":
                                 return (
                                   <Select>
-                                    {variables[variable]?.options.map(
+                                    {service?.variables[variable]?.options.map(
                                       (option) => {
                                         return (
                                           <Option value={option}>
