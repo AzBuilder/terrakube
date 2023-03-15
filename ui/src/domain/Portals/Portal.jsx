@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import {
   Layout,
   Breadcrumb,
@@ -14,28 +14,38 @@ import {
   Select,
 } from "antd";
 import YAML from "yaml";
+import axiosInstance from "../../config/axiosConfig";
+import { unzip } from "unzipit";
 
 const { Title } = Typography;
 const { Content } = Layout;
 const { TabPane } = Tabs;
+const hcl = require("hcl2-parser");
 
 export const Portal = () => {
   const [mode, setMode] = useState("list");
+  const [moduleInputs, setModuleInputs] = useState([]);
   const [service, setService] = useState({});
+  const [loading, setLoading] = useState(false);
+
   let servicesYaml = `
   - name: "Virtual Machine"
-    moduleSource: "terrakube/azure-vm/azurerm"
+    moduleSource: "azure/repository/sample"
+    moduleVersion: "1.0.0"
     description: "Create a virtual machine that runs Linux or Windows. Select an image from Azure marketplace or use your own customized image."
     iconUrl: "https://pbs.twimg.com/media/FPk1KFTXIAYrBC6.png"
   - name: "Grafana"
-    moduleSource: "terrakube/azure-vm/azurerm"
+    moduleSource: "azure/repository/sample"
+    moduleVersion: "1.0.0"
     description: "Create a virtual machine that runs Linux or Windows. Select an image from Azure marketplace or use your own customized image."
     iconUrl: "https://cdn.worldvectorlogo.com/logos/grafana.svg"
   - name: "Service 3"
-    moduleSource: "terrakube/azure-vm/azurerm"
+    moduleSource: "azure/repository/sample"
+    moduleVersion: "1.0.0"
     iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfOAminWvMkr1_XtolJpSX-uRnvnvdcNwh-w&usqp=CAU"
   - name: "Cloud Storage"
-    moduleSource: "terrakube/azure-vm/azurerm"
+    moduleSource: "azure/repository/sample"
+    moduleVersion: "1.0.0"
     iconUrl: "https://download.logo.wine/logo/Google_Storage/Google_Storage-Logo.wine.png"
   `;
 
@@ -51,27 +61,55 @@ export const Portal = () => {
     },
   ];
 
-  const inputs = [
-    {
-      name: "name",
-      defaultValue: "test",
-      type: "input",
+  const inputs = {
+    time: {
+      defaultValue: "15",
+      type: "inputNumber",
     },
-    {
-      name: "size",
+    size: {
       defaultValue: "s3",
       type: "select",
       options: ["size 1", "size 2"],
     },
-  ];
+  };
   const handleClick = (item) => {
+    setLoading(true);
     setService(item);
     setMode("create");
+    loadInputs(item);
   };
+
+  const loadInputs = (item) => {
+    axiosInstance
+      .get(
+        `${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${item.moduleSource}/${item.moduleVersion}/download`
+      )
+      .then((resp) => {
+        readHCL(resp.headers["x-terraform-get"]);
+      });
+  };
+
+  async function readHCL(url) {
+    const { entries } = await unzip(url);
+    var hclString = "";
+    for (const [name, entry] of Object.entries(entries)) {
+      if (name.includes(".tf") && !name.includes("/")) {
+        var contentText = await entry.text();
+        hclString += "\n" + contentText;
+      }
+    }
+
+    const hclResult = hcl.parseToObject(hclString);
+    console.log(Object.keys(hclResult[0]?.variable));
+    setModuleInputs(Object.keys(hclResult[0]?.variable));
+    setLoading(false);
+  }
 
   const cancelClick = () => {
     setMode("list");
   };
+
+  useEffect(() => {}, []);
   return (
     <Content style={{ padding: "0 50px" }}>
       <Breadcrumb style={{ margin: "16px 0" }}></Breadcrumb>
@@ -144,41 +182,59 @@ export const Portal = () => {
             {" "}
             <Title level={4}>Create a {service.name}</Title>
             <div className="App-text">{service?.description}</div>
-            <Form name="execute">
-              {inputs.map((input, index) => {
-                return (
-                  <Form.Item label={input.name} name={input.name}>
-                    {(() => {
-                      switch (input.type) {
-                        case "input":
-                          return <Input />;
-                        case "inputNumber":
-                          return <InputNumber />;
-                        case "select":
-                          return (
-                            <Select>
-                              {input.options.map((option, index) => {
-                                return <Option value={option}>{option}</Option>;
-                              })}
-                            </Select>
-                          );
-                        default:
-                          return <Input />;
-                      }
-                    })()}
-                  </Form.Item>
-                );
-              })}
-              <Form.Item>
-                <Button onClick={cancelClick} type="default">
-                  Cancel
-                </Button>{" "}
-                &nbsp;
-                <Button type="primary" htmlType="submit">
-                  Create
-                </Button>
-              </Form.Item>
-            </Form>
+            {loading ? (
+              <p>Loading fields...</p>
+            ) : (
+              <Form name="execute">
+                {moduleInputs.map((input) => {
+                  return (
+                    <>
+                      {inputs.hasOwnProperty(input) ? (
+                        <Form.Item label={input} name={input}>
+                          {(() => {
+                            switch (inputs[input]?.type) {
+                              case "input":
+                                return <Input />;
+                              case "inputNumber":
+                                return <InputNumber />;
+                              case "select":
+                                return (
+                                  <Select>
+                                    {inputs[input]?.options.map(
+                                      (option, index) => {
+                                        return (
+                                          <Option value={option}>
+                                            {option}
+                                          </Option>
+                                        );
+                                      }
+                                    )}
+                                  </Select>
+                                );
+                              default:
+                                return <Input />;
+                            }
+                          })()}
+                        </Form.Item>
+                      ) : (
+                        <Form.Item label={input} name={input}>
+                          <Input />
+                        </Form.Item>
+                      )}
+                    </>
+                  );
+                })}
+                <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Create
+                  </Button>{" "}
+                  &nbsp;
+                  <Button onClick={cancelClick} type="default">
+                    Cancel
+                  </Button>{" "}
+                </Form.Item>
+              </Form>
+            )}
           </>
         )}
       </div>
