@@ -24,14 +24,14 @@ const hcl = require("hcl2-parser");
 
 export const Portal = () => {
   const [mode, setMode] = useState("list");
-  const [moduleInputs, setModuleInputs] = useState([]);
+  const [moduleVariables, setModuleVariables] = useState([]);
   const [service, setService] = useState({});
   const [loading, setLoading] = useState(false);
 
   let servicesYaml = `
   - name: "Virtual Machine"
     moduleSource: "azure/repository/sample"
-    moduleVersion: "1.0.0"
+    moduleVersion: "1.1.0"
     description: "Create a virtual machine that runs Linux or Windows. Select an image from Azure marketplace or use your own customized image."
     iconUrl: "https://pbs.twimg.com/media/FPk1KFTXIAYrBC6.png"
   - name: "Grafana"
@@ -61,13 +61,11 @@ export const Portal = () => {
     },
   ];
 
-  const inputs = {
+  const variables = {
     time: {
-      defaultValue: "15",
       type: "inputNumber",
     },
-    size: {
-      defaultValue: "s3",
+    name: {
       type: "select",
       options: ["size 1", "size 2"],
     },
@@ -76,10 +74,10 @@ export const Portal = () => {
     setLoading(true);
     setService(item);
     setMode("create");
-    loadInputs(item);
+    loadModuleVariables(item);
   };
 
-  const loadInputs = (item) => {
+  const loadModuleVariables = (item) => {
     axiosInstance
       .get(
         `${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${item.moduleSource}/${item.moduleVersion}/download`
@@ -100,8 +98,7 @@ export const Portal = () => {
     }
 
     const hclResult = hcl.parseToObject(hclString);
-    console.log(Object.keys(hclResult[0]?.variable));
-    setModuleInputs(Object.keys(hclResult[0]?.variable));
+    setModuleVariables(Object.keys(hclResult[0]?.variable));
     setLoading(false);
   }
 
@@ -186,13 +183,13 @@ export const Portal = () => {
               <p>Loading fields...</p>
             ) : (
               <Form name="execute">
-                {moduleInputs.map((input) => {
+                {moduleVariables.map((variable) => {
                   return (
                     <>
-                      {inputs.hasOwnProperty(input) ? (
-                        <Form.Item label={input} name={input}>
+                      {variables.hasOwnProperty(variable) ? (
+                        <Form.Item label={variable} name={variable}>
                           {(() => {
-                            switch (inputs[input]?.type) {
+                            switch (variables[variable]?.type) {
                               case "input":
                                 return <Input />;
                               case "inputNumber":
@@ -200,8 +197,8 @@ export const Portal = () => {
                               case "select":
                                 return (
                                   <Select>
-                                    {inputs[input]?.options.map(
-                                      (option, index) => {
+                                    {variables[variable]?.options.map(
+                                      (option) => {
                                         return (
                                           <Option value={option}>
                                             {option}
@@ -217,7 +214,7 @@ export const Portal = () => {
                           })()}
                         </Form.Item>
                       ) : (
-                        <Form.Item label={input} name={input}>
+                        <Form.Item label={variable} name={variable}>
                           <Input />
                         </Form.Item>
                       )}
