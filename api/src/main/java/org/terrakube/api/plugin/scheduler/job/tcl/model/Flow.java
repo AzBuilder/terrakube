@@ -19,6 +19,8 @@ public class Flow {
     private int step;
     List<Command> commands;
 
+    List<ScheduleTemplate> templates;
+
     Map<String, String> inputsEnv;
 
     Map<String, String> inputsTerraform;

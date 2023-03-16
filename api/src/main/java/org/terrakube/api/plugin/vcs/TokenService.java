@@ -43,7 +43,7 @@ public class TokenService {
         Vcs vcs = vcsRepository.findByCallback(vcsId);
         if (vcs == null){
             log.info("Searching VCS by Id");
-            vcs = vcsRepository.getById(UUID.fromString(vcsId));
+            vcs = vcsRepository.getReferenceById(UUID.fromString(vcsId));
         } else {
             log.info("VCS found with custom callback");
         }

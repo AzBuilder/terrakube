@@ -102,7 +102,7 @@ public class ScheduleJobService {
 
     @Transactional
     public void unlockWorkpace(UUID workspaceId){
-        Workspace workspace = workspaceRepository.getById(workspaceId);
+        Workspace workspace = workspaceRepository.getReferenceById(workspaceId);
         workspace.setLocked(false);
         workspaceRepository.save(workspace);
     }

@@ -37,7 +37,7 @@ public class ContextController {
         String savedContext = "{}";
         try {
             new ObjectMapper().readTree(context);
-            Job job = jobRepository.getById(jobId);
+            Job job = jobRepository.getReferenceById(jobId);
             if (job !=null && job.getStatus().equals(JobStatus.running))
                 savedContext = storageTypeService.saveContext(jobId, context);
         } catch (JacksonException e) {

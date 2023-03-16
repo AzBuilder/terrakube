@@ -75,7 +75,7 @@ public class MigrateJobs implements ApplicationListener<ContextRefreshedEvent> {
         log.info("Reschedule Vcs JobKey {}", jobKey);
         int minutes = Calendar.getInstance().get(Calendar.MINUTE);
         String vcsId = jobKey.replace(DEPRECATED_PREFIX_JOB_VCS, "");
-        Vcs vcs = vcsRepository.getById(UUID.fromString(vcsId));
+        Vcs vcs = vcsRepository.getReferenceById(UUID.fromString(vcsId));
         try {
             switch (vcs.getVcsType()) {
                 case GITHUB:
@@ -104,7 +104,7 @@ public class MigrateJobs implements ApplicationListener<ContextRefreshedEvent> {
     public void rescheduleJob(String jobKey) {
         log.info("Reschedule Job Context {}", jobKey);
         int jobId = Integer.parseInt(jobKey.replace(DEPRECATED_PREFIX_JOB_CONTEXT, ""));
-        Job job = jobRepository.getById(jobId);
+        Job job = jobRepository.getReferenceById(jobId);
         try {
             scheduleJobService.createJobContext(job);
             scheduler.deleteJob(JobKey.jobKey(jobKey));
@@ -116,7 +116,7 @@ public class MigrateJobs implements ApplicationListener<ContextRefreshedEvent> {
     public void rescheduleJobTrigger(String jobKey) {
         log.info("Reschedule Job Trigger {}", jobKey);
         String scheduleId = jobKey.replace(DEPRECATED_PREFIX_JOB_TRIGGER, "");
-        Schedule schedule = scheduleRepository.getById(UUID.fromString(scheduleId));
+        Schedule schedule = scheduleRepository.getReferenceById(UUID.fromString(scheduleId));
         try {
             scheduleJobService.createJobTrigger(schedule.getCron(), scheduleId);
             scheduler.deleteJob(JobKey.jobKey(jobKey));

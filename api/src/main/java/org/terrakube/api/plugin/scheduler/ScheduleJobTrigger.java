@@ -40,7 +40,7 @@ public class ScheduleJobTrigger implements org.quartz.Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         String triggerId = jobExecutionContext.getJobDetail().getJobDataMap().getString(TRIGGER_ID);
-        Schedule schedule = scheduleRepository.getById(UUID.fromString(triggerId));
+        Schedule schedule = scheduleRepository.getReferenceById(UUID.fromString(triggerId));
 
         if (!schedule.getWorkspace().isLocked()) {
             log.info("Creating new job for triggerId: {}", triggerId);
@@ -48,7 +48,7 @@ public class ScheduleJobTrigger implements org.quartz.Job {
             job.setWorkspace(schedule.getWorkspace());
             job.setOrganization(schedule.getWorkspace().getOrganization());
             if (schedule.getTemplateReference() != null) {
-                Template template = templateRepository.getById(UUID.fromString(schedule.getTemplateReference()));
+                Template template = templateRepository.getReferenceById(UUID.fromString(schedule.getTemplateReference()));
                 job.setTcl(template.getTcl());
                 job.setTemplateReference(schedule.getTemplateReference());
             } else {

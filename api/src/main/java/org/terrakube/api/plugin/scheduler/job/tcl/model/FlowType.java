@@ -10,5 +10,7 @@ public enum FlowType {
 
     yamlError,
 
-    disableWorkspace
+    disableWorkspace,
+
+    scheduleTemplates
 }
