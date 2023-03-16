@@ -122,14 +122,17 @@ public class ExecutorService {
     private HashMap<String, String> loadOtherEnvironmentVariables(Job job, Flow flow, HashMap<String, String> workspaceEnvVariables) {
         if (flow.getInputsEnv() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsEnv() != null)) {
             if (flow.getImportComands() != null && flow.getImportComands().getInputsEnv() != null) {
+                log.info("Loading ENV inputs from ImportComands");
                 workspaceEnvVariables = loadInputData(job, Category.ENV, new HashMap(flow.getImportComands().getInputsEnv()), workspaceEnvVariables);
             }
 
             if (flow.getInputsEnv() != null) {
+                log.info("Loading ENV inputs from InputsEnv");
                 workspaceEnvVariables = loadInputData(job, Category.ENV, new HashMap(flow.getInputsEnv()), workspaceEnvVariables);
             }
 
         } else {
+            log.info("Loading default env variables to job");
             workspaceEnvVariables = loadDefault(job, Category.ENV, workspaceEnvVariables);
         }
         return workspaceEnvVariables;
@@ -138,14 +141,17 @@ public class ExecutorService {
     private HashMap<String, String> loadOtherTerraformVariables(Job job, Flow flow, HashMap<String, String> workspaceTerraformVariables) {
         if (flow.getInputsTerraform() != null || (flow.getImportComands() != null && flow.getImportComands().getInputsTerraform() != null)) {
             if (flow.getImportComands() != null && flow.getImportComands().getInputsTerraform() != null) {
+                log.info("Loading TERRAFORM inputs from ImportComands");
                 workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, new HashMap(flow.getImportComands().getInputsTerraform()), workspaceTerraformVariables);
             }
 
-            if (flow.getInputsEnv() != null) {
+            if (flow.getInputsTerraform() != null) {
+                log.info("Loading TERRAFORM inputs from InputsTerraform");
                 workspaceTerraformVariables = loadInputData(job, Category.TERRAFORM, new HashMap(flow.getInputsTerraform()), workspaceTerraformVariables);
             }
 
         } else {
+            log.info("Loading default env variables to job");
             workspaceTerraformVariables = loadDefault(job, Category.TERRAFORM, workspaceTerraformVariables);
         }
         return workspaceTerraformVariables;
@@ -170,8 +176,8 @@ public class ExecutorService {
             for (Globalvar globalvar : job.getOrganization().getGlobalvar()) {
                 if (globalvar.getCategory().equals(category)) {
                     workspaceData.putIfAbsent(globalvar.getKey(), globalvar.getValue());
+                    log.info("Adding {} Variable Key: {} Value {}", category, globalvar.getKey(), globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
                 }
-                log.info("Adding {} Variable Key: {} Value {}", category, globalvar.getKey(), globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
             }
         return workspaceData;
     }
