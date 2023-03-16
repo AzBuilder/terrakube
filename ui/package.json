@@ -36,6 +36,7 @@
     "react-scripts": "5.0.1",
     "react-social-login-buttons": "^3.6.1",
     "redux": "^4.2.0",
+    "rehype-raw": "^6.1.1",
     "remark-gfm": "^3.0.1",
     "unzipit": "^1.3.5",
     "uuid": "^9.0.0",

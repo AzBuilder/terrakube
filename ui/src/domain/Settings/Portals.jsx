@@ -186,10 +186,22 @@ export const PortalSettings = () => {
                 }
                 title={item.attributes.name}
                 description={
-                  <a>
+                  <a
+                    href={
+                      location.protocol +
+                      "//" +
+                      location.host +
+                      "/organizations/" +
+                      orgid +
+                      "/portal/" +
+                      item.id
+                    }
+                  >
                     {location.protocol +
                       "//" +
                       location.host +
+                      "/organizations/" +
+                      orgid +
                       "/portal/" +
                       item.id}
                   </a>

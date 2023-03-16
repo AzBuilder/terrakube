@@ -97,7 +97,7 @@ const App = () => {
           <Route exact path="/settings/tokens">
             <UserSettings />
           </Route>
-          <Route exact path="/portal/:portalid">
+          <Route exact path="/organizations/:orgid/portal/:portalid">
             <Portal />
           </Route>
         </Switch>

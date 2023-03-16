@@ -19,70 +19,22 @@ import { unzip } from "unzipit";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import { useParams } from "react-router-dom";
+import { Buffer } from "buffer";
 
 const { Title } = Typography;
 const { Content } = Layout;
 const { TabPane } = Tabs;
+const { Option } = Select;
 const hcl = require("hcl2-parser");
 
 export const Portal = () => {
+  const { orgid, portalid } = useParams();
   const [mode, setMode] = useState("list");
   const [moduleVariables, setModuleVariables] = useState([]);
   const [service, setService] = useState({});
+  const [services, setServices] = useState("");
   const [loading, setLoading] = useState(false);
-
-  let servicesYaml = `
-  - name: "Virtual Machine"
-    moduleSource: "azure/repository/sample"
-    moduleVersion: "1.1.0"
-    description: "Create a virtual machine that runs Linux or Windows. Select an image from Azure marketplace or use your own customized image."
-    iconUrl: "https://pbs.twimg.com/media/FPk1KFTXIAYrBC6.png"
-  - name: "Grafana"
-    moduleSource: "azure/repository/sample"
-    moduleVersion: "1.1.0"
-    description: "Create a virtual machine that runs Linux or Windows. Select an image from Azure marketplace or use your own customized image."
-    iconUrl: "https://cdn.worldvectorlogo.com/logos/grafana.svg"
-    variables:
-      time:
-         type: "inputNumber"
-  - name: "Service 3"
-    moduleSource: "azure/repository/sample"
-    moduleVersion: "1.1.0"
-    iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfOAminWvMkr1_XtolJpSX-uRnvnvdcNwh-w&usqp=CAU"
-    variables:
-      time:
-         label: "Time label"
-         type: "inputNumber"
-      name:
-         type: "select"
-         options:
-            - "Size 1"
-            - "Size 2"
-  - name: "Cloud Storage"
-    moduleSource: "azure/repository/sample"
-    moduleVersion: "1.0.0"
-    iconUrl: "https://download.logo.wine/logo/Google_Storage/Google_Storage-Logo.wine.png"
-    variables:
-      time:
-         label: "My label"
-  - name: "Lab 1"
-    moduleSource: "azure/repository/sample"
-    moduleVersion: "1.0.0"
-    title: " "
-    description: |
-      ### Register to Lab
-      <details>
-      <summary>See steps</summary>
-      1. Navigate to the registration URL that you received from the lab creator. <br/>
-      2. Sign in to the service using your organizational or school account to complete the registration. <br/>
-      <img src="https://learn.microsoft.com/en-us/azure/lab-services/media/tutorial-connect-vm-in-classroom-lab/register-lab.png"/>
-      </details>
-      
-    iconUrl: "https://arunpotti.files.wordpress.com/2021/12/microsoft_azure.svg_.png"
-    variables:
-      time:
-         hidden: true
-  `;
 
   const resources = [
     {
@@ -132,7 +84,24 @@ export const Portal = () => {
     setMode("list");
   };
 
-  useEffect(() => {}, []);
+  const loadPortal = () => {
+    setLoading(true);
+    axiosInstance
+      .get(`organization/${orgid}/portal/${portalid}`)
+      .then((response) => {
+        let buff = new Buffer(
+          response.data.data.attributes.definition,
+          "base64"
+        );
+        var services = YAML.parse(buff.toString("ascii"));
+        console.log(services);
+        setServices(services);
+        setLoading(false);
+      });
+  };
+  useEffect(() => {
+    loadPortal();
+  }, []);
   return (
     <Content style={{ padding: "0 50px" }}>
       <Breadcrumb style={{ margin: "16px 0" }}></Breadcrumb>
@@ -140,39 +109,44 @@ export const Portal = () => {
         {mode === "list" ? (
           <>
             <Title level={4}>Services</Title>
-            <List
-              grid={{ gutter: 16, column: 8 }}
-              dataSource={YAML.parse(servicesYaml)}
-              renderItem={(item) => (
-                <List.Item>
-                  <Card
-                    onClick={() => handleClick(item)}
-                    style={{ height: "150px" }}
-                    hoverable
-                  >
-                    <div
-                      style={{
-                        marginLeft: "auto",
-                        marginRight: "auto",
-                        width: "50%",
-                      }}
+            {loading && !services ? (
+              <p>Loading Services...</p>
+            ) : (
+              <List
+                grid={{ gutter: 16, column: 8 }}
+                dataSource={services}
+                renderItem={(item) => (
+                  <List.Item>
+                    <Card
+                      onClick={() => handleClick(item)}
+                      style={{ height: "150px" }}
+                      hoverable
                     >
-                      <Avatar shape="square" src={item.iconUrl} />
-                      <br /> <br />
-                    </div>
-                    <div
-                      style={{
-                        marginLeft: "auto",
-                        marginRight: "auto",
-                        width: "70%",
-                      }}
-                    >
-                      {item.name}
-                    </div>
-                  </Card>
-                </List.Item>
-              )}
-            />
+                      <div
+                        style={{
+                          marginLeft: "auto",
+                          marginRight: "auto",
+                          width: "50%",
+                        }}
+                      >
+                        <Avatar shape="square" src={item.iconUrl} />
+                        <br /> <br />
+                      </div>
+                      <div
+                        style={{
+                          marginLeft: "auto",
+                          marginRight: "auto",
+                          width: "70%",
+                        }}
+                      >
+                        {item.name}
+                      </div>
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            )}
+
             <br />
             <br />
             <Title level={4}>Resources</Title>
