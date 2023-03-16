@@ -8,10 +8,9 @@ import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.FlowType;
+import org.terrakube.api.plugin.scheduler.job.tcl.model.ScheduleTemplate;
 import org.terrakube.api.plugin.softdelete.SoftDeleteService;
-import org.terrakube.api.repository.JobRepository;
-import org.terrakube.api.repository.StepRepository;
-import org.terrakube.api.repository.WorkspaceRepository;
+import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.step.Step;
@@ -21,8 +20,11 @@ import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.Workspace;
+import org.terrakube.api.rs.workspace.schedule.Schedule;
 
+import java.text.ParseException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +36,8 @@ import static org.terrakube.api.plugin.scheduler.ScheduleJobService.PREFIX_JOB_C
 @Setter
 @Slf4j
 public class ScheduleJob implements org.quartz.Job {
+    private final ScheduleRepository scheduleRepository;
+    private final TemplateRepository templateRepository;
 
     public static final String JOB_ID = "jobId";
 
@@ -46,6 +50,8 @@ public class ScheduleJob implements org.quartz.Job {
     WorkspaceRepository workspaceRepository;
 
     SoftDeleteService softDeleteService;
+
+    ScheduleJobService scheduleJobService;
 
     @Transactional
     @Override
@@ -110,7 +116,7 @@ public class ScheduleJob implements org.quartz.Job {
                         jobRepository.save(job);
                         Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
                         step.setName("Error sending to executor, check logs");
-                        stepRepository.save(step);                     
+                        stepRepository.save(step);
                     }
                     break;
                 case approval:
@@ -134,6 +140,24 @@ public class ScheduleJob implements org.quartz.Job {
                     workspace.setDeleted(true);
                     workspaceRepository.save(workspace);
                     break;
+                case scheduleTemplates:
+                    log.info("Creating new schedules for this workspace");
+                    if(setupScheduler(job, flow.get())){
+                        log.info("Schedule completed successfully");
+
+                        Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
+                        step.setStatus(JobStatus.completed);
+                        log.info("Updating Step {} to completed", stepId);
+                        stepRepository.save(step);
+
+                        log.info("Updating Job {} to pending to continue execution", stepId);
+                        job.setStatus(JobStatus.pending);
+                        jobRepository.save(job);
+                    } else {
+                        job.setStatus(JobStatus.failed);
+                        jobRepository.save(job);
+                    }
+                    break;
                 case yamlError:
                     log.error("Terrakube Template error, please verify the template definition");
                     job.setStatus(JobStatus.failed);
@@ -149,6 +173,41 @@ public class ScheduleJob implements org.quartz.Job {
             removeJobContext(job, jobExecutionContext);
             unlockWorkspace(job);
         }
+    }
+
+    private boolean setupScheduler(Job job, Flow flow) {
+        boolean success = true;
+        for (ScheduleTemplate scheduleTemplate : flow.getScheduleTemplates()) {
+            Template template = templateRepository.getByOrganizationNameAndName(job.getOrganization().getName(), scheduleTemplate.getName());
+
+            if (template != null) {
+                Schedule schedule = new Schedule();
+                schedule.setWorkspace(job.getWorkspace());
+                schedule.setId(UUID.randomUUID());
+                schedule.setCron(scheduleTemplate.getSchedule());
+                schedule.setEnabled(true);
+                schedule.setCreatedBy(job.getCreatedBy());
+                schedule.setCreatedDate(job.getCreatedDate());
+
+                schedule.setDescription("Schedule from Job " + job.getId());
+
+                schedule = scheduleRepository.save(schedule);
+
+                try {
+                    scheduleJobService.createJobTrigger(schedule.getCron(), schedule.getId().toString());
+                } catch (ParseException | SchedulerException e) {
+                    log.error(e.getMessage());
+                    success = false;
+                }
+            } else {
+                log.error("Unable to find template with name {} in organization {}", scheduleTemplate.getName(), job.getOrganization().getName());
+                success = false;
+                break;
+            }
+
+        }
+
+        return success;
     }
 
     private void completeJob(Job job) {
