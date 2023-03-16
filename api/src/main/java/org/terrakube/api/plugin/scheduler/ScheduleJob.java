@@ -57,7 +57,7 @@ public class ScheduleJob implements org.quartz.Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         int jobId = jobExecutionContext.getJobDetail().getJobDataMap().getInt(JOB_ID);
-        Job job = jobRepository.getById(jobId);
+        Job job = jobRepository.getReferenceById(jobId);
 
         log.info("Checking Job {} Status {}", job.getId(), job.getStatus());
 
@@ -177,7 +177,7 @@ public class ScheduleJob implements org.quartz.Job {
 
     private boolean setupScheduler(Job job, Flow flow) {
         boolean success = true;
-        for (ScheduleTemplate scheduleTemplate : flow.getScheduleTemplates()) {
+        for (ScheduleTemplate scheduleTemplate : flow.getTemplates()) {
             Template template = templateRepository.getByOrganizationNameAndName(job.getOrganization().getName(), scheduleTemplate.getName());
 
             if (template != null) {
@@ -188,7 +188,7 @@ public class ScheduleJob implements org.quartz.Job {
                 schedule.setEnabled(true);
                 schedule.setCreatedBy(job.getCreatedBy());
                 schedule.setCreatedDate(job.getCreatedDate());
-
+                schedule.setTemplateReference(template.getId().toString());
                 schedule.setDescription("Schedule from Job " + job.getId());
 
                 schedule = scheduleRepository.save(schedule);

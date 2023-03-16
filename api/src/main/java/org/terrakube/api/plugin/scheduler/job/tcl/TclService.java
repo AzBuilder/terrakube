@@ -64,12 +64,12 @@ public class TclService {
                     newStep.setName("Running Step" + flow.getStep());
                 }
                 log.info("Step name {}", newStep.getName());
-                Job parentJob = jobRepository.getById(job.getId());
+                Job parentJob = jobRepository.getReferenceById(job.getId());
                 newStep.setJob(parentJob);
                 newStep = stepRepository.save(newStep);
                 log.info("Parent {} Step created {}", newStep.getJob().getId(), newStep.getId());
             });
-            return jobRepository.getById(job.getId());
+            return jobRepository.getReferenceById(job.getId());
         } else
             return job;
     }
@@ -216,6 +216,6 @@ public class TclService {
     }
 
     private String getTemplateTcl(String templateId) {
-        return templateRepository.getById(UUID.fromString(templateId)).getTcl();
+        return templateRepository.getReferenceById(UUID.fromString(templateId)).getTcl();
     }
 }

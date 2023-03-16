@@ -31,7 +31,7 @@ public class ScheduleVcs implements org.quartz.Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         String vcsId = jobExecutionContext.getJobDetail().getJobDataMap().getString(VCS_ID);
-        Vcs vcs = vcsRepository.getById(UUID.fromString(vcsId));
+        Vcs vcs = vcsRepository.getReferenceById(UUID.fromString(vcsId));
 
         if(vcs.getStatus().equals(VcsStatus.COMPLETED)) {
             Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(
@@ -44,7 +44,7 @@ public class ScheduleVcs implements org.quartz.Job {
                     vcs.getCallback());
 
             if (!newTokenInformation.isEmpty()) {
-                Vcs tempVcs = vcsRepository.getById(vcs.getId());
+                Vcs tempVcs = vcsRepository.getReferenceById(vcs.getId());
                 tempVcs.setAccessToken((String) newTokenInformation.get("accessToken"));
                 tempVcs.setRefreshToken((String) newTokenInformation.get("refreshToken"));
                 tempVcs.setTokenExpiration((Date) newTokenInformation.get("tokenExpiration"));
