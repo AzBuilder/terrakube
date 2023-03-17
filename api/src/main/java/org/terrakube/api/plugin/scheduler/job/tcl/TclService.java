@@ -16,6 +16,7 @@ import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.step.Step;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -75,7 +76,7 @@ public class TclService {
     }
 
     private FlowConfig getFlowConfig(String tcl) {
-        Yaml yaml = new Yaml(new Constructor(FlowConfig.class));
+        Yaml yaml = new Yaml(new Constructor(FlowConfig.class, new LoaderOptions()));
         FlowConfig flowConfig = null;
         try {
             FlowConfig temp = yaml.load(new String(Base64.getDecoder().decode(tcl)));
@@ -145,7 +146,7 @@ public class TclService {
             String commandsText = getCommandList(repository, branch, folder, generateImportFolder());
 
             log.info("Parsing yaml file");
-            Yaml yaml = new Yaml(new Constructor(CommandConfig.class));
+            Yaml yaml = new Yaml(new Constructor(CommandConfig.class, new LoaderOptions()));
             CommandConfig temp = yaml.load(commandsText);
 
             commands = temp.getCommands();
