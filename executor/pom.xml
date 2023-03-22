@@ -22,7 +22,7 @@
 		<commons-codec>1.15</commons-codec>
 		<okhttp.version>4.9.1</okhttp.version>
 		<azure-storage-blob.version>12.16.0</azure-storage-blob.version>
-		<jgit.version>6.2.0.202206071550-r</jgit.version>
+		<jgit.version>6.4.0.202211300538-r</jgit.version>
 		<lombok.version>1.18.24</lombok.version>
 		<groovy.version>3.0.12</groovy.version>
 		<ivy.version>2.5.1</ivy.version>
