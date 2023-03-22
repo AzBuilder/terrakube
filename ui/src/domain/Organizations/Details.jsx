@@ -9,6 +9,7 @@ import {
   Card,
   Tag,
   Tooltip,
+  Radio,
 } from "antd";
 import {
   GitlabOutlined,
@@ -125,7 +126,50 @@ export const OrganizationDetails = ({
                 New workspace
               </Button>
             </div>
-            <Search placeholder="Filter workspaces" style={{ width: "100%" }} />
+            <Search placeholder="Search by name" style={{ width: "100%" }} />{" "}
+            <br />
+            <div style={{ marginTop: "20px" }}>
+              {" "}
+              <Radio.Group>
+                {" "}
+                <Tooltip
+                  placement="bottom"
+                  title="Show only workspaces needing attention"
+                >
+                  <Radio.Button value="b">
+                    <ExclamationCircleOutlined style={{ color: "#fa8f37" }} />
+                  </Radio.Button>{" "}
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only workspaces with error"
+                >
+                  <Radio.Button value="d">
+                    <StopOutlined style={{ color: "#FB0136" }} />
+                  </Radio.Button>{" "}
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only running workspaces"
+                >
+                  <Radio.Button value="c">
+                    {" "}
+                    <SyncOutlined style={{ color: "#108ee9" }} />
+                  </Radio.Button>
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only successfully completed workspaces"
+                >
+                  <Radio.Button value="a">
+                    <CheckCircleOutlined style={{ color: "#2eb039" }} />
+                  </Radio.Button>
+                </Tooltip>
+                <Radio.Button>
+                  <InfoCircleOutlined />
+                </Radio.Button>
+              </Radio.Group>
+            </div>
             <List
               split=""
               className="workspaceList"
