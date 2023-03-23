@@ -9,6 +9,7 @@ import {
   Card,
   Tag,
   Tooltip,
+  Radio,
 } from "antd";
 import {
   GitlabOutlined,
@@ -44,7 +45,10 @@ export const OrganizationDetails = ({
   const { id } = useParams();
   const [organization, setOrganization] = useState({});
   const [workspaces, setWorkspaces] = useState([]);
+  const [filteredWorkspaces, setFilteredWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filterValue, setFilterValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const history = useHistory();
   const handleCreate = (e) => {
     history.push("/workspaces/create");
@@ -86,6 +90,56 @@ export const OrganizationDetails = ({
     history.push("/workspaces/" + id);
   };
 
+  const onFilterChange = (e) => {
+    setFilterValue(e.target.value);
+    applyFilters(searchValue, e.target.value);
+  };
+
+  const onRadioClick = (e) => {
+    const tag = e.target;
+    if (tag.type === "radio" && filterValue === tag.value.toString()) {
+      setFilterValue("");
+      applyFilters(searchValue, "");
+    }
+  };
+
+  const onSearch = (value) => {
+    setSearchValue(value);
+    applyFilters(value, filterValue);
+  };
+
+  const applyFilters = (searchValue, filterValue) => {
+    if (searchValue !== "" && filterValue !== "") {
+      console.log("filter by both");
+      var filteredWorkspaces = workspaces.filter(
+        (workspace) =>
+          workspace.name.includes(searchValue) &&
+          workspace.lastStatus === filterValue
+      );
+      setFilteredWorkspaces(filteredWorkspaces);
+      return;
+    }
+
+    if (searchValue !== "") {
+      console.log("filter by name " + searchValue);
+      var filteredWorkspaces = workspaces.filter((workspace) =>
+        workspace.name.includes(searchValue)
+      );
+      setFilteredWorkspaces(filteredWorkspaces);
+      return;
+    }
+
+    if (filterValue !== "") {
+      console.log("filter by status " + filterValue);
+      var filteredWorkspaces = workspaces.filter(
+        (workspace) => workspace.lastStatus === filterValue
+      );
+      setFilteredWorkspaces(filteredWorkspaces);
+      return;
+    }
+    console.log("no filter");
+    setFilteredWorkspaces(workspaces);
+  };
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
@@ -96,7 +150,11 @@ export const OrganizationDetails = ({
         setOrganization(response.data);
 
         if (response.data.included) {
-          setupOrganizationIncludes(response.data.included, setWorkspaces);
+          setupOrganizationIncludes(
+            response.data.included,
+            setWorkspaces,
+            setFilteredWorkspaces
+          );
         }
 
         setLoading(false);
@@ -125,93 +183,155 @@ export const OrganizationDetails = ({
                 New workspace
               </Button>
             </div>
-            <Search placeholder="Filter workspaces" style={{ width: "100%" }} />
-            <List
-              split=""
-              className="workspaceList"
-              dataSource={workspaces}
-              renderItem={(item) => (
-                <List.Item>
-                  <Card
-                    onClick={() => handleClick(item.id)}
-                    style={{ width: "100%" }}
-                    hoverable
+            <div style={{ clear: "both", width: "100%" }}>
+              <div
+                onClick={onRadioClick}
+                style={{ width: "50%", float: "left" }}
+              >
+                {" "}
+                <Radio.Group onChange={onFilterChange} value={filterValue}>
+                  {" "}
+                  <Tooltip
+                    placement="bottom"
+                    title="Show only workspaces needing attention"
                   >
-                    <Space
-                      style={{ color: "rgb(82, 87, 97)" }}
-                      direction="vertical"
+                    <Radio.Button value="waitingApproval">
+                      <ExclamationCircleOutlined style={{ color: "#fa8f37" }} />
+                    </Radio.Button>{" "}
+                  </Tooltip>
+                  <Tooltip
+                    placement="bottom"
+                    title="Show only workspaces with error"
+                  >
+                    <Radio.Button value="failed">
+                      <StopOutlined style={{ color: "#FB0136" }} />
+                    </Radio.Button>{" "}
+                  </Tooltip>
+                  <Tooltip
+                    placement="bottom"
+                    title="Show only running workspaces"
+                  >
+                    <Radio.Button value="running">
+                      {" "}
+                      <SyncOutlined style={{ color: "#108ee9" }} />
+                    </Radio.Button>
+                  </Tooltip>
+                  <Tooltip
+                    placement="bottom"
+                    title="Show only successfully completed workspaces"
+                  >
+                    <Radio.Button value="completed">
+                      <CheckCircleOutlined style={{ color: "#2eb039" }} />
+                    </Radio.Button>
+                  </Tooltip>{" "}
+                  <Tooltip
+                    placement="bottom"
+                    title="Show only never executed workspaces"
+                  >
+                    <Radio.Button value="never executed">
+                      <InfoCircleOutlined />
+                    </Radio.Button>
+                  </Tooltip>
+                </Radio.Group>
+              </div>
+              <div style={{ float: "left", width: "50%" }}>
+                {" "}
+                <Search
+                  placeholder="Search by name"
+                  onSearch={onSearch}
+                  allowClear
+                  style={{ width: "100%" }}
+                />{" "}
+              </div>
+            </div>
+            <div style={{ clear: "both", paddingTop: "10px" }}>
+              <List
+                split=""
+                className="workspaceList"
+                dataSource={filteredWorkspaces}
+                renderItem={(item) => (
+                  <List.Item>
+                    <Card
+                      onClick={() => handleClick(item.id)}
+                      style={{ width: "100%" }}
+                      hoverable
                     >
-                      <h3>{item.name}</h3>
-                      {item.description}
-                      <Space size={40} style={{ marginTop: "25px" }}>
-                        <Tag
-                          icon={
-                            item.lastStatus == "completed" ? (
-                              <CheckCircleOutlined />
-                            ) : item.lastStatus == "running" ? (
-                              <SyncOutlined spin />
-                            ) : item.lastStatus === "waitingApproval" ? (
-                              <ExclamationCircleOutlined />
-                            ) : item.lastStatus === "never executed" ? (
-                              <InfoCircleOutlined />
-                            ) : item.lastStatus === "rejected" ? (
-                              <CloseCircleOutlined />
-                            ) : item.lastStatus === "cancelled" ? (
-                              <StopOutlined />
-                            ) : item.lastStatus === "failed" ? (
-                              <StopOutlined />
-                            ) : (
-                              <ClockCircleOutlined />
-                            )
-                          }
-                          color={item.statusColor}
-                        >
-                          {item.lastStatus}
-                        </Tag>{" "}
-                        <br />
-                        <span>
-                          <ClockCircleOutlined />
-                          &nbsp;&nbsp;
-                          {DateTime.fromISO(item.lastRun).toRelative() ??
-                            "never executed"}
-                        </span>
-                        <span>
-                          <IconContext.Provider value={{ size: "1.3em" }}>
-                            <SiTerraform />
-                          </IconContext.Provider>
-                          &nbsp;&nbsp;{item.terraformVersion}
-                        </span>
-                        {item.branch !== "remote-content" ? (
-                          <span>
-                            {renderVCSLogo(
-                              new URL(fixSshURL(item.source)).hostname
-                            )}
-                            &nbsp;{" "}
-                            <a href={fixSshURL(item.source)} target="_blank">
-                              {new URL(fixSshURL(item.source))?.pathname
-                                ?.replace(".git", "")
-                                ?.substring(1)}
-                            </a>
-                          </span>
-                        ) : (
-                          <span
-                            style={{
-                              verticalAlign: "middle",
-                              display: "inline-block",
-                            }}
+                      <Space
+                        style={{ color: "rgb(82, 87, 97)" }}
+                        direction="vertical"
+                      >
+                        <h3>{item.name}</h3>
+                        {item.description}
+                        <Space size={40} style={{ marginTop: "25px" }}>
+                          <Tag
+                            icon={
+                              item.lastStatus == "completed" ? (
+                                <CheckCircleOutlined />
+                              ) : item.lastStatus == "running" ? (
+                                <SyncOutlined spin />
+                              ) : item.lastStatus === "waitingApproval" ? (
+                                <ExclamationCircleOutlined />
+                              ) : item.lastStatus === "never executed" ? (
+                                <InfoCircleOutlined />
+                              ) : item.lastStatus === "rejected" ? (
+                                <CloseCircleOutlined />
+                              ) : item.lastStatus === "cancelled" ? (
+                                <StopOutlined />
+                              ) : item.lastStatus === "failed" ? (
+                                <StopOutlined />
+                              ) : (
+                                <ClockCircleOutlined />
+                              )
+                            }
+                            color={item.statusColor}
                           >
-                            <IconContext.Provider value={{ size: "1.4em" }}>
-                              <BiTerminal />
-                            </IconContext.Provider>
-                            &nbsp;&nbsp;cli/api driven workflow
+                            {item.lastStatus}
+                          </Tag>{" "}
+                          <br />
+                          <span>
+                            <ClockCircleOutlined />
+                            &nbsp;&nbsp;
+                            {DateTime.fromISO(item.lastRun).toRelative() ??
+                              "never executed"}
                           </span>
-                        )}
+                          <span>
+                            <IconContext.Provider value={{ size: "1.3em" }}>
+                              <SiTerraform />
+                            </IconContext.Provider>
+                            &nbsp;&nbsp;{item.terraformVersion}
+                          </span>
+                          {item.branch !== "remote-content" ? (
+                            <span>
+                              {renderVCSLogo(
+                                new URL(fixSshURL(item.source)).hostname
+                              )}
+                              &nbsp;{" "}
+                              <a href={fixSshURL(item.source)} target="_blank">
+                                {new URL(fixSshURL(item.source))?.pathname
+                                  ?.replace(".git", "")
+                                  ?.substring(1)}
+                              </a>
+                            </span>
+                          ) : (
+                            <span
+                              style={{
+                                verticalAlign: "middle",
+                                display: "inline-block",
+                              }}
+                            >
+                              <IconContext.Provider value={{ size: "1.4em" }}>
+                                <BiTerminal />
+                              </IconContext.Provider>
+                              &nbsp;&nbsp;cli/api driven workflow
+                            </span>
+                          )}
+                        </Space>
                       </Space>
-                    </Space>
-                  </Card>
-                </List.Item>
-              )}
-            />
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            </div>
           </div>
         )}
       </div>
@@ -227,7 +347,11 @@ function fixSshURL(source) {
   }
 }
 
-function setupOrganizationIncludes(includes, setWorkspaces) {
+function setupOrganizationIncludes(
+  includes,
+  setWorkspaces,
+  setFilteredWorkspaces
+) {
   let workspaces = [];
 
   includes.forEach((element) => {
@@ -267,4 +391,5 @@ function setupOrganizationIncludes(includes, setWorkspaces) {
   });
 
   setWorkspaces(workspaces);
+  setFilteredWorkspaces(workspaces);
 }
