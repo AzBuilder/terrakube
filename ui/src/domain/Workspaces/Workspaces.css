@@ -26,6 +26,7 @@
 .variableActions {
   display: flex;
   justify-content: space-between;
+  clear: both
 }
 
 .createWorkspace{
