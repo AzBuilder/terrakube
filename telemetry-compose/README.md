@@ -53,3 +53,11 @@ OTEL_TRACES_EXPORTER=jaeger
 OTEL_EXPORTER_JAEGER_ENDPOINT=http://jaeger-all-in-one:14250
 OTEL_SERVICE_NAME=TERRAKUBE-EXECUTOR
 ```
+
+## Telemetry - Jaeger UI
+
+To see al the telemetry information visit:
+
+```
+http://localhost:16686/
+```
