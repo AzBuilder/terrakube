@@ -7,6 +7,6 @@ public class StreamingService {
 
     LogsRepository logsRepository;
     public String getCurrentLogs(int id, String stepId){
-        return logsRepository.getBydIdAndStepId(id, stepId).getOutput();
+        return logsRepository.getBydIAndStepId(id, stepId).getOutput();
     }
 }

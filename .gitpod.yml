@@ -94,6 +94,10 @@ ports:
     port: 9001
     onOpen: ignore
     visibility: public
+  - name: MinioConsole
+    port: 6379
+    onOpen: ignore
+    visibility: private
 
 vscode:
   extensions:
