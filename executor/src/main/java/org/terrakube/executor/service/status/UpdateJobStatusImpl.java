@@ -70,6 +70,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         Job job = terrakubeClient.getJobById(organizationId, jobId).getData();
         job.getAttributes().setStatus(successful ? "pending" : "failed");
 
+        log.info("StepId: {}", stepId);
         log.info("output: {}", jobOutput.length());
         log.info("outputError: {}", jobErrorOutput.length());
 

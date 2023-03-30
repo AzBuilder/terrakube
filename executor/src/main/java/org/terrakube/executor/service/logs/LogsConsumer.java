@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class LogsConsumer implements Consumer<String> {
 
     @NonNull
-    private int jobId;
+    private Integer jobId;
 
     @NonNull
     private String stepId;
