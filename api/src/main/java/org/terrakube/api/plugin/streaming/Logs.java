@@ -1,16 +1,24 @@
 package org.terrakube.api.plugin.streaming;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
+import org.springframework.data.redis.core.index.Indexed;
 
 @RedisHash("logs")
 @Getter
 @Setter
+@Builder
 public class Logs {
 
-    private int id;
-
-    private String stepId;
+    @Id
+    private String id;
+    @Indexed
+    private Integer jobId;
     private String output;
+    @TimeToLive
+    private Long ttl;
 }

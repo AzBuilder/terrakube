@@ -36,7 +36,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
         log.info("Searching: /.terraform-spring-boot/local/tfoutput/{}/{}/{}.tfoutput", organizationId, jobId, stepId);
         String outputFilePath = String.format(OUTPUT_DIRECTORY, organizationId, jobId, stepId);
-        String tempLogs = streamingService.getCurrentLogs(Integer.valueOf(jobId), stepId);
+        String tempLogs = streamingService.getCurrentLogs(stepId);
         if(tempLogs != null){
             return tempLogs.getBytes(StandardCharsets.UTF_8);
         } else {
