@@ -15,7 +15,7 @@ public class LogsService implements ProcessLogs {
     LogsRepository logsRepository;
 
     @Override
-    synchronized public void sendLogs(Integer jobId, String stepId, String output) {
+    public void sendLogs(Integer jobId, String stepId, String output) {
         Optional<Logs> currentLogs = logsRepository.findById(stepId);
         if (!currentLogs.isPresent()) {
             currentLogs = Optional.of(

@@ -38,6 +38,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
         String outputFilePath = String.format(OUTPUT_DIRECTORY, organizationId, jobId, stepId);
         String tempLogs = streamingService.getCurrentLogs(stepId);
         if(tempLogs != null){
+            log.info("Current /n {}", tempLogs);
             return tempLogs.getBytes(StandardCharsets.UTF_8);
         } else {
             return getOutputBytes(outputFilePath);
