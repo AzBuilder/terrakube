@@ -28,6 +28,7 @@
     <name>Terrakube Platform</name>
 
     <modules>
+        <module>redis</module>
         <module>api</module>
         <module>registry</module>
         <module>executor</module>

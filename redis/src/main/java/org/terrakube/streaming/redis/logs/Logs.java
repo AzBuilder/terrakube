@@ -1,4 +1,4 @@
-package org.terrakube.executor.service.logs;
+package org.terrakube.streaming.redis.logs;
 
 import lombok.Builder;
 import lombok.Setter;

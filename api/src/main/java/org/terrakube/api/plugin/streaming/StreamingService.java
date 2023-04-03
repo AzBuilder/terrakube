@@ -18,6 +18,16 @@ public class StreamingService {
         Optional<Logs> logs = logsRepository.findById(stepId);
         log.info("Current {} {}", stepId, logs.isPresent()? logs.get().getOutput() : null);
 
+
+        for(Logs logs1 : logsRepository.findAll()){
+            log.info("{}",logs1.toString());
+            if(logs1.getId().equals(stepId)){
+                log.info("Id exists");
+            } else {
+                log.info("id not found");
+            }
+        }
+
         return (logs.isPresent()? logs.get().getOutput() : null);
     }
 }
