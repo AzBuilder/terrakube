@@ -3,6 +3,8 @@ package org.terrakube.api.plugin.streaming;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.terrakube.streaming.redis.logs.Logs;
+import org.terrakube.streaming.redis.logs.LogsRepository;
 
 import java.util.Optional;
 
