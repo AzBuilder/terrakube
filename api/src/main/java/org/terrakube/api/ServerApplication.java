@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "org.terrakube.api.repository")
+@EnableRedisRepositories(basePackages = "org.terrakube.streaming.redis.logs")
 @EnableAsync
 @EnableCaching
 @EnableScheduling
