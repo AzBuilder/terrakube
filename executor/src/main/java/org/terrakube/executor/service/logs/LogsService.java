@@ -24,7 +24,7 @@ public class LogsService implements ProcessLogs {
         streamData.put("jobId", String.valueOf(jobId));
         streamData.put("stepId", stepId);
         streamData.put("lineNumber", String.valueOf(lineNumber));
-        streamData.put("ouptut", output);
+        streamData.put("output", output);
 
         StringRecord record = StreamRecords.string(streamData).withStreamKey(stepId);
 
