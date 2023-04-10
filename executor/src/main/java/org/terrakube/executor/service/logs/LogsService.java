@@ -2,49 +2,37 @@ package org.terrakube.executor.service.logs;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.TextStringBuilder;
+import org.springframework.data.redis.connection.stream.StreamRecords;
+import org.springframework.data.redis.connection.stream.StringRecord;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.terrakube.streaming.redis.logs.Logs;
-import org.terrakube.streaming.redis.logs.LogsRepository;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class LogsService implements ProcessLogs {
 
-    LogsRepository logsRepository;
+    RedisTemplate redisTemplate;
 
     @Override
-    public void sendLogs(Integer jobId, String stepId, String output) {
-        Optional<Logs> currentLogs = logsRepository.findById(stepId);
-        if (!currentLogs.isPresent()) {
-            currentLogs = Optional.of(
-                    Logs.builder()
-                            .id(stepId)
-                            .jobId(jobId)
-                            .output(output)
-                            .ttl(2700L) //45 minutes
-                            .build()
-            );
-        }
-        currentLogs.get()
-                .setOutput(
-                        new TextStringBuilder(currentLogs.get().getOutput())
-                                .appendln(output)
-                                .toString()
-                );
-        logsRepository.save(currentLogs.get());
+    public void sendLogs(Integer jobId, String stepId, int lineNumber, String output) {
+        Map<String, String> streamData = new LinkedHashMap();
+        streamData.put("jobId", String.valueOf(jobId));
+        streamData.put("stepId", stepId);
+        streamData.put("lineNumber", String.valueOf(lineNumber));
+        streamData.put("ouptut", output);
+
+        StringRecord record = StreamRecords.string(streamData).withStreamKey(stepId);
+
+        redisTemplate.opsForStream().add(record);
     }
 
     public void deleteLogs(String stepId) {
-        Logs logs = logsRepository.findById(stepId).get();
-        if (logs == null) {
-            log.info("The key is not inside redis, I have no idea why :(");
-        } else {
-            log.warn("Deleting logs from redis with id {}", stepId);
-            logsRepository.delete(logs);
-        }
+        StringRecord record = StreamRecords.string(new HashMap()).withStreamKey(stepId);
+        redisTemplate.opsForStream().delete(record);
     }
 }

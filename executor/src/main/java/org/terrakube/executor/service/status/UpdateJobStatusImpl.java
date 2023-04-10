@@ -2,6 +2,7 @@ package org.terrakube.executor.service.status;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.job.Job;
 import org.terrakube.client.model.organization.job.JobRequest;
@@ -10,10 +11,8 @@ import org.terrakube.client.model.organization.job.step.StepAttributes;
 import org.terrakube.client.model.organization.job.step.StepRequest;
 import org.terrakube.executor.configuration.ExecutorFlagsProperties;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
-import org.terrakube.executor.service.logs.LogsService;
 import org.terrakube.executor.service.mode.TerraformJob;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.logs.LogsService;
 
 @Slf4j
 @Service
@@ -26,10 +25,6 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     private TerraformOutput terraformOutput;
 
     private ExecutorFlagsProperties executorFlagsProperties;
-
-    private LogsService logsService;
-
-
 
     @Override
     public void setRunningStatus(TerraformJob terraformJob, String commitId) {
@@ -85,7 +80,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
 
         terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
 
-        //logsService.deleteLogs(stepId);
+        logsService.deleteLogs(stepId);
     }
 
     private void updateStepStatus(boolean status, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput) {

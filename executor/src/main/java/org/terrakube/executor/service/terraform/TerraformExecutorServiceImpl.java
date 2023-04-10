@@ -6,19 +6,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.TextStringBuilder;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.service.executor.ExecutorJobResult;
-import org.terrakube.executor.service.logs.LogsConsumer;
-import org.terrakube.executor.service.logs.LogsService;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.scripts.ScriptEngineService;
 import org.jetbrains.annotations.NotNull;
 import org.terrakube.terraform.TerraformClient;
 import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.logs.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -57,12 +57,14 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .terraformOutput(jobOutput)
                     .stepId(terraformJob.getStepId())
                     .processLogs(logsService)
+                    .lineNumber(new AtomicInteger(0))
                     .build();
 
             Consumer<String> planOutputError = LogsConsumer.builder()
                     .jobId(Integer.valueOf(terraformJob.getJobId()))
                     .terraformOutput(jobErrorOutput)
                     .stepId(terraformJob.getStepId())
+                    .lineNumber(new AtomicInteger(0))
                     .processLogs(logsService)
                     .build();
 
@@ -121,6 +123,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         try {
             Consumer<String> applyOutput = LogsConsumer.builder()
                     .jobId(Integer.valueOf(terraformJob.getJobId()))
+                    .lineNumber(new AtomicInteger(0))
                     .terraformOutput(terraformOutput)
                     .stepId(terraformJob.getStepId())
                     .processLogs(logsService)
@@ -131,6 +134,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .terraformOutput(terraformErrorOutput)
                     .stepId(terraformJob.getStepId())
                     .processLogs(logsService)
+                    .lineNumber(new AtomicInteger(0))
                     .build();
 
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
@@ -190,9 +194,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .terraformOutput(jobOutput)
                     .stepId(terraformJob.getStepId())
                     .processLogs(logsService)
+                    .lineNumber(new AtomicInteger(0))
                     .build();
 
             Consumer<String> errorOutputDestroy = LogsConsumer.builder()
+                    .lineNumber(new AtomicInteger(0))
                     .jobId(Integer.valueOf(terraformJob.getJobId()))
                     .terraformOutput(jobErrorOutput)
                     .stepId(terraformJob.getStepId())
