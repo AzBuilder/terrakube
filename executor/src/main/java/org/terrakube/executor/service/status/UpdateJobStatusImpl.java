@@ -11,6 +11,7 @@ import org.terrakube.client.model.organization.job.step.StepAttributes;
 import org.terrakube.client.model.organization.job.step.StepRequest;
 import org.terrakube.executor.configuration.ExecutorFlagsProperties;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
+import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.logs.LogsService;
 
@@ -26,6 +27,10 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
 
     private ExecutorFlagsProperties executorFlagsProperties;
 
+    private LogsService logsService;
+
+    private TerraformOutputPathService terraformOutputPathService;
+
     @Override
     public void setRunningStatus(TerraformJob terraformJob, String commitId) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
@@ -37,6 +42,8 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
             jobRequest.setData(job);
 
             terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
+
+            updateStepLogs(terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId());
         }
     }
 
@@ -87,6 +94,20 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         StepAttributes stepAttributes = new StepAttributes();
         stepAttributes.setOutput(this.terraformOutput.save(organizationId, jobId, stepId, jobOutput, jobErrorOutput));
         stepAttributes.setStatus(status ? "completed": "failed");
+
+        Step step = new Step();
+        step.setId(stepId);
+        step.setType("step");
+        step.setAttributes(stepAttributes);
+        StepRequest stepRequest = new StepRequest();
+        stepRequest.setData(step);
+
+        terrakubeClient.updateStep(stepRequest, organizationId, jobId, stepId);
+    }
+
+    private void updateStepLogs(String organizationId, String jobId, String stepId) {
+        StepAttributes stepAttributes = new StepAttributes();
+        stepAttributes.setOutput(terraformOutputPathService.getOutputPath(organizationId, jobId, stepId));
 
         Step step = new Step();
         step.setId(stepId);

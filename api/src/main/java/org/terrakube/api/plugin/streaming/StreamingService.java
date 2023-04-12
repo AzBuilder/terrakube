@@ -3,6 +3,7 @@ package org.terrakube.api.plugin.streaming;
 import liquibase.repackaged.org.apache.commons.text.TextStringBuilder;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.connection.stream.StringRecord;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,6 +29,7 @@ public class StreamingService {
             log.info("{}", logs);
         } catch (Exception ex ){
             log.error(ex.getMessage());
+
         }
         return logs.toString();
     }
