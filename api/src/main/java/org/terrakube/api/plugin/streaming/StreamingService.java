@@ -22,11 +22,10 @@ public class StreamingService {
         TextStringBuilder logs = new TextStringBuilder();
         try {
             List<StringRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(stepId), StreamOffset.latest(stepId));
-
             for (StringRecord record : streamData) {
                 logs.appendln(record.getValue().get("output"));
             }
-            log.info("{}", logs.toString());
+            log.info("{}", logs);
         } catch (Exception ex ){
             log.error(ex.getMessage());
         }

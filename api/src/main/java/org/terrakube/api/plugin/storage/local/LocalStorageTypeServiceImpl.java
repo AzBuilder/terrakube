@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.terrakube.api.plugin.storage.StorageTypeService;
-import org.terrakube.api.plugin.streaming.StreamingService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,19 +29,11 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     private static final String NO_DATA_FOUND = "";
     private static final String NO_CONTEXT_FOUND = "{}";
 
-    private StreamingService streamingService;
-
     @Override
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
         log.info("Searching: /.terraform-spring-boot/local/tfoutput/{}/{}/{}.tfoutput", organizationId, jobId, stepId);
         String outputFilePath = String.format(OUTPUT_DIRECTORY, organizationId, jobId, stepId);
-        String tempLogs = streamingService.getCurrentLogs(stepId);
-        if(tempLogs != null){
-            log.info("Current /n {}", tempLogs);
-            return tempLogs.getBytes(StandardCharsets.UTF_8);
-        } else {
-            return getOutputBytes(outputFilePath);
-        }
+        return getOutputBytes(outputFilePath);
     }
 
     @Override
