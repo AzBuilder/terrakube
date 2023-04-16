@@ -178,7 +178,7 @@ export const DetailsJob = ({ jobId }) => {
     const interval = setInterval(() => {
       loadJob();
       loadContext();
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [jobId]);
 

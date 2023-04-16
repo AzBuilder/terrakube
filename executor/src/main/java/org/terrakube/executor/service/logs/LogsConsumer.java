@@ -33,6 +33,8 @@ public class LogsConsumer implements Consumer<String> {
         int line = lineNumber.addAndGet(1);
         log.info(logs);
         terraformOutput.appendln(logs);
-        processLogs.sendLogs(jobId, stepId, line, logs);
+        synchronized (this) {
+            processLogs.sendLogs(jobId, stepId, line, logs);
+        }
     }
 }

@@ -115,7 +115,7 @@ public class StorageTypeAutoConfiguration {
 
                 break;
             default:
-                storageTypeService = LocalStorageTypeServiceImpl.builder().streamingService(streamingService).build();
+                storageTypeService = LocalStorageTypeServiceImpl.builder().build();
         }
         return storageTypeService;
     }

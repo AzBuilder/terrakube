@@ -34,9 +34,6 @@ public class LogsService implements ProcessLogs {
     }
 
     public void deleteLogs(String stepId) {
-        List<StringRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(stepId), StreamOffset.latest(stepId));
-        for(StringRecord stringRecord : streamData) {
-            redisTemplate.opsForStream().delete(stringRecord);
-        }
+            redisTemplate.delete(stepId);
     }
 }
