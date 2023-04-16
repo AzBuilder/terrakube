@@ -103,6 +103,9 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             scriptAfterSuccessPlan = executePostOperationScripts(terraformJob, workingDirectory, planOutput, executionPlan);
 
+
+            Thread.sleep(10000);
+
             result = generateJobResult(scriptAfterSuccessPlan, jobOutput.toString(), jobErrorOutput.toString());
             result.setPlanFile(executionPlan ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
                     terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
@@ -172,6 +175,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             log.warn("Terraform apply Executed Successfully: {}", execution);
             scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, applyOutput, execution);
 
+
+            Thread.sleep(10000);
             result = generateJobResult(scriptAfterSuccess, terraformOutput.toString(), terraformErrorOutput.toString());
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
@@ -234,6 +239,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             log.warn("Terraform destroy Executed Successfully: {}", execution);
             scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, outputDestroy, execution);
 
+            Thread.sleep(10000);
             result = generateJobResult(scriptAfterSuccess, jobOutput.toString(), jobErrorOutput.toString());
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);

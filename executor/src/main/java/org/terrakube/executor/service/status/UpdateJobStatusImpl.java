@@ -87,6 +87,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
 
         terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
 
+        log.info("Deleting Stream Id: {}", stepId);
         logsService.deleteLogs(stepId);
     }
 

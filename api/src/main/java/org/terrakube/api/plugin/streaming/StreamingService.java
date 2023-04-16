@@ -20,17 +20,19 @@ public class StreamingService {
 
     public String getCurrentLogs(String stepId){
 
-        TextStringBuilder logs = new TextStringBuilder();
+        TextStringBuilder currentLogs = new TextStringBuilder();
         try {
-            List<StringRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(stepId), StreamOffset.latest(stepId));
-            for (StringRecord record : streamData) {
-                logs.appendln(record.getValue().get("output"));
+            List<MapRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(stepId), StreamOffset.latest(stepId));
+            for (MapRecord mapRecord : streamData) {
+                StringRecord stringRecord = StringRecord.of(mapRecord);
+                String output = stringRecord.getValue().get("output");
+                currentLogs.appendln(output);
             }
-            log.info("{}", logs);
+            log.info("{}", currentLogs);
         } catch (Exception ex ){
             log.error(ex.getMessage());
 
         }
-        return logs.toString();
+        return currentLogs.toString();
     }
 }

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.TextStringBuilder;
+import org.springframework.scheduling.annotation.Async;
 
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,8 +34,6 @@ public class LogsConsumer implements Consumer<String> {
         int line = lineNumber.addAndGet(1);
         log.info(logs);
         terraformOutput.appendln(logs);
-        synchronized (this) {
-            processLogs.sendLogs(jobId, stepId, line, logs);
-        }
+        processLogs.sendLogs(jobId, stepId, line, logs);
     }
 }
