@@ -17,13 +17,13 @@ import java.nio.charset.StandardCharsets;
 public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";
-
     private static final String CONTENT_DIRECTORY = "/.terraform-spring-boot/local/content/%s/terraformContent.tar.gz";
     private static final String CONTEXT_DIRECTORY = "/.terraform-spring-boot/local/output/context/%s/context.json";
     private static final String STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/terraformLibrary.tfPlan";
     private static final String STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
     private static final String NO_DATA_FOUND = "";
     private static final String NO_CONTEXT_FOUND = "{}";
+    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate";
 
     @Override
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
@@ -44,6 +44,19 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
         log.info("Searching: /.terraform-spring-boot/local/tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
         String outputFilePath = String.format(STATE_DIRECTORY_JSON, organizationId, workspaceId, stateFileName);
         return getOutputBytes(outputFilePath);
+    }
+
+    @Override
+    public void uploadState(String organizationId, String workspaceId, String terraformState) {
+        try {
+            String newStateFile = String.format(LOCAL_BACKEND_DIRECTORY, organizationId, workspaceId);
+            log.info("newFilename: {}", newStateFile);
+            File stateFile = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(newStateFile)));
+            FileUtils.forceMkdir(stateFile.getParentFile());
+            FileUtils.writeStringToFile(stateFile, terraformState, Charset.defaultCharset().toString());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 
     @Override

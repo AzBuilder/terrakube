@@ -31,11 +31,10 @@ import org.terrakube.executor.service.mode.TerraformJob;
 public class LocalTerraformStateImpl implements TerraformState {
 
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
-    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/"
-            + TERRAFORM_PLAN_FILE;
-    private static final String LOCAL_STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/"
-            + TERRAFORM_PLAN_FILE;
-    private static final String LOCAL_STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
+    private static final String TERRAFORM_STATE_FILE = "terraform.tfstate";
+    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/" + TERRAFORM_STATE_FILE;
+    private static final String LOCAL_PLAN_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
+    private static final String LOCAL_PLAN_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
     private static final String BACKEND_FILE_NAME = "terrakube_override.tf";
 
     @NonNull
@@ -75,9 +74,9 @@ public class LocalTerraformStateImpl implements TerraformState {
 
     @Override
     public String saveTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId,
-            File workingDirectory) {
+                                    File workingDirectory) {
 
-        String localStateFilePath = String.format(LOCAL_STATE_DIRECTORY, organizationId, workspaceId, jobId, stepId);
+        String localStateFilePath = String.format(LOCAL_PLAN_DIRECTORY, organizationId, workspaceId, jobId, stepId);
 
         String stepStateDirectory = FileUtils.getUserDirectoryPath().concat(
                 FilenameUtils.separatorsToSystem(
@@ -103,10 +102,10 @@ public class LocalTerraformStateImpl implements TerraformState {
 
     @Override
     public boolean downloadTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId,
-            File workingDirectory) {
+                                         File workingDirectory) {
         AtomicBoolean planExists = new AtomicBoolean(false);
         Optional.ofNullable(
-                terrakubeClient.getJobById(organizationId, jobId).getData().getAttributes().getTerraformPlan())
+                        terrakubeClient.getJobById(organizationId, jobId).getData().getAttributes().getTerraformPlan())
                 .ifPresent(stateFilePath -> {
                     try {
                         log.info("Copying state from {}:", stateFilePath);
@@ -129,7 +128,7 @@ public class LocalTerraformStateImpl implements TerraformState {
     public void saveStateJson(TerraformJob terraformJob, String applyJSON) {
         if (applyJSON != null) {
             String stateFilenameUUID = UUID.randomUUID().toString();
-            String stateFileName = String.format(LOCAL_STATE_DIRECTORY_JSON, terraformJob.getOrganizationId(),
+            String stateFileName = String.format(LOCAL_PLAN_DIRECTORY_JSON, terraformJob.getOrganizationId(),
                     terraformJob.getWorkspaceId(), stateFilenameUUID);
             log.info("terraformStateFile: {}", stateFileName);
 
