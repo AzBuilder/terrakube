@@ -82,6 +82,11 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public void uploadState(String organizationId, String workspaceId, String terraformState) {
+
+    }
+
+    @Override
     public String saveContext(int jobId, String jobContext) {
         String blobKey = String.format(CONTEXT_JSON, jobId);
         log.info("context file: {}", String.format(CONTEXT_JSON, jobId));

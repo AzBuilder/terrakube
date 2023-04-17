@@ -50,6 +50,11 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public void uploadState(String organizationId, String workspaceId, String terraformState) {
+
+    }
+
+    @Override
     public String saveContext(int jobId, String jobContext) {
         BlobContainerClient contextContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_OUTPUT);
 
