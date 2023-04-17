@@ -77,13 +77,10 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/state-versions")
-    public ResponseEntity<String> createWorkspaceState(@PathVariable("workspaceId") String workspaceId, @RequestBody StateData stateData) {
+    public ResponseEntity<StateData> createWorkspaceState(@PathVariable("workspaceId") String workspaceId, @RequestBody StateData stateData) {
         log.info("Create State /remote/tfe/v2/ {}", workspaceId);
         log.info("Body: {}", stateData.toString());
-
-        remoteTfeService.createWorkspaceState(workspaceId, stateData);
-
-        return ResponseEntity.status(201).body("");
+        return ResponseEntity.of(Optional.of(remoteTfeService.createWorkspaceState(workspaceId, stateData)));
     }
 
     @Transactional

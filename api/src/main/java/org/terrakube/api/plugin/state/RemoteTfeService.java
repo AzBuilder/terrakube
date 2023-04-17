@@ -63,7 +63,6 @@ public class RemoteTfeService {
                             TemplateRepository templateRepository,
                             ScheduleJobService scheduleJobService,
                             @Value("${org.terrakube.hostname}") String hostname,
-                            @Value("${org.terrakube.hostname}") String hostname,
                             StorageTypeService storageTypeService,
                             StepRepository stepRepository) {
         this.jobRepository = jobRepository;
@@ -258,7 +257,7 @@ public class RemoteTfeService {
         History history = new History();
         UUID historyId = UUID.randomUUID();
         history.setId(historyId);
-        history.setOutput(terraformState);
+        //history.setOutput(terraformState);
         history.setJobReference("0");
         history.setWorkspace(workspace);
         historyRepository.save(history);
