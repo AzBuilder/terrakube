@@ -47,6 +47,13 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
+        String currentStateFile = String.format(LOCAL_BACKEND_DIRECTORY, organizationId, workspaceId);
+        log.info("newFilename: {}", currentStateFile);
+        return getOutputBytes(currentStateFile);
+    }
+
+    @Override
     public void uploadState(String organizationId, String workspaceId, String terraformState) {
         try {
             String newStateFile = String.format(LOCAL_BACKEND_DIRECTORY, organizationId, workspaceId);

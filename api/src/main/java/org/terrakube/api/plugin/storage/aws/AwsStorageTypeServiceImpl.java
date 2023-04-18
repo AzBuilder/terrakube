@@ -83,6 +83,21 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
+        byte[] data;
+        try {
+            log.info("Searching: tfstate/{}/{}/terraform.tfstate", organizationId, workspaceId);
+            S3Object s3object = s3client.getObject(bucketName, String.format("tfstate/%s/%s/terraform.tfstate", organizationId, workspaceId));
+            S3ObjectInputStream inputStream = s3object.getObjectContent();
+            data = inputStream.getDelegateStream().readAllBytes();
+        } catch (IOException e) {
+            log.error(S3_ERROR_LOG, e.getMessage());
+            data = new byte[0];
+        }
+        return data;
+    }
+
+    @Override
     public void uploadState(String organizationId, String workspaceId, String terraformState) {
         String blobKey = String.format("tfstate/%s/%s/terraform.tfstate", organizationId, workspaceId);
         log.info("terraformStateFile: {}", blobKey);
