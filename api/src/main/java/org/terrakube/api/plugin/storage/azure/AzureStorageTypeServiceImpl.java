@@ -50,6 +50,11 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
+        return new byte[0];
+    }
+
+    @Override
     public void uploadState(String organizationId, String workspaceId, String terraformState) {
 
     }

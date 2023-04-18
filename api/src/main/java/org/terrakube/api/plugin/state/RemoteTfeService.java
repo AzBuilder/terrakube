@@ -282,6 +282,12 @@ public class RemoteTfeService {
                         workspace.getId().toString()));
         responseAttributes.put("serial", 1);
         response.getData().setAttributes(responseAttributes);
+
+        log.info("Download State URL: {}", String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString()));
         return response;
     }
 
