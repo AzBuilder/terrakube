@@ -12,7 +12,6 @@ class AuditConfig {
 
     @Bean
     public AuditorAware<String> auditorProvider() {
-        AuditorAware<String> auditorAware = new DexAuditorAwareImpl();
-        return auditorAware;
+        return new DexAuditorAwareImpl();
     }
 }
