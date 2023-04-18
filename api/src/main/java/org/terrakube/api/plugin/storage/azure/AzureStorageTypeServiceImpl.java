@@ -52,7 +52,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     @Override
     public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
-        log.info("Searching: /%s/%s/terraform.tfstate", organizationId, workspaceId);
+        log.info("Searching: /{}/{}/terraform.tfstate", organizationId, workspaceId);
         return containerClient.getBlobClient(String.format("%s/%s/terraform.tfstate", organizationId, workspaceId)).downloadContent().toBytes();
     }
 
@@ -60,7 +60,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     public void uploadState(String organizationId, String workspaceId, String terraformState) {
         BlobContainerClient contextContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
 
-        String stateFileName = String.format("/%s/%s/terraform.tfstate", organizationId, workspaceId);
+        String stateFileName = String.format("%s/%s/terraform.tfstate", organizationId, workspaceId);
         log.info("New State File Az Storage: {}", stateFileName);
         BlobClient blobClient = contextContainerClient.getBlobClient(stateFileName);
 
