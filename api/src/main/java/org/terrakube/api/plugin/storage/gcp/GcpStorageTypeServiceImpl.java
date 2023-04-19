@@ -26,7 +26,7 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     private static final String GCP_LOCATION_OUTPUT = "tfoutput/%s/%s/%s.tfoutput";
     private static final String GCP_STATE_LOCATION = "tfstate/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String GCP_STATE_JSON = "tfstate/%s/%s/state/%s.json";
-    private static final String GCP_CURRENT_STATE = "tfstate/%s/%s/terraform.tfstate";
+    private static final String GCP_CURRENT_STATE = "tfstate/%s/%s/terraform.tfstate/default.tfstate";
     private static final String CONTEXT_JSON = "tfoutput/context/%s/context.json";
 
     private static final String TERRAFORM_TAR_GZ = "content/%s/terraformContent.tar.gz";
