@@ -26,6 +26,7 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     private static final String GCP_LOCATION_OUTPUT = "tfoutput/%s/%s/%s.tfoutput";
     private static final String GCP_STATE_LOCATION = "tfstate/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String GCP_STATE_JSON = "tfstate/%s/%s/state/%s.json";
+    private static final String GCP_CURRENT_STATE = "tfstate/%s/%s/terraform.tfstate/default.tfstate";
     private static final String CONTEXT_JSON = "tfoutput/context/%s/context.json";
 
     private static final String TERRAFORM_TAR_GZ = "content/%s/terraformContent.tar.gz";
@@ -67,12 +68,35 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
-        return new byte[0];
+        log.info("getTerraformStateJson {}", String.format(GCP_CURRENT_STATE, organizationId, workspaceId));
+        return storage.get(
+                        BlobId.of(
+                                bucketName,
+                                String.format(GCP_CURRENT_STATE, organizationId, workspaceId)))
+                .getContent();
     }
 
     @Override
     public void uploadState(String organizationId, String workspaceId, String terraformState) {
+        String currentStateKey = String.format(GCP_CURRENT_STATE, organizationId, workspaceId);
+        log.info("Define new Current State File: {}", currentStateKey);
 
+        BlobId blobId = BlobId.of(bucketName, currentStateKey);
+        Blob blob = storage.get(blobId);
+        if (blob != null) {
+            log.info("State does not exists...");
+            try {
+                WritableByteChannel channel = blob.writer();
+                channel.write(ByteBuffer.wrap(terraformState.getBytes(Charset.defaultCharset())));
+                channel.close();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        } else {
+            log.info("Updating state...");
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+            storage.create(blobInfo, terraformState.getBytes(Charset.defaultCharset()));
+        }
     }
 
     @Override
