@@ -42,6 +42,8 @@ import java.util.*;
 @Slf4j
 @Service
 public class RemoteTfeService {
+
+    private static final String GENERIC_STATE_PATH = "%s/tfstate/v1/organization/%s/workspace/%s/jobId/%s/step/%s/terraform.tfstate";
     private JobRepository jobRepository;
     private ContentRepository contentRepository;
     private OrganizationRepository organizationRepository;
@@ -54,15 +56,15 @@ public class RemoteTfeService {
     private StepRepository stepRepository;
 
     public RemoteTfeService(JobRepository jobRepository,
-            ContentRepository contentRepository,
-            OrganizationRepository organizationRepository,
-            WorkspaceRepository workspaceRepository,
-            HistoryRepository historyRepository,
-            TemplateRepository templateRepository,
-            ScheduleJobService scheduleJobService,
-            @Value("${org.terrakube.hostname}") String hostname,
-            StorageTypeService storageTypeService,
-            StepRepository stepRepository) {
+                            ContentRepository contentRepository,
+                            OrganizationRepository organizationRepository,
+                            WorkspaceRepository workspaceRepository,
+                            HistoryRepository historyRepository,
+                            TemplateRepository templateRepository,
+                            ScheduleJobService scheduleJobService,
+                            @Value("${org.terrakube.hostname}") String hostname,
+                            StorageTypeService storageTypeService,
+                            StepRepository stepRepository) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -244,10 +246,19 @@ public class RemoteTfeService {
 
     StateData createWorkspaceState(String workspaceId, StateData stateData) {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
+
+        byte[] decodedBytes = Base64.getUrlDecoder().decode(stateData.getData().getAttributes().get("state").toString());
+        String terraformState = new String(decodedBytes);
+
+        //upload state to backend storage
+        storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
+
+        //create history
         History history = new History();
         UUID historyId = UUID.randomUUID();
         history.setId(historyId);
-        history.setOutput(stateData.getData().getAttributes().get("state").toString());
+        //history.setOutput(terraformState);
+        history.setJobReference("0");
         history.setWorkspace(workspace);
         historyRepository.save(history);
 
@@ -259,12 +270,24 @@ public class RemoteTfeService {
         Map<String, Object> responseAttributes = new HashMap<>();
         responseAttributes.put("vcs-commit-sha", null);
         responseAttributes.put("vcs-commit-url", null);
-        responseAttributes.put("hosted-state-download-url",
-                "https://archivist.terraform.io/v1/object/4fde7951-93c0-4414-9a40-f3abc4bac490");
-        responseAttributes.put("hosted-json-state-download-url",
-                "https://archivist.terraform.io/v1/object/4fde7951-93c0-4414-9a40-f3abc4bac490");
+        responseAttributes.put("hosted-state-download-url", String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString()));
+        responseAttributes.put("hosted-json-state-download-url", String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString()));
         responseAttributes.put("serial", 1);
         response.getData().setAttributes(responseAttributes);
+
+        log.info("Download State URL: {}", String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString()));
         return response;
     }
 

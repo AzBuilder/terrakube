@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -45,7 +46,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
         } catch (IOException e) {
-            log.error(S3_ERROR_LOG,e.getMessage());
+            log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
         return data;
@@ -60,7 +61,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
         } catch (IOException e) {
-            log.error(S3_ERROR_LOG,e.getMessage());
+            log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
         return data;
@@ -75,10 +76,33 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
         } catch (IOException e) {
-            log.error(S3_ERROR_LOG,e.getMessage());
+            log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
         return data;
+    }
+
+    @Override
+    public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
+        byte[] data;
+        try {
+            log.info("Searching: tfstate/{}/{}/terraform.tfstate", organizationId, workspaceId);
+            S3Object s3object = s3client.getObject(bucketName, String.format("tfstate/%s/%s/terraform.tfstate", organizationId, workspaceId));
+            S3ObjectInputStream inputStream = s3object.getObjectContent();
+            data = inputStream.getDelegateStream().readAllBytes();
+        } catch (IOException e) {
+            log.error(S3_ERROR_LOG, e.getMessage());
+            data = new byte[0];
+        }
+        return data;
+    }
+
+    @Override
+    public void uploadState(String organizationId, String workspaceId, String terraformState) {
+        String blobKey = String.format("tfstate/%s/%s/terraform.tfstate", organizationId, workspaceId);
+        log.info("terraformStateFile: {}", blobKey);
+        s3client.putObject(bucketName, blobKey, terraformState);
+
     }
 
     @Override
@@ -101,7 +125,8 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             log.info("Searching: /tfoutput/context/{}/context.json", jobId);
             S3Object s3object = s3client.getObject(bucketName, String.format(CONTEXT_JSON, jobId));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
-            data = new String(inputStream.getDelegateStream().readAllBytes(), StandardCharsets.UTF_8);;
+            data = new String(inputStream.getDelegateStream().readAllBytes(), StandardCharsets.UTF_8);
+            ;
         } catch (Exception e) {
             log.error(S3_ERROR_LOG, e.getMessage());
             data = "{}";

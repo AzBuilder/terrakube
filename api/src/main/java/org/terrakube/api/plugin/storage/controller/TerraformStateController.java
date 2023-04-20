@@ -27,4 +27,12 @@ public class TerraformStateController {
     public @ResponseBody byte[] getTerraformStateJson(@PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId, @PathVariable("stateFilename") String stateFilename) {
         return storageTypeService.getTerraformStateJson(organizationId, workspaceId, stateFilename);
     }
+
+    @GetMapping(
+            value = "/organization/{organizationId}/workspace/{workspaceId}/state/terraform.tfstate",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody byte[] getCurrentTerraformState(@PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId) {
+        return storageTypeService.getCurrentTerraformState(organizationId, workspaceId);
+    }
 }

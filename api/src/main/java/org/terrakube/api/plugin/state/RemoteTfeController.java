@@ -13,6 +13,7 @@ import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
+import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import java.nio.charset.StandardCharsets;
 
@@ -76,27 +77,10 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/state-versions")
-    public ResponseEntity<String> createWorkspaceState(@PathVariable("workspaceId") String workspaceId, @RequestBody String StateData) {
+    public ResponseEntity<StateData> createWorkspaceState(@PathVariable("workspaceId") String workspaceId, @RequestBody StateData stateData) {
         log.info("Create State /remote/tfe/v2/ {}", workspaceId);
-        log.info("Body: {}", StateData);
-
-        return ResponseEntity.ok("{\n" +
-        "    \"data\": {\n" +
-        "        \"id\": \"sv-DmoXecHePnNznaA4\",\n" +
-        "        \"type\": \"state-versions\",\n" +
-        "        \"attributes\": {\n" +
-        "            \"vcs-commit-sha\": null,\n" +
-        "            \"vcs-commit-url\": null,\n" +
-        "            \"created-at\": \"2018-07-12T20:32:01.490Z\",\n" +
-        "            \"hosted-state-download-url\": \"https://archivist.terraform.io/v1/object/f55b739b-ff03-4716-b436-726466b96dc4\",\n" +
-        "            \"hosted-json-state-download-url\": \"https://archivist.terraform.io/v1/object/4fde7951-93c0-4414-9a40-f3abc4bac490\",\n" +
-        "            \"serial\": 1\n" +
-        "        },\n" +
-        "        \"links\": {\n" +
-        "            \"self\": \"/api/v2/state-versions/sv-DmoXecHePnNznaA4\"\n" +
-        "        }\n" +
-        "    }\n" +
-        "}");
+        log.info("Body: {}", stateData.toString());
+        return ResponseEntity.of(Optional.of(remoteTfeService.createWorkspaceState(workspaceId, stateData)));
     }
 
     @Transactional

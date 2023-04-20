@@ -17,8 +17,5 @@ public class GroupServiceProperties {
 }
 
 enum GroupType {
-    AZURE,
-    LOCAL,
-
     DEX
 }
