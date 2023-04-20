@@ -23,6 +23,15 @@ services:
     - 1389:1389
     networks:
       - dex
+  redis-service:
+    image: bitnami/redis:7.0.10
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
 
 networks:
   dex:
@@ -30,3 +39,4 @@ networks:
 
 volumes:
   data1-1:
+  redis_data:

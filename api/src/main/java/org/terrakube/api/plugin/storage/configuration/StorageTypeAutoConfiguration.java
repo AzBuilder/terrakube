@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.terrakube.api.plugin.streaming.StreamingService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,7 +44,7 @@ import java.io.IOException;
 public class StorageTypeAutoConfiguration {
 
     @Bean
-    public StorageTypeService terraformOutput(StorageTypeProperties storageTypeProperties, AzureStorageTypeProperties azureStorageTypeProperties, AwsStorageTypeProperties awsStorageTypeProperties, GcpStorageTypeProperties gcpStorageTypeProperties) {
+    public StorageTypeService terraformOutput(StreamingService streamingService, StorageTypeProperties storageTypeProperties, AzureStorageTypeProperties azureStorageTypeProperties, AwsStorageTypeProperties awsStorageTypeProperties, GcpStorageTypeProperties gcpStorageTypeProperties) {
         StorageTypeService storageTypeService = null;
         log.info("StorageType={}", storageTypeProperties.getType());
         switch (storageTypeProperties.getType()) {
@@ -114,7 +115,7 @@ public class StorageTypeAutoConfiguration {
 
                 break;
             default:
-                storageTypeService = new LocalStorageTypeServiceImpl();
+                storageTypeService = LocalStorageTypeServiceImpl.builder().build();
         }
         return storageTypeService;
     }

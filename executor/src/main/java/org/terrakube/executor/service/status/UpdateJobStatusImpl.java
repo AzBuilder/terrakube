@@ -1,6 +1,8 @@
 package org.terrakube.executor.service.status;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.job.Job;
 import org.terrakube.client.model.organization.job.JobRequest;
@@ -9,22 +11,25 @@ import org.terrakube.client.model.organization.job.step.StepAttributes;
 import org.terrakube.client.model.organization.job.step.StepRequest;
 import org.terrakube.executor.configuration.ExecutorFlagsProperties;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
+import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 import org.terrakube.executor.service.mode.TerraformJob;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.logs.LogsService;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class UpdateJobStatusImpl implements UpdateJobStatus {
 
-    @Autowired
-    TerrakubeClient terrakubeClient;
 
-    @Autowired
-    TerraformOutput terraformOutput;
+    private TerrakubeClient terrakubeClient;
 
-    @Autowired
-    ExecutorFlagsProperties executorFlagsProperties;
+    private TerraformOutput terraformOutput;
+
+    private ExecutorFlagsProperties executorFlagsProperties;
+
+    private LogsService logsService;
+
+    private TerraformOutputPathService terraformOutputPathService;
 
     @Override
     public void setRunningStatus(TerraformJob terraformJob, String commitId) {
@@ -37,6 +42,8 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
             jobRequest.setData(job);
 
             terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
+
+            updateStepLogs(terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId());
         }
     }
 
@@ -65,6 +72,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         Job job = terrakubeClient.getJobById(organizationId, jobId).getData();
         job.getAttributes().setStatus(successful ? "pending" : "failed");
 
+        log.info("StepId: {}", stepId);
         log.info("output: {}", jobOutput.length());
         log.info("outputError: {}", jobErrorOutput.length());
 
@@ -78,12 +86,29 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         jobRequest.setData(job);
 
         terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
+
+        log.info("Deleting Stream Id: {}", stepId);
+        logsService.deleteLogs(stepId);
     }
 
     private void updateStepStatus(boolean status, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput) {
         StepAttributes stepAttributes = new StepAttributes();
         stepAttributes.setOutput(this.terraformOutput.save(organizationId, jobId, stepId, jobOutput, jobErrorOutput));
         stepAttributes.setStatus(status ? "completed": "failed");
+
+        Step step = new Step();
+        step.setId(stepId);
+        step.setType("step");
+        step.setAttributes(stepAttributes);
+        StepRequest stepRequest = new StepRequest();
+        stepRequest.setData(step);
+
+        terrakubeClient.updateStep(stepRequest, organizationId, jobId, stepId);
+    }
+
+    private void updateStepLogs(String organizationId, String jobId, String stepId) {
+        StepAttributes stepAttributes = new StepAttributes();
+        stepAttributes.setOutput(terraformOutputPathService.getOutputPath(organizationId, jobId, stepId));
 
         Step step = new Step();
         step.setId(stepId);

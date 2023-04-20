@@ -1,5 +1,7 @@
 package org.terrakube.api.plugin.storage.local;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -14,6 +16,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
+@AllArgsConstructor
+@Builder
 public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";

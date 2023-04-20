@@ -36,6 +36,7 @@
         <aws-sdk.version>1.12.261</aws-sdk.version>
         <gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
+        <jedis.version>3.9.0</jedis.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
@@ -77,6 +78,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
@@ -90,6 +96,16 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.yahoo.elide</groupId>
@@ -261,7 +277,6 @@
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
-
     </dependencies>
     <dependencyManagement>
         <dependencies>

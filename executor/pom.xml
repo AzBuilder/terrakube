@@ -23,7 +23,7 @@
 		<okhttp.version>4.9.1</okhttp.version>
 		<azure-storage-blob.version>12.16.0</azure-storage-blob.version>
 		<jgit.version>6.4.0.202211300538-r</jgit.version>
-		<lombok.version>1.18.24</lombok.version>
+		<lombok.version>1.18.26</lombok.version>
 		<groovy.version>3.0.17</groovy.version>
 		<ivy.version>2.5.1</ivy.version>
 		<jcolor.version>5.2.0</jcolor.version>
@@ -32,6 +32,7 @@
 		<slf4j.version>1.7.36</slf4j.version>
 		<gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
 		<commons-compress.version>1.22</commons-compress.version>
+		<jedis.version>3.9.0</jedis.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
 		</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
@@ -49,6 +50,16 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${jedis.version}</version>
+			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -154,7 +165,6 @@
 			<artifactId>commons-compress</artifactId>
 			<version>${commons-compress.version}</version>
 		</dependency>
-
 	</dependencies>
 
 	<dependencyManagement>
