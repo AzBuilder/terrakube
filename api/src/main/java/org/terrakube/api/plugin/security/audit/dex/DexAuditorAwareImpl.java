@@ -14,7 +14,7 @@ public class DexAuditorAwareImpl implements AuditorAware<String> {
     public Optional<String> getCurrentAuditor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
-            log.info("getCurrentAuditor: {}", authentication);
+            log.debug("getCurrentAuditor: {}", authentication);
             if (authentication instanceof AnonymousAuthenticationToken)
                 return Optional.of("AnonymousUser");
             else

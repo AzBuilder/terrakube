@@ -40,15 +40,15 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
         String issuer = getIssuer(request);
         switch (issuer) {
             case jwtTypePat:
-                log.info("Using Terrakube Authentication Provider");
+                log.debug("Using Terrakube Authentication Provider");
                 providerManager = new ProviderManager(new JwtAuthenticationProvider(getJwtEncoder(jwtTypePat)));
                 break;
             case jwtTypeInternal:
-                log.info("Using Terrakube Internal Authentication Provider");
+                log.debug("Using Terrakube Internal Authentication Provider");
                 providerManager = new ProviderManager(new JwtAuthenticationProvider(getJwtEncoder(jwtTypeInternal)));
                 break;
             default:
-                log.info("Using Dex JWT Authentication Provider");
+                log.debug("Using Dex JWT Authentication Provider");
                 providerManager = new ProviderManager(new JwtAuthenticationProvider(JwtDecoders.fromIssuerLocation(this.dexIssuerUri)));
                 break;
         }

@@ -39,7 +39,7 @@ public class DexAuthenticatedUserImpl implements AuthenticatedUser {
 
     @Override
     public boolean isServiceAccount(User user) {
-        log.info("isServiceAccount/PAT {}", getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("Terrakube") || getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal"));
+        log.debug("isServiceAccount/PAT {}", getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("Terrakube") || getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal"));
         return getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("Terrakube") || getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal");
     }
 
@@ -57,7 +57,7 @@ public class DexAuthenticatedUserImpl implements AuthenticatedUser {
             isSuperUser = groupService.isMember(user, instanceOwner);
         }
 
-        log.info("{} is super user", isServiceAccount ? applicationName : userName);
+        log.debug("{} is super user", isServiceAccount ? applicationName : userName);
         return isSuperUser;
     }
 
