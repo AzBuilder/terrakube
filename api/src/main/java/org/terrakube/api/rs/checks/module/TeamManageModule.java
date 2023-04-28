@@ -28,7 +28,7 @@ public class TeamManageModule extends OperationCheck<Module> {
 
     @Override
     public boolean ok(Module module, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team manage module {}", module.getId());
+        log.debug("team manage module {}", module.getId());
         boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = module.getOrganization().getTeam();
         for (Team team : teamList) {

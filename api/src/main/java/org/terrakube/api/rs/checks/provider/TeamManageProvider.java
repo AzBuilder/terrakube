@@ -28,7 +28,7 @@ public class TeamManageProvider extends OperationCheck<Provider> {
 
     @Override
     public boolean ok(Provider provider, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team manage provider {}", provider.getId());
+        log.debug("team manage provider {}", provider.getId());
         boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = provider.getOrganization().getTeam();
         for (Team team : teamList) {

@@ -27,7 +27,7 @@ public class TeamViewVcs extends OperationCheck<Vcs> {
 
     @Override
     public boolean ok(Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team view vcs {}", vcs.getId());
+        log.debug("team view vcs {}", vcs.getId());
         List<Team> teamList = vcs.getOrganization().getTeam();
         return authenticatedUser.isSuperUser(requestScope.getUser()) ? true : membershipService.checkMembership(requestScope.getUser(), teamList);
     }

@@ -21,7 +21,7 @@ public class ReadVcsSecret extends OperationCheck<Vcs> {
 
     @Override
     public boolean ok(Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("user view vcs {}", vcs.getId());
+        log.debug("user view vcs {}", vcs.getId());
         return false;
     }
 }

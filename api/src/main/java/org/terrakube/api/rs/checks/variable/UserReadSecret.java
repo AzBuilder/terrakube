@@ -22,7 +22,7 @@ public class UserReadSecret extends OperationCheck<Variable> {
 
     @Override
     public boolean ok(Variable variable, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("user view variable {}", variable.getId());
+        log.debug("user view variable {}", variable.getId());
         if(variable.isSensitive()) {
             return false;
         }

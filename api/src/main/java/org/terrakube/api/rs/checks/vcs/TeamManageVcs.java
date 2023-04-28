@@ -27,7 +27,7 @@ public class TeamManageVcs extends OperationCheck<Vcs> {
 
     @Override
     public boolean ok(Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team manage vcs {}", vcs.getId());
+        log.debug("team manage vcs {}", vcs.getId());
         boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         List<Team> teamList = vcs.getOrganization().getTeam();
         for (Team team : teamList) {
