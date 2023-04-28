@@ -27,7 +27,7 @@ public class TeamViewTemplate extends OperationCheck<Template> {
 
     @Override
     public boolean ok(Template template, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team view template {}", template.getId());
+        log.debug("team view template {}", template.getId());
         List<Team> teamList = template.getOrganization().getTeam();
         return authenticatedUser.isSuperUser(requestScope.getUser()) ? true : membershipService.checkMembership(requestScope.getUser(), teamList);
     }

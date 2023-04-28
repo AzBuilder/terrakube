@@ -27,7 +27,7 @@ public class TeamManageJob extends OperationCheck<Job> {
 
     @Override
     public boolean ok(Job job, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team manage job {}", job.getId());
+        log.debug("team manage job {}", job.getId());
         List<Team> teamList = job.getOrganization().getTeam();
         boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         boolean isWorkspaceLock = job.getWorkspace().isLocked();

@@ -27,7 +27,7 @@ public class TeamViewJob extends OperationCheck<Job> {
 
     @Override
     public boolean ok(Job job, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team view job {}", job.getId());
+        log.debug("team view job {}", job.getId());
         List<Team> teamList = job.getOrganization().getTeam();
         return authenticatedUser.isSuperUser(requestScope.getUser()) ? true : membershipService.checkMembership(requestScope.getUser(), teamList);
 

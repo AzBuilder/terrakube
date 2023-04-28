@@ -52,12 +52,12 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
         List<Team> teamList = organization.getTeam();
         for (Team team : teamList) {
             if (isServiceAccount) {
-                log.info("isServiceMember {} {}", team.getName(), groupService.isServiceMember(user, team.getName()));
+                log.debug("isServiceMember {} {}", team.getName(), groupService.isServiceMember(user, team.getName()));
                 if (groupService.isServiceMember(user, team.getName())) {
                     return true;
                 }
             } else {
-                log.info("isMember {} {}", team.getName(), groupService.isMember(user, team.getName()));
+                log.debug("isMember {} {}", team.getName(), groupService.isMember(user, team.getName()));
                 if (groupService.isMember(user, team.getName()))
                     return true;
             }

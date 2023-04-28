@@ -25,13 +25,13 @@ public class MembershipService {
             if (authenticatedUser.isServiceAccount(user)) {
                 String applicationName = authenticatedUser.getApplication(user);
                 if (groupService.isServiceMember(user, team.getName())) {
-                    log.info("application {} is member of {}", applicationName, team.getName());
+                    log.debug("application {} is member of {}", applicationName, team.getName());
                     return true;
                 }
             } else {
                 String userName = authenticatedUser.getEmail(user);
                 if (groupService.isMember(user, team.getName()))
-                    log.info("user {} is member of {}", userName, team.getName());
+                    log.debug("user {} is member of {}", userName, team.getName());
                 return true;
             }
         }

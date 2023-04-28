@@ -24,7 +24,7 @@ public class TeamViewSsh extends OperationCheck<Ssh> {
 
     @Override
     public boolean ok(Ssh ssh, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team view ssh {}", ssh.getId());
+        log.debug("team view ssh {}", ssh.getId());
         return authenticatedUser.isSuperUser(requestScope.getUser()) ? true : membershipService.checkMembership(requestScope.getUser(), ssh.getOrganization().getTeam());
     }
 }

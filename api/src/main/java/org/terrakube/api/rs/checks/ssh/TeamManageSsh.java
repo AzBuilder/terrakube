@@ -25,7 +25,7 @@ public class TeamManageSsh extends OperationCheck<Ssh> {
 
     @Override
     public boolean ok(Ssh ssh, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team manage ssh {}", ssh.getId());
+        log.debug("team manage ssh {}", ssh.getId());
         boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         for (Team team : ssh.getOrganization().getTeam()) {
             if (isServiceAccount){

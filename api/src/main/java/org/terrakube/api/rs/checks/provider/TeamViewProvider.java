@@ -28,7 +28,7 @@ public class TeamViewProvider extends OperationCheck<Provider> {
 
     @Override
     public boolean ok(Provider provider, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        log.info("team view provider {}", provider.getId());
+        log.debug("team view provider {}", provider.getId());
         List<Team> teamList = provider.getOrganization().getTeam();
         return authenticatedUser.isSuperUser(requestScope.getUser()) ? true : membershipService.checkMembership(requestScope.getUser(), teamList);
     }

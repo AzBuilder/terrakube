@@ -20,7 +20,7 @@ public class DexGroupServiceImpl implements GroupService {
             if (groupName.equals(group))
                 isMember = true;
         }
-        log.info("{} is member {} {}", principal.getTokenAttributes().get("name"), group, isMember);
+        log.debug("{} is member {} {}", principal.getTokenAttributes().get("name"), group, isMember);
         return isMember;
     }
 
@@ -33,9 +33,9 @@ public class DexGroupServiceImpl implements GroupService {
                 if (groupName.equals(group))
                     isMember = true;
             }
-            log.info("{} is member {} {}", principal.getTokenAttributes().get("name"), group, isMember);
+            log.debug("{} is member {} {}", principal.getTokenAttributes().get("name"), group, isMember);
         }else{
-            log.info("TerrakubeInternal Client Service Group Membership");
+            log.debug("TerrakubeInternal Client Service Group Membership");
         }
         return isMember;
     }
