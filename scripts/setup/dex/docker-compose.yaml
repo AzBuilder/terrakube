@@ -26,7 +26,8 @@ services:
   redis-service:
     image: bitnami/redis:7.0.10
     environment:
-      - REDIS_PASSWORD=password123456
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_MASTER_PASSWORD=password123456
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
       - '6379:6379'
