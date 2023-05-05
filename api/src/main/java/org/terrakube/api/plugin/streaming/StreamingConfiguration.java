@@ -18,6 +18,7 @@ public class StreamingConfiguration {
     @Bean
     JedisConnectionFactory jedisConnectionFactory(StreamingProperties streamingProperties) {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(streamingProperties.getHostname(), streamingProperties.getPort());
+        redisStandaloneConfiguration.setPassword(streamingProperties.getPassword());
         JedisConnectionFactory jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
         return jedisConFactory;
     }

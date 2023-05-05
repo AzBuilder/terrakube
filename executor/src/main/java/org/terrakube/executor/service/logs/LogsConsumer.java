@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.TextStringBuilder;
-import org.springframework.scheduling.annotation.Async;
-
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;

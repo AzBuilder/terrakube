@@ -16,4 +16,5 @@ public class StreamingProperties {
 
     private String hostname;
     private int port;
+    private String password;
 }

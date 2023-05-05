@@ -28,7 +28,7 @@ public class StreamingService {
                 String output = stringRecord.getValue().get("output");
                 currentLogs.appendln(output);
             }
-            log.info("{}", currentLogs);
+            log.info("Logs Size: {}", currentLogs.size());
         } catch (Exception ex ){
             log.error(ex.getMessage());
 
