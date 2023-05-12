@@ -10,5 +10,7 @@ public interface AuthenticatedUser {
 
     boolean isServiceAccount(User user);
 
+    boolean isServiceAccountInternal(User user);
+
     boolean isSuperUser(User user);
 }

@@ -44,6 +44,12 @@ public class DexAuthenticatedUserImpl implements AuthenticatedUser {
     }
 
     @Override
+    public boolean isServiceAccountInternal(User user) {
+        log.debug("isServiceAccountInternal {}", getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal"));
+        return getSecurityPrincipal(user).getTokenAttributes().get("iss").equals("TerrakubeInternal");
+    }
+
+    @Override
     public boolean isSuperUser(User user) {
         boolean isServiceAccount=isServiceAccount(user);
         boolean isSuperUser;
