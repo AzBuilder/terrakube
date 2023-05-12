@@ -18,7 +18,7 @@ public class ReadPrivateKey extends OperationCheck<Ssh> {
 
     @Override
     public boolean ok(Ssh ssh, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        if(authenticatedUser.isServiceAccount(requestScope.getUser()) && authenticatedUser.isSuperUser(requestScope.getUser())){
+        if(authenticatedUser.isServiceAccount(requestScope.getUser())){
             return true;
         }
         return false;
