@@ -52,6 +52,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             HashMap<String, String> terraformParametersPlan = getWorkspaceParameters(terraformJob.getVariables());
             HashMap<String, String> environmentVariablesPlan = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
 
+            environmentVariablesPlan.put("GIT_SSH_COMMAND", "ssh -i ~/.ssh/id_rsa");
+
             Consumer<String> planOutput = LogsConsumer.builder()
                     .jobId(Integer.valueOf(terraformJob.getJobId()))
                     .terraformOutput(jobOutput)
