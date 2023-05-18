@@ -117,6 +117,14 @@ public class BashEngine implements CommandExecution {
                 .map(bash -> bash.getParentFile().getAbsolutePath())
                 .collect(Collectors.joining(":"));
 
+        // Loading Bash scripts from working directory if the terraform module has some sh files
+        Collection<File> bashToolsWorkspace = FileUtils.listFiles(workingDirectory, new String[]{"sh"}, true);
+        bashToolsWorkspace.stream().forEach(bash -> bash.setExecutable(true));
+
+        String bashToolsWorkspacePath = bashToolsWorkspace.stream()
+                .map(bash -> bash.getParentFile().getAbsolutePath())
+                .collect(Collectors.joining(":"));
+
         String externalToolsCompletePath = "";
 
         // Search all external tools inside folder /.terrakube/tools
@@ -136,7 +144,7 @@ public class BashEngine implements CommandExecution {
             .collect(Collectors.joining(":"));
         }
 
-        bashToolsCompletePath = String.join(":", externalToolsCompletePath, bashToolsCompletePath);
+        bashToolsCompletePath = String.join(":", externalToolsCompletePath, bashToolsCompletePath, bashToolsWorkspacePath);
         return bashToolsCompletePath;
     }
 
