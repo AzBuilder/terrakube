@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.terrakube.terraform.TerraformClient;
 import org.springframework.stereotype.Service;
 import org.terrakube.executor.service.logs.*;
+import org.terrakube.terraform.TerraformProcessData;
 
 import java.io.File;
 import java.io.IOException;
@@ -356,7 +357,18 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
                 terraformJob.getWorkspaceId(), workingDirectory);
 
-        terraformClient.init(terraformJob.getTerraformVersion(), workingDirectory, null, output, errorOutput)
+        File sshFolder = null
+
+        TerraformProcessData terraformProcessData = TerraformProcessData.builder()
+                .terraformVersion(terraformJob.getTerraformVersion())
+                .terraformVariables(terraformJob.getVariables())
+                .terraformEnvironmentVariables(terraformJob.getEnvironmentVariables())
+                .workingDirectory(workingDirectory)
+                .terraformBackendConfigFileName(backendFile)
+                .sshFile(sshFolder)
+                .build();
+
+        terraformClient.init(terraformProcessData, output, errorOutput)
                 .get();
         return backendFile;
     }

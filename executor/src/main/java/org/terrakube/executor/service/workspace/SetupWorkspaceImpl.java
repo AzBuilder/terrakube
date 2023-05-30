@@ -35,8 +35,7 @@ import java.util.UUID;
 public class SetupWorkspaceImpl implements SetupWorkspace {
 
     private static final String EXECUTOR_DIRECTORY = "%s/.terraform-spring-boot/executor/%s/%s/.originRepository";
-    private static final String SSH_DIRECTORY = "%s/.terraform-spring-boot/ssh/executor/%s/%s/%s";
-    private static final String SSH_EXECUTOR_JOB = "%s/.terraform-spring-boot/ssh/executor/%s";
+    private static final String SSH_DIRECTORY = "%s/.terraform-spring-boot/ssh/executor/%s/%s/.ssh/%s";
 
     WorkspaceSecurity workspaceSecurity;
     boolean enableRegistrySecurity;
@@ -52,7 +51,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         try {
             workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
             if (!terraformJob.getBranch().equals("remote-content")) {
-                downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getJobId());
+                downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
             } else {
                 downloadWorkspaceTarGz(workspaceCloneFolder.getParentFile(), terraformJob.getSource());
             }
@@ -77,7 +76,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return executorFolder;
     }
 
-    private void downloadWorkspace(File gitCloneFolder, String source, String branch, String workspaceFolder, String vcsType, String accessToken, String jobId) throws IOException {
+    private void downloadWorkspace(File gitCloneFolder, String source, String branch, String workspaceFolder, String vcsType, String accessToken, String organizationId, String workspaceId) throws IOException {
         try {
             if (vcsType.startsWith("SSH")) {
                 Git.cloneRepository()
@@ -85,10 +84,9 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .setDirectory(gitCloneFolder)
                         .setBranch(branch)
                         .setTransportConfigCallback(transport -> {
-                            ((SshTransport) transport).setSshSessionFactory(getSshdSessionFactory(vcsType, accessToken, jobId));
+                            ((SshTransport) transport).setSshSessionFactory(getSshdSessionFactory(vcsType, accessToken, organizationId, workspaceId));
                         })
                         .call();
-                FileUtils.deleteDirectory(new File(String.format(SSH_EXECUTOR_JOB, FileUtils.getUserDirectoryPath(), jobId)));
             } else {
                 Git.cloneRepository()
                         .setURI(source)
@@ -187,8 +185,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         }
     }
 
-    public SshdSessionFactory getSshdSessionFactory(String vcsType, String accessToken, String jobId) {
-        File sshDir = generateWorkspaceSshFolder(vcsType, accessToken, jobId);
+    public SshdSessionFactory getSshdSessionFactory(String vcsType, String accessToken, String organizationId, String workspaceId) {
+        File sshDir = generateWorkspaceSshFolder(vcsType, accessToken, organizationId, workspaceId);
         SshdSessionFactory sshdSessionFactory = new SshdSessionFactoryBuilder()
                 .setServerKeyDatabase((h, s) -> new ServerKeyDatabase() {
 
@@ -216,13 +214,12 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return sshdSessionFactory;
     }
 
-    private File generateWorkspaceSshFolder(String vcsType, String privateKey, String jobId) {
-        String sshId = UUID.randomUUID().toString();
+    private File generateWorkspaceSshFolder(String vcsType, String privateKey, String organizationId, String workspaceId) {
         String sshFileName = vcsType.split("~")[1];
-        String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), jobId, sshId, sshFileName);
+        String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), organizationId, workspaceId, sshFileName);
         File sshFile = new File(sshFilePath);
         try {
-            log.info("Creating new SSH folder for job {} sshId {}", jobId, sshId);
+            log.info("Creating new SSH folder for job {} sshId {}", organizationId, workspaceId);
             FileUtils.forceMkdirParent(sshFile);
             FileUtils.writeStringToFile(sshFile, privateKey, Charset.defaultCharset());
         } catch (IOException e) {
