@@ -35,7 +35,7 @@ import java.util.UUID;
 public class SetupWorkspaceImpl implements SetupWorkspace {
 
     private static final String EXECUTOR_DIRECTORY = "%s/.terraform-spring-boot/executor/%s/%s/.originRepository";
-    private static final String SSH_DIRECTORY = "%s/.terraform-spring-boot/ssh/executor/%s/%s/.ssh/%s";
+    public static final String SSH_DIRECTORY = "%s/.terraform-spring-boot/ssh/executor/%s/%s/.ssh/%s";
 
     WorkspaceSecurity workspaceSecurity;
     boolean enableRegistrySecurity;

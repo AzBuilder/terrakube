@@ -3,6 +3,7 @@ package org.terrakube.executor.service.terraform;
 import com.diogonunes.jcolor.AnsiFormat;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.TextStringBuilder;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.service.executor.ExecutorJobResult;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 import static com.diogonunes.jcolor.Attribute.*;
+import static org.terrakube.executor.service.workspace.SetupWorkspaceImpl.SSH_DIRECTORY;
 
 @AllArgsConstructor
 @Slf4j
@@ -357,7 +359,12 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
                 terraformJob.getWorkspaceId(), workingDirectory);
 
-        File sshFolder = null
+        File sshKeyFile = null;
+        if (terraformJob.getVcsType().startsWith("SSH")) {
+            String sshFileName = terraformJob.getVcsType().split("~")[1];
+            String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), sshFileName);
+            sshKeyFile = new File(sshFilePath);
+        }
 
         TerraformProcessData terraformProcessData = TerraformProcessData.builder()
                 .terraformVersion(terraformJob.getTerraformVersion())
@@ -365,7 +372,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 .terraformEnvironmentVariables(terraformJob.getEnvironmentVariables())
                 .workingDirectory(workingDirectory)
                 .terraformBackendConfigFileName(backendFile)
-                .sshFile(sshFolder)
+                .sshFile(sshKeyFile)
                 .build();
 
         terraformClient.init(terraformProcessData, output, errorOutput)
