@@ -339,6 +339,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                                         Consumer<String> errorOutput) throws IOException, ExecutionException, InterruptedException {
         initBanner(terraformJob, output);
         TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
+        terraformProcessData.setTerraformEnvironmentVariables(new HashMap<>());
+        terraformProcessData.setTerraformVariables(new HashMap<>());
         terraformClient.init(terraformProcessData, output, errorOutput)
                 .get();
         return terraformProcessData.getTerraformBackendConfigFileName();
