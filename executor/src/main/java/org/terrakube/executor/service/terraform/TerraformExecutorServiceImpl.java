@@ -84,21 +84,12 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 if (isDestroy) {
                     log.warn("Executor running a plan to destroy resources...");
                     executionPlan = terraformClient.planDestroy(
-                            terraformJob.getTerraformVersion(),
-                            workingDirectory,
-                            null,
-                            terraformParametersPlan,
-                            environmentVariablesPlan,
+                            getTerraformProcessData(terraformJob, workingDirectory),
                             planOutput,
                             planOutputError).get();
-                }
-                else
+                } else
                     executionPlan = terraformClient.plan(
-                            terraformJob.getTerraformVersion(),
-                            workingDirectory,
-                            null,
-                            terraformParametersPlan,
-                            environmentVariablesPlan,
+                            getTerraformProcessData(terraformJob, workingDirectory),
                             planOutput,
                             planOutputError).get();
 
@@ -160,14 +151,12 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             showTerraformMessage("APPLY", applyOutput);
             if (scriptBeforeSuccess) {
+                TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
+                terraformProcessData.setTerraformVariables((terraformState.downloadTerraformPlan(terraformJob.getOrganizationId(),
+                        terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(),
+                        workingDirectory) ? new HashMap<>() : terraformParameters));
                 execution = terraformClient.apply(
-                        terraformJob.getTerraformVersion(),
-                        workingDirectory,
-                        null,
-                        (terraformState.downloadTerraformPlan(terraformJob.getOrganizationId(),
-                                terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(),
-                                workingDirectory) ? new HashMap<>() : terraformParameters),
-                        environmentVariables,
+                        terraformProcessData,
                         applyOutput,
                         applyErrorOutput).get();
 
@@ -228,11 +217,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             showTerraformMessage("DESTROY", outputDestroy);
             if (scriptBeforeSuccess) {
                 execution = terraformClient.destroy(
-                        terraformJob.getTerraformVersion(),
-                        workingDirectory,
-                        null,
-                        terraformParameters,
-                        environmentVariables,
+                        getTerraformProcessData(terraformJob, workingDirectory),
                         outputDestroy,
                         errorOutputDestroy).get();
 
@@ -307,7 +292,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         log.info("Running Terraform show");
         TextStringBuilder jsonState = new TextStringBuilder();
         Consumer<String> applyJSON = getStringConsumer(jsonState);
-        Boolean showPlan = terraformClient.show(terraformJob.getTerraformVersion(), workingDirectory, null, applyJSON, applyJSON).get();
+        Boolean showPlan = terraformClient.show(getTerraformProcessData(terraformJob, workingDirectory), applyJSON, applyJSON).get();
         if (Boolean.TRUE.equals(showPlan)) {
             log.info("Uploading terraform state json");
             terraformState.saveStateJson(terraformJob, jsonState.toString());
@@ -316,8 +301,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> terraformJsonOutput = getStringConsumer(jsonOutput);
 
             log.info("Checking terraform output json");
-            Boolean showOutput = terraformClient.output(terraformJob.getTerraformVersion(), workingDirectory, terraformJsonOutput,
-                    terraformJsonOutput).get();
+            Boolean showOutput = terraformClient.output(getTerraformProcessData(terraformJob, workingDirectory), terraformJsonOutput, terraformJsonOutput).get();
             if (Boolean.TRUE.equals(showOutput))
                 terraformJob.setTerraformOutput(jsonOutput.toString());
         }
@@ -353,31 +337,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     private String executeTerraformInit(TerraformJob terraformJob, File workingDirectory, Consumer<String> output,
                                         Consumer<String> errorOutput) throws IOException, ExecutionException, InterruptedException {
-
         initBanner(terraformJob, output);
-
-        String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
-                terraformJob.getWorkspaceId(), workingDirectory);
-
-        File sshKeyFile = null;
-        if (terraformJob.getVcsType().startsWith("SSH")) {
-            String sshFileName = terraformJob.getVcsType().split("~")[1];
-            String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), sshFileName);
-            sshKeyFile = new File(sshFilePath);
-        }
-
-        TerraformProcessData terraformProcessData = TerraformProcessData.builder()
-                .terraformVersion(terraformJob.getTerraformVersion())
-                .terraformVariables(terraformJob.getVariables())
-                .terraformEnvironmentVariables(terraformJob.getEnvironmentVariables())
-                .workingDirectory(workingDirectory)
-                .terraformBackendConfigFileName(backendFile)
-                .sshFile(sshKeyFile)
-                .build();
-
+        TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
         terraformClient.init(terraformProcessData, output, errorOutput)
                 .get();
-        return backendFile;
+        return terraformProcessData.getTerraformBackendConfigFileName();
     }
 
     private HashMap<String, String> getWorkspaceParameters(HashMap<String, String> parameters) {
@@ -408,5 +372,29 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
         output.accept(colorize("Running Terraform " + operation, colorMessage));
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
+    }
+
+    private TerraformProcessData getTerraformProcessData(TerraformJob terraformJob, File workingDirectory) {
+
+        String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
+                terraformJob.getWorkspaceId(), workingDirectory);
+
+        File sshKeyFile = null;
+        if (terraformJob.getVcsType().startsWith("SSH")) {
+            String sshFileName = terraformJob.getVcsType().split("~")[1];
+            String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), sshFileName);
+            sshKeyFile = new File(sshFilePath);
+        }
+
+        TerraformProcessData terraformProcessData = TerraformProcessData.builder()
+                .terraformVersion(terraformJob.getTerraformVersion())
+                .terraformVariables(terraformJob.getVariables())
+                .terraformEnvironmentVariables(terraformJob.getEnvironmentVariables())
+                .workingDirectory(workingDirectory)
+                .terraformBackendConfigFileName(backendFile)
+                .sshFile(sshKeyFile)
+                .build();
+
+        return terraformProcessData;
     }
 }
