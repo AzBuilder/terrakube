@@ -222,7 +222,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         try {
             log.info("Creating new SSH folder for organization {} wordkspace {}", organizationId, workspaceId);
             FileUtils.forceMkdirParent(sshFile);
-            FileUtils.writeStringToFile(sshFile, privateKey, Charset.defaultCharset());
+            FileUtils.writeStringToFile(sshFile, privateKey + "\n", Charset.defaultCharset());
             
             Set<PosixFilePermission> perms = new HashSet<>();
             perms.add(PosixFilePermission.OWNER_READ);
