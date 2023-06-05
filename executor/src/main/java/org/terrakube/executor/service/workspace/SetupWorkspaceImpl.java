@@ -25,10 +25,11 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.PublicKey;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -219,10 +220,16 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), organizationId, workspaceId, sshFileName);
         File sshFile = new File(sshFilePath);
         try {
-            log.info("Creating new SSH folder for job {} sshId {}", organizationId, workspaceId);
+            log.info("Creating new SSH folder for organization {} wordkspace {}", organizationId, workspaceId);
             FileUtils.forceMkdirParent(sshFile);
             FileUtils.writeStringToFile(sshFile, privateKey, Charset.defaultCharset());
+            Set<PosixFilePermission> perms = new HashSet<>();
+            perms.add(PosixFilePermission.OWNER_READ);
+            perms.add(PosixFilePermission.OWNER_WRITE);
+
+            Files.setPosixFilePermissions(Path.of(sshFile.getAbsolutePath()), perms);
         } catch (IOException e) {
+            e.printStackTrace();
             log.error(e.getMessage());
         }
         return sshFile.getParentFile();
