@@ -52,7 +52,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         try {
             workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
             if (!terraformJob.getBranch().equals("remote-content")) {
-                downloadWorkspace(workspaceCloneFolder, terraformJob.getSource(), terraformJob.getBranch(), terraformJob.getFolder(), terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+                downloadWorkspace(workspaceCloneFolder, terraformJob);
             } else {
                 downloadWorkspaceTarGz(workspaceCloneFolder.getParentFile(), terraformJob.getSource());
             }
@@ -77,30 +77,30 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return executorFolder;
     }
 
-    private void downloadWorkspace(File gitCloneFolder, String source, String branch, String workspaceFolder, String vcsType, String accessToken, String organizationId, String workspaceId) throws IOException {
+    private void downloadWorkspace(File gitCloneFolder, TerraformJob terraformJob) throws IOException {
         try {
-            if (vcsType.startsWith("SSH")) {
+            if (terraformJob.getVcsType().startsWith("SSH")) {
                 Git.cloneRepository()
-                        .setURI(source)
+                        .setURI(terraformJob.getSource())
                         .setDirectory(gitCloneFolder)
-                        .setBranch(branch)
+                        .setBranch(terraformJob.getBranch())
                         .setTransportConfigCallback(transport -> {
-                            ((SshTransport) transport).setSshSessionFactory(getSshdSessionFactory(vcsType, accessToken, organizationId, workspaceId));
+                            ((SshTransport) transport).setSshSessionFactory(getSshdSessionFactory(terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()));
                         })
                         .call();
             } else {
                 Git.cloneRepository()
-                        .setURI(source)
+                        .setURI(terraformJob.getSource())
                         .setDirectory(gitCloneFolder)
-                        .setCredentialsProvider(setupCredentials(vcsType, accessToken))
-                        .setBranch(branch)
+                        .setCredentialsProvider(setupCredentials(terraformJob.getVcsType(), terraformJob.getAccessToken()))
+                        .setBranch(terraformJob.getBranch())
                         .call();
             }
 
             getCommitId(gitCloneFolder);
 
-            log.info("Copy files from folder {} to {}", gitCloneFolder.getPath() + workspaceFolder, gitCloneFolder.getParentFile().getPath());
-            File finalWorkspaceFolder = new File(gitCloneFolder.getPath() + workspaceFolder);
+            log.info("Copy files from folder {} to {}", gitCloneFolder.getPath() + terraformJob.getFolder(), gitCloneFolder.getParentFile().getPath());
+            File finalWorkspaceFolder = new File(gitCloneFolder.getPath() + terraformJob.getFolder());
             if (finalWorkspaceFolder.exists())
                 for (File srcFile : finalWorkspaceFolder.listFiles()) {
                     log.info("Copy {} to {}", srcFile.getName(), gitCloneFolder.getParentFile().getPath());
@@ -111,7 +111,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                     }
                 }
             else {
-                log.error("Folder {} does not exists in the repository", workspaceFolder);
+                log.error("Folder {} does not exists in the repository", terraformJob.getFolder());
             }
 
         } catch (GitAPIException ex) {
