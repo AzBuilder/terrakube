@@ -230,7 +230,6 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
             Files.setPosixFilePermissions(Path.of(sshFile.getAbsolutePath()), perms);
         } catch (IOException e) {
-            e.printStackTrace();
             log.error(e.getMessage());
         }
         return sshFile.getParentFile();
