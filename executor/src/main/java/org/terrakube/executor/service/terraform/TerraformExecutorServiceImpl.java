@@ -341,8 +341,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
         terraformProcessData.setTerraformEnvironmentVariables(new HashMap<>());
         terraformProcessData.setTerraformVariables(new HashMap<>());
-        terraformClient.init(terraformProcessData, output, errorOutput)
-                .get();
+        terraformClient.init(terraformProcessData, output, errorOutput).get();
         return terraformProcessData.getTerraformBackendConfigFileName();
     }
 
@@ -378,7 +377,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     private TerraformProcessData getTerraformProcessData(TerraformJob terraformJob, File workingDirectory) {
 
-        String backendFile = terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
+        terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
                 terraformJob.getWorkspaceId(), workingDirectory);
 
         File sshKeyFile = null;
@@ -393,7 +392,6 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 .terraformVariables(terraformJob.getVariables())
                 .terraformEnvironmentVariables(terraformJob.getEnvironmentVariables())
                 .workingDirectory(workingDirectory)
-                .terraformBackendConfigFileName(backendFile)
                 .sshFile(sshKeyFile)
                 .build();
 
