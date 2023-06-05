@@ -133,7 +133,6 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .build();
 
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
-            HashMap<String, String> environmentVariables = getWorkspaceParameters(terraformJob.getEnvironmentVariables());
 
             boolean execution = false;
             boolean scriptBeforeSuccess;
