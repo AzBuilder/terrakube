@@ -287,7 +287,10 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         log.info("Running Terraform show");
         TextStringBuilder jsonState = new TextStringBuilder();
         Consumer<String> applyJSON = getStringConsumer(jsonState);
-        Boolean showPlan = terraformClient.show(getTerraformProcessData(terraformJob, workingDirectory), applyJSON, applyJSON).get();
+        TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
+        terraformProcessData.setTerraformVariables(new HashMap());
+        terraformProcessData.setTerraformEnvironmentVariables(new HashMap());
+        Boolean showPlan = terraformClient.show(terraformProcessData, applyJSON, applyJSON).get();
         if (Boolean.TRUE.equals(showPlan)) {
             log.info("Uploading terraform state json");
             terraformState.saveStateJson(terraformJob, jsonState.toString());
