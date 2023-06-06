@@ -299,7 +299,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Consumer<String> terraformJsonOutput = getStringConsumer(jsonOutput);
 
             log.info("Checking terraform output json");
-            Boolean showOutput = terraformClient.output(getTerraformProcessData(terraformJob, workingDirectory), terraformJsonOutput, terraformJsonOutput).get();
+            Boolean showOutput = terraformClient.output(terraformProcessData, terraformJsonOutput, terraformJsonOutput).get();
             if (Boolean.TRUE.equals(showOutput))
                 terraformJob.setTerraformOutput(jsonOutput.toString());
         }
@@ -340,6 +340,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         terraformProcessData.setTerraformEnvironmentVariables(new HashMap<>());
         terraformProcessData.setTerraformVariables(new HashMap<>());
         terraformClient.init(terraformProcessData, output, errorOutput).get();
+
+        Thread.sleep(5000);
         return terraformProcessData.getTerraformBackendConfigFileName();
     }
 
