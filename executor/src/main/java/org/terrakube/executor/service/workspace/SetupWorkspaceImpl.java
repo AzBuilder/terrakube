@@ -133,6 +133,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
                     File f = new File(String.format("%s/%s", destinationFilePath, entry.getName()));
+                    log.info("Creating folder: {}", f.getCanonicalPath());
                     String canonicalDestinationPath = f.getCanonicalPath();
 
                     if( !canonicalDestinationPath.startsWith(destinationFilePath)){
@@ -151,6 +152,10 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
                     if( !canonicalDestinationPath.startsWith(destinationFilePath)){
                         throw new IOException("Entry is outside of the target directory");
+                    }
+                    if (!f.exists()) {
+                        f.getParentFile().mkdirs();
+                        f.createNewFile();
                     }
                     FileOutputStream fos = new FileOutputStream(f.getCanonicalPath(), false);
                     log.info("Adding file {} to workspace context", destinationFilePath + "/" + entry.getName());
