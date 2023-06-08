@@ -1,8 +1,11 @@
 package org.terrakube.api.plugin.state;
 
+import com.amazonaws.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,15 @@ public class RemoteTfeController {
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/entitlement-set")
     public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName)));
+    }
+
+    @GetMapping(produces = "application/vnd.api+json", path = "ping")
+    public ResponseEntity<String> ping() {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("TFP-API-Version", "2.5");
+        responseHeaders.set("TFP-AppName", "Terrakube");
+        ResponseEntity response = new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
+        return response;
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}")
