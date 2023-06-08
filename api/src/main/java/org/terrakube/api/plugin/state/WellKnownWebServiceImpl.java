@@ -19,6 +19,7 @@ public class WellKnownWebServiceImpl {
             "    \"ports\": [10000, 10001]\n" +
             "    }, \n" +
             "  \"state.v2\": \"/remote/state/v2/\"\n," +
+            "  \"tfe.v2\": \"/remote/tfe/v2/\"\n," +
             "  \"tfe.v2.1\": \"/remote/tfe/v2/\"\n" +
             "}";
 
