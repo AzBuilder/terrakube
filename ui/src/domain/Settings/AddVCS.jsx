@@ -1,6 +1,16 @@
 import { React, useState } from "react";
 import "./Settings.css";
-import { Steps, Space, Button, Form, Input, Row, Col, Typography } from "antd";
+import {
+  Steps,
+  Space,
+  Button,
+  Form,
+  Input,
+  Row,
+  Col,
+  Typography,
+  message,
+} from "antd";
 import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { HiOutlineExternalLink } from "react-icons/hi";
@@ -436,6 +446,27 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           );
           loadVCS();
           setMode("list");
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 403) {
+            message.error(
+              <span>
+                You are not authorized to create VCS Settings. <br /> Please
+                contact your administrator and request the{" "}
+                <b>Manage VCS Settings</b> permission. <br /> For more
+                information, visit the{" "}
+                <a
+                  target="_blank"
+                  href="https://docs.terrakube.org/user-guide/organizations/team-management"
+                >
+                  Terrakube documentation
+                </a>
+                .
+              </span>
+            );
+          }
         }
       });
   };
