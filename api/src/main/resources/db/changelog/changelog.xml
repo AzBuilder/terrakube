@@ -31,4 +31,5 @@
     <include file="/db/changelog/local/changelog-2.9.0-delete-workspace.xml"/>
     <include file="/db/changelog/local/changelog-2.10.0-remote-state.xml"/>
     <include file="/db/changelog/local/changelog-2.10.0-workspace-audit.xml"/>
+    <include file="/db/changelog/local/changelog-2.14.0-vcs-redirect-url.xml"/>
 </databaseChangeLog>

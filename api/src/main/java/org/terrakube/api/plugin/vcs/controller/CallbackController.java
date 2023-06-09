@@ -2,9 +2,14 @@ package org.terrakube.api.plugin.vcs.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.TokenService;
+
+import com.amazonaws.services.s3.internal.eventstreaming.HeaderValue;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 @Slf4j
 @RestController
@@ -15,14 +20,20 @@ public class CallbackController {
     TokenService tokenService;
 
     @GetMapping("/vcs/{vcsId}")
-    public ResponseEntity<String> connected(@PathVariable("vcsId") String vcsId, @RequestParam String code){
-        if(code != null){
+    public ResponseEntity<String> connected(@PathVariable("vcsId") String vcsId, @RequestParam String code) {
+        if (code != null) {
             log.info("Updating connection for vcs {}", vcsId);
-            tokenService.generateAccessToken(vcsId, code);
+            String redirectUrl = tokenService.generateAccessToken(vcsId, code);
+
+            if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("location", redirectUrl);
+                return new ResponseEntity<String>(headers, HttpStatus.FOUND);
+            }
             return ResponseEntity.ok("Connected");
+
         }
         return ResponseEntity.ok().build();
     }
 
 }
-

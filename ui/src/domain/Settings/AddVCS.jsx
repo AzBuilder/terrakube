@@ -411,6 +411,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           clientId: values.clientId,
           clientSecret: values.clientSecret,
           callback: uuid,
+          redirectUrl: `${window._env_.REACT_APP_REDIRECT_URI}/organizations/${orgid}/settings/vcs`,
         },
       },
     };
