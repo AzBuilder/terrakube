@@ -1,6 +1,6 @@
 import { React, useState, useRef, useEffect } from "react";
 import "./Settings.css";
-import { Steps, Space, Button, Form, Input, Card, List } from "antd";
+import { Steps, Space, Button, Form, Input, Card, List, message } from "antd";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
@@ -127,6 +127,27 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
         if (response.status == "201") {
           loadTemplates();
           setMode("list");
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 403) {
+            message.error(
+              <span>
+                You are not authorized to create Templates. <br /> Please
+                contact your administrator and request the{" "}
+                <b>Manage Templates</b> permission. <br /> For more information,
+                visit the{" "}
+                <a
+                  target="_blank"
+                  href="https://docs.terrakube.org/user-guide/organizations/team-management"
+                >
+                  Terrakube documentation
+                </a>
+                .
+              </span>
+            );
+          }
         }
       });
   };
