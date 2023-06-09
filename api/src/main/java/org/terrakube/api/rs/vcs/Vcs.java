@@ -11,7 +11,6 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
-
 @ReadPermission(expression = "team view vcs")
 @CreatePermission(expression = "team manage vcs")
 @UpdatePermission(expression = "team manage vcs")
@@ -64,6 +63,9 @@ public class Vcs extends GenericAuditFields {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "token_expiration")
     private Date tokenExpiration;
+
+    @Column(name = "redirect_url")
+    private String redirectUrl;
 
     @ManyToOne
     private Organization organization;
