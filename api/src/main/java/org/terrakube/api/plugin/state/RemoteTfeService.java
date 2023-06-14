@@ -451,7 +451,14 @@ public class RemoteTfeService {
         workspaceModel.setData(new Resource());
         relationships.setWorkspace(workspaceModel);
 
+        runsData.setIncluded(new ArrayList());
+
+        if(include.equals("workspace")){
+            runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(), job.getWorkspace().getName(), new HashMap<>()));
+        }
+        
         runsData.getData().setRelationships(relationships);
+        
         log.info("{}", runsData.toString());
         return runsData;
     }
