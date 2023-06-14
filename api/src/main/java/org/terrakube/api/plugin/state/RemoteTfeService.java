@@ -190,6 +190,8 @@ public class RemoteTfeService {
             defaultAttributes.put("can-update-variable", true);
             defaultAttributes.put("can-read-assessment-result", true);
             defaultAttributes.put("can-force-delete", true);
+            defaultAttributes.put("structured-run-output-enabled", true);
+
 
             attributes.put("permissions", defaultAttributes);
 
