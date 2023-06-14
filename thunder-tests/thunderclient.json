@@ -2570,5 +2570,41 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "09d0577b-3ebf-4b8b-8920-f9e86b8beeda",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "d1bb220a-b9b1-4ca5-a767-07eb6e29f872",
+    "name": "ping",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/ping",
+    "method": "GET",
+    "sortNum": 840000,
+    "created": "2023-06-08T22:44:50.795Z",
+    "modified": "2023-06-08T23:37:47.004Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "591f54e4-48ef-47e9-908c-7b3133ff7244",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "d1bb220a-b9b1-4ca5-a767-07eb6e29f872",
+    "name": "terraform.json",
+    "url": "{{terrakubeApi}}/.well-known/terraform.json",
+    "method": "GET",
+    "sortNum": 420000,
+    "created": "2023-06-08T23:17:02.253Z",
+    "modified": "2023-06-08T23:26:53.792Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]
