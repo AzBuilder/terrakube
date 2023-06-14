@@ -127,7 +127,7 @@ public class RemoteTfeController {
 
     @Transactional
     @GetMapping (produces = "application/vnd.api+json", path = "/runs/{runId}")
-    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId,@RequestParam(name = "include") String include) {
+    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId,@RequestParam(name = "include", required = false) String include) {
         return ResponseEntity.ok(remoteTfeService.getRun(runId, include));
     }
 

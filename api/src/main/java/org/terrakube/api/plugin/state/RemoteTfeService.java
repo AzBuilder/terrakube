@@ -190,7 +190,7 @@ public class RemoteTfeService {
             defaultAttributes.put("can-update-variable", true);
             defaultAttributes.put("can-read-assessment-result", true);
             defaultAttributes.put("can-force-delete", true);
-            defaultAttributes.put("structured-run-output-enabled", true);
+            //defaultAttributes.put("structured-run-output-enabled", true);
 
 
             attributes.put("permissions", defaultAttributes);
@@ -455,13 +455,15 @@ public class RemoteTfeService {
 
         org.terrakube.api.plugin.state.model.runs.WorkspaceModel workspaceModel = new org.terrakube.api.plugin.state.model.runs.WorkspaceModel();
         workspaceModel.setData(new Resource());
+        workspaceModel.getData().setId(job.getWorkspace().getId().toString());
+        workspaceModel.getData().setType("workspaces");
         relationships.setWorkspace(workspaceModel);
 
-        runsData.setIncluded(new ArrayList());
-
-        if(include.equals("workspace")){
-            runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(), job.getWorkspace().getName(), new HashMap<>()));
-        }
+        log.info("Included: {}", include);
+        //if(include != null && include.equals("workspace")){
+        //    runsData.setIncluded(new ArrayList());
+        //    runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(), job.getWorkspace().getName(), new HashMap<>()));
+        //}
         
         runsData.getData().setRelationships(relationships);
         
