@@ -219,8 +219,14 @@ public class RemoteTfeService {
             Workspace newWorkspace = new Workspace();
             newWorkspace.setId(UUID.randomUUID());
             newWorkspace.setName(workspaceData.getData().getAttributes().get("name").toString());
-            newWorkspace
-                    .setTerraformVersion(workspaceData.getData().getAttributes().get("terraform-version").toString());
+            String terraformVersion = "";
+            if(workspaceData.getData().getAttributes().get("terraform-version") != null){
+                terraformVersion = workspaceData.getData().getAttributes().get("terraform-version").toString();
+            } else {
+                terraformVersion = "1.4.6";
+                log.warn("Using default terraform version: {}", terraformVersion);
+            }
+            newWorkspace.setTerraformVersion(terraformVersion);
             newWorkspace.setSource("empty");
             newWorkspace.setBranch("remote-content");
             newWorkspace.setOrganization(organization);
