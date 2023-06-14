@@ -217,14 +217,8 @@ public class RemoteTfeService {
             Workspace newWorkspace = new Workspace();
             newWorkspace.setId(UUID.randomUUID());
             newWorkspace.setName(workspaceData.getData().getAttributes().get("name").toString());
-            String terraformVersion = "";
-            if(workspaceData.getData().getAttributes().get("terraform-version") != null){
-                terraformVersion = workspaceData.getData().getAttributes().get("terraform-version").toString();
-            } else {
-                terraformVersion = "1.4.6";
-                log.warn("Using default terraform version: {}", terraformVersion);
-            }
-            newWorkspace.setTerraformVersion(terraformVersion);
+            newWorkspace
+                    .setTerraformVersion(workspaceData.getData().getAttributes().get("terraform-version").toString());
             newWorkspace.setSource("empty");
             newWorkspace.setBranch("remote-content");
             newWorkspace.setOrganization(organization);
@@ -382,7 +376,7 @@ public class RemoteTfeService {
         log.info("Job Created");
         scheduleJobService.createJobContext(job);
         log.info("Job Context Created");
-        return getRun(job.getId());
+        return getRun(job.getId(), null);
     }
 
     private String getTemplateName(String configurationId, boolean isDestroy) {
@@ -398,7 +392,7 @@ public class RemoteTfeService {
         }
     }
 
-    RunsData getRun(int runId) {
+    RunsData getRun(int runId, String include) {
         log.info("Searching Run {}", runId);
         RunsData runsData = new RunsData();
         RunsModel runsModel = new RunsModel();
@@ -408,27 +402,7 @@ public class RemoteTfeService {
 
         String planStatus = "running";
         Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
-        /*
-         * if (job.getStep() != null && !job.getStep().isEmpty()) {
-         * List<Step> stepList = job.getStep();
-         * for (Step step : stepList) {
-         * if (step.getStepNumber() == 100) {
-         * switch (step.getStatus()) {
-         * case completed:
-         * planStatus = "finished";
-         * break;
-         * case running:
-         * case queue:
-         * planStatus = "running";
-         * break;
-         * case failed:
-         * planStatus = "errored";
-         * break;
-         * }
-         * }
-         * }
-         * }
-         */
+
         switch (job.getStatus()) {
             case completed:
                 planStatus = "finished";
@@ -471,6 +445,10 @@ public class RemoteTfeService {
         applyModel.getData().setId(String.valueOf(runId));
         relationships.setApply(applyModel);
 
+        org.terrakube.api.plugin.state.model.runs.WorkspaceModel workspaceModel = new org.terrakube.api.plugin.state.model.runs.WorkspaceModel();
+        workspaceModel.setData(new Resource());
+        relationships.setWorkspace(workspaceModel);
+
         runsData.getData().setRelationships(relationships);
         log.info("{}", runsData.toString());
         return runsData;
@@ -491,7 +469,7 @@ public class RemoteTfeService {
                 }
             }
         }
-        return getRun(runId);
+        return getRun(runId, null);
     }
 
     RunsData runDiscard(int runId) {
@@ -504,7 +482,7 @@ public class RemoteTfeService {
         } catch (ParseException | SchedulerException e) {
             throw new RuntimeException(e);
         }
-        return getRun(runId);
+        return getRun(runId, null);
     }
 
     PlanRunData getPlan(int planId) {
