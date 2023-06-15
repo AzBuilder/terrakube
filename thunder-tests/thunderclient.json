@@ -2606,5 +2606,40 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "8b8abb72-6aba-49b4-b0f5-10045b9cc363",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "d1bb220a-b9b1-4ca5-a767-07eb6e29f872",
+    "name": "ping Copy",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/runs/1?include=workspaces",
+    "method": "GET",
+    "sortNum": 850000,
+    "created": "2023-06-14T23:02:33.685Z",
+    "modified": "2023-06-14T23:50:13.461Z",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "*/*",
+        "isDisabled": true
+      },
+      {
+        "name": "User-Agent",
+        "value": "Thunder Client (https://www.thunderclient.com)",
+        "isDisabled": true
+      }
+    ],
+    "params": [
+      {
+        "name": "include",
+        "value": "workspaces",
+        "isPath": false
+      }
+    ],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]
