@@ -1,5 +1,6 @@
 package org.terrakube.api.plugin.state;
 
+import com.amazonaws.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
@@ -44,7 +45,7 @@ public class RemoteTfeController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("TFP-API-Version", "2.5");
         responseHeaders.set("TFP-AppName", "Terrakube");
-        ResponseEntity response = new ResponseEntity<>(responseHeaders, HttpStatus.NO_CONTENT);
+        ResponseEntity response = new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
         return response;
     }
 
@@ -126,8 +127,8 @@ public class RemoteTfeController {
 
     @Transactional
     @GetMapping (produces = "application/vnd.api+json", path = "/runs/{runId}")
-    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId) {
-        return ResponseEntity.ok(remoteTfeService.getRun(runId));
+    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId,@RequestParam(name = "include", required = false) String include) {
+        return ResponseEntity.ok(remoteTfeService.getRun(runId, include));
     }
 
     @Transactional
