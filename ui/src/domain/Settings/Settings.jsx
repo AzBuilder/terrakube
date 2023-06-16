@@ -5,7 +5,7 @@ import { GeneralSettings } from "./General";
 import { TeamSettings } from "./Teams";
 import { VCSSettings } from "./VCS";
 import { TemplatesSettings } from "./Templates";
-import { TagSettings } from "./Tags";
+import { TagsSettings } from "./Tags";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
 import { SSHKeysSettings } from "./SSHKeys";
 import { GlobalVariablesSettings } from "./GlobalVariables";

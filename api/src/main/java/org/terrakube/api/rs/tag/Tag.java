@@ -17,6 +17,7 @@ import java.util.UUID;
 public class Tag extends GenericAuditFields {
     @Id
     @Type(type = "uuid-char")
+    @GeneratedValue
     private UUID id;
 
     @Column(name = "name")

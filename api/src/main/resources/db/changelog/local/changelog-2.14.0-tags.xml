@@ -14,6 +14,9 @@
             <column name="updated_date" type="datetime"/>
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_tag_org" references="organization(id)"/>
+            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>

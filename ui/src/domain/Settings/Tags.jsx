@@ -20,7 +20,7 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-export const TagSettings = () => {
+export const TagsSettings = () => {
   const { orgid } = useParams();
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -105,7 +105,7 @@ export const TagSettings = () => {
       })
       .then((response) => {
         console.log(response);
-        loadtags();
+        loadTags();
         setVisible(false);
         form.resetFields();
       });
@@ -182,26 +182,6 @@ export const TagSettings = () => {
                   ></Avatar>
                 }
                 title={item.attributes.name}
-                description={
-                  <div>
-                    Access to Manage:&nbsp;&nbsp;&nbsp;
-                    <Space split={<Divider type="vertical" />}>
-                      {item.attributes.manageWorkspace ? (
-                        <span>Workspaces</span>
-                      ) : null}
-                      {item.attributes.manageModule ? (
-                        <span>Modules</span>
-                      ) : null}
-                      {item.attributes.manageProvider ? (
-                        <span>Providers</span>
-                      ) : null}
-                      {item.attributes.manageVcs ? <span>Vcs</span> : null}
-                      {item.attributes.manageTemplate ? (
-                        <span>Templates</span>
-                      ) : null}
-                    </Space>
-                  </div>
-                }
               />
             </List.Item>
           )}
@@ -229,80 +209,16 @@ export const TagSettings = () => {
       >
         <Space style={{ width: "100%" }} direction="vertical">
           <Form name="tag" form={form} layout="vertical">
-            {mode === "create" ? (
-              <Form.Item
-                name="name"
-                tooltip={{
-                  title: "Must be a valid AD Group name",
-                  icon: <InfoCircleOutlined />,
-                }}
-                label="Name"
-                rules={[{ required: true }]}
-              >
-                <Input />
-              </Form.Item>
-            ) : (
-              ""
-            )}
             <Form.Item
-              name="manageWorkspace"
-              valuePropName="checked"
-              label="Manage Workspaces"
+              name="name"
               tooltip={{
-                title:
-                  "Allow members to create and administrate all workspaces within the organization",
+                title: "Must be a valid tag name",
                 icon: <InfoCircleOutlined />,
               }}
+              label="Name"
+              rules={[{ required: true }]}
             >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageModule"
-              valuePropName="checked"
-              label="Manage Modules"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all modules within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageProvider"
-              valuePropName="checked"
-              label="Manage Providers"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all providers within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageVcs"
-              valuePropName="checked"
-              label="Manage VCS Settings"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all VCS Settings within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageTemplate"
-              valuePropName="checked"
-              label="Manage Templates"
-              tooltip={{
-                title:
-                  "Allow members to create and administrate all Templates within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
+              <Input />
             </Form.Item>
           </Form>
         </Space>
