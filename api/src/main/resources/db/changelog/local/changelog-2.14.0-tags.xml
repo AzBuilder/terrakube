@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="20" author="javier-canizalez@outlook.com">
+        <createTable tableName="tag">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(64)"/>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_tag_org" references="organization(id)"/>
+            </column>
+        </createTable>
+        <createTable tableName="workspacetag">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tag_id" type="varchar(36)">
+                <constraints deleteCascade="true" nullable="false" foreignKeyName="fk_workspace_tag" references="tag(id)"/>
+            </column>
+            <column name="workspace_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_tag_workspace" references="workspace(id)"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+        </createTable>
+        <addUniqueConstraint
+           columnNames="tag_id, workspace_id"
+           constraintName="const_workspace_tag"
+           deferrable="true"
+           disabled="true"
+           initiallyDeferred="true"
+           tableName="workspacetag"
+           validate="true"/>
+    </changeSet>
+</databaseChangeLog>
