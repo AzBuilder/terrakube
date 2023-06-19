@@ -12,6 +12,7 @@ import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.parameters.Variable;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.workspace.history.History;
+import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
@@ -19,7 +20,6 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
-
 
 @ReadPermission(expression = "team view workspace")
 @CreatePermission(expression = "team manage workspace")
@@ -34,7 +34,7 @@ import java.util.UUID;
 public class Workspace extends GenericAuditFields {
 
     @Id
-    @Type(type="uuid-char")
+    @Type(type = "uuid-char")
     @GeneratedValue
     private UUID id;
 
@@ -81,6 +81,9 @@ public class Workspace extends GenericAuditFields {
     @Exclude
     @OneToMany(mappedBy = "workspace")
     private List<Content> content;
+
+    @OneToMany(mappedBy = "workspace")
+    private List<WorkspaceTag> workspaceTag;
 
     @OneToOne
     private Vcs vcs;

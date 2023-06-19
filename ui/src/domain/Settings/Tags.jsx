@@ -160,7 +160,10 @@ export const TagsSettings = () => {
                   style={{ width: "20px" }}
                   title={
                     <p>
-                      This will permanently delete this tag <br />
+                      Deleting this tag will also remove it <br />
+                      from all the Workspaces that use it.
+                      <br />
+                      This action cannot be undone. <br />
                       Are you sure?
                     </p>
                   }

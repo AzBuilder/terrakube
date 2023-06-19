@@ -1,6 +1,5 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
-import { HiOutlineExternalLink } from "react-icons/hi";
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,
@@ -23,6 +22,9 @@ import {
   Switch,
   Typography,
   Popconfirm,
+  Row,
+  Col,
+  Divider,
 } from "antd";
 import { compareVersions } from "./Workspaces";
 import { CreateJob } from "../Jobs/Create";
@@ -30,6 +32,8 @@ import { DetailsJob } from "../Jobs/Details";
 import { Variables } from "../Workspaces/Variables";
 import { States } from "../Workspaces/States";
 import { Schedules } from "../Workspaces/Schedules";
+import { CLIDriven } from "../Workspaces/CLIDriven";
+import { Tags } from "../Workspaces/Tags";
 import { useParams, Link } from "react-router-dom";
 import {
   CheckCircleOutlined,
@@ -40,6 +44,8 @@ import {
   InfoCircleOutlined,
   DeleteOutlined,
   UserOutlined,
+  ThunderboltOutlined,
+  PlayCircleOutlined,
 } from "@ant-design/icons";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
@@ -71,7 +77,7 @@ export const WorkspaceDetails = (props) => {
   const [jobVisible, setjobVisible] = useState(false);
   const [organizationName, setOrganizationName] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
-  const [activeKey, setActiveKey] = useState("2");
+  const [activeKey, setActiveKey] = useState("1");
   const [terraformVersions, setTerraformVersions] = useState([]);
   const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
@@ -268,83 +274,41 @@ export const WorkspaceDetails = (props) => {
                 tabBarExtraContent={<CreateJob changeJob={changeJob} />}
                 onChange={callback}
               >
-                {workspace.data.attributes.source === "empty" &&
-                  workspace.data.attributes.branch === "remote-content" && (
-                    <TabPane tab="Overview" key="1">
-                      <div>
-                        <h1>Waiting for configuration</h1>
-                        <div className="App-text">
-                          This workspace currently has no Terraform
-                          configuration files associated with it. Terrakube is
-                          waiting for the configuration to be uploaded.
+                <TabPane tab="Overview" key="1">
+                  <Row>
+                    <Col span={19}>
+                      {workspace.data.attributes.source === "empty" &&
+                      workspace.data.attributes.branch === "remote-content" ? (
+                        <CLIDriven
+                          organizationName={organizationName}
+                          workspaceName={workspaceName}
+                        />
+                      ) : (
+                        <div>
+                          <br />
+                          <h3></h3>
                         </div>
-                        <h3>CLI-driven workflow</h3>
-                        <div className="App-text">
-                          <ol>
-                            <li>
-                              Ensure you are properly authenticated into
-                              Terrakube by running{" "}
-                              <span className="code">terraform login</span> on
-                              the command line or by using a credentials block.
-                            </li>{" "}
-                            <br />
-                            <li>
-                              Add a code block to your Terraform configuration
-                              files to set up the remote backend . You can add
-                              this configuration block to any .tf file in the
-                              directory where you run Terraform. <br />
-                              <br />
-                              <b>Example Code</b>
-                              <pre className="moduleCode">
-                                terraform {"{"} <br />
-                                &nbsp;&nbsp;backend "remote" {"{"} <br />
-                                &nbsp;&nbsp;&nbsp;&nbsp;organization = "
-                                {organizationName}" <br />
-                                <br />
-                                &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "
-                                {workspaceName}" <br />
-                                &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
-                                &nbsp;&nbsp;{"}"} <br />
-                                {"}"} <br />
-                              </pre>
-                            </li>
-                            <br />
-                            <li>
-                              Run <span className="code">terraform init</span>{" "}
-                              to initialize the workspace.
-                            </li>
-                            <br />
-                            <li>
-                              Run <span className="code">terraform apply</span>{" "}
-                              to start the first run for this workspace.
-                            </li>
-                          </ol>
-                          For more details, see the{" "}
-                          <Button
-                            className="link"
-                            target="_blank"
-                            href="https://docs.terrakube.org/user-guide/workspaces/cli-driven-workflow"
-                            type="link"
-                          >
-                            CLI workflow guide.&nbsp; <HiOutlineExternalLink />.
-                          </Button>
-                          <br /> <br />
-                          <h3>API-driven workflow</h3>
-                          Advanced users can follow{" "}
-                          <Button
-                            className="link"
-                            target="_blank"
-                            href="https://docs.terrakube.org/user-guide/workspaces/api-driven-workflow"
-                            type="link"
-                          >
-                            this guide.&nbsp; <HiOutlineExternalLink />.
-                          </Button>{" "}
-                          to set up their workspace.
-                        </div>
-                      </div>
-                    </TabPane>
-                  )}
+                      )}
+                    </Col>
+                    <Col span={5}>
+                      <Space direction="vertical">
+                        <br />
+                        <span className="App-text">
+                          <ThunderboltOutlined /> Execution Mode: <a>Remote</a>{" "}
+                        </span>
+                        <span className="App-text">
+                          <PlayCircleOutlined /> Auto apply: <a>Off</a>{" "}
+                        </span>
+                        <Divider />
+                        <h4>Tags</h4>
+                        <Tags
+                          organizationId={organizationId}
+                          workspaceId={id}
+                        />
+                      </Space>
+                    </Col>
+                  </Row>
+                </TabPane>
 
                 <TabPane tab="Runs" key="2">
                   {jobVisible ? (
