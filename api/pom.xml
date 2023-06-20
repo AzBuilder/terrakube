@@ -37,7 +37,7 @@
         <gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
         <jedis.version>3.9.0</jedis.version>
-        <commons-fileupload.version>1.4</commons-fileupload.version>
+        <commons-text.version>1.10.0</commons-text.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -207,6 +207,11 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${commons-text.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mock-server</groupId>

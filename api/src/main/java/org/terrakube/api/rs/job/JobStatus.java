@@ -10,5 +10,6 @@ public enum JobStatus {
 
     rejected,
     cancelled,
-    failed
+    failed,
+    unknown
 }

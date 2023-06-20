@@ -1,8 +1,11 @@
 package org.terrakube.api.plugin.state;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.TextStringBuilder;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
@@ -54,6 +57,7 @@ public class RemoteTfeService {
     private String hostname;
     private StorageTypeService storageTypeService;
     private StepRepository stepRepository;
+    private RedisTemplate redisTemplate;
 
     public RemoteTfeService(JobRepository jobRepository,
                             ContentRepository contentRepository,
@@ -64,7 +68,8 @@ public class RemoteTfeService {
                             ScheduleJobService scheduleJobService,
                             @Value("${org.terrakube.hostname}") String hostname,
                             StorageTypeService storageTypeService,
-                            StepRepository stepRepository) {
+                            StepRepository stepRepository,
+                            RedisTemplate redisTemplate) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -75,6 +80,7 @@ public class RemoteTfeService {
         this.hostname = hostname;
         this.storageTypeService = storageTypeService;
         this.stepRepository = stepRepository;
+        this.redisTemplate = redisTemplate;
 
     }
 
@@ -523,19 +529,7 @@ public class RemoteTfeService {
                             planStatus = "running";
                             break;
                         case completed:
-                            // LOGIC TO ENABLE READING LOGS
-                            switch (checkPlanLogStatus(planId)) {
-                                case UNKNOWN:
-                                    updatePlanLogStatus(planId, LogStatus.BEGIN);
-                                    planStatus = "running";
-                                    break;
-                                case COMPLETED:
-                                    planStatus = "finished";
-                                    break;
-                                default:
-                                    planStatus = "running";
-                            }
-
+                            planStatus = "finished";
                             break;
                         case failed:
                             planStatus = "errored";
@@ -578,19 +572,7 @@ public class RemoteTfeService {
                             applyStatus = "running";
                             break;
                         case completed:
-                            // LOGIC TO ENABLE READING LOGS
-                            switch (checkApplyLogStatus(planId)) {
-                                case UNKNOWN:
-                                    updateApplyLogStatus(planId, LogStatus.BEGIN);
-                                    applyStatus = "running";
-                                    break;
-                                case COMPLETED:
-                                    applyStatus = "finished";
-                                    break;
-                                default:
-                                    applyStatus = "running";
-                            }
-
+                            applyStatus = "finished";
                             break;
                         case failed:
                             applyStatus = "errored";
@@ -606,16 +588,15 @@ public class RemoteTfeService {
         return applyRunData;
     }
 
-    private LogStatus checkPlanLogStatus(int planId) {
+    private JobStatus checkPlanLogStatus(int planId) {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         for (Step step : job.getStep()) {
-            if (step.getStepNumber() == 100 && step.getLogStatus() != null
-                    && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {
-                return step.getLogStatus();
+            if (step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.running)) {
+                return JobStatus.running;
             }
         }
 
-        return LogStatus.UNKNOWN;
+        return JobStatus.unknown;
     }
 
     private LogStatus checkApplyLogStatus(int planId) {
@@ -659,20 +640,24 @@ public class RemoteTfeService {
     byte[] getPlanLogs(int planId) throws IOException {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
-        if (checkPlanLogStatus(planId).equals(LogStatus.BEGIN))
+        TextStringBuilder logsOutput = new TextStringBuilder();
             if (job.getStep() != null && !job.getStep().isEmpty())
                 for (Step step : job.getStep()) {
-                    log.info("Current Job State {}", job.getStatus());
-                    if (step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.completed)
-                            || step.getStatus().equals(JobStatus.failed)) {
-                        log.info("Get Logs for Step {}", step.getId().toString());
-                        logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(),
-                                String.valueOf(planId), step.getId().toString());
-                        String logsFinal = new String(logs, StandardCharsets.UTF_8);
+                    if (step.getStepNumber() == 100) {
+                        log.info("Checking logs stepId: {}", step.getId());
 
-                        logs = ("Terrakube Remote Plan Execution\n\n"
-                                + logsFinal.split("Running Terraform PLAN")[1].substring(54)).getBytes();
-                        updatePlanLogStatus(planId, LogStatus.COMPLETED);
+                        List<MapRecord> messages = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
+                                StreamReadOptions.empty().noack(),
+                                StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
+
+                        for (MapRecord mapRecord: messages){
+                            Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
+                            log.info("{}", streamData.get("output"));
+                            logsOutput.appendln(streamData.get("output"));
+                            redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
+                        }
+                        
+                        logs = logsOutput.toString().getBytes(StandardCharsets.UTF_8);
                     }
                 }
         return logs;
