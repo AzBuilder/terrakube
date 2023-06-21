@@ -589,104 +589,63 @@ public class RemoteTfeService {
         return applyRunData;
     }
 
-    private JobStatus checkPlanLogStatus(int planId) {
-        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
-        for (Step step : job.getStep()) {
-            if (step.getStepNumber() == 100 && step.getStatus().equals(JobStatus.running)) {
-                return JobStatus.running;
-            }
-        }
-
-        return JobStatus.unknown;
-    }
-
-    private LogStatus checkApplyLogStatus(int planId) {
-        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
-        for (Step step : job.getStep()) {
-            if (step.getStepNumber() == 200 && step.getLogStatus() != null
-                    && step.getStatus().equals(JobStatus.completed) || step.getStatus().equals(JobStatus.failed)) {
-                return step.getLogStatus();
-            }
-        }
-
-        return LogStatus.UNKNOWN;
-    }
-
-    private boolean updatePlanLogStatus(int planId, LogStatus logStatus) {
-        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
-        for (Step step : job.getStep()) {
-            if (step.getStepNumber() == 100) {
-                step.setLogStatus(logStatus);
-                stepRepository.save(step);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean updateApplyLogStatus(int planId, LogStatus logStatus) {
-        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
-        for (Step step : job.getStep()) {
-            if (step.getStepNumber() == 200) {
-                step.setLogStatus(logStatus);
-                stepRepository.save(step);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    byte[] getPlanLogs(int planId) throws IOException {
+    byte[] getPlanLogs(int planId) {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutput = new TextStringBuilder();
-            if (job.getStep() != null && !job.getStep().isEmpty())
-                for (Step step : job.getStep()) {
-                    if (step.getStepNumber() == 100) {
-                        log.info("Checking logs stepId: {}", step.getId());
+        if (job.getStep() != null && !job.getStep().isEmpty())
+            for (Step step : job.getStep()) {
+                if (step.getStepNumber() == 100) {
+                    log.info("Checking logs for plan: {}", step.getId());
 
-                        try {
-                            List<MapRecord> messages = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
-                                    StreamReadOptions.empty().noack(),
-                                    StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
+                    try {
+                        List<MapRecord> messagesPlan = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
+                                StreamReadOptions.empty().noack(),
+                                StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
 
-                            for (MapRecord mapRecord: messages){
-                                Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
-                                log.info("{}", streamData.get("output"));
-                                logsOutput.appendln(streamData.get("output"));
-                                redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
-                            }
-
-                            logs = logsOutput.toString().getBytes(StandardCharsets.UTF_8);
-                        } catch (Exception ex){
-                            log.error(ex.getMessage());
+                        for (MapRecord mapRecord : messagesPlan) {
+                            Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
+                            log.info("{}", streamData.get("output"));
+                            logsOutput.appendln(streamData.get("output"));
+                            redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
                         }
+
+                        logs = logsOutput.toString().getBytes(StandardCharsets.UTF_8);
+                    } catch (Exception ex) {
+                        log.debug(ex.getMessage());
                     }
                 }
+            }
         return logs;
     }
 
-    byte[] getApplyLogs(int planId) throws IOException {
+    byte[] getApplyLogs(int planId){
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
-        if (checkApplyLogStatus(planId).equals(LogStatus.BEGIN))
-            if (job.getStep() != null && !job.getStep().isEmpty())
-                for (Step step : job.getStep()) {
-                    log.info("Current Job State {}", job.getStatus());
-                    if (step.getStepNumber() == 200 && step.getStatus().equals(JobStatus.completed)
-                            || step.getStatus().equals(JobStatus.failed)) {
-                        log.info("Get Logs for Step Apply{}", step.getId().toString());
-                        logs = storageTypeService.getStepOutput(job.getOrganization().getId().toString(),
-                                String.valueOf(planId), step.getId().toString());
-                        String logsFinal = new String(logs, StandardCharsets.UTF_8);
+        TextStringBuilder logsOutputApply = new TextStringBuilder();
+        if (job.getStep() != null && !job.getStep().isEmpty())
+            for (Step step : job.getStep()) {
+                if (step.getStepNumber() == 100) {
+                    log.info("Checking logs stepId for apply: {}", step.getId());
 
-                        logs = ("Terrakube Remote Plan Execution\n\n"
-                                + logsFinal.split("Running Terraform APPLY")[1].substring(54)).getBytes();
-                        updateApplyLogStatus(planId, LogStatus.COMPLETED);
+                    try {
+                        List<MapRecord> messagesApply = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
+                                StreamReadOptions.empty().noack(),
+                                StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
+
+                        for (MapRecord mapRecord : messagesApply) {
+                            Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
+                            logsOutputApply.appendln(streamData.get("output"));
+                            log.info("{}", streamData.get("output"));
+                            redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
+                        }
+
+                        logs = logsOutputApply.toString().getBytes(StandardCharsets.UTF_8);
+                    } catch (Exception ex) {
+                        log.debug(ex.getMessage());
                     }
                 }
+            }
         return logs;
     }
 }
