@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
@@ -53,6 +54,8 @@ public class ScheduleJob implements org.quartz.Job {
 
     ScheduleJobService scheduleJobService;
 
+    RedisTemplate redisTemplate;
+
     @Transactional
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -63,6 +66,7 @@ public class ScheduleJob implements org.quartz.Job {
 
         switch (job.getStatus()) {
             case pending:
+                redisTemplate.delete(String.valueOf(job.getId()));
                 executePendingJob(job, jobExecutionContext);
                 break;
             case approved:
@@ -72,12 +76,14 @@ public class ScheduleJob implements org.quartz.Job {
                 log.info("Job {} running", job.getId());
                 break;
             case completed:
+                redisTemplate.delete(String.valueOf(job.getId()));
                 removeJobContext(job, jobExecutionContext);
                 unlockWorkspace(job);
                 break;
             case cancelled:
             case failed:
             case rejected:
+                redisTemplate.delete(String.valueOf(job.getId()));
                 try {
                     log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                     updateJobStepsWithStatus(job.getId(), JobStatus.failed);
@@ -101,7 +107,6 @@ public class ScheduleJob implements org.quartz.Job {
             log.info("Execute command: {} \n {}", flow.get().getType(), flow.get().getCommands());
             String stepId = tclService.getCurrentStepId(job);
             FlowType tempFlowType = FlowType.valueOf(flow.get().getType());
-
             switch (tempFlowType) {
                 case terraformPlanDestroy:
                 case terraformPlan:

@@ -25,6 +25,7 @@ public class TerraformJob {
     private String vcsType;
     private String accessToken;
     private String terraformOutput;
+    private boolean showHeader;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
 
