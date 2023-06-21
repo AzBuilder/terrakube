@@ -6,9 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.terrakube.api.repository.StepRepository;
+import org.terrakube.api.rs.job.step.Step;
 
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -17,17 +19,17 @@ public class StreamingService {
 
     RedisTemplate redisTemplate;
 
-    public String getCurrentLogs(String stepId){
+    StepRepository stepRepository;
 
+    public String getCurrentLogs(String stepId){
+        Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
         TextStringBuilder currentLogs = new TextStringBuilder();
         try {
-            List<MapRecord> streamData = redisTemplate.opsForStream().read(Consumer.from("UI", String.valueOf(stepId)),
-                    StreamReadOptions.empty().noack(),
-                    StreamOffset.fromStart(stepId));
-            
+            String idStream = String.valueOf(step.getJob().getId());
+            List<MapRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(String.valueOf(step.getJob().getId())), StreamOffset.latest(String.valueOf(step.getJob().getId())));
             for (MapRecord mapRecord : streamData) {
-                Map<String, String> stream = (Map<String, String>) mapRecord.getValue();
-                String output = stream.get("output");
+                StringRecord stringRecord = StringRecord.of(mapRecord);
+                String output = stringRecord.getValue().get("output");
                 currentLogs.appendln(output);
             }
             log.info("Logs Size: {}", currentLogs.size());

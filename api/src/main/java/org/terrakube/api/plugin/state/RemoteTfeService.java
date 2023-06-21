@@ -35,6 +35,7 @@ import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
+import redis.clients.jedis.exceptions.JedisDataException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -646,18 +647,22 @@ public class RemoteTfeService {
                     if (step.getStepNumber() == 100) {
                         log.info("Checking logs stepId: {}", step.getId());
 
-                        List<MapRecord> messages = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
-                                StreamReadOptions.empty().noack(),
-                                StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
+                        try {
+                            List<MapRecord> messages = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
+                                    StreamReadOptions.empty().noack(),
+                                    StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
 
-                        for (MapRecord mapRecord: messages){
-                            Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
-                            log.info("{}", streamData.get("output"));
-                            logsOutput.appendln(streamData.get("output"));
-                            redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
+                            for (MapRecord mapRecord: messages){
+                                Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
+                                log.info("{}", streamData.get("output"));
+                                logsOutput.appendln(streamData.get("output"));
+                                redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
+                            }
+
+                            logs = logsOutput.toString().getBytes(StandardCharsets.UTF_8);
+                        } catch (Exception ex){
+                            log.error(ex.getMessage());
                         }
-                        
-                        logs = logsOutput.toString().getBytes(StandardCharsets.UTF_8);
                     }
                 }
         return logs;

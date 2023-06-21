@@ -26,7 +26,7 @@ public class LogsService implements ProcessLogs {
         redisTemplate.opsForStream().add(jobId.toString(), streamData);
     }
 
-    public void deleteLogs(String stepId) {
-            redisTemplate.delete(stepId);
+    public void deleteLogs(String jobId) {
+        redisTemplate.delete(jobId);
     }
 }
