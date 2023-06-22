@@ -22,10 +22,9 @@ public class StreamingService {
     StepRepository stepRepository;
 
     public String getCurrentLogs(String stepId){
-        Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
         TextStringBuilder currentLogs = new TextStringBuilder();
         try {
-            String idStream = String.valueOf(step.getJob().getId());
+            Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
             List<MapRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(String.valueOf(step.getJob().getId())), StreamOffset.latest(String.valueOf(step.getJob().getId())));
             for (MapRecord mapRecord : streamData) {
                 StringRecord stringRecord = StringRecord.of(mapRecord);
