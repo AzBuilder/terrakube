@@ -93,8 +93,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             scriptBeforeSuccessPlan = executePrepOperationScripts(terraformJob, workingDirectory, planOutput);
 
-            if (terraformJob.isShowHeader())
-                showTerraformMessage("PLAN", planOutput);
+            showTerraformMessage("PLAN", planOutput);
 
             if (scriptBeforeSuccessPlan)
                 if (isDestroy) {
@@ -166,8 +165,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, applyOutput);
 
-            if (terraformJob.isShowHeader())
-                showTerraformMessage("APPLY", applyOutput);
+            showTerraformMessage("APPLY", applyOutput);
 
             if (scriptBeforeSuccess) {
                 TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
@@ -231,9 +229,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     errorOutputDestroy);
 
             scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, outputDestroy);
-
-            if (terraformJob.isShowHeader())
-                showTerraformMessage("DESTROY", outputDestroy);
+            
+            showTerraformMessage("DESTROY", outputDestroy);
 
             if (scriptBeforeSuccess) {
                 execution = terraformClient.destroy(
@@ -403,11 +400,12 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         output.accept(colorize("Running Terraform Init: ", colorMessage));
     }
 
-    private void showTerraformMessage(String operation, Consumer<String> output) {
+    private void showTerraformMessage(String operation, Consumer<String> output) throws InterruptedException {
         AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
         output.accept(colorize("Running Terraform " + operation, colorMessage));
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
+        Thread.sleep(2000);
     }
 
     private TerraformProcessData getTerraformProcessData(TerraformJob terraformJob, File workingDirectory) {
