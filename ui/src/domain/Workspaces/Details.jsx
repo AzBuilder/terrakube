@@ -47,6 +47,7 @@ import {
   ThunderboltOutlined,
   PlayCircleOutlined,
 } from "@ant-design/icons";
+import { FiGitCommit } from "react-icons/fi";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -285,8 +286,112 @@ export const WorkspaceDetails = (props) => {
                         />
                       ) : (
                         <div>
-                          <br />
-                          <h3></h3>
+                          <h3>Latest Run</h3>
+                          <div
+                            style={{ marginRight: "150px", borderWidth: "1px" }}
+                          >
+                            <List
+                              itemLayout="horizontal"
+                              style={{
+                                border: "1px solid #c2c5cb",
+                                padding: "24px",
+                              }}
+                              dataSource={
+                                jobs.length > 0
+                                  ? jobs
+                                      .sort((a, b) => a.id - b.id)
+                                      .reverse()
+                                      .slice(0, 1)
+                                  : []
+                              }
+                              renderItem={(item) => (
+                                <List.Item>
+                                  <List.Item.Meta
+                                    style={{ margin: "0px", padding: "0px" }}
+                                    avatar={
+                                      <Avatar
+                                        shape="square"
+                                        icon={<UserOutlined />}
+                                      />
+                                    }
+                                    description={
+                                      <div>
+                                        <Row>
+                                          <Col span={20}>
+                                            <h4 className="ant-list-item-meta-title">
+                                              <a
+                                                onClick={() =>
+                                                  handleClick(item.id)
+                                                }
+                                              >
+                                                {item.title}
+                                              </a>{" "}
+                                            </h4>
+                                            <b>{item.createdBy}</b> triggered a
+                                            run {item.latestChange} via{" "}
+                                            <b>UI</b>{" "}
+                                            {item.commitId !== "000000000" ? (
+                                              <>
+                                                <FiGitCommit />{" "}
+                                                {item.commitId?.substring(0, 6)}{" "}
+                                              </>
+                                            ) : (
+                                              ""
+                                            )}
+                                          </Col>
+                                          <Col>
+                                            {
+                                              <div className="textLeft">
+                                                <Tag
+                                                  icon={
+                                                    item.status ==
+                                                    "completed" ? (
+                                                      <CheckCircleOutlined />
+                                                    ) : item.status ==
+                                                      "running" ? (
+                                                      <SyncOutlined spin />
+                                                    ) : item.status ===
+                                                      "waitingApproval" ? (
+                                                      <ExclamationCircleOutlined />
+                                                    ) : item.status ===
+                                                      "cancelled" ? (
+                                                      <StopOutlined />
+                                                    ) : item.status ===
+                                                      "failed" ? (
+                                                      <StopOutlined />
+                                                    ) : (
+                                                      <ClockCircleOutlined />
+                                                    )
+                                                  }
+                                                  color={item.statusColor}
+                                                >
+                                                  {item.status}
+                                                </Tag>{" "}
+                                              </div>
+                                            }
+                                          </Col>
+                                        </Row>
+                                        <br />
+                                        <br />
+                                        <Row>
+                                          <Col span={20} />
+                                          <Col>
+                                            <Button
+                                              onClick={() =>
+                                                handleClick(item.id)
+                                              }
+                                            >
+                                              See details
+                                            </Button>
+                                          </Col>
+                                        </Row>
+                                      </div>
+                                    }
+                                  />
+                                </List.Item>
+                              )}
+                            />
+                          </div>
                         </div>
                       )}
                     </Col>

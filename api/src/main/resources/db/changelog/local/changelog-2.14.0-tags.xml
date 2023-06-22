@@ -41,5 +41,13 @@
            initiallyDeferred="true"
            tableName="workspacetag"
            validate="true"/>
+        <addUniqueConstraint
+            columnNames="name"
+            constraintName="const_tag"
+            deferrable="true"
+            disabled="true"
+            initiallyDeferred="true"
+            tableName="tag"
+            validate="true"/>   
     </changeSet>
 </databaseChangeLog>
