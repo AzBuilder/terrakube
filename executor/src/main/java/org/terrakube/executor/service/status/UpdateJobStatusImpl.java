@@ -86,9 +86,6 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         jobRequest.setData(job);
 
         terrakubeClient.updateJob(jobRequest, job.getRelationships().getOrganization().getData().getId(), job.getId());
-
-        log.info("Deleting Stream Id: {}", stepId);
-        logsService.deleteLogs(stepId);
     }
 
     private void updateStepStatus(boolean status, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput) {

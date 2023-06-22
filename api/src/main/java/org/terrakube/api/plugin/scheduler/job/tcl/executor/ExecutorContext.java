@@ -23,6 +23,7 @@ public class ExecutorContext {
     private String branch;
     private String folder;
     private String vcsType;
+    private boolean showHeader;
     private String accessToken;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;

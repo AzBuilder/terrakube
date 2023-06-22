@@ -47,6 +47,14 @@ public class ExecutorService {
         executorContext.setJobId(String.valueOf(job.getId()));
         executorContext.setStepId(stepId);
 
+        if(job.getWorkspace().getBranch().equals("remote-content")){
+            log.warn("Running remote operation, disable headers");
+            executorContext.setShowHeader(false);
+        } else {
+            log.warn("Running default operation, enable headers");
+            executorContext.setShowHeader(true);
+        }
+
         log.info("Checking Variables");
         if (job.getWorkspace().getVcs() != null) {
             Vcs vcs = job.getWorkspace().getVcs();

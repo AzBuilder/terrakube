@@ -2,8 +2,6 @@ package org.terrakube.executor.service.logs;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.connection.stream.StringRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +23,10 @@ public class LogsService implements ProcessLogs {
         streamData.put("lineNumber", String.valueOf(lineNumber));
         streamData.put("output", output);
 
-        StringRecord record = StreamRecords.string(streamData).withStreamKey(stepId);
-
-        redisTemplate.opsForStream().add(record);
+        redisTemplate.opsForStream().add(jobId.toString(), streamData);
     }
 
-    public void deleteLogs(String stepId) {
-            redisTemplate.delete(stepId);
+    public void deleteLogs(String jobId) {
+        redisTemplate.delete(jobId);
     }
 }

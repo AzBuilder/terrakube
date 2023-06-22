@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.TextStringBuilder;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.service.executor.ExecutorJobResult;
 import org.terrakube.executor.service.mode.TerraformJob;
@@ -38,11 +39,27 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     TerraformClient terraformClient;
     TerraformState terraformState;
     ScriptEngineService scriptEngineService;
+    RedisTemplate redisTemplate;
 
     LogsService logsService;
 
+    private void setupConsumerGroups(String jobId) {
+        try {
+            redisTemplate.opsForStream().createGroup(jobId, "CLI");
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+
+        try {
+            redisTemplate.opsForStream().createGroup(jobId, "UI");
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
     @Override
     public ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory, boolean isDestroy) {
+        setupConsumerGroups(terraformJob.getJobId());
         ExecutorJobResult result;
 
         TextStringBuilder jobOutput = new TextStringBuilder();
@@ -77,6 +94,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             scriptBeforeSuccessPlan = executePrepOperationScripts(terraformJob, workingDirectory, planOutput);
 
             showTerraformMessage("PLAN", planOutput);
+
             if (scriptBeforeSuccessPlan)
                 if (isDestroy) {
                     log.warn("Executor running a plan to destroy resources...");
@@ -111,6 +129,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     @Override
     public ExecutorJobResult apply(TerraformJob terraformJob, File workingDirectory) {
+        setupConsumerGroups(terraformJob.getJobId());
         ExecutorJobResult result;
 
         TextStringBuilder terraformOutput = new TextStringBuilder();
@@ -147,6 +166,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, applyOutput);
 
             showTerraformMessage("APPLY", applyOutput);
+
             if (scriptBeforeSuccess) {
                 TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
                 terraformProcessData.setTerraformVariables((terraformState.downloadTerraformPlan(terraformJob.getOrganizationId(),
@@ -175,6 +195,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     @Override
     public ExecutorJobResult destroy(TerraformJob terraformJob, File workingDirectory) {
+        setupConsumerGroups(terraformJob.getJobId());
         ExecutorJobResult result;
 
         TextStringBuilder jobOutput = new TextStringBuilder();
@@ -208,8 +229,9 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     errorOutputDestroy);
 
             scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, outputDestroy);
-
+            
             showTerraformMessage("DESTROY", outputDestroy);
+
             if (scriptBeforeSuccess) {
                 execution = terraformClient.destroy(
                         getTerraformProcessData(terraformJob, workingDirectory),
@@ -335,11 +357,21 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
     private String executeTerraformInit(TerraformJob terraformJob, File workingDirectory, Consumer<String> output,
                                         Consumer<String> errorOutput) throws IOException, ExecutionException, InterruptedException {
-        initBanner(terraformJob, output);
+        if (terraformJob.isShowHeader())
+            initBanner(terraformJob, output);
+
         TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
         terraformProcessData.setTerraformEnvironmentVariables(new HashMap<>());
         terraformProcessData.setTerraformVariables(new HashMap<>());
-        terraformClient.init(terraformProcessData, output, errorOutput).get();
+
+        if (terraformJob.isShowHeader())
+            terraformClient.init(terraformProcessData, output, errorOutput).get();
+        else
+            terraformClient.init(terraformProcessData, s -> {
+                log.info(s);
+            }, s -> {
+                log.info(s);
+            }).get();
 
         Thread.sleep(5000);
         return terraformProcessData.getTerraformBackendConfigFileName();
@@ -368,11 +400,12 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         output.accept(colorize("Running Terraform Init: ", colorMessage));
     }
 
-    private void showTerraformMessage(String operation, Consumer<String> output) {
+    private void showTerraformMessage(String operation, Consumer<String> output) throws InterruptedException {
         AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
         output.accept(colorize("Running Terraform " + operation, colorMessage));
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
+        Thread.sleep(2000);
     }
 
     private TerraformProcessData getTerraformProcessData(TerraformJob terraformJob, File workingDirectory) {

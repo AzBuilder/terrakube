@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.state;
 
-import com.amazonaws.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
