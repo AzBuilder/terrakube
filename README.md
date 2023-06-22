@@ -13,7 +13,7 @@ The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expo
 ## High Level Architecture
 ![Architecture](https://raw.githubusercontent.com/AzBuilder/docs/master/.gitbook/assets/TerrakubeV2.png)
 
-For more information please visit our [documentation](https://docs.terrakube.org/).
+For more information please visit our [documentation](https://docs.terrakube.io/).
 
 ### Getting started guide
 
@@ -25,11 +25,11 @@ For more information about the test environment please refer to the following [f
 
 ### Minikube
 
-To quickly test Terrakube in Minikube please follow [this](https://docs.terrakube.org/getting-started/deployment/minikube)
+To quickly test Terrakube in Minikube please follow [this](https://docs.terrakube.io/getting-started/deployment/minikube)
 
 ### Docker-Compose
 
-To quickly test Terrakube in docker compose please follow [this](https://docs.terrakube.org/getting-started/docker-compose)
+To quickly test Terrakube in docker compose please follow [this](https://docs.terrakube.io/getting-started/docker-compose)
 
 ### Security - Authentication
 
