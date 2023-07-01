@@ -262,8 +262,8 @@ public class RemoteTfeService {
     StateData createWorkspaceState(String workspaceId, StateData stateData) {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
 
-        byte[] decodedBytes = Base64.getUrlDecoder().decode(stateData.getData().getAttributes().get("state").toString());
-        String terraformState = new String(decodedBytes);
+        byte[] decodedBytes = stateData.getData().getAttributes().get("state").toString().getBytes();
+        String terraformState = new String(Base64.getMimeDecoder().decode(decodedBytes));
 
         //upload state to backend storage
         storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
