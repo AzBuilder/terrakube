@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.repository.StepRepository;
+import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.step.Step;
 
 import java.util.List;
@@ -25,14 +26,15 @@ public class StreamingService {
         TextStringBuilder currentLogs = new TextStringBuilder();
         try {
             Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
-            List<MapRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(String.valueOf(step.getJob().getId())), StreamOffset.latest(String.valueOf(step.getJob().getId())));
-            for (MapRecord mapRecord : streamData) {
-                StringRecord stringRecord = StringRecord.of(mapRecord);
-                String output = stringRecord.getValue().get("output");
-                currentLogs.appendln(output);
+            if(!step.getStatus().equals(JobStatus.completed) && !step.getStatus().equals(JobStatus.failed)) {
+                List<MapRecord> streamData = redisTemplate.opsForStream().read(StreamOffset.fromStart(String.valueOf(step.getJob().getId())), StreamOffset.latest(String.valueOf(step.getJob().getId())));
+                for (MapRecord mapRecord : streamData) {
+                    StringRecord stringRecord = StringRecord.of(mapRecord);
+                    String output = stringRecord.getValue().get("output");
+                    currentLogs.appendln(output);
+                }
+                log.info("Logs Size: {}", currentLogs.size());
             }
-            log.info("Logs Size: {}", currentLogs.size());
-
         } catch (Exception ex ){
             log.error(ex.getMessage());
 
