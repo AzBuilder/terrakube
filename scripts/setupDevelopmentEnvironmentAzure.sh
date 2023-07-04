@@ -47,6 +47,9 @@ function generateApiVars(){
   echo "spring_profiles_active=demo" >> .envApi
   echo "DexClientId=$DexClientId" >> .envApi
   echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envApi
+  echo "TerrakubeRedisHostname=localhost" >> .envApi
+  echo "TerrakubeRedisPort=6379" >> .envApi
+  echo "TerrakubeRedisPassword=password123456" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
@@ -98,6 +101,9 @@ function generateExecutorVars(){
   echo "TerrakubeRegistryDomain=$TerrakubeRegistryDomain" >> .envExecutor
   echo "TerrakubeApiUrl=$TerrakubeApiUrl" >> .envExecutor
   echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envExecutor
+  echo "TerrakubeRedisHostname=localhost" >> .envExecutor
+  echo "TerrakubeRedisPort=6379" >> .envExecutor
+  echo "TerrakubeRedisPassword=password123456" >> .envExecutor
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
 }
 
@@ -144,6 +150,9 @@ function generateRegistryVars(){
 
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
+  echo "TerrakubeRedisHostname=localhost" >> .envRegistry
+  echo "TerrakubeRedisPort=6379" >> .envRegistry
+  echo "TerrakubeRedisPassword=password123456" >> .envRegistry
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
 }
 

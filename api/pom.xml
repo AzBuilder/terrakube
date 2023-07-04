@@ -26,7 +26,6 @@
         <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
         <groovy.version>3.0.8</groovy.version>
         <azure-identity.version>1.5.3</azure-identity.version>
-        <microsoft-graph.version>5.16.0</microsoft-graph.version>
         <postgresql.version>42.4.3</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
@@ -223,11 +222,6 @@
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
             <version>${azure-identity.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.graph</groupId>
-            <artifactId>microsoft-graph</artifactId>
-            <version>${microsoft-graph.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
