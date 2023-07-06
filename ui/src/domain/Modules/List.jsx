@@ -15,12 +15,63 @@ const { Content } = Layout;
 const include = { MODULE: "module" }
 const { Search } = Input;
 
-
 export const ModuleList = ({ setOrganizationName, organizationName }) => {
   const { orgid } = useParams();
   const [organization, setOrganization] = useState({});
   const [modules, setModules] = useState([]);
+  const [filteredModules, setFilteredModules] = useState([]);
+  const [filterValue, setFilterValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const onFilterChange = (e) => {
+    setFilterValue(e.target.value);
+    applyFilters(searchValue, e.target.value);
+  };
+
+  const onRadioClick = (e) => {
+    const tag = e.target;
+    if (tag.type === "radio" && filterValue === tag.value.toString()) {
+      setFilterValue("");
+      applyFilters(searchValue, "");
+    }
+  };
+
+  const onSearch = (value) => {
+    setSearchValue(value);
+    applyFilters(value, filterValue);
+  };
+
+  const applyFilters = (searchValue, filterValue) => {
+    if (searchValue !== "" && filterValue !== "") {
+      var filteredModules = modules.filter(
+        (modules) =>
+          modules.name.includes(searchValue) &&
+          modules.lastStatus === filterValue
+      );
+      setFilteredModules(filteredModules);
+      return;
+    }
+
+    if (searchValue !== "") {
+      var filteredModules = modules.filter((modules) =>
+        modules.name.includes(searchValue)
+      );
+      setFilteredModules(filteredModules);
+      return;
+    }
+
+    if (filterValue !== "") {
+      console.log("filter by status " + filterValue);
+      var filteredModules = modules.filter(
+        (modules) => modules.lastStatus === filterValue
+      );
+      setFilteredModules(filteredModules);
+      return;
+    }
+    console.log("no filter");
+    setFilteredModules(modules);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -31,7 +82,11 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
         setOrganization(response.data);
 
         if (response.data.included) {
-          setupOrganizationIncludes(response.data.included, setModules);
+          setupOrganizationIncludes(
+            response.data.included, 
+            setModules, 
+            setFilteredModules
+          );
         }
 
         setLoading(false);
@@ -73,8 +128,8 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
         ) : (
           <div className="modulesWrapper">
             <div className='variableActions'><h2>Modules</h2><Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} onClick={handlePublish}>Publish module</Button></div>
-            <Search placeholder="Filter modules" style={{ width: "100%" }} />
-            <List split="" className="moduleList" dataSource={modules}
+            <Search placeholder="Filter modules" onSearch={onSearch} allowClear style={{ width: "100%" }} />
+            <List split="" className="moduleList" dataSource={filteredModules}
               renderItem={item => (
                 <List.Item>
                   <Card onClick={() => handleClick(item.id)} style={{ width: "100%" }} hoverable>
@@ -101,7 +156,11 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
   );
 }
 
-function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
+function setupOrganizationIncludes(
+  includes,
+  setModules,
+  setFilteredModules
+) {
   let modules = [];
 
   includes.forEach(element => {
@@ -120,4 +179,5 @@ function setupOrganizationIncludes(includes, setModules, setWorkspaces) {
   });
 
   setModules(modules);
+  setFilteredModules(modules);
 }
