@@ -73,6 +73,19 @@ public class RemoteTfeController {
     }
 
     @Transactional
+    @PatchMapping(produces = "application/vnd.api+json", path = "workspaces/{workspacesId}")
+    public ResponseEntity<WorkspaceData> updateWorkspace(@PathVariable("workspacesId") String workspacesId, @RequestBody WorkspaceData workspaceData) {
+        log.info("Create {}", workspaceData.toString());
+        Optional<WorkspaceData> updatedWorkspace = Optional.ofNullable(remoteTfeService.updateWorkspace(workspacesId, workspaceData));
+        if(updatedWorkspace.isPresent()){
+            log.info("Created: {}", updatedWorkspace.get().toString());
+            return ResponseEntity.status(201).body(updatedWorkspace.get());
+        }else{
+            return ResponseEntity.status(500).body(new WorkspaceData());
+        }
+    }
+
+    @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/lock")
     public ResponseEntity<WorkspaceData> lockWorkspace(@PathVariable("workspaceId") String workspaceId) {
         log.info("Lock {}", workspaceId);

@@ -213,6 +213,18 @@ public class RemoteTfeService {
         }
 
     }
+    WorkspaceData updateWorkspace(String workspaceId, WorkspaceData workspaceData) {
+        Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
+
+        log.info("Updating existing workspace {} in {}", workspace.get().getName(), workspace.get().getOrganization().getName());
+
+        Workspace updatedWorkspace = workspace.get();
+        updatedWorkspace.setTerraformVersion(workspaceData.getData().getAttributes().get("terraform-version").toString());
+
+        workspaceRepository.save(updatedWorkspace);
+
+        return getWorkspace(updatedWorkspace.getOrganization().getName(), updatedWorkspace.getName(), new HashMap<>());
+    }
 
     WorkspaceData createWorkspace(String organizationName, WorkspaceData workspaceData) {
         Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getByOrganizationNameAndName(
@@ -227,7 +239,7 @@ public class RemoteTfeService {
             newWorkspace.setId(UUID.randomUUID());
             newWorkspace.setName(workspaceData.getData().getAttributes().get("name").toString());
             String terraformVersion = "";
-            if(workspaceData.getData().getAttributes().get("terraform-version") != null){
+            if (workspaceData.getData().getAttributes().get("terraform-version") != null) {
                 terraformVersion = workspaceData.getData().getAttributes().get("terraform-version").toString();
             } else {
                 terraformVersion = "1.4.6";
@@ -471,9 +483,9 @@ public class RemoteTfeService {
         //    runsData.setIncluded(new ArrayList());
         //    runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(), job.getWorkspace().getName(), new HashMap<>()));
         //}
-        
+
         runsData.getData().setRelationships(relationships);
-        
+
         log.info("{}", runsData.toString());
         return runsData;
     }
@@ -619,7 +631,7 @@ public class RemoteTfeService {
         return logs;
     }
 
-    byte[] getApplyLogs(int planId){
+    byte[] getApplyLogs(int planId) {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutputApply = new TextStringBuilder();
