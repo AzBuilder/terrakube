@@ -17,6 +17,8 @@ import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
+import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
+
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +59,12 @@ public class RemoteTfeController {
     public ResponseEntity<WorkspaceData> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
         log.info("Searching: {} {}", organizationName, workspaceName);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap<>())));
+    }
+
+    @GetMapping (produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
+    public ResponseEntity<WorkspaceList> listWorkspace(@PathVariable("organizationName") String organizationName, @RequestParam("search[tags]") String searchTags) {
+        log.info("Searching: {} {}", organizationName, searchTags);
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName,searchTags)));
     }
 
     

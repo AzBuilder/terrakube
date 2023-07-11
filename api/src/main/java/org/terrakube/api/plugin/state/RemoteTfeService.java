@@ -23,6 +23,7 @@ import org.terrakube.api.plugin.state.model.runs.*;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
+import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.repository.*;
@@ -211,6 +212,14 @@ public class RemoteTfeService {
         } else {
             return null;
         }
+
+    }
+
+    WorkspaceList listWorkspace(String organizationName, String searchTags) {
+        WorkspaceList workspaceList = new WorkspaceList();
+        workspaceList.setData(new ArrayList());
+
+        return workspaceList;
 
     }
     WorkspaceData updateWorkspace(String workspaceId, WorkspaceData workspaceData) {
