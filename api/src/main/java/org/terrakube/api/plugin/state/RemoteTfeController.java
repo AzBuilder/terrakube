@@ -72,6 +72,7 @@ public class RemoteTfeController {
         }
     }
 
+    @Transactional
     @PatchMapping(produces = "application/vnd.api+json", path = "workspaces/{workspacesId}")
     public ResponseEntity<WorkspaceData> updateWorkspace(@PathVariable("workspacesId") String workspacesId, @RequestBody WorkspaceData workspaceData) {
         log.info("Create {}", workspaceData.toString());
