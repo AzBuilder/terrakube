@@ -387,7 +387,7 @@ export const CreateModule = () => {
                   {
                     required: true,
                     pattern:
-                      "((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)(/)?",
+                      "((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)?(/)?",
                   },
                 ]}
               >
