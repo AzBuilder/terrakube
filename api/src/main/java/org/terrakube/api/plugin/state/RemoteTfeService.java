@@ -246,6 +246,7 @@ public class RemoteTfeService {
                 Tag newTag = new Tag();
                 newTag.setId(UUID.randomUUID());
                 newTag.setName(tagModel.getAttributes().get("name"));
+                newTag.setOrganization(workspace.getOrganization());
                 newTag = tagRepository.save(newTag);
 
                 WorkspaceTag newWorkspaceTag = new WorkspaceTag();
