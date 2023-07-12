@@ -25,20 +25,21 @@ import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
+import org.terrakube.api.plugin.state.model.workspace.tags.TagDataList;
+import org.terrakube.api.plugin.state.model.workspace.tags.TagModel;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
-import org.terrakube.api.rs.job.LogStatus;
 import org.terrakube.api.rs.job.step.Step;
+import org.terrakube.api.rs.tag.Tag;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
-import redis.clients.jedis.exceptions.JedisDataException;
+import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -61,6 +62,10 @@ public class RemoteTfeService {
     private StepRepository stepRepository;
     private RedisTemplate redisTemplate;
 
+    private TagRepository tagRepository;
+
+    private WorkspaceTagRepository workspaceTagRepository;
+
     public RemoteTfeService(JobRepository jobRepository,
                             ContentRepository contentRepository,
                             OrganizationRepository organizationRepository,
@@ -71,7 +76,9 @@ public class RemoteTfeService {
                             @Value("${org.terrakube.hostname}") String hostname,
                             StorageTypeService storageTypeService,
                             StepRepository stepRepository,
-                            RedisTemplate redisTemplate) {
+                            RedisTemplate redisTemplate,
+                            TagRepository tagRepository,
+                            WorkspaceTagRepository workspaceTagRepository) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -83,7 +90,8 @@ public class RemoteTfeService {
         this.storageTypeService = storageTypeService;
         this.stepRepository = stepRepository;
         this.redisTemplate = redisTemplate;
-
+        this.tagRepository = tagRepository;
+        this.workspaceTagRepository = workspaceTagRepository;
     }
 
     EntitlementData getOrgEntitlementSet(String organizationName) {
@@ -214,14 +222,43 @@ public class RemoteTfeService {
         }
 
     }
-
     WorkspaceList listWorkspace(String organizationName, String searchTags) {
         WorkspaceList workspaceList = new WorkspaceList();
         workspaceList.setData(new ArrayList());
-
         return workspaceList;
-
     }
+
+    boolean updateWorkspaceTags(String workspaceId, TagDataList tagDataList) {
+        Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
+        for(TagModel tagModel : tagDataList.getData()){
+            Tag tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), tagModel.getAttributes().get("name"));
+            if(tag!= null){
+                log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
+
+                WorkspaceTag newWorkspaceTag = new WorkspaceTag();
+                newWorkspaceTag.setId(UUID.randomUUID());
+                newWorkspaceTag.setTagId(tag.getId().toString());
+                newWorkspaceTag.setWorkspace(workspace);
+
+                workspaceTagRepository.save(newWorkspaceTag);
+            } else {
+                log.info("Creating new tag {} in Org {}", tagModel.getAttributes().get("name"), workspace.getOrganization().getName());
+                Tag newTag = new Tag();
+                newTag.setId(UUID.randomUUID());
+                newTag.setName(tagModel.getAttributes().get("name"));
+                newTag = tagRepository.save(newTag);
+
+                WorkspaceTag newWorkspaceTag = new WorkspaceTag();
+                newWorkspaceTag.setId(UUID.randomUUID());
+                newWorkspaceTag.setTagId(newTag.getId().toString());
+                newWorkspaceTag.setWorkspace(workspace);
+
+                workspaceTagRepository.save(newWorkspaceTag);
+            }
+        }
+        return true;
+    }
+
     WorkspaceData updateWorkspace(String workspaceId, WorkspaceData workspaceData) {
         Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
 
