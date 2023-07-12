@@ -463,7 +463,7 @@ export const CreateWorkspace = () => {
                   {
                     required: true,
                     pattern:
-                      "(empty)|(((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)(/)?)",
+                      "(empty)|(((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)?(/)?)",
                   },
                 ]}
               >
