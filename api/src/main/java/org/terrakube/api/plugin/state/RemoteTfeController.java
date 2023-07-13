@@ -68,6 +68,7 @@ public class RemoteTfeController {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName,searchTags)));
     }
 
+    @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/relationships/tags")
     public ResponseEntity<String> updateWorkspaceTags(@PathVariable("workspaceId") String workspaceId, @RequestBody TagDataList tagDataList) {
         log.info("Updating Workspace Tags {}", tagDataList.toString());
