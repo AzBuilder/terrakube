@@ -232,7 +232,7 @@ public class RemoteTfeService {
             boolean includeWorkspace = true;
             for (WorkspaceTag workspaceTag : workspaceTagList) {
                 Tag tag = tagRepository.getReferenceById(UUID.fromString(workspaceTag.getTagId()));
-                if (listTags.indexOf(tag.getName()) == -1 || listTags.size() == workspaceTagList.size()) {
+                if (listTags.indexOf(tag.getName()) == -1 || listTags.size() != workspaceTagList.size()) {
                     includeWorkspace = false;
                 }
             }
