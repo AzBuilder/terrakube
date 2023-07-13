@@ -227,13 +227,14 @@ public class RemoteTfeService {
         workspaceList.setData(new ArrayList());
 
         List<String> listTags = Arrays.stream(searchTags.split(",")).toList();
+
         for (Workspace workspace : organizationRepository.getOrganizationByName(organizationName).getWorkspace()) {
             List<WorkspaceTag> workspaceTagList = workspace.getWorkspaceTag();
-            boolean includeWorkspace = true;
+            boolean includeWorkspace = false;
             for (WorkspaceTag workspaceTag : workspaceTagList) {
                 Tag tag = tagRepository.getReferenceById(UUID.fromString(workspaceTag.getTagId()));
-                if (listTags.indexOf(tag.getName()) == -1 || listTags.size() != workspaceTagList.size()) {
-                    includeWorkspace = false;
+                if (listTags.indexOf(tag.getName()) > -1 && listTags.size() == workspaceTagList.size()) {
+                    includeWorkspace = true;
                 }
             }
 
@@ -246,17 +247,18 @@ public class RemoteTfeService {
 
     boolean updateWorkspaceTags(String workspaceId, TagDataList tagDataList) {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
+        workspaceTagRepository.deleteByWorkspace(workspace);
         for (TagModel tagModel : tagDataList.getData()) {
             Tag tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), tagModel.getAttributes().get("name"));
             if (tag != null) {
                 log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
-
-                WorkspaceTag newWorkspaceTag = new WorkspaceTag();
-                newWorkspaceTag.setId(UUID.randomUUID());
-                newWorkspaceTag.setTagId(tag.getId().toString());
-                newWorkspaceTag.setWorkspace(workspace);
-
-                workspaceTagRepository.save(newWorkspaceTag);
+                if(workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getName()) == null) {
+                    WorkspaceTag newWorkspaceTag = new WorkspaceTag();
+                    newWorkspaceTag.setId(UUID.randomUUID());
+                    newWorkspaceTag.setTagId(tag.getId().toString());
+                    newWorkspaceTag.setWorkspace(workspace);
+                    workspaceTagRepository.save(newWorkspaceTag);
+                }
             } else {
                 log.info("Creating new tag {} in Org {}", tagModel.getAttributes().get("name"), workspace.getOrganization().getName());
                 Tag newTag = new Tag();
@@ -680,7 +682,7 @@ public class RemoteTfeService {
 
                         for (MapRecord mapRecord : messagesPlan) {
                             Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
-                            log.info("{}", streamData.get("output"));
+                            log.info("Data length {}", streamData.get("output").length());
                             logsOutput.appendln(streamData.get("output"));
                             redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
                         }

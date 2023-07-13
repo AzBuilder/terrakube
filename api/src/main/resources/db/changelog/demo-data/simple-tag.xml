@@ -7,25 +7,25 @@
         ***TAGS***
         **********
         -->
-        <insert tableName="tags">
+        <insert tableName="tag">
             <column name="id"               value="58529721-425e-44d7-8b0d-1d515043c2f7" />
             <column name="name"             value="development" />
             <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
         </insert>
 
-        <insert tableName="tags">
+        <insert tableName="tag">
             <column name="id"               value="0d7e4a6a-560e-40f1-a6dd-c7433a04f088" />
             <column name="name"             value="staging" />
             <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
         </insert>
 
-        <insert tableName="tags">
+        <insert tableName="tag">
             <column name="id"               value="2edcb0b0-3d25-453b-bcbc-21baa7780cf7" />
             <column name="name"             value="production" />
             <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
         </insert>
 
-        <insert tableName="tags">
+        <insert tableName="tag">
             <column name="id"               value="89f11ea7-322d-43f4-9575-2544d56d9614" />
             <column name="name"             value="networking" />
             <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
@@ -38,10 +38,10 @@
         -->
         <insert tableName="workspace">
             <column name="id"                value="c20633b2-82cc-4105-9806-16e23ad0e1df" />
-            <column name="name"              value="sample_simple_tag" />
-            <column name="description"       value="sample workspace with tags" />
-            <column name="source"            value="https://github.com/AzBuilder/terrakube-docker-compose.git" />
-            <column name="branch"            value="main" />
+            <column name="name"              value="simple_tag1" />
+            <column name="description"       value="cli driven example 1" />
+            <column name="source"            value="empty" />
+            <column name="branch"            value="remote-content" />
             <column name="terraform_version" value="1.5.3" />
             <column name="organization_id"   value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
         </insert>
@@ -61,6 +61,66 @@
             <column name="id"               value="6b22c1bf-4737-4826-9034-6f9ee1a45283" />
             <column name="tag_id"           value="89f11ea7-322d-43f4-9575-2544d56d9614" />
             <column name="workspace_id"     value="c20633b2-82cc-4105-9806-16e23ad0e1df" />
+        </insert>
+
+
+        <!--
+        ***************
+        ***WORKSPACE***
+        ***************
+        -->
+        <insert tableName="workspace">
+            <column name="id"                value="5a7873bd-9fd3-4193-b3df-33ba586fb146" />
+            <column name="name"              value="simple_tag2" />
+            <column name="description"       value="cli driven example 2" />
+            <column name="source"            value="empty" />
+            <column name="branch"            value="remote-content" />
+            <column name="terraform_version" value="1.5.3" />
+            <column name="organization_id"   value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <!--
+        ********************
+        ***WORKSPACE TAGS***
+        ********************
+        -->
+        <insert tableName="workspacetag">
+            <column name="id"               value="50c2b56b-bdb0-4fb1-b030-f5920c580ee3" />
+            <column name="tag_id"           value="58529721-425e-44d7-8b0d-1d515043c2f7" />
+            <column name="workspace_id"     value="5a7873bd-9fd3-4193-b3df-33ba586fb146" />
+        </insert>
+
+        <insert tableName="workspacetag">
+            <column name="id"               value="6c6904c1-b2a3-4c5a-9803-eced8678d288" />
+            <column name="tag_id"           value="89f11ea7-322d-43f4-9575-2544d56d9614" />
+            <column name="workspace_id"     value="5a7873bd-9fd3-4193-b3df-33ba586fb146" />
+        </insert>
+
+
+        <!--
+        ***************
+        ***WORKSPACE***
+        ***************
+        -->
+        <insert tableName="workspace">
+            <column name="id"                value="24480d33-2649-4c34-aabd-cbc988eb6265" />
+            <column name="name"              value="simple_tag3" />
+            <column name="description"       value="cli driven example 3" />
+            <column name="source"            value="empty" />
+            <column name="branch"            value="remote-content" />
+            <column name="terraform_version" value="1.5.3" />
+            <column name="organization_id"   value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <!--
+        ********************
+        ***WORKSPACE TAGS***
+        ********************
+        -->
+        <insert tableName="workspacetag">
+            <column name="id"               value="81b1cdd5-5432-4bbc-87a4-3e02cdad0c89" />
+            <column name="tag_id"           value="58529721-425e-44d7-8b0d-1d515043c2f7" />
+            <column name="workspace_id"     value="24480d33-2649-4c34-aabd-cbc988eb6265" />
         </insert>
 
     </changeSet>
