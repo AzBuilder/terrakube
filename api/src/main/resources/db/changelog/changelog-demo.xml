@@ -12,4 +12,5 @@
     <include file="/db/changelog/demo-data/aws.xml"/>
     <include file="/db/changelog/demo-data/gcp.xml"/>
     <include file="/db/changelog/demo-data/simple.xml"/>
+    <include file="/db/changelog/demo-data/simple-tag.xml"/>
 </databaseChangeLog>

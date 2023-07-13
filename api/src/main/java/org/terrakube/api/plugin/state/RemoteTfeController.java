@@ -17,6 +17,9 @@ import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
+import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
+import org.terrakube.api.plugin.state.model.workspace.tags.TagDataList;
+
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +60,25 @@ public class RemoteTfeController {
     public ResponseEntity<WorkspaceData> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
         log.info("Searching: {} {}", organizationName, workspaceName);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap<>())));
+    }
+
+    @Transactional
+    @GetMapping (produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
+    public ResponseEntity<WorkspaceList> listWorkspace(@PathVariable("organizationName") String organizationName, @RequestParam("search[tags]") String searchTags) {
+        log.info("Searching: {} {}", organizationName, searchTags);
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName,searchTags)));
+    }
+
+    @Transactional
+    @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/relationships/tags")
+    public ResponseEntity<String> updateWorkspaceTags(@PathVariable("workspaceId") String workspaceId, @RequestBody TagDataList tagDataList) {
+        log.info("Updating Workspace Tags {}", tagDataList.toString());
+        boolean workspaceTags = remoteTfeService.updateWorkspaceTags(workspaceId, tagDataList);
+        if(workspaceTags){
+            return ResponseEntity.status(204).body("");
+        }else{
+            return ResponseEntity.status(404).body("");
+        }
     }
 
     
