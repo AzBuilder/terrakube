@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet author="demo-data" id="demo-4">
+        <!--
+        **********
+        ***TAGS***
+        **********
+        -->
+        <insert tableName="tags">
+            <column name="id"               value="58529721-425e-44d7-8b0d-1d515043c2f7" />
+            <column name="name"             value="development" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="tags">
+            <column name="id"               value="0d7e4a6a-560e-40f1-a6dd-c7433a04f088" />
+            <column name="name"             value="staging" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="tags">
+            <column name="id"               value="2edcb0b0-3d25-453b-bcbc-21baa7780cf7" />
+            <column name="name"             value="production" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <insert tableName="tags">
+            <column name="id"               value="89f11ea7-322d-43f4-9575-2544d56d9614" />
+            <column name="name"             value="networking" />
+            <column name="organization_id"  value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+        <!--
+        ***************    
+        ***WORKSPACE***
+        ***************
+        -->
+        <insert tableName="workspace">
+            <column name="id"                value="c20633b2-82cc-4105-9806-16e23ad0e1df" />
+            <column name="name"              value="sample_simple_tag" />
+            <column name="description"       value="sample workspace with tags" />
+            <column name="source"            value="https://github.com/AzBuilder/terrakube-docker-compose.git" />
+            <column name="branch"            value="main" />
+            <column name="terraform_version" value="1.5.3" />
+            <column name="organization_id"   value="d9b58bd3-f3fc-4056-a026-1163297e80a8" />
+        </insert>
+
+       <!--
+       ********************
+       ***WORKSPACE TAGS***
+       ********************
+       -->
+        <insert tableName="workspacetag">
+            <column name="id"               value="e982f999-f68f-4635-a44a-e8b32c122ae8" />
+            <column name="tag_id"           value="58529721-425e-44d7-8b0d-1d515043c2f7" />
+            <column name="workspace_id"     value="c20633b2-82cc-4105-9806-16e23ad0e1df" />
+        </insert>
+
+        <insert tableName="workspacetag">
+            <column name="id"               value="6b22c1bf-4737-4826-9034-6f9ee1a45283" />
+            <column name="tag_id"           value="89f11ea7-322d-43f4-9575-2544d56d9614" />
+            <column name="workspace_id"     value="c20633b2-82cc-4105-9806-16e23ad0e1df" />
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

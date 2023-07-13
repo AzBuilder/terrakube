@@ -208,7 +208,6 @@ public class RemoteTfeService {
             defaultAttributes.put("can-force-delete", true);
             //defaultAttributes.put("structured-run-output-enabled", true);
 
-
             attributes.put("permissions", defaultAttributes);
 
             otherAttributes.forEach((key, value) -> attributes.putIfAbsent(key, value));
@@ -222,17 +221,34 @@ public class RemoteTfeService {
         }
 
     }
+
     WorkspaceList listWorkspace(String organizationName, String searchTags) {
         WorkspaceList workspaceList = new WorkspaceList();
         workspaceList.setData(new ArrayList());
+
+        List<String> listTags = Arrays.stream(searchTags.split(",")).toList();
+        for (Workspace workspace : organizationRepository.getOrganizationByName(organizationName).getWorkspace()) {
+            List<WorkspaceTag> workspaceTagList = workspace.getWorkspaceTag();
+            boolean includeWorkspace = true;
+            for (WorkspaceTag workspaceTag : workspaceTagList) {
+                Tag tag = tagRepository.getReferenceById(UUID.fromString(workspaceTag.getTagId()));
+                if (listTags.indexOf(tag.getName()) == -1 || listTags.size() == workspaceTagList.size()) {
+                    includeWorkspace = false;
+                }
+            }
+
+            if(includeWorkspace){
+                workspaceList.getData().add(getWorkspace(organizationName,workspace.getName(), new HashMap()).getData());
+            }
+        }
         return workspaceList;
     }
 
     boolean updateWorkspaceTags(String workspaceId, TagDataList tagDataList) {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
-        for(TagModel tagModel : tagDataList.getData()){
+        for (TagModel tagModel : tagDataList.getData()) {
             Tag tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), tagModel.getAttributes().get("name"));
-            if(tag!= null){
+            if (tag != null) {
                 log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
 
                 WorkspaceTag newWorkspaceTag = new WorkspaceTag();
@@ -246,6 +262,7 @@ public class RemoteTfeService {
                 Tag newTag = new Tag();
                 newTag.setId(UUID.randomUUID());
                 newTag.setName(tagModel.getAttributes().get("name"));
+                newTag.setOrganization(workspace.getOrganization());
                 newTag = tagRepository.save(newTag);
 
                 WorkspaceTag newWorkspaceTag = new WorkspaceTag();
