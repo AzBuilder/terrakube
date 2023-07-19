@@ -10,6 +10,8 @@ public interface StorageTypeService {
 
     byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName);
 
+    void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId);
+
     byte[] getCurrentTerraformState(String organizationId, String workspaceId);
 
     void uploadState(String organizationId, String workspaceId, String terraformState);

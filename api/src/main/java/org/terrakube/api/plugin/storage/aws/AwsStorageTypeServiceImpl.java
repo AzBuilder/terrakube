@@ -83,6 +83,11 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId) {
+
+    }
+
+    @Override
     public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
         byte[] data;
         try {

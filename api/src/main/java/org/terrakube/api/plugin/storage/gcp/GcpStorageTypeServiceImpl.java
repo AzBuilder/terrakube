@@ -67,6 +67,11 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId) {
+
+    }
+
+    @Override
     public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
         log.info("getTerraformStateJson {}", String.format(GCP_CURRENT_STATE, organizationId, workspaceId));
         return storage.get(
