@@ -93,8 +93,5 @@ public class Workspace extends GenericAuditFields {
 
     @OneToOne
     private Ssh ssh;
-
-    public String getExecutionMode(){
-        return this.executionMode == null ? "local":this.executionMode;
-    }
+    
 }

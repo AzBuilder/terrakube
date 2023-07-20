@@ -133,7 +133,7 @@ public class RemoteTfeController {
     @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/current-state-version")
     public ResponseEntity<StateData> getCurrentWorkspaceState(@PathVariable("workspaceId") String workspaceId) {
         log.info("Get current workspace state {}", workspaceId);
-        return ResponseEntity.of(Optional.of(remoteTfeService.getCurrentWorkspaceState(workspaceId)));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getCurrentWorkspaceState(workspaceId)));
     }
 
     @Transactional

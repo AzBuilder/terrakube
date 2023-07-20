@@ -187,7 +187,7 @@ public class RemoteTfeService {
             attributes.put("terraform-version", workspace.get().getTerraformVersion());
             attributes.put("locked", workspace.get().isLocked());
             attributes.put("auto-apply", false);
-            attributes.put("execution-mode", workspace.get().getExecutionMode());
+            attributes.put("execution-mode", "local");
 
             Map<String, Boolean> defaultAttributes = new HashMap<>();
             defaultAttributes.put("can-create-state-versions", true);
@@ -370,15 +370,17 @@ public class RemoteTfeService {
         History history = new History();
         UUID historyId = UUID.randomUUID();
         history.setId(historyId);
+        history.setOutput("");
+        history.setJobReference(String.valueOf(job.getId()));
+        history.setWorkspace(workspace);
+        history = historyRepository.save(history);
+
         history.setOutput(String
                 .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
                         hostname,
                         workspace.getOrganization().getId().toString(),
                         workspace.getId().toString(),
-                        historyId));
-        history.setJobReference(String.valueOf(job.getId()));
-        history.setWorkspace(workspace);
-        history = historyRepository.save(history);
+                        history.getId().toString()));
 
         //upload json state to backend storage
         storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformStateJson, history.getId().toString());
@@ -401,7 +403,7 @@ public class RemoteTfeService {
                         hostname,
                         workspace.getOrganization().getId().toString(),
                         workspace.getId().toString(),
-                        historyId));
+                        history.getId().toString()));
         responseAttributes.put("serial", 1);
         response.getData().setAttributes(responseAttributes);
 
@@ -416,7 +418,7 @@ public class RemoteTfeService {
                         hostname,
                         workspace.getOrganization().getId().toString(),
                         workspace.getId().toString(),
-                        historyId));
+                        history.getId().toString()));
         return response;
     }
 
