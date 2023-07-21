@@ -84,7 +84,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
     @Override
     public void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId) {
         String blobKey = String.format("tfstate/%s/%s/state/%s.json", organizationId, workspaceId, stateJsonHistoryId);
-        log.info("terraformStateFile: {}", blobKey);
+        log.info("terraformJsonStateFile: {}", blobKey);
         s3client.putObject(bucketName, blobKey, stateJson);
     }
 

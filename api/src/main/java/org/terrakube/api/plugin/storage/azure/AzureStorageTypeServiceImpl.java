@@ -54,7 +54,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
         BlobContainerClient contextContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
 
         String stateFileName = String.format("%s/%s/state/%s.json", organizationId, workspaceId, stateJsonHistoryId);
-        log.info("New State File JSON Az Storage: {}", stateFileName);
+        log.info("New State JSON Az Storage: {}", stateFileName);
         BlobClient blobClient = contextContainerClient.getBlobClient(stateFileName);
 
         BinaryData binaryData = BinaryData.fromBytes(stateJson.getBytes());
