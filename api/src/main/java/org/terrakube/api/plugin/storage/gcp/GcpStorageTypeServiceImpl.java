@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
 import java.io.IOException;
@@ -68,7 +67,21 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId) {
+        String currentStateKey = String.format(GCP_STATE_JSON, organizationId, workspaceId, stateJsonHistoryId);
+        log.info("Define new Json State File: {}", currentStateKey);
 
+        BlobId blobId = BlobId.of(bucketName, currentStateKey);
+        Blob blob = storage.get(blobId);
+        if (blob != null) {
+            log.info("Creating new JSON state...");
+            try {
+                WritableByteChannel channel = blob.writer();
+                channel.write(ByteBuffer.wrap(stateJson.getBytes(Charset.defaultCharset())));
+                channel.close();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        }
     }
 
     @Override
