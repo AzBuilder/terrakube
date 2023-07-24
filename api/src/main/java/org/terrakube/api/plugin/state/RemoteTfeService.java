@@ -187,7 +187,7 @@ public class RemoteTfeService {
             attributes.put("terraform-version", workspace.get().getTerraformVersion());
             attributes.put("locked", workspace.get().isLocked());
             attributes.put("auto-apply", false);
-            attributes.put("execution-mode", "local");
+            attributes.put("execution-mode", workspace.get().getExecutionMode());
 
             Map<String, Boolean> defaultAttributes = new HashMap<>();
             defaultAttributes.put("can-create-state-versions", true);
