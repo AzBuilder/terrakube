@@ -83,6 +83,7 @@ export const WorkspaceDetails = (props) => {
   const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
+  const [executionMode, setExecutionMode] = useState("...");
 
   const terraformVersionsApi = `${
     new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
@@ -164,6 +165,7 @@ export const WorkspaceDetails = (props) => {
             }
             setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
             setWorkspaceName(response.data.data.attributes.name);
+            setExecutionMode(response.data.data.attributes.executionMode);
           });
       });
   };
@@ -179,6 +181,7 @@ export const WorkspaceDetails = (props) => {
           description: values.description,
           folder: values.folder,
           locked: values.locked,
+          executionMode: values.executionMode,
           terraformVersion: values.terraformVersion,
         },
       },
@@ -399,7 +402,7 @@ export const WorkspaceDetails = (props) => {
                       <Space direction="vertical">
                         <br />
                         <span className="App-text">
-                          <ThunderboltOutlined /> Execution Mode: <a>Remote</a>{" "}
+                          <ThunderboltOutlined /> Execution Mode: <a>{executionMode}</a>{" "}
                         </span>
                         <span className="App-text">
                           <PlayCircleOutlined /> Auto apply: <a>Off</a>{" "}
@@ -521,6 +524,7 @@ export const WorkspaceDetails = (props) => {
                           description: workspace.data.attributes.description,
                           folder: workspace.data.attributes.folder,
                           locked: workspace.data.attributes.locked,
+                          executionMode: workspace.data.attributes.executionMode
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -579,6 +583,21 @@ export const WorkspaceDetails = (props) => {
                           <Switch />
                         </Form.Item>
 
+                        <Form.Item
+                          name="executionMode"
+                          label="Execution Mode"
+                          extra="Use this option with terraform remote state/cloud block if you want to execute Terraform CLI remotely and just upload the state to Terrakube"
+                        >
+                          <Select
+                            defaultValue={
+                              workspace.data.attributes.executionMode
+                            }
+                            style={{ width: 250 }}
+                          >
+                             <Option key="remote">remote</Option>
+                             <Option key="local">local</Option>
+                          </Select>
+                        </Form.Item>
                         <Form.Item>
                           <Button type="primary" htmlType="submit">
                             Save settings

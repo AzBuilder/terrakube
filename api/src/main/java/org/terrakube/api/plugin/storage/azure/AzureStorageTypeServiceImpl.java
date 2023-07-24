@@ -50,6 +50,18 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
+    public void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId) {
+        BlobContainerClient contextContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
+
+        String stateFileName = String.format("%s/%s/state/%s.json", organizationId, workspaceId, stateJsonHistoryId);
+        log.info("New State JSON Az Storage: {}", stateFileName);
+        BlobClient blobClient = contextContainerClient.getBlobClient(stateFileName);
+
+        BinaryData binaryData = BinaryData.fromBytes(stateJson.getBytes());
+        blobClient.upload(binaryData, true);
+    }
+
+    @Override
     public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
         log.info("Searching: /{}/{}/terraform.tfstate", organizationId, workspaceId);

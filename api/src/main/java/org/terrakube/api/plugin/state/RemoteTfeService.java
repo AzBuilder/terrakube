@@ -187,8 +187,9 @@ public class RemoteTfeService {
             attributes.put("terraform-version", workspace.get().getTerraformVersion());
             attributes.put("locked", workspace.get().isLocked());
             attributes.put("auto-apply", false);
+            attributes.put("execution-mode", workspace.get().getExecutionMode());
 
-            Map<String, Boolean> defaultAttributes = new HashMap<String, Boolean>();
+            Map<String, Boolean> defaultAttributes = new HashMap<>();
             defaultAttributes.put("can-create-state-versions", true);
             defaultAttributes.put("can-destroy", true);
             defaultAttributes.put("can-force-unlock", true);
@@ -238,8 +239,8 @@ public class RemoteTfeService {
                 }
             }
 
-            if(includeWorkspace){
-                workspaceList.getData().add(getWorkspace(organizationName,workspace.getName(), new HashMap()).getData());
+            if (includeWorkspace) {
+                workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap()).getData());
             }
         }
         return workspaceList;
@@ -252,7 +253,7 @@ public class RemoteTfeService {
             Tag tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), tagModel.getAttributes().get("name"));
             if (tag != null) {
                 log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
-                if(workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getName()) == null) {
+                if (workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getName()) == null) {
                     WorkspaceTag newWorkspaceTag = new WorkspaceTag();
                     newWorkspaceTag.setId(UUID.randomUUID());
                     newWorkspaceTag.setTagId(tag.getId().toString());
@@ -342,17 +343,47 @@ public class RemoteTfeService {
         byte[] decodedBytes = stateData.getData().getAttributes().get("state").toString().getBytes();
         String terraformState = new String(Base64.getMimeDecoder().decode(decodedBytes));
 
+        //According to API docs json-state is optional so if the value is not available we will upload a default "{}"
+        byte[] decodedBytesJson = (stateData.getData().getAttributes().get("json-state") != null) ? stateData.getData().getAttributes().get("json-state").toString().getBytes() : "{}".getBytes(StandardCharsets.UTF_8);
+        String terraformStateJson = new String(Base64.getMimeDecoder().decode(decodedBytesJson));
+
         //upload state to backend storage
         storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
 
-        //create history
+        //create dummy job
+        Job job = new Job();
+        job.setWorkspace(workspace);
+        job.setOrganization(workspace.getOrganization());
+        job.setStatus(JobStatus.completed);
+        job = jobRepository.save(job);
+
+        //dummy step
+        Step step = new Step();
+        step.setId(UUID.randomUUID());
+        step.setJob(job);
+        step.setName("Dummy State Uploaded");
+        step.setStatus(JobStatus.completed);
+        step.setStepNumber(100);
+        stepRepository.save(step);
+
+        //create dummy history
         History history = new History();
         UUID historyId = UUID.randomUUID();
         history.setId(historyId);
-        //history.setOutput(terraformState);
-        history.setJobReference("0");
+        history.setOutput("");
+        history.setJobReference(String.valueOf(job.getId()));
         history.setWorkspace(workspace);
-        historyRepository.save(history);
+        history = historyRepository.save(history);
+
+        history.setOutput(String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString(),
+                        history.getId().toString()));
+
+        //upload json state to backend storage
+        storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformStateJson, history.getId().toString());
 
         StateData response = new StateData();
         response.setData(new StateModel());
@@ -368,10 +399,11 @@ public class RemoteTfeService {
                         workspace.getOrganization().getId().toString(),
                         workspace.getId().toString()));
         responseAttributes.put("hosted-json-state-download-url", String
-                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
                         hostname,
                         workspace.getOrganization().getId().toString(),
-                        workspace.getId().toString()));
+                        workspace.getId().toString(),
+                        history.getId().toString()));
         responseAttributes.put("serial", 1);
         response.getData().setAttributes(responseAttributes);
 
@@ -380,7 +412,49 @@ public class RemoteTfeService {
                         hostname,
                         workspace.getOrganization().getId().toString(),
                         workspace.getId().toString()));
+
+        log.info("Download State JSON URL: {}", String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString(),
+                        history.getId().toString()));
         return response;
+    }
+
+    StateData getCurrentWorkspaceState(String workspaceId) {
+        Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
+
+        log.info("Searching for existing terraform state for {} in the storage service", workspace.getId());
+        byte[] currentState;
+        try {
+            currentState = storageTypeService.getCurrentTerraformState(workspace.getOrganization().getId().toString(), workspaceId);
+        } catch (Exception ex) {
+            log.error("Exception searching state in storage");
+            log.error(ex.getMessage());
+            currentState = new byte[0];
+        }
+        if (currentState.length > 0) {
+            String historyId = UUID.randomUUID().toString();
+            StateData currentStateData = new StateData();
+            currentStateData.setData(new StateModel());
+            currentStateData.getData().setId(historyId);
+            currentStateData.getData().setType("state-versions");
+
+            Map<String, Object> responseAttributes = new HashMap<>();
+            responseAttributes.put("vcs-commit-url", null);
+            responseAttributes.put("vcs-commit-sha", null);
+            responseAttributes.put("hosted-state-download-url", String
+                    .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                            hostname,
+                            workspace.getOrganization().getId().toString(),
+                            workspace.getId().toString()));
+            responseAttributes.put("serial", 1);
+            currentStateData.getData().setAttributes(responseAttributes);
+
+            return currentStateData;
+        } else
+            return null;
     }
 
     ConfigurationData createConfigurationVersion(String workspaceId, ConfigurationData configurationData) {

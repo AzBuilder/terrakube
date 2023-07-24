@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Slf4j
 @AllArgsConstructor
@@ -48,6 +49,19 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
         log.info("Searching: /.terraform-spring-boot/local/tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
         String outputFilePath = String.format(STATE_DIRECTORY_JSON, organizationId, workspaceId, stateFileName);
         return getOutputBytes(outputFilePath);
+    }
+
+    @Override
+    public void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId) {
+        try {
+            String newStateFileJson = String.format(STATE_DIRECTORY_JSON, organizationId, workspaceId, stateJsonHistoryId);
+            log.info("newFileJson: {}", newStateFileJson);
+            File stateFile = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(newStateFileJson)));
+            FileUtils.forceMkdir(stateFile.getParentFile());
+            FileUtils.writeStringToFile(stateFile, stateJson, Charset.defaultCharset().toString());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 
     @Override

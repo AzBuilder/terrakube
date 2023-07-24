@@ -62,6 +62,9 @@ public class Workspace extends GenericAuditFields {
     @Column(name = "terraform_version")
     private String terraformVersion;
 
+    @Column(name = "execution_mode")
+    private String executionMode;
+
     @ManyToOne
     private Organization organization;
 
@@ -90,4 +93,5 @@ public class Workspace extends GenericAuditFields {
 
     @OneToOne
     private Ssh ssh;
+    
 }

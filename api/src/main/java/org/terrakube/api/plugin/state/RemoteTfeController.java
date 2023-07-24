@@ -56,17 +56,17 @@ public class RemoteTfeController {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgInformation(organizationName)));
     }
 
-    @GetMapping (produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces/{workspaceName}")
+    @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces/{workspaceName}")
     public ResponseEntity<WorkspaceData> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
         log.info("Searching: {} {}", organizationName, workspaceName);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap<>())));
     }
 
     @Transactional
-    @GetMapping (produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
+    @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
     public ResponseEntity<WorkspaceList> listWorkspace(@PathVariable("organizationName") String organizationName, @RequestParam("search[tags]") String searchTags) {
         log.info("Searching: {} {}", organizationName, searchTags);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName,searchTags)));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName, searchTags)));
     }
 
     @Transactional
@@ -74,22 +74,22 @@ public class RemoteTfeController {
     public ResponseEntity<String> updateWorkspaceTags(@PathVariable("workspaceId") String workspaceId, @RequestBody TagDataList tagDataList) {
         log.info("Updating Workspace Tags {}", tagDataList.toString());
         boolean workspaceTags = remoteTfeService.updateWorkspaceTags(workspaceId, tagDataList);
-        if(workspaceTags){
+        if (workspaceTags) {
             return ResponseEntity.status(204).body("");
-        }else{
+        } else {
             return ResponseEntity.status(404).body("");
         }
     }
 
-    
+
     @PostMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
     public ResponseEntity<WorkspaceData> createWorkspace(@PathVariable("organizationName") String organizationName, @RequestBody WorkspaceData workspaceData) {
         log.info("Create {}", workspaceData.toString());
         Optional<WorkspaceData> newWorkspace = Optional.ofNullable(remoteTfeService.createWorkspace(organizationName, workspaceData));
-        if(newWorkspace.isPresent()){
+        if (newWorkspace.isPresent()) {
             log.info("Created: {}", newWorkspace.get().toString());
             return ResponseEntity.status(201).body(newWorkspace.get());
-        }else{
+        } else {
             return ResponseEntity.status(500).body(new WorkspaceData());
         }
     }
@@ -99,10 +99,10 @@ public class RemoteTfeController {
     public ResponseEntity<WorkspaceData> updateWorkspace(@PathVariable("workspacesId") String workspacesId, @RequestBody WorkspaceData workspaceData) {
         log.info("Create {}", workspaceData.toString());
         Optional<WorkspaceData> updatedWorkspace = Optional.ofNullable(remoteTfeService.updateWorkspace(workspacesId, workspaceData));
-        if(updatedWorkspace.isPresent()){
+        if (updatedWorkspace.isPresent()) {
             log.info("Created: {}", updatedWorkspace.get().toString());
             return ResponseEntity.status(201).body(updatedWorkspace.get());
-        }else{
+        } else {
             return ResponseEntity.status(500).body(new WorkspaceData());
         }
     }
@@ -130,6 +130,13 @@ public class RemoteTfeController {
     }
 
     @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/current-state-version")
+    public ResponseEntity<StateData> getCurrentWorkspaceState(@PathVariable("workspaceId") String workspaceId) {
+        log.info("Get current workspace state {}", workspaceId);
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getCurrentWorkspaceState(workspaceId)));
+    }
+
+    @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/configuration-versions")
     public ResponseEntity<ConfigurationData> createConfigurationVersion(@PathVariable("workspaceId") String workspaceId, @RequestBody ConfigurationData configurationData) {
         log.info("Creating Configuration Version for worspaceId {}", workspaceId);
@@ -144,60 +151,60 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @PutMapping (path = "/configuration-versions/{configurationid}")
+    @PutMapping(path = "/configuration-versions/{configurationid}")
     public ResponseEntity<String> uploadConfiguration(HttpServletRequest httpServletRequest, @PathVariable("configurationid") String configurationId) throws IOException {
-        log.info("Uploading Id {} file", configurationId );
+        log.info("Uploading Id {} file", configurationId);
         remoteTfeService.uploadFile(configurationId, httpServletRequest.getInputStream());
         log.info("File created");
         return ResponseEntity.ok().body("");
     }
 
     @Transactional
-    @PostMapping (produces = "application/vnd.api+json", path = "/runs")
+    @PostMapping(produces = "application/vnd.api+json", path = "/runs")
     public ResponseEntity<RunsData> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
         log.info("Create new run");
         return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
     }
 
     @Transactional
-    @GetMapping (produces = "application/vnd.api+json", path = "/runs/{runId}")
-    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId,@RequestParam(name = "include", required = false) String include) {
+    @GetMapping(produces = "application/vnd.api+json", path = "/runs/{runId}")
+    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId, @RequestParam(name = "include", required = false) String include) {
         return ResponseEntity.ok(remoteTfeService.getRun(runId, include));
     }
 
     @Transactional
-    @PostMapping (produces = "application/vnd.api+json", path = "/runs/{runId}/actions/apply")
+    @PostMapping(produces = "application/vnd.api+json", path = "/runs/{runId}/actions/apply")
     public ResponseEntity<RunsData> runApply(@PathVariable("runId") int runId) {
         return ResponseEntity.ok(remoteTfeService.runApply(runId));
     }
 
     @Transactional
-    @PostMapping (produces = "application/vnd.api+json", path = "/runs/{runId}/actions/discard")
+    @PostMapping(produces = "application/vnd.api+json", path = "/runs/{runId}/actions/discard")
     public ResponseEntity<RunsData> runDiscard(@PathVariable("runId") int runId) {
         return ResponseEntity.ok(remoteTfeService.runDiscard(runId));
     }
 
 
     @Transactional
-    @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}")
+    @GetMapping(produces = "application/vnd.api+json", path = "/plans/{planId}")
     public ResponseEntity<PlanRunData> getPlan(@PathVariable("planId") int planId) {
         return ResponseEntity.ok(remoteTfeService.getPlan(planId));
     }
 
     @Transactional
-    @GetMapping (produces = "application/vnd.api+json", path = "/applies/{applyId}")
+    @GetMapping(produces = "application/vnd.api+json", path = "/applies/{applyId}")
     public ResponseEntity<ApplyRunData> getApply(@PathVariable("applyId") int applyId) {
         return ResponseEntity.ok(remoteTfeService.getApply(applyId));
     }
 
     @Transactional
-    @GetMapping (produces = "application/vnd.api+json", path = "/plans/{planId}/logs")
+    @GetMapping(produces = "application/vnd.api+json", path = "/plans/{planId}/logs")
     public ResponseEntity<String> getPlanLogs(@PathVariable("planId") int planId) throws IOException {
         return ResponseEntity.of(Optional.ofNullable(new String(remoteTfeService.getPlanLogs(planId), StandardCharsets.UTF_8)));
     }
 
     @Transactional
-    @GetMapping (produces = "application/vnd.api+json", path = "/applies/{applyId}/logs")
+    @GetMapping(produces = "application/vnd.api+json", path = "/applies/{applyId}/logs")
     public ResponseEntity<String> getApplyLogs(@PathVariable("applyId") int planId) throws IOException {
         return ResponseEntity.of(Optional.ofNullable(new String(remoteTfeService.getApplyLogs(planId), StandardCharsets.UTF_8)));
     }

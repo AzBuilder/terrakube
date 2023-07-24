@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -80,6 +79,13 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             data = new byte[0];
         }
         return data;
+    }
+
+    @Override
+    public void uploadTerraformStateJson(String organizationId, String workspaceId, String stateJson, String stateJsonHistoryId) {
+        String blobKey = String.format("tfstate/%s/%s/state/%s.json", organizationId, workspaceId, stateJsonHistoryId);
+        log.info("terraformJsonStateFile: {}", blobKey);
+        s3client.putObject(bucketName, blobKey, stateJson);
     }
 
     @Override
