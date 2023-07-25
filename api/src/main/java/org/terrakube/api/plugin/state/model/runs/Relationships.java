@@ -14,6 +14,7 @@ public class Relationships {
     ConfigurationModel configurationVersion;
     WorkspaceModel workspace;
     PlanModel plan;
-
     ApplyModel apply;
+    @JsonProperty("run-events")
+    RunEventsModel runEventsModel;
 }
