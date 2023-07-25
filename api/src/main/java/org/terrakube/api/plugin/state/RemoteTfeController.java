@@ -166,6 +166,14 @@ public class RemoteTfeController {
         return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
     }
 
+    @GetMapping(produces = "application/vnd.api+json", path = "/runs/{runsId}/run-events")
+    public ResponseEntity<String> getRunEvents(@PathVariable("runsId") String runsId) {
+        log.info("Gettinng Runs Events for Run Id {}", runsId);
+        return ResponseEntity.status(200).body("{\n" +
+                "  \"data\": []\n" +
+                "}");
+    }
+
     @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "/runs/{runId}")
     public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId, @RequestParam(name = "include", required = false) String include) {

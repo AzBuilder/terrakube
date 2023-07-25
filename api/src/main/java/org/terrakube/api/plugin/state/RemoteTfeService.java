@@ -617,6 +617,10 @@ public class RemoteTfeService {
         workspaceModel.getData().setType("workspaces");
         relationships.setWorkspace(workspaceModel);
 
+        RunEventsModel runEventsModel = new RunEventsModel();
+        runEventsModel.setData(new ArrayList());
+        relationships.setRunEventsModel(runEventsModel);
+
         log.info("Included: {}", include);
         //if(include != null && include.equals("workspace")){
         //    runsData.setIncluded(new ArrayList());
