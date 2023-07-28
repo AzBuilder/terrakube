@@ -35,12 +35,13 @@ public class DataSourceAutoConfiguration {
                 dataSource = sqlServerDataSource;
                 break;
             case POSTGRESQL:
+                log.info("postgresql datasource using SSL Mode: {}", dataSourceConfigurationProperties.getSslMode());
                 PGSimpleDataSource ds = new PGSimpleDataSource();
                 ds.setServerNames(new String[]{dataSourceConfigurationProperties.getHostname()});
                 ds.setDatabaseName(dataSourceConfigurationProperties.getDatabaseName());
                 ds.setUser(dataSourceConfigurationProperties.getDatabaseUser());
                 ds.setPassword(dataSourceConfigurationProperties.getDatabasePassword());
-                ds.setSslMode("disable");
+                ds.setSslMode(dataSourceConfigurationProperties.getSslMode());
                 dataSource = ds;
                 break;
             case MYSQL:
