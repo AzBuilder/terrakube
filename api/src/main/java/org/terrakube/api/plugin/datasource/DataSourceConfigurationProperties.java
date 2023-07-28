@@ -18,4 +18,5 @@ public class DataSourceConfigurationProperties {
     private String databaseName;
     private String databaseUser;
     private String databasePassword;
+    private String sslMode;
 }
