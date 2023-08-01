@@ -226,21 +226,23 @@ public class RemoteTfeService {
     }
 
     StateConsumerList getWorkspaceStateConsumers(String workspaceId) {
-        Optional<Workspace> workspace = Optional
+        Optional<Workspace> workspaceFound = Optional
                 .ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
 
         StateConsumerList stateConsumerList = new StateConsumerList();
         stateConsumerList.setData(new ArrayList());
-        if (workspace.isPresent()) {
-            workspace.get().getOrganization().getWorkspace().forEach(workspaceData -> {
-                if (workspaceData.getId().toString().equals(workspaceId)){
-                    stateConsumerList.getData().add(getWorkspace(workspace.get().getOrganization().getName(), workspace.get().getName(), new HashMap()).getData());
+
+        workspaceFound.ifPresent(workspaceData -> {
+            log.info("Workspace found {}, generating workspace list from organization", workspaceData.getName());
+            workspaceData.getOrganization().getWorkspace().forEach(workspace -> {
+                if (!workspace.getId().toString().equals(workspaceId)){
+                    log.info("Adding workspace {} as state consumers", workspace.getName());
+                    stateConsumerList.getData().add(getWorkspace(workspace.getOrganization().getName(), workspace.getName(), new HashMap()).getData());
                 }
             });
-            return stateConsumerList;
-        } else {
-            return stateConsumerList;
-        }
+        });
+
+        return stateConsumerList;
 
     }
 
