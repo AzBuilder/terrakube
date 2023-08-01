@@ -25,6 +25,7 @@ import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
+import org.terrakube.api.plugin.state.model.workspace.state.consumers.StateConsumerList;
 import org.terrakube.api.plugin.state.model.workspace.tags.TagDataList;
 import org.terrakube.api.plugin.state.model.workspace.tags.TagModel;
 import org.terrakube.api.plugin.storage.StorageTypeService;
@@ -188,6 +189,7 @@ public class RemoteTfeService {
             attributes.put("locked", workspace.get().isLocked());
             attributes.put("auto-apply", false);
             attributes.put("execution-mode", workspace.get().getExecutionMode());
+            attributes.put("global-remote-state", true);
 
             Map<String, Boolean> defaultAttributes = new HashMap<>();
             defaultAttributes.put("can-create-state-versions", true);
@@ -219,6 +221,25 @@ public class RemoteTfeService {
             return workspaceData;
         } else {
             return null;
+        }
+
+    }
+
+    StateConsumerList getWorkspaceStateConsumers(String workspaceId) {
+        Optional<Workspace> workspace = Optional
+                .ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
+
+        StateConsumerList stateConsumerList = new StateConsumerList();
+        stateConsumerList.setData(new ArrayList());
+        if (workspace.isPresent()) {
+            workspace.get().getOrganization().getWorkspace().forEach(workspaceData -> {
+                if (workspaceData.getId().toString().equals(workspaceId)){
+                    stateConsumerList.getData().add(getWorkspace(workspace.get().getOrganization().getName(), workspace.get().getName(), new HashMap()).getData());
+                }
+            });
+            return stateConsumerList;
+        } else {
+            return stateConsumerList;
         }
 
     }
