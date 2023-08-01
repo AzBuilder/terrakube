@@ -13,6 +13,8 @@ import org.terrakube.client.spring.autoconfigure.RestClientProperties;
 import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -34,11 +36,14 @@ public class WorkspaceSecurityImpl implements WorkspaceSecurity {
     RestClientProperties clientProperties;
     String registryDomain;
 
+    String apiUrl;
+
     String internalSecret;
 
-    public WorkspaceSecurityImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.client.secretKey}") String internalSecret) {
+    public WorkspaceSecurityImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.api.url}") String apiUrl,  @Value("${org.terrakube.client.secretKey}") String internalSecret) {
         this.clientProperties = restClientProperties;
         this.registryDomain = registryDomain;
+        this.apiUrl = apiUrl;
         this.internalSecret = internalSecret;
     }
 
@@ -86,6 +91,12 @@ public class WorkspaceSecurityImpl implements WorkspaceSecurity {
 
         String token = generateAccessToken();
         String credentialFileContent = String.format(CREDENTIALS_CONTENT, registryDomain, token);
+        String credentialFileContent2 = "";
+        try {
+            credentialFileContent2 = String.format(CREDENTIALS_CONTENT, new URL(apiUrl).getHost(), token);
+        } catch (MalformedURLException e) {
+            log.error(e.getMessage());
+        }
 
         try {
             File credentialFile = new File(
@@ -95,6 +106,9 @@ public class WorkspaceSecurityImpl implements WorkspaceSecurity {
             );
             synchronized (this) {
                 FileUtils.writeStringToFile(credentialFile, credentialFileContent, Charset.defaultCharset(), false);
+                FileUtils.writeStringToFile(credentialFile, "\n", Charset.defaultCharset(), true);
+                FileUtils.writeStringToFile(credentialFile, credentialFileContent2, Charset.defaultCharset(), true);
+
             }
         } catch (IOException e) {
             log.error(e.getMessage());
