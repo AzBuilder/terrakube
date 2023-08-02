@@ -144,12 +144,6 @@ export const WorkspaceDetails = (props) => {
           )
           .then((response) => {
             setWorkspace(response.data);
-            if (
-              response.data.data.attributes.source === "empty" &&
-              response.data.data.attributes.branch === "remote-content"
-            ) {
-              switchKey("1");
-            }
 
             if (response.data.included) {
               setupWorkspaceIncludes(
@@ -402,7 +396,8 @@ export const WorkspaceDetails = (props) => {
                       <Space direction="vertical">
                         <br />
                         <span className="App-text">
-                          <ThunderboltOutlined /> Execution Mode: <a>{executionMode}</a>{" "}
+                          <ThunderboltOutlined /> Execution Mode:{" "}
+                          <a>{executionMode}</a>{" "}
                         </span>
                         <span className="App-text">
                           <PlayCircleOutlined /> Auto apply: <a>Off</a>{" "}
@@ -524,7 +519,8 @@ export const WorkspaceDetails = (props) => {
                           description: workspace.data.attributes.description,
                           folder: workspace.data.attributes.folder,
                           locked: workspace.data.attributes.locked,
-                          executionMode: workspace.data.attributes.executionMode
+                          executionMode:
+                            workspace.data.attributes.executionMode,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -594,8 +590,8 @@ export const WorkspaceDetails = (props) => {
                             }
                             style={{ width: 250 }}
                           >
-                             <Option key="remote">remote</Option>
-                             <Option key="local">local</Option>
+                            <Option key="remote">remote</Option>
+                            <Option key="local">local</Option>
                           </Select>
                         </Form.Item>
                         <Form.Item>
