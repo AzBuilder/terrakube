@@ -251,18 +251,19 @@ public class RemoteTfeService {
         workspaceList.setData(new ArrayList());
 
         List<String> listTags = Arrays.stream(searchTags.split(",")).toList();
-
+        log.info("Searching workspaces with tags: {}", searchTags);
         for (Workspace workspace : organizationRepository.getOrganizationByName(organizationName).getWorkspace()) {
             List<WorkspaceTag> workspaceTagList = workspace.getWorkspaceTag();
-            boolean includeWorkspace = false;
+            int matchingTags = 0;
+
             for (WorkspaceTag workspaceTag : workspaceTagList) {
                 Tag tag = tagRepository.getReferenceById(UUID.fromString(workspaceTag.getTagId()));
-                if (listTags.indexOf(tag.getName()) > -1 && listTags.size() == workspaceTagList.size()) {
-                    includeWorkspace = true;
+                if (listTags.indexOf(tag.getName()) > -1) {
+                    matchingTags++;
                 }
             }
-
-            if (includeWorkspace) {
+            log.info("Workspace {} Tags Count {} Searching Tag Quantity {} Matched {}", workspace.getName(), workspaceTagList.size(), listTags.size(), matchingTags);
+            if (matchingTags == listTags.size()) {
                 workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap()).getData());
             }
         }
