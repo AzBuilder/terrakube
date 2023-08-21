@@ -276,7 +276,7 @@ public class RemoteTfeService {
         tagDataList.getData().forEach(tagModel -> {
             Tag tag = searchOrCreateTagOrganization(workspace, tagModel.getAttributes().get("name"));
             log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
-            if (workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getName()) == null) {
+            if (workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getId().toString()) == null) {
                 log.info("Tag {} does not exist in workspace {}, adding new tag to workspace...", tagModel.getAttributes().get("name"), workspace.getName());
                 WorkspaceTag newWorkspaceTag = new WorkspaceTag();
                 newWorkspaceTag.setId(UUID.randomUUID());
