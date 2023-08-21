@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
@@ -235,7 +236,7 @@ public class RemoteTfeService {
         workspaceFound.ifPresent(workspaceData -> {
             log.info("Workspace found {}, generating workspace list from organization", workspaceData.getName());
             workspaceData.getOrganization().getWorkspace().forEach(workspace -> {
-                if (!workspace.getId().toString().equals(workspaceId)){
+                if (!workspace.getId().toString().equals(workspaceId)) {
                     log.info("Adding workspace {} as state consumers", workspace.getName());
                     stateConsumerList.getData().add(getWorkspace(workspace.getOrganization().getName(), workspace.getName(), new HashMap()).getData());
                 }
@@ -272,35 +273,43 @@ public class RemoteTfeService {
 
     boolean updateWorkspaceTags(String workspaceId, TagDataList tagDataList) {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
-        workspaceTagRepository.deleteByWorkspace(workspace);
-        for (TagModel tagModel : tagDataList.getData()) {
-            Tag tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), tagModel.getAttributes().get("name"));
-            if (tag != null) {
-                log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
-                if (workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getName()) == null) {
-                    WorkspaceTag newWorkspaceTag = new WorkspaceTag();
-                    newWorkspaceTag.setId(UUID.randomUUID());
-                    newWorkspaceTag.setTagId(tag.getId().toString());
-                    newWorkspaceTag.setWorkspace(workspace);
-                    workspaceTagRepository.save(newWorkspaceTag);
-                }
-            } else {
-                log.info("Creating new tag {} in Org {}", tagModel.getAttributes().get("name"), workspace.getOrganization().getName());
-                Tag newTag = new Tag();
-                newTag.setId(UUID.randomUUID());
-                newTag.setName(tagModel.getAttributes().get("name"));
-                newTag.setOrganization(workspace.getOrganization());
-                newTag = tagRepository.save(newTag);
-
+        tagDataList.getData().forEach(tagModel -> {
+            Tag tag = searchOrCreateTagOrganization(workspace, tagModel.getAttributes().get("name"));
+            log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
+            if (workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getId().toString()) == null) {
+                log.info("Tag {} does not exist in workspace {}, adding new tag to workspace...", tagModel.getAttributes().get("name"), workspace.getName());
                 WorkspaceTag newWorkspaceTag = new WorkspaceTag();
                 newWorkspaceTag.setId(UUID.randomUUID());
-                newWorkspaceTag.setTagId(newTag.getId().toString());
+                newWorkspaceTag.setTagId(tag.getId().toString());
                 newWorkspaceTag.setWorkspace(workspace);
-
                 workspaceTagRepository.save(newWorkspaceTag);
+            } else {
+                log.info("Tag {} exist in workspace {}, there is no need to update", tagModel.getAttributes().get("name"), workspace.getName());
             }
-        }
+        });
+
         return true;
+    }
+
+    synchronized Tag searchOrCreateTagOrganization(Workspace workspace, String tagName) {
+        log.info("Checking if Tag {} exists inside Organization {}", tagName, workspace.getOrganization().getName());
+        Tag tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), tagName);
+
+        if (tag == null) {
+            log.info("Creating new tag {} in Org {}", tagName, workspace.getOrganization().getName());
+            tag = new Tag();
+            try {
+                tag.setId(UUID.randomUUID());
+                tag.setName(tagName);
+                tag.setOrganization(workspace.getOrganization());
+                tag = tagRepository.save(tag);
+            } catch (Exception exception) {
+                log.error(exception.getMessage());
+                tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(), tagName);
+            }
+
+        }
+        return tag;
     }
 
     WorkspaceData updateWorkspace(String workspaceId, WorkspaceData workspaceData) {
