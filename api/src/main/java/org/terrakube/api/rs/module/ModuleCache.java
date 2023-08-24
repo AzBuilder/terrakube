@@ -18,6 +18,7 @@ import org.terrakube.api.rs.vcs.Vcs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Slf4j
@@ -33,6 +34,21 @@ public class ModuleCache {
     }
 
     public List<String> getVersions(String modulePath, String source, Vcs vcs, Ssh ssh) {
+
+        Optional<List<String>> currentVersion = Optional.ofNullable((List<String>) redisTemplate.opsForValue().get(modulePath));
+        if(currentVersion.isPresent()){
+            log.info("Module {} is in cache", modulePath);
+            redisTemplate.opsForValue().get(modulePath);
+        } else {
+            log.info("Module {} not in cache", modulePath);
+            currentVersion = Optional.of(getVersionFromRepository(source, vcs, ssh));
+            redisTemplate.opsForValue().set(modulePath, currentVersion.get());
+        }
+
+        return currentVersion.get();
+    }
+
+    private List<String> getVersionFromRepository(String source, Vcs vcs, Ssh ssh){
         List<String> versionList = new ArrayList<>();
         try {
             CredentialsProvider credentialsProvider = null;
