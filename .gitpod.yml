@@ -101,6 +101,6 @@ ports:
 
 vscode:
   extensions:
-    - rangav.vscode-thunder-client
+    - rangav.vscode-thunder-client@v2.6.1
     - esbenp.prettier-vscode
     - vscjava.vscode-java-pack
