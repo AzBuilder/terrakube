@@ -47,7 +47,7 @@ public class DataSourceAutoConfiguration {
             case MYSQL:
                 DriverManagerDataSource mysql = new DriverManagerDataSource();
                 mysql.setDriverClassName("com.mysql.cj.jdbc.Driver");
-                mysql.setUrl(String.format("jdbc:mysql://%s:3306/%s?serverTimezone=UTC", dataSourceConfigurationProperties.getHostname(), dataSourceConfigurationProperties.getDatabaseName()));
+                mysql.setUrl(String.format("jdbc:mysql://%s:%s/%s?serverTimezone=UTC", dataSourceConfigurationProperties.getHostname(), dataSourceConfigurationProperties.getPort(), dataSourceConfigurationProperties.getDatabaseName()));
                 mysql.setUsername(dataSourceConfigurationProperties.getDatabaseUser());
                 mysql.setPassword(dataSourceConfigurationProperties.getDatabasePassword());
                 dataSource = mysql;
