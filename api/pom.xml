@@ -37,6 +37,7 @@
         <jjwt.version>0.11.5</jjwt.version>
         <jedis.version>3.9.0</jedis.version>
         <commons-text.version>1.10.0</commons-text.version>
+        <commons-lang3.version>3.13.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -211,6 +212,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>${commons-text.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mock-server</groupId>

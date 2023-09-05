@@ -1,6 +1,7 @@
 package org.terrakube.api.rs.module;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -8,47 +9,46 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.terrakube.api.plugin.ssh.TerrakubeSshdSessionFactory;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
+import redis.clients.jedis.Jedis;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Slf4j
 public class ModuleCache {
 
-    private RedisTemplate redisTemplate;
+    private Jedis jedis;
 
     public ModuleCache() {
+        log.warn("Init Module Cache...");
+
         String hostname = System.getenv("TerrakubeRedisHostname");
         String port = System.getenv("TerrakubeRedisPort");
         String password = System.getenv("TerrakubeRedisPassword");
-        this.redisTemplate = redisTemplate(jedisConnectionFactory(hostname, Integer.valueOf(port), password));
+
+        this.jedis = new Jedis(hostname, Integer.valueOf(port));
+        this.jedis.auth(password);
+
+        log.info("Redis connection completed...");
     }
 
     public List<String> getVersions(String modulePath, String source, Vcs vcs, Ssh ssh) {
-
-        Optional<List<String>> currentVersion = Optional.ofNullable((List<String>) redisTemplate.opsForValue().get(modulePath));
-        if(currentVersion.isPresent()){
+        Optional<String> currentList = Optional.ofNullable(jedis.get(modulePath));
+        if (currentList.isPresent()) {
             log.info("Module {} is in cache", modulePath);
-            redisTemplate.opsForValue().get(modulePath);
+            return Arrays.asList(StringUtils.split(currentList.get().toString(),"|"));
         } else {
             log.info("Module {} not in cache", modulePath);
-            currentVersion = Optional.of(getVersionFromRepository(source, vcs, ssh));
-            redisTemplate.opsForValue().set(modulePath, currentVersion.get());
+            List<String> fromRepository = getVersionFromRepository(source, vcs, ssh);
+            this.jedis.set(modulePath, StringUtils.join(fromRepository, "|"));
+            return fromRepository;
         }
-
-        return currentVersion.get();
     }
 
-    private List<String> getVersionFromRepository(String source, Vcs vcs, Ssh ssh){
+    private List<String> getVersionFromRepository(String source, Vcs vcs, Ssh ssh) {
         List<String> versionList = new ArrayList<>();
         try {
             CredentialsProvider credentialsProvider = null;
@@ -81,12 +81,12 @@ public class ModuleCache {
                         .callAsMap();
             }
 
-            if (ssh != null){
+            if (ssh != null) {
                 log.info("vcs using ssh {}", ssh.getId());
 
                 transportConfigCallback = transport -> {
-                    if(transport instanceof SshTransport) {
-                        if( transport instanceof SshTransport) {
+                    if (transport instanceof SshTransport) {
+                        if (transport instanceof SshTransport) {
                             TerrakubeSshdSessionFactory terrakubeSshdSessionFactory = TerrakubeSshdSessionFactory
                                     .builder()
                                     .sshId(ssh.getId().toString())
@@ -105,7 +105,7 @@ public class ModuleCache {
                         .callAsMap();
             }
 
-            if (ssh == null && vcs == null){
+            if (ssh == null && vcs == null) {
                 tags = Git.lsRemoteRepository()
                         .setTags(true)
                         .setRemote(source)
@@ -125,16 +125,4 @@ public class ModuleCache {
 
     }
 
-    JedisConnectionFactory jedisConnectionFactory(String hostname, int port, String password) {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostname, port);
-        redisStandaloneConfiguration.setPassword(password);
-        JedisConnectionFactory jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
-        return jedisConFactory;
-    }
-
-    RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory jedisConnectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactory);
-        return template;
-    }
 }

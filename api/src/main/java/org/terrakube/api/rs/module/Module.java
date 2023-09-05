@@ -47,6 +47,7 @@ public class Module extends GenericAuditFields {
     @ManyToOne
     private Organization organization;
 
+    @Exclude
     private static final ModuleCache moduleCache = new ModuleCache();
 
     @Transient
