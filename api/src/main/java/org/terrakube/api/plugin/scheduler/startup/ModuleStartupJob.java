@@ -19,9 +19,14 @@ public class ModuleStartupJob implements Job {
     @Transactional
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        organizationRepository.findAll().parallelStream().forEach(organization -> {
+        organizationRepository.findAll().forEach(organization -> {
             organization.getModule().forEach(module -> {
-                log.info("Refresh Module Index {}/{}/{} ", organization.getName(), module.getProvider(), module.getName());
+                try{
+                    log.info("Refresh Module Index {}/{}/{} ", organization.getName(), module.getProvider(), module.getName());
+                } catch (Exception ex){
+                    log.error(ex.getMessage());
+                }
+                
             });
         });
     }

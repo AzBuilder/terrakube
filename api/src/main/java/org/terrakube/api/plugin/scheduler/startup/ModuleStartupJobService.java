@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -19,6 +20,7 @@ public class ModuleStartupJobService {
 
     private Scheduler scheduler;
 
+    @Transactional
     @PostConstruct
     public void initModuleStartup() throws ParseException, SchedulerException {
         try {
