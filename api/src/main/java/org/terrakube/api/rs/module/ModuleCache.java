@@ -38,7 +38,6 @@ public class ModuleCache {
 
     public List<String> getVersions(String modulePath, String source, Vcs vcs, Ssh ssh) {
         Optional<String> currentList = Optional.ofNullable(jedis.get(modulePath));
-        this.jedis.expire(modulePath, 60L);
         if (currentList.isPresent()) {
             log.info("Module {} is in cache", modulePath);
             return Arrays.asList(StringUtils.split(currentList.get().toString(),"|"));
@@ -47,7 +46,6 @@ public class ModuleCache {
             log.info("Module {} not in cache, new value will expire in {}", modulePath, ttl);
             List<String> fromRepository = getVersionFromRepository(source, vcs, ssh);
             this.jedis.set(modulePath, StringUtils.join(fromRepository, "|"));
-            this.jedis.expire(modulePath, ttl);
             return fromRepository;
         }
     }
