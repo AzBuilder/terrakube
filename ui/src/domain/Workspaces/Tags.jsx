@@ -22,18 +22,35 @@ export const Tags = ({ organizationId, workspaceId }) => {
       },
     };
 
+    //search for existing tag if you type the name and hit enter
+    let existingTagId
+    console.log("Searching existing value")
     axiosInstance
-      .post(`organization/${organizationId}/tag`, body, {
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-        },
-      })
-      .then((response) => {
-        newTags.push(response.data?.data);
-        setNewTags(newTags);
-        console.log(newTags);
-        addTagToWorkspace(response.data?.data?.id);
-      });
+    .get(`organization/${organizationId}/tag?filter[tag]=name==${tagName}`)
+    .then((oldTag) => {
+      existingTagId = oldTag.data?.data[0]?.id
+      console.log(`Existing TagId ${existingTagId} for ${tagName}`)
+
+      if(existingTagId === undefined){
+        console.log('Tag does not exists, creating a new one....')
+        axiosInstance
+        .post(`organization/${organizationId}/tag`, body, {
+          headers: {
+            "Content-Type": "application/vnd.api+json",
+          },
+        })
+        .then((response) => {
+          newTags.push(response.data?.data);
+          setNewTags(newTags);
+          console.log(newTags);
+          addTagToWorkspace(response.data?.data?.id);
+        });
+      } else {
+        console.log('Adding existing tag to workspace ....')
+        addTagToWorkspace(existingTagId)
+      }
+    });
+
   };
   const addTagToWorkspace = (tagId) => {
     const body = {
