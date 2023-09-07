@@ -24,6 +24,9 @@ public class ModuleStartupJobService {
         try {
             log.info("Run module index scan");
             runModuleRefresher();
+            log.info("Disable Old Module Refresh");
+            JobDetail jobDetail = scheduler.getJobDetail(new JobKey(PREFIX_JOB_MODULE_REFRESH));
+            log.info("jobDetail is null {}", jobDetail == null);
         } catch (Exception ex) {
             log.error(ex.getMessage());
         }

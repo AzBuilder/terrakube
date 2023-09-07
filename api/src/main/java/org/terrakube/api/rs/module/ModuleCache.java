@@ -15,7 +15,6 @@ import org.terrakube.api.rs.vcs.Vcs;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 
 @Slf4j
@@ -42,8 +41,7 @@ public class ModuleCache {
             log.info("Module {} is in cache", modulePath);
             return Arrays.asList(StringUtils.split(currentList.get().toString(),"|"));
         } else {
-            long ttl = RandomGenerator.getDefault().nextLong(60L, 90L);
-            log.info("Module {} not in cache, new value will expire in {}", modulePath, ttl);
+            log.info("Module {} is not in cache, adding to cache (this should not happen...)", modulePath);
             List<String> fromRepository = getVersionFromRepository(source, vcs, ssh);
             this.jedis.set(modulePath, StringUtils.join(fromRepository, "|"));
             return fromRepository;
@@ -121,10 +119,6 @@ public class ModuleCache {
             log.error(e.getMessage());
         }
         return versionList;
-    }
-
-    public void setVersion(String module, List<String> versionList) {
-
     }
 
 }
