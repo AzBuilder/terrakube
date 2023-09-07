@@ -57,7 +57,7 @@ public class ModuleStartupJobService {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .startNow()
                 .forJob(jobDetail)
-                .withIdentity(PREFIX_JOB_MODULE_REFRESH)
+                .withIdentity(PREFIX_JOB_MODULE_REFRESH+ "_" + UUID.randomUUID())
                 .withDescription("ModuleRefreshV1")
                 .startNow()
                 .build();
