@@ -29,6 +29,14 @@ public class ModuleStartupJobService {
             log.info("Disable Old Module Refresh");
             JobDetail jobDetail = scheduler.getJobDetail(new JobKey(PREFIX_JOB_MODULE_REFRESH));
             log.info("jobDetail is null {}", jobDetail == null);
+            if(jobDetail == null){
+                setupModuleRefreshJob(CRON_SCHEDULE);
+            } else {
+                log.info("Delete Old Quartz Job");
+                scheduler.deleteJob(new JobKey(PREFIX_JOB_MODULE_REFRESH));
+                log.info("Reschedule with new frequency");
+                setupModuleRefreshJob(CRON_SCHEDULE);
+            }
         } catch (Exception ex) {
             log.error(ex.getMessage());
         }
@@ -58,7 +66,7 @@ public class ModuleStartupJobService {
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    public void setupModuleRefreshJob() throws ParseException, SchedulerException {
+    public void setupModuleRefreshJob(String quartzSchedule) throws ParseException, SchedulerException {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("ModuleRefresh", "ModuleRefreshV1");
 
@@ -74,7 +82,7 @@ public class ModuleStartupJobService {
                 .forJob(jobDetail)
                 .withIdentity(PREFIX_JOB_MODULE_REFRESH)
                 .withDescription("ModuleRefreshV1")
-                .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(CRON_SCHEDULE)))
+                .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(quartzSchedule)))
                 .build();
 
         log.info("Create Schedule Job Trigger {}", jobDetail.getKey());

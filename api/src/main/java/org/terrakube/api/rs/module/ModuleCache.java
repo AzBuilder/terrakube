@@ -48,7 +48,7 @@ public class ModuleCache {
         }
     }
 
-    private List<String> getVersionFromRepository(String source, Vcs vcs, Ssh ssh) {
+    public List<String> getVersionFromRepository(String source, Vcs vcs, Ssh ssh) {
         List<String> versionList = new ArrayList<>();
         try {
             CredentialsProvider credentialsProvider = null;
@@ -119,6 +119,11 @@ public class ModuleCache {
             log.error(e.getMessage());
         }
         return versionList;
+    }
+
+    public void setVersions(String modulePath, List<String> moduleVersions){
+        log.info("Updating module index for {}", modulePath);
+        this.jedis.set(modulePath, StringUtils.join(moduleVersions, "|"));
     }
 
 }
