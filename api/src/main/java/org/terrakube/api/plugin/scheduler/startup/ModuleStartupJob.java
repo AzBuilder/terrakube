@@ -24,7 +24,6 @@ public class ModuleStartupJob implements Job {
         organizationRepository.findAll().forEach(organization -> {
             organization.getModule().forEach(module -> {
                 try {
-                    log.info("Refresh Module Index {}/{}/{} ", organization.getName(), module.getName(), module.getProvider());
                     moduleCache.setVersions(module.getRegistryPath(null), moduleCache.getVersionFromRepository(module.getSource(), module.getVcs(), module.getSsh()));
                 } catch (Exception ex) {
                     log.error(ex.getMessage());
