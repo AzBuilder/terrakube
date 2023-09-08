@@ -36,7 +36,9 @@ public class ModuleCache {
             if(jedisPool == null) {
                 if (hostname != null && port != null && password != null) {
                     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-                    jedisPoolConfig.setMaxTotal(128);
+                    jedisPoolConfig.setMaxTotal(256);
+                    jedisPoolConfig.setMaxIdle(256);
+                    jedisPoolConfig.setMinIdle(128);
                     jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), 600000, password);
                     log.info("Redis connection completed...");
                 }
