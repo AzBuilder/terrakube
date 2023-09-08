@@ -3,6 +3,7 @@ package org.terrakube.api.plugin.scheduler.startup;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Profile("!test")
 public class ModuleStartupJobService {
 
     private static final String PREFIX_JOB_MODULE_REFRESH = "TerrakubeV2_ModuleRefresh";
