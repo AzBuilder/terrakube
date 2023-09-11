@@ -1,7 +1,5 @@
 package org.terrakube.api.rs.module;
 
-import liquibase.pro.packaged.J;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -32,13 +30,13 @@ public class ModuleCache {
         String port = System.getenv("TerrakubeRedisPort");
         String password = System.getenv("TerrakubeRedisPassword");
 
-        synchronized(this) {
-            if(jedisPool == null) {
+        synchronized (this) {
+            if (jedisPool == null) {
                 if (hostname != null && port != null && password != null) {
                     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-                    jedisPoolConfig.setMaxTotal(256);
-                    jedisPoolConfig.setMaxIdle(256);
-                    jedisPoolConfig.setMinIdle(128);
+                    jedisPoolConfig.setMaxTotal(128);
+                    jedisPoolConfig.setMaxIdle(128);
+                    jedisPoolConfig.setMinIdle(64);
                     jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), 600000, password);
                     log.info("Redis connection completed...");
                 }
@@ -47,12 +45,19 @@ public class ModuleCache {
 
     }
 
-    private Jedis getJedisConnection(){
+    private Jedis getJedisConnection() {
         return jedisPool.getResource();
     }
 
     public List<String> getVersions(String modulePath, String source, Vcs vcs, Ssh ssh) {
-        Optional<String> currentList = Optional.ofNullable((jedisPool != null)? getJedisConnection().get(modulePath): null);
+        Jedis connection;
+        String cacheFromRedis = null;
+        if (jedisPool != null) {
+            connection = getJedisConnection();
+            cacheFromRedis = connection.get(modulePath);
+            jedisPool.returnResource(connection);
+        }
+        Optional<String> currentList = Optional.ofNullable((jedisPool != null) ? cacheFromRedis : null);
         if (currentList.isPresent()) {
             log.info("Module {} is in cache", modulePath);
             return Arrays.asList(StringUtils.split(currentList.get().toString(), "|"));
@@ -60,8 +65,11 @@ public class ModuleCache {
             log.info("Module {} is not in cache, adding to cache (this should not happen...)", modulePath);
             List<String> fromRepository = getVersionFromRepository(source, vcs, ssh);
             if (jedisPool != null) {
-                getJedisConnection().set(modulePath, StringUtils.join(fromRepository, "|"));
+                connection = getJedisConnection();
+                connection.set(modulePath, StringUtils.join(fromRepository, "|"));
+                jedisPool.returnResource(connection);
             }
+
             return fromRepository;
         }
     }
@@ -142,7 +150,9 @@ public class ModuleCache {
     public void setVersions(String modulePath, List<String> moduleVersions) {
         log.info("Updating module index for {}", modulePath);
         if (jedisPool != null) {
-            getJedisConnection().set(modulePath, StringUtils.join(moduleVersions, "|"));
+            Jedis connection = getJedisConnection();
+            connection.set(modulePath, StringUtils.join(moduleVersions, "|"));
+            jedisPool.returnResource(connection);
         }
     }
 
