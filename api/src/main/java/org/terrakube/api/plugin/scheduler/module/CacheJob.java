@@ -1,4 +1,4 @@
-package org.terrakube.api.plugin.scheduler.startup;
+package org.terrakube.api.plugin.scheduler.module;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,23 +8,23 @@ import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.repository.OrganizationRepository;
-import org.terrakube.api.rs.module.ModuleCache;
+import org.terrakube.api.rs.module.GitTagsCache;
 
 @AllArgsConstructor
 @Component
 @Slf4j
-public class ModuleStartupJob implements Job {
+public class CacheJob implements Job {
 
     OrganizationRepository organizationRepository;
 
     @Transactional
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        ModuleCache moduleCache = new ModuleCache();
+        GitTagsCache gitTagsCache = new GitTagsCache();
         organizationRepository.findAll().forEach(organization -> {
             organization.getModule().forEach(module -> {
                 try {
-                    moduleCache.setVersions(module.getRegistryPath(null), moduleCache.getVersionFromRepository(module.getSource(), module.getVcs(), module.getSsh()));
+                    gitTagsCache.setVersions(module.getRegistryPath(null), gitTagsCache.getVersionFromRepository(module.getSource(), module.getVcs(), module.getSsh()));
                 } catch (Exception ex) {
                     log.error(ex.getMessage());
                 }

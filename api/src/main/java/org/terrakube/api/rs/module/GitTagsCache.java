@@ -20,24 +20,31 @@ import java.util.*;
 
 
 @Slf4j
-public class ModuleCache {
+public class GitTagsCache {
     private static JedisPool jedisPool;
 
-    public ModuleCache() {
+    public GitTagsCache() {
         log.warn("Init Module Cache...");
 
         String hostname = System.getenv("TerrakubeRedisHostname");
         String port = System.getenv("TerrakubeRedisPort");
         String password = System.getenv("TerrakubeRedisPassword");
+        log.info(password);
+        String maxTotal = System.getenv("ModuleCacheMaxTotal") != null ? System.getenv("ModuleCacheMaxTotal"): "128";
+        String maxIdle = System.getenv("ModuleCacheMaxIdle") != null ? System.getenv("ModuleCacheMaxIdle"): "128";
+        String minIdle = System.getenv("ModuleCacheMinIdle") != null ? System.getenv("ModuleCacheMinIdle"): "64";
+        String timeout = System.getenv("ModuleCacheTimeout") != null ? System.getenv("ModuleCacheTimeout"): "600000";
+        String schedule = System.getenv("ModuleCacheSchedule") != null ? System.getenv("ModuleCacheSchedule"): "0 */3 * ? * *";
 
         synchronized (this) {
             if (jedisPool == null) {
                 if (hostname != null && port != null && password != null) {
+                    log.warn("Module Config: MaxTotal {} MaxIdle {} MinIdle {} Timeout {} Schedule {}", maxTotal, maxIdle, minIdle, timeout, schedule);
                     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-                    jedisPoolConfig.setMaxTotal(128);
-                    jedisPoolConfig.setMaxIdle(128);
-                    jedisPoolConfig.setMinIdle(64);
-                    jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), 600000, password);
+                    jedisPoolConfig.setMaxTotal(Integer.valueOf(maxTotal));
+                    jedisPoolConfig.setMaxIdle(Integer.valueOf(maxIdle));
+                    jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
+                    jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), timeout, password);
                     log.info("Redis connection completed...");
                 }
             }

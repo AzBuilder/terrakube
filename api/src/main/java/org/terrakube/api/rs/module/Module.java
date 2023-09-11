@@ -48,7 +48,7 @@ public class Module extends GenericAuditFields {
     private Organization organization;
 
     @Exclude
-    private static final ModuleCache moduleCache = new ModuleCache();
+    private static final GitTagsCache gitTagsCache = new GitTagsCache();
 
     @Transient
     @ComputedAttribute
@@ -59,7 +59,7 @@ public class Module extends GenericAuditFields {
     @Transient
     @ComputedAttribute
     public List<String> getVersions(RequestScope requestScope) {
-        return moduleCache.getVersions(getRegistryPath(requestScope), this.source, this.vcs, this.ssh);
+        return gitTagsCache.getVersions(getRegistryPath(requestScope), this.source, this.vcs, this.ssh);
     }
 
     @OneToOne

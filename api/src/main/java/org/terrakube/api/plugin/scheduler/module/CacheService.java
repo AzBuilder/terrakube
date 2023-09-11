@@ -1,8 +1,9 @@
-package org.terrakube.api.plugin.scheduler.startup;
+package org.terrakube.api.plugin.scheduler.module;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @AllArgsConstructor
 @Profile("!test")
-public class ModuleStartupJobService {
+public class CacheService {
 
     private static final String PREFIX_JOB_MODULE_REFRESH = "TerrakubeV2_ModuleRefresh";
-    private static final String CRON_SCHEDULE = "0 */3 * ? * *"; //CHECK 3 MINUTES
 
+    private CacheConfigurationProperties cacheConfigurationProperties;
     private Scheduler scheduler;
 
     @Transactional
@@ -32,12 +33,12 @@ public class ModuleStartupJobService {
             JobDetail jobDetail = scheduler.getJobDetail(new JobKey(PREFIX_JOB_MODULE_REFRESH));
             log.info("jobDetail is null {}", jobDetail == null);
             if(jobDetail == null){
-                setupModuleRefreshJob(CRON_SCHEDULE);
+                setupModuleRefreshJob(cacheConfigurationProperties.getSchedule());
             } else {
                 log.info("Delete Old Quartz Job");
                 scheduler.deleteJob(new JobKey(PREFIX_JOB_MODULE_REFRESH));
                 log.info("Reschedule with new frequency");
-                setupModuleRefreshJob(CRON_SCHEDULE);
+                setupModuleRefreshJob(cacheConfigurationProperties.getSchedule());
             }
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -49,7 +50,7 @@ public class ModuleStartupJobService {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("ModuleRefresh", "ModuleRefreshV1");
 
-        JobDetail jobDetail = JobBuilder.newJob().ofType(ModuleStartupJob.class)
+        JobDetail jobDetail = JobBuilder.newJob().ofType(CacheJob.class)
                 .storeDurably()
                 .setJobData(jobDataMap)
                 .withIdentity(PREFIX_JOB_MODULE_REFRESH + "_" + UUID.randomUUID())
@@ -72,7 +73,7 @@ public class ModuleStartupJobService {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("ModuleRefresh", "ModuleRefreshV1");
 
-        JobDetail jobDetail = JobBuilder.newJob().ofType(ModuleStartupJob.class)
+        JobDetail jobDetail = JobBuilder.newJob().ofType(CacheJob.class)
                 .storeDurably()
                 .setJobData(jobDataMap)
                 .withIdentity(PREFIX_JOB_MODULE_REFRESH)
