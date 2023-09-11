@@ -29,7 +29,6 @@ public class GitTagsCache {
         String hostname = System.getenv("TerrakubeRedisHostname");
         String port = System.getenv("TerrakubeRedisPort");
         String password = System.getenv("TerrakubeRedisPassword");
-        log.info(password);
         String maxTotal = System.getenv("ModuleCacheMaxTotal") != null ? System.getenv("ModuleCacheMaxTotal"): "128";
         String maxIdle = System.getenv("ModuleCacheMaxIdle") != null ? System.getenv("ModuleCacheMaxIdle"): "128";
         String minIdle = System.getenv("ModuleCacheMinIdle") != null ? System.getenv("ModuleCacheMinIdle"): "64";
@@ -44,7 +43,7 @@ public class GitTagsCache {
                     jedisPoolConfig.setMaxTotal(Integer.valueOf(maxTotal));
                     jedisPoolConfig.setMaxIdle(Integer.valueOf(maxIdle));
                     jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
-                    jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), timeout, password);
+                    jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
                     log.info("Redis connection completed...");
                 }
             }
