@@ -1,4 +1,4 @@
-package org.terrakube.api.plugin.pat;
+package org.terrakube.api.plugin.tokens.pat;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
