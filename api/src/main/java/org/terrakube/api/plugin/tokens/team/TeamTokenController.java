@@ -24,7 +24,8 @@ public class TeamTokenController {
 
     @PostMapping
     public ResponseEntity<TeamToken> createToken(@RequestBody GroupTokenRequest groupTokenRequest,  Principal principal) {
-        TeamToken teamToken = teamTokenService.createTeamToken(groupTokenRequest.getGroup(), groupTokenRequest.getDays(), groupTokenRequest.getDescription(), ((JwtAuthenticationToken) principal), );
+        TeamToken teamToken = new TeamToken();
+        teamToken.setToken(teamTokenService.createTeamToken(groupTokenRequest.getGroup(), groupTokenRequest.getDays(), groupTokenRequest.getDescription(), ((JwtAuthenticationToken) principal)));
         return new ResponseEntity<>(teamToken, HttpStatus.CREATED);
     }
 
@@ -53,7 +54,7 @@ public class TeamTokenController {
 
     @Getter
     @Setter
-    private class GroupTokenRequest{
+    private static class GroupTokenRequest{
         private String group;
         private String description;
         private int days;
