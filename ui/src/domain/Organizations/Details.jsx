@@ -12,7 +12,7 @@ import {
   Radio,
   Row,
   Col,
-  Dropdown,
+  Select,
 } from "antd";
 import {
   GitlabOutlined,
@@ -24,12 +24,11 @@ import {
   InfoCircleOutlined,
   CloseCircleOutlined,
   StopOutlined,
-  TagsOutlined,
 } from "@ant-design/icons";
 import { BiTerminal } from "react-icons/bi";
 import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { IconContext } from "react-icons";
-import axiosInstance from "../../config/axiosConfig";
+import axiosInstance, { axiosGraphQL } from "../../config/axiosConfig";
 import { useParams, useHistory } from "react-router-dom";
 import {
   ORGANIZATION_ARCHIVE,
@@ -38,9 +37,6 @@ import {
 const { Content } = Layout;
 const { DateTime } = require("luxon");
 const { Search } = Input;
-const include = {
-  WORKSPACE: "workspace",
-};
 
 export const OrganizationDetails = ({
   setOrganizationName,
@@ -53,6 +49,7 @@ export const OrganizationDetails = ({
   const [loading, setLoading] = useState(false);
   const [filterValue, setFilterValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [filterTags, setFilterTags] = useState([]);
   const [tags, setTags] = useState([]);
   const history = useHistory();
   const handleCreate = (e) => {
@@ -97,58 +94,71 @@ export const OrganizationDetails = ({
 
   const onFilterChange = (e) => {
     setFilterValue(e.target.value);
-    applyFilters(searchValue, e.target.value);
+    applyFilters(searchValue, e.target.value,filterTags);
   };
 
   const onRadioClick = (e) => {
     const tag = e.target;
     if (tag.type === "radio" && filterValue === tag.value.toString()) {
       setFilterValue("");
-      applyFilters(searchValue, "");
+      applyFilters(searchValue, "",filterTags);
     }
+  };
+
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
+    setFilterTags(value);
+    applyFilters(searchValue, filterValue, value);
   };
 
   const onSearch = (value) => {
     setSearchValue(value);
-    applyFilters(value, filterValue);
+    applyFilters(value, filterValue,filterTags);
   };
 
   const getTagName = (tagId) => {
     return tags.data.find((tag) => tag.id === tagId)?.attributes?.name;
   };
 
-  const applyFilters = (searchValue, filterValue) => {
-    if (searchValue !== "" && filterValue !== "") {
-      console.log("filter by both");
+  const filterOption = (input, option) =>
+  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+  const applyFilters = (searchValue, filterValue, selectedTags) => {
+    console.log(searchValue|| "serach empty");
+    console.log(filterValue||"filter empty");
+    console.log(selectedTags||"tags empty");
+
+      // filter by description and name
       var filteredWorkspaces = workspaces.filter(
+        (workspace) =>{
+           if(workspace.description){
+             return (workspace.name.includes(searchValue || workspace.name )|| workspace.description?.includes(searchValue || workspace?.description))
+           }
+           else{
+              return (workspace.name.includes(searchValue || workspace.name ))
+            }
+        }
+      );
+
+      // filter by status
+      filteredWorkspaces = filteredWorkspaces.filter(
         (workspace) =>
-          workspace.name.includes(searchValue) &&
-          workspace.lastStatus === filterValue
+        workspace.lastStatus === (filterValue|| workspace.lastStatus)
       );
-      setFilteredWorkspaces(filteredWorkspaces);
-      return;
-    }
 
-    if (searchValue !== "") {
-      console.log("filter by name " + searchValue);
-      var filteredWorkspaces = workspaces.filter((workspace) =>
-        workspace.name.includes(searchValue)
-      );
+      // filter by tag
+      filteredWorkspaces = filteredWorkspaces.filter( (workspace) => {   
+        if(selectedTags && selectedTags.length > 0){
+          return workspace.workspaceTag.edges.some((tag) => selectedTags.includes(tag.node.tagId))
+        }else{
+          return true;
+        }
+      });
+          
       setFilteredWorkspaces(filteredWorkspaces);
       return;
-    }
-
-    if (filterValue !== "") {
-      console.log("filter by status " + filterValue);
-      var filteredWorkspaces = workspaces.filter(
-        (workspace) => workspace.lastStatus === filterValue
-      );
-      setFilteredWorkspaces(filteredWorkspaces);
-      return;
-    }
-    console.log("no filter");
-    setFilteredWorkspaces(workspaces);
   };
+
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
@@ -193,16 +203,12 @@ export const OrganizationDetails = ({
         }
       }`,
     };
-    axiosInstance
-      .post(
-        `https://8080-azbuilder-terrakube-fbba5f1au7o.ws-us104.gitpod.io/graphql/api/v1`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
+    axiosGraphQL
+      .post("", body, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
       .then((response) => {
         console.log(response);
         var organizationName =
@@ -296,19 +302,34 @@ export const OrganizationDetails = ({
               </Col>
               <Col span={12}>
                 <Row justify="end">
-                  <Col span={4}>
-                    <Dropdown.Button placement="bottom" icon={<TagsOutlined />}>
-                      Tags
-                    </Dropdown.Button>{" "}
+                  <Col span={11}>
+                    {!tags.data ? (
+                      <p>loading...</p>
+                    ) : (
+                      <Select
+                        mode="multiple"
+                        showSearch
+                        optionFilterProp="children"
+                        allowClear
+                        filterOption={filterOption}
+                        style={{ width: '100%' }}
+                        placeholder="Search by tag"
+                        onChange={handleChange}
+                        filterSort={(optionA, optionB) =>
+                          (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                        }
+                        options={tags.data.map(function (tag) {
+                          return { label: tag.attributes.name, value: tag.id };
+                        })}
+                      />
+                    )}
                   </Col>
-                  <Col span={1}>
-                    </Col>
+                  <Col span={1}></Col>
                   <Col span={12}>
                     <Search
-                      placeholder="Search by name"
+                      placeholder="Search by name, description"
                       onSearch={onSearch}
                       allowClear
-                      
                     />
                   </Col>
                 </Row>
