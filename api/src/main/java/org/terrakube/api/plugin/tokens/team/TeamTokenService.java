@@ -1,5 +1,6 @@
 package org.terrakube.api.plugin.tokens.team;
 
+import com.google.gson.JsonPrimitive;
 import com.nimbusds.jose.shaded.json.JSONArray;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import io.jsonwebtoken.Jwts;
@@ -27,15 +28,14 @@ public class TeamTokenService {
     private String base64Key;
     private static final String ISSUER = "Terrakube";
 
-    public TeamTokenController.TeamToken createTeamToken(String group, int days, String description, JwtAuthenticationToken principalJwt) {
-        TeamTokenController.TeamToken teamToken = new TeamTokenController.TeamToken();
+    public String createTeamToken(String group, int days, String description, JwtAuthenticationToken principalJwt) {
         List<String> currentGroups = getCurrentGroups(principalJwt);
 
         if (currentGroups.indexOf(group) > -1) {
-            teamToken.setToken(createToken(days, description, group));
+            return createToken(days, description, group);
         }
 
-        return teamToken;
+        return "";
     }
 
     public String createToken(int days, String description, String group) {
@@ -46,9 +46,7 @@ public class TeamTokenService {
         log.info("Generated Team Token {}", keyId);
 
         JSONArray groupArray = new JSONArray();
-        JSONObject groupName = new JSONObject();
-        groupName.put("group", group);
-        groupArray.add(groupName);
+        groupArray.add(new JSONObject(group));
 
         String jws = Jwts.builder()
                 .setIssuer(ISSUER)
