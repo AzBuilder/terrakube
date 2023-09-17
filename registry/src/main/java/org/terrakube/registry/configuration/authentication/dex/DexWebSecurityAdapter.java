@@ -43,6 +43,7 @@ public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
                         .antMatchers("/actuator/**").permitAll()
                         .antMatchers("/terraform/modules/v1/download/**").permitAll()
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> {
                     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver = RegistryAuthenticationManagerResolver
