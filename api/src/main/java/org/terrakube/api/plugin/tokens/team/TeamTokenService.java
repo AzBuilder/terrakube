@@ -1,8 +1,8 @@
 package org.terrakube.api.plugin.tokens.team;
 
-import com.google.gson.JsonPrimitive;
 import com.nimbusds.jose.shaded.json.JSONArray;
 import com.nimbusds.jose.shaded.json.JSONObject;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.terrakube.api.rs.pat.Pat;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -38,7 +37,7 @@ public class TeamTokenService {
         return "";
     }
 
-    public String createToken(int days, String description, String group) {
+    public String createToken(int days, String description, String groupName) {
 
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.base64Key));
         UUID keyId = UUID.randomUUID();
@@ -46,16 +45,17 @@ public class TeamTokenService {
         log.info("Generated Team Token {}", keyId);
 
         JSONArray groupArray = new JSONArray();
-        groupArray.add(new JSONObject(group));
+        groupArray.add(groupName);
 
         String jws = Jwts.builder()
                 .setIssuer(ISSUER)
-                .setSubject(String.format("%s (Team Token)", group))
+                .setSubject(String.format("%s (Team Token)", groupName))
                 .setAudience(ISSUER)
                 .setId(keyId.toString())
-                .claim("email", group)
+                .claim("email", groupName)
+                .claim("description", description)
                 .claim("email_verified", true)
-                .claim("name", String.format("%s (Token)", group))
+                .claim("name", String.format("%s (Token)", groupName))
                 .claim("groups", groupArray)
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
