@@ -35,13 +35,13 @@ public class TeamTokenService {
         List<String> currentGroups = getCurrentGroups(principalJwt);
 
         if (currentGroups.indexOf(group) > -1) {
-            return createToken(days, description, group);
+            return createToken(days, description, group, (String) principalJwt.getTokenAttributes().get("email"));
         }
 
         return "";
     }
 
-    public String createToken(int days, String description, String groupName) {
+    public String createToken(int days, String description, String groupName, String ownerEmail) {
 
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.base64Key));
         UUID keyId = UUID.randomUUID();
@@ -56,7 +56,7 @@ public class TeamTokenService {
                 .setSubject(String.format("%s (Team Token)", groupName))
                 .setAudience(ISSUER)
                 .setId(keyId.toString())
-                .claim("email", groupName)
+                .claim("email", ownerEmail)
                 .claim("description", description)
                 .claim("email_verified", true)
                 .claim("name", String.format("%s (Token)", groupName))
