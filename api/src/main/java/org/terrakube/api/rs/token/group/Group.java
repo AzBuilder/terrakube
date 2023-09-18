@@ -22,6 +22,6 @@ public class Group extends GenericAuditFields {
     private UUID id;
 
     private int days;
-    private String group;
+    private String groupName;
     private String description;
 }

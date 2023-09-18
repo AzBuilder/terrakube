@@ -6,7 +6,7 @@ import org.terrakube.api.rs.token.group.Group;
 import java.util.List;
 import java.util.UUID;
 
-public interface GroupTokenRepository extends JpaRepository<Group, UUID> {
+public interface TeamTokenRepository extends JpaRepository<Group, UUID> {
 
-    List<Group> findByGroupIn(List<String> groups);
+    List<Group> findByGroupNameIn(List<String> groups);
 }
