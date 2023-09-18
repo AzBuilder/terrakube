@@ -1,4 +1,4 @@
-package org.terrakube.api.rs.pat;
+package org.terrakube.api.rs.token.pat;
 
 import lombok.*;
 import org.hibernate.annotations.Type;

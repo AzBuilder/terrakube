@@ -1,4 +1,4 @@
-package org.terrakube.api.plugin.pat;
+package org.terrakube.api.plugin.token.pat;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import org.terrakube.api.rs.pat.Pat;
+import org.terrakube.api.rs.token.pat.Pat;
 
 import java.security.Principal;
 import java.util.List;
