@@ -177,6 +177,7 @@ export const OrganizationDetails = ({
                     name
                     description
                     source
+                    branch
                     terraformVersion
                     workspaceTag {
                       edges { 
