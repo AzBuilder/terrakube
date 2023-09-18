@@ -11,7 +11,7 @@
             </column>
             <column name="days" type="int"/>
             <column name="description" type="varchar(64)"/>
-            <column name="group" type="varchar(64)"/>
+            <column name="group_name" type="varchar(64)"/>
             <column name="created_date" type="datetime"/>
             <column name="updated_date" type="datetime"/>
             <column name="created_by" type="varchar2(128)"/>

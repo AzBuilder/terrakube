@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -22,6 +23,8 @@ public class Group extends GenericAuditFields {
     private UUID id;
 
     private int days;
-    private String groupName;
+    
+    @Column(name="group_name")
+    private String group;
     private String description;
 }

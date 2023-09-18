@@ -78,7 +78,7 @@ public class TeamTokenService {
     }
 
     public List<Group> searchToken(JwtAuthenticationToken principalJwt){
-        return teamTokenRepository.findByGroupNameIn(getCurrentGroups(principalJwt));
+        return teamTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
     }
 
     public List<String> getCurrentGroups(JwtAuthenticationToken principalJwt) {

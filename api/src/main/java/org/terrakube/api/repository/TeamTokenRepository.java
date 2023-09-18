@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface TeamTokenRepository extends JpaRepository<Group, UUID> {
 
-    List<Group> findByGroupNameIn(List<String> groups);
+    List<Group> findByGroupIn(List<String> groups);
 }

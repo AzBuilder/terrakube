@@ -2682,11 +2682,41 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "656a462f-fabf-49d4-abcf-a5f66a8cecc6",
     "name": "search teams",
-    "url": "{{terrakubeApi}}/access-token/v1/teams",
+    "url": "{{terrakubeApi}}/access-token/v1/teams/current-teams",
     "method": "GET",
     "sortNum": 735000,
     "created": "2023-09-14T23:33:33.133Z",
-    "modified": "2023-09-14T23:34:09.020Z",
+    "modified": "2023-09-18T22:57:05.079Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.id",
+        "action": "setto",
+        "value": "{{sshId}}"
+      }
+    ]
+  },
+  {
+    "_id": "41fd577b-e3bf-4d3f-8821-904732cfeeda",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "656a462f-fabf-49d4-abcf-a5f66a8cecc6",
+    "name": "search teams tokens",
+    "url": "{{terrakubeApi}}/access-token/v1/teams",
+    "method": "GET",
+    "sortNum": 745000,
+    "created": "2023-09-18T22:57:10.544Z",
+    "modified": "2023-09-18T22:57:18.752Z",
     "headers": [
       {
         "name": "Content-Type",
