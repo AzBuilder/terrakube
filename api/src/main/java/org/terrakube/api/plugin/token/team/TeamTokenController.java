@@ -9,8 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import org.terrakube.api.rs.token.pat.Pat;
-import org.terrakube.api.rs.token.team.Team;
+import org.terrakube.api.rs.token.group.Group;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class TeamTokenController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Team>> searchToken(Principal principal){
+    public ResponseEntity<List<Group>> searchToken(Principal principal){
         return new ResponseEntity<>(teamTokenService.searchToken(((JwtAuthenticationToken) principal)), HttpStatus.ACCEPTED);
     }
 

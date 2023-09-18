@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.terrakube.api.repository.TeamTokenRepository;
-import org.terrakube.api.rs.token.team.Team;
+import org.terrakube.api.repository.GroupTokenRepository;
+import org.terrakube.api.rs.token.group.Group;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -28,7 +28,7 @@ public class TeamTokenService {
     private String base64Key;
 
     @Autowired
-    private TeamTokenRepository teamTokenRepository;
+    private GroupTokenRepository groupTokenRepository;
     private static final String ISSUER = "Terrakube";
 
     public String createTeamToken(String group, int days, String description, JwtAuthenticationToken principalJwt) {
@@ -66,19 +66,19 @@ public class TeamTokenService {
                 .signWith(key)
                 .compact();
 
-        Team teamToken = new Team();
-        teamToken.setId(keyId);
-        teamToken.setDays(days);
-        teamToken.setGroup(groupName);
-        teamToken.setDescription(description);
+        Group groupToken = new Group();
+        groupToken.setId(keyId);
+        groupToken.setDays(days);
+        groupToken.setGroup(groupName);
+        groupToken.setDescription(description);
 
-        teamTokenRepository.save(teamToken);
+        groupTokenRepository.save(groupToken);
 
         return jws;
     }
 
-    public List<Team> searchToken(JwtAuthenticationToken principalJwt){
-        return teamTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
+    public List<Group> searchToken(JwtAuthenticationToken principalJwt){
+        return groupTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
     }
 
     public List<String> getCurrentGroups(JwtAuthenticationToken principalJwt) {

@@ -1,4 +1,4 @@
-package org.terrakube.api.rs.token.team;
+package org.terrakube.api.rs.token.group;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "team_token")
-public class Team extends GenericAuditFields {
+public class Group extends GenericAuditFields {
     @Id
     @Type(type="uuid-char")
     private UUID id;
