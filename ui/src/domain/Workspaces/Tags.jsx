@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useReducer } from "react";
+import { React, useEffect, useState } from "react";
 import { Select } from "antd";
 import axiosInstance from "../../config/axiosConfig";
 

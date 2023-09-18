@@ -10,6 +10,9 @@ import {
   Tag,
   Tooltip,
   Radio,
+  Row,
+  Col,
+  Select,
 } from "antd";
 import {
   GitlabOutlined,
@@ -25,7 +28,7 @@ import {
 import { BiTerminal } from "react-icons/bi";
 import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { IconContext } from "react-icons";
-import axiosInstance from "../../config/axiosConfig";
+import axiosInstance, { axiosGraphQL } from "../../config/axiosConfig";
 import { useParams, useHistory } from "react-router-dom";
 import {
   ORGANIZATION_ARCHIVE,
@@ -34,9 +37,6 @@ import {
 const { Content } = Layout;
 const { DateTime } = require("luxon");
 const { Search } = Input;
-const include = {
-  WORKSPACE: "workspace",
-};
 
 export const OrganizationDetails = ({
   setOrganizationName,
@@ -49,6 +49,8 @@ export const OrganizationDetails = ({
   const [loading, setLoading] = useState(false);
   const [filterValue, setFilterValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [filterTags, setFilterTags] = useState([]);
+  const [tags, setTags] = useState([]);
   const history = useHistory();
   const handleCreate = (e) => {
     history.push("/workspaces/create");
@@ -92,77 +94,141 @@ export const OrganizationDetails = ({
 
   const onFilterChange = (e) => {
     setFilterValue(e.target.value);
-    applyFilters(searchValue, e.target.value);
+    applyFilters(searchValue, e.target.value,filterTags);
   };
 
   const onRadioClick = (e) => {
     const tag = e.target;
     if (tag.type === "radio" && filterValue === tag.value.toString()) {
       setFilterValue("");
-      applyFilters(searchValue, "");
+      applyFilters(searchValue, "",filterTags);
     }
+  };
+
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
+    setFilterTags(value);
+    applyFilters(searchValue, filterValue, value);
   };
 
   const onSearch = (value) => {
     setSearchValue(value);
-    applyFilters(value, filterValue);
+    applyFilters(value, filterValue,filterTags);
   };
 
-  const applyFilters = (searchValue, filterValue) => {
-    if (searchValue !== "" && filterValue !== "") {
-      console.log("filter by both");
+  const getTagName = (tagId) => {
+    return tags.data.find((tag) => tag.id === tagId)?.attributes?.name;
+  };
+
+  const filterOption = (input, option) =>
+  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+  const applyFilters = (searchValue, filterValue, selectedTags) => {
+    console.log(searchValue|| "serach empty");
+    console.log(filterValue||"filter empty");
+    console.log(selectedTags||"tags empty");
+
+      // filter by description and name
       var filteredWorkspaces = workspaces.filter(
+        (workspace) =>{
+           if(workspace.description){
+             return (workspace.name.includes(searchValue || workspace.name )|| workspace.description?.includes(searchValue || workspace?.description))
+           }
+           else{
+              return (workspace.name.includes(searchValue || workspace.name ))
+            }
+        }
+      );
+
+      // filter by status
+      filteredWorkspaces = filteredWorkspaces.filter(
         (workspace) =>
-          workspace.name.includes(searchValue) &&
-          workspace.lastStatus === filterValue
+        workspace.lastStatus === (filterValue|| workspace.lastStatus)
       );
-      setFilteredWorkspaces(filteredWorkspaces);
-      return;
-    }
 
-    if (searchValue !== "") {
-      console.log("filter by name " + searchValue);
-      var filteredWorkspaces = workspaces.filter((workspace) =>
-        workspace.name.includes(searchValue)
-      );
+      // filter by tag
+      filteredWorkspaces = filteredWorkspaces.filter( (workspace) => {   
+        if(selectedTags && selectedTags.length > 0){
+          return workspace.workspaceTag.edges.some((tag) => selectedTags.includes(tag.node.tagId))
+        }else{
+          return true;
+        }
+      });
+          
       setFilteredWorkspaces(filteredWorkspaces);
       return;
-    }
-
-    if (filterValue !== "") {
-      console.log("filter by status " + filterValue);
-      var filteredWorkspaces = workspaces.filter(
-        (workspace) => workspace.lastStatus === filterValue
-      );
-      setFilteredWorkspaces(filteredWorkspaces);
-      return;
-    }
-    console.log("no filter");
-    setFilteredWorkspaces(workspaces);
   };
+
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
-    axiosInstance
-      .get(`organization/${id}?include=workspace,job`)
+
+    const body = {
+      query: `{
+        organization(ids: ["${id}"]) {
+          edges {
+            node {
+              id
+              name
+              workspace {
+                edges {
+                  node {
+                    id
+                    name
+                    description
+                    source
+                    branch
+                    terraformVersion
+                    workspaceTag {
+                      edges { 
+                        node {
+                          id
+                          tagId
+                        }
+                      } 
+                    }
+                    job{
+                      edges {
+                        node {
+                          id
+                          status
+                          updatedDate
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`,
+    };
+    axiosGraphQL
+      .post("", body, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
       .then((response) => {
         console.log(response);
-        setOrganization(response.data);
+        var organizationName =
+          response.data.data.organization.edges[0].node.name;
+        setOrganization(response.data.data.organization.edges[0].node);
 
-        if (response.data.included) {
-          setupOrganizationIncludes(
-            response.data.included,
-            setWorkspaces,
-            setFilteredWorkspaces
-          );
-        }
-
-        setLoading(false);
-        localStorage.setItem(
-          ORGANIZATION_NAME,
-          response.data.data.attributes.name
+        setupOrganizationIncludes(
+          response.data.data.organization.edges[0].node.workspace.edges,
+          setWorkspaces,
+          setFilteredWorkspaces
         );
-        setOrganizationName(response.data.data.attributes.name);
+
+        axiosInstance.get(`organization/${id}/tag`).then((response) => {
+          setTags(response.data);
+          setLoading(false);
+        });
+
+        localStorage.setItem(ORGANIZATION_NAME, organizationName);
+        setOrganizationName(organizationName);
       });
   }, [id]);
 
@@ -173,7 +239,7 @@ export const OrganizationDetails = ({
         <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-content">
-        {loading || !organization.data || !workspaces ? (
+        {loading || !organization || !workspaces ? (
           <p>Data loading...</p>
         ) : (
           <div className="workspaceWrapper">
@@ -183,67 +249,93 @@ export const OrganizationDetails = ({
                 New workspace
               </Button>
             </div>
-            <div style={{ clear: "both", width: "100%" }}>
-              <div
-                onClick={onRadioClick}
-                style={{ width: "50%", float: "left" }}
-              >
-                {" "}
-                <Radio.Group onChange={onFilterChange} value={filterValue}>
+            <Row>
+              <Col span={12}>
+                <div onClick={onRadioClick}>
                   {" "}
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only workspaces needing attention"
-                  >
-                    <Radio.Button value="waitingApproval">
-                      <ExclamationCircleOutlined style={{ color: "#fa8f37" }} />
-                    </Radio.Button>{" "}
-                  </Tooltip>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only workspaces with error"
-                  >
-                    <Radio.Button value="failed">
-                      <StopOutlined style={{ color: "#FB0136" }} />
-                    </Radio.Button>{" "}
-                  </Tooltip>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only running workspaces"
-                  >
-                    <Radio.Button value="running">
-                      {" "}
-                      <SyncOutlined style={{ color: "#108ee9" }} />
-                    </Radio.Button>
-                  </Tooltip>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only successfully completed workspaces"
-                  >
-                    <Radio.Button value="completed">
-                      <CheckCircleOutlined style={{ color: "#2eb039" }} />
-                    </Radio.Button>
-                  </Tooltip>{" "}
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only never executed workspaces"
-                  >
-                    <Radio.Button value="never executed">
-                      <InfoCircleOutlined />
-                    </Radio.Button>
-                  </Tooltip>
-                </Radio.Group>
-              </div>
-              <div style={{ float: "left", width: "50%" }}>
-                {" "}
-                <Search
-                  placeholder="Search by name"
-                  onSearch={onSearch}
-                  allowClear
-                  style={{ width: "100%" }}
-                />{" "}
-              </div>
-            </div>
+                  <Radio.Group onChange={onFilterChange} value={filterValue}>
+                    {" "}
+                    <Tooltip
+                      placement="bottom"
+                      title="Show only workspaces needing attention"
+                    >
+                      <Radio.Button value="waitingApproval">
+                        <ExclamationCircleOutlined
+                          style={{ color: "#fa8f37" }}
+                        />
+                      </Radio.Button>{" "}
+                    </Tooltip>
+                    <Tooltip
+                      placement="bottom"
+                      title="Show only workspaces with error"
+                    >
+                      <Radio.Button value="failed">
+                        <StopOutlined style={{ color: "#FB0136" }} />
+                      </Radio.Button>{" "}
+                    </Tooltip>
+                    <Tooltip
+                      placement="bottom"
+                      title="Show only running workspaces"
+                    >
+                      <Radio.Button value="running">
+                        {" "}
+                        <SyncOutlined style={{ color: "#108ee9" }} />
+                      </Radio.Button>
+                    </Tooltip>
+                    <Tooltip
+                      placement="bottom"
+                      title="Show only successfully completed workspaces"
+                    >
+                      <Radio.Button value="completed">
+                        <CheckCircleOutlined style={{ color: "#2eb039" }} />
+                      </Radio.Button>
+                    </Tooltip>{" "}
+                    <Tooltip
+                      placement="bottom"
+                      title="Show only never executed workspaces"
+                    >
+                      <Radio.Button value="never executed">
+                        <InfoCircleOutlined />
+                      </Radio.Button>
+                    </Tooltip>
+                  </Radio.Group>
+                </div>
+              </Col>
+              <Col span={12}>
+                <Row justify="end">
+                  <Col span={11}>
+                    {!tags.data ? (
+                      <p>loading...</p>
+                    ) : (
+                      <Select
+                        mode="multiple"
+                        showSearch
+                        optionFilterProp="children"
+                        allowClear
+                        filterOption={filterOption}
+                        style={{ width: '100%' }}
+                        placeholder="Search by tag"
+                        onChange={handleChange}
+                        filterSort={(optionA, optionB) =>
+                          (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                        }
+                        options={tags.data.map(function (tag) {
+                          return { label: tag.attributes.name, value: tag.id };
+                        })}
+                      />
+                    )}
+                  </Col>
+                  <Col span={1}></Col>
+                  <Col span={12}>
+                    <Search
+                      placeholder="Search by name, description"
+                      onSearch={onSearch}
+                      allowClear
+                    />
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
             <div style={{ clear: "both", paddingTop: "10px" }}>
               <List
                 split=""
@@ -257,11 +349,32 @@ export const OrganizationDetails = ({
                       hoverable
                     >
                       <Space
-                        style={{ color: "rgb(82, 87, 97)" }}
+                        style={{ color: "rgb(82, 87, 97)", width: "100%" }}
                         direction="vertical"
                       >
-                        <h3>{item.name}</h3>
-                        {item.description}
+                        <Row>
+                          <Col span={12}>
+                            <h3>{item.name}</h3>
+                            {item.description}
+                          </Col>
+                          <Col span={10}>
+                            <Row justify="start">
+                              <Col span={24}>
+                                <Tooltip title="Workspace Tags">
+                                  {loading || !tags ? (
+                                    <p>Tags loading...</p>
+                                  ) : (
+                                    item.workspaceTag.edges.map((tag) => (
+                                      <Tag color="geekblue">
+                                        {getTagName(tag.node.tagId)}
+                                      </Tag>
+                                    ))
+                                  )}
+                                </Tooltip>
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
                         <Space size={40} style={{ marginTop: "25px" }}>
                           <Tag
                             icon={
@@ -355,41 +468,30 @@ function setupOrganizationIncludes(
   let workspaces = [];
 
   includes.forEach((element) => {
-    switch (element.type) {
-      case include.WORKSPACE:
-        //get latest job for workspace
-        var lastJobId = element.relationships?.job?.data?.slice(-1)?.pop()?.id;
-        var lastRunDate = includes.find(
-          (x) => x.type === "job" && x.id === lastJobId
-        )?.attributes?.updatedDate;
-        var lastStatus =
-          includes.find((x) => x.type === "job" && x.id === lastJobId)
-            ?.attributes?.status ?? "never executed";
-        console.log("id", lastJobId);
-        workspaces.push({
-          id: element.id,
-          lastRun: lastRunDate,
-          lastStatus: lastStatus,
-          statusColor:
-            lastStatus == "completed"
-              ? "#2eb039"
-              : lastStatus == "running"
-              ? "#108ee9"
-              : lastStatus == "waitingApproval"
-              ? "#fa8f37"
-              : lastStatus === "rejected"
-              ? "#FB0136"
-              : lastStatus === "failed"
-              ? "#FB0136"
-              : "",
-          ...element.attributes,
-        });
-        break;
-      default:
-        break;
-    }
+    //get latest job for workspace
+    var lastJob = element.node.job.edges?.slice(-1)?.pop()?.node;
+    var lastStatus = lastJob?.status ?? "never executed";
+    workspaces.push({
+      id: element.node.id,
+      lastRun: lastJob?.updatedDate,
+      lastStatus: lastJob?.status ?? "never executed",
+      statusColor:
+        lastStatus == "completed"
+          ? "#2eb039"
+          : lastStatus == "running"
+          ? "#108ee9"
+          : lastStatus == "waitingApproval"
+          ? "#fa8f37"
+          : lastStatus === "rejected"
+          ? "#FB0136"
+          : lastStatus === "failed"
+          ? "#FB0136"
+          : "",
+      ...element.node,
+    });
   });
 
   setWorkspaces(workspaces);
   setFilteredWorkspaces(workspaces);
+  console.log(workspaces);
 }
