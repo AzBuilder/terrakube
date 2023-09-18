@@ -1,4 +1,4 @@
-package org.terrakube.api.plugin.tokens.team;
+package org.terrakube.api.plugin.token.team;
 
 
 import lombok.AllArgsConstructor;
@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.terrakube.api.rs.token.pat.Pat;
+import org.terrakube.api.rs.token.team.Team;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class TeamTokenController {
         return new ResponseEntity<>(teamToken, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/current-teams")
     public ResponseEntity<CurrentGroupsResponse> SearchTeams(Principal principal){
         JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
         CurrentGroupsResponse groupList = new CurrentGroupsResponse();
@@ -37,7 +39,12 @@ public class TeamTokenController {
         teamTokenService.getCurrentGroups(principalJwt).forEach(group->{
             groupList.getGroups().add(group);
         });
-        return new ResponseEntity<>(groupList, HttpStatus.FOUND);
+        return new ResponseEntity<>(groupList, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Team>> searchToken(Principal principal){
+        return new ResponseEntity<>(teamTokenService.searchToken(((JwtAuthenticationToken) principal)), HttpStatus.ACCEPTED);
     }
 
     @Getter

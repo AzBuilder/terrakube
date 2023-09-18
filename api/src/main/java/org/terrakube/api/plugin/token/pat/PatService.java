@@ -1,4 +1,4 @@
-package org.terrakube.api.plugin.tokens.pat;
+package org.terrakube.api.plugin.token.pat;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.repository.PatRepository;
-import org.terrakube.api.rs.pat.Pat;
+import org.terrakube.api.rs.token.pat.Pat;
 
 import javax.crypto.SecretKey;
 import java.security.Principal;

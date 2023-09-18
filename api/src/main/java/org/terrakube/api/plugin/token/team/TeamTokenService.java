@@ -1,15 +1,16 @@
-package org.terrakube.api.plugin.tokens.team;
+package org.terrakube.api.plugin.token.team;
 
 import com.nimbusds.jose.shaded.json.JSONArray;
-import com.nimbusds.jose.shaded.json.JSONObject;
-import com.nimbusds.jose.util.JSONObjectUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.terrakube.api.repository.TeamTokenRepository;
+import org.terrakube.api.rs.token.team.Team;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -25,6 +26,9 @@ public class TeamTokenService {
 
     @Value("${org.terrakube.token.pat}")
     private String base64Key;
+
+    @Autowired
+    private TeamTokenRepository teamTokenRepository;
     private static final String ISSUER = "Terrakube";
 
     public String createTeamToken(String group, int days, String description, JwtAuthenticationToken principalJwt) {
@@ -62,9 +66,20 @@ public class TeamTokenService {
                 .signWith(key)
                 .compact();
 
+        Team teamToken = new Team();
+        teamToken.setId(keyId);
+        teamToken.setDays(days);
+        teamToken.setGroup(groupName);
+        teamToken.setDescription(description);
+
+        teamTokenRepository.save(teamToken);
+
         return jws;
     }
 
+    public List<Team> searchToken(JwtAuthenticationToken principalJwt){
+        return teamTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
+    }
 
     public List<String> getCurrentGroups(JwtAuthenticationToken principalJwt) {
         Object groups = principalJwt.getTokenAttributes().get("groups");
