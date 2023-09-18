@@ -177,6 +177,7 @@ export const OrganizationDetails = ({
                     name
                     description
                     source
+                    branch
                     terraformVersion
                     workspaceTag {
                       edges { 
@@ -414,12 +415,14 @@ export const OrganizationDetails = ({
                           </span>
                           {item.branch !== "remote-content" ? (
                             <span>
-                              {(item.source!= "empty")?renderVCSLogo((new URL(fixSshURL(item.source)).hostname)):""}
+                              {renderVCSLogo(
+                                new URL(fixSshURL(item.source)).hostname
+                              )}
                               &nbsp;{" "}
-                              <a href={(item.source!= "empty" )?fixSshURL(item.source):""} target="_blank">
-                                {(item.source!= "empty")?new URL(fixSshURL(item.source))?.pathname
+                              <a href={fixSshURL(item.source)} target="_blank">
+                                {new URL(fixSshURL(item.source))?.pathname
                                   ?.replace(".git", "")
-                                  ?.substring(1):""}
+                                  ?.substring(1)}
                               </a>
                             </span>
                           ) : (
