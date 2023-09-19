@@ -6,6 +6,7 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
@@ -27,8 +28,8 @@ import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
 import org.terrakube.api.plugin.state.model.workspace.state.consumers.StateConsumerList;
 import org.terrakube.api.plugin.state.model.workspace.tags.TagDataList;
-import org.terrakube.api.plugin.state.model.workspace.tags.TagModel;
 import org.terrakube.api.plugin.storage.StorageTypeService;
+import org.terrakube.api.plugin.token.team.TeamTokenService;
 import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.job.Job;
@@ -68,6 +69,8 @@ public class RemoteTfeService {
 
     private WorkspaceTagRepository workspaceTagRepository;
 
+    private TeamTokenService teamTokenService;
+
     public RemoteTfeService(JobRepository jobRepository,
                             ContentRepository contentRepository,
                             OrganizationRepository organizationRepository,
@@ -80,7 +83,8 @@ public class RemoteTfeService {
                             StepRepository stepRepository,
                             RedisTemplate redisTemplate,
                             TagRepository tagRepository,
-                            WorkspaceTagRepository workspaceTagRepository) {
+                            WorkspaceTagRepository workspaceTagRepository,
+                            TeamTokenService teamTokenService) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -94,11 +98,41 @@ public class RemoteTfeService {
         this.redisTemplate = redisTemplate;
         this.tagRepository = tagRepository;
         this.workspaceTagRepository = workspaceTagRepository;
+        this.teamTokenService = teamTokenService;
     }
 
-    EntitlementData getOrgEntitlementSet(String organizationName) {
+    private boolean validateUserIsMemberOrg(Organization organization, JwtAuthenticationToken currentUser){
+        List<String> userGroups = teamTokenService.getCurrentGroups(currentUser);
+        AtomicBoolean userIsMemberOrg = new AtomicBoolean(false);
+        organization.getTeam().forEach(orgTeam ->{
+            userGroups.forEach(userTeam->{
+                if(orgTeam.getName().equals(userTeam)){
+                    userIsMemberOrg.set(true);
+                    log.info("User {} is member of {}", currentUser.getTokenAttributes().get("email"), orgTeam.getName());
+                }
+            });
+        });
+        return userIsMemberOrg.get();
+    }
+
+    private boolean validateUserManageWorkspace(Organization organization, JwtAuthenticationToken currentUser){
+        List<String> userGroups = teamTokenService.getCurrentGroups(currentUser);
+        AtomicBoolean userWithManageWorkspace = new AtomicBoolean(false);
+        organization.getTeam().forEach(orgTeam ->{
+            userGroups.forEach(userTeam->{
+                if(orgTeam.getName().equals(userTeam) && orgTeam.isManageWorkspace()){
+                    userWithManageWorkspace.set(true);
+                    log.info("User {} has manage workspace in {}", currentUser.getTokenAttributes().get("email"), orgTeam.getName());
+                }
+            });
+        });
+        return userWithManageWorkspace.get();
+    }
+
+    EntitlementData getOrgEntitlementSet(String organizationName, JwtAuthenticationToken currentUser) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
-        if (organization != null) {
+
+        if (organization != null && validateUserIsMemberOrg(organization, currentUser)) {
             EntitlementModel entitlementModel = new EntitlementModel();
             entitlementModel.setId("org-" + organizationName);
             Map<String, Object> entitlementAttributes = new HashMap<>();
@@ -128,16 +162,18 @@ public class RemoteTfeService {
 
     }
 
-    OrganizationData getOrgInformation(String organizationName) {
+    OrganizationData getOrgInformation(String organizationName, JwtAuthenticationToken currentUser) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
-        if (organization != null) {
+        if (organization != null && validateUserIsMemberOrg(organization, currentUser)) {
             OrganizationModel organizationModel = new OrganizationModel();
             organizationModel.setId(organizationName);
             organizationModel.setType("organizations");
 
+            boolean isManageWorkspace = validateUserManageWorkspace(organization, currentUser);
+
             Map<String, Object> permissionMap = new HashMap<>();
-            permissionMap.put("can-update", true);
-            permissionMap.put("can-destroy", true);
+            permissionMap.put("can-update", isManageWorkspace);
+            permissionMap.put("can-destroy", isManageWorkspace);
             permissionMap.put("can-access-via-teams", false);
             permissionMap.put("can-create-module", false);
             permissionMap.put("can-create-team", false);
@@ -152,11 +188,11 @@ public class RemoteTfeService {
             permissionMap.put("can-traverse", false);
             permissionMap.put("can-start-trial", false);
             permissionMap.put("can-update-agent-pools", false);
-            permissionMap.put("can-manage-tags", true);
+            permissionMap.put("can-manage-tags", isManageWorkspace);
             permissionMap.put("can-manage-public-modules", false);
             permissionMap.put("can-manage-public-providers", false);
-            permissionMap.put("can-manage-run-tasks", true);
-            permissionMap.put("can-read-run-tasks", true);
+            permissionMap.put("can-manage-run-tasks", isManageWorkspace);
+            permissionMap.put("can-read-run-tasks", isManageWorkspace);
             permissionMap.put("can-create-provider", false);
 
             Map<String, Object> attributes = new HashMap<>();
@@ -172,7 +208,7 @@ public class RemoteTfeService {
         }
     }
 
-    WorkspaceData getWorkspace(String organizationName, String workspaceName, Map<String, Object> otherAttributes) {
+    WorkspaceData getWorkspace(String organizationName, String workspaceName, Map<String, Object> otherAttributes, JwtAuthenticationToken currentUser) {
         Optional<Workspace> workspace = Optional
                 .ofNullable(workspaceRepository.getByOrganizationNameAndName(organizationName, workspaceName));
 
@@ -192,24 +228,26 @@ public class RemoteTfeService {
             attributes.put("execution-mode", workspace.get().getExecutionMode());
             attributes.put("global-remote-state", true);
 
+            boolean isManageWorkspace = validateUserManageWorkspace(workspace.get().getOrganization(), currentUser);
+
             Map<String, Boolean> defaultAttributes = new HashMap<>();
-            defaultAttributes.put("can-create-state-versions", true);
-            defaultAttributes.put("can-destroy", true);
-            defaultAttributes.put("can-force-unlock", true);
-            defaultAttributes.put("can-lock", true);
-            defaultAttributes.put("can-manage-run-tasks", true);
-            defaultAttributes.put("can-manage-tags", true);
-            defaultAttributes.put("can-queue-apply", true);
-            defaultAttributes.put("can-queue-destroy", true);
-            defaultAttributes.put("can-queue-run", true);
-            defaultAttributes.put("can-read-settings", true);
-            defaultAttributes.put("can-read-state-versions", true);
-            defaultAttributes.put("can-read-variable", true);
-            defaultAttributes.put("can-unlock", true);
-            defaultAttributes.put("can-update", true);
-            defaultAttributes.put("can-update-variable", true);
-            defaultAttributes.put("can-read-assessment-result", true);
-            defaultAttributes.put("can-force-delete", true);
+            defaultAttributes.put("can-create-state-versions", isManageWorkspace);
+            defaultAttributes.put("can-destroy", isManageWorkspace);
+            defaultAttributes.put("can-force-unlock", isManageWorkspace);
+            defaultAttributes.put("can-lock", isManageWorkspace);
+            defaultAttributes.put("can-manage-run-tasks", isManageWorkspace);
+            defaultAttributes.put("can-manage-tags", isManageWorkspace);
+            defaultAttributes.put("can-queue-apply", isManageWorkspace);
+            defaultAttributes.put("can-queue-destroy", isManageWorkspace);
+            defaultAttributes.put("can-queue-run", isManageWorkspace);
+            defaultAttributes.put("can-read-settings", isManageWorkspace);
+            defaultAttributes.put("can-read-state-versions", isManageWorkspace);
+            defaultAttributes.put("can-read-variable", isManageWorkspace);
+            defaultAttributes.put("can-unlock", isManageWorkspace);
+            defaultAttributes.put("can-update", isManageWorkspace);
+            defaultAttributes.put("can-update-variable", isManageWorkspace);
+            defaultAttributes.put("can-read-assessment-result", isManageWorkspace);
+            defaultAttributes.put("can-force-delete", isManageWorkspace);
             //defaultAttributes.put("structured-run-output-enabled", true);
 
             attributes.put("permissions", defaultAttributes);
@@ -226,7 +264,7 @@ public class RemoteTfeService {
 
     }
 
-    StateConsumerList getWorkspaceStateConsumers(String workspaceId) {
+    StateConsumerList getWorkspaceStateConsumers(String workspaceId, JwtAuthenticationToken currentUser) {
         Optional<Workspace> workspaceFound = Optional
                 .ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
 
@@ -238,7 +276,7 @@ public class RemoteTfeService {
             workspaceData.getOrganization().getWorkspace().forEach(workspace -> {
                 if (!workspace.getId().toString().equals(workspaceId)) {
                     log.info("Adding workspace {} as state consumers", workspace.getName());
-                    stateConsumerList.getData().add(getWorkspace(workspace.getOrganization().getName(), workspace.getName(), new HashMap()).getData());
+                    stateConsumerList.getData().add(getWorkspace(workspace.getOrganization().getName(), workspace.getName(), new HashMap(), currentUser).getData());
                 }
             });
         });
@@ -247,7 +285,7 @@ public class RemoteTfeService {
 
     }
 
-    WorkspaceList listWorkspace(String organizationName, String searchTags) {
+    WorkspaceList listWorkspace(String organizationName, String searchTags, JwtAuthenticationToken currentUser) {
         WorkspaceList workspaceList = new WorkspaceList();
         workspaceList.setData(new ArrayList());
 
@@ -265,7 +303,7 @@ public class RemoteTfeService {
             }
             log.info("Workspace {} Tags Count {} Searching Tag Quantity {} Matched {}", workspace.getName(), workspaceTagList.size(), listTags.size(), matchingTags);
             if (matchingTags == listTags.size()) {
-                workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap()).getData());
+                workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
             }
         }
         return workspaceList;
@@ -312,7 +350,7 @@ public class RemoteTfeService {
         return tag;
     }
 
-    WorkspaceData updateWorkspace(String workspaceId, WorkspaceData workspaceData) {
+    WorkspaceData updateWorkspace(String workspaceId, WorkspaceData workspaceData, JwtAuthenticationToken currentUser) {
         Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
 
         log.info("Updating existing workspace {} in {}", workspace.get().getName(), workspace.get().getOrganization().getName());
@@ -322,10 +360,10 @@ public class RemoteTfeService {
 
         workspaceRepository.save(updatedWorkspace);
 
-        return getWorkspace(updatedWorkspace.getOrganization().getName(), updatedWorkspace.getName(), new HashMap<>());
+        return getWorkspace(updatedWorkspace.getOrganization().getName(), updatedWorkspace.getName(), new HashMap<>(), currentUser);
     }
 
-    WorkspaceData createWorkspace(String organizationName, WorkspaceData workspaceData) {
+    WorkspaceData createWorkspace(String organizationName, WorkspaceData workspaceData, JwtAuthenticationToken currentUser) {
         Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getByOrganizationNameAndName(
                 organizationName, workspaceData.getData().getAttributes().get("name").toString()));
 
@@ -353,10 +391,10 @@ public class RemoteTfeService {
         Map<String, Object> otherAttributes = new HashMap<>();
         otherAttributes.put("locked", false);
         return getWorkspace(organizationName, workspaceData.getData().getAttributes().get("name").toString(),
-                otherAttributes);
+                otherAttributes, currentUser);
     }
 
-    WorkspaceData updateWorkspaceLock(String workspaceId, boolean locked) {
+    WorkspaceData updateWorkspaceLock(String workspaceId, boolean locked, JwtAuthenticationToken currentUser) {
         log.info("Update Lock Workspace: {} to {}", workspaceId, locked);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
         log.info("Workspace {} Organization {} ", workspace.getId().toString(),
@@ -367,7 +405,7 @@ public class RemoteTfeService {
         Map<String, Object> otherAttributes = new HashMap<>();
 
         otherAttributes.put("locked", false);
-        return getWorkspace(organizationName, workspace.getName(), otherAttributes);
+        return getWorkspace(organizationName, workspace.getName(), otherAttributes, currentUser);
     }
 
     StateData createWorkspaceState(String workspaceId, StateData stateData) {

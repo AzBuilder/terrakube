@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
@@ -26,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Optional;
@@ -38,9 +40,10 @@ public class RemoteTfeController {
 
     RemoteTfeService remoteTfeService;
 
+    @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/entitlement-set")
-    public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName) {
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName)));
+    public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName, Principal principal) {
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName, ((JwtAuthenticationToken) principal))));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "ping")
@@ -52,29 +55,30 @@ public class RemoteTfeController {
         return response;
     }
 
+    @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}")
-    public ResponseEntity<OrganizationData> getOrgInformation(@PathVariable("organizationName") String organizationName) {
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgInformation(organizationName)));
+    public ResponseEntity<OrganizationData> getOrgInformation(@PathVariable("organizationName") String organizationName, Principal principal) {
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgInformation(organizationName, (JwtAuthenticationToken) principal)));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces/{workspaceName}")
-    public ResponseEntity<WorkspaceData> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName) {
+    public ResponseEntity<WorkspaceData> getWorkspace(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName, Principal principal) {
         log.info("Searching: {} {}", organizationName, workspaceName);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap<>())));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspace(organizationName, workspaceName, new HashMap<>(), (JwtAuthenticationToken) principal)));
     }
 
     @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "workspaces/{workspaceId}/relationships/remote-state-consumers")
-    public ResponseEntity<StateConsumerList> getWorkspaceStateConsumers(@PathVariable("workspaceId") String workspaceId) {
+    public ResponseEntity<StateConsumerList> getWorkspaceStateConsumers(@PathVariable("workspaceId") String workspaceId, Principal principal) {
         log.info("Searching Workspace Consumers for Id: {}", workspaceId);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspaceStateConsumers(workspaceId)));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspaceStateConsumers(workspaceId, (JwtAuthenticationToken) principal)));
     }
 
     @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
-    public ResponseEntity<WorkspaceList> listWorkspace(@PathVariable("organizationName") String organizationName, @RequestParam("search[tags]") String searchTags) {
+    public ResponseEntity<WorkspaceList> listWorkspace(@PathVariable("organizationName") String organizationName, @RequestParam("search[tags]") String searchTags, Principal principal) {
         log.info("Searching: {} {}", organizationName, searchTags);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName, searchTags)));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName, searchTags, (JwtAuthenticationToken) principal)));
     }
 
     @Transactional
@@ -91,9 +95,9 @@ public class RemoteTfeController {
 
 
     @PostMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
-    public ResponseEntity<WorkspaceData> createWorkspace(@PathVariable("organizationName") String organizationName, @RequestBody WorkspaceData workspaceData) {
+    public ResponseEntity<WorkspaceData> createWorkspace(@PathVariable("organizationName") String organizationName, @RequestBody WorkspaceData workspaceData, Principal principal) {
         log.info("Create {}", workspaceData.toString());
-        Optional<WorkspaceData> newWorkspace = Optional.ofNullable(remoteTfeService.createWorkspace(organizationName, workspaceData));
+        Optional<WorkspaceData> newWorkspace = Optional.ofNullable(remoteTfeService.createWorkspace(organizationName, workspaceData,(JwtAuthenticationToken) principal));
         if (newWorkspace.isPresent()) {
             log.info("Created: {}", newWorkspace.get().toString());
             return ResponseEntity.status(201).body(newWorkspace.get());
@@ -104,9 +108,9 @@ public class RemoteTfeController {
 
     @Transactional
     @PatchMapping(produces = "application/vnd.api+json", path = "workspaces/{workspacesId}")
-    public ResponseEntity<WorkspaceData> updateWorkspace(@PathVariable("workspacesId") String workspacesId, @RequestBody WorkspaceData workspaceData) {
+    public ResponseEntity<WorkspaceData> updateWorkspace(@PathVariable("workspacesId") String workspacesId, @RequestBody WorkspaceData workspaceData, Principal principal) {
         log.info("Create {}", workspaceData.toString());
-        Optional<WorkspaceData> updatedWorkspace = Optional.ofNullable(remoteTfeService.updateWorkspace(workspacesId, workspaceData));
+        Optional<WorkspaceData> updatedWorkspace = Optional.ofNullable(remoteTfeService.updateWorkspace(workspacesId, workspaceData, (JwtAuthenticationToken) principal));
         if (updatedWorkspace.isPresent()) {
             log.info("Created: {}", updatedWorkspace.get().toString());
             return ResponseEntity.status(201).body(updatedWorkspace.get());
@@ -117,16 +121,16 @@ public class RemoteTfeController {
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/lock")
-    public ResponseEntity<WorkspaceData> lockWorkspace(@PathVariable("workspaceId") String workspaceId) {
+    public ResponseEntity<WorkspaceData> lockWorkspace(@PathVariable("workspaceId") String workspaceId, Principal principal) {
         log.info("Lock {}", workspaceId);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, true)));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, true, (JwtAuthenticationToken) principal)));
     }
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/unlock")
-    public ResponseEntity<WorkspaceData> unlockWorkspace(@PathVariable("workspaceId") String workspaceId) {
+    public ResponseEntity<WorkspaceData> unlockWorkspace(@PathVariable("workspaceId") String workspaceId, Principal principal) {
         log.info("Unlock {}", workspaceId);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, false)));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, false, (JwtAuthenticationToken) principal)));
     }
 
     @Transactional
