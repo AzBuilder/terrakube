@@ -108,7 +108,6 @@ public class RemoteTfeService {
             userGroups.forEach(userTeam->{
                 if(orgTeam.getName().equals(userTeam)){
                     userIsMemberOrg.set(true);
-                    log.info("User {} is member of {}", currentUser.getTokenAttributes().get("email"), orgTeam.getName());
                 }
             });
         });
@@ -122,7 +121,6 @@ public class RemoteTfeService {
             userGroups.forEach(userTeam->{
                 if(orgTeam.getName().equals(userTeam) && orgTeam.isManageWorkspace()){
                     userWithManageWorkspace.set(true);
-                    log.info("User {} has manage workspace in {}", currentUser.getTokenAttributes().get("email"), orgTeam.getName());
                 }
             });
         });
