@@ -44,7 +44,7 @@ public class ScheduleVcs implements org.quartz.Job {
             vcsDeleted = true;
         }
 
-        if (!vcsDeleted && vcs != null && !vcsDeleted && vcs.getStatus().equals(VcsStatus.COMPLETED)) {
+        if (!vcsDeleted && vcs != null && vcs.getStatus().equals(VcsStatus.COMPLETED)) {
             Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(
                     vcs.getId().toString(),
                     vcs.getVcsType(),
