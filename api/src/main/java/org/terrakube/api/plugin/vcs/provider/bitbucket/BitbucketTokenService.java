@@ -23,7 +23,6 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
         for (int attempt = 0; attempt < 5; attempt++) {
             try {
                 log.info("Getting Bitbucket initial token {} attempt", attempt);
-                Thread.sleep(2000);
                 WebClient client = WebClient.builder()
                         .baseUrl("https://bitbucket.org")
                         .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +62,6 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
         for (int attempt = 0; attempt < 5; attempt++) {
             try {
                 log.info("Getting Bitbucket refresh token {} attempt", attempt);
-                Thread.sleep(5000);
                 WebClient client = WebClient.builder()
                         .baseUrl("https://bitbucket.org")
                         .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
