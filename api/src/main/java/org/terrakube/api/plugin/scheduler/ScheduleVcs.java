@@ -3,6 +3,7 @@ package org.terrakube.api.plugin.scheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.TokenService;
 import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.vcs.Vcs;
@@ -12,6 +13,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @Component
 @Getter
 @Setter
+@Slf4j
 public class ScheduleVcs implements org.quartz.Job {
 
     public static final String VCS_ID = "vcsId";
@@ -31,9 +34,17 @@ public class ScheduleVcs implements org.quartz.Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         String vcsId = jobExecutionContext.getJobDetail().getJobDataMap().getString(VCS_ID);
-        Vcs vcs = vcsRepository.getReferenceById(UUID.fromString(vcsId));
+        boolean vcsDeleted = false;
+        Vcs vcs = null;
 
-        if(vcs.getStatus().equals(VcsStatus.COMPLETED)) {
+        try {
+            vcs = vcsRepository.getReferenceById(UUID.fromString(vcsId));
+        } catch (EntityNotFoundException ex) {
+            log.warn("VCS {} was deleted, job is still active but is no longer need it", vcsId);
+            vcsDeleted = true;
+        }
+
+        if (!vcsDeleted && vcs != null && !vcsDeleted && vcs.getStatus().equals(VcsStatus.COMPLETED)) {
             Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(
                     vcs.getId().toString(),
                     vcs.getVcsType(),
@@ -51,5 +62,6 @@ public class ScheduleVcs implements org.quartz.Job {
                 vcsRepository.save(tempVcs);
             }
         }
+
     }
 }
