@@ -20,9 +20,8 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
     @Override
     public BitBucketToken getAccessToken(String clientId, String clientSecret, String tempCode, String callback) throws TokenException {
         BitBucketToken bitBucketToken = null;
-        for (int attempt = 0; attempt < 5; attempt++) {
+        for (int newToken = 0; newToken < 5; newToken++) {
             try {
-                log.info("Getting Bitbucket initial token {} attempt", attempt);
                 WebClient client = WebClient.builder()
                         .baseUrl("https://bitbucket.org")
                         .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -34,6 +33,8 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
                 formData.add("grant_type", "authorization_code");
                 formData.add("code", tempCode);
 
+                log.info("Checking token {} attempt", newToken);
+
                 bitBucketToken = client.post()
                         .uri("/site/oauth2/access_token")
                         .body(BodyInserters.fromFormData(formData))
@@ -41,8 +42,6 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
                         .bodyToMono(BitBucketToken.class)
                         .timeout(Duration.ofSeconds(10))
                         .block();
-
-                log.info("Successfully get bitbucket initial token");
                 break;
 
             } catch (Exception ex) {
@@ -88,10 +87,10 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
             }
         }
 
-        if (bitBucketToken != null) {
-            return bitBucketToken;
-        } else {
+        if (bitBucketToken == null)
             throw new TokenException("500", "Unable to get Bitbucket Token");
-        }
+
+        return bitBucketToken;
+
     }
 }
