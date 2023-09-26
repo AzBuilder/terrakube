@@ -13,9 +13,9 @@ import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -34,17 +34,21 @@ public class ScheduleVcs implements org.quartz.Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         String vcsId = jobExecutionContext.getJobDetail().getJobDataMap().getString(VCS_ID);
-        boolean vcsDeleted = false;
         Vcs vcs = null;
-
-        try {
-            vcs = vcsRepository.getReferenceById(UUID.fromString(vcsId));
-        } catch (EntityNotFoundException ex) {
-            log.warn("VCS {} was deleted, job is still active but is no longer need it", vcsId);
-            vcsDeleted = true;
+        Optional<Vcs> search = vcsRepository.findById(UUID.fromString(vcsId));
+        if (search.isPresent()) {
+            log.info("VCS connection found using Id");
+            vcs = search.get();
+        } else {
+            vcs = vcsRepository.findByCallback(vcsId);
+            if (vcs == null) {
+                log.warn("VCS Job Id {} is still active but no longer needed it, vcs connection cannot be found in the database", vcsId);
+                return;
+            }
+            log.info("VCS found with custom callback");
         }
 
-        if (!vcsDeleted && vcs != null && vcs.getStatus().equals(VcsStatus.COMPLETED)) {
+        if (vcs.getStatus().equals(VcsStatus.COMPLETED)) {
             Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(
                     vcs.getId().toString(),
                     vcs.getVcsType(),
