@@ -543,7 +543,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       configure credentials in .terraformrc or <br />{" "}
                       terraform.rc to access this module:
                       <pre className="moduleCredentials">
-                        credentials "app.terrakube.io" {"{"} <br />
+                        credentials "
+                        {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}" {"{"} <br />
                         &nbsp;&nbsp;# valid user API token:
                         <br />
                         &nbsp;&nbsp;token = "xxxxxx.yyyyyy.zzzzzzzzzzzzz"
