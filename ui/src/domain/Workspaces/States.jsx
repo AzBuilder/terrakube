@@ -76,7 +76,6 @@ export const States = ({
       resp.data.values.root_module != null
     ) {
       try{
-        hola()
         if (resp.data.values.root_module.resources != null) {
           resp.data.values.root_module.resources.forEach((element) => {
             let dependencies = 0;
