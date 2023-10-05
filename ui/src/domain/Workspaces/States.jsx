@@ -64,7 +64,6 @@ export const States = ({
 
   function loadData(resp) {
     console.log(resp.data);
-    setStateContent(JSON.stringify(resp.data, null, "\t"));
 
     let resources = [];
     let x = new Map();
@@ -119,14 +118,18 @@ export const States = ({
           });
         }
       } catch (error){
-          console.log("Error building diagram from current state")
-          element = {
-            address: 100,
-            name: "unknown",
-            provider_name: "unknown",
-            type: "unknown"
-          }
-          resources = pushNode(resources, dependencies, element, x, y);
+        console.error(`Failed to build diagram: ${error}`)
+        resources = [];
+        resources.push({
+          id: "1",
+          type: "resourceNode",
+          data: {
+            name: "Error Building Diagram",
+            provider: "azurerm",
+            type: "unknown",
+          },
+          position: { x: 0, y: 130 },
+        });
       }
 
     }
@@ -144,6 +147,7 @@ export const States = ({
       axiosInstance
         .get(state.output)
         .then((resp) => {
+          setStateContent(JSON.stringify(resp.data, null, "\t"));
           loadData(resp);
         })
         .catch((err) =>
