@@ -199,17 +199,20 @@ export const WorkspaceDetails = (props) => {
       });
   };
 
-  const onDelete = (values) => {
+  const onDelete = (workspace) => {
+    let randomLetters = generateRandomString(4)
+    let deletedName = `${workspace.data.attributes.name.substring(0,21)}_DEL_${randomLetters}`;
+    console.log(`New deleted name; ${deletedName}`)
     const body = {
       data: {
         type: "workspace",
         id: id,
         attributes: {
+          name: deletedName,
           deleted: "true",
         },
       },
     };
-
     axiosInstance
       .patch(`organization/${organizationId}/workspace/${id}`, body, {
         headers: {
@@ -609,7 +612,7 @@ export const WorkspaceDetails = (props) => {
                     </div>
                     <Popconfirm
                       onConfirm={() => {
-                        onDelete(id);
+                        onDelete(workspace);
                       }}
                       style={{ width: "100%" }}
                       title={
@@ -641,6 +644,18 @@ export const WorkspaceDetails = (props) => {
     </Content>
   );
 };
+
+const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+function generateRandomString(length) {
+    let result = '';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+}
 
 function setupWorkspaceIncludes(
   includes,
