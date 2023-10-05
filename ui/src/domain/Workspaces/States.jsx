@@ -64,7 +64,6 @@ export const States = ({
 
   function loadData(resp) {
     console.log(resp.data);
-    setStateContent(JSON.stringify(resp.data, null, "\t"));
 
     let resources = [];
     let x = new Map();
@@ -75,29 +74,9 @@ export const States = ({
       resp.data.values != null &&
       resp.data.values.root_module != null
     ) {
-      if (resp.data.values.root_module.resources != null) {
-        resp.data.values.root_module.resources.forEach((element) => {
-          let dependencies = 0;
-          if (element.depends_on != null)
-            dependencies = element.depends_on.length;
-          x.set(
-            dependencies,
-            (x.get(dependencies) ? x.get(dependencies) : 0) + 350
-          );
-
-          resources = pushNode(resources, dependencies, element, x, y);
-          resources = pushNodeDependency(
-            resources,
-            dependencies,
-            element,
-            element.depends_on
-          );
-        });
-      }
-
-      if (resp.data.values.root_module.child_modules != null) {
-        resp.data.values.root_module.child_modules.forEach((child) => {
-          child.resources.forEach((element) => {
+      try{
+        if (resp.data.values.root_module.resources != null) {
+          resp.data.values.root_module.resources.forEach((element) => {
             let dependencies = 0;
             if (element.depends_on != null)
               dependencies = element.depends_on.length;
@@ -105,7 +84,7 @@ export const States = ({
               dependencies,
               (x.get(dependencies) ? x.get(dependencies) : 0) + 350
             );
-
+  
             resources = pushNode(resources, dependencies, element, x, y);
             resources = pushNodeDependency(
               resources,
@@ -114,8 +93,45 @@ export const States = ({
               element.depends_on
             );
           });
+        }
+  
+        if (resp.data.values.root_module.child_modules != null) {
+          resp.data.values.root_module.child_modules.forEach((child) => {
+            if(child.resources != null)
+              child.resources.forEach((element) => {
+                let dependencies = 0;
+                if (element.depends_on != null)
+                  dependencies = element.depends_on.length;
+                x.set(
+                  dependencies,
+                  (x.get(dependencies) ? x.get(dependencies) : 0) + 350
+                );
+  
+                resources = pushNode(resources, dependencies, element, x, y);
+                resources = pushNodeDependency(
+                  resources,
+                  dependencies,
+                  element,
+                  element.depends_on
+                );
+            });
+          });
+        }
+      } catch (error){
+        console.error(`Failed to build diagram: ${error}`)
+        resources = [];
+        resources.push({
+          id: "1",
+          type: "resourceNode",
+          data: {
+            name: "Error Building Diagram",
+            provider: "azurerm",
+            type: "unknown",
+          },
+          position: { x: 0, y: 130 },
         });
       }
+
     }
 
     setResources(resources);
@@ -131,6 +147,7 @@ export const States = ({
       axiosInstance
         .get(state.output)
         .then((resp) => {
+          setStateContent(JSON.stringify(resp.data, null, "\t"));
           loadData(resp);
         })
         .catch((err) =>
