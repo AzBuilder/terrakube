@@ -75,29 +75,10 @@ export const States = ({
       resp.data.values != null &&
       resp.data.values.root_module != null
     ) {
-      if (resp.data.values.root_module.resources != null) {
-        resp.data.values.root_module.resources.forEach((element) => {
-          let dependencies = 0;
-          if (element.depends_on != null)
-            dependencies = element.depends_on.length;
-          x.set(
-            dependencies,
-            (x.get(dependencies) ? x.get(dependencies) : 0) + 350
-          );
-
-          resources = pushNode(resources, dependencies, element, x, y);
-          resources = pushNodeDependency(
-            resources,
-            dependencies,
-            element,
-            element.depends_on
-          );
-        });
-      }
-
-      if (resp.data.values.root_module.child_modules != null) {
-        resp.data.values.root_module.child_modules.forEach((child) => {
-          child.resources.forEach((element) => {
+      try{
+        hola()
+        if (resp.data.values.root_module.resources != null) {
+          resp.data.values.root_module.resources.forEach((element) => {
             let dependencies = 0;
             if (element.depends_on != null)
               dependencies = element.depends_on.length;
@@ -105,7 +86,7 @@ export const States = ({
               dependencies,
               (x.get(dependencies) ? x.get(dependencies) : 0) + 350
             );
-
+  
             resources = pushNode(resources, dependencies, element, x, y);
             resources = pushNodeDependency(
               resources,
@@ -114,8 +95,41 @@ export const States = ({
               element.depends_on
             );
           });
-        });
+        }
+  
+        if (resp.data.values.root_module.child_modules != null) {
+          resp.data.values.root_module.child_modules.forEach((child) => {
+            if(child.resources != null)
+              child.resources.forEach((element) => {
+                let dependencies = 0;
+                if (element.depends_on != null)
+                  dependencies = element.depends_on.length;
+                x.set(
+                  dependencies,
+                  (x.get(dependencies) ? x.get(dependencies) : 0) + 350
+                );
+  
+                resources = pushNode(resources, dependencies, element, x, y);
+                resources = pushNodeDependency(
+                  resources,
+                  dependencies,
+                  element,
+                  element.depends_on
+                );
+            });
+          });
+        }
+      } catch (error){
+          console.log("Error building diagram from current state")
+          element = {
+            address: 100,
+            name: "unknown",
+            provider_name: "unknown",
+            type: "unknown"
+          }
+          resources = pushNode(resources, dependencies, element, x, y);
       }
+
     }
 
     setResources(resources);
