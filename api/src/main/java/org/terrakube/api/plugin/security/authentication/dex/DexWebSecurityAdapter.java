@@ -26,7 +26,7 @@ public class DexWebSecurityAdapter {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret) throws Exception {
-        http.csrf().ignoringAntMatchers("/remote/tfe/v2/configuration-versions/*").and().cors().and().authorizeRequests(authz -> authz
+        http.cors().and().authorizeRequests(authz -> authz
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/actuator/**").permitAll()
                         .antMatchers("/callback/v1/**").permitAll()
