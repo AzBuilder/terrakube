@@ -5,6 +5,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -24,6 +25,7 @@ import org.terrakube.executor.service.workspace.security.WorkspaceSecurity;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -121,7 +123,19 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
     private void downloadWorkspaceTarGz(File tarGzFolder, String source) throws IOException {
         File terraformTarGz = new File(tarGzFolder.getPath() + "/terraformContent.tar.gz");
-        FileUtils.copyURLToFile(new URL(source), terraformTarGz, 10000, 10000);
+        OutputStream stream = null;
+        try {
+            URL url = new URL(source);
+            URLConnection urlConnection = url.openConnection();
+            urlConnection.setRequestProperty("Authorization", "Bearer " + workspaceSecurity.generateAccessToken(1));
+            stream = new FileOutputStream(terraformTarGz);
+            IOUtils.copy(urlConnection.getInputStream(), stream);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+            stream.close();
+        }
+
         extractTarGZ(new FileInputStream(terraformTarGz), tarGzFolder.getPath());
     }
 

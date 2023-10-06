@@ -111,7 +111,7 @@ export const WorkspaceDetails = (props) => {
   useEffect(() => {
     setLoading(true);
     loadWorkspace();
-    axiosClient.get(terraformVersionsApi).then((resp) => {
+    axiosInstance.get(terraformVersionsApi).then((resp) => {
       const tfVersions = [];
       for (const version in resp.data.versions) {
         if (!version.includes("-")) tfVersions.push(version);

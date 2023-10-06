@@ -54,7 +54,7 @@ export const CreateWorkspace = () => {
   useEffect(() => {
     setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
     setLoading(true);
-    axiosClient.get(terraformVersionsApi).then((resp) => {
+    axiosInstance.get(terraformVersionsApi).then((resp) => {
       console.log(resp);
       const tfVersions = [];
       for (const version in resp.data.versions) {

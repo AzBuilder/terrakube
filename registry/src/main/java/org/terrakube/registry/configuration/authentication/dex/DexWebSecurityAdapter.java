@@ -7,9 +7,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,24 +21,13 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-@EnableWebSecurity
 @ConditionalOnProperty(prefix = "org.terrakube.registry.authentication", name = "type", havingValue = "DEX")
-public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+public class DexWebSecurityAdapter {
 
-    @Value("${org.terrakube.ui.fqdn:http://localhost:3000}")
-    private String uiDomain;
-
-    @Value("${org.terrakube.token.issuer-uri}")
-    private String issuerUri;
-
-    @Value("${org.terrakube.token.pat}")
-    private String patJwtSecret;
-
-    @Value("${org.terrakube.token.internal}")
-    private String internalJwtSecret;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret) throws Exception {
         http.cors().and().authorizeRequests(authz -> authz
                         .antMatchers("/.well-known/**").permitAll()
                         .antMatchers("/actuator/**").permitAll()
@@ -48,16 +38,18 @@ public class DexWebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .oauth2ResourceServer(oauth2 -> {
                     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver = RegistryAuthenticationManagerResolver
                             .builder()
-                            .issuerUri(this.issuerUri)
-                            .patSecret(this.patJwtSecret)
-                            .internalSecret(this.internalJwtSecret)
+                            .issuerUri(issuerUri)
+                            .patSecret(patJwtSecret)
+                            .internalSecret(internalJwtSecret)
                             .build();
                     oauth2.authenticationManagerResolver(authenticationManagerResolver);
                 });
+
+        return http.build();
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    CorsConfigurationSource corsConfigurationSource(@Value("${org.terrakube.ui.fqdn:http://localhost:3000}") String uiDomain) {
         log.info("CORS for UI Domain {}", uiDomain);
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(uiDomain.split(",")));
