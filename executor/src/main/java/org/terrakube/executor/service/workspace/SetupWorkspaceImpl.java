@@ -128,7 +128,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             URL url = new URL(source);
             URLConnection urlConnection = url.openConnection();
             urlConnection.setRequestProperty("Authorization", "Bearer " + workspaceSecurity.generateAccessToken(1));
-            IOUtils.copy(urlConnection.getInputStream(), new FileOutputStream(terraformTarGz));
+            stream = new FileOutputStream(terraformTarGz);
+            IOUtils.copy(urlConnection.getInputStream(), stream);
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {
