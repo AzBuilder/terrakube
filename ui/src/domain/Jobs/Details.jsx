@@ -214,7 +214,7 @@ export const DetailsJob = ({ jobId }) => {
   const loadContext = () => {
     const api = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL);
 
-    axiosClient
+    axiosInstance
       .get(`${api.protocol}//${api.host}/context/v1/${jobId}`)
       .then((response) => {
         console.log("terrakube");
