@@ -123,10 +123,18 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
     private void downloadWorkspaceTarGz(File tarGzFolder, String source) throws IOException {
         File terraformTarGz = new File(tarGzFolder.getPath() + "/terraformContent.tar.gz");
-        URL url = new URL(source);
-        URLConnection urlConnection = url.openConnection();
-        urlConnection.setRequestProperty("Authorization", "Bearer " + workspaceSecurity.generateAccessToken(1));
-        IOUtils.copy(urlConnection.getInputStream(), new FileOutputStream(terraformTarGz));
+        OutputStream stream = null;
+        try {
+            URL url = new URL(source);
+            URLConnection urlConnection = url.openConnection();
+            urlConnection.setRequestProperty("Authorization", "Bearer " + workspaceSecurity.generateAccessToken(1));
+            IOUtils.copy(urlConnection.getInputStream(), new FileOutputStream(terraformTarGz));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+            stream.close();
+        }
+
         extractTarGZ(new FileInputStream(terraformTarGz), tarGzFolder.getPath());
     }
 
