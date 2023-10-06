@@ -36,7 +36,6 @@ public class DexWebSecurityAdapter {
                         .antMatchers(HttpMethod.PUT, "/remote/tfe/v2/configuration-versions/*").permitAll()
                         .antMatchers("/remote/tfe/v2/plans/*/logs").permitAll()
                         .antMatchers("/remote/tfe/v2/applies/*/logs").permitAll()
-                        .antMatchers(HttpMethod.POST, "/remote/tfe/v2/workspaces/{workspaceId}/state-versions").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> {
