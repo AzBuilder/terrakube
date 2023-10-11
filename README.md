@@ -131,7 +131,7 @@ data "terrakube_organization" "org" {
 
 resource "terrakube_team" "team" {
   name             = "TERRAKUBE_SUPER_ADMIN"
-  organization_id  = data.terrakube_vcs.vcs.organization_id
+  organization_id  = data.terrakube_organization.org.id
   manage_workspace = false
   manage_module    = false
   manage_provider  = true
@@ -141,7 +141,7 @@ resource "terrakube_team" "team" {
 
 resource "terrakube_module" "module1" {
   name            = "module_public_connection"
-  organization_id = data.terrakube_ssh.ssh.organization_id
+  organization_id = data.terrakube_organization.org.id
   description     = "module_public_connection"
   provider_name   = "aws"
   source          = "https://github.com/terraform-aws-modules/terraform-aws-vpc.git"
