@@ -108,7 +108,7 @@ docker build -t terrakube-ui:latest  .
 
 ### Terraform Terrakube Provider
 
-A Terraform provider is available in this repository to manage Terrakube objects like modules, teams, ssh keys, etc.
+A Terraform provider is available in [this repository](https://github.com/AzBuilder/terraform-provider-terrakube) to manage Terrakube objects like modules, teams, ssh keys, etc.
 
 Example: 
 ```terraform
