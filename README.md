@@ -105,6 +105,49 @@ cd ui
 docker build -t terrakube-ui:latest  .
 ```
 
+
+### Terraform Terrakube Provider
+
+A Terraform provider is available in [this repository](https://github.com/AzBuilder/terraform-provider-terrakube) to manage Terrakube objects like modules, teams, ssh keys, etc.
+
+Example: 
+```terraform
+terraform {
+  required_providers {
+    terrakube = {
+      source = "AzBuilder/terrakube"
+    }
+  }
+}
+
+provider "terrakube" {
+  endpoint = "http://terrakube-api.minikube.net"
+  token    = "(PERSONAL ACCESS TOKEN OR TEAM TOKEN)"
+}
+
+data "terrakube_organization" "org" {
+  name = "simple"
+}
+
+resource "terrakube_team" "team" {
+  name             = "TERRAKUBE_SUPER_ADMIN"
+  organization_id  = data.terrakube_organization.org.id
+  manage_workspace = false
+  manage_module    = false
+  manage_provider  = true
+  manage_vcs       = true
+  manage_template  = true
+}
+
+resource "terrakube_module" "module1" {
+  name            = "module_public_connection"
+  organization_id = data.terrakube_organization.org.id
+  description     = "module_public_connection"
+  provider_name   = "aws"
+  source          = "https://github.com/terraform-aws-modules/terraform-aws-vpc.git"
+}
+```
+
 ### Sponsors
 
 Any company can become a sponsor by donating or providing any benefit to the project or the team helping improve Terrakube.
