@@ -41,15 +41,15 @@ public class GroovyEngine implements CommandExecution {
     }
 
     @Override
-    public boolean execute(TerraformJob terraformJob, String scriptContent, File workingDirectory, Consumer<String> output) {
+    public boolean execute(TerraformJob terraformJob, String scriptContent, File terraformWorkingDir, Consumer<String> output) {
         boolean executeSuccess = true;
-        File groovyScript = new File(workingDirectory.getAbsolutePath() + USER_GROOVY_SCRIPT);
+        File groovyScript = new File(terraformWorkingDir.getAbsolutePath() + USER_GROOVY_SCRIPT);
 
         try {
             log.info("ScriptPath: {}", groovyScript.toURI().toURL());
             FileUtils.writeStringToFile(groovyScript, scriptContent, Charset.defaultCharset());
 
-            List<URL> groovyClasses = getGroovyExtensions(workingDirectory);
+            List<URL> groovyClasses = getGroovyExtensions(terraformWorkingDir);
             groovyClasses.add(groovyScript.toURI().toURL());
 
             log.info("Execute Groovy scriptContent: \n {}", scriptContent);
@@ -58,7 +58,7 @@ public class GroovyEngine implements CommandExecution {
                     this.getClass().getClassLoader()
             );
 
-            Binding sharedData = setupBindings(terraformJob, workingDirectory);
+            Binding sharedData = setupBindings(terraformJob, terraformWorkingDir);
             sharedData.setProperty("terrakubeOutput", new ByteArrayOutputStream());
 
             engine.run(groovyScript.getName(), sharedData);

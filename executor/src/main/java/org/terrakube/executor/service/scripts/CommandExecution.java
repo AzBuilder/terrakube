@@ -6,5 +6,5 @@ import java.io.File;
 import java.util.function.Consumer;
 
 public interface CommandExecution {
-    boolean execute(TerraformJob terraformJob, String command, File workingDirectory, Consumer<String> output);
+    boolean execute(TerraformJob terraformJob, String command, File terraformWorkingDir, Consumer<String> output);
 }
