@@ -63,7 +63,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-        return workspaceCloneFolder != null ? workspaceCloneFolder.getParentFile() : new File("/tmp/" + UUID.randomUUID());
+        return workspaceCloneFolder != null ? workspaceCloneFolder : new File("/tmp/" + UUID.randomUUID());
     }
 
     private File setupWorkspaceDirectory(String organizationId, String workspaceId) throws IOException {
