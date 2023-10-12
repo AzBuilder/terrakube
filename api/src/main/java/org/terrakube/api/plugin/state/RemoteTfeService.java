@@ -101,7 +101,13 @@ public class RemoteTfeService {
         this.teamTokenService = teamTokenService;
     }
 
+    private boolean validateTerrakubeUser(JwtAuthenticationToken currentUser){
+        return currentUser.getTokenAttributes().get("iss").equals("TerrakubeInternal");
+    }
+
     private boolean validateUserIsMemberOrg(Organization organization, JwtAuthenticationToken currentUser){
+        if(validateTerrakubeUser(currentUser))
+            return true;
         List<String> userGroups = teamTokenService.getCurrentGroups(currentUser);
         AtomicBoolean userIsMemberOrg = new AtomicBoolean(false);
         organization.getTeam().forEach(orgTeam ->{
@@ -115,6 +121,8 @@ public class RemoteTfeService {
     }
 
     private boolean validateUserManageWorkspace(Organization organization, JwtAuthenticationToken currentUser){
+        if(validateTerrakubeUser(currentUser))
+            return true;
         List<String> userGroups = teamTokenService.getCurrentGroups(currentUser);
         AtomicBoolean userWithManageWorkspace = new AtomicBoolean(false);
         organization.getTeam().forEach(orgTeam ->{
