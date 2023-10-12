@@ -36,13 +36,13 @@ public class ExecutorJobImpl implements ExecutorJob {
     public void createJob(TerraformJob terraformJob) {
         log.info("Create Job for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
         boolean executionSuccess = true;
-        File workspaceFolder = setupWorkspace.prepareWorkspace(terraformJob);
+        File terraformWorkingDir = setupWorkspace.prepareWorkspace(terraformJob);
 
         String commitId = "000000000";
         ExecutorJobResult terraformResult = new ExecutorJobResult();
 
         if (!terraformJob.getBranch().equals("remote-content"))
-            commitId = getCommitId(workspaceFolder);
+            commitId = getCommitId(terraformWorkingDir);
 
         updateJobStatus.setRunningStatus(terraformJob, commitId);
 
@@ -50,15 +50,15 @@ public class ExecutorJobImpl implements ExecutorJob {
             case "terraformPlanDestroy":
             case "terraformPlan":
                 log.info("Execute Plan for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                terraformResult = terraformExecutor.plan(terraformJob, workspaceFolder, terraformJob.getType().equals("terraformPlanDestroy"));
+                terraformResult = terraformExecutor.plan(terraformJob, terraformWorkingDir, terraformJob.getType().equals("terraformPlanDestroy"));
                 break;
             case "terraformApply":
                 log.info("Execute Apply for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                terraformResult = terraformExecutor.apply(terraformJob, workspaceFolder);
+                terraformResult = terraformExecutor.apply(terraformJob, terraformWorkingDir);
                 break;
             case "terraformDestroy":
                 log.info("Execute Destroy for Organization {} Workspace {} ", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
-                terraformResult = terraformExecutor.destroy(terraformJob, workspaceFolder);
+                terraformResult = terraformExecutor.destroy(terraformJob, terraformWorkingDir);
                 break;
             case "customScripts":
             case "approval":
@@ -66,7 +66,7 @@ public class ExecutorJobImpl implements ExecutorJob {
                 TextStringBuilder scriptOutput = new TextStringBuilder();
                 TextStringBuilder scriptErrorOutput = new TextStringBuilder();
                 Consumer<String> output = outputScripts -> scriptOutput.appendln(outputScripts);
-                executionSuccess = scriptEngineService.execute(terraformJob, terraformJob.getCommandList(), workspaceFolder, output);
+                executionSuccess = scriptEngineService.execute(terraformJob, terraformJob.getCommandList(), terraformWorkingDir, output);
                 terraformResult.setOutputLog(scriptOutput.toString());
                 terraformResult.setOutputErrorLog(scriptErrorOutput.toString());
                 terraformResult.setSuccessfulExecution(executionSuccess);
@@ -84,7 +84,7 @@ public class ExecutorJobImpl implements ExecutorJob {
         updateJobStatus.setCompletedStatus(executionSuccess, terraformJob, terraformResult.getOutputLog(), terraformResult.getOutputErrorLog(), terraformResult.getPlanFile(), commitId);
 
         try {
-            FileUtils.cleanDirectory(workspaceFolder);
+            FileUtils.cleanDirectory(terraformWorkingDir);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -96,7 +96,7 @@ public class ExecutorJobImpl implements ExecutorJob {
     private static String getCommitId(File workspaceFolder) {
         String commitId = "";
         try {
-            final File commitInformation = new File(String.format("%s/commitHash.info", workspaceFolder.getPath()));
+            final File commitInformation = new File(String.format("%s/commitHash.info", workspaceFolder.getCanonicalPath()));
             final InputStream commitIdStream = new DataInputStream(new FileInputStream(commitInformation));
             commitId = IOUtils.toString(commitIdStream, Charset.defaultCharset());
         } catch (IOException e) {

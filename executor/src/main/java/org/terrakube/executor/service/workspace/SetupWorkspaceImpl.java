@@ -184,7 +184,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                     next();
             String latestCommitHash = latestCommit.getName();
             log.info("Commit Id: {}", latestCommitHash);
-            String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getParentFile().getPath());
+            String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getCanonicalPath());
             log.info("Writing commit id to {}", commitInfoFile);
             FileUtils.writeStringToFile(new File(commitInfoFile), latestCommitHash, Charset.defaultCharset());
 
