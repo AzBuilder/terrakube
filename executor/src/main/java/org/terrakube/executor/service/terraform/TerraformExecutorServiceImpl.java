@@ -58,7 +58,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     }
 
     private File getTerraformWorkingDir(TerraformJob terraformJob, File workingDirectory) throws IOException {
-        File terraformWorkingDir = null;
+        File terraformWorkingDir = workingDirectory;
         try {
             if (!terraformJob.getBranch().equals("remote-content")) {
                 terraformWorkingDir = new File(workingDirectory.getCanonicalPath() + terraformJob.getFolder());
@@ -67,7 +67,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-        log.info("Terraform Working Directory: {}",terraformWorkingDir.getCanonicalPath());
+        log.info("Terraform Working Directory: {}", terraformWorkingDir.getCanonicalPath());
         return terraformWorkingDir;
     }
 
