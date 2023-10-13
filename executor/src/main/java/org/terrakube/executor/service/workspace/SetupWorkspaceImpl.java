@@ -59,7 +59,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 downloadWorkspaceTarGz(workspaceCloneFolder, terraformJob.getSource());
             }
             if (enableRegistrySecurity)
-                workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
+                workspaceSecurity.addTerraformCredentials();
         } catch (IOException e) {
             log.error(e.getMessage());
         }
