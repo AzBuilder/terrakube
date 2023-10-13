@@ -56,7 +56,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             if (!terraformJob.getBranch().equals("remote-content")) {
                 downloadWorkspace(workspaceCloneFolder, terraformJob);
             } else {
-                downloadWorkspaceTarGz(workspaceCloneFolder.getParentFile(), terraformJob.getSource());
+                downloadWorkspaceTarGz(workspaceCloneFolder, terraformJob.getSource());
             }
             if (enableRegistrySecurity)
                 workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
