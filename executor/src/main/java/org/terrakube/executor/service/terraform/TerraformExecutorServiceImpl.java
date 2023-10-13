@@ -62,8 +62,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         try {
             if (!terraformJob.getBranch().equals("remote-content")) {
                 terraformWorkingDir = new File(workingDirectory.getCanonicalPath() + terraformJob.getFolder());
-            } else
-                terraformWorkingDir = workingDirectory;
+            }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
