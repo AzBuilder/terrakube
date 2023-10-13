@@ -44,7 +44,7 @@ public class ScriptEngineService {
         this.toolsBranch = toolsBranch;
     }
 
-    public boolean execute(TerraformJob terraformJob, List<Command> commands, File workingDirectory, Consumer<String> output) {
+    public boolean execute(TerraformJob terraformJob, List<Command> commands, File terraformWorkingDir, Consumer<String> output) {
         AtomicBoolean executeSuccess = new AtomicBoolean(true);
         TreeMap<Integer, Command> commandOrder = new TreeMap<>();
         if (commands != null) {
@@ -53,17 +53,17 @@ public class ScriptEngineService {
             });
 
             try {
-                createToolsDirectory(workingDirectory);
+                createToolsDirectory(terraformWorkingDir);
 
                 commandOrder.forEach((priority, command) -> {
                     if (executeSuccess.get()) {
                         printBannerInit(command, output);
                         switch (command.getRuntime()) {
                             case GROOVY:
-                                executeSuccess.set(groovyEngine.execute(terraformJob, command.getScript(), workingDirectory, output));
+                                executeSuccess.set(groovyEngine.execute(terraformJob, command.getScript(), terraformWorkingDir, output));
                                 break;
                             case BASH:
-                                executeSuccess.set(bashEngine.execute(terraformJob, command.getScript(), workingDirectory, output));
+                                executeSuccess.set(bashEngine.execute(terraformJob, command.getScript(), terraformWorkingDir, output));
                                 break;
                             default:
                                 break;
@@ -72,7 +72,7 @@ public class ScriptEngineService {
                     }
                 });
 
-                cleanToolsDirectory(workingDirectory);
+                cleanToolsDirectory(terraformWorkingDir);
             } catch (IOException e) {
                 log.error(e.getMessage());
             }
@@ -99,14 +99,14 @@ public class ScriptEngineService {
         output.accept(colorize("\n\n", colorMessage));
     }
 
-    private void createToolsDirectory(File workingDirectory) throws IOException {
-        FileUtils.deleteDirectory(getToolsRepository(workingDirectory));
-        FileUtils.forceMkdir(getToolsRepository(workingDirectory));
+    private void createToolsDirectory(File terraformWorkingDir) throws IOException {
+        FileUtils.deleteDirectory(getToolsRepository(terraformWorkingDir));
+        FileUtils.forceMkdir(getToolsRepository(terraformWorkingDir));
 
         try {
             Git.cloneRepository()
-                    .setURI(toolsRepository)
-                    .setDirectory(getToolsRepository(workingDirectory))
+                    .setURI(this.toolsRepository)
+                    .setDirectory(getToolsRepository(terraformWorkingDir))
                     .setBranch(this.toolsBranch)
                     .call();
         } catch (GitAPIException e) {
@@ -115,11 +115,11 @@ public class ScriptEngineService {
     }
 
     @NotNull
-    private File getToolsRepository(File workingDirectory) {
-        return new File(workingDirectory.getAbsolutePath() + TOOLS_REPOSITORY);
+    private File getToolsRepository(File terraformWorkingDir) {
+        return new File(terraformWorkingDir.getAbsolutePath() + TOOLS_REPOSITORY);
     }
 
-    private void cleanToolsDirectory(File workingDirectory) throws IOException {
-        FileUtils.deleteDirectory(getToolsRepository(workingDirectory));
+    private void cleanToolsDirectory(File terraformWorkingDir) throws IOException {
+        FileUtils.deleteDirectory(getToolsRepository(terraformWorkingDir));
     }
 }

@@ -57,6 +57,19 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         }
     }
 
+    private File getTerraformWorkingDir(TerraformJob terraformJob, File workingDirectory) throws IOException {
+        File terraformWorkingDir = workingDirectory;
+        try {
+            if (!terraformJob.getBranch().equals("remote-content")) {
+                terraformWorkingDir = new File(workingDirectory.getCanonicalPath() + terraformJob.getFolder());
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        log.info("Terraform Working Directory: {}", terraformWorkingDir.getCanonicalPath());
+        return terraformWorkingDir;
+    }
+
     @Override
     public ExecutorJobResult plan(TerraformJob terraformJob, File workingDirectory, boolean isDestroy) {
         setupConsumerGroups(terraformJob.getJobId());
@@ -65,6 +78,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         TextStringBuilder jobOutput = new TextStringBuilder();
         TextStringBuilder jobErrorOutput = new TextStringBuilder();
         try {
+            File terraformWorkingDir = getTerraformWorkingDir(terraformJob, workingDirectory);
             boolean executionPlan = false;
             boolean scriptBeforeSuccessPlan;
             boolean scriptAfterSuccessPlan;
@@ -87,11 +101,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             executeTerraformInit(
                     terraformJob,
-                    workingDirectory,
+                    terraformWorkingDir,
                     planOutput,
                     planOutputError);
 
-            scriptBeforeSuccessPlan = executePrepOperationScripts(terraformJob, workingDirectory, planOutput);
+            scriptBeforeSuccessPlan = executePreOperationScripts(terraformJob, terraformWorkingDir, planOutput);
 
             showTerraformMessage("PLAN", planOutput);
 
@@ -99,26 +113,26 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 if (isDestroy) {
                     log.warn("Executor running a plan to destroy resources...");
                     executionPlan = terraformClient.planDestroy(
-                            getTerraformProcessData(terraformJob, workingDirectory),
+                            getTerraformProcessData(terraformJob, terraformWorkingDir),
                             planOutput,
                             planOutputError).get();
                 } else {
                     executionPlan = terraformClient.plan(
-                            getTerraformProcessData(terraformJob, workingDirectory),
+                            getTerraformProcessData(terraformJob, terraformWorkingDir),
                             planOutput,
                             planOutputError).get();
                 }
 
             log.warn("Terraform plan Executed Successfully: {}", executionPlan);
 
-            scriptAfterSuccessPlan = executePostOperationScripts(terraformJob, workingDirectory, planOutput, executionPlan);
+            scriptAfterSuccessPlan = executePostOperationScripts(terraformJob, terraformWorkingDir, planOutput, executionPlan);
 
 
             Thread.sleep(10000);
 
             result = generateJobResult(scriptAfterSuccessPlan, jobOutput.toString(), jobErrorOutput.toString());
             result.setPlanFile(executionPlan ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
-                    terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), workingDirectory)
+                    terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), terraformWorkingDir)
                     : "");
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
@@ -135,6 +149,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         TextStringBuilder terraformOutput = new TextStringBuilder();
         TextStringBuilder terraformErrorOutput = new TextStringBuilder();
         try {
+            File terraformWorkingDir = getTerraformWorkingDir(terraformJob, workingDirectory);
             Consumer<String> applyOutput = LogsConsumer.builder()
                     .jobId(Integer.valueOf(terraformJob.getJobId()))
                     .lineNumber(new AtomicInteger(0))
@@ -159,30 +174,30 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             executeTerraformInit(
                     terraformJob,
-                    workingDirectory,
+                    terraformWorkingDir,
                     applyOutput,
                     applyErrorOutput);
 
-            scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, applyOutput);
+            scriptBeforeSuccess = executePreOperationScripts(terraformJob, terraformWorkingDir, applyOutput);
 
             showTerraformMessage("APPLY", applyOutput);
 
             if (scriptBeforeSuccess) {
-                TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
+                TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, terraformWorkingDir);
                 terraformProcessData.setTerraformVariables((terraformState.downloadTerraformPlan(terraformJob.getOrganizationId(),
                         terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(),
-                        workingDirectory) ? new HashMap<>() : terraformParameters));
+                        terraformWorkingDir) ? new HashMap<>() : terraformParameters));
                 execution = terraformClient.apply(
                         terraformProcessData,
                         applyOutput,
                         applyErrorOutput).get();
 
-                handleTerraformStateChange(terraformJob, workingDirectory);
+                handleTerraformStateChange(terraformJob, terraformWorkingDir);
 
             }
 
             log.warn("Terraform apply Executed Successfully: {}", execution);
-            scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, applyOutput, execution);
+            scriptAfterSuccess = executePostOperationScripts(terraformJob, terraformWorkingDir, applyOutput, execution);
 
 
             Thread.sleep(10000);
@@ -201,7 +216,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         TextStringBuilder jobOutput = new TextStringBuilder();
         TextStringBuilder jobErrorOutput = new TextStringBuilder();
         try {
-
+            File terraformWorkingDir = getTerraformWorkingDir(terraformJob, workingDirectory);
             Consumer<String> outputDestroy = LogsConsumer.builder()
                     .jobId(Integer.valueOf(terraformJob.getJobId()))
                     .terraformOutput(jobOutput)
@@ -224,25 +239,25 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             executeTerraformInit(
                     terraformJob,
-                    workingDirectory,
+                    terraformWorkingDir,
                     outputDestroy,
                     errorOutputDestroy);
 
-            scriptBeforeSuccess = executePrepOperationScripts(terraformJob, workingDirectory, outputDestroy);
-            
+            scriptBeforeSuccess = executePreOperationScripts(terraformJob, terraformWorkingDir, outputDestroy);
+
             showTerraformMessage("DESTROY", outputDestroy);
 
             if (scriptBeforeSuccess) {
                 execution = terraformClient.destroy(
-                        getTerraformProcessData(terraformJob, workingDirectory),
+                        getTerraformProcessData(terraformJob, terraformWorkingDir),
                         outputDestroy,
                         errorOutputDestroy).get();
 
-                handleTerraformStateChange(terraformJob, workingDirectory);
+                handleTerraformStateChange(terraformJob, terraformWorkingDir);
             }
 
             log.warn("Terraform destroy Executed Successfully: {}", execution);
-            scriptAfterSuccess = executePostOperationScripts(terraformJob, workingDirectory, outputDestroy, execution);
+            scriptAfterSuccess = executePostOperationScripts(terraformJob, terraformWorkingDir, outputDestroy, execution);
 
             Thread.sleep(10000);
             result = generateJobResult(scriptAfterSuccess, jobOutput.toString(), jobErrorOutput.toString());
@@ -261,7 +276,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         return jobResult;
     }
 
-    private boolean executePrepOperationScripts(TerraformJob terraformJob, File workingDirectory, Consumer<String> output) {
+    private boolean executePreOperationScripts(TerraformJob terraformJob, File workingDirectory, Consumer<String> output) {
         boolean scriptBeforeSuccess;
         if (terraformJob.getCommandList() != null)
             scriptBeforeSuccess = scriptEngineService.execute(

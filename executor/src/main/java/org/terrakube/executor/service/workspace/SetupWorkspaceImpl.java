@@ -37,7 +37,7 @@ import java.util.*;
 @Service
 public class SetupWorkspaceImpl implements SetupWorkspace {
 
-    private static final String EXECUTOR_DIRECTORY = "%s/.terraform-spring-boot/executor/%s/%s/.originRepository";
+    private static final String EXECUTOR_DIRECTORY = "%s/.terraform-spring-boot/executor/%s/%s";
     public static final String SSH_DIRECTORY = "%s/.terraform-spring-boot/executor/%s/%s/.ssh/%s";
 
     WorkspaceSecurity workspaceSecurity;
@@ -56,14 +56,14 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             if (!terraformJob.getBranch().equals("remote-content")) {
                 downloadWorkspace(workspaceCloneFolder, terraformJob);
             } else {
-                downloadWorkspaceTarGz(workspaceCloneFolder.getParentFile(), terraformJob.getSource());
+                downloadWorkspaceTarGz(workspaceCloneFolder, terraformJob.getSource());
             }
             if (enableRegistrySecurity)
-                workspaceSecurity.addTerraformCredentials(workspaceCloneFolder);
+                workspaceSecurity.addTerraformCredentials();
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-        return workspaceCloneFolder != null ? workspaceCloneFolder.getParentFile() : new File("/tmp/" + UUID.randomUUID());
+        return workspaceCloneFolder != null ? workspaceCloneFolder : new File("/tmp/" + UUID.randomUUID());
     }
 
     private File setupWorkspaceDirectory(String organizationId, String workspaceId) throws IOException {
@@ -75,7 +75,6 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         FileUtils.forceMkdir(executorFolder);
         FileUtils.cleanDirectory(executorFolder);
         log.info("Workspace git clone directory: {}", executorFolder.getPath());
-        log.info("Workspace working directory: {}", executorFolder.getParentFile().getPath());
         return executorFolder;
     }
 
@@ -101,20 +100,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
             getCommitId(gitCloneFolder);
 
-            log.info("Copy files from folder {} to {}", gitCloneFolder.getPath() + terraformJob.getFolder(), gitCloneFolder.getParentFile().getPath());
-            File finalWorkspaceFolder = new File(gitCloneFolder.getPath() + terraformJob.getFolder());
-            if (finalWorkspaceFolder.exists())
-                for (File srcFile : finalWorkspaceFolder.listFiles()) {
-                    log.info("Copy {} to {}", srcFile.getName(), gitCloneFolder.getParentFile().getPath());
-                    if (srcFile.isDirectory()) {
-                        FileUtils.copyDirectoryToDirectory(srcFile, gitCloneFolder.getParentFile());
-                    } else {
-                        FileUtils.copyFileToDirectory(srcFile, gitCloneFolder.getParentFile());
-                    }
-                }
-            else {
-                log.error("Folder {} does not exists in the repository", terraformJob.getFolder());
-            }
+            log.info("Git clone: {} Branch: {} Folder {}", terraformJob.getSource(), terraformJob.getBranch(), gitCloneFolder.getPath());
 
         } catch (GitAPIException ex) {
             log.error(ex.getMessage());
@@ -150,7 +136,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                     log.debug("Creating folder: {}", f.getCanonicalPath());
                     String canonicalDestinationPath = f.getCanonicalPath();
 
-                    if( !canonicalDestinationPath.startsWith(destinationFilePath)){
+                    if (!canonicalDestinationPath.startsWith(destinationFilePath)) {
                         throw new IOException("Entry is outside of the target directory");
                     }
 
@@ -164,13 +150,13 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                     File f = new File(String.format("%s/%s", destinationFilePath, entry.getName()));
                     String canonicalDestinationPath = f.getCanonicalPath();
 
-                    if( !canonicalDestinationPath.startsWith(destinationFilePath)){
+                    if (!canonicalDestinationPath.startsWith(destinationFilePath)) {
                         throw new IOException("Entry is outside of the target directory");
                     }
                     if (!f.exists()) {
                         f.getParentFile().mkdirs();
-                        if(f.createNewFile()){
-                            log.debug("File created: {}",f.getCanonicalPath());
+                        if (f.createNewFile()) {
+                            log.debug("File created: {}", f.getCanonicalPath());
                         }
                     }
                     FileOutputStream fos = new FileOutputStream(f.getCanonicalPath(), false);
@@ -198,7 +184,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                     next();
             String latestCommitHash = latestCommit.getName();
             log.info("Commit Id: {}", latestCommitHash);
-            String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getParentFile().getPath());
+            String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getCanonicalPath());
             log.info("Writing commit id to {}", commitInfoFile);
             FileUtils.writeStringToFile(new File(commitInfoFile), latestCommitHash, Charset.defaultCharset());
 
@@ -244,7 +230,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             log.info("Creating new SSH folder for organization {} wordkspace {}", organizationId, workspaceId);
             FileUtils.forceMkdirParent(sshFile);
             FileUtils.writeStringToFile(sshFile, privateKey + "\n", Charset.defaultCharset());
-            
+
             Set<PosixFilePermission> perms = new HashSet<>();
             perms.add(PosixFilePermission.OWNER_READ);
             perms.add(PosixFilePermission.OWNER_WRITE);

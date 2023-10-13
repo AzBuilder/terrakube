@@ -4,7 +4,7 @@ import java.io.File;
 
 public interface WorkspaceSecurity {
 
-    void addTerraformCredentials(File workingDirectory);
+    void addTerraformCredentials();
 
     String generateAccessToken();
 

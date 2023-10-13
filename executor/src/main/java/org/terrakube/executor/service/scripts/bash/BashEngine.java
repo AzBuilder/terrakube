@@ -33,11 +33,11 @@ public class BashEngine implements CommandExecution {
     private final ExecutorService executor = Executors.newWorkStealingPool();
 
     @Override
-    public boolean execute(TerraformJob terraformJob, String script, File workingDirectory, Consumer<String> output) {
+    public boolean execute(TerraformJob terraformJob, String script, File terraformWorkingDir, Consumer<String> output) {
         boolean executeSuccess = true;
         File bashScript = new File(
                 FilenameUtils.separatorsToSystem(
-                        workingDirectory.getAbsolutePath().concat(USER_BASH_SCRIPT)
+                        terraformWorkingDir.getAbsolutePath().concat(USER_BASH_SCRIPT)
                 )
         );
 
@@ -45,7 +45,7 @@ public class BashEngine implements CommandExecution {
             log.info("ScriptPath: {}", bashScript.toURI().toURL());
             FileUtils.writeStringToFile(bashScript, script, Charset.defaultCharset());
 
-            ProcessLauncher processLauncher = setupBashProcess(terraformJob, workingDirectory, bashScript, output, output);
+            ProcessLauncher processLauncher = setupBashProcess(terraformJob, terraformWorkingDir, bashScript, output, output);
             Integer exitCode = processLauncher.launch().get();
             log.info("Exit code {}", exitCode);
             if(exitCode != 0) {

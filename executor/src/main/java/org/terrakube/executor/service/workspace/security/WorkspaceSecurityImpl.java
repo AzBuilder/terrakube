@@ -87,7 +87,7 @@ public class WorkspaceSecurityImpl implements WorkspaceSecurity {
     }
 
     @Override
-    public void addTerraformCredentials(File workingDirectory) {
+    public void addTerraformCredentials() {
 
         String token = generateAccessToken();
         String credentialFileContent = String.format(CREDENTIALS_CONTENT, registryDomain, token);
