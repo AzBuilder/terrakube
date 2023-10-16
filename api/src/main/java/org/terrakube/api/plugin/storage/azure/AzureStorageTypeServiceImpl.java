@@ -141,4 +141,9 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
             return "".getBytes(StandardCharsets.UTF_8);
         }
     }
+
+    @Override
+    public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
+        log.warn("Delete Module Storage not supported (Azure)");
+    }
 }

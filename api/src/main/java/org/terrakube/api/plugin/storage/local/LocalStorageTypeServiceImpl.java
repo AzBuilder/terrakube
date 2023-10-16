@@ -161,4 +161,15 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);
         }
     }
+
+    @Override
+    public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
+        try {
+            String registryPath = String.format("%s/.terraform-spring-boot/local/modules/%s/%s/%s", FileUtils.getUserDirectoryPath(), organizationName, moduleName, providerName);
+            log.warn("Delete module folder: {}", registryPath);
+            FileUtils.cleanDirectory(new File(registryPath));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
