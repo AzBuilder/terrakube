@@ -1,9 +1,7 @@
 package org.terrakube.api.plugin.storage.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 @Builder
@@ -165,5 +164,24 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             data = "".getBytes(Charset.defaultCharset());
         }
         return data;
+    }
+
+    @Override
+    public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
+        String registryPath = String.format("registry/%s/%s/%s/", organizationName, moduleName, providerName);
+        deleteDirectory(registryPath);
+    }
+
+    private void deleteDirectory(String prefix) {
+        ObjectListing objectList = s3client.listObjects(bucketName, prefix);
+        List<S3ObjectSummary> objectSummeryList = objectList.getObjectSummaries();
+        String[] keysList = new String[objectSummeryList.size()];
+        int count = 0;
+        for (S3ObjectSummary summary : objectSummeryList) {
+            keysList[count++] = summary.getKey();
+            log.warn("File {} will be deleted.",summary.getKey());
+        }
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName).withKeys(keysList);
+        s3client.deleteObjects(deleteObjectsRequest);
     }
 }

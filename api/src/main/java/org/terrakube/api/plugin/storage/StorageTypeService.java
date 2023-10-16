@@ -23,4 +23,6 @@ public interface StorageTypeService {
     void createContentFile(String contentId, InputStream inputStream);
 
     byte[] getContentFile(String contentId);
+
+    void deleteModuleStorage(String organizationName, String moduleName, String providerName);
 }

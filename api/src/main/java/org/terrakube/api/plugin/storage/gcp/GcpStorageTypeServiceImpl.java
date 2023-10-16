@@ -194,4 +194,9 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
         else
             return "".getBytes(Charset.defaultCharset());
     }
+
+    @Override
+    public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
+        log.warn("Delete Module Storage not supported (Gcp)");
+    }
 }
