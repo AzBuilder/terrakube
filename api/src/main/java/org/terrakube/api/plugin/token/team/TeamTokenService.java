@@ -53,6 +53,8 @@ public class TeamTokenService {
 
         Date expiration = Date.from(Instant.now().plus(days, ChronoUnit.DAYS).plus(hours, ChronoUnit.HOURS).plus(minutes, ChronoUnit.MINUTES));
 
+        log.info("Team token will expire: {}", expiration);
+
         String jws = Jwts.builder()
                 .setIssuer(ISSUER)
                 .setSubject(String.format("%s (Team Token)", groupName))
