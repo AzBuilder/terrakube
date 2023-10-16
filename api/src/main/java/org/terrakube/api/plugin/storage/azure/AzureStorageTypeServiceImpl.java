@@ -4,6 +4,8 @@ import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.models.BlobListDetails;
+import com.azure.storage.blob.models.ListBlobsOptions;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     private static final String CONTAINER_NAME_STATE = "tfstate";
     private static final String CONTAINER_NAME_OUTPUT = "tfoutput";
+    private static final String CONTAINER_NAME_REGISTRY = "registry";
 
     private static final String CONTAINER_TERRAFORM_CONTENT = "content";
     private static final String CONTEXT_FILE = "context/%s/context.json";
@@ -144,6 +147,14 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
-        log.warn("Delete Module Storage not supported (Azure)");
+        log.info("Deleting all blobs at {} in container {}", CONTAINER_NAME_REGISTRY);
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_REGISTRY);
+        ListBlobsOptions options = new ListBlobsOptions().setPrefix(String.format("%s/%s/%s", organizationName, moduleName, providerName))
+                .setDetails(new BlobListDetails().setRetrieveDeletedBlobs(false).setRetrieveSnapshots(false));
+        containerClient.listBlobs(options, null).iterator()
+                .forEachRemaining(item -> {
+                    log.warn("Deleting file: {}", item.getName());
+                    containerClient.getBlobClient(item.getName()).delete();
+                });
     }
 }
