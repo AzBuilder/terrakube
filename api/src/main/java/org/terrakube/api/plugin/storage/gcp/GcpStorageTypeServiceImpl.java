@@ -1,9 +1,7 @@
 package org.terrakube.api.plugin.storage.gcp;
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.*;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -197,6 +195,27 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
-        log.warn("Delete Module Storage not supported (Gcp)");
+        Page<Blob> blobs =
+                storage.list(
+                        bucketName,
+                        Storage.BlobListOption.currentDirectory(),
+                        Storage.BlobListOption.prefix(String.format("registry/%s/%s/%s/", organizationName, moduleName, providerName))
+                );
+
+        Iterable<Blob> blobIterator = blobs.iterateAll();
+        for (Blob b : blobIterator) {
+            Page<Blob> blobsVersion =
+                    storage.list(
+                            bucketName,
+                            Storage.BlobListOption.currentDirectory(),
+                            Storage.BlobListOption.prefix(b.getName())
+                    );
+            for (Blob bVersion : blobsVersion.iterateAll()) {
+                log.info("Deleting object: {}", bVersion.getName());
+                storage.delete(bVersion.getBlobId());
+            }
+            
+        }
+
     }
 }
