@@ -31,17 +31,17 @@ public class TeamTokenService {
     private TeamTokenRepository teamTokenRepository;
     private static final String ISSUER = "Terrakube";
 
-    public String createTeamToken(String group, int days, String description, JwtAuthenticationToken principalJwt) {
+    public String createTeamToken(String group, int days, int hours, int minutes, String description, JwtAuthenticationToken principalJwt) {
         List<String> currentGroups = getCurrentGroups(principalJwt);
 
         if (currentGroups.indexOf(group) > -1) {
-            return createToken(days, description, group, (String) principalJwt.getTokenAttributes().get("email"));
+            return createToken(days, hours, minutes, description, group, (String) principalJwt.getTokenAttributes().get("email"));
         }
 
         return "";
     }
 
-    public String createToken(int days, String description, String groupName, String ownerEmail) {
+    public String createToken(int days, int hours, int minutes, String description, String groupName, String ownerEmail) {
 
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.base64Key));
         UUID keyId = UUID.randomUUID();
@@ -50,6 +50,8 @@ public class TeamTokenService {
 
         JSONArray groupArray = new JSONArray();
         groupArray.add(groupName);
+
+        Date expiration = Date.from(Instant.now().plus(days, ChronoUnit.DAYS).plus(hours, ChronoUnit.HOURS).plus(minutes, ChronoUnit.MINUTES));
 
         String jws = Jwts.builder()
                 .setIssuer(ISSUER)
@@ -62,7 +64,7 @@ public class TeamTokenService {
                 .claim("name", String.format("%s (Token)", groupName))
                 .claim("groups", groupArray)
                 .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
+                .setExpiration(expiration)
                 .signWith(key)
                 .compact();
 
