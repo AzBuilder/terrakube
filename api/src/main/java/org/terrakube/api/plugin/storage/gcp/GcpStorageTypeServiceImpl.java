@@ -37,31 +37,49 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     @Override
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
         log.info("getStepOutput {}", String.format(GCP_LOCATION_OUTPUT, organizationId, jobId, stepId));
-        return storage.get(
-                        BlobId.of(
-                                bucketName,
-                                String.format(GCP_LOCATION_OUTPUT, organizationId, jobId, stepId)))
-                .getContent();
+        byte[] response = new byte[0];
+        try {
+            response = storage.get(
+                            BlobId.of(
+                                    bucketName,
+                                    String.format(GCP_LOCATION_OUTPUT, organizationId, jobId, stepId)))
+                    .getContent();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return response;
     }
 
     @Override
     public byte[] getTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId) {
         log.info("getTerraformPlan {}", String.format(GCP_STATE_LOCATION, organizationId, workspaceId, jobId, stepId));
-        return storage.get(
-                        BlobId.of(
-                                bucketName,
-                                String.format(GCP_STATE_LOCATION, organizationId, workspaceId, jobId, stepId)))
-                .getContent();
+        byte[] response = new byte[0];
+        try {
+            response = storage.get(
+                            BlobId.of(
+                                    bucketName,
+                                    String.format(GCP_STATE_LOCATION, organizationId, workspaceId, jobId, stepId)))
+                    .getContent();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return response;
     }
 
     @Override
     public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
         log.info("getTerraformStateJson {}", String.format(GCP_STATE_JSON, organizationId, workspaceId, stateFileName));
-        return storage.get(
-                        BlobId.of(
-                                bucketName,
-                                String.format(GCP_STATE_JSON, organizationId, workspaceId, stateFileName)))
-                .getContent();
+        byte[] response = new byte[0];
+        try {
+            response = storage.get(
+                            BlobId.of(
+                                    bucketName,
+                                    String.format(GCP_STATE_JSON, organizationId, workspaceId, stateFileName)))
+                    .getContent();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return response;
     }
 
     @Override
@@ -86,11 +104,17 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     @Override
     public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
         log.info("getTerraformStateJson {}", String.format(GCP_CURRENT_STATE, organizationId, workspaceId));
-        return storage.get(
+        byte[] response = new byte[0];
+        try {
+            response =  storage.get(
                         BlobId.of(
                                 bucketName,
                                 String.format(GCP_CURRENT_STATE, organizationId, workspaceId)))
                 .getContent();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return response;
     }
 
     @Override
