@@ -190,9 +190,13 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     @Override
     public void deleteWorkspaceStateData(String organizationId, String workspaceId) {
         try {
-            String registryPath = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
-            log.warn("Delete workspace state folder: {}", registryPath);
-            FileUtils.cleanDirectory(new File(registryPath));
+            String statePath = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+            log.warn("Delete workspace state folder: {}", statePath);
+            FileUtils.cleanDirectory(new File(statePath));
+
+            statePath = String.format("%s/.terraform-spring-boot/local/backend/%s/%s/", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+            log.warn("Delete workspace state folder: {}", statePath);
+            FileUtils.cleanDirectory(new File(statePath));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

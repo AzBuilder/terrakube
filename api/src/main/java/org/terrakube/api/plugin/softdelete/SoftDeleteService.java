@@ -6,6 +6,7 @@ import org.quartz.*;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.scheduler.module.DeleteStorageCacheJob;
+import org.terrakube.api.plugin.scheduler.workspace.DeleteStorageBackendJob;
 import org.terrakube.api.repository.ScheduleRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.Organization;
@@ -61,7 +62,7 @@ public class SoftDeleteService {
             jobDataMap.put("workspaceId", workspaceId);
             jobDataMap.put("jobList", jobIdList);
 
-            JobDetail jobDetail = JobBuilder.newJob().ofType(DeleteStorageCacheJob.class)
+            JobDetail jobDetail = JobBuilder.newJob().ofType(DeleteStorageBackendJob.class)
                     .storeDurably()
                     .setJobData(jobDataMap)
                     .withIdentity(PREFIX_JOB_MODULE_DELETE_STORAGE + "_" + UUID.randomUUID())
