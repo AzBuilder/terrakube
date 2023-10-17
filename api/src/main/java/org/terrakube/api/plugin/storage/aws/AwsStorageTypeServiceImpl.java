@@ -43,7 +43,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_LOCATION_OUTPUT, organizationId, jobId, stepId));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
@@ -58,7 +58,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_STATE_LOCATION, organizationId, workspaceId, jobId, stepId));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
@@ -73,7 +73,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_STATE_JSON, organizationId, workspaceId, stateFileName));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
@@ -95,7 +95,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
             S3Object s3object = s3client.getObject(bucketName, String.format("tfstate/%s/%s/terraform.tfstate", organizationId, workspaceId));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }

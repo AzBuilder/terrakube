@@ -170,7 +170,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             log.warn("Delete module folder: {}", registryPath);
             FileUtils.cleanDirectory(new File(registryPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
     }
 
@@ -183,7 +183,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
                 FileUtils.cleanDirectory(new File(workspaceOutputFolder));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
     }
 
@@ -198,7 +198,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             log.warn("Delete workspace state folder: {}", statePath);
             FileUtils.cleanDirectory(new File(statePath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
     }
 }
