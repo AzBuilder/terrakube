@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -169,7 +170,35 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             log.warn("Delete module folder: {}", registryPath);
             FileUtils.cleanDirectory(new File(registryPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteWorkspaceOutputData(String organizationId, List<Integer> jobList) {
+        try {
+            for (Integer jobId : jobList) {
+                String workspaceOutputFolder = String.format("%s/.terraform-spring-boot/local/output/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, jobId);
+                log.warn("Delete workspace output folder: {}", workspaceOutputFolder);
+                FileUtils.cleanDirectory(new File(workspaceOutputFolder));
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteWorkspaceStateData(String organizationId, String workspaceId) {
+        try {
+            String statePath = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+            log.warn("Delete workspace state folder: {}", statePath);
+            FileUtils.cleanDirectory(new File(statePath));
+
+            statePath = String.format("%s/.terraform-spring-boot/local/backend/%s/%s/", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+            log.warn("Delete workspace state folder: {}", statePath);
+            FileUtils.cleanDirectory(new File(statePath));
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
     }
 }

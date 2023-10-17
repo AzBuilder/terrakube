@@ -1,6 +1,7 @@
 package org.terrakube.api.plugin.storage;
 
 import java.io.InputStream;
+import java.util.List;
 
 public interface StorageTypeService {
 
@@ -25,4 +26,8 @@ public interface StorageTypeService {
     byte[] getContentFile(String contentId);
 
     void deleteModuleStorage(String organizationName, String moduleName, String providerName);
+
+    void deleteWorkspaceOutputData(String organizationId, List<Integer> jobList);
+
+    void deleteWorkspaceStateData(String organizationId, String workspaceId);
 }
