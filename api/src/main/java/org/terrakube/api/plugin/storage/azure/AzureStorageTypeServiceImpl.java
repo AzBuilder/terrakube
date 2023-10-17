@@ -36,21 +36,40 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_OUTPUT);
         log.info("Searching: /tfoutput/{}/{}/{}.tfoutput", organizationId, jobId, stepId);
-        return containerClient.getBlobClient(String.format("%s/%s/%s.tfoutput", organizationId, jobId, stepId)).downloadContent().toBytes();
+        byte[] response = new byte[0];
+        try {
+            response = containerClient.getBlobClient(String.format("%s/%s/%s.tfoutput", organizationId, jobId, stepId)).downloadContent().toBytes();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return response;
     }
 
     @Override
     public byte[] getTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
         log.info("Searching: /tfstate/{}/{}/{}/{}/terraformLibrary.tfPlan", organizationId, workspaceId, jobId, stepId);
-        return containerClient.getBlobClient(String.format("%s/%s/%s/%s/terraformLibrary.tfPlan", organizationId, workspaceId, jobId, stepId)).downloadContent().toBytes();
+        byte[] response = new byte[0];
+        try {
+            response = containerClient.getBlobClient(String.format("%s/%s/%s/%s/terraformLibrary.tfPlan", organizationId, workspaceId, jobId, stepId)).downloadContent().toBytes();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        return response;
     }
 
     @Override
     public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
         log.info("Searching: /tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
-        return containerClient.getBlobClient(String.format("%s/%s/state/%s.json", organizationId, workspaceId, stateFileName)).downloadContent().toBytes();
+        byte[] response = new byte[0];
+        try {
+            response = containerClient.getBlobClient(String.format("%s/%s/state/%s.json", organizationId, workspaceId, stateFileName)).downloadContent().toBytes();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return response;
     }
 
     @Override
@@ -69,7 +88,13 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
     public byte[] getCurrentTerraformState(String organizationId, String workspaceId) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_STATE);
         log.info("Searching: /{}/{}/terraform.tfstate", organizationId, workspaceId);
-        return containerClient.getBlobClient(String.format("%s/%s/terraform.tfstate", organizationId, workspaceId)).downloadContent().toBytes();
+        byte[] response = new byte[0];
+        try {
+            response = containerClient.getBlobClient(String.format("%s/%s/terraform.tfstate", organizationId, workspaceId)).downloadContent().toBytes();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return response;
     }
 
     @Override
@@ -154,9 +179,9 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public void deleteWorkspaceOutputData(String organizationId, List<Integer> jobList) {
-        for(Integer jobId: jobList){
+        for (Integer jobId : jobList) {
             String workspaceOutputFolder = String.format("%s/%s", organizationId, jobId);
-            deleteFolderFromContainer(CONTAINER_NAME_OUTPUT,workspaceOutputFolder);
+            deleteFolderFromContainer(CONTAINER_NAME_OUTPUT, workspaceOutputFolder);
         }
     }
 
@@ -166,7 +191,7 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
         deleteFolderFromContainer(CONTAINER_NAME_STATE, moduleFolderPath);
     }
 
-    private void deleteFolderFromContainer(String containerName, String folderPath){
+    private void deleteFolderFromContainer(String containerName, String folderPath) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(folderPath)
                 .setDetails(new BlobListDetails().setRetrieveDeletedBlobs(false).setRetrieveSnapshots(false));
