@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 @Builder
@@ -195,27 +196,41 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
+        String modulePath = String.format("registry/%s/%s/%s/", organizationName, moduleName, providerName);
+        deleteFolderFromBucket(modulePath);
+
+    }
+
+    @Override
+    public void deleteWorkspaceOutputData(String organizationId, List<Integer> jobList) {
+        for (Integer jobId : jobList) {
+            String outputPath = String.format("tfoutput/%s/%s/", organizationId, jobId);
+            deleteFolderFromBucket(outputPath);
+        }
+    }
+
+    @Override
+    public void deleteWorkspaceStateData(String organizationId, String workspaceId) {
+        String outputPath = String.format("tfstate/%s/%s/", organizationId, workspaceId);
+        deleteFolderFromBucket(outputPath);
+    }
+
+    private void deleteFolderFromBucket(String folderPath) {
         Page<Blob> blobs =
                 storage.list(
                         bucketName,
                         Storage.BlobListOption.currentDirectory(),
-                        Storage.BlobListOption.prefix(String.format("registry/%s/%s/%s/", organizationName, moduleName, providerName))
+                        Storage.BlobListOption.prefix(folderPath)
                 );
 
-        Iterable<Blob> blobIterator = blobs.iterateAll();
-        for (Blob b : blobIterator) {
-            Page<Blob> blobsVersion =
-                    storage.list(
-                            bucketName,
-                            Storage.BlobListOption.currentDirectory(),
-                            Storage.BlobListOption.prefix(b.getName())
-                    );
-            for (Blob bVersion : blobsVersion.iterateAll()) {
-                log.info("Deleting object: {}", bVersion.getName());
-                storage.delete(bVersion.getBlobId());
+        for (Blob blob : blobs.iterateAll()) {
+            if (blob.getName().endsWith("/")) {
+                deleteFolderFromBucket(blob.getName());
+            } else {
+                log.info("Deleting object: {}", blob.getName());
+                storage.delete(blob.getBlobId());
             }
-            
-        }
 
+        }
     }
 }

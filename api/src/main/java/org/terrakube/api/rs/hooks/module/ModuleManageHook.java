@@ -48,7 +48,7 @@ public class ModuleManageHook implements LifeCycleHook<Module> {
                             .startNow()
                             .build();
 
-                    log.info("Create Schedule Module Refresh: {}", jobDetail.getKey());
+                    log.info("Create Schedule to delete module cache form storage: {}", jobDetail.getKey());
                     scheduler.scheduleJob(jobDetail, trigger);
                 } catch (SchedulerException e) {
                     log.error(e.getMessage());

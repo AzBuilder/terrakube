@@ -17,7 +17,7 @@ public class DeleteStorageCacheJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.info("Deleting module storage backened data....");
+        log.info("Deleting module storage backend data....");
         storageTypeService.deleteModuleStorage(
                 jobExecutionContext.getJobDetail().getJobDataMap().getString("moduleOrganization"),
                 jobExecutionContext.getJobDetail().getJobDataMap().getString("moduleName"),

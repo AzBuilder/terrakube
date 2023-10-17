@@ -169,10 +169,24 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
     @Override
     public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
         String registryPath = String.format("registry/%s/%s/%s/", organizationName, moduleName, providerName);
-        deleteDirectory(registryPath);
+        deleteFolderFromBucket(registryPath);
     }
 
-    private void deleteDirectory(String prefix) {
+    @Override
+    public void deleteWorkspaceOutputData(String organizationId, List<Integer> jobList) {
+        for (Integer jobId: jobList){
+            String workspaceOutputFolder = String.format("tfoutput/%s/%s/", organizationId, jobId);
+            deleteFolderFromBucket(workspaceOutputFolder);
+        }
+    }
+
+    @Override
+    public void deleteWorkspaceStateData(String organizationId, String workspaceId) {
+        String workspaceStateFolder = String.format("tfstate/%s/%s/", organizationId, workspaceId);
+        deleteFolderFromBucket(workspaceStateFolder);
+    }
+
+    private void deleteFolderFromBucket(String prefix) {
         ObjectListing objectList = s3client.listObjects(bucketName, prefix);
         List<S3ObjectSummary> objectSummeryList = objectList.getObjectSummaries();
         String[] keysList = new String[objectSummeryList.size()];

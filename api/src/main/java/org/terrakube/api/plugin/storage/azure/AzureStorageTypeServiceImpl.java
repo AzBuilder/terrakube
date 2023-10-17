@@ -14,6 +14,7 @@ import org.terrakube.api.plugin.storage.StorageTypeService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 @Builder
@@ -147,9 +148,27 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public void deleteModuleStorage(String organizationName, String moduleName, String providerName) {
-        log.info("Deleting all blobs at {} in container {}", CONTAINER_NAME_REGISTRY);
-        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME_REGISTRY);
-        ListBlobsOptions options = new ListBlobsOptions().setPrefix(String.format("%s/%s/%s", organizationName, moduleName, providerName))
+        String moduleFolderPath = String.format("%s/%s/%s", organizationName, moduleName, providerName);
+        deleteFolderFromContainer(CONTAINER_NAME_REGISTRY, moduleFolderPath);
+    }
+
+    @Override
+    public void deleteWorkspaceOutputData(String organizationId, List<Integer> jobList) {
+        for(Integer jobId: jobList){
+            String workspaceOutputFolder = String.format("%s/%s", organizationId, jobId);
+            deleteFolderFromContainer(CONTAINER_NAME_OUTPUT,workspaceOutputFolder);
+        }
+    }
+
+    @Override
+    public void deleteWorkspaceStateData(String organizationId, String workspaceId) {
+        String moduleFolderPath = String.format("%s/%s", organizationId, workspaceId);
+        deleteFolderFromContainer(CONTAINER_NAME_STATE, moduleFolderPath);
+    }
+
+    private void deleteFolderFromContainer(String containerName, String folderPath){
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
+        ListBlobsOptions options = new ListBlobsOptions().setPrefix(folderPath)
                 .setDetails(new BlobListDetails().setRetrieveDeletedBlobs(false).setRetrieveSnapshots(false));
         containerClient.listBlobs(options, null).iterator()
                 .forEachRemaining(item -> {
