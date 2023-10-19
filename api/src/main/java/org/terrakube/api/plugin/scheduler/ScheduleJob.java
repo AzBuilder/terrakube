@@ -143,11 +143,12 @@ public class ScheduleJob implements org.quartz.Job {
                     log.warn("Update workspace deleted to true");
                     Workspace workspace = job.getWorkspace();
                     workspace.setDeleted(true);
+                    workspace.setName("DELETED_" + UUID.randomUUID());
                     workspaceRepository.save(workspace);
                     break;
                 case scheduleTemplates:
                     log.info("Creating new schedules for this workspace");
-                    if(setupScheduler(job, flow.get())){
+                    if (setupScheduler(job, flow.get())) {
                         log.info("Schedule completed successfully");
 
                         Step step = stepRepository.getReferenceById(UUID.fromString(stepId));
