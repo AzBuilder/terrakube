@@ -149,6 +149,8 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     const body = {
       description: values.description,
       days: values.days,
+      minutes: values.minutes,
+      hours: values.hours,
       group: teamName,
     };
     console.log(body);
@@ -322,15 +324,15 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
             workspaces through the API.
           </div>
           <Tooltip title="A team token can only be generated if you are member of this team.">
-          <Button
-            type="primary"
-            disabled={createTokenDisabled}
-            onClick={onNewToken}
-            htmlType="button"
-            to
-          >
-            Create a Team Token
-          </Button>
+            <Button
+              type="primary"
+              disabled={createTokenDisabled}
+              onClick={onNewToken}
+              htmlType="button"
+              to
+            >
+              Create a Team Token
+            </Button>
           </Tooltip>
           <h4 style={{ marginTop: "30px" }}>Team API Tokens List</h4>
           {loadingTokens ? (
@@ -356,7 +358,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                         by user <b>{item.createdBy}</b> and expires{" "}
                         <b>
                           {DateTime.fromISO(item.createdDate)
-                            .plus({ days: item.days })
+                            .plus({ days: item.days, hours: item.hours, minutes: item.minutes })
                             .toLocaleString(DateTime.DATETIME_MED)}
                         </b>
                       </span>
@@ -388,7 +390,12 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
             }}
           >
             <Space style={{ width: "100%" }} direction="vertical">
-              <Form name="tokens" form={formToken} layout="vertical">
+              <Form
+                name="tokens"
+                initialValues={{ minutes: 0, hours: 0, days:0 }}
+                form={formToken}
+                layout="vertical"
+              >
                 <Form.Item
                   name="description"
                   tooltip={{
@@ -410,7 +417,29 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                   label="Days"
                   rules={[{ required: true }]}
                 >
-                  <InputNumber min={1} />
+                  <InputNumber min={0} />
+                </Form.Item>
+                <Form.Item
+                  name="hours"
+                  tooltip={{
+                    title: "Number of hours for the token to be valid",
+                    icon: <InfoCircleOutlined />,
+                  }}
+                  label="Hours"
+                  rules={[{ required: true }]}
+                >
+                  <InputNumber min={0} />
+                </Form.Item>
+                <Form.Item
+                  name="minutes"
+                  tooltip={{
+                    title: "Number of minutes for the token to be valid",
+                    icon: <InfoCircleOutlined />,
+                  }}
+                  label="Minutes"
+                  rules={[{ required: true }]}
+                >
+                  <InputNumber min={0} />
                 </Form.Item>
               </Form>
             </Space>
@@ -418,7 +447,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           <Modal
             width="600px"
             visible={visibleToken}
-            title={"Create API token"}
+            title={"Create Team API token"}
             okText="Done"
             onOk={() => {
               setVisibleToken(false);

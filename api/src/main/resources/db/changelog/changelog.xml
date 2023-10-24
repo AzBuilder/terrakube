@@ -36,5 +36,6 @@
     <include file="/db/changelog/local/changelog-2.15.0-tags-constraint.xml"/>
     <include file="/db/changelog/local/changelog-2.15.0-execution-mode.xml"/>
     <include file="/db/changelog/local/changelog-2.16.0-team-token.xml"/>
+    <include file="/db/changelog/local/changelog-2.17.0-team-token-hours.xml"/>
 
 </databaseChangeLog>
