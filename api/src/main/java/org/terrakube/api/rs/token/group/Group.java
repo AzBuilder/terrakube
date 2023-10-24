@@ -23,6 +23,10 @@ public class Group extends GenericAuditFields {
     private UUID id;
 
     private int days;
+
+    private int hours;
+
+    private int minutes;
     
     @Column(name="group_name")
     private String group;

@@ -73,6 +73,8 @@ public class TeamTokenService {
         Group groupToken = new Group();
         groupToken.setId(keyId);
         groupToken.setDays(days);
+        groupToken.setHours(hours);
+        groupToken.setMinutes(minutes);
         groupToken.setGroup(groupName);
         groupToken.setDescription(description);
 
