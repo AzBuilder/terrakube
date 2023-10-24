@@ -35,7 +35,7 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
             <GeneralSettings />
           </TabPane>
           <TabPane tab="Teams" key="2">
-            <TeamSettings />
+            <TeamSettings key={key}/>
           </TabPane>
           <TabPane tab="Global Variables" key="3">
             <GlobalVariablesSettings />
