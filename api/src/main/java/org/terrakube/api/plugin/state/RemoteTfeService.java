@@ -497,6 +497,9 @@ public class RemoteTfeService {
         Map<String, Object> responseAttributes = new HashMap<>();
         responseAttributes.put("vcs-commit-sha", null);
         responseAttributes.put("vcs-commit-url", null);
+        if (terraformState != null) {
+            responseAttributes.put("status", "pending");
+        }
         responseAttributes.put("hosted-state-download-url", String
                 .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
                         hostname,
@@ -521,7 +524,8 @@ public class RemoteTfeService {
                             archiveJsonStateId));
         }
 
-        responseAttributes.put("serial", 1);
+        responseAttributes.put("serial", stateData.getData().getAttributes().get("serial"));
+        responseAttributes.put("lineage", stateData.getData().getAttributes().get("lineage"));
         response.getData().setAttributes(responseAttributes);
 
         log.info("Download State URL: {}", String
