@@ -1,6 +1,7 @@
 package org.terrakube.api.plugin.storage.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.ResponseEntity;
 import org.terrakube.api.plugin.storage.StorageTypeService;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/tfstate/v1")
 public class TerraformStateController {
 
@@ -55,6 +57,7 @@ public class TerraformStateController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<String> uploadHostedState(HttpServletRequest httpServletRequest, @PathVariable("archiveId") String archiveId) throws IOException {
+        log.info("uploadHostedState for: {}", archiveId);
         Optional<Archive> archive = archiveRepository.findById(UUID.fromString(archiveId));
         if (archive.isPresent()) {
             Archive archiveData = archive.get();
@@ -78,6 +81,7 @@ public class TerraformStateController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<String> uploadJsonHostedState(HttpServletRequest httpServletRequest, @PathVariable("archiveId") String archiveId) throws IOException {
+        log.info("uploadJsonHostedState for: {}", archiveId);
         Optional<Archive> archive = archiveRepository.findById(UUID.fromString(archiveId));
         if (archive.isPresent()) {
             Archive archiveData = archive.get();
