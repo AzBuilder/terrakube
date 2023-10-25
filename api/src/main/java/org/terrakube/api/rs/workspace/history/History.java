@@ -1,16 +1,15 @@
 package org.terrakube.api.rs.workspace.history;
 
-import com.yahoo.elide.annotation.CreatePermission;
-import com.yahoo.elide.annotation.DeletePermission;
-import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.annotation.UpdatePermission;
+import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
+import org.terrakube.api.rs.workspace.history.archive.Archive;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Include(rootLevel = false)
@@ -36,4 +35,7 @@ public class History extends GenericAuditFields {
     @ManyToOne
     private Workspace workspace;
 
+    @Exclude
+    @OneToMany(mappedBy = "history")
+    private List<Archive> archive;
 }

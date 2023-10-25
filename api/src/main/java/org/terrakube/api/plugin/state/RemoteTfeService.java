@@ -40,6 +40,7 @@ import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
+import org.terrakube.api.rs.workspace.history.archive.Archive;
 import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
 
 import java.io.InputStream;
@@ -71,6 +72,8 @@ public class RemoteTfeService {
 
     private TeamTokenService teamTokenService;
 
+    private ArchiveRepository archiveRepository;
+
     public RemoteTfeService(JobRepository jobRepository,
                             ContentRepository contentRepository,
                             OrganizationRepository organizationRepository,
@@ -84,7 +87,8 @@ public class RemoteTfeService {
                             RedisTemplate redisTemplate,
                             TagRepository tagRepository,
                             WorkspaceTagRepository workspaceTagRepository,
-                            TeamTokenService teamTokenService) {
+                            TeamTokenService teamTokenService,
+                            ArchiveRepository archiveRepository) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -99,6 +103,7 @@ public class RemoteTfeService {
         this.tagRepository = tagRepository;
         this.workspaceTagRepository = workspaceTagRepository;
         this.teamTokenService = teamTokenService;
+        this.archiveRepository = archiveRepository;
     }
 
     private boolean validateTerrakubeUser(JwtAuthenticationToken currentUser) {
@@ -428,11 +433,6 @@ public class RemoteTfeService {
         byte[] decodedBytesJson = (stateData.getData().getAttributes().get("json-state") != null) ? stateData.getData().getAttributes().get("json-state").toString().getBytes() : "{}".getBytes(StandardCharsets.UTF_8);
         String terraformStateJson = new String(Base64.getMimeDecoder().decode(decodedBytesJson));
 
-        if (terraformState != null) {
-            //upload state to backend storage
-            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
-        }
-
         //create dummy job
         Job job = new Job();
         job.setWorkspace(workspace);
@@ -457,6 +457,27 @@ public class RemoteTfeService {
         history.setJobReference(String.valueOf(job.getId()));
         history.setWorkspace(workspace);
         history = historyRepository.save(history);
+
+        UUID archiveStateId = UUID.randomUUID();
+        UUID archiveJsonStateId = UUID.randomUUID();
+        if (terraformState != null) {
+            //upload state to backend storage
+            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
+        } else {
+            log.warn("State field is empty, workspace state should be uploaded, creating new archive " +
+                    "...");
+            Archive archiveState = new Archive();
+            archiveState.setId(archiveStateId);
+            archiveState.setHistory(history);
+
+            archiveRepository.save(archiveState);
+
+            Archive archiveJsonState = new Archive();
+            archiveJsonState.setId(archiveJsonStateId);
+            archiveJsonState.setHistory(history);
+
+            archiveRepository.save(archiveJsonState);
+        }
 
         history.setOutput(String
                 .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
@@ -488,23 +509,20 @@ public class RemoteTfeService {
                         workspace.getId().toString(),
                         history.getId().toString()));
 
-        // Terraform 1.6.X fields
-        responseAttributes.put("hosted-state-upload-url", String
-                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
-                        hostname,
-                        workspace.getOrganization().getId().toString(),
-                        workspace.getId().toString()));
-        responseAttributes.put("hosted-json-state-upload-url", String
-                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
-                        hostname,
-                        workspace.getOrganization().getId().toString(),
-                        workspace.getId().toString(),
-                        history.getId().toString()));
+        if (terraformState != null) {
+            // Terraform 1.6.X fields when state field in request is null
+            responseAttributes.put("hosted-state-upload-url", String
+                    .format("https://%s/tfstate/v1/archive/%s/terraform.tfstate",
+                            hostname,
+                            archiveStateId));
+            responseAttributes.put("hosted-json-state-upload-url", String
+                    .format("https://%s/tfstate/v1/archive/%s/terraform.json.tfstate",
+                            hostname,
+                            archiveJsonStateId));
+        }
 
         responseAttributes.put("serial", 1);
         response.getData().setAttributes(responseAttributes);
-
-
 
         log.info("Download State URL: {}", String
                 .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
