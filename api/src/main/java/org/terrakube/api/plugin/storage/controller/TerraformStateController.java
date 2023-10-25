@@ -1,9 +1,18 @@
 package org.terrakube.api.plugin.storage.controller;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.ResponseEntity;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.terrakube.api.repository.HistoryRepository;
+import org.terrakube.api.rs.workspace.history.History;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @AllArgsConstructor
 @RestController
@@ -34,5 +43,25 @@ public class TerraformStateController {
     )
     public @ResponseBody byte[] getCurrentTerraformState(@PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId) {
         return storageTypeService.getCurrentTerraformState(organizationId, workspaceId);
+    }
+
+    @PutMapping(
+            value = "/organization/{organizationId}/workspace/{workspaceId}/state/terraform.tfstate",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<String> uploadHostedState(HttpServletRequest httpServletRequest, @PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId) throws IOException {
+        String terraformState = IOUtils.toString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8.name());
+        storageTypeService.uploadState(organizationId, workspaceId, terraformState);
+        return ResponseEntity.status(201).body("");
+    }
+
+    @PutMapping(
+            value = "/organization/{organizationId}/workspace/{workspaceId}/state/{historyId}.json",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<String>  uploadJsonHostedState(HttpServletRequest httpServletRequest, @PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId, @PathVariable("historyId") String historyId) throws IOException {
+        String terraformJsonState = IOUtils.toString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8.name());
+        storageTypeService.uploadTerraformStateJson(organizationId, workspaceId, terraformJsonState, historyId);
+        return ResponseEntity.status(201).body("");
     }
 }

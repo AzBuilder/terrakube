@@ -101,18 +101,18 @@ public class RemoteTfeService {
         this.teamTokenService = teamTokenService;
     }
 
-    private boolean validateTerrakubeUser(JwtAuthenticationToken currentUser){
+    private boolean validateTerrakubeUser(JwtAuthenticationToken currentUser) {
         return currentUser.getTokenAttributes().get("iss").equals("TerrakubeInternal");
     }
 
-    private boolean validateUserIsMemberOrg(Organization organization, JwtAuthenticationToken currentUser){
-        if(validateTerrakubeUser(currentUser))
+    private boolean validateUserIsMemberOrg(Organization organization, JwtAuthenticationToken currentUser) {
+        if (validateTerrakubeUser(currentUser))
             return true;
         List<String> userGroups = teamTokenService.getCurrentGroups(currentUser);
         AtomicBoolean userIsMemberOrg = new AtomicBoolean(false);
-        organization.getTeam().forEach(orgTeam ->{
-            userGroups.forEach(userTeam->{
-                if(orgTeam.getName().equals(userTeam)){
+        organization.getTeam().forEach(orgTeam -> {
+            userGroups.forEach(userTeam -> {
+                if (orgTeam.getName().equals(userTeam)) {
                     userIsMemberOrg.set(true);
                 }
             });
@@ -120,14 +120,14 @@ public class RemoteTfeService {
         return userIsMemberOrg.get();
     }
 
-    private boolean validateUserManageWorkspace(Organization organization, JwtAuthenticationToken currentUser){
-        if(validateTerrakubeUser(currentUser))
+    private boolean validateUserManageWorkspace(Organization organization, JwtAuthenticationToken currentUser) {
+        if (validateTerrakubeUser(currentUser))
             return true;
         List<String> userGroups = teamTokenService.getCurrentGroups(currentUser);
         AtomicBoolean userWithManageWorkspace = new AtomicBoolean(false);
-        organization.getTeam().forEach(orgTeam ->{
-            userGroups.forEach(userTeam->{
-                if(orgTeam.getName().equals(userTeam) && orgTeam.isManageWorkspace()){
+        organization.getTeam().forEach(orgTeam -> {
+            userGroups.forEach(userTeam -> {
+                if (orgTeam.getName().equals(userTeam) && orgTeam.isManageWorkspace()) {
                     userWithManageWorkspace.set(true);
                 }
             });
@@ -417,15 +417,21 @@ public class RemoteTfeService {
     StateData createWorkspaceState(String workspaceId, StateData stateData) {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
 
-        byte[] decodedBytes = stateData.getData().getAttributes().get("state").toString().getBytes();
-        String terraformState = new String(Base64.getMimeDecoder().decode(decodedBytes));
+        String terraformState = null;
+
+        if (stateData.getData().getAttributes().get("state") != null) {
+            byte[] decodedBytes = stateData.getData().getAttributes().get("state").toString().getBytes();
+            terraformState = new String(Base64.getMimeDecoder().decode(decodedBytes));
+        }
 
         //According to API docs json-state is optional so if the value is not available we will upload a default "{}"
         byte[] decodedBytesJson = (stateData.getData().getAttributes().get("json-state") != null) ? stateData.getData().getAttributes().get("json-state").toString().getBytes() : "{}".getBytes(StandardCharsets.UTF_8);
         String terraformStateJson = new String(Base64.getMimeDecoder().decode(decodedBytesJson));
 
-        //upload state to backend storage
-        storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
+        if (terraformState != null) {
+            //upload state to backend storage
+            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
+        }
 
         //create dummy job
         Job job = new Job();
@@ -481,8 +487,24 @@ public class RemoteTfeService {
                         workspace.getOrganization().getId().toString(),
                         workspace.getId().toString(),
                         history.getId().toString()));
+
+        // Terraform 1.6.X fields
+        responseAttributes.put("hosted-state-upload-url", String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString()));
+        responseAttributes.put("hosted-json-state-upload-url", String
+                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
+                        hostname,
+                        workspace.getOrganization().getId().toString(),
+                        workspace.getId().toString(),
+                        history.getId().toString()));
+
         responseAttributes.put("serial", 1);
         response.getData().setAttributes(responseAttributes);
+
+
 
         log.info("Download State URL: {}", String
                 .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",

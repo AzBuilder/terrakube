@@ -154,7 +154,6 @@ public class GitTagsCache {
     }
 
     public void setVersions(String modulePath, List<String> moduleVersions) {
-        log.info("Updating module index for {}", modulePath);
         if (jedisPool != null) {
             Jedis connection = getJedisConnection();
             connection.set(modulePath, StringUtils.join(moduleVersions, "|"));

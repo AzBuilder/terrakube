@@ -26,16 +26,18 @@ public class DexWebSecurityAdapter {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret) throws Exception {
-        http.cors().and().authorizeRequests(authz -> authz
-                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .antMatchers("/actuator/**").permitAll()
-                        .antMatchers("/callback/v1/**").permitAll()
-                        .antMatchers("/.well-known/terraform.json").permitAll()
-                        .antMatchers("/remote/tfe/v2/ping").permitAll()
-                        .antMatchers(HttpMethod.PUT, "/remote/tfe/v2/configuration-versions/*").permitAll()
-                        .antMatchers("/remote/tfe/v2/plans/*/logs").permitAll()
-                        .antMatchers("/remote/tfe/v2/applies/*/logs").permitAll()
-                        .anyRequest().authenticated()
+        http.cors().and().csrf().ignoringAntMatchers("/remote/tfe/v2/configuration-versions/*").and().authorizeRequests(authz -> {
+                            authz
+                                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                    .antMatchers("/actuator/**").permitAll()
+                                    .antMatchers("/callback/v1/**").permitAll()
+                                    .antMatchers("/.well-known/terraform.json").permitAll()
+                                    .antMatchers("/remote/tfe/v2/ping").permitAll()
+                                    .antMatchers(HttpMethod.PUT, "/remote/tfe/v2/configuration-versions/*").permitAll()
+                                    .antMatchers("/remote/tfe/v2/plans/*/logs").permitAll()
+                                    .antMatchers("/remote/tfe/v2/applies/*/logs").permitAll()
+                                    .anyRequest().authenticated();
+                        }
                 )
                 .oauth2ResourceServer(oauth2 -> {
                     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver = DexAuthenticationManagerResolver
