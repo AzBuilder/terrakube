@@ -62,7 +62,6 @@ public class TerraformStateController {
         if (archive.isPresent()) {
             Archive archiveData = archive.get();
             String terraformState = IOUtils.toString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8.name());
-            log.warn("Writing: {}", terraformState);
             storageTypeService.uploadState(
                     archiveData.getHistory().getWorkspace().getOrganization().getId().toString(),
                     archiveData.getHistory().getWorkspace().getId().toString(),
@@ -73,8 +72,6 @@ public class TerraformStateController {
         } else {
             return ResponseEntity.status(403).body("");
         }
-
-
     }
 
     @PutMapping(
@@ -87,7 +84,6 @@ public class TerraformStateController {
         if (archive.isPresent()) {
             Archive archiveData = archive.get();
             String terraformJsonState = IOUtils.toString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8.name());
-            log.warn("Writing: {}", terraformJsonState);
             storageTypeService.uploadTerraformStateJson(
                     archiveData.getHistory().getWorkspace().getOrganization().getId().toString(),
                     archiveData.getHistory().getWorkspace().getId().toString(),

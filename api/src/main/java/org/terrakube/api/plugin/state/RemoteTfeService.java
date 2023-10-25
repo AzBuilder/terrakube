@@ -497,7 +497,7 @@ public class RemoteTfeService {
         Map<String, Object> responseAttributes = new HashMap<>();
         responseAttributes.put("vcs-commit-sha", null);
         responseAttributes.put("vcs-commit-url", null);
-        if (terraformState != null) {
+        if (terraformState == null) {
             responseAttributes.put("status", "pending");
         }
         responseAttributes.put("hosted-state-download-url", String
