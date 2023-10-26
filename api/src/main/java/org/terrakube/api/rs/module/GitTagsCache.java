@@ -24,7 +24,7 @@ public class GitTagsCache {
     private static JedisPool jedisPool;
 
     public GitTagsCache() {
-        log.warn("Init Module Cache...");
+        log.debug("Init Module Cache...");
 
         String hostname = System.getenv("TerrakubeRedisHostname");
         String port = System.getenv("TerrakubeRedisPort");
@@ -154,7 +154,6 @@ public class GitTagsCache {
     }
 
     public void setVersions(String modulePath, List<String> moduleVersions) {
-        log.info("Updating module index for {}", modulePath);
         if (jedisPool != null) {
             Jedis connection = getJedisConnection();
             connection.set(modulePath, StringUtils.join(moduleVersions, "|"));

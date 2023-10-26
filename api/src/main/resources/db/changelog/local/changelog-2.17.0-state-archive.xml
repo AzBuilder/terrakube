@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="23" author="alfespa17@gmail.com">
+        <createTable tableName="temp_archive">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="type" type="varchar(8)"/>
+            <column name="history_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_arch_hist" references="history(id)"/>
+            </column>
+        </createTable>
+        <addColumn tableName="history" >
+            <column name="serial" type="int" />
+        </addColumn>
+        <addColumn tableName="history" >
+            <column name="lineage" type="varchar(36)" />
+        </addColumn>
+        <addColumn tableName="history" >
+            <column name="md5" type="varchar(32)" />
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

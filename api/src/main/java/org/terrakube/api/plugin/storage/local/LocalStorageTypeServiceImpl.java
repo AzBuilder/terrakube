@@ -124,10 +124,10 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
                 return IOUtils.toByteArray(new FileInputStream(localOutputDirectory));
             } catch (IOException e) {
                 log.error(e.getMessage());
-                return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);
+                return new byte[0];
             }
         } else {
-            return NO_DATA_FOUND.getBytes(StandardCharsets.UTF_8);
+            return new byte[0];
         }
     }
 

@@ -26,6 +26,7 @@ public class CacheJob implements Job {
                 try {
                     gitTagsCache.setVersions(module.getRegistryPath(null), gitTagsCache.getVersionFromRepository(module.getSource(), module.getVcs(), module.getSsh()));
                 } catch (Exception ex) {
+                    log.error("Updating module index for {}", module.getRegistryPath(null));
                     log.error(ex.getMessage());
                 }
 
