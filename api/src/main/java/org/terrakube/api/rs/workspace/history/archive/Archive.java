@@ -17,6 +17,10 @@ public class Archive {
     @GeneratedValue
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private ArchiveType type;
+
     @ManyToOne
     private History history;
 }

@@ -24,7 +24,7 @@ public class GitTagsCache {
     private static JedisPool jedisPool;
 
     public GitTagsCache() {
-        log.warn("Init Module Cache...");
+        log.debug("Init Module Cache...");
 
         String hostname = System.getenv("TerrakubeRedisHostname");
         String port = System.getenv("TerrakubeRedisPort");

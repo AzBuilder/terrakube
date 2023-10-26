@@ -1,5 +1,6 @@
 package org.terrakube.api.plugin.state;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
@@ -144,15 +145,15 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @PostMapping(produces = "application/vnd.api+json", path = "/state-versions/{historyId}")
+    @GetMapping(produces = "application/vnd.api+json", path = "/state-versions/{historyId}")
     public ResponseEntity<StateData> getWorkspaceState(@PathVariable("historyId") String historyId) {
         log.info("Looking history id {}", historyId);
-        return ResponseEntity.of(Optional.of(null));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getWorkspaceState(historyId)));
     }
 
     @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/current-state-version")
-    public ResponseEntity<StateData> getCurrentWorkspaceState(@PathVariable("workspaceId") String workspaceId) {
+    public ResponseEntity<StateData> getCurrentWorkspaceState(@PathVariable("workspaceId") String workspaceId) throws JsonProcessingException {
         log.info("Get current workspace state {}", workspaceId);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getCurrentWorkspaceState(workspaceId)));
     }

@@ -1,5 +1,7 @@
 package org.terrakube.api.plugin.state;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.TextStringBuilder;
 import org.quartz.SchedulerException;
@@ -41,8 +43,11 @@ import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.content.Content;
 import org.terrakube.api.rs.workspace.history.History;
 import org.terrakube.api.rs.workspace.history.archive.Archive;
+import org.terrakube.api.rs.workspace.history.archive.ArchiveType;
 import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -420,6 +425,7 @@ public class RemoteTfeService {
     }
 
     StateData createWorkspaceState(String workspaceId, StateData stateData) {
+        log.info("Creating new workspace state for {}", workspaceId);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
 
         String terraformState = null;
@@ -442,7 +448,6 @@ public class RemoteTfeService {
 
         //dummy step
         Step step = new Step();
-        step.setId(UUID.randomUUID());
         step.setJob(job);
         step.setName("Dummy State Uploaded");
         step.setStatus(JobStatus.completed);
@@ -451,33 +456,13 @@ public class RemoteTfeService {
 
         //create dummy history
         History history = new History();
-        UUID historyId = UUID.randomUUID();
-        history.setId(historyId);
         history.setOutput("");
+        history.setSerial(stateData.getData().getAttributes().get("serial") != null ? stateData.getData().getAttributes().get("serial").toString(): "1");
+        history.setLineage(stateData.getData().getAttributes().get("lineage") != null ? stateData.getData().getAttributes().get("lineage").toString(): null);
         history.setJobReference(String.valueOf(job.getId()));
         history.setWorkspace(workspace);
+
         history = historyRepository.save(history);
-
-        UUID archiveStateId = UUID.randomUUID();
-        UUID archiveJsonStateId = UUID.randomUUID();
-        if (terraformState != null) {
-            //upload state to backend storage
-            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
-        } else {
-            log.warn("State field is empty, workspace state should be uploaded, creating new archive " +
-                    "...");
-            Archive archiveState = new Archive();
-            archiveState.setId(archiveStateId);
-            archiveState.setHistory(history);
-
-            archiveRepository.save(archiveState);
-
-            Archive archiveJsonState = new Archive();
-            archiveJsonState.setId(archiveJsonStateId);
-            archiveJsonState.setHistory(history);
-
-            archiveRepository.save(archiveJsonState);
-        }
 
         history.setOutput(String
                 .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
@@ -486,64 +471,102 @@ public class RemoteTfeService {
                         workspace.getId().toString(),
                         history.getId().toString()));
 
+        history = historyRepository.save(history);
+
+        if (terraformState != null) {
+            //upload state to backend storage
+            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
+        } else {
+            log.warn("State field is empty, workspace state should be uploaded, creating new archive ...");
+            Archive archiveState = new Archive();
+            archiveState.setHistory(history);
+            archiveState.setType(ArchiveType.RAW);
+            archiveRepository.save(archiveState).getId();
+
+            Archive archiveJsonState = new Archive();
+            archiveJsonState.setHistory(history);
+            archiveJsonState.setType(ArchiveType.JSON);
+            archiveRepository.save(archiveJsonState).getId();
+        }
+
         //upload json state to backend storage
         storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformStateJson, history.getId().toString());
 
-        StateData response = new StateData();
-        response.setData(new StateModel());
-        response.getData().setId(historyId.toString());
-        response.getData().setType("state-versions");
-
-        Map<String, Object> responseAttributes = new HashMap<>();
-        responseAttributes.put("vcs-commit-sha", null);
-        responseAttributes.put("vcs-commit-url", null);
-        if (terraformState == null) {
-            responseAttributes.put("status", "pending");
-        }
-        responseAttributes.put("hosted-state-download-url", String
-                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
-                        hostname,
-                        workspace.getOrganization().getId().toString(),
-                        workspace.getId().toString()));
-        responseAttributes.put("hosted-json-state-download-url", String
-                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
-                        hostname,
-                        workspace.getOrganization().getId().toString(),
-                        workspace.getId().toString(),
-                        history.getId().toString()));
-
-        if (terraformState != null) {
-            // Terraform 1.6.X fields when state field in request is null
-            responseAttributes.put("hosted-state-upload-url", String
-                    .format("https://%s/tfstate/v1/archive/%s/terraform.tfstate",
-                            hostname,
-                            archiveStateId));
-            responseAttributes.put("hosted-json-state-upload-url", String
-                    .format("https://%s/tfstate/v1/archive/%s/terraform.json.tfstate",
-                            hostname,
-                            archiveJsonStateId));
-        }
-
-        responseAttributes.put("serial", stateData.getData().getAttributes().get("serial"));
-        responseAttributes.put("lineage", stateData.getData().getAttributes().get("lineage"));
-        response.getData().setAttributes(responseAttributes);
-
-        log.info("Download State URL: {}", String
-                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
-                        hostname,
-                        workspace.getOrganization().getId().toString(),
-                        workspace.getId().toString()));
-
-        log.info("Download State JSON URL: {}", String
-                .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
-                        hostname,
-                        workspace.getOrganization().getId().toString(),
-                        workspace.getId().toString(),
-                        history.getId().toString()));
-        return response;
+        return getWorkspaceState(history.getId().toString());
     }
 
-    StateData getCurrentWorkspaceState(String workspaceId) {
+    StateData getWorkspaceState(String historyId) {
+        Optional<History> historyTmp = historyRepository.findById(UUID.fromString(historyId));
+
+        if (historyTmp.isPresent()) {
+            History history = historyTmp.get();
+            StateData response = new StateData();
+            response.setData(new StateModel());
+            response.getData().setId(historyId.toString());
+            response.getData().setType("state-versions");
+
+            Map<String, Object> responseAttributes = new HashMap<>();
+            responseAttributes.put("vcs-commit-sha", null);
+            responseAttributes.put("vcs-commit-url", null);
+
+            responseAttributes.put("hosted-state-download-url", String
+                    .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                            hostname,
+                            history.getWorkspace().getOrganization().getId().toString(),
+                            history.getWorkspace().getId()));
+            responseAttributes.put("hosted-json-state-download-url", String
+                    .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
+                            hostname,
+                            history.getWorkspace().getOrganization().getId().toString(),
+                            history.getWorkspace().getId(),
+                            history.getId().toString()));
+
+
+            Optional<Archive> archiveRawState = archiveRepository.findByHistoryAndType(history, ArchiveType.RAW);
+            Optional<Archive> archiveJsonState = archiveRepository.findByHistoryAndType(history, ArchiveType.JSON);
+
+            // if archive exist return pending otherwise return finilized
+            if (archiveRawState.isEmpty() && archiveJsonState.isEmpty()) {
+                responseAttributes.put("status", "pending");
+            } else {
+                responseAttributes.put("status", "finalized");
+            }
+
+
+            if(archiveRawState.isPresent())
+                responseAttributes.put("hosted-state-upload-url", String
+                        .format("https://%s/tfstate/v1/archive/%s/terraform.tfstate",
+                                hostname,
+                                archiveRawState.get().getId()));
+
+            if(archiveJsonState.isPresent())
+                responseAttributes.put("hosted-json-state-upload-url", String
+                        .format("https://%s/tfstate/v1/archive/%s/terraform.json.tfstate",
+                                hostname,
+                                archiveJsonState.get().getId()));
+
+            response.getData().setAttributes(responseAttributes);
+
+            log.info("Download State URL: {}", String
+                    .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/terraform.tfstate",
+                            hostname,
+                            history.getWorkspace().getOrganization().getId().toString(),
+                            history.getWorkspace().getId()));
+
+            log.info("Download State JSON URL: {}", String
+                    .format("https://%s/tfstate/v1/organization/%s/workspace/%s/state/%s.json",
+                            hostname,
+                            history.getWorkspace().getOrganization().getId().toString(),
+                            history.getWorkspace().getId(),
+                            history.getId().toString()));
+
+            log.info(response.toString());
+            return response;
+        } else
+            return null;
+    }
+
+    StateData getCurrentWorkspaceState(String workspaceId) throws JsonProcessingException {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
 
         log.info("Searching for existing terraform state for {} in the storage service", workspace.getId());
@@ -570,7 +593,12 @@ public class RemoteTfeService {
                             hostname,
                             workspace.getOrganization().getId().toString(),
                             workspace.getId().toString()));
-            responseAttributes.put("serial", 1);
+
+            String stateString = new String(currentState, StandardCharsets.UTF_8);
+            Map<String,Object> result = new ObjectMapper().readValue(stateString, HashMap.class);
+            responseAttributes.put("serial", result.get("serial").toString());
+            responseAttributes.put("terraform-version", result.get("terraform_version").toString());
+            responseAttributes.put("status", "finalized");
             currentStateData.getData().setAttributes(responseAttributes);
 
             return currentStateData;

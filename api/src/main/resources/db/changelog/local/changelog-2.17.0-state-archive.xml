@@ -9,9 +9,19 @@
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
+            <column name="type" type="varchar(8)"/>
             <column name="history_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_arch_hist" references="history(id)"/>
             </column>
         </createTable>
+        <addColumn tableName="history" >
+            <column name="serial" type="int" />
+        </addColumn>
+        <addColumn tableName="history" >
+            <column name="lineage" type="varchar(36)" />
+        </addColumn>
+        <addColumn tableName="history" >
+            <column name="md5" type="varchar(32)" />
+        </addColumn>
     </changeSet>
 </databaseChangeLog>
