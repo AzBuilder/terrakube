@@ -596,11 +596,12 @@ public class RemoteTfeService {
 
             String stateString = new String(currentState, StandardCharsets.UTF_8);
             Map<String,Object> result = new ObjectMapper().readValue(stateString, HashMap.class);
-            responseAttributes.put("serial", result.get("serial").toString());
+            responseAttributes.put("serial", Integer.valueOf(result.get("serial").toString()));
             responseAttributes.put("terraform-version", result.get("terraform_version").toString());
             responseAttributes.put("status", "finalized");
             currentStateData.getData().setAttributes(responseAttributes);
 
+            log.info(currentStateData.toString());
             return currentStateData;
         } else
             return null;
