@@ -24,6 +24,7 @@ import {
   ClockCircleOutlined,
   DownloadOutlined,
   DeleteOutlined,
+  ArrowLeftOutlined
 } from "@ant-design/icons";
 import { GitlabOutlined, GithubOutlined } from "@ant-design/icons";
 import {
@@ -113,6 +114,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
           var contentText = await entry.text();
           hclString += "\n" + contentText;
         }
+        setSubmodules(modules.sort());
       }
       //  if submodule is not empty then load the specific submodule tf files
       else {
@@ -129,8 +131,6 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         }
       }
     }
-    console.log(modules);
-    setSubmodules(modules.sort());
     const hclResult = hcl.parseToObject(hclString);
     console.log(hclResult);
     if (hclResult) {
@@ -165,6 +165,14 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     setSubmodule(e.key);
     setSubmodulePath("//modules/" + e.key);
     loadModuleDetails(module.data.attributes.registryPath, version, e.key);
+  };
+
+  const handleClickBack = () => {
+    setMarkdown("loading...");
+    setSubmodule("");
+    setSubmodulePath("");
+    loadModuleDetails(module.data.attributes.registryPath, version, "");
+    loadReadme(module.data.attributes.registryPath, version);
   };
 
   const onDelete = (id) => {
@@ -409,8 +417,26 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                   {submodule !== "" && (
                     <>
                       <div>
+                        <Button style={{paddingLeft:"0px", marginBottom:"10px"}} type="link" onClick={handleClickBack} icon={<ArrowLeftOutlined />}>Back to {moduleName}</Button>
                         <h2 className="moduleTitle">
-                          submodules/{submodule}
+                          submodules/
+                          <Dropdown
+                            overlay={
+                              <Menu onClick={onClickSubmodule}>
+                                {" "}
+                                {submodules.map(function (name, index) {
+                                  return (
+                                    <Menu.Item key={name}>{name}</Menu.Item>
+                                  );
+                                })}
+                              </Menu>
+                            }
+                            trigger={["click"]}
+                          >
+                            <a style={{ color: "black" }}>
+                              {submodule} <DownOutlined />
+                            </a>
+                          </Dropdown>
                         </h2>
                       </div>
                     </>
