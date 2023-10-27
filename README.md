@@ -21,7 +21,7 @@ If you want to develop or test Terrakube click in the following button to open a
 
 [![gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
 
-For more information about the test environment please refer to the following [file](development.md) and to learn about the API check the following [api information](https://docs.terrakube.org/api/methods)
+For more information about the test environment please refer to the following [file](development.md) and to learn about the API check the following [api information](https://docs.terrakube.io/api/methods)
 
 ### Minikube
 

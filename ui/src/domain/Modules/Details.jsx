@@ -165,6 +165,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     setSubmodule(e.key);
     setSubmodulePath("//modules/" + e.key);
     loadModuleDetails(module.data.attributes.registryPath, version, e.key);
+    if(markdown == "loading..."){
+      setMarkdown("");
+    }
   };
 
   const handleClickBack = () => {

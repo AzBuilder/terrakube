@@ -55,7 +55,7 @@ export const CreateOrganization = ({ setOrganizationName }) => {
                 visit the{" "}
                 <a
                   target="_blank"
-                  href="https://docs.terrakube.org/getting-started/security#administrator-group"
+                  href="https://docs.terrakube.io/getting-started/security#administrator-group"
                 >
                   Terrakube documentation
                 </a>

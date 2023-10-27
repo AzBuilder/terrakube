@@ -210,7 +210,7 @@ export const CreateModule = () => {
                 permission. <br /> For more information, visit the{" "}
                 <a
                   target="_blank"
-                  href="https://docs.terrakube.org/user-guide/organizations/team-management"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
                 >
                   Terrakube documentation
                 </a>
