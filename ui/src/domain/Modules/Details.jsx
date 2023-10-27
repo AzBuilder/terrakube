@@ -24,6 +24,7 @@ import {
   ClockCircleOutlined,
   DownloadOutlined,
   DeleteOutlined,
+  ArrowLeftOutlined
 } from "@ant-design/icons";
 import { GitlabOutlined, GithubOutlined } from "@ant-design/icons";
 import {
@@ -63,6 +64,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const [loadingResources, setLoadingResources] = useState("loading...");
   const [outputs, setOutputs] = useState("Outputs");
   const [resources, setResources] = useState("Resources");
+  const [submodules, setSubmodules] = useState([]);
+  const [submodule, setSubmodule] = useState("");
+  const [submodulePath, setSubmodulePath] = useState("");
   const history = useHistory();
   const renderLogo = (provider) => {
     switch (provider) {
@@ -89,16 +93,44 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     loadModuleDetails(module.data.attributes.registryPath, e.key);
   };
 
-  async function readFiles(url) {
+  async function readFiles(url, submodule = "") {
     const { entries } = await unzip(url);
     var hclString = "";
+    var modules = [];
     for (const [name, entry] of Object.entries(entries)) {
-      if (name.includes(".tf") && !name.includes("/")) {
-        var contentText = await entry.text();
-        hclString += "\n" + contentText;
+      if (submodule == "") {
+        // if submodule is empty then load the submodules dropdown list
+        if (name.includes("modules/")) {
+          var moduleName = name.split("/")[1];
+
+          if (!modules.includes(moduleName) && moduleName != "") {
+            console.log(moduleName);
+            modules.push(moduleName);
+          }
+        }
+
+        // if submodule is empty then load the root module
+        if (name.includes(".tf") && !name.includes("/")) {
+          var contentText = await entry.text();
+          hclString += "\n" + contentText;
+        }
+        setSubmodules(modules.sort());
+      }
+      //  if submodule is not empty then load the specific submodule tf files
+      else {
+        if (
+          name.includes(".tf") &&
+          name.includes("modules/" + submodule + "/")
+        ) {
+          var contentText = await entry.text();
+          hclString += "\n" + contentText;
+        }
+        if (name.includes("modules/" + submodule + "/README.md")) {
+          var readme = await entry.text();
+          setMarkdown(readme);
+        }
       }
     }
-
     const hclResult = hcl.parseToObject(hclString);
     console.log(hclResult);
     if (hclResult) {
@@ -127,6 +159,21 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       }
     }
   }
+
+  const onClickSubmodule = (e) => {
+    setMarkdown("loading...");
+    setSubmodule(e.key);
+    setSubmodulePath("//modules/" + e.key);
+    loadModuleDetails(module.data.attributes.registryPath, version, e.key);
+  };
+
+  const handleClickBack = () => {
+    setMarkdown("loading...");
+    setSubmodule("");
+    setSubmodulePath("");
+    loadModuleDetails(module.data.attributes.registryPath, version, "");
+    loadReadme(module.data.attributes.registryPath, version);
+  };
 
   const onDelete = (id) => {
     axiosInstance
@@ -182,7 +229,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       });
   }, [orgid, id]);
 
-  const loadModuleDetails = async (path, version) => {
+  const loadModuleDetails = async (path, version, submodule = "") => {
     setLoadingInputs("loading...");
     setLoadingOutputs("loading...");
     setLoadingResources("loading...");
@@ -192,7 +239,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         `${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`
       )
       .then((resp) => {
-        readFiles(resp.headers["x-terraform-get"]);
+        readFiles(resp.headers["x-terraform-get"], submodule);
       });
   };
 
@@ -249,93 +296,151 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                   direction="vertical"
                   style={{ marginTop: "10px", width: "95%" }}
                 >
-                  <Tag color="blue">
-                    <span>
-                      <MdBusiness /> Private
-                    </span>
-                  </Tag>
-                  <div>
-                    <h2 className="moduleTitle">
-                      {module.data.attributes.name}
-                    </h2>
-                    <span className="moduleDescription">
-                      {module.data.attributes.description}
-                    </span>
-                  </div>
-                  <Space
-                    className="moduleProvider"
-                    size="large"
-                    direction="horizontal"
-                  >
-                    <span>Published by {organizationName}</span>
-                    <span>
-                      Provider {renderLogo(module.data.attributes.provider)}{" "}
-                      {module.data.attributes.provider}
-                    </span>
-                  </Space>
-                  <IconContext.Provider value={{ size: "1.3em" }}>
-                    <table className="moduleDetails">
-                      <tr>
-                        <td>
-                          <RiFolderHistoryLine /> Version
-                        </td>
-                        <td>
-                          <ClockCircleOutlined /> Published
-                        </td>
-                        <td>
-                          <DownloadOutlined /> Provisions
-                        </td>
-                        <td>
-                          <BiBookBookmark /> Source
-                        </td>
-                      </tr>
-                      <tr className="black">
-                        <td>
-                          {version}{" "}
+                  {submodule === "" && (
+                    <>
+                      <Tag color="blue">
+                        <span>
+                          <MdBusiness /> Private
+                        </span>
+                      </Tag>
+                      <div>
+                        <h2 className="moduleTitle">
+                          {module.data.attributes.name}
+                        </h2>
+                        <span className="moduleDescription">
+                          {module.data.attributes.description}
+                        </span>
+                      </div>
+                      <Space
+                        className="moduleProvider"
+                        size="large"
+                        direction="horizontal"
+                      >
+                        <span>Published by {organizationName}</span>
+                        <span>
+                          Provider {renderLogo(module.data.attributes.provider)}{" "}
+                          {module.data.attributes.provider}
+                        </span>
+                      </Space>
+                      <IconContext.Provider value={{ size: "1.3em" }}>
+                        <table className="moduleDetails">
+                          <tr>
+                            <td>
+                              <RiFolderHistoryLine /> Version
+                            </td>
+                            <td>
+                              <ClockCircleOutlined /> Published
+                            </td>
+                            <td>
+                              <DownloadOutlined /> Provisions
+                            </td>
+                            <td>
+                              <BiBookBookmark /> Source
+                            </td>
+                          </tr>
+                          <tr className="black">
+                            <td>
+                              {version}{" "}
+                              <Dropdown
+                                overlay={
+                                  <Menu onClick={handleClick}>
+                                    {" "}
+                                    {module.data.attributes.versions
+                                      .sort(compareVersions)
+                                      .reverse()
+                                      .map(function (name, index) {
+                                        return (
+                                          <Menu.Item key={name}>
+                                            {name}
+                                          </Menu.Item>
+                                        );
+                                      })}
+                                  </Menu>
+                                }
+                                trigger={["click"]}
+                              >
+                                <a className="ant-dropdown-link">
+                                  Change <DownOutlined />
+                                </a>
+                              </Dropdown>
+                              ,
+                            </td>
+                            <td>
+                              {DateTime.fromISO(
+                                module.data.attributes.createdDate
+                              ).toRelative()}
+                            </td>
+                            <td>
+                              &nbsp; {module.data.attributes.downloadQuantity}
+                            </td>
+                            <td>
+                              {renderVCSLogo(vcsProvider)}{" "}
+                              <a
+                                href={fixSshURL(module.data.attributes.source)}
+                                target="_blank"
+                              >
+                                {new URL(
+                                  fixSshURL(module.data.attributes.source)
+                                )?.pathname
+                                  ?.replace(".git", "")
+                                  ?.substring(1)}
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+                      </IconContext.Provider>
+                      {submodules.length > 0 && (
+                        <Dropdown
+                          overlay={
+                            <Menu onClick={onClickSubmodule}>
+                              {" "}
+                              {submodules.map(function (name, index) {
+                                return <Menu.Item key={name}>{name}</Menu.Item>;
+                              })}
+                            </Menu>
+                          }
+                          trigger={["click"]}
+                        >
+                          <Button
+                            style={{ marginTop: "20px", fontSize: ".75rem" }}
+                          >
+                            <Space>
+                              Submodules
+                              <DownOutlined />
+                            </Space>
+                          </Button>
+                        </Dropdown>
+                      )}
+                    </>
+                  )}
+
+                  {submodule !== "" && (
+                    <>
+                      <div>
+                        <Button style={{paddingLeft:"0px", marginBottom:"10px"}} type="link" onClick={handleClickBack} icon={<ArrowLeftOutlined />}>Back to {moduleName}</Button>
+                        <h2 className="moduleTitle">
+                          submodules/
                           <Dropdown
                             overlay={
-                              <Menu onClick={handleClick}>
+                              <Menu onClick={onClickSubmodule}>
                                 {" "}
-                                {module.data.attributes.versions
-                                  .sort(compareVersions)
-                                  .reverse()
-                                  .map(function (name, index) {
-                                    return (
-                                      <Menu.Item key={name}>{name}</Menu.Item>
-                                    );
-                                  })}
+                                {submodules.map(function (name, index) {
+                                  return (
+                                    <Menu.Item key={name}>{name}</Menu.Item>
+                                  );
+                                })}
                               </Menu>
                             }
                             trigger={["click"]}
                           >
-                            <a className="ant-dropdown-link">
-                              Change <DownOutlined />
+                            <a style={{ color: "black" }}>
+                              {submodule} <DownOutlined />
                             </a>
                           </Dropdown>
-                          ,
-                        </td>
-                        <td>
-                          {DateTime.fromISO(
-                            module.data.attributes.createdDate
-                          ).toRelative()}
-                        </td>
-                        <td>
-                          &nbsp; {module.data.attributes.downloadQuantity}
-                        </td>
-                        <td>
-                          {renderVCSLogo(vcsProvider)}{" "}
-                          <a
-                            href={fixSshURL(module.data.attributes.source)}
-                            target="_blank"
-                          >
-                            {new URL(fixSshURL(module.data.attributes.source))?.pathname
-                              ?.replace(".git", "")
-                              ?.substring(1)}
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
-                  </IconContext.Provider>
+                        </h2>
+                      </div>
+                    </>
+                  )}
                   <Tabs
                     className="moduleTabs"
                     onChange={onChange}
@@ -530,7 +635,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       module "{module.data.attributes.name}" {"{"} <br />
                       &nbsp;&nbsp;source = "
                       {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}/
-                      {module.data.attributes.registryPath}" <br />
+                      {module.data.attributes.registryPath}
+                      {submodulePath}" <br />
                       &nbsp;&nbsp;version = "{version}" <br />
                       &nbsp;&nbsp;# insert required variables here <br />
                       {"}"}
@@ -544,7 +650,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       terraform.rc to access this module:
                       <pre className="moduleCredentials">
                         credentials "
-                        {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}" {"{"} <br />
+                        {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}"{" "}
+                        {"{"} <br />
                         &nbsp;&nbsp;# valid user API token:
                         <br />
                         &nbsp;&nbsp;token = "xxxxxx.yyyyyy.zzzzzzzzzzzzz"
@@ -564,11 +671,10 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   );
 };
 
-
-function fixSshURL(source){
-  if(source.startsWith("git@")){
-      return source.replace(":","/").replace("git@","https://")
+function fixSshURL(source) {
+  if (source.startsWith("git@")) {
+    return source.replace(":", "/").replace("git@", "https://");
   } else {
-      return source
+    return source;
   }
 }
