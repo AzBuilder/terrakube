@@ -40,7 +40,7 @@ export const ProfilePicture = (props) => {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://docs.terrakube.org/"
+          href="https://docs.terrakube.io/"
         >
           Help
         </a>

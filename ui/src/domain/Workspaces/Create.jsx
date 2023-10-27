@@ -238,7 +238,7 @@ export const CreateWorkspace = () => {
       }).catch(error => {
          if (error.response) {
           if(error.response.status === 403){
-          message.error(<span>You are not authorized to create workspaces. <br/> Please contact your administrator and request the <b>Manage Workspaces</b> permission. <br/> For more information, visit the <a target="_blank" href="https://docs.terrakube.org/user-guide/organizations/team-management">Terrakube documentation</a>.</span>);
+          message.error(<span>You are not authorized to create workspaces. <br/> Please contact your administrator and request the <b>Manage Workspaces</b> permission. <br/> For more information, visit the <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">Terrakube documentation</a>.</span>);
           }
         }
       });

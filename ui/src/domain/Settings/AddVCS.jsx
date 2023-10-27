@@ -59,13 +59,13 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const getDocsUrl = (vcs) => {
     switch (vcs) {
       case "GITLAB":
-        return "https://docs.terrakube.org/vcs/gitlab.com";
+        return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab.com";
       case "BITBUCKET":
-        return "https://docs.terrakube.org/vcs/bitbucket.com";
+        return "https://docs.terrakube.io/user-guide/vcs-providers/bitbucket.com";
       case "AZURE_DEVOPS":
-        return "https://docs.terrakube.org/vcs/azure-devops";
+        return "https://docs.terrakube.io/user-guide/vcs-providers/azure-devops";
       default:
-        return "https://docs.terrakube.org/vcs/github.com";
+        return "https://docs.terrakube.io/user-guide/vcs-providers/github.com";
     }
   };
 
@@ -459,7 +459,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 information, visit the{" "}
                 <a
                   target="_blank"
-                  href="https://docs.terrakube.org/user-guide/organizations/team-management"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
                 >
                   Terrakube documentation
                 </a>

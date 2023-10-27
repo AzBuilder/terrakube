@@ -140,7 +140,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
                 visit the{" "}
                 <a
                   target="_blank"
-                  href="https://docs.terrakube.org/user-guide/organizations/team-management"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
                 >
                   Terrakube documentation
                 </a>
@@ -215,7 +215,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
             <Button
               className="link"
               target="_blank"
-              href="https://docs.terrakube.org/user-guide/organizations/templates"
+              href="https://docs.terrakube.io/user-guide/organizations/templates"
               type="link"
             >
               documentation&nbsp; <HiOutlineExternalLink />.
