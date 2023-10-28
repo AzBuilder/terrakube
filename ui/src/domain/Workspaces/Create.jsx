@@ -173,6 +173,7 @@ export const CreateWorkspace = () => {
           name: values.name,
           terraformVersion: values.terraformVersion,
           branch: values.branch,
+          executionMode: "remote",
         },
       },
     };
@@ -187,6 +188,7 @@ export const CreateWorkspace = () => {
             name: values.name,
             terraformVersion: values.terraformVersion,
             branch: values.branch,
+            executionMode: "remote",
           },
           relationships: {
             vcs: {
@@ -209,6 +211,7 @@ export const CreateWorkspace = () => {
             name: values.name,
             terraformVersion: values.terraformVersion,
             branch: values.branch,
+            executionMode: "remote"
           },
           relationships: {
             ssh: {

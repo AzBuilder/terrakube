@@ -25,6 +25,7 @@ import {
   Row,
   Col,
   Divider,
+  Table
 } from "antd";
 import { compareVersions } from "./Workspaces";
 import { CreateJob } from "../Jobs/Create";
@@ -46,7 +47,13 @@ import {
   UserOutlined,
   ThunderboltOutlined,
   PlayCircleOutlined,
+  LockOutlined,
+  ProfileOutlined,
+  UnlockOutlined,
+  GitlabOutlined, GithubOutlined 
 } from "@ant-design/icons";
+import { SiTerraform,  SiBitbucket, SiAzuredevops} from "react-icons/si";
+import { IconContext } from "react-icons";
 import { FiGitCommit } from "react-icons/fi";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
@@ -57,6 +64,7 @@ const include = {
   JOB: "job",
   HISTORY: "history",
   SCHEDULE: "schedule",
+  VCS:"vcs",
 };
 const { DateTime } = require("luxon");
 
@@ -84,14 +92,59 @@ export const WorkspaceDetails = (props) => {
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
-
+  const [vcsProvider, setVCSProvider] = useState("");
+  const [resources, setResources] = useState([]);
+  const [outputs, setOutputs] = useState([]);
+  const [currentStateId,setCurrentStateId]  = useState(0);
   const terraformVersionsApi = `${
     new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
   }/terraform/index.json`;
   const handleClick = (id) => {
     changeJob(id);
   };
+  const outputColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a, b) =>a.name.localeCompare(b.name),
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+    },
+    {
+      title: 'Value',
+      dataIndex: 'value',
+      key: 'value',
+      render: (text) =>  <Paragraph style={{margin:"0px"}} copyable={{ tooltips: false }}>{text}</Paragraph>,
+    },
+  ];
 
+  const resourceColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a, b) =>a.name.localeCompare(b.name),
+    },
+    {
+      title: 'Provider',
+      dataIndex: 'provider',
+      key: 'provider',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+    },
+    {
+      title: 'Module',
+      dataIndex: 'module',
+      key: 'module',
+    },
+  ];
   const handleStatesClick = (key) => {
     switchKey(key);
   };
@@ -140,11 +193,11 @@ export const WorkspaceDetails = (props) => {
         setTemplates(template.data.data);
         axiosInstance
           .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule`
+            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs`
           )
           .then((response) => {
             setWorkspace(response.data);
-
+            console.log(response.data);
             if (response.data.included) {
               setupWorkspaceIncludes(
                 response.data.included,
@@ -154,7 +207,13 @@ export const WorkspaceDetails = (props) => {
                 setHistory,
                 setSchedule,
                 template.data.data,
-                setLastRun
+                setLastRun,
+                setVCSProvider,
+                setCurrentStateId,
+                currentStateId,
+                axiosInstance,
+                setResources,
+                setOutputs
               );
             }
             setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
@@ -163,6 +222,10 @@ export const WorkspaceDetails = (props) => {
           });
       });
   };
+
+  const handleClickSettings = () => {
+    setActiveKey("6");
+  }
 
   const onFinish = (values) => {
     setWaiting(true);
@@ -199,10 +262,36 @@ export const WorkspaceDetails = (props) => {
       });
   };
 
+  const renderVCSLogo = (vcs) => {
+    switch (vcs) {
+      case "GITLAB":
+        return <GitlabOutlined style={{ fontSize: "18px" }} />;
+      case "BITBUCKET":
+        return (
+          <IconContext.Provider value={{ size: "18px" }}>
+            <SiBitbucket />
+            &nbsp;
+          </IconContext.Provider>
+        );
+      case "AZURE_DEVOPS":
+        return (
+          <IconContext.Provider value={{ size: "18px" }}>
+            <SiAzuredevops />
+            &nbsp;
+          </IconContext.Provider>
+        );
+      default:
+        return <GithubOutlined style={{ fontSize: "18px" }} />;
+    }
+  };
+
   const onDelete = (workspace) => {
-    let randomLetters = generateRandomString(4)
-    let deletedName = `${workspace.data.attributes.name.substring(0,21)}_DEL_${randomLetters}`;
-    console.log(`New deleted name; ${deletedName}`)
+    let randomLetters = generateRandomString(4);
+    let deletedName = `${workspace.data.attributes.name.substring(
+      0,
+      21
+    )}_DEL_${randomLetters}`;
+    console.log(`New deleted name; ${deletedName}`);
     const body = {
       data: {
         type: "workspace",
@@ -250,25 +339,37 @@ export const WorkspaceDetails = (props) => {
             <div className="orgWrapper">
               <div className="variableActions">
                 <h2>{workspace.data.attributes.name}</h2>
-                <table className="moduleDetails">
-                  <tr>
-                    <td>Resources</td>
-                    <td>Terraform version</td>
-                    <td>Updated</td>
-                  </tr>
-                  <tr className="black">
-                    <td>0</td>
-                    <td>{workspace.data.attributes.terraformVersion}</td>
-                    <td>
+              </div>
+              <Space className="workspace-details" direction="vertical" >
+              <Paragraph style={{margin:"0px"}} copyable={{ text: id , tooltips: false }}>
+                  <span className="workspace-details"> ID: {id} </span> 
+                </Paragraph>
+                {workspace.data.attributes.description ==="" ?(workspace.data.attributes.description) :(
+               <a className="workspace-button" onClick={handleClickSettings} style={{color:"#3b3d45"}}>Add workspace description</a>
+               )}
+                <Space size={40} style={{marginBottom:"40px"}} direction="horizontal">
+                  <span>
+                    {workspace.data.attributes.locked?(<><LockOutlined /> Locked</>):(<><UnlockOutlined /> Unlocked</>)} 
+                  </span>
+                  <span>
+                    <ProfileOutlined /> Resources{" "}
+                    <span style={{ fontWeight: "500" }}>{resources.length}</span>
+                  </span>
+                  <IconContext.Provider value={{ size: "1.0em" }}>
+                    <SiTerraform /> Terraform{" "}
+                    <a onClick={handleClickSettings} className="workspace-button" style={{color:"#3b3d45"}}>
+                      v{workspace.data.attributes.terraformVersion}
+                    </a>
+                  </IconContext.Provider>
+                  <span>
+                    <ClockCircleOutlined /> Updated{" "}
+                    <span style={{ fontWeight: "500" }}>
                       {DateTime.fromISO(lastRun).toRelative() ??
                         "never executed"}
-                    </td>
-                  </tr>
-                </table>
-              </div>
-              <div className="App-text">
-                {workspace.data.attributes.description}
-              </div>
+                    </span>
+                  </span>
+                </Space>
+              </Space>
               <Tabs
                 activeKey={activeKey}
                 onTabClick={handleStatesClick}
@@ -392,6 +493,14 @@ export const WorkspaceDetails = (props) => {
                               )}
                             />
                           </div>
+                          <Tabs type="card" style={{marginTop:"30px"}}>
+                            <TabPane tab="Resources" key="1">
+                               <Table dataSource={resources} columns={resourceColumns} />
+                            </TabPane>
+                            <TabPane tab="Outputs" key="2">
+                            <Table  dataSource={outputs} columns={outputColumns} />
+                            </TabPane>
+                          </Tabs>
                         </div>
                       )}
                     </Col>
@@ -399,8 +508,21 @@ export const WorkspaceDetails = (props) => {
                       <Space direction="vertical">
                         <br />
                         <span className="App-text">
+                          {renderVCSLogo(vcsProvider)}{" "}
+                          <a
+                                href={fixSshURL(workspace.data.attributes.source)}
+                                target="_blank"
+                              >
+                                {new URL(
+                                  fixSshURL(workspace.data.attributes.source)
+                                )?.pathname
+                                  ?.replace(".git", "")
+                                  ?.substring(1)}
+                              </a>
+                        </span>
+                        <span className="App-text">
                           <ThunderboltOutlined /> Execution Mode:{" "}
-                          <a>{executionMode}</a>{" "}
+                          <a onClick={handleClickSettings}>{executionMode}</a>{" "}
                         </span>
                         <span className="App-text">
                           <PlayCircleOutlined /> Auto apply: <a>Off</a>{" "}
@@ -645,16 +767,17 @@ export const WorkspaceDetails = (props) => {
   );
 };
 
-const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const characters =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 function generateRandomString(length) {
-    let result = '';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
+  let result = "";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
 
-    return result;
+  return result;
 }
 
 function setupWorkspaceIncludes(
@@ -665,7 +788,13 @@ function setupWorkspaceIncludes(
   setHistory,
   setSchedule,
   templates,
-  setLastRun
+  setLastRun,
+  setVCSProvider,
+  setCurrentStateId,
+  currentStateId,
+  axiosInstance,
+  setResources,
+  setOutputs
 ) {
   let variables = [];
   let jobs = [];
@@ -718,6 +847,7 @@ function setupWorkspaceIncludes(
           relativeDate: DateTime.fromISO(
             element.attributes.createdDate
           ).toRelative(),
+          createdDate: element.attributes.createdDate,
           ...element.attributes,
         });
         break;
@@ -730,6 +860,9 @@ function setupWorkspaceIncludes(
           )?.attributes?.name,
           ...element.attributes,
         });
+        break;
+      case include.VCS:
+        setVCSProvider(element.attributes.vcsType);
         break;
       case include.VARIABLE:
         if (element.attributes.category == "ENV") {
@@ -754,4 +887,57 @@ function setupWorkspaceIncludes(
   setJobs(jobs);
   setHistory(history);
   setSchedule(schedule);
+
+  // set state data
+  var lastState = history
+  .sort((a, b) => a.jobReference - b.jobReference)
+  .reverse()[0];
+  // reload state only if there is a new version
+  if(currentStateId !== lastState?.id){
+    loadState(lastState,axiosInstance,setOutputs,setResources);
+  }
+  setCurrentStateId(lastState?.id);
+}
+
+function loadState (state,axiosInstance,setOutputs,setResources) {
+    axiosInstance
+      .get(state.output)
+      .then((resp) => {
+        var result = parseState(resp.data);
+        console.log("result",result)
+        setResources(result.resources);
+        setOutputs(result.outputs);
+      });
+};
+
+function parseState(state){
+  var resources = [];
+  var outputs = [];
+
+  for (const [key, value] of Object.entries(state?.values?.outputs)) {
+    outputs.push({
+      name: key,
+      type: value.type,
+      value: value.value,
+    });
+  }
+
+  // parse root module resources
+  for (const [key, value] of Object.entries(state?.values?.root_module?.resources)) {
+    resources.push({
+      name: value.name,
+      type: value.type,
+      provider: value.provider_name,
+      module: "root"
+    });
+  }
+  return {resources:resources,outputs:outputs};
+}
+
+function fixSshURL(source) {
+  if (source.startsWith("git@")) {
+    return source.replace(":", "/").replace("git@", "https://");
+  } else {
+    return source;
+  }
 }

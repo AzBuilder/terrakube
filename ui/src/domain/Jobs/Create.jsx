@@ -6,7 +6,7 @@ import {
   WORKSPACE_ARCHIVE,
 } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
-import { InfoCircleTwoTone } from "@ant-design/icons";
+import { InfoCircleTwoTone,PlusOutlined } from "@ant-design/icons";
 
 const validateMessages = { required: "${label} is required!" };
 
@@ -81,8 +81,9 @@ export const CreateJob = ({ changeJob }) => {
         onClick={() => {
           setVisible(true);
         }}
+        icon={<PlusOutlined />}
       >
-        Start new job
+        New job
       </Button>
 
       <Modal
