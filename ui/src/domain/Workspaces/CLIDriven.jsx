@@ -1,11 +1,11 @@
 import { React } from "react";
-import { Button } from "antd";
+import { Button, Tabs } from "antd";
 import { HiOutlineExternalLink } from "react-icons/hi";
-
+const { TabPane } = Tabs;
 export const CLIDriven = ({ organizationName, workspaceName }) => {
   return (
     <div>
-      <h1>Waiting for configuration</h1>
+      <h2>Waiting for configuration</h2>
       <div className="App-text">
         This workspace currently has no Terraform configuration files associated
         with it. Terrakube is waiting for the configuration to be uploaded.
@@ -25,18 +25,42 @@ export const CLIDriven = ({ organizationName, workspaceName }) => {
             file in the directory where you run Terraform. <br />
             <br />
             <b>Example Code</b>
-            <pre className="moduleCode">
-              terraform {"{"} <br />
-              &nbsp;&nbsp;backend "remote" {"{"} <br />
-              &nbsp;&nbsp;&nbsp;&nbsp;organization = "{organizationName}" <br />
-              <br />
-              &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "{workspaceName}"{" "}
-              <br />
-              &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
-              &nbsp;&nbsp;{"}"} <br />
-              {"}"} <br />
-            </pre>
+            <Tabs type="card" style={{ marginTop: "30px" }}>
+              <TabPane tab="cloud block" key="1">
+                <pre className="moduleCode">
+                  terraform {"{"} <br />
+                  &nbsp;&nbsp;cloud {"{"} <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;organization = "{
+                    organizationName
+                  }" <br />
+                  <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "{
+                    workspaceName
+                  }" <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
+                  &nbsp;&nbsp;{"}"} <br />
+                  {"}"} <br />
+                </pre>
+              </TabPane>
+              <TabPane tab="remote backend" key="2">
+                <pre className="moduleCode">
+                  terraform {"{"} <br />
+                  &nbsp;&nbsp;backend "remote" {"{"} <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;organization = "{
+                    organizationName
+                  }" <br />
+                  <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "{
+                    workspaceName
+                  }" <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
+                  &nbsp;&nbsp;{"}"} <br />
+                  {"}"} <br />
+                </pre>
+              </TabPane>
+            </Tabs>
           </li>
           <br />
           <li>
