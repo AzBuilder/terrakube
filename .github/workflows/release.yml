@@ -1,26 +1,25 @@
-name: Push Docker Images
+name: Release Terrakube
 
 on: 
   release:
     types: [created]
 
 jobs:
-  build:
-
+  build-jammy:
     runs-on: ubuntu-latest
     env:
        VERSION: ${{ github.event.release.tag_name }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 17
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'liberica'
     - name: Update POM Version
       run: mvn versions:set-property -Dproperty=revision -DnewVersion=$VERSION -DgenerateBackupPoms=false
     - name: Build Image with Maven
-      run: mvn -pl "api,registry,executor" spring-boot:build-image -B  --file pom.xml
+      run: mvn -pl "api,registry,executor" spring-boot:build-image -B  --file pom.xml -Dmaven.test.skip=true
       env:
         USER_NAME: ${{ secrets.USER_NAME }}
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -105,3 +104,48 @@ jobs:
 
     - name: Docker Push UI Latest
       run: docker push azbuilder/terrakube-ui:latest
+
+  build-alpaquita:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.event.release.tag_name }}-alpaquita
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'liberica'
+      - name: Update POM Version
+        run: mvn versions:set-property -Dproperty=revision -DnewVersion=$VERSION -DgenerateBackupPoms=false
+      - name: Build Image with Maven
+        run: mvn -pl "api,registry, executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
+        env:
+          USER_NAME: ${{ secrets.USER_NAME }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: docker login
+        env:
+          DOCKER_USER: ${{secrets.DOCKER_USER}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+      - name: Docker tag API Alpaquita
+        run: docker tag $(docker images api-server -q) azbuilder/api-server:$VERSION
+
+      - name: Docker Push API Alpaquita
+        run: docker push azbuilder/api-server:$VERSION
+
+      - name: Docker tag Registry Alpaquita
+        run: docker tag $(docker images open-registry -q) azbuilder/open-registry:$VERSION
+
+      - name: Docker Push Registry Alpaquita
+        run: docker push azbuilder/open-registry:$VERSION
+
+      - name: Docker tag EXECUTOR Alpaquita
+        run: docker tag $(docker images executor -q) azbuilder/executor:$VERSION
+
+      - name: Docker Push EXECUTOR Alpaquita
+        run: docker push azbuilder/executor:$VERSION
+

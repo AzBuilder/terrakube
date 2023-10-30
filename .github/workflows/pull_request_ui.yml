@@ -1,4 +1,4 @@
-name: Build UI
+name: Build Terrakube UI
 
 on:
   push:

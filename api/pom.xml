@@ -40,6 +40,10 @@
         <commons-lang3.version>3.13.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
+        <!--BUILDPACK DATA-->
+        <buildpack.builder>paketobuildpacks/builder-jammy-base</buildpack.builder>
+        <buildpack.java>gcr.io/paketo-buildpacks/java</buildpack.java>
+        <buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry</buildpack.telemetry>
     </properties>
     <build>
         <plugins>
@@ -48,10 +52,10 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                 <image>
-                    <builder>paketobuildpacks/builder-jammy-base</builder>
+                    <builder>${buildpack.builder}</builder>
                     <buildpacks>
-                        <buildpack>gcr.io/paketo-buildpacks/java</buildpack>
-                        <buildpack>gcr.io/paketo-buildpacks/opentelemetry</buildpack>
+                        <buildpack>${buildpack.java}</buildpack>
+                        <buildpack>${buildpack.telemetry}</buildpack>
                     </buildpacks>
                     <bindings>
                         <binding>${basedir}/../bindings/ca-certificates:/platform/bindings/ca-certificates</binding>

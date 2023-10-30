@@ -35,6 +35,10 @@
 		<jedis.version>3.9.0</jedis.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
 		</sonar.coverage.jacoco.xmlReportPaths>
+		<!--BUILDPACK DATA-->
+		<buildpack.builder>paketobuildpacks/builder-jammy-base</buildpack.builder>
+		<buildpack.java>gcr.io/paketo-buildpacks/java</buildpack.java>
+		<buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry</buildpack.telemetry>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -200,10 +204,10 @@
 						</exclude>
 					</excludes>
 					<image>
-					    <builder>paketobuildpacks/builder-jammy-base</builder>
+					    <builder>${buildpack.builder}</builder>
                     	<buildpacks>
-                        	<buildpack>gcr.io/paketo-buildpacks/java</buildpack>
-                        	<buildpack>gcr.io/paketo-buildpacks/opentelemetry</buildpack>
+                        	<buildpack>${buildpack.java}</buildpack>
+                        	<buildpack>${buildpack.telemetry}</buildpack>
                     	</buildpacks>
                     	<bindings>
                         	<binding>${basedir}/../bindings/ca-certificates:/platform/bindings/ca-certificates</binding>
