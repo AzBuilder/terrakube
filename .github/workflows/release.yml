@@ -119,7 +119,7 @@ jobs:
       - name: Update POM Version
         run: mvn versions:set-property -Dproperty=revision -DnewVersion=$VERSION -DgenerateBackupPoms=false
       - name: Build Image with Maven
-        run: mvn -pl "api,registry" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
+        run: mvn -pl "api,registry, executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
         env:
           USER_NAME: ${{ secrets.USER_NAME }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -131,15 +131,21 @@ jobs:
         run: |
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-      - name: Docker tag API Image
+      - name: Docker tag API Alpaquita
         run: docker tag $(docker images api-server -q) azbuilder/api-server:$VERSION
 
-      - name: Docker Push API latest
+      - name: Docker Push API Alpaquita
         run: docker push azbuilder/api-server:$VERSION
 
-      - name: Docker tag Registry Image
+      - name: Docker tag Registry Alpaquita
         run: docker tag $(docker images open-registry -q) azbuilder/open-registry:$VERSION
 
-      - name: Docker Push Registry
+      - name: Docker Push Registry Alpaquita
         run: docker push azbuilder/open-registry:$VERSION
+
+      - name: Docker tag EXECUTOR Alpaquita
+        run: docker tag $(docker images executor -q) azbuilder/executor:$VERSION
+
+      - name: Docker Push EXECUTOR Alpaquita
+        run: docker push azbuilder/executor:$VERSION
 
