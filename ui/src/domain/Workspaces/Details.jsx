@@ -25,7 +25,7 @@ import {
   Row,
   Col,
   Divider,
-  Table
+  Table,
 } from "antd";
 import { compareVersions } from "./Workspaces";
 import { CreateJob } from "../Jobs/Create";
@@ -50,11 +50,13 @@ import {
   LockOutlined,
   ProfileOutlined,
   UnlockOutlined,
-  GitlabOutlined, GithubOutlined 
+  GitlabOutlined,
+  GithubOutlined,
 } from "@ant-design/icons";
-import { SiTerraform,  SiBitbucket, SiAzuredevops} from "react-icons/si";
+import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { IconContext } from "react-icons";
 import { FiGitCommit } from "react-icons/fi";
+import { BiTerminal } from "react-icons/bi";
 import "./Workspaces.css";
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -64,7 +66,7 @@ const include = {
   JOB: "job",
   HISTORY: "history",
   SCHEDULE: "schedule",
-  VCS:"vcs",
+  VCS: "vcs",
 };
 const { DateTime } = require("luxon");
 
@@ -95,7 +97,7 @@ export const WorkspaceDetails = (props) => {
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
-  const [currentStateId,setCurrentStateId]  = useState(0);
+  const [currentStateId, setCurrentStateId] = useState(0);
   const terraformVersionsApi = `${
     new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
   }/terraform/index.json`;
@@ -104,45 +106,49 @@ export const WorkspaceDetails = (props) => {
   };
   const outputColumns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) =>a.name.localeCompare(b.name),
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
     },
     {
-      title: 'Value',
-      dataIndex: 'value',
-      key: 'value',
-      render: (text) =>  <Paragraph style={{margin:"0px"}} copyable={{ tooltips: false }}>{text}</Paragraph>,
+      title: "Value",
+      dataIndex: "value",
+      key: "value",
+      render: (text) => (
+        <Paragraph style={{ margin: "0px" }} copyable={{ tooltips: false }}>
+          {text}
+        </Paragraph>
+      ),
     },
   ];
 
   const resourceColumns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) =>a.name.localeCompare(b.name),
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: 'Provider',
-      dataIndex: 'provider',
-      key: 'provider',
+      title: "Provider",
+      dataIndex: "provider",
+      key: "provider",
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
     },
     {
-      title: 'Module',
-      dataIndex: 'module',
-      key: 'module',
+      title: "Module",
+      dataIndex: "module",
+      key: "module",
     },
   ];
   const handleStatesClick = (key) => {
@@ -225,7 +231,7 @@ export const WorkspaceDetails = (props) => {
 
   const handleClickSettings = () => {
     setActiveKey("6");
-  }
+  };
 
   const onFinish = (values) => {
     setWaiting(true);
@@ -340,24 +346,53 @@ export const WorkspaceDetails = (props) => {
               <div className="variableActions">
                 <h2>{workspace.data.attributes.name}</h2>
               </div>
-              <Space className="workspace-details" direction="vertical" >
-              <Paragraph style={{margin:"0px"}} copyable={{ text: id , tooltips: false }}>
-                  <span className="workspace-details"> ID: {id} </span> 
+              <Space className="workspace-details" direction="vertical">
+                <Paragraph
+                  style={{ margin: "0px" }}
+                  copyable={{ text: id, tooltips: false }}
+                >
+                  <span className="workspace-details"> ID: {id} </span>
                 </Paragraph>
-                {workspace.data.attributes.description ==="" ?(workspace.data.attributes.description) :(
-               <a className="workspace-button" onClick={handleClickSettings} style={{color:"#3b3d45"}}>Add workspace description</a>
-               )}
-                <Space size={40} style={{marginBottom:"40px"}} direction="horizontal">
+                {workspace.data.attributes.description === "" ? (
+                  workspace.data.attributes.description
+                ) : (
+                  <a
+                    className="workspace-button"
+                    onClick={handleClickSettings}
+                    style={{ color: "#3b3d45" }}
+                  >
+                    Add workspace description
+                  </a>
+                )}
+                <Space
+                  size={40}
+                  style={{ marginBottom: "40px" }}
+                  direction="horizontal"
+                >
                   <span>
-                    {workspace.data.attributes.locked?(<><LockOutlined /> Locked</>):(<><UnlockOutlined /> Unlocked</>)} 
+                    {workspace.data.attributes.locked ? (
+                      <>
+                        <LockOutlined /> Locked
+                      </>
+                    ) : (
+                      <>
+                        <UnlockOutlined /> Unlocked
+                      </>
+                    )}
                   </span>
                   <span>
                     <ProfileOutlined /> Resources{" "}
-                    <span style={{ fontWeight: "500" }}>{resources.length}</span>
+                    <span style={{ fontWeight: "500" }}>
+                      {resources.length}
+                    </span>
                   </span>
                   <IconContext.Provider value={{ size: "1.0em" }}>
                     <SiTerraform /> Terraform{" "}
-                    <a onClick={handleClickSettings} className="workspace-button" style={{color:"#3b3d45"}}>
+                    <a
+                      onClick={handleClickSettings}
+                      className="workspace-button"
+                      style={{ color: "#3b3d45" }}
+                    >
                       v{workspace.data.attributes.terraformVersion}
                     </a>
                   </IconContext.Provider>
@@ -378,7 +413,7 @@ export const WorkspaceDetails = (props) => {
               >
                 <TabPane tab="Overview" key="1">
                   <Row>
-                    <Col span={19}>
+                    <Col span={19} style={{paddingRight:"20px"}}>
                       {workspace.data.attributes.source === "empty" &&
                       workspace.data.attributes.branch === "remote-content" ? (
                         <CLIDriven
@@ -493,12 +528,18 @@ export const WorkspaceDetails = (props) => {
                               )}
                             />
                           </div>
-                          <Tabs type="card" style={{marginTop:"30px"}}>
+                          <Tabs type="card" style={{ marginTop: "30px" }}>
                             <TabPane tab="Resources" key="1">
-                               <Table dataSource={resources} columns={resourceColumns} />
+                              <Table
+                                dataSource={resources}
+                                columns={resourceColumns}
+                              />
                             </TabPane>
                             <TabPane tab="Outputs" key="2">
-                            <Table  dataSource={outputs} columns={outputColumns} />
+                              <Table
+                                dataSource={outputs}
+                                columns={outputColumns}
+                              />
                             </TabPane>
                           </Tabs>
                         </div>
@@ -508,9 +549,14 @@ export const WorkspaceDetails = (props) => {
                       <Space direction="vertical">
                         <br />
                         <span className="App-text">
-                          {renderVCSLogo(vcsProvider)}{" "}
-                          <a
-                                href={fixSshURL(workspace.data.attributes.source)}
+                          { workspace.data.attributes.branch !== "remote-content" ? (
+                            <>
+                              {" "}
+                              {renderVCSLogo(vcsProvider)}{" "}
+                              <a
+                                href={fixSshURL(
+                                  workspace.data.attributes.source
+                                )}
                                 target="_blank"
                               >
                                 {new URL(
@@ -519,6 +565,15 @@ export const WorkspaceDetails = (props) => {
                                   ?.replace(".git", "")
                                   ?.substring(1)}
                               </a>
+                            </>
+                          ) : (
+                            <>
+                              <IconContext.Provider value={{ size: "1.4em" }}>
+                                <BiTerminal />
+                              </IconContext.Provider>
+                              &nbsp;&nbsp;cli/api driven workflow
+                            </>
+                          )}
                         </span>
                         <span className="App-text">
                           <ThunderboltOutlined /> Execution Mode:{" "}
@@ -890,27 +945,25 @@ function setupWorkspaceIncludes(
 
   // set state data
   var lastState = history
-  .sort((a, b) => a.jobReference - b.jobReference)
-  .reverse()[0];
+    .sort((a, b) => a.jobReference - b.jobReference)
+    .reverse()[0];
   // reload state only if there is a new version
-  if(currentStateId !== lastState?.id){
-    loadState(lastState,axiosInstance,setOutputs,setResources);
+  if (currentStateId !== lastState?.id) {
+    loadState(lastState, axiosInstance, setOutputs, setResources);
   }
   setCurrentStateId(lastState?.id);
 }
 
-function loadState (state,axiosInstance,setOutputs,setResources) {
-    axiosInstance
-      .get(state.output)
-      .then((resp) => {
-        var result = parseState(resp.data);
-        console.log("result",result)
-        setResources(result.resources);
-        setOutputs(result.outputs);
-      });
-};
+function loadState(state, axiosInstance, setOutputs, setResources) {
+  axiosInstance.get(state.output).then((resp) => {
+    var result = parseState(resp.data);
+    console.log("result", result);
+    setResources(result.resources);
+    setOutputs(result.outputs);
+  });
+}
 
-function parseState(state){
+function parseState(state) {
   var resources = [];
   var outputs = [];
 
@@ -923,15 +976,17 @@ function parseState(state){
   }
 
   // parse root module resources
-  for (const [key, value] of Object.entries(state?.values?.root_module?.resources)) {
+  for (const [key, value] of Object.entries(
+    state?.values?.root_module?.resources
+  )) {
     resources.push({
       name: value.name,
       type: value.type,
       provider: value.provider_name,
-      module: "root"
+      module: "root",
     });
   }
-  return {resources:resources,outputs:outputs};
+  return { resources: resources, outputs: outputs };
 }
 
 function fixSshURL(source) {
