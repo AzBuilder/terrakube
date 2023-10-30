@@ -57,7 +57,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build with Alpaquita Linux
-        run: mvn clean install -Dspring-boot.build-image.skip=false -Dmaven.test.skip=true -Dbuildpack.builder=gcr.io/bellsoft/buildpacks.builder:glibc
+        run: mvn clean install -Dspring-boot.build-image.skip=false -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
 
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
