@@ -99,6 +99,10 @@ ports:
     port: 6379
     onOpen: ignore
     visibility: private
+  - name: PostgreSQL
+    port: 5432
+    onOpen: ignore
+    visibility: private
 
 vscode:
   extensions:

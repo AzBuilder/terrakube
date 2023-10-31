@@ -31,7 +31,7 @@ public class History extends GenericAuditFields {
 
     @Column(name = "output")
     private String output;
-    
+
     @Column(name = "serial")
     private String serial = "1";
 
