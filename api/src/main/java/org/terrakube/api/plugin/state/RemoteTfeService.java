@@ -457,7 +457,7 @@ public class RemoteTfeService {
         //create dummy history
         History history = new History();
         history.setOutput("");
-        history.setSerial(stateData.getData().getAttributes().get("serial") != null ? stateData.getData().getAttributes().get("serial").toString(): "1");
+        history.setSerial(stateData.getData().getAttributes().get("serial") != null ? Integer.parseInt(stateData.getData().getAttributes().get("serial").toString()): 1);
         history.setLineage(stateData.getData().getAttributes().get("lineage") != null ? stateData.getData().getAttributes().get("lineage").toString(): null);
         history.setJobReference(String.valueOf(job.getId()));
         history.setWorkspace(workspace);
