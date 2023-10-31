@@ -31,15 +31,15 @@ public class History extends GenericAuditFields {
 
     @Column(name = "output")
     private String output;
-
+    
     @Column(name = "serial")
-    private String serial;
+    private String serial = "1";
 
     @Column(name = "md5")
-    private String md5;
+    private String md5 = "";
 
     @Column(name = "lineage")
-    private String lineage;
+    private String lineage = "";
 
     @ManyToOne
     private Workspace workspace;
