@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="26" author="alfespa17@gmail.com">
+        <addDefaultValue 
+            columnDataType="int"  
+            columnName="serial"   
+            defaultValueNumeric="1"    
+            tableName="history"/>
+        <addDefaultValue
+            columnDataType="varchar(32)"  
+            columnName="md5"  
+            defaultValue="0"    
+            tableName="history"/>
+        <addDefaultValue
+            columnDataType="varchar(36)"  
+            columnName="lineage"  
+            defaultValue="0"    
+            tableName="history"/>
+        <update tableName="history">
+            <column name="serial" valueNumeric="1"/>
+        </update>
+        <update tableName="history">
+            <column name="md5" valueNumeric="0"/>
+        </update>
+        <update tableName="history">
+            <column name="lineage" valueNumeric="0"/>
+        </update>
+    </changeSet>
+</databaseChangeLog>

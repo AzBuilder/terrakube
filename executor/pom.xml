@@ -17,7 +17,7 @@
 		<java.version>17</java.version>
 		<commons-text.version>1.10.0</commons-text.version>
 		<terraform-spring-boot-starter.version>0.10.1</terraform-spring-boot-starter.version>
-		<terrakube-client-starter.version>0.11.0</terrakube-client-starter.version>
+		<terrakube-client-starter.version>0.12.0</terrakube-client-starter.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<commons-codec>1.15</commons-codec>
 		<okhttp.version>4.12.0</okhttp.version>
