@@ -24,10 +24,10 @@
             <column name="serial" valueNumeric="1"/>
         </update>
         <update tableName="history">
-            <column name="md5" valueNumeric="0"/>
+            <column name="md5" value="0"/>
         </update>
         <update tableName="history">
-            <column name="lineage" valueNumeric="0"/>
+            <column name="lineage" value="0"/>
         </update>
     </changeSet>
 </databaseChangeLog>
