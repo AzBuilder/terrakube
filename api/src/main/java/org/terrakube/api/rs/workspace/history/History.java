@@ -36,10 +36,10 @@ public class History extends GenericAuditFields {
     private int serial = 1;
 
     @Column(name = "md5")
-    private String md5 = "";
+    private String md5 = "0";
 
     @Column(name = "lineage")
-    private String lineage = "";
+    private String lineage = "0";
 
     @ManyToOne
     private Workspace workspace;

@@ -133,6 +133,9 @@ public class AzureTerraformStateImpl implements TerraformState {
             HistoryAttributes historyAttributes = new HistoryAttributes();
             historyAttributes.setOutput(stateURL);
             historyAttributes.setJobReference(terraformJob.getJobId());
+            historyAttributes.setSerial(1);
+            historyAttributes.setMd5("0");
+            historyAttributes.setLineage("0");
             newHistory.setAttributes(historyAttributes);
             historyRequest.setData(newHistory);
 

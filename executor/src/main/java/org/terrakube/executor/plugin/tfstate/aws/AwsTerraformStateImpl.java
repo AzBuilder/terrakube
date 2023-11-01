@@ -167,6 +167,9 @@ public class AwsTerraformStateImpl implements TerraformState {
             newHistory.setType("history");
             HistoryAttributes historyAttributes = new HistoryAttributes();
             historyAttributes.setOutput(stateURL);
+            historyAttributes.setSerial(1);
+            historyAttributes.setMd5("0");
+            historyAttributes.setLineage("0");
             historyAttributes.setJobReference(terraformJob.getJobId());
             newHistory.setAttributes(historyAttributes);
             historyRequest.setData(newHistory);

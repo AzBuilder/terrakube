@@ -159,6 +159,9 @@ public class GcpTerraformStateImpl implements TerraformState {
             newHistory.setType("history");
             HistoryAttributes historyAttributes = new HistoryAttributes();
             historyAttributes.setJobReference(terraformJob.getJobId());
+            historyAttributes.setSerial(1);
+            historyAttributes.setMd5("0");
+            historyAttributes.setLineage("0");
             historyAttributes.setOutput(terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename));
             newHistory.setAttributes(historyAttributes);
             historyRequest.setData(newHistory);
