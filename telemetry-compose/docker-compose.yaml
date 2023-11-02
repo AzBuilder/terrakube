@@ -1,13 +1,13 @@
 version: "3.8"
 services:
   terrakube-api:
-    image: azbuilder/api-server:2.14.0
+    image: azbuilder/api-server:2.17.0
     ports:
       - 8080:8080
     env_file:
       - api.env
   terrakube-ui:
-    image: azbuilder/terrakube-ui:2.14.0
+    image: azbuilder/terrakube-ui:2.17.0
     ports:
       - 3000:8080
     volumes:
@@ -15,20 +15,19 @@ services:
     env_file:
       - ui.env
   terrakube-executor:
-    image: azbuilder/executor:2.14.0
+    image: azbuilder/executor:2.17.0
     ports:
       - 8090:8090
     env_file:
       - executor.env
   terrakube-registry:
-    image: azbuilder/open-registry:2.14.0
+    image: azbuilder/open-registry:2.17.0
     ports:
       - 8075:8075
     env_file:
       - registry.env
   terrakube-dex:
-    image: ghcr.io/dexidp/dex:v2.32.0
-    container_name: dex-service
+    image: ghcr.io/dexidp/dex:v2.37.0
     volumes:
       - ./config-ldap.yaml:/etc/dex/config.docker.yaml
     ports:
