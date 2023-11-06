@@ -426,7 +426,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     private TerraformProcessData getTerraformProcessData(TerraformJob terraformJob, File workingDirectory) {
 
         terraformState.getBackendStateFile(terraformJob.getOrganizationId(),
-                terraformJob.getWorkspaceId(), workingDirectory);
+                terraformJob.getWorkspaceId(), workingDirectory, terraformJob.getTerraformVersion());
 
         File sshKeyFile = null;
         if (terraformJob.getVcsType().startsWith("SSH")) {

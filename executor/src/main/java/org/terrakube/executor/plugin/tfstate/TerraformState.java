@@ -6,7 +6,7 @@ import java.io.File;
 
 public interface TerraformState {
 
-    String getBackendStateFile(String organizationId, String workspaceId, File workingDirectory);
+    String getBackendStateFile(String organizationId, String workspaceId, File workingDirectory, String terraformVersion);
 
     String saveTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId, File workingDirectory);
 

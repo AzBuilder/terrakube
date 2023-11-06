@@ -44,7 +44,8 @@ public class LocalTerraformStateImpl implements TerraformState {
     TerraformStatePathService terraformStatePathService;
 
     @Override
-    public String getBackendStateFile(String organizationId, String workspaceId, File workingDirectory) {
+    public String getBackendStateFile(String organizationId, String workspaceId, File workingDirectory, String terraformVersion) {
+        log.info("Generating backend override file for terraform {}", terraformVersion);
         String localBackend = BACKEND_FILE_NAME;
         try {
             String localBackendDirectory = FileUtils.getUserDirectoryPath().concat(
