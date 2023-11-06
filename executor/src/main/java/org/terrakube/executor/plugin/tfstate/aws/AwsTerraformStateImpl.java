@@ -85,6 +85,7 @@ public class AwsTerraformStateImpl implements TerraformState {
                     awsBackendHcl.appendln("       s3 = \"" + endpoint + "\"");
                     awsBackendHcl.appendln("    }");
                     awsBackendHcl.appendln("    skip_requesting_account_id = true");
+                    awsBackendHcl.appendln("    skip_s3_checksum = true");
                     awsBackendHcl.appendln("    use_path_style = true");
                 }
 
