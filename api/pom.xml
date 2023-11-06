@@ -40,6 +40,7 @@
         <commons-lang3.version>3.13.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
+        <maven-artifact.version>3.8.8</maven-artifact.version>
         <!--BUILDPACK DATA-->
         <buildpack.builder>paketobuildpacks/builder-jammy-base</buildpack.builder>
         <buildpack.java>gcr.io/paketo-buildpacks/java</buildpack.java>
@@ -285,6 +286,11 @@
             <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven-artifact.version}</version>
         </dependency>
     </dependencies>
     <dependencyManagement>

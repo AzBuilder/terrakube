@@ -13,6 +13,7 @@ import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.TextStringBuilder;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.workspace.history.History;
 import org.terrakube.client.model.organization.workspace.history.HistoryAttributes;
@@ -60,7 +61,10 @@ public class AwsTerraformStateImpl implements TerraformState {
     TerraformStatePathService terraformStatePathService;
 
     @Override
-    public String getBackendStateFile(String organizationId, String workspaceId, File workingDirectory) {
+    public String getBackendStateFile(String organizationId, String workspaceId, File workingDirectory, String terraformVersion) {
+        log.info("Generating backend override file for terraform {}", terraformVersion);
+        ComparableVersion version = new ComparableVersion(terraformVersion);
+
         String awsBackend = BACKEND_FILE_NAME;
         try {
             TextStringBuilder awsBackendHcl = new TextStringBuilder();
@@ -73,11 +77,21 @@ public class AwsTerraformStateImpl implements TerraformState {
             awsBackendHcl.appendln("    secret_key = \"" + secretKey + "\"");
 
             if(endpoint != null){
-                awsBackendHcl.appendln("    endpoint  = \"" + endpoint + "\"");
+                if(version.compareTo(new ComparableVersion("1.6.0")) < 0){
+                    awsBackendHcl.appendln("    endpoint  = \"" + endpoint + "\"");
+                    awsBackendHcl.appendln("    force_path_style             = true");
+                } else {
+                    awsBackendHcl.appendln("    endpoints = {");
+                    awsBackendHcl.appendln("       s3 = \"" + endpoint + "\"");
+                    awsBackendHcl.appendln("    }");
+                    awsBackendHcl.appendln("    skip_requesting_account_id = true");
+                    awsBackendHcl.appendln("    use_path_style = true");
+                }
+
                 awsBackendHcl.appendln("    skip_credentials_validation  = true");
                 awsBackendHcl.appendln("    skip_metadata_api_check      = true");
                 awsBackendHcl.appendln("    skip_region_validation       = true");
-                awsBackendHcl.appendln("    force_path_style             = true");
+
             }
 
             awsBackendHcl.appendln("  }");
