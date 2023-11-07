@@ -948,6 +948,7 @@ function setupWorkspaceIncludes(
     .sort((a, b) => a.jobReference - b.jobReference)
     .reverse()[0];
   // reload state only if there is a new version
+  console.log('Get latest state')
   if (currentStateId !== lastState?.id) {
     loadState(lastState, axiosInstance, setOutputs, setResources);
   }
@@ -966,26 +967,36 @@ function loadState(state, axiosInstance, setOutputs, setResources) {
 function parseState(state) {
   var resources = [];
   var outputs = [];
-
-  for (const [key, value] of Object.entries(state?.values?.outputs)) {
-    outputs.push({
-      name: key,
-      type: value.type,
-      value: value.value,
-    });
+  console.log("Current state")
+  console.log(state)
+  if(state?.values?.outputs != null){
+    for (const [key, value] of Object.entries(state?.values?.outputs)) {
+      outputs.push({
+        name: key,
+        type: value.type,
+        value: value.value,
+      });
+    }
+  } else {
+    console.log('State has no outputs')
   }
 
   // parse root module resources
-  for (const [key, value] of Object.entries(
-    state?.values?.root_module?.resources
-  )) {
-    resources.push({
-      name: value.name,
-      type: value.type,
-      provider: value.provider_name,
-      module: "root",
-    });
+  if(state?.values?.root_module?.resources != null){
+    for (const [key, value] of Object.entries(
+      state?.values?.root_module?.resources
+    )) {
+      resources.push({
+        name: value.name,
+        type: value.type,
+        provider: value.provider_name,
+        module: "root",
+      });
+    }
+  } else {
+    console.log('State has no resources')
   }
+  
   return { resources: resources, outputs: outputs };
 }
 
