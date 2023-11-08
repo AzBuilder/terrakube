@@ -415,7 +415,7 @@ export const WorkspaceDetails = (props) => {
                   <Row>
                     <Col span={19} style={{paddingRight:"20px"}}>
                       {workspace.data.attributes.source === "empty" &&
-                      workspace.data.attributes.branch === "remote-content" ? (
+                      workspace.data.attributes.branch === "remote-content" && workspace.data.relationships.history.data.length < 1 ? (
                         <CLIDriven
                           organizationName={organizationName}
                           workspaceName={workspaceName}
