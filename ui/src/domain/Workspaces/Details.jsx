@@ -969,6 +969,7 @@ function parseState(state) {
   var outputs = [];
   console.log("Current state")
   console.log(state)
+  // parse root outputs
   if(state?.values?.outputs != null){
     for (const [key, value] of Object.entries(state?.values?.outputs)) {
       outputs.push({
@@ -990,13 +991,32 @@ function parseState(state) {
         name: value.name,
         type: value.type,
         provider: value.provider_name,
-        module: "root",
+        module: "root_module",
       });
     }
   } else {
     console.log('State has no resources')
   }
-  
+
+  // parse child module resources
+  if(state?.values?.root_module?.child_modules?.length > 0){
+    state?.values?.root_module?.child_modules?.forEach((moduleVal, index) => {
+        console.log(`Checking child ${moduleVal.address} with index ${index}`)
+        for (const [key, value] of Object.entries(
+            moduleVal.resources
+        )) {
+          resources.push({
+            name: value.name,
+            type: value.type,
+            provider: value.provider_name,
+            module: moduleVal.address,
+          });
+        }
+    })
+  } else {
+    console.log('State has no child modules resources')
+  }
+
   return { resources: resources, outputs: outputs };
 }
 
