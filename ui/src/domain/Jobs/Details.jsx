@@ -219,7 +219,8 @@ export const DetailsJob = ({ jobId }) => {
       .then((response) => {
         console.log("terrakube");
         console.log(response?.data?.terrakubeUI);
-        setUITemplates(JSON.parse(response?.data?.terrakubeUI));
+        if(response?.data?.terrakubeUI)
+           setUITemplates(JSON.parse(response?.data?.terrakubeUI));
       });
   };
   return (
