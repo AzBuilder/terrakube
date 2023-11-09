@@ -956,6 +956,9 @@ function setupWorkspaceIncludes(
 }
 
 function loadState(state, axiosInstance, setOutputs, setResources) {
+  if (!state) {
+    return;
+  }
   axiosInstance.get(state.output).then((resp) => {
     var result = parseState(resp.data);
     console.log("result", result);

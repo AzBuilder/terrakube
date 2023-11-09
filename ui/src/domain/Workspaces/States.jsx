@@ -1,9 +1,10 @@
 import { React, useState, useRef } from "react";
-import { List, Space, Card, Row, Col, Avatar, Button } from "antd";
+import { List, Space, Card, Row, Col, Avatar } from "antd";
 import Editor from "@monaco-editor/react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import ReactFlow, { Controls, Background } from "react-flow-renderer";
 import NodeResource from "./NodeResource";
+import {DownloadState} from "./DownloadState";
 import { UserOutlined } from "@ant-design/icons";
 
 export const States = ({
@@ -74,7 +75,7 @@ export const States = ({
       resp.data.values != null &&
       resp.data.values.root_module != null
     ) {
-      try{
+      try {
         if (resp.data.values.root_module.resources != null) {
           resp.data.values.root_module.resources.forEach((element) => {
             let dependencies = 0;
@@ -84,7 +85,7 @@ export const States = ({
               dependencies,
               (x.get(dependencies) ? x.get(dependencies) : 0) + 350
             );
-  
+
             resources = pushNode(resources, dependencies, element, x, y);
             resources = pushNodeDependency(
               resources,
@@ -94,10 +95,10 @@ export const States = ({
             );
           });
         }
-  
+
         if (resp.data.values.root_module.child_modules != null) {
           resp.data.values.root_module.child_modules.forEach((child) => {
-            if(child.resources != null)
+            if (child.resources != null)
               child.resources.forEach((element) => {
                 let dependencies = 0;
                 if (element.depends_on != null)
@@ -106,7 +107,7 @@ export const States = ({
                   dependencies,
                   (x.get(dependencies) ? x.get(dependencies) : 0) + 350
                 );
-  
+
                 resources = pushNode(resources, dependencies, element, x, y);
                 resources = pushNodeDependency(
                   resources,
@@ -114,11 +115,11 @@ export const States = ({
                   element,
                   element.depends_on
                 );
-            });
+              });
           });
         }
-      } catch (error){
-        console.error(`Failed to build diagram: ${error}`)
+      } catch (error) {
+        console.error(`Failed to build diagram: ${error}`);
         resources = [];
         resources.push({
           id: "1",
@@ -131,11 +132,11 @@ export const States = ({
           position: { x: 0, y: 130 },
         });
       }
-
     }
 
     setResources(resources);
   }
+ 
 
   const changeState = (state) => {
     setCurrentState(state);
@@ -232,9 +233,7 @@ export const States = ({
               </Space>
             </Col>
             <Col span={2}>
-              <Button target="_blank" href={currentState.output}>
-                Download
-              </Button>
+               <DownloadState stateUrl={currentState.output}/>
               <br />
               <span className="stateDetails">{currentState.relativeDate}</span>
             </Col>
