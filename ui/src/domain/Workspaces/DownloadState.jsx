@@ -1,8 +1,6 @@
 import { React } from "react";
 import { Dropdown } from "antd";
 import {
-  FileImageOutlined,
-  FileTextOutlined,
   FileJpgOutlined,
 } from "@ant-design/icons";
 import { toPng, toSvg, toJpeg } from "html-to-image";
