@@ -3,6 +3,7 @@ import { SiTerraform  } from "react-icons/si";
 import { Card, Avatar } from 'antd';
 import { IconContext } from "react-icons";
 import { Handle } from 'react-flow-renderer';
+import {getAWSIcon} from './AWSIconset';
 const { Meta } = Card;
 
 export default memo(({ data, isConnectable }) => {
@@ -55,16 +56,13 @@ const GetResourceIcon = (resource) => {
                 default:
                     return <Avatar shape="square" size="large" src="/providers/azurerm/Azure.svg" />;
             }
-            
-
-        /* AWS */ 
+        /* AWS */
         case 'registry.terraform.io/hashicorp/aws':
-            return <Avatar shape="square" size="large" src="/providers/aws/AWS.svg" />;
-          
-        /* Default */ 
-        default: 
+            const iconSource = getAWSIcon(resource.type);
+            return <Avatar shape="square" size="large" src={iconSource} />;
+        /* Default */
+        default:
             return <IconContext.Provider value={{ size: "30px" }}><SiTerraform></SiTerraform></IconContext.Provider>;
-    
     }
 
 }
