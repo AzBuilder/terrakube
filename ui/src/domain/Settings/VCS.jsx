@@ -76,16 +76,28 @@ export const VCSSettings = ({ vcsMode }) => {
     }
   };
 
-  const getConnectUrl = (vcs, clientId, callbackUrl) => {
+  const getConnectUrl = (vcs, clientId, callbackUrl, endpoint) => {
     switch (vcs) {
       case "GITLAB":
-        return `https://gitlab.com/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
+        if(endpoint != null)
+          return `${endpoint}/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
+        else
+          return `https://gitlab.com/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
       case "BITBUCKET":
-        return `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
+        if(endpoint != null)
+          return `${endpoint}/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
+        else
+          return `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
       case "AZURE_DEVOPS":
-        return `https://app.vssps.visualstudio.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
+        if(endpoint != null)
+          return `${endpoint}/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
+        else
+          return `https://app.vssps.visualstudio.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
       default:
-        return `https://github.com/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
+        if(endpoint != null)
+          return `${endpoint}/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
+        else
+          return `https://github.com/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
     }
   };
 
