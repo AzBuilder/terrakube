@@ -1,4 +1,4 @@
-const AWSIconSet = [
+const AWSIcons = [
     // AWS Compute
     { type: "aws_ec2_", path: "/providers/aws/Arch_Compute/32/Arch_Amazon-EC2_32.svg"},
     { type: "aws_autoscaling_", path:"/providers/aws/Arch_Compute/32/Arch_Amazon-EC2-Auto-Scaling_32.svg"},
@@ -128,12 +128,22 @@ const AWSIconSet = [
 
 ]
 
+const getServiceIcon = (providerType,resourceType) => {
+    switch (providerType) {
+        case "registry.terraform.io/hashicorp/aws":
+            return getAWSIcon(resourceType);
+        default:
+            return "/providers/aws/AWS.svg";
+    }
+};
+
+
 const getAWSIcon = (resourceType) => {
     // search exact match
-    var icon = AWSIconSet.find(icon => resourceType === icon.type);
+    var icon = AWSIcons.find(icon => resourceType === icon.type);
     if (icon) return icon.path;
 
     // search partial match
-    icon = AWSIconSet.find(icon => resourceType.includes(icon.type));
+    icon = AWSIcons.find(icon => resourceType.includes(icon.type));
     return icon ? icon.path : "/providers/aws/AWS.svg";
-};
+}
