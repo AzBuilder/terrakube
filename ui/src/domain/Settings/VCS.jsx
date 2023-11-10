@@ -283,7 +283,8 @@ export const VCSSettings = ({ vcsMode }) => {
                                 item.attributes.clientId,
                                 getCallBackUrl(
                                   item.attributes?.callback ?? item.id
-                                )
+                                ),
+                                  item.attributes.endpoint
                               )}
                               size="small"
                             >
