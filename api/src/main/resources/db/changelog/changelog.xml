@@ -39,5 +39,6 @@
     <include file="/db/changelog/local/changelog-2.17.0-team-token-hours.xml"/>
     <include file="/db/changelog/local/changelog-2.17.0-state-archive.xml"/>
     <include file="/db/changelog/local/changelog-2.17.0-fix-state-archive.xml"/>
+    <include file="/db/changelog/local/changelog-2.18.0-vcs-custom-endpoint.xml"/>
 
 </databaseChangeLog>

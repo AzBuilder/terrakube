@@ -397,20 +397,46 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getConnectUrl = (vcs, clientId, callbackUrl) => {
+  const getConnectUrl = (vcs, clientId, callbackUrl, endpoint) => {
     switch (vcs) {
       case "GITLAB":
-        return `https://gitlab.com/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
+        if(endpoint != null)
+          return `${endpoint}/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
+        else
+          return `https://gitlab.com/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
       case "BITBUCKET":
-        return `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
+        if(endpoint != null)
+          return `${endpoint}/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
+        else
+          return `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
       case "AZURE_DEVOPS":
-        return `https://app.vssps.visualstudio.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
+        if(endpoint != null)
+          return `${endpoint}/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
+        else
+          return `https://app.vssps.visualstudio.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
       default:
-        return `https://github.com/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
+        if(endpoint != null)
+          return `${endpoint}/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
+        else
+          return `https://github.com/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
     }
   };
 
+  const renderDefaultEndpoint = (vcsType) => {
+    switch (vcsType) {
+      case "GITLAB":
+          return `https://gitlab.com`;
+      case "BITBUCKET":
+          return `https://bitbucket.org`;
+      case "AZURE_DEVOPS":
+          return `https://app.vssps.visualstudio.com`;
+      default:
+          return `https://github.com`;
+    }
+  }
+
   const onFinish = (values) => {
+    console.log(`Using endpoint ${values.endpoint}`)
     const body = {
       data: {
         type: "vcs",
@@ -421,6 +447,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           clientId: values.clientId,
           clientSecret: values.clientSecret,
           callback: uuid,
+          endpoint: values.endpoint,
           redirectUrl: `${window._env_.REACT_APP_REDIRECT_URI}/organizations/${orgid}/settings/vcs`,
         },
       },
@@ -441,7 +468,8 @@ export const AddVCS = ({ setMode, loadVCS }) => {
             getConnectUrl(
               vcsType,
               response.data.data.attributes.clientId,
-              getCallBackUrl()
+              getCallBackUrl(),
+                response.data.data.attributes.endpoint
             )
           );
           loadVCS();
@@ -564,6 +592,13 @@ export const AddVCS = ({ setMode, loadVCS }) => {
               rules={[{ required: true }]}
             >
               <Input placeholder={renderVCSType(vcsType)} />
+            </Form.Item>
+            <Form.Item
+                name="endpoint"
+                label="Only change this value when using a self-hosted VCS (Example: Github Enterprise, Bitbucket Server, Gitlab Server, etc)"
+                rules={[{ required: true }]}
+            >
+              <Input placeholder="" defaultValue={renderDefaultEndpoint(vcsType)}/>
             </Form.Item>
             <Form.Item
               name="clientId"

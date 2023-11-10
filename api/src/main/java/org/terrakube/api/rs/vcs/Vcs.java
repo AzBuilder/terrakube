@@ -42,6 +42,9 @@ public class Vcs extends GenericAuditFields {
     @Column(name = "callback")
     private String callback;
 
+    @Column(name = "endpoint")
+    private String endpoint;
+
     @ReadPermission(expression = "read vcs secret")
     @Column(name = "client_secret")
     private String clientSecret;

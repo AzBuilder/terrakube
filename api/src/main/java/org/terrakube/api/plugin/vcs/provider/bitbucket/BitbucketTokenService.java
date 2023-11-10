@@ -17,17 +17,14 @@ import java.time.Duration;
 @Slf4j
 public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
 
+    private static final String DEFAULT_ENDPOINT="https://bitbucket.org";
+
     @Override
-    public BitBucketToken getAccessToken(String clientId, String clientSecret, String tempCode, String callback) throws TokenException {
+    public BitBucketToken getAccessToken(String clientId, String clientSecret, String tempCode, String callback, String endpoint) throws TokenException {
         BitBucketToken bitBucketToken = null;
         for (int newToken = 0; newToken < 5; newToken++) {
             try {
-                WebClient client = WebClient.builder()
-                        .baseUrl("https://bitbucket.org")
-                        .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                        .defaultHeaders(header -> header.setBasicAuth(clientId, clientSecret))
-                        .build();
+                WebClient client = getClient(clientId, clientSecret, endpoint);
 
                 MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
                 formData.add("grant_type", "authorization_code");
@@ -56,17 +53,12 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
         }
     }
 
-    public BitBucketToken refreshAccessToken(String clientId, String clientSecret, String refreshToken) throws TokenException {
+    public BitBucketToken refreshAccessToken(String clientId, String clientSecret, String refreshToken, String endpoint) throws TokenException {
         BitBucketToken bitBucketToken = null;
         for (int attempt = 0; attempt < 5; attempt++) {
             try {
                 log.info("Getting Bitbucket refresh token {} attempt", attempt);
-                WebClient client = WebClient.builder()
-                        .baseUrl("https://bitbucket.org")
-                        .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                        .defaultHeaders(header -> header.setBasicAuth(clientId, clientSecret))
-                        .build();
+                WebClient client = getClient(clientId, clientSecret, endpoint);
 
                 MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
                 formData.add("grant_type", "refresh_token");
@@ -92,5 +84,14 @@ public class BitbucketTokenService implements GetAccessToken<BitBucketToken> {
 
         return bitBucketToken;
 
+    }
+
+    private WebClient getClient(String clientId, String clientSecret, String endpoint) {
+        return WebClient.builder()
+                .baseUrl((endpoint != null) ? endpoint : DEFAULT_ENDPOINT)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .defaultHeaders(header -> header.setBasicAuth(clientId, clientSecret))
+                .build();
     }
 }
