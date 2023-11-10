@@ -162,6 +162,14 @@ for providing us with free licenses to their great tools.
 * [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/WebStorm_icon.svg" alt="WebStorm" width="32"> WebStorm](https://www.jetbrains.com/webstorm/)
 * [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/DataGrip_icon.svg" alt="DataGrip" width="32"> DataGrip](https://www.jetbrains.com/datagrip/)
 
+### Gitbook
+
+Thank you for providing access the [OSS Plan](https://docs.gitbook.com/account-management/plans/apply-for-the-non-profit-open-source-plan) to handle all Terrakube documentation.
+
+Thank you to [<img src="https://uploads-ssl.webflow.com/5c349f90a3cd4515d0564552/5c66e5b48238e30e170da3be_logo.svg" alt="Gitbook" width="32"> Gitbook](https://www.gitbook.com/)
+for providing us with free [OSS Plan](https://docs.gitbook.com/account-management/plans/apply-for-the-non-profit-open-source-plan).
+
+
 #### Terraform BSL License
 
 Hashicorp confirmed that Terrakube is compatible with the new Terraform BSL License, more information can be found in the following [discussion](https://github.com/orgs/AzBuilder/discussions/467).
