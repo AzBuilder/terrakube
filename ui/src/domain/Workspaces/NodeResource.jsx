@@ -3,7 +3,7 @@ import { SiTerraform  } from "react-icons/si";
 import { Card, Avatar } from 'antd';
 import { IconContext } from "react-icons";
 import { Handle } from 'react-flow-renderer';
-import {getServiceIcon} from './Icons';
+import {getServiceIcon} from './Icons.js';
 const { Meta } = Card;
 
 export default memo(({ data, isConnectable }) => {

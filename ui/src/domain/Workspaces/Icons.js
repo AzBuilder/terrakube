@@ -128,7 +128,7 @@ const AWSIcons = [
 
 ]
 
-const getServiceIcon = (providerType,resourceType) => {
+export function getServiceIcon (providerType,resourceType){
     switch (providerType) {
         case "registry.terraform.io/hashicorp/aws":
             return getAWSIcon(resourceType);
