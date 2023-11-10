@@ -596,7 +596,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
             <Form.Item
                 name="endpoint"
                 label="Only change this value when using a self-hosted VCS (Example: Github Enterprise, Bitbucket Server, Gitlab Server, etc)"
-                rules={[{ required: true }]}
+                rules={[{ required: false }]}
             >
               <Input placeholder="" defaultValue={renderDefaultEndpoint(vcsType)}/>
             </Form.Item>
