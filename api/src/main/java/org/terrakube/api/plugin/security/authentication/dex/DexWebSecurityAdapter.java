@@ -26,11 +26,13 @@ public class DexWebSecurityAdapter {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret) throws Exception {
-        http.cors().and().csrf().ignoringAntMatchers("/remote/tfe/v2/configuration-versions/*", "/tfstate/v1/archive/*/terraform.tfstate", "/tfstate/v1/archive/*/terraform.json.tfstate").and().authorizeRequests(authz -> {
+        http.cors().and().csrf().ignoringAntMatchers("/remote/tfe/v2/configuration-versions/*", "/tfstate/v1/archive/*/terraform.tfstate", "/tfstate/v1/archive/*/terraform.json.tfstate","/webhook/v1/**").and().authorizeRequests(authz -> {
                             authz
                                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                     .antMatchers("/actuator/**").permitAll()
+                                    .antMatchers("/error").permitAll()
                                     .antMatchers("/callback/v1/**").permitAll()
+                                    .antMatchers("/webhook/v1/**").permitAll()
                                     .antMatchers("/.well-known/terraform.json").permitAll()
                                     .antMatchers("/remote/tfe/v2/ping").permitAll()
                                     .antMatchers(HttpMethod.PUT, "/remote/tfe/v2/configuration-versions/*").permitAll()

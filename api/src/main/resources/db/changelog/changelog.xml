@@ -32,12 +32,12 @@
     <include file="/db/changelog/local/changelog-2.10.0-remote-state.xml"/>
     <include file="/db/changelog/local/changelog-2.10.0-workspace-audit.xml"/>
     <include file="/db/changelog/local/changelog-2.14.0-vcs-redirect-url.xml"/>
-   <include file="/db/changelog/local/changelog-2.14.0-tags.xml"/>
+    <include file="/db/changelog/local/changelog-2.14.0-tags.xml"/>
     <include file="/db/changelog/local/changelog-2.15.0-tags-constraint.xml"/>
     <include file="/db/changelog/local/changelog-2.15.0-execution-mode.xml"/>
     <include file="/db/changelog/local/changelog-2.16.0-team-token.xml"/>
     <include file="/db/changelog/local/changelog-2.17.0-team-token-hours.xml"/>
     <include file="/db/changelog/local/changelog-2.17.0-state-archive.xml"/>
     <include file="/db/changelog/local/changelog-2.17.0-fix-state-archive.xml"/>
-
+    <include file="/db/changelog/local/changelog-2.18.0-webhooks.xml"/>
 </databaseChangeLog>

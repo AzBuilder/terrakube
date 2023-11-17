@@ -465,7 +465,7 @@ export const WorkspaceDetails = (props) => {
                                             </h4>
                                             <b>{item.createdBy}</b> triggered a
                                             run {item.latestChange} via{" "}
-                                            <b>UI</b>{" "}
+                                            <b>{item.via || "UI"}</b>{" "}
                                             {item.commitId !== "000000000" ? (
                                               <>
                                                 <FiGitCommit />{" "}
@@ -661,7 +661,7 @@ export const WorkspaceDetails = (props) => {
                                   ) : (
                                     ""
                                   )}
-                                  | <b>{item.createdBy}</b> triggered via UI
+                                  | <b>{item.createdBy}</b> triggered via {item.via || "UI"}
                                 </span>
                               }
                             />

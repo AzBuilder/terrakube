@@ -54,6 +54,9 @@ public class Job extends GenericAuditFields {
     @Column(name = "template_reference")
     private String templateReference;
 
+    @Column(name = "via")
+    private String via = "UI";
+
     @ManyToOne
     private Organization organization;
 
