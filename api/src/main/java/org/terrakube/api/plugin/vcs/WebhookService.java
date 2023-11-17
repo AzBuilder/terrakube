@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.vcs.provider.github.GitHubWebhookService;
+import org.terrakube.api.plugin.vcs.provider.gitlab.GitLabWebhookService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class WebhookService {
     WebhookRepository webhookRepository;
     WorkspaceRepository workspaceRepository;
     GitHubWebhookService gitHubWebhookService;
+    GitLabWebhookService gitLabWebhookService;
     JobRepository jobRepository;
     ScheduleJobService scheduleJobService;
 
@@ -62,6 +64,10 @@ public class WebhookService {
                     switch (vcs.getVcsType()) {
                         case GITHUB:
                              webhookResult = gitHubWebhookService.processWebhook(jsonPayload, headers,base64WorkspaceId);
+                            break;
+                        case GITLAB:
+                             webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,base64WorkspaceId);
+                            break;
                         default:
                             break;
                     }
@@ -153,6 +159,8 @@ public class WebhookService {
         case GITHUB:
              webhookRemoteId = gitHubWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
             break;
+        case GITLAB:
+             webhookRemoteId = gitLabWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
         default:
             break;
     }
