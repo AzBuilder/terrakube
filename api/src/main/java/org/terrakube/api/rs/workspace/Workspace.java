@@ -26,6 +26,7 @@ import java.util.UUID;
 @UpdatePermission(expression = "team manage workspace")
 @DeletePermission(expression = "team manage workspace")
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = WorkspaceManageHook.class)
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = WorkspaceManageHook.class)
 @Include
 @Getter
 @Setter
