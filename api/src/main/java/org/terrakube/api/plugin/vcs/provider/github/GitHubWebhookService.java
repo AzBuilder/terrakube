@@ -42,6 +42,8 @@ public class GitHubWebhookService {
 
     public WebhookResult processWebhook(String jsonPayload,Map<String, String> headers, String token) {
         WebhookResult result = new WebhookResult();
+        result.setBranch("");
+        result.setVia("Github");
         try {
 
             log.info("verify signature for github webhook");
@@ -66,15 +68,27 @@ public class GitHubWebhookService {
             }
 
             log.info("Parsing github webhook payload");
-            // Extract branch from the ref
-            JsonNode rootNode = objectMapper.readTree(jsonPayload);
-            String ref = rootNode.path("ref").asText();
-            String extractedBranch = ref.split("/")[2];
-            result.setBranch(extractedBranch);
 
             // Extract event
             String event = headers.get("x-github-event");
             result.setEvent(event);
+
+            if(event.equals("push"))
+            {
+                // Extract branch from the ref
+                JsonNode rootNode = objectMapper.readTree(jsonPayload);
+                String ref = rootNode.path("ref").asText();
+                String extractedBranch = ref.split("/")[2];
+                result.setBranch(extractedBranch);
+
+                // Extract the user who triggered the webhook
+                JsonNode pusherNode = rootNode.path("pusher");
+                String pusher = pusherNode.path("email").asText();
+                result.setCreatedBy(pusher);
+            }
+
+
+
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();

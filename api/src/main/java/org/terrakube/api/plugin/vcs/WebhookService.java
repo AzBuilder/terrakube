@@ -16,6 +16,7 @@ import org.terrakube.api.rs.workspace.Workspace;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.vcs.provider.github.GitHubWebhookService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ public class WebhookService {
     WorkspaceRepository workspaceRepository;
     GitHubWebhookService gitHubWebhookService;
     JobRepository jobRepository;
+    ScheduleJobService scheduleJobService;
 
 
     @Transactional
@@ -87,7 +89,14 @@ public class WebhookService {
                                 job.setOrganization(workspace.getOrganization());
                                 job.setWorkspace(workspace);
                                 job.setTemplateReference(templateId);
-                                jobRepository.save(job);
+                                job.setCreatedBy(webhookResult.getCreatedBy());
+                                job.setUpdatedBy(webhookResult.getCreatedBy());
+                                Date triggerDate = new Date(System.currentTimeMillis());
+                                job.setCreatedDate(triggerDate);
+                                job.setUpdatedDate(triggerDate);
+                                job.setVia(webhookResult.getVia());
+                                Job savedJob = jobRepository.save(job);
+                                scheduleJobService.createJobContext(savedJob);
                             } catch (Exception e) {
                                 log.error("Error creating the job", e);
                             }
@@ -123,11 +132,9 @@ public class WebhookService {
     }
 
     if (templateId.isEmpty()) {
-        log.warn("Template 'Plan and apply' not found");
-    } else {
-        // by default get the first template
+        log.warn("Template 'Plan and apply' not found , getting first template");
         templateId = templates.get(0).getId().toString();
-    }
+    } 
 
     // Template id is a json with the mapping of the event and the template id. 
     // In a future release we can trigger a different template for each event

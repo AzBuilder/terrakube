@@ -22,5 +22,8 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
+        <addColumn tableName="job" >
+            <column name="via" type="varchar(64)"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

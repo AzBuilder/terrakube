@@ -687,6 +687,7 @@ public class RemoteTfeService {
         job.setOrganization(workspace.getOrganization());
         job.setStatus(JobStatus.pending);
         job.setComments("terraform-cli");
+        job.setVia("CLI");
         job.setTemplateReference(template.getId().toString());
         job = jobRepository.save(job);
         log.info("Job Created");
