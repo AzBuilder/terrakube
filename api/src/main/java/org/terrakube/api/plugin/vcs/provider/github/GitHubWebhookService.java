@@ -91,13 +91,11 @@ public class GitHubWebhookService {
 
 
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.info("Error processing the webhook", e);
         } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.info("Error processing the webhook", e);
         } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.info("Error parsing the secret", e);
         }
         return result;
     }
@@ -150,7 +148,7 @@ private String extractOwnerAndRepo(String repoUrl) {
         String repo = parts[2].replace(".git", "");
         return owner + "/" + repo;
     } catch (Exception e) {
-        e.printStackTrace();
+       log.error("error extracing the repo", e);;
     }
     return "";
 }
