@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
+import org.terrakube.api.plugin.vcs.provider.bitbucket.BitBucketWebhookService;
 import org.terrakube.api.plugin.vcs.provider.github.GitHubWebhookService;
 import org.terrakube.api.plugin.vcs.provider.gitlab.GitLabWebhookService;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class WebhookService {
     WorkspaceRepository workspaceRepository;
     GitHubWebhookService gitHubWebhookService;
     GitLabWebhookService gitLabWebhookService;
+    BitBucketWebhookService BitBucketWebhookService;
     JobRepository jobRepository;
     ScheduleJobService scheduleJobService;
 
@@ -67,6 +69,9 @@ public class WebhookService {
                             break;
                         case GITLAB:
                              webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,base64WorkspaceId);
+                            break;
+                        case BITBUCKET:
+                            webhookResult = BitBucketWebhookService.processWebhook(jsonPayload, headers,base64WorkspaceId);
                             break;
                         default:
                             break;
@@ -157,10 +162,14 @@ public class WebhookService {
     Vcs vcs = workspace.getVcs();
     switch (vcs.getVcsType()) {
         case GITHUB:
-             webhookRemoteId = gitHubWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
+            webhookRemoteId = gitHubWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
             break;
         case GITLAB:
-             webhookRemoteId = gitLabWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
+            webhookRemoteId = gitLabWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
+            break;
+        case BITBUCKET:
+            webhookRemoteId = BitBucketWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
+            break;
         default:
             break;
     }
