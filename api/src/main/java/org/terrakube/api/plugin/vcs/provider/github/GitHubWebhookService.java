@@ -148,9 +148,9 @@ private String extractOwnerAndRepo(String repoUrl) {
         String repo = parts[2].replace(".git", "");
         return owner + "/" + repo;
     } catch (Exception e) {
-       log.error("error extracing the repo", e);;
+       log.error("error extracing the repo", e);
+       return "";
     }
-    return "";
 }
 
 private static String bytesToHex(byte[] hash) {
