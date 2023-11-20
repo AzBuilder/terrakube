@@ -73,7 +73,7 @@ public class GitLabWebhookService {
             }
 
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Error parsing JSON payload", e);
         }
         return result;
     }
@@ -130,7 +130,7 @@ public class GitLabWebhookService {
             String ownerAndRepo = owner + "/" + repo;
             return URLEncoder.encode(ownerAndRepo, "UTF-8");
         } catch (Exception e) {
-            e.printStackTrace();
+           log.info("Error extracting owner and repo from URL", e);
         }
         return "";
     }
