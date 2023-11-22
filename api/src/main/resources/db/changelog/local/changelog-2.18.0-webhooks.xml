@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="25" author="javier-canizalez@outlook.com">
+        <createTable tableName="webhook">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="type" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="template_mapping" type="clob">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reference_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remote_hook_id" type="varchar(220)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addColumn tableName="job" >
+            <column name="via" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

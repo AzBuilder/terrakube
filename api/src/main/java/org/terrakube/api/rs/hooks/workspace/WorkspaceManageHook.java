@@ -7,6 +7,7 @@ import com.yahoo.elide.core.security.RequestScope;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.softdelete.SoftDeleteService;
+import org.terrakube.api.plugin.vcs.WebhookService;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class WorkspaceManageHook implements LifeCycleHook<Workspace> {
 
     SoftDeleteService softDeleteService;
+    WebhookService webhookService;
 
     @Override
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase transactionPhase, Workspace workspace, RequestScope requestScope, Optional<ChangeSpec> optional) {
@@ -26,6 +28,9 @@ public class WorkspaceManageHook implements LifeCycleHook<Workspace> {
                     softDeleteService.disableWorkspaceSchedules(workspace);
                 }
                 break;
+            case CREATE:
+                log.info(null);
+                webhookService.createWorkspaceWebhook(workspace);
             default:
                 log.info("No hook define for this operation");
                 break;

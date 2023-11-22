@@ -47,6 +47,7 @@ export const CreateJob = ({ changeJob }) => {
         type: "job",
         attributes: {
           templateReference: values.templateId,
+          via: "UI",
         },
         relationships: {
           workspace: {

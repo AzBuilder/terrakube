@@ -270,7 +270,7 @@ export const DetailsJob = ({ jobId }) => {
               header={
                 <span>
                   <Avatar size="small" shape="square" icon={<UserOutlined />} />{" "}
-                  <b>{job.data.attributes.createdBy}</b> triggered a run from UI{" "}
+                  <b>{job.data.attributes.createdBy}</b> triggered a run from {job.data.attributes.via || "UI"}{" "}
                   {DateTime.fromISO(
                     job.data.attributes.createdDate
                   ).toRelative()}
