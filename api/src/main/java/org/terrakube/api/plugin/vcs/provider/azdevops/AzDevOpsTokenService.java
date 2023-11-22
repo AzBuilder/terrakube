@@ -16,7 +16,9 @@ public class AzDevOpsTokenService {
     @Value("${org.terrakube.hostname}")
     private String hostname;
 
-    public AzDevOpsToken getAccessToken(String vcsId, String clientSecret, String tempCode, String callback) throws TokenException {
+    private static final String DEFAULT_ENDPOINT="https://app.vssps.visualstudio.com";
+
+    public AzDevOpsToken getAccessToken(String vcsId, String clientSecret, String tempCode, String callback, String endpoint) throws TokenException {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         formData.add("client_assertion", clientSecret);
@@ -24,7 +26,7 @@ public class AzDevOpsTokenService {
         formData.add("assertion", tempCode);
         formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, callback == null ? vcsId: callback));
 
-        AzDevOpsToken azDevOpsToken = getWebClient().post()
+        AzDevOpsToken azDevOpsToken = getWebClient(endpoint).post()
                 .uri("/oauth2/token")
                 .body(BodyInserters.fromFormData(formData))
                 .retrieve()
@@ -34,7 +36,7 @@ public class AzDevOpsTokenService {
         return validateNewToken(azDevOpsToken);
     }
 
-    public AzDevOpsToken refreshAccessToken(String vcsId, String clientSecret, String refreshToken, String callback) throws TokenException {
+    public AzDevOpsToken refreshAccessToken(String vcsId, String clientSecret, String refreshToken, String callback, String endpoint) throws TokenException {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         formData.add("client_assertion", clientSecret);
@@ -42,7 +44,7 @@ public class AzDevOpsTokenService {
         formData.add("assertion", refreshToken);
         formData.add("redirect_uri", String.format("https://%s/callback/v1/vcs/%s", hostname, callback == null ? vcsId: callback));
 
-        AzDevOpsToken azDevOpsToken  = getWebClient().post()
+        AzDevOpsToken azDevOpsToken  = getWebClient(endpoint).post()
                 .uri("/oauth2/token")
                 .body(BodyInserters.fromFormData(formData))
                 .retrieve()
@@ -52,9 +54,9 @@ public class AzDevOpsTokenService {
         return validateNewToken(azDevOpsToken);
     }
 
-    private WebClient getWebClient(){
+    private WebClient getWebClient(String endpoint){
         return WebClient.builder()
-                .baseUrl("https://app.vssps.visualstudio.com")
+                .baseUrl((endpoint != null)? endpoint : DEFAULT_ENDPOINT)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
     }
@@ -63,7 +65,7 @@ public class AzDevOpsTokenService {
         if(azDevOpsToken != null) {
             return azDevOpsToken;
         } else {
-            throw new TokenException("500","Unable to get GitHub Token");
+            throw new TokenException("500","Unable to get Azure DevOps Token");
         }
     }
 }

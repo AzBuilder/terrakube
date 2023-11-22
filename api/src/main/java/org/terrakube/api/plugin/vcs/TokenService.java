@@ -53,12 +53,12 @@ public class TokenService {
             switch (vcs.getVcsType()) {
                 case GITHUB:
                     GitHubToken gitHubToken = gitHubTokenService.getAccessToken(vcs.getClientId(),
-                            vcs.getClientSecret(), tempCode, null);
+                            vcs.getClientSecret(), tempCode, null, vcs.getEndpoint());
                     vcs.setAccessToken(gitHubToken.getAccess_token());
                     break;
                 case BITBUCKET:
                     BitBucketToken bitBucketToken = bitbucketTokenService.getAccessToken(vcs.getClientId(),
-                            vcs.getClientSecret(), tempCode, null);
+                            vcs.getClientSecret(), tempCode, null, vcs.getEndpoint());
                     vcs.setAccessToken(bitBucketToken.getAccess_token());
                     vcs.setRefreshToken(bitBucketToken.getRefresh_token());
                     vcs.setTokenExpiration(
@@ -68,7 +68,7 @@ public class TokenService {
                     break;
                 case GITLAB:
                     GitLabToken gitLabToken = gitLabTokenService.getAccessToken(vcs.getId().toString(),
-                            vcs.getClientId(), vcs.getClientSecret(), tempCode, vcs.getCallback());
+                            vcs.getClientId(), vcs.getClientSecret(), tempCode, vcs.getCallback(), vcs.getEndpoint());
                     vcs.setAccessToken(gitLabToken.getAccess_token());
                     vcs.setRefreshToken(gitLabToken.getRefresh_token());
                     vcs.setTokenExpiration(new Date(System.currentTimeMillis() + gitLabToken.getExpires_in() * 1000));
@@ -77,7 +77,7 @@ public class TokenService {
                     break;
                 case AZURE_DEVOPS:
                     AzDevOpsToken azDevOpsToken = azDevOpsTokenService.getAccessToken(vcs.getId().toString(),
-                            vcs.getClientSecret(), tempCode, vcs.getCallback());
+                            vcs.getClientSecret(), tempCode, vcs.getCallback(), vcs.getEndpoint());
                     vcs.setAccessToken(azDevOpsToken.getAccess_token());
                     vcs.setRefreshToken(azDevOpsToken.getRefresh_token());
                     vcs.setTokenExpiration(new Date(System.currentTimeMillis() + azDevOpsToken.getExpires_in() * 1000));
@@ -105,7 +105,7 @@ public class TokenService {
     }
 
     public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId,
-            String clientSecret, String refreshToken, String callback) {
+            String clientSecret, String refreshToken, String callback, String endpoint) {
         Map<String, Object> tokenInformation = new HashMap<>();
         log.info("Renew Token before: {} {}", tokenExpiration, vcsId);
 
@@ -113,7 +113,7 @@ public class TokenService {
             case BITBUCKET:
                 try {
                     BitBucketToken bitBucketToken = bitbucketTokenService.refreshAccessToken(clientId, clientSecret,
-                            refreshToken);
+                            refreshToken, endpoint);
                     tokenInformation.put("accessToken", bitBucketToken.getAccess_token());
                     tokenInformation.put("refreshToken", bitBucketToken.getRefresh_token());
                     tokenInformation.put("tokenExpiration",
@@ -125,7 +125,7 @@ public class TokenService {
             case GITLAB:
                 try {
                     GitLabToken gitLabToken = gitLabTokenService.refreshAccessToken(vcsId, clientId, clientSecret,
-                            refreshToken, callback);
+                            refreshToken, callback, endpoint);
                     tokenInformation.put("accessToken", gitLabToken.getAccess_token());
                     tokenInformation.put("refreshToken", gitLabToken.getRefresh_token());
                     tokenInformation.put("tokenExpiration",
@@ -137,7 +137,7 @@ public class TokenService {
             case AZURE_DEVOPS:
                 try {
                     AzDevOpsToken azDevOpsToken = azDevOpsTokenService.refreshAccessToken(vcsId, clientSecret,
-                            refreshToken, callback);
+                            refreshToken, callback, endpoint);
                     tokenInformation.put("accessToken", azDevOpsToken.getAccess_token());
                     tokenInformation.put("refreshToken", azDevOpsToken.getRefresh_token());
                     tokenInformation.put("tokenExpiration",

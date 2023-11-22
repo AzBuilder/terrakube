@@ -10,11 +10,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class GitLabTokenService {
 
+    private static final String DEFAULT_ENDPOINT="https://gitlab.com";
+
     @Value("${org.terrakube.hostname}")
     private String hostname;
 
-    public GitLabToken getAccessToken(String vcsId, String clientId, String clientSecret, String tempCode, String callback) throws TokenException {
-        GitLabToken gitLabToken = getWebClient().post().uri(uriBuilder -> uriBuilder.path("/oauth/token")
+    public GitLabToken getAccessToken(String vcsId, String clientId, String clientSecret, String tempCode, String callback, String endpoint) throws TokenException {
+        GitLabToken gitLabToken = getWebClient(endpoint).post().uri(uriBuilder -> uriBuilder.path("/oauth/token")
                         .queryParam("client_id", clientId)
                         .queryParam("client_secret", clientSecret)
                         .queryParam("code",tempCode)
@@ -26,8 +28,8 @@ public class GitLabTokenService {
         return validateNewToken(gitLabToken);
     }
 
-    public GitLabToken refreshAccessToken(String vcsId, String clientId, String clientSecret, String refreshToken, String callback) throws TokenException {
-        GitLabToken gitLabToken = getWebClient().post().uri(uriBuilder -> uriBuilder.path("/oauth/token")
+    public GitLabToken refreshAccessToken(String vcsId, String clientId, String clientSecret, String refreshToken, String callback, String endpoint) throws TokenException {
+        GitLabToken gitLabToken = getWebClient(endpoint).post().uri(uriBuilder -> uriBuilder.path("/oauth/token")
                         .queryParam("client_id", clientId)
                         .queryParam("client_secret", clientSecret)
                         .queryParam("refresh_token", refreshToken)
@@ -39,9 +41,9 @@ public class GitLabTokenService {
         return validateNewToken(gitLabToken);
     }
 
-    private WebClient getWebClient(){
+    private WebClient getWebClient(String endpoint){
         return WebClient.builder()
-                .baseUrl("https://gitlab.com")
+                .baseUrl((endpoint != null)? endpoint : DEFAULT_ENDPOINT)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
@@ -50,7 +52,7 @@ public class GitLabTokenService {
         if(gitLabToken != null) {
             return gitLabToken;
         } else {
-            throw new TokenException("500","Unable to get GitHub Token");
+            throw new TokenException("500","Unable to get Gitlab Token");
         }
     }
 }

@@ -9,9 +9,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class GitHubTokenService implements GetAccessToken<GitHubToken> {
-    public GitHubToken getAccessToken(String clientId, String clientSecret, String tempCode, String callback) throws TokenException {
+
+    private static final String DEFAULT_ENDPOINT="https://github.com";
+
+    public GitHubToken getAccessToken(String clientId, String clientSecret, String tempCode, String callback, String endpoint) throws TokenException {
         WebClient client = WebClient.builder()
-                .baseUrl("https://github.com")
+                .baseUrl((endpoint != null)? endpoint : DEFAULT_ENDPOINT)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
