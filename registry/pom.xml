@@ -17,7 +17,7 @@
 		<azure.version>3.13.1</azure.version>
 		<java.version>17</java.version>
 		<lombok.version>1.18.20</lombok.version>
-		<terrakube-client-starter.version>0.12.0</terrakube-client-starter.version>
+		<terrakube-client-starter.version>0.13.0</terrakube-client-starter.version>
 		<jgit.version>6.6.1.202309021850-r</jgit.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<azure-storage-blob.version>12.14.3</azure-storage-blob.version>
