@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.vcs.WebhookResult;
+import org.terrakube.api.plugin.vcs.WebhookServiceBase;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Service
 @Slf4j
-public class GitHubWebhookService {
+public class GitHubWebhookService extends WebhookServiceBase {
 
     private final ObjectMapper objectMapper;
 
@@ -116,12 +117,14 @@ public String createWebhook(Workspace workspace,String webhookId)
 
     // Create the body, in this version we only support push event but in future we can make this more dynamic
     String body = "{\"name\":\"web\",\"active\":true,\"events\":[\"push\"],\"config\":{\"url\":\""+webhookUrl+"\",\"secret\":\""+ secret +"\",\"content_type\":\"json\",\"insecure_ssl\":\"1\"}}";
+    String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + ownerAndRepo+"/hooks";
+    log.info(apiUrl);
 
     // Create the entity
     HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
     // Make the request using the github api, in the future we can make api dynamic to use github server url
-    ResponseEntity<String> response = restTemplate.exchange("https://api.github.com/repos/" + ownerAndRepo+"/hooks", HttpMethod.POST, entity, String.class);
+    ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
 
     // Extract the id from the response
     if (response.getStatusCodeValue() == 201) {
@@ -138,31 +141,6 @@ public String createWebhook(Workspace workspace,String webhookId)
 
     return url;
 
-}
-
-private String extractOwnerAndRepo(String repoUrl) {
-    try {
-        URL url = new URL(repoUrl);
-        String[] parts = url.getPath().split("/");
-        String owner = parts[1];
-        String repo = parts[2].replace(".git", "");
-        return owner + "/" + repo;
-    } catch (Exception e) {
-       log.error("error extracing the repo", e);
-       return "";
-    }
-}
-
-private static String bytesToHex(byte[] hash) {
-    StringBuilder hexString = new StringBuilder(2 * hash.length);
-    for (byte b : hash) {
-        String hex = Integer.toHexString(0xff & b);
-        if (hex.length() == 1) {
-            hexString.append('0');
-        }
-        hexString.append(hex);
-    }
-    return hexString.toString();
 }
 
 }

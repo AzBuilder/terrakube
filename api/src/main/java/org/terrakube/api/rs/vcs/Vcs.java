@@ -45,6 +45,9 @@ public class Vcs extends GenericAuditFields {
     @Column(name = "endpoint")
     private String endpoint;
 
+    @Column(name = "api_url")
+    private String apiUrl;
+
     @ReadPermission(expression = "read vcs secret")
     @Column(name = "client_secret")
     private String clientSecret;

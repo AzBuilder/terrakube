@@ -10,8 +10,13 @@ import {
   Col,
   Typography,
   message,
+  Dropdown,
 } from "antd";
-import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
+import {
+  GithubOutlined,
+  GitlabOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import axiosInstance from "../../config/axiosConfig";
@@ -32,7 +37,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const handleChange = (currentVal) => {
     setCurrent(currentVal);
   };
-  const handleClick = (vcs) => {
+  const handleVCSClick = (vcs) => {
     setCurrent(1);
     setVcsType(vcs);
   };
@@ -47,22 +52,102 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     switch (vcs) {
       case "GITLAB":
         return "GitLab";
+      case "GITLAB_ENTERPRISE":
+        return "GitLab Enterprise";
       case "BITBUCKET":
         return "BitBucket";
+      case "BITBUCKET_SERVER":
+        return "BitBucket Server";
       case "AZURE_DEVOPS":
         return "Azure Devops";
+      case "AZURE_DEVOPS_SERVER":
+        return "Azure Devops Server";
+      case "GITHUB_ENTERPRISE":
+        return "GitHub Enterprise";
       default:
         return "GitHub";
     }
   };
+  const gitlabItems = [
+    {
+      label: "Gitlab.com",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("GITLAB");
+      },
+    },
+    {
+      label: "Gitlab Enterprise Edition",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("GITLAB_ENTERPRISE");
+      },
+    },
+  ];
 
+  const githubItems = [
+    {
+      label: "Github.com",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("GITHUB");
+      },
+    },
+    {
+      label: "Github Enterprise",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("GITHUB_ENTERPRISE");
+      },
+    },
+  ];
+
+  const bitBucketItems = [
+    {
+      label: "Bitbucket Cloud",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("BITBUCKET");
+      },
+    },
+    {
+      label: "Bitbucket Server",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("BITBUCKET_SERVER");
+      },
+    },
+  ];
+
+  const azDevOpsItems = [
+    {
+      label: "Azure DevOps Services",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("AZURE_DEVOPS");
+      },
+    },
+    {
+      label: "Azure DevOps Server",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("AZURE_DEVOPS_SERVER");
+      },
+    },
+  ];
   const getDocsUrl = (vcs) => {
     switch (vcs) {
       case "GITLAB":
         return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab.com";
+      case "GITLAB_ENTERPRISE":
+        return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab.com";
       case "BITBUCKET":
         return "https://docs.terrakube.io/user-guide/vcs-providers/bitbucket.com";
+      case "BITBUCKET_SERVER":
+        return "https://docs.terrakube.io/user-guide/vcs-providers/bitbucket-server";
       case "AZURE_DEVOPS":
+        return "https://docs.terrakube.io/user-guide/vcs-providers/azure-devops";
+      case "AZURE_DEVOPS_SERVER":
         return "https://docs.terrakube.io/user-guide/vcs-providers/azure-devops";
       default:
         return "https://docs.terrakube.io/user-guide/vcs-providers/github.com";
@@ -72,23 +157,114 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const getClientIdName = (vcs) => {
     switch (vcs) {
       case "GITLAB":
+      case "GITLAB_ENTERPRISE":
         return "Application ID";
       case "BITBUCKET":
+      case "BITBUCKET_SERVER":
         return "Key";
       case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
         return "App ID";
       default:
         return "Client ID";
     }
   };
 
+  const getVcsType = (vcs) => {
+    switch (vcs) {
+      case "GITLAB":
+      case "GITLAB_ENTERPRISE":
+        return "GITLAB";
+      case "BITBUCKET":
+      case "BITBUCKET_SERVER":
+        return "BITBUCKET";
+      case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
+        return "AZURE_DEVOPS";
+      default:
+        return "GITHUB";
+    }
+  };
+
+  const getAPIUrl = (vcs) => {
+    switch (vcs) {
+      case "GITLAB":
+        return "https://gitlab.com/api/v4";
+      case "BITBUCKET":
+        return "https://api.bitbucket.org/2.0";
+      case "AZURE_DEVOPS":
+        return "https://dev.azure.com";
+      case "GITHUB":
+        return "https://api.github.com";
+      default:
+        return "";
+    }
+  };
+
+  const getAPIUrlPlaceholder = (vcs) => {
+    switch (vcs) {
+      case "GITLAB_ENTERPRISE":
+        return "ex. https://<GITLAB INSTANCE HOSTNAME>/api/v4";
+      case "BITBUCKET_SERVER":
+        return "ex. https://<BITBUCKET INSTANCE HOSTNAME>";
+      case "AZURE_DEVOPS_SERVER":
+        return "ex. https://<AZURE DEVOPS INSTANCE HOSTNAME>";
+      case "GITHUB_ENTERPRISE":
+        return "ex. https://<GITHUB INSTANCE HOSTNAME>/api/v3";
+      default:
+        return "";
+    }
+  };
+
+  const getHttpsPlaceholder = (vcs) => {
+    switch (vcs) {
+      case "GITLAB_ENTERPRISE":
+        return "ex. https://<GITLAB INSTANCE HOSTNAME>";
+      case "BITBUCKET_SERVER":
+        return "ex. https://<BITBUCKET INSTANCE HOSTNAME>/<CONTEXT PATH>";
+      case "AZURE_DEVOPS_SERVER":
+        return "ex. https://<AZURE DEVOPS INSTANCE HOSTNAME>";
+      case "GITHUB_ENTERPRISE":
+        return "ex. https://<GITHUB INSTANCE HOSTNAME>";
+      default:
+        return "";
+    }
+  };
+
+  const httpsHidden = (vcs) => {
+    switch (vcs) {
+      case "GITLAB":
+      case "BITBUCKET":
+      case "AZURE_DEVOPS":
+      case "GITHUB":
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const apiUrlHidden = (vcs) => {
+    switch (vcs) {
+      case "GITLAB":
+      case "BITBUCKET":
+      case "AZURE_DEVOPS":
+      case "GITHUB":
+        return true;
+      default:
+        return false;
+    }
+  };
+
   const getSecretIdName = (vcs) => {
     switch (vcs) {
       case "GITLAB":
+      case "GITLAB_ENTERPRISE":
         return "Secret";
       case "BITBUCKET":
+      case "BITBUCKET_SERVER":
         return "Secret";
       case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
         return "Client Secret";
       default:
         return "Client Secret";
@@ -101,7 +277,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return (
           <div>
             <p className="paragraph">
-              1. On Gitlab,{" "}
+              1. On {renderVCSType(vcsType)},{" "}
               <Button
                 className="link"
                 target="_blank"
@@ -149,10 +325,10 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return (
           <div>
             <p className="paragraph">
-              1. On Bitbucket Cloud, logged in as whichever account you want
-              Terrakube to act as, add a new OAuth Consumer. You can find the
-              OAuth Consumer settings page under your workspace settings. Enter
-              the following information:
+              1. On {renderVCSType(vcsType)}, logged in as whichever account you
+              want Terrakube to act as, add a new OAuth Consumer. You can find
+              the OAuth Consumer settings page under your workspace settings.
+              Enter the following information:
             </p>
             <div className="paragraph">
               <p></p>
@@ -220,7 +396,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return (
           <div>
             <p className="paragraph">
-              1. On Azure DevOps,{" "}
+              1. On {renderVCSType(vcsType)},{" "}
               <Button
                 className="link"
                 target="_blank"
@@ -286,15 +462,23 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return (
           <div>
             <p className="paragraph">
-              1. On GitHub,{" "}
-              <Button
-                className="link"
-                target="_blank"
-                href="https://github.com/settings/applications/new"
-                type="link"
-              >
-                register a new OAuth Application&nbsp; <HiOutlineExternalLink />
-              </Button>
+              1. On {renderVCSType(vcsType)},{" "}
+              {vcsType === "GITHUB" ? (
+                <Button
+                  className="link"
+                  target="_blank"
+                  href="https://github.com/settings/applications/new"
+                  type="link"
+                >
+                  register a new OAuth Application&nbsp;{" "}
+                  <HiOutlineExternalLink />
+                </Button>
+              ) : (
+                <span>
+                  register a new OAuth Application using the link https://
+                  <i>yourdomain.com</i>/settings/applications/new
+                </span>
+              )}
               . Enter the following information:
             </p>
             <div className="paragraph">
@@ -400,54 +584,57 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const getConnectUrl = (vcs, clientId, callbackUrl, endpoint) => {
     switch (vcs) {
       case "GITLAB":
-        if(endpoint != null)
+        if (endpoint != null)
           return `${endpoint}/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
         else
           return `https://gitlab.com/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
       case "BITBUCKET":
-        if(endpoint != null)
+        if (endpoint != null)
           return `${endpoint}/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
         else
           return `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
       case "AZURE_DEVOPS":
-        if(endpoint != null)
+        if (endpoint != null)
           return `${endpoint}/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
         else
           return `https://app.vssps.visualstudio.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
       default:
-        if(endpoint != null)
+        if (endpoint != null)
           return `${endpoint}/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
         else
           return `https://github.com/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
     }
   };
 
-  const renderDefaultEndpoint = (vcsType) => {
+  const getDefaultHttps = (vcsType) => {
     switch (vcsType) {
       case "GITLAB":
-          return `https://gitlab.com`;
+        return `https://gitlab.com`;
       case "BITBUCKET":
-          return `https://bitbucket.org`;
+        return `https://bitbucket.org`;
       case "AZURE_DEVOPS":
-          return `https://app.vssps.visualstudio.com`;
+        return `https://app.vssps.visualstudio.com`;
+      case "GITHUB":
+        return `https://github.com`;
       default:
-          return `https://github.com`;
+        return ``;
     }
-  }
+  };
 
   const onFinish = (values) => {
-    console.log(`Using endpoint ${values.endpoint}`)
+    console.log(`Using endpoint ${values.endpoint}`);
     const body = {
       data: {
         type: "vcs",
         attributes: {
           name: values.name,
           description: values.name,
-          vcsType: vcsType,
+          vcsType: getVcsType(vcsType),
           clientId: values.clientId,
           clientSecret: values.clientSecret,
           callback: uuid,
           endpoint: values.endpoint,
+          apiUrl: values.apiUrl,
           redirectUrl: `${window._env_.REACT_APP_REDIRECT_URI}/organizations/${orgid}/settings/vcs`,
         },
       },
@@ -469,7 +656,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
               vcsType,
               response.data.data.attributes.clientId,
               getCallBackUrl(),
-                response.data.data.attributes.endpoint
+              response.data.data.attributes.endpoint
             )
           );
           loadVCS();
@@ -523,42 +710,33 @@ export const AddVCS = ({ setMode, loadVCS }) => {
             Choose the version control provider you would like to connect.
           </div>
           <Space direction="horizontal">
-            <Button
-              icon={<GithubOutlined />}
-              onClick={() => {
-                handleClick("GITHUB");
-              }}
-              size="large"
-            >
-              Github
-            </Button>
-            <Button
-              icon={<GitlabOutlined />}
-              onClick={() => {
-                handleClick("GITLAB");
-              }}
-              size="large"
-            >
-              Gitlab
-            </Button>
-            <Button
-              icon={<SiBitbucket />}
-              onClick={() => {
-                handleClick("BITBUCKET");
-              }}
-              size="large"
-            >
-              &nbsp;&nbsp;Bitbucket
-            </Button>
-            <Button
-              icon={<SiAzuredevops />}
-              onClick={() => {
-                handleClick("AZURE_DEVOPS");
-              }}
-              size="large"
-            >
-              &nbsp;&nbsp;Azure Devops
-            </Button>
+            <Dropdown menu={{ items: githubItems }}>
+              <Button size="large">
+                <Space>
+                  <GithubOutlined /> Github <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+            <Dropdown menu={{ items: gitlabItems }}>
+              <Button size="large">
+                <Space>
+                  <GitlabOutlined />
+                  Gitlab <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+            <Dropdown menu={{ items: bitBucketItems }}>
+              <Button size="large">
+                <SiBitbucket /> &nbsp; Bitbucket <DownOutlined />
+              </Button>
+            </Dropdown>
+            <Dropdown menu={{ items: azDevOpsItems }}>
+              <Button size="large">
+                <Space>
+                  <SiAzuredevops /> Azure Devops <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
           </Space>
         </Space>
       )}
@@ -584,6 +762,10 @@ export const AddVCS = ({ setMode, loadVCS }) => {
             validateMessages={validateMessages}
             name="create-vcs"
             layout="vertical"
+            initialValues={{
+              endpoint: getDefaultHttps(vcsType),
+              apiUrl: getAPIUrl(vcsType),
+            }}
           >
             <Form.Item
               name="name"
@@ -594,11 +776,20 @@ export const AddVCS = ({ setMode, loadVCS }) => {
               <Input placeholder={renderVCSType(vcsType)} />
             </Form.Item>
             <Form.Item
-                name="endpoint"
-                label="Only change this value when using a self-hosted VCS (Example: Github Enterprise, Bitbucket Server, Gitlab Server, etc)"
-                rules={[{ required: false }]}
+              name="endpoint"
+              label="HTTPS URL"
+              rules={[{ required: true }]}
+              hidden={httpsHidden(vcsType)}
             >
-              <Input placeholder="" defaultValue={renderDefaultEndpoint(vcsType)}/>
+              <Input placeholder={getHttpsPlaceholder(vcsType)} />
+            </Form.Item>
+            <Form.Item
+              name="apiUrl"
+              label="API URL"
+              rules={[{ required: true }]}
+              hidden={apiUrlHidden(vcsType)}
+            >
+              <Input placeholder={getAPIUrlPlaceholder(vcsType)} />
             </Form.Item>
             <Form.Item
               name="clientId"

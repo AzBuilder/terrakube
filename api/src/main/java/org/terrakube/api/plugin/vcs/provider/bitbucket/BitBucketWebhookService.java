@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.vcs.WebhookResult;
+import org.terrakube.api.plugin.vcs.WebhookServiceBase;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Service
 @Slf4j
-public class BitBucketWebhookService {
+public class BitBucketWebhookService extends WebhookServiceBase {
 
     private final ObjectMapper objectMapper;
 
@@ -127,7 +128,7 @@ public class BitBucketWebhookService {
         log.info(body);
         // Create the entity
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        String apiUrl = "https://api.bitbucket.org/2.0/repositories/" + ownerAndRepo + "/hooks";
+        String apiUrl =  workspace.getVcs().getApiUrl() + "/2.0/repositories/" + ownerAndRepo + "/hooks";
 
         // Make the request using the Bitbucket api
         ResponseEntity<String> response = restTemplate.exchange(apiUrl
@@ -152,30 +153,4 @@ public class BitBucketWebhookService {
 
         return url;
     }
-
-    private String extractOwnerAndRepo(String repoUrl) {
-        try {
-            URL url = new URL(repoUrl);
-            String[] parts = url.getPath().split("/");
-            String owner = parts[1];
-            String repo = parts[2].replace(".git", "");
-            return owner + "/" + repo;
-        } catch (Exception e) {
-            log.error("error extracing the repo", e);
-            return "";
-        }
-    }
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (byte b : hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
 }
