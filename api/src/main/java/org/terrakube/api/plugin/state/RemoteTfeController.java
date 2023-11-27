@@ -211,6 +211,7 @@ public class RemoteTfeController {
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/runs/{runId}/actions/discard")
     public ResponseEntity<RunsData> runDiscard(@PathVariable("runId") int runId) {
+        log.info("Running discard: {}", runId);
         return ResponseEntity.ok(remoteTfeService.runDiscard(runId));
     }
 

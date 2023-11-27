@@ -741,7 +741,7 @@ public class RemoteTfeService {
 
         HashMap<String, Object> actions = new HashMap<>();
         actions.put("is-confirmable", true);
-        actions.put("is-discardable", false);
+        actions.put("is-discardable", true);
         runsModel.getAttributes().put("actions", actions);
 
         HashMap<String, Object> permissions = new HashMap<>();
@@ -804,6 +804,7 @@ public class RemoteTfeService {
 
     RunsData runDiscard(int runId) {
         try {
+            log.warn("Updating job status for discard: {}", runId);
             Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
             job.setStatus(JobStatus.cancelled);
             jobRepository.save(job);
