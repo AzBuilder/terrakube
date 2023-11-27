@@ -810,7 +810,7 @@ public class RemoteTfeService {
             scheduleJobService.unlockWorkpace(job.getWorkspace().getId());
             scheduleJobService.deleteJobContext(job.getId());
         } catch (ParseException | SchedulerException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
         return getRun(runId, null);
     }
