@@ -10,6 +10,7 @@ import {
   Space,
   Select,
   message,
+  Dropdown,
 } from "antd";
 import {
   ORGANIZATION_ARCHIVE,
@@ -19,7 +20,11 @@ import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
 import { compareVersions } from "./Workspaces";
 import { IconContext } from "react-icons";
-import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
+import {
+  GithubOutlined,
+  GitlabOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { SiGit } from "react-icons/si";
 import { useHistory, Link } from "react-router-dom";
@@ -50,6 +55,73 @@ export const CreateWorkspace = () => {
   const [sshKeysVisible, setSSHKeysVisible] = useState(false);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const gitlabItems = [
+    {
+      label: "Gitlab.com",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("GITLAB");
+      }
+    },
+    {
+      label: "Gitlab Enterprise Edition",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("GITLAB_ENTERPRISE");
+      }
+    },
+  ];
+
+  const githubItems = [
+    {
+      label: "Github.com",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("GITHUB");
+      }
+    },
+    {
+      label: "Github Enterprise",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("GITHUB_ENTERPRISE");
+      }
+    },
+  ];
+
+  const bitBucketItems = [
+    {
+      label: "Bitbucket Cloud",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("BITBUCKET");
+      }
+    },
+    {
+      label: "Bitbucket Server",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("BITBUCKET_SERVER");
+      }
+    },
+  ];
+
+  const azDevOpsItems = [
+    {
+      label: "Azure DevOps Services",
+      key: "1",
+      onClick: () => {
+        handleVCSClick("AZURE_DEVOPS");
+      }
+    },
+    {
+      label: "Azure DevOps Server",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("AZURE_DEVOPS_SERVER");
+      }
+    },
+  ];
   const history = useHistory();
   useEffect(() => {
     setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
@@ -112,7 +184,7 @@ export const CreateWorkspace = () => {
         return (
           <IconContext.Provider value={{ size: "20px" }}>
             <SiAzuredevops />
-            &nbsp;&nbsp;
+            &nbsp;
           </IconContext.Provider>
         );
       default:
@@ -211,7 +283,7 @@ export const CreateWorkspace = () => {
             name: values.name,
             terraformVersion: values.terraformVersion,
             branch: values.branch,
-            executionMode: "remote"
+            executionMode: "remote",
           },
           relationships: {
             ssh: {
@@ -237,11 +309,25 @@ export const CreateWorkspace = () => {
           console.log("/workspaces/" + response.data.data.id);
           history.push("/workspaces/" + response.data.data.id);
         }
-
-      }).catch(error => {
-         if (error.response) {
-          if(error.response.status === 403){
-          message.error(<span>You are not authorized to create workspaces. <br/> Please contact your administrator and request the <b>Manage Workspaces</b> permission. <br/> For more information, visit the <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">Terrakube documentation</a>.</span>);
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 403) {
+            message.error(
+              <span>
+                You are not authorized to create workspaces. <br /> Please
+                contact your administrator and request the{" "}
+                <b>Manage Workspaces</b> permission. <br /> For more
+                information, visit the{" "}
+                <a
+                  target="_blank"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
+                >
+                  Terrakube documentation
+                </a>
+                .
+              </span>
+            );
           }
         }
       });
@@ -389,42 +475,33 @@ export const CreateWorkspace = () => {
               ) : (
                 <div>
                   <Space direction="horizontal">
-                    <Button
-                      icon={<GithubOutlined />}
-                      onClick={() => {
-                        handleVCSClick("GITHUB");
-                      }}
-                      size="large"
-                    >
-                      Github
+                    <Dropdown menu={{ items: githubItems }}>
+                      <Button size="large">
+                        <Space>
+                          <GithubOutlined /> Github <DownOutlined />
+                        </Space>
+                      </Button>
+                    </Dropdown>
+                    <Dropdown menu={{ items: gitlabItems }}>
+                      <Button size="large">
+                        <Space>
+                          <GitlabOutlined />
+                          Gitlab <DownOutlined />
+                        </Space>
+                      </Button>
+                    </Dropdown>
+                    <Dropdown menu={{ items: bitBucketItems }}>
+                    <Button size="large">
+                      <SiBitbucket /> &nbsp; Bitbucket <DownOutlined />
                     </Button>
-                    <Button
-                      icon={<GitlabOutlined />}
-                      onClick={() => {
-                        handleVCSClick("GITLAB");
-                      }}
-                      size="large"
-                    >
-                      Gitlab
+                    </Dropdown>
+                    <Dropdown menu={{ items: azDevOpsItems }}>
+                    <Button size="large">
+                      <Space>
+                     <SiAzuredevops /> Azure Devops <DownOutlined/>
+                      </Space>
                     </Button>
-                    <Button
-                      icon={<SiBitbucket />}
-                      onClick={() => {
-                        handleVCSClick("BITBUCKET");
-                      }}
-                      size="large"
-                    >
-                      &nbsp;&nbsp;Bitbucket
-                    </Button>
-                    <Button
-                      icon={<SiAzuredevops />}
-                      onClick={() => {
-                        handleVCSClick("AZURE_DEVOPS");
-                      }}
-                      size="large"
-                    >
-                      &nbsp;&nbsp;Azure Devops
-                    </Button>
+                    </Dropdown>
                   </Space>
                   <br />
                   <Button

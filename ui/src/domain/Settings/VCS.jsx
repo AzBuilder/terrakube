@@ -63,19 +63,6 @@ export const VCSSettings = ({ vcsMode }) => {
     }
   };
 
-  const renderAPIUrl = (vcs) => {
-    switch (vcs) {
-      case "GITLAB":
-        return "https://gitlab.com/api/v4";
-      case "BITBUCKET":
-        return "BitBucket";
-      case "AZURE_DEVOPS":
-        return "Azure Devops";
-      default:
-        return "https://api.github.com";
-    }
-  };
-
   const getConnectUrl = (vcs, clientId, callbackUrl, endpoint) => {
     switch (vcs) {
       case "GITLAB":
@@ -219,7 +206,7 @@ export const VCSSettings = ({ vcsMode }) => {
                       <Row>
                         <Col span={6}>API URL</Col>
                         <Col span={18}>
-                          {renderAPIUrl(item.attributes.vcsType)}
+                          {item.attributes?.apiUrl}
                         </Col>
                       </Row>
                     </p>

@@ -7,6 +7,7 @@
     <changeSet id="26" author="alfespa17@gmail.com">
         <addColumn tableName="vcs" >
             <column name="endpoint" type="varchar2(128)" />
+            <column name="api_url" type="varchar2(128)" />
         </addColumn>
     </changeSet>
 </databaseChangeLog>

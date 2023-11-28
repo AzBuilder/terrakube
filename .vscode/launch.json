@@ -7,7 +7,7 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "org.terrakube.api.ServerApplication",
             "projectName": "api-server",
-            "args": "-Xmx512m -Xms256m",
+            "args": "-Xmx512m -Xms256m -Dcom.sun.net.ssl.checkRevocation=false",
             "envFile": "${workspaceFolder}/.envApi",
             "preLaunchTask": "setup-java"
         },

@@ -16,7 +16,7 @@ public class DexAuditorAwareImpl implements AuditorAware<String> {
         if (authentication != null && authentication.isAuthenticated()) {
             log.debug("getCurrentAuditor: {}", authentication);
             if (authentication instanceof AnonymousAuthenticationToken)
-                return Optional.ofNullable("");
+                return Optional.empty();
             else
                 return Optional.of(isServiceAccount(authentication) ? "serviceAccount" : getEmail(authentication));
         } else {

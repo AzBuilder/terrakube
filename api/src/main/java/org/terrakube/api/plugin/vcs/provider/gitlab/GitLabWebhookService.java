@@ -99,7 +99,7 @@ public class GitLabWebhookService {
         log.info(body);
         // Create the entity
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        URI gitlabUri = UriComponentsBuilder.fromHttpUrl("https://gitlab.com/api/v4/projects/" + ownerAndRepo + "/hooks").build(true).toUri();
+        URI gitlabUri = UriComponentsBuilder.fromHttpUrl(workspace.getVcs().getApiUrl() + "/projects/" + ownerAndRepo + "/hooks").build(true).toUri();
 
         // Make the request using the GitLab API
         ResponseEntity<String> response = restTemplate.exchange(
