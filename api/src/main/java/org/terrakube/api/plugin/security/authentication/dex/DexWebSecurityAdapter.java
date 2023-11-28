@@ -40,6 +40,7 @@ public class DexWebSecurityAdapter {
                                     .antMatchers(HttpMethod.PUT,"/tfstate/v1/archive/*/terraform.json.tfstate").permitAll()
                                     .antMatchers("/remote/tfe/v2/plans/*/logs").permitAll()
                                     .antMatchers("/remote/tfe/v2/applies/*/logs").permitAll()
+                                    .antMatchers("/app/*/*/runs/*").permitAll()
                                     .anyRequest().authenticated();
                         }
                 )
