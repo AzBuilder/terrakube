@@ -25,7 +25,7 @@ public class RedirectController {
     ResponseEntity<Void> jobIdRedirect(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName, @PathVariable("jobId") int jobId) {
         log.info("Redirect for: {}/{}/{}", organizationName, workspaceName, jobId);
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(String.format("%s/workspace/%s", uiURL, jobRepository.findById(jobId).get().getWorkspace().getId())))
+                .location(URI.create(String.format("%s/workspaces/%s", uiURL, jobRepository.findById(jobId).get().getWorkspace().getId())))
                 .build();
     }
 }
