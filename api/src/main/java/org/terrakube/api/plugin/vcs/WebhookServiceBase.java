@@ -3,13 +3,22 @@ package org.terrakube.api.plugin.vcs;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.datical.liquibase.ext.checks.config.TriFunction;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -44,7 +53,8 @@ public class WebhookServiceBase {
         return hexString.toString();
     }
 
-    protected boolean verifySignature(Map<String, String> headers, String headerName, String token, String jsonPayload) {
+    protected boolean verifySignature(Map<String, String> headers, String headerName, String token,
+            String jsonPayload) {
         try {
             String signatureHeader = headers.get(headerName);
             if (signatureHeader == null) {
@@ -70,6 +80,37 @@ public class WebhookServiceBase {
             return false;
         }
 
+    }
+
+    protected ResponseEntity<String> makeApiRequest(HttpHeaders headers, String body, String apiUrl) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+        return restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+    }
+
+    protected WebhookResult handleWebhook(String jsonPayload, Map<String, String> headers, String token,
+            String signatureHeader, String via, TriFunction<String, WebhookResult, Map<String, String>, WebhookResult > handleEvent) {
+        WebhookResult result = new WebhookResult();
+        result.setBranch("");
+        result.setVia(via);
+
+        log.info("verify signature for " + via + " webhook");
+        result.setValid(verifySignature(headers, signatureHeader, token, jsonPayload));
+
+        if (!result.isValid()) {
+            log.info("Signature verification failed");
+            return result;
+        }
+
+        log.info("Parsing " + via + " webhook payload");
+
+        try {
+            result = handleEvent.apply(jsonPayload, result,headers);
+        } catch (Exception e) {
+            log.info("Error processing the webhook", e);
+        }
+
+        return result;
     }
 
 }
