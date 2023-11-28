@@ -48,24 +48,12 @@ public class GitHubWebhookService extends WebhookServiceBase {
         try {
 
             log.info("verify signature for github webhook");
-            result.setValid(true);
-            // Verify the Github signature
-            String signatureHeader = headers.get("x-hub-signature-256");
-            if (signatureHeader == null) {
-                log.error("X-Hub-Signature-256 header is missing!");
-                result.setValid(false);
+            result.setValid(verifySignature(headers, "x-hub-signature-256", token, jsonPayload));
+            
+            if(!result.isValid())
+            {
+                log.info("Signature verification failed");
                 return result;
-            }
-            Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secretKeySpec = new SecretKeySpec(token.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-            mac.init(secretKeySpec);
-            byte[] computedHash = mac.doFinal(jsonPayload.getBytes(StandardCharsets.UTF_8));
-            String expectedSignature = "sha256=" + bytesToHex(computedHash);
-
-            if (!signatureHeader.equals(expectedSignature)) {
-               log.error("Request signature didn't match!");
-               result.setValid(false);
-               return result;
             }
 
             log.info("Parsing github webhook payload");
@@ -87,16 +75,8 @@ public class GitHubWebhookService extends WebhookServiceBase {
                 String pusher = pusherNode.path("email").asText();
                 result.setCreatedBy(pusher);
             }
-
-
-
-
         } catch (JsonProcessingException e) {
             log.info("Error processing the webhook", e);
-        } catch (NoSuchAlgorithmException e) {
-            log.info("Error processing the webhook", e);
-        } catch (InvalidKeyException e) {
-            log.info("Error parsing the secret", e);
         }
         return result;
     }
