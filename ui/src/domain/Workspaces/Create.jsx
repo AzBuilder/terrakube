@@ -64,8 +64,15 @@ export const CreateWorkspace = () => {
       }
     },
     {
-      label: "Gitlab Enterprise Edition",
+      label: "Gitlab Community Edition",
       key: "2",
+      onClick: () => {
+        handleVCSClick("GITLAB_COMMUNITY");
+      },
+    },
+    {
+      label: "Gitlab Enterprise Edition",
+      key: "3",
       onClick: () => {
         handleVCSClick("GITLAB_ENTERPRISE");
       }
@@ -105,13 +112,6 @@ export const CreateWorkspace = () => {
       key: "1",
       onClick: () => {
         handleVCSClick("AZURE_DEVOPS");
-      }
-    },
-    {
-      label: "Azure DevOps Server",
-      key: "2",
-      onClick: () => {
-        handleVCSClick("AZURE_DEVOPS_SERVER");
       }
     },
   ];
