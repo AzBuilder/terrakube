@@ -104,13 +104,6 @@ export const CreateWorkspace = () => {
         handleVCSClick("BITBUCKET");
       }
     },
-    {
-      label: "Bitbucket Server",
-      key: "2",
-      onClick: () => {
-        handleVCSClick("BITBUCKET_SERVER");
-      }
-    },
   ];
 
   const azDevOpsItems = [

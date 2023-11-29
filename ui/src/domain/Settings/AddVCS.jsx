@@ -119,13 +119,6 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         handleVCSClick("BITBUCKET");
       },
     },
-    {
-      label: "Bitbucket Server",
-      key: "2",
-      onClick: () => {
-        handleVCSClick("BITBUCKET_SERVER");
-      },
-    },
   ];
 
   const azDevOpsItems = [
@@ -214,7 +207,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       case "GITLAB_COMMUNITY":
         return "ex. https://<GITLAB INSTANCE HOSTNAME>/api/v4";
       case "BITBUCKET_SERVER":
-        return "ex. https://<BITBUCKET INSTANCE HOSTNAME>";
+        return "ex. https://<BITBUCKET INSTANCE HOSTNAME>/context-path/rest/api/1.0";
       case "AZURE_DEVOPS_SERVER":
         return "ex. https://<AZURE DEVOPS INSTANCE HOSTNAME>";
       case "GITHUB_ENTERPRISE":
@@ -285,7 +278,6 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
-      case "GITLAB_COMMUNITY":
         return (
           <div>
             <p className="paragraph">
@@ -344,6 +336,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           </div>
         );
       case "BITBUCKET":
+      case "BITBUCKET_SERVER":
         return (
           <div>
             <p className="paragraph">
@@ -415,6 +408,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           </div>
         );
       case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
         return (
           <div>
             <p className="paragraph">
@@ -558,6 +552,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           </p>
         );
       case "BITBUCKET":
+      case "BITBUCKET_SERVER":
         return (
           <p className="paragraph">
             2. After clicking the "Save" button, you'll be taken to the OAuth
@@ -567,6 +562,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           </p>
         );
       case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
         return (
           <p className="paragraph">
             2. Create the application. On the following page, you'll find its
@@ -586,10 +582,13 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const renderStep3 = (vcs) => {
     switch (vcs) {
       case "GITLAB":
+      case "GITLAB_ENTERPRISE":
         return null;
       case "BITBUCKET":
+      case "BITBUCKET_SERVER":
         return null;
       case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
         return null;
       default:
         return (
@@ -606,16 +605,19 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const getConnectUrl = (vcs, clientId, callbackUrl, endpoint) => {
     switch (vcs) {
       case "GITLAB":
+      case "GITLAB_ENTERPRISE":
         if (endpoint != null)
           return `${endpoint}/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
         else
           return `https://gitlab.com/oauth/authorize?client_id=${clientId}&response_type=code&scope=api&&redirect_uri=${callbackUrl}`;
       case "BITBUCKET":
+      case "BITBUCKET_SERVER":
         if (endpoint != null)
           return `${endpoint}/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
         else
           return `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=code&response_type=code&scope=repository`;
       case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
         if (endpoint != null)
           return `${endpoint}/oauth2/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=Assertion&scope=vso.code+vso.code_status`;
         else

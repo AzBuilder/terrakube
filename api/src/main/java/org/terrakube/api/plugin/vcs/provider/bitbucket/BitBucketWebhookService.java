@@ -85,7 +85,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         String body = "{\"description\":\"Terrakube\",\"url\":\"" + webhookUrl
                 + "\",\"active\":true,\"events\":[\"repo:push\"],\"secret\":\"" + secret + "\"}";
 
-        String apiUrl = workspace.getVcs().getApiUrl() + "/2.0/repositories/" + ownerAndRepo + "/hooks";
+        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks";
 
         ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
 
