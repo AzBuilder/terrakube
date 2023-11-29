@@ -54,6 +54,8 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return "GitLab";
       case "GITLAB_ENTERPRISE":
         return "GitLab Enterprise";
+      case "GITLAB_COMMUNITY":
+        return "GitLab Community Edition";
       case "BITBUCKET":
         return "BitBucket";
       case "BITBUCKET_SERVER":
@@ -77,8 +79,15 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       },
     },
     {
-      label: "Gitlab Enterprise Edition",
+      label: "Gitlab Community Edition",
       key: "2",
+      onClick: () => {
+        handleVCSClick("GITLAB_ENTERPRISE");
+      },
+    },
+    {
+      label: "Gitlab Enterprise Edition",
+      key: "3",
       onClick: () => {
         handleVCSClick("GITLAB_ENTERPRISE");
       },
@@ -127,20 +136,14 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         handleVCSClick("AZURE_DEVOPS");
       },
     },
-    {
-      label: "Azure DevOps Server",
-      key: "2",
-      onClick: () => {
-        handleVCSClick("AZURE_DEVOPS_SERVER");
-      },
-    },
   ];
   const getDocsUrl = (vcs) => {
     switch (vcs) {
       case "GITLAB":
         return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab.com";
       case "GITLAB_ENTERPRISE":
-        return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab.com";
+      case "GITLAB_COMMUNITY":  
+        return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab-ee-and-ce";
       case "BITBUCKET":
         return "https://docs.terrakube.io/user-guide/vcs-providers/bitbucket.com";
       case "BITBUCKET_SERVER":
@@ -149,6 +152,8 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return "https://docs.terrakube.io/user-guide/vcs-providers/azure-devops";
       case "AZURE_DEVOPS_SERVER":
         return "https://docs.terrakube.io/user-guide/vcs-providers/azure-devops";
+      case "GITHUB_ENTERPRISE":
+        return "https://docs.terrakube.io/user-guide/vcs-providers/github-enterprise";
       default:
         return "https://docs.terrakube.io/user-guide/vcs-providers/github.com";
     }
@@ -158,6 +163,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
+      case "GITLAB_COMMUNITY":
         return "Application ID";
       case "BITBUCKET":
       case "BITBUCKET_SERVER":
@@ -174,6 +180,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
+      case "GITLAB_COMMUNITY":
         return "GITLAB";
       case "BITBUCKET":
       case "BITBUCKET_SERVER":
@@ -204,6 +211,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const getAPIUrlPlaceholder = (vcs) => {
     switch (vcs) {
       case "GITLAB_ENTERPRISE":
+      case "GITLAB_COMMUNITY":
         return "ex. https://<GITLAB INSTANCE HOSTNAME>/api/v4";
       case "BITBUCKET_SERVER":
         return "ex. https://<BITBUCKET INSTANCE HOSTNAME>";
@@ -219,6 +227,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const getHttpsPlaceholder = (vcs) => {
     switch (vcs) {
       case "GITLAB_ENTERPRISE":
+      case "GITLAB_COMMUNITY":
         return "ex. https://<GITLAB INSTANCE HOSTNAME>";
       case "BITBUCKET_SERVER":
         return "ex. https://<BITBUCKET INSTANCE HOSTNAME>/<CONTEXT PATH>";
@@ -259,6 +268,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
+      case "GITLAB_COMMUNITY":
         return "Secret";
       case "BITBUCKET":
       case "BITBUCKET_SERVER":
@@ -274,19 +284,31 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const renderStep1 = (vcs) => {
     switch (vcs) {
       case "GITLAB":
+      case "GITLAB_ENTERPRISE":
+      case "GITLAB_COMMUNITY":
         return (
           <div>
             <p className="paragraph">
               1. On {renderVCSType(vcsType)},{" "}
-              <Button
-                className="link"
-                target="_blank"
-                href="https://gitlab.com/-/profile/applications"
-                type="link"
-              >
-                register a new OAuth Application&nbsp; <HiOutlineExternalLink />
-              </Button>
-              . Enter the following information:
+              {vcsType === "GITLAB" ? (
+                <>
+                  <Button
+                    className="link"
+                    target="_blank"
+                    href="https://gitlab.com/-/profile/applications"
+                    type="link"
+                  >
+                    register a new OAuth Application&nbsp;{" "}
+                    <HiOutlineExternalLink />
+                  </Button>
+                  . Enter the following information:
+                </>
+              ) : (
+                <span>
+                  navigate to User Settings → Application and register a new
+                  OAuth Application with the following information.
+                </span>
+              )}
             </p>
             <div className="paragraph">
               <p></p>
