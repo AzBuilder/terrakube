@@ -1,7 +1,7 @@
 <br/>
 <div id="terrakube" align="center">
     <br />
-    <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="120"/>
+    <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="100"/>
     <h3>Terrakube</h3>
     <p>Open source IaC Automation and Collaboration Software.</p>
 </div>
