@@ -43,13 +43,7 @@ The key features of Terrakube are:
 To learn more about Terrakube [go to the complete documentation.](https://docs.terrakube.io/) 
 
 ### Contributing 
-Terrakube is open to any idea or feedback. See our [Contribute Guide](CONTRIBUTING.md) for more deatils
-
-### Community
-You can reach Terrakube community and developers via the following channels:
-
-- Q & A : Github Discussions
-- Chat : The #argo-cd Slack channel
+Terrakube welcomes any idea or feedback from the community. If you want to contribute to this project, please read our [Contribution Guide](CONTRIBUTING.md) for more details.
   
 ### Sponsors
 
