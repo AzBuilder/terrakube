@@ -34,15 +34,6 @@ The key features of Terrakube are:
 
 ### Installation
 
-You can quickly install Terrakube using the [helm chart](https://github.com/AzBuilder/terrakube-helm-chart):
-
-```
-kubectl create namespace terrakube
-helm install terrakube terrakube-repo/terrakube -n terrakube
-```
-
-For additional guides use the following links:
-
 - [Install Terrakube using Helm](https://docs.terrakube.io/getting-started/deployment/docker-compose)
 - [Install Terrakube using Docker Compose](https://docs.terrakube.io/getting-started/docker-compose)
 - [Test Terrakube using Minikube](https://docs.terrakube.io/getting-started/deployment/minikube-+-https)
@@ -51,7 +42,8 @@ For additional guides use the following links:
 ### Documentation
 To learn more about Terrakube [go to the complete documentation.](https://docs.terrakube.io/) 
 
-### Contributing
+### Contributing 
+Terrakube is open to any idea or feedback. See our [Contribute Guide](CONTRIBUTING.md) for more deatils
 
 ### Community
 You can reach Terrakube community and developers via the following channels:
