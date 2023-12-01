@@ -60,7 +60,6 @@ You can reach Terrakube community and developers via the following channels:
 - Chat : The #argo-cd Slack channel
   
 ### Sponsors
-Thanks to our sponsors:
 
 | Sponsor  | Thanks |
 | ------------- | ------------- |
