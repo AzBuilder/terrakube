@@ -22,6 +22,7 @@
 ### Features
 The key features of Terrakube are:
 - **Private Registry:** Publish your Terraform Modules and Providers privately.
+  <br/>
   ![Private registry](https://github.com/AzBuilder/terrakube/assets/27365102/66fbd39c-0a40-43d8-94d9-4c2a0976051c)
 
 - Organize infrastructure using Organizations and Workspaces
