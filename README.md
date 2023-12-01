@@ -20,7 +20,13 @@
 
 
 ### Features
-
+- Private Registry
+- Organize infrastructure using Organizations and Workspaces
+- Terraform Workflow
+- Version Control Integration
+- Access Control
+- Policy enforcement
+  
 
 ### Getting Started
 
