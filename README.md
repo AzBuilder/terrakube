@@ -1,14 +1,21 @@
-## Terrakube Platform [![gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
+<br/>
+<div id="terrakube" align="center">
+    <br />
+    <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="120"/>
+    <h3>Terrakube</h3>
+    <p>Open source IaC Automation and Collaboration Software.</p>
+</div>
 
-[![Gitter](https://badges.gitter.im/AzBuilder/community.svg)](https://gitter.im/AzBuilder/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+<div id="badges" align="center">
+
+[![gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
 [![Build](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml/badge.svg)](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=AzBuilder_azb-server&metric=coverage)](https://sonarcloud.io/dashboard?id=AzBuilder_azb-server)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/AzBuilder/azb-server/blob/main/LICENSE)
 [![gitbook](https://raw.githubusercontent.com/aleen42/badges/master/src/gitbook_2.svg)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
+</div>
 
-Open source Terraform Automation and Collaboration Software.
 
-The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expose a [JSON:API](https://jsonapi.org/) or [GraphQL](https://graphql.org/).
 
 ## High Level Architecture
 ![Architecture](https://raw.githubusercontent.com/AzBuilder/docs/master/.gitbook/assets/TerrakubeV2.png)
