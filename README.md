@@ -20,10 +20,12 @@
 
 
 ### Features
+The key features of Terrakube are:
 - Private Registry
 - Organize infrastructure using Organizations and Workspaces
-- Terraform Workflow
 - Version Control Integration
+- Terraform Workflow
+- Custom Workflows
 - Access Control
 - Policy enforcement
   
@@ -31,12 +33,17 @@
 ### Getting Started
 
 ### Documentation
+To learn more about Terrakube [go to the complete documentation.](https://docs.terrakube.io/) 
 
+### Contributing
 
 ### Community
+You can reach Terrakube community and developers via the following channels:
 
+- Q & A : Github Discussions
+- Chat : The #argo-cd Slack channel
+  
 ### Sponsors
-
 
 - [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains" width="32"> JetBrains](https://jb.gg/OpenSource)
 - [<img src="https://uploads-ssl.webflow.com/5c349f90a3cd4515d0564552/5c66e5b48238e30e170da3be_logo.svg" alt="Gitbook" width="32"> Gitbook](https://www.gitbook.com/)
