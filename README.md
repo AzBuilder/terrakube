@@ -32,6 +32,22 @@ The key features of Terrakube are:
 
 ### Getting Started
 
+### Installation
+
+You can quickly install Terrakube using the helm chart
+
+```
+kubectl create namespace terrakube
+helm install terrakube terrakube-repo/terrakube -n terrakube
+```
+
+For additional guides use the following links:
+
+- Install Terrakube using Helm
+- Install Terrakube using Docker Compose
+- Test Terrakube using Minikube
+- Test Terrakube using Gitpod
+
 ### Documentation
 To learn more about Terrakube [go to the complete documentation.](https://docs.terrakube.io/) 
 
