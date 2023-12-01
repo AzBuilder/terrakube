@@ -20,12 +20,6 @@
 
 
 ### Features
-This project contains three modules describe below:
-
-
-
-
-
 
 
 ### Getting Started
@@ -40,8 +34,7 @@ This project contains three modules describe below:
 
 - [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains" width="32"> JetBrains](https://jb.gg/OpenSource)
 - [<img src="https://uploads-ssl.webflow.com/5c349f90a3cd4515d0564552/5c66e5b48238e30e170da3be_logo.svg" alt="Gitbook" width="32"> Gitbook](https://www.gitbook.com/)
-- Docker 
+- [<img src="https://github.com/AzBuilder/terrakube/assets/27365102/e5977550-eb4f-4519-9aa8-293e5660f873" width="32"> Docker](https://www.docker.com/)
 
 ### Terraform BSL License
-
 Hashicorp confirmed that Terrakube is compatible with the new Terraform BSL License, more information can be found in the following [discussion](https://github.com/orgs/AzBuilder/discussions/467).
