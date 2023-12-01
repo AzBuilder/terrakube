@@ -2,8 +2,8 @@
 <div id="terrakube" align="center">
     <br />
     <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="100"/>
-    <h3>Terrakube</h3>
-    <p>Open source IaC Automation and Collaboration Software.</p>
+    <h2 border="0">Terrakube</h2>
+    <p>Open source Terraform Automation and Collaboration Software.</p>
 </div>
 
 <div id="badges" align="center">
@@ -13,6 +13,8 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=AzBuilder_azb-server&metric=coverage)](https://sonarcloud.io/dashboard?id=AzBuilder_azb-server)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/AzBuilder/azb-server/blob/main/LICENSE)
 [![gitbook](https://raw.githubusercontent.com/aleen42/badges/master/src/gitbook_2.svg)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
+
+
 </div>
 
 
@@ -28,6 +30,10 @@ This project contains three modules describe below:
 
 ### Getting Started
 
+### Documentation
+
+
+### Community
 
 ### Sponsors
 
