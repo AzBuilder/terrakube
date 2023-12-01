@@ -1,6 +1,12 @@
 package org.terrakube.registry.configuration.authentication.dex;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.JwtParserBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.authentication.ProviderManager;
@@ -18,10 +24,14 @@ import lombok.Setter;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 @Builder
 @Getter
 @Setter
+@Slf4j
 public class RegistryAuthenticationManagerResolver implements AuthenticationManagerResolver<HttpServletRequest> {
 
     private static final String jwtPat ="Terrakube";
@@ -50,8 +60,17 @@ public class RegistryAuthenticationManagerResolver implements AuthenticationMana
 
     private String getJwtIssuer(HttpServletRequest request) {
         String token = request.getHeader("authorization").replace("Bearer ", "");
-        String jwtToken = token.substring(0, token.lastIndexOf('.') + 1);
-        return Jwts.parser().build().parseUnsecuredClaims(jwtToken).getPayload().getIssuer();
+        String[] chunks = token.split("\\.");
+        Base64.Decoder decoder = Base64.getDecoder();
+        String payload = new String(decoder.decode(chunks[1]));
+        String issuer = "";
+        try {
+            Map<String,Object> result = new ObjectMapper().readValue(payload, HashMap.class);
+            issuer = result.get("iss").toString();
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+        return issuer;
     }
 
     private JwtDecoder getJwtEncoder(String issuerType) {
