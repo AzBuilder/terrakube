@@ -25,7 +25,7 @@
         <rest-assured.version>4.5.1</rest-assured.version>
         <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
         <groovy.version>3.0.8</groovy.version>
-        <azure-identity.version>1.5.3</azure-identity.version>
+        <azure-identity.version>1.11.1</azure-identity.version>
         <postgresql.version>42.4.3</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
