@@ -29,13 +29,15 @@ The key features of Terrakube are:
 
 <img src="https://github.com/AzBuilder/terrakube/assets/27365102/f36953f7-0dbd-4877-be8d-ba2bf7704f2b" width="1080"/>  <br/>
 
-
 - **Version Control Integration:** Terrakube integrates with Github (Cloud and  Enterprise), GitLab (EE and CE), Bitbucket and Azure DevOps to retrieve your terraform code. <br/>
+
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/d9102910-41af-42be-b154-1257108f688b" width="1080"/>  <br/>
+
 - Terraform Workflow
 - Custom Workflows
 - Access Control
 - Policy enforcement
-  
+
 
 ### Getting Started
 
