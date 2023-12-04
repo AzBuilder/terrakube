@@ -23,11 +23,12 @@
 The key features of Terrakube are:
 - **Private Registry:** Publish your Terraform Modules and Providers privately.   <br/>
 
-  ![Private registry](https://github.com/AzBuilder/terrakube/assets/27365102/66fbd39c-0a40-43d8-94d9-4c2a0976051c)
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/66fbd39c-0a40-43d8-94d9-4c2a0976051c" width="1080"/>  <br/>
 
-- **Organize infrastructure using Organizations and Workspaces**    <br/>
+- **Organizations and Workspaces:** Organize your infrastructure in Organizations and Workspaces. You can also use Tags in Workspaces to correlate, organize, and even filter workspaces based on the assigned tags.    <br/>
 
-![workspaces and organizations](https://github.com/AzBuilder/terrakube/assets/27365102/f36953f7-0dbd-4877-be8d-ba2bf7704f2b)
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/f36953f7-0dbd-4877-be8d-ba2bf7704f2b" width="1080"/>  <br/>
+
 
 - **Version Control Integration:** Terrakube integrates with Github (Cloud and  Enterprise), GitLab (EE and CE), Bitbucket and Azure DevOps to retrieve your terraform code. <br/>
 - Terraform Workflow
