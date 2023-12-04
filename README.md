@@ -25,7 +25,7 @@ The key features of Terrakube are:
 
 <img src="https://github.com/AzBuilder/terrakube/assets/27365102/66fbd39c-0a40-43d8-94d9-4c2a0976051c" width="1080"/>  <br/>
 
-- **Organizations and Workspaces:** Organize your infrastructure in Organizations and Workspaces. You can also use Tags in Workspaces to correlate, organize, and even filter workspaces based on the assigned tags.    <br/>
+- **Organizations and Workspaces:** Organize your infrastructure using Organizations and Workspaces. You can also use Tags in Workspaces to correlate, organize, and even filter workspaces based on the assigned tags.    <br/>
 
 <img src="https://github.com/AzBuilder/terrakube/assets/27365102/f36953f7-0dbd-4877-be8d-ba2bf7704f2b" width="1080"/>  <br/>
 
