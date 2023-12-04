@@ -3,7 +3,7 @@
     <br />
     <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="100"/>
     <h2 border="0">Terrakube</h2>
-    <p>Open source Terraform Automation and Collaboration Software.</p>
+    <p>Open source IaC Automation and Collaboration Software.</p>
 </div>
 
 <div id="badges" align="center">
