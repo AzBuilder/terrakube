@@ -1,4 +1,3 @@
-![Terraform workflow](https://github.com/AzBuilder/terrakube/assets/27365102/e1ee06ea-535f-4b8b-b302-55c96f3e3e53)<br/>
 <div id="terrakube" align="center">
     <br />
     <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="100"/>
