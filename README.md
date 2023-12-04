@@ -1,4 +1,4 @@
-<br/>
+![Terraform workflow](https://github.com/AzBuilder/terrakube/assets/27365102/e1ee06ea-535f-4b8b-b302-55c96f3e3e53)<br/>
 <div id="terrakube" align="center">
     <br />
     <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="100"/>
@@ -33,11 +33,15 @@ The key features of Terrakube are:
 
 <img src="https://github.com/AzBuilder/terrakube/assets/27365102/d9102910-41af-42be-b154-1257108f688b" width="1080"/>  <br/>
 
-- Terraform Workflow
-- Custom Workflows
-- Access Control
-- Policy enforcement
+- **Terraform Workflow:** Terrakube allows you to run the Terraform workflow from anywhere, anytime. You can perform actions such as terraform apply, terraform plan, and terraform destroy. You can also manage variables and access the Terraform state files.
 
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/9e0421be-576c-4206-a29a-c1d62238681e" width="1080"/>  <br/>
+
+- **Custom Workflows:** Enhance your IaC workflow with OPA, Infracost, or any other tool of your choice. You can use Terrakube extensions to integrate them seamlessly, or create your own custom integration using the Terrakube API. This way, you can automate compliance checks, cost estimates, security scans, and more for your Terraform projects.
+  
+- **Access Control:** You can use [DEX](https://github.com/dexidp/dex) to authenticate in Terrakube with various identity providers, such as Azure Active Directory, Amazon Cognito, Github, SAML, and more. You can also leverage your existing groups to assign granular permissions to Workspaces, Modules, VCS, and other resources.
+
+- **Remote Backend:** Terrakube supports both `remote backend` and `cloud` block so you can run your workflow directly from the Terraform CLI.
 
 ### Getting Started
 
