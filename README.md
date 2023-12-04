@@ -1,173 +1,69 @@
-## Terrakube Platform [![gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
+![Terraform workflow](https://github.com/AzBuilder/terrakube/assets/27365102/e1ee06ea-535f-4b8b-b302-55c96f3e3e53)<br/>
+<div id="terrakube" align="center">
+    <br />
+    <img src="https://avatars.githubusercontent.com/u/80990539?s=200&v=4" alt="Terrakube Logo" width="100"/>
+    <h2 border="0">Terrakube</h2>
+    <p>Open source IaC Automation and Collaboration Software.</p>
+</div>
 
-[![Gitter](https://badges.gitter.im/AzBuilder/community.svg)](https://gitter.im/AzBuilder/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+<div id="badges" align="center">
+
+[![gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
 [![Build](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml/badge.svg)](https://github.com/AzBuilder/azb-server/actions/workflows/pull_request.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=AzBuilder_azb-server&metric=coverage)](https://sonarcloud.io/dashboard?id=AzBuilder_azb-server)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/AzBuilder/azb-server/blob/main/LICENSE)
 [![gitbook](https://raw.githubusercontent.com/aleen42/badges/master/src/gitbook_2.svg)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
 
-Open source Terraform Automation and Collaboration Software.
 
-The server defines a rest API based on [Yahoo Elide](https://elide.io/) and expose a [JSON:API](https://jsonapi.org/) or [GraphQL](https://graphql.org/).
-
-## High Level Architecture
-![Architecture](https://raw.githubusercontent.com/AzBuilder/docs/master/.gitbook/assets/TerrakubeV2.png)
-
-For more information please visit our [documentation](https://docs.terrakube.io/).
-
-### Getting started guide
-
-If you want to develop or test Terrakube click in the following button to open a complete running environment in just a couple of seconds.
-
-[![gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/AzBuilder/terrakube)
-
-For more information about the test environment please refer to the following [file](development.md) and to learn about the API check the following [api information](https://docs.terrakube.io/api/methods)
-
-### Minikube
-
-To quickly test Terrakube in Minikube please follow [this](https://docs.terrakube.io/getting-started/deployment/minikube)
-
-### Docker-Compose
-
-To quickly test Terrakube in docker compose please follow [this](https://docs.terrakube.io/getting-started/docker-compose)
-
-### Security - Authentication
-
-Terrakube uses [DEX](https://dexidp.io/docs/connectors/) to handle authentication. Dex is an identity service that uses OpenID Connect to drive authentication for other apps.
-Dex acts as a portal to other identity providers through “connectors.” This lets Terrakube defer authentication to LDAP servers, SAML providers, or established identity providers like GitHub, Google, and Active Directory.
-
-### Modules
-This project contains three modules describe below:
-
-| Name     | Description                                                      |
-|:---------|------------------------------------------------------------------|
-| api      | Expose the API to manage all terraform workspaces                |
-| registry | Open source terraform registry compatible with the Terrakube API |
-| executor | This components run terraform jobs and use Terrakube extensions  |
-| ui       | React JS terrakube front end                                     |
-
-### Version Control Services
-The platform support public and private repositories for modules and workspaces in the following providers:
-
-* GitHub.com
-* Bitbucket.com
-* Gitlab.com
-* Azure DevOps
-
-For private repositories you need to use one of the following methods for authentication:
-
-* oAuth Applications (GitHub, Bitbucket, Gitlab and Azure Devops)
-* SSH Keys 
-  - RSA
-  - ED25519
-
-### Requirements
-
-To compile and run the tool you will need the following:
-
-* Java 17
-* Maven
-* Node
-
-### Compiling
-
-```bash
-mvn clean install -Dspring-boot.build-image.skip=true
-cd ui 
-yarn install
-```
-
-### Supported Databases
-To run the api you need the following environment variables:
-
-| Name             | Description |
-|:-----------------|-------------|
-| SQL Azure        | Supported   |
-| PostgreSQL       | Supported   |
-| MySQL            | Supported   |
-| MariaDB          | Pending     |
-| Oracle           | Pending     |
-
-### Supported Storage Backend.
-
-The platform support the following storage backends.
-- Minio
-- Azure Storage Account
-- Google Cloud Storage
-- Amazon S3
-
-### Build Docker Images
-
-To build the docker images for the server and server job execute the following command:
-```bash
-mvn spring-boot:build-image
-cd ui 
-docker build -t terrakube-ui:latest  .
-```
+</div>
 
 
-### Terraform Terrakube Provider
 
-A Terraform provider is available in [this repository](https://github.com/AzBuilder/terraform-provider-terrakube) to manage Terrakube objects like modules, teams, ssh keys, etc.
+### Features
+The key features of Terrakube are:
+- **Private Registry:** Publish your Terraform Modules and Providers privately.   <br/>
 
-Example: 
-```terraform
-terraform {
-  required_providers {
-    terrakube = {
-      source = "AzBuilder/terrakube"
-    }
-  }
-}
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/66fbd39c-0a40-43d8-94d9-4c2a0976051c" width="1080"/>  <br/>
 
-provider "terrakube" {
-  endpoint = "http://terrakube-api.minikube.net"
-  token    = "(PERSONAL ACCESS TOKEN OR TEAM TOKEN)"
-}
+- **Organizations and Workspaces:** Use Organizations and Workspaces to manage your infrastructure in a structured and efficient way. Workspaces also support Tags, which let you group, organize, and filter your workspaces based on the tags you assign to them.    <br/>
 
-data "terrakube_organization" "org" {
-  name = "simple"
-}
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/f36953f7-0dbd-4877-be8d-ba2bf7704f2b" width="1080"/>  <br/>
 
-resource "terrakube_team" "team" {
-  name             = "TERRAKUBE_SUPER_ADMIN"
-  organization_id  = data.terrakube_organization.org.id
-  manage_workspace = false
-  manage_module    = false
-  manage_provider  = true
-  manage_vcs       = true
-  manage_template  = true
-}
+- **Version Control Integration:** Terrakube integrates with Github (Cloud and  Enterprise), GitLab (EE and CE), Bitbucket and Azure DevOps to retrieve your terraform code. <br/>
 
-resource "terrakube_module" "module1" {
-  name            = "module_public_connection"
-  organization_id = data.terrakube_organization.org.id
-  description     = "module_public_connection"
-  provider_name   = "aws"
-  source          = "https://github.com/terraform-aws-modules/terraform-aws-vpc.git"
-}
-```
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/d9102910-41af-42be-b154-1257108f688b" width="1080"/>  <br/>
 
+- **Terraform Workflow:** Terrakube allows you to run the Terraform workflow from anywhere, anytime. You can perform actions such as terraform apply, terraform plan, and terraform destroy. You can also manage variables and access the Terraform state files.
+
+<img src="https://github.com/AzBuilder/terrakube/assets/27365102/9e0421be-576c-4206-a29a-c1d62238681e" width="1080"/>  <br/>
+
+- **Custom Workflows:** Enhance your IaC workflow with OPA, Infracost, or any other tool of your choice. You can use Terrakube extensions to integrate them seamlessly, or create your own custom integration using the Terrakube API. This way, you can automate compliance checks, cost estimates, security scans, and more for your Terraform projects.
+  
+- **Access Control:** You can use [DEX](https://github.com/dexidp/dex) to authenticate in Terrakube with various identity providers, such as Azure Active Directory, Amazon Cognito, Github, SAML, and more. You can also leverage your existing groups to assign granular permissions to Workspaces, Modules, VCS, and other resources.
+
+- **Remote Backend:** Terrakube supports both `remote backend` and `cloud` block so you can run your workflow directly from the Terraform CLI.
+
+### Getting Started
+
+### Installation
+
+- [Install Terrakube using Helm](https://docs.terrakube.io/getting-started/deployment/docker-compose)
+- [Install Terrakube using Docker Compose](https://docs.terrakube.io/getting-started/docker-compose)
+- [Test Terrakube using Minikube](https://docs.terrakube.io/getting-started/deployment/minikube-+-https)
+- [Test Terrakube using Gitpod](https://docs.terrakube.io/getting-started/getting-started)
+
+### Documentation
+To learn more about Terrakube [go to the complete documentation.](https://docs.terrakube.io/) 
+
+### Contributing 
+Terrakube welcomes any idea or feedback from the community. If you want to contribute to this project, please read our [Contribution Guide](CONTRIBUTING.md) for more details.
+  
 ### Sponsors
 
-Any company can become a sponsor by donating or providing any benefit to the project or the team helping improve Terrakube.
-
-#### JetBrains
-
-Thank you to [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains" width="32"> JetBrains](https://jb.gg/OpenSource)
-for providing us with free licenses to their great tools.
-
-* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/IntelliJ_IDEA_icon.svg" alt="IDEA" width="32"> IDEA](https://www.jetbrains.com/idea/)
-* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/GoLand_icon.svg" alt="GoLand" width="32"> GoLand](https://www.jetbrains.com/go/)
-* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/WebStorm_icon.svg" alt="WebStorm" width="32"> WebStorm](https://www.jetbrains.com/webstorm/)
-* [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/DataGrip_icon.svg" alt="DataGrip" width="32"> DataGrip](https://www.jetbrains.com/datagrip/)
-
-### Gitbook
-
-Thank you to [<img src="https://uploads-ssl.webflow.com/5c349f90a3cd4515d0564552/5c66e5b48238e30e170da3be_logo.svg" alt="Gitbook" width="32"> Gitbook](https://www.gitbook.com/)
-for providing us with free [OSS Plan](https://docs.gitbook.com/account-management/plans/apply-for-the-non-profit-open-source-plan).
-
-
-#### Terraform BSL License
-
+| Sponsor  | Thanks |
+| ------------- | ------------- |
+| [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" alt="JetBrains" width="32"> JetBrains](https://jb.gg/OpenSource)  | For providing with free licenses to their great tools.   |
+| [<img src="https://uploads-ssl.webflow.com/5c349f90a3cd4515d0564552/5c66e5b48238e30e170da3be_logo.svg" alt="Gitbook" width="32"> Gitbook](https://www.gitbook.com/)   | For providing us with free OSS Plan. |
+| [<img src="https://github.com/AzBuilder/terrakube/assets/27365102/e5977550-eb4f-4519-9aa8-293e5660f873" width="32"> Docker](https://www.docker.com/) | For providing us with free OSS Plan.|
+### Terraform BSL License
 Hashicorp confirmed that Terrakube is compatible with the new Terraform BSL License, more information can be found in the following [discussion](https://github.com/orgs/AzBuilder/discussions/467).
