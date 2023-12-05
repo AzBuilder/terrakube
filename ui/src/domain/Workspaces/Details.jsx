@@ -975,11 +975,25 @@ function parseState(state) {
   // parse root outputs
   if(state?.values?.outputs != null){
     for (const [key, value] of Object.entries(state?.values?.outputs)) {
-      outputs.push({
-        name: key,
-        type: value.type,
-        value: value.value,
-      });
+      if( typeof value.type === "string" ){
+        console.log(typeof value.type)
+        outputs.push({
+          name: key,
+          type: value.type,
+          value: value.value,
+        });
+      }
+      else {
+        console.log(typeof value.type)
+        const jsonObject = JSON.stringify(value.value)
+        const jsonType = value.type.toString()
+        console.log(jsonObject)
+        outputs.push({
+          name: key,
+          type: "Other type",
+          value: jsonObject,
+        });
+      }
     }
   } else {
     console.log('State has no outputs')
