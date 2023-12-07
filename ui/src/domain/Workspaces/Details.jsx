@@ -1,5 +1,6 @@
 import { React, useEffect, useState } from "react";
-import axiosInstance, { axiosClient } from "../../config/axiosConfig";
+import axiosInstance from "../../config/axiosConfig";
+import { useHistory } from "react-router-dom";
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,
@@ -73,6 +74,7 @@ const { DateTime } = require("luxon");
 const { Content } = Layout;
 
 export const WorkspaceDetails = (props) => {
+  const browserHistory = useHistory();
   const { id } = useParams();
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
   localStorage.setItem(WORKSPACE_ARCHIVE, id);
@@ -233,6 +235,35 @@ export const WorkspaceDetails = (props) => {
     setActiveKey("6");
   };
 
+  const handleLockButton = (locked) => {
+    const body = {
+      data: {
+        type: "workspace",
+        id: id,
+        attributes: {
+          locked: !locked,
+        },
+      },
+    };
+    axiosInstance
+    .patch(`organization/${organizationId}/workspace/${id}`, body, {
+      headers: {
+        "Content-Type": "application/vnd.api+json",
+      },
+    })
+    .then((response) => {
+      console.log(response);
+      if (response.status == "204") {
+        loadWorkspace();
+        var newstatus = locked ? "unlocked" :"locked";
+        message.success("Workspace " + newstatus + " successfully");
+      } else {
+        var newstatus = locked ? "unlock" :"lock";
+        message.error("Workspace " + newstatus+ " failed");
+      }
+    });
+  };
+
   const onFinish = (values) => {
     setWaiting(true);
     const body = {
@@ -319,7 +350,7 @@ export const WorkspaceDetails = (props) => {
         if (response.status == "204") {
           console.log(response);
           message.success("Workspace deleted successfully");
-          history.push(`/organizations/${organizationId}/workspaces`);
+          browserHistory.push(`/organizations/${organizationId}/workspaces`);
         } else {
           message.error("Workspace deletion failed");
         }
@@ -408,14 +439,36 @@ export const WorkspaceDetails = (props) => {
               <Tabs
                 activeKey={activeKey}
                 onTabClick={handleStatesClick}
-                tabBarExtraContent={<CreateJob changeJob={changeJob} />}
+                tabBarExtraContent={
+                  <>
+                    <Space direction="horizontal">
+                      {" "}
+                      <Button
+                        type="default"
+                        htmlType="button"
+                        onClick={()=>handleLockButton(workspace.data.attributes.locked)}
+                        icon={
+                          workspace.data.attributes.locked ? (
+                            <UnlockOutlined />
+                          ) : (
+                            <LockOutlined />
+                          )
+                        }
+                      >
+                        {workspace.data.attributes.locked ? "Unlock" : "Lock"}
+                      </Button>
+                      <CreateJob changeJob={changeJob} />
+                    </Space>
+                  </>
+                }
                 onChange={callback}
               >
                 <TabPane tab="Overview" key="1">
                   <Row>
-                    <Col span={19} style={{paddingRight:"20px"}}>
+                    <Col span={19} style={{ paddingRight: "20px" }}>
                       {workspace.data.attributes.source === "empty" &&
-                      workspace.data.attributes.branch === "remote-content" && workspace.data.relationships.history.data.length < 1 ? (
+                      workspace.data.attributes.branch === "remote-content" &&
+                      workspace.data.relationships.history.data.length < 1 ? (
                         <CLIDriven
                           organizationName={organizationName}
                           workspaceName={workspaceName}
@@ -549,7 +602,8 @@ export const WorkspaceDetails = (props) => {
                       <Space direction="vertical">
                         <br />
                         <span className="App-text">
-                          { workspace.data.attributes.branch !== "remote-content" ? (
+                          {workspace.data.attributes.branch !==
+                          "remote-content" ? (
                             <>
                               {" "}
                               {renderVCSLogo(vcsProvider)}{" "}
@@ -661,7 +715,8 @@ export const WorkspaceDetails = (props) => {
                                   ) : (
                                     ""
                                   )}
-                                  | <b>{item.createdBy}</b> triggered via {item.via || "UI"}
+                                  | <b>{item.createdBy}</b> triggered via{" "}
+                                  {item.via || "UI"}
                                 </span>
                               }
                             />
@@ -948,7 +1003,7 @@ function setupWorkspaceIncludes(
     .sort((a, b) => a.jobReference - b.jobReference)
     .reverse()[0];
   // reload state only if there is a new version
-  console.log('Get latest state')
+  console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
     loadState(lastState, axiosInstance, setOutputs, setResources);
   }
@@ -970,24 +1025,23 @@ function loadState(state, axiosInstance, setOutputs, setResources) {
 function parseState(state) {
   var resources = [];
   var outputs = [];
-  console.log("Current state")
-  console.log(state)
+  console.log("Current state");
+  console.log(state);
   // parse root outputs
-  if(state?.values?.outputs != null){
+  if (state?.values?.outputs != null) {
     for (const [key, value] of Object.entries(state?.values?.outputs)) {
-      if( typeof value.type === "string" ){
-        console.log(typeof value.type)
+      if (typeof value.type === "string") {
+        console.log(typeof value.type);
         outputs.push({
           name: key,
           type: value.type,
           value: value.value,
         });
-      }
-      else {
-        console.log(typeof value.type)
-        const jsonObject = JSON.stringify(value.value)
-        const jsonType = value.type.toString()
-        console.log(jsonObject)
+      } else {
+        console.log(typeof value.type);
+        const jsonObject = JSON.stringify(value.value);
+        const jsonType = value.type.toString();
+        console.log(jsonObject);
         outputs.push({
           name: key,
           type: "Other type",
@@ -996,11 +1050,11 @@ function parseState(state) {
       }
     }
   } else {
-    console.log('State has no outputs')
+    console.log("State has no outputs");
   }
 
   // parse root module resources
-  if(state?.values?.root_module?.resources != null){
+  if (state?.values?.root_module?.resources != null) {
     for (const [key, value] of Object.entries(
       state?.values?.root_module?.resources
     )) {
@@ -1012,26 +1066,24 @@ function parseState(state) {
       });
     }
   } else {
-    console.log('State has no resources')
+    console.log("State has no resources");
   }
 
   // parse child module resources
-  if(state?.values?.root_module?.child_modules?.length > 0){
+  if (state?.values?.root_module?.child_modules?.length > 0) {
     state?.values?.root_module?.child_modules?.forEach((moduleVal, index) => {
-        console.log(`Checking child ${moduleVal.address} with index ${index}`)
-        for (const [key, value] of Object.entries(
-            moduleVal.resources
-        )) {
-          resources.push({
-            name: value.name,
-            type: value.type,
-            provider: value.provider_name,
-            module: moduleVal.address,
-          });
-        }
-    })
+      console.log(`Checking child ${moduleVal.address} with index ${index}`);
+      for (const [key, value] of Object.entries(moduleVal.resources)) {
+        resources.push({
+          name: value.name,
+          type: value.type,
+          provider: value.provider_name,
+          module: moduleVal.address,
+        });
+      }
+    });
   } else {
-    console.log('State has no child modules resources')
+    console.log("State has no child modules resources");
   }
 
   return { resources: resources, outputs: outputs };
