@@ -376,7 +376,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             initBanner(terraformJob, output);
 
         TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
-        terraformProcessData.setTerraformEnvironmentVariables(new HashMap<>());
+        terraformProcessData.setTerraformEnvironmentVariables(terraformProcessData.getTerraformEnvironmentVariables());
         terraformProcessData.setTerraformVariables(new HashMap<>());
 
         if (terraformJob.isShowHeader())
