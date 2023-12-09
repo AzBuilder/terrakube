@@ -37,6 +37,7 @@ import { Schedules } from "../Workspaces/Schedules";
 import { CLIDriven } from "../Workspaces/CLIDriven";
 import { Tags } from "../Workspaces/Tags";
 import { useParams, Link } from "react-router-dom";
+import {ResourceDrawer} from "../Workspaces/ResourceDrawer";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -55,10 +56,12 @@ import {
   GithubOutlined,
 } from "@ant-design/icons";
 import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
+import { HiOutlineExternalLink } from "react-icons/hi";
 import { IconContext } from "react-icons";
 import { FiGitCommit } from "react-icons/fi";
 import { BiTerminal } from "react-icons/bi";
 import "./Workspaces.css";
+import { getServiceIcon } from "./Icons.js";
 const { TabPane } = Tabs;
 const { Option } = Select;
 const { Paragraph } = Typography;
@@ -82,6 +85,8 @@ export const WorkspaceDetails = (props) => {
   const [variables, setVariables] = useState([]);
   const [history, setHistory] = useState([]);
   const [schedule, setSchedule] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [resource, setResource] = useState({});
   const [envVariables, setEnvVariables] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [stateDetailsVisible, setStateDetailsVisible] = useState(false);
@@ -117,6 +122,7 @@ export const WorkspaceDetails = (props) => {
       title: "Type",
       dataIndex: "type",
       key: "type",
+      sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
       title: "Value",
@@ -136,16 +142,34 @@ export const WorkspaceDetails = (props) => {
       dataIndex: "name",
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (text, record) => (
+        <Button onClick={() => showDrawer(record)} type="link">
+          {text} &nbsp;<HiOutlineExternalLink />
+        </Button>
+      ),
     },
     {
       title: "Provider",
       dataIndex: "provider",
       key: "provider",
+      sorter: (a, b) => a.provider.localeCompare(b.provider),
     },
     {
       title: "Type",
       dataIndex: "type",
       key: "type",
+      onFilter: (value, record) => record.type.indexOf(value) === 0,
+      sorter: (a, b) => a.type.localeCompare(b.type),
+      render: (text, record) => (
+        <>
+          <Avatar
+            shape="square"
+            size="small"
+            src={getServiceIcon(record.provider, record.type)}
+          />{" "}
+          &nbsp;{text}
+        </>
+      ),
     },
     {
       title: "Module",
@@ -158,6 +182,11 @@ export const WorkspaceDetails = (props) => {
   };
   const callback = (key) => {
     switchKey(key);
+  };
+
+  const showDrawer = (record) => {
+    setOpen(true);
+    setResource(record);
   };
 
   const switchKey = (key) => {
@@ -246,22 +275,22 @@ export const WorkspaceDetails = (props) => {
       },
     };
     axiosInstance
-    .patch(`organization/${organizationId}/workspace/${id}`, body, {
-      headers: {
-        "Content-Type": "application/vnd.api+json",
-      },
-    })
-    .then((response) => {
-      console.log(response);
-      if (response.status == "204") {
-        loadWorkspace();
-        var newstatus = locked ? "unlocked" :"locked";
-        message.success("Workspace " + newstatus + " successfully");
-      } else {
-        var newstatus = locked ? "unlock" :"lock";
-        message.error("Workspace " + newstatus+ " failed");
-      }
-    });
+      .patch(`organization/${organizationId}/workspace/${id}`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        if (response.status == "204") {
+          loadWorkspace();
+          var newstatus = locked ? "unlocked" : "locked";
+          message.success("Workspace " + newstatus + " successfully");
+        } else {
+          var newstatus = locked ? "unlock" : "lock";
+          message.error("Workspace " + newstatus + " failed");
+        }
+      });
   };
 
   const onFinish = (values) => {
@@ -446,7 +475,9 @@ export const WorkspaceDetails = (props) => {
                       <Button
                         type="default"
                         htmlType="button"
-                        onClick={()=>handleLockButton(workspace.data.attributes.locked)}
+                        onClick={() =>
+                          handleLockButton(workspace.data.attributes.locked)
+                        }
                         icon={
                           workspace.data.attributes.locked ? (
                             <UnlockOutlined />
@@ -582,19 +613,20 @@ export const WorkspaceDetails = (props) => {
                             />
                           </div>
                           <Tabs type="card" style={{ marginTop: "30px" }}>
-                            <TabPane tab="Resources" key="1">
+                            <TabPane tab={<>Resources  ({resources.length})</> } key="1">
                               <Table
                                 dataSource={resources}
                                 columns={resourceColumns}
                               />
                             </TabPane>
-                            <TabPane tab="Outputs" key="2">
+                            <TabPane tab={<>Outputs  ({outputs.length})</> } key="2">
                               <Table
                                 dataSource={outputs}
                                 columns={outputColumns}
                               />
                             </TabPane>
                           </Tabs>
+                          <ResourceDrawer resource={resource} setOpen={setOpen} open={open}/>
                         </div>
                       )}
                     </Col>
@@ -1063,6 +1095,8 @@ function parseState(state) {
         type: value.type,
         provider: value.provider_name,
         module: "root_module",
+        values: value.values,
+        depends_on: value.depends_on,
       });
     }
   } else {
@@ -1079,6 +1113,8 @@ function parseState(state) {
           type: value.type,
           provider: value.provider_name,
           module: moduleVal.address,
+          values: value.values,
+          depends_on: value.depends_on,
         });
       }
     });

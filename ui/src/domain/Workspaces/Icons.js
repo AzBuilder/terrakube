@@ -128,12 +128,23 @@ const AWSIcons = [
 
 ]
 
+
+const AzureIcons = [
+    { type: "azurerm_aadb2c_directory", path: "/providers/azurerm/Identity/10228-icon-service-Azure-AD-B2C.svg"},
+    { type: "azurerm_api_management", path: "/providers/azurerm/App Services/10042-icon-service-API-Management-Services.svg"},
+    { type: "azurerm_app_service", path:"/providers/azurerm/App Services/10035-icon-service-App-Services.svg"},
+    { type: "azurerm_app_service_plan", path:"providers/azurerm/App Services/00046-icon-service-App-Service-Plans.svg"},
+    { type: "azurerm_resource_group", path:"/providers/azurerm/General/10007-icon-service-Resource-Groups.svg"},
+]
+
 export function getServiceIcon (providerType,resourceType){
     switch (providerType) {
         case "registry.terraform.io/hashicorp/aws":
             return getAWSIcon(resourceType);
+        case "registry.terraform.io/hashicorp/azurerm":
+            return getAzureIcon(resourceType);
         default:
-            return "/providers/aws/AWS.svg";
+            return "/providers/terraform.svg";
     }
 };
 
@@ -146,4 +157,14 @@ const getAWSIcon = (resourceType) => {
     // search partial match
     icon = AWSIcons.find(icon => resourceType.includes(icon.type));
     return icon ? icon.path : "/providers/aws/AWS.svg";
+}
+
+const getAzureIcon = (resourceType) => {
+    // search exact match
+    var icon = AzureIcons.find(icon => resourceType === icon.type);
+    if (icon) return icon.path;
+
+    // search partial match
+    icon = AzureIcons.find(icon => resourceType.includes(icon.type));
+    return icon ? icon.path : "/providers/azurerm/Azure.svg";
 }
