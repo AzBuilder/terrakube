@@ -9,6 +9,7 @@ import org.terrakube.api.rs.hooks.organization.OrganizationManageHook;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.module.Module;
 import org.terrakube.api.rs.provider.Provider;
+import org.terrakube.api.rs.servicecatalog.ServiceCatalog;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.tag.Tag;
@@ -83,5 +84,10 @@ public class Organization {
     private List<Globalvar> globalvar;
 
     @OneToMany(mappedBy = "organization")
+
     private List<Tag> tag;
+
+    @OneToMany(mappedBy = "organization")
+    private List<ServiceCatalog> servicecatalog;
+
 }

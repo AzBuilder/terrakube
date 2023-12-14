@@ -9,6 +9,7 @@ import { TagsSettings } from "./Tags";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
 import { SSHKeysSettings } from "./SSHKeys";
 import { GlobalVariablesSettings } from "./GlobalVariables";
+import { ServiceCatalogSettings } from "./ServiceCatalog";
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
@@ -35,7 +36,7 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
             <GeneralSettings />
           </TabPane>
           <TabPane tab="Teams" key="2">
-            <TeamSettings key={key}/>
+            <TeamSettings key={key} />
           </TabPane>
           <TabPane tab="Global Variables" key="3">
             <GlobalVariablesSettings />
@@ -51,6 +52,9 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
           </TabPane>
           <TabPane tab="Tags" key="7">
             <TagsSettings />
+          </TabPane>
+          <TabPane tab="Service Catalog" key="8">
+            <ServiceCatalogSettings />
           </TabPane>
         </Tabs>
       </div>
