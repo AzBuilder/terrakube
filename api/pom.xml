@@ -17,7 +17,7 @@
         <java.version>17</java.version>
         <elide.version>6.1.12</elide.version>
         <liquibase-core.version>4.8.0</liquibase-core.version>
-        <azure.version>4.0.0</azure.version>
+        <azure.version>5.7.0</azure.version>
         <mssql-jdbc.version>11.2.3.jre17</mssql-jdbc.version>
         <msal4j.version>1.11.2</msal4j.version>
         <lombok.version>1.18.28</lombok.version>
@@ -25,13 +25,11 @@
         <rest-assured.version>4.5.1</rest-assured.version>
         <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
         <groovy.version>3.0.8</groovy.version>
-        <azure-identity.version>1.5.3</azure-identity.version>
         <postgresql.version>42.4.3</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <quartz.version>2.3.2</quartz.version>
-        <azure-storage-blob.version>12.18.0</azure-storage-blob.version>
         <aws-sdk.version>1.12.261</aws-sdk.version>
         <gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
@@ -232,7 +230,6 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>${azure-identity.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -260,7 +257,6 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-storage-blob</artifactId>
-            <version>${azure-storage-blob.version}</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -297,7 +293,7 @@
         <dependencies>
             <dependency>
                 <groupId>com.azure.spring</groupId>
-                <artifactId>azure-spring-boot-bom</artifactId>
+                <artifactId>spring-cloud-azure-dependencies</artifactId>
                 <version>${azure.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
