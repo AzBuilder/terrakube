@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   terrakube-api:
-    image: azbuilder/api-server:2.17.0
+    image: azbuilder/api-server:2.18.3
     ports: 
       - 8080:8080
     env_file:
@@ -9,7 +9,7 @@ services:
     depends_on:
     - postgresql-service
   terrakube-ui:
-    image: azbuilder/terrakube-ui:2.17.0
+    image: azbuilder/terrakube-ui:2.18.3
     ports: 
       - 3000:8080
     volumes:
@@ -17,13 +17,13 @@ services:
     env_file:
       - ui.env 
   terrakube-executor:
-    image: azbuilder/executor:2.17.0
+    image: azbuilder/executor:2.18.3
     ports: 
     - 8090:8090
     env_file:
       - executor.env 
   terrakube-registry:
-    image: azbuilder/open-registry:2.17.0
+    image: azbuilder/open-registry:2.18.3
     ports: 
     - 8075:8075
     env_file:
