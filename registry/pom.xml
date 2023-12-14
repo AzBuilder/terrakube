@@ -14,13 +14,12 @@
 	<name>Terrakube Terraform Registry</name>
 	<description>Open Source Terraform Registry for Terrakube</description>
 	<properties>
-		<azure.version>3.13.1</azure.version>
+		<azure.version>5.7.0</azure.version>
 		<java.version>17</java.version>
 		<lombok.version>1.18.20</lombok.version>
 		<terrakube-client-starter.version>0.13.0</terrakube-client-starter.version>
 		<jgit.version>6.6.1.202309021850-r</jgit.version>
 		<commons-io.version>2.8.0</commons-io.version>
-		<azure-storage-blob.version>12.14.3</azure-storage-blob.version>
 		<mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
 		<rest-assured.version>4.5.1</rest-assured.version>
 		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
@@ -111,7 +110,6 @@
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-storage-blob</artifactId>
-			<version>${azure-storage-blob.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -158,7 +156,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.azure.spring</groupId>
-				<artifactId>azure-spring-boot-bom</artifactId>
+				<artifactId>spring-cloud-azure-dependencies</artifactId>
 				<version>${azure.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
