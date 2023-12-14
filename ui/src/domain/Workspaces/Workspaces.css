@@ -119,3 +119,7 @@
   color:"black";
   font-weight: 400;
 }
+
+.react-flow__attribution{
+  display: none;
+}

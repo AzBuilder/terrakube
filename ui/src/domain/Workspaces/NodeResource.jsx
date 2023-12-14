@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { Card, Avatar } from "antd";
-import { Handle } from "react-flow-renderer";
+import { Handle } from "reactflow";
 import { getServiceIcon } from "./Icons.js";
 const { Meta } = Card;
 

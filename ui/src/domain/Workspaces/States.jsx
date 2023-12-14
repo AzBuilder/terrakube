@@ -1,11 +1,17 @@
-import { React, useState, useRef } from "react";
+import { React, useState, useRef, useCallback, useMemo } from "react";
 import { List, Space, Card, Row, Col, Avatar } from "antd";
 import Editor from "@monaco-editor/react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
-import ReactFlow, { Controls, Background } from "react-flow-renderer";
+import ReactFlow, {
+  Controls,
+  Background,
+  applyNodeChanges,
+  applyEdgeChanges,
+} from "reactflow";
 import NodeResource from "./NodeResource";
-import {DownloadState} from "./DownloadState";
+import { DownloadState } from "./DownloadState";
 import { UserOutlined } from "@ant-design/icons";
+import 'reactflow/dist/style.css';
 
 export const States = ({
   history,
@@ -15,8 +21,16 @@ export const States = ({
   const [currentState, setCurrentState] = useState({});
   const [stateContent, setStateContent] = useState("");
   const [activeTab, setactivetab] = useState("diagram");
-  const [resources, setResources] = useState([]);
-
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+  const onNodesChange = useCallback(
+    (changes) => setNodes((ns) => applyNodeChanges(changes, ns)),
+    []
+  );
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((es) => applyEdgeChanges(changes, es)),
+    []
+  );
   const editorRef = useRef(null);
   const handleClick = (state) => {
     changeState(state);
@@ -26,8 +40,8 @@ export const States = ({
     editorRef.current = editor;
   }
 
-  function pushNode(resources, dependencies, element, xmap, y) {
-    resources.push({
+  function pushNode(nodes, dependencies, element, xmap, y) {
+    nodes.push({
       id: element.address,
       type: "resourceNode",
       data: {
@@ -38,18 +52,13 @@ export const States = ({
       position: { x: xmap.get(dependencies), y: y + dependencies * 130 },
     });
 
-    return resources;
+    return nodes;
   }
 
-  function pushNodeDependency(
-    resources,
-    dependencies,
-    element,
-    elementDependsOn
-  ) {
+  function pushEdge(edges, dependencies, element, elementDependsOn) {
     if (dependencies > 0)
       elementDependsOn.forEach((dep) => {
-        resources.push({
+        edges.push({
           id: element.address + "-" + dep,
           source: element.address,
           target: dep,
@@ -60,13 +69,14 @@ export const States = ({
         });
       });
 
-    return resources;
+    return edges;
   }
 
   function loadData(resp) {
     console.log(resp.data);
 
-    let resources = [];
+    let nodes = [];
+    let edges = [];
     let x = new Map();
     let y = 100;
 
@@ -86,13 +96,8 @@ export const States = ({
               (x.get(dependencies) ? x.get(dependencies) : 0) + 350
             );
 
-            resources = pushNode(resources, dependencies, element, x, y);
-            resources = pushNodeDependency(
-              resources,
-              dependencies,
-              element,
-              element.depends_on
-            );
+            nodes = pushNode(nodes, dependencies, element, x, y);
+            edges = pushEdge(edges, dependencies, element, element.depends_on);
           });
         }
 
@@ -108,9 +113,9 @@ export const States = ({
                   (x.get(dependencies) ? x.get(dependencies) : 0) + 350
                 );
 
-                resources = pushNode(resources, dependencies, element, x, y);
-                resources = pushNodeDependency(
-                  resources,
+                nodes = pushNode(nodes, dependencies, element, x, y);
+                edges = pushEdge(
+                  edges,
                   dependencies,
                   element,
                   element.depends_on
@@ -120,10 +125,9 @@ export const States = ({
         }
       } catch (error) {
         console.error(`Failed to build diagram: ${error}`);
-        resources = [];
-        resources.push({
+        nodes = [];
+        nodes.push({
           id: "1",
-          type: "resourceNode",
           data: {
             name: "Error Building Diagram",
             provider: "azurerm",
@@ -134,9 +138,9 @@ export const States = ({
       }
     }
 
-    setResources(resources);
+    setNodes(nodes);
+    setEdges(edges);
   }
- 
 
   const changeState = (state) => {
     setCurrentState(state);
@@ -180,9 +184,12 @@ export const States = ({
     setactivetab(key);
   };
 
-  const nodeTypes = {
-    resourceNode: NodeResource,
-  };
+  const nodeTypes = useMemo(
+    () => ({
+      resourceNode: NodeResource,
+    }),
+    []
+  );
 
   return (
     <div>
@@ -233,7 +240,7 @@ export const States = ({
               </Space>
             </Col>
             <Col span={2}>
-               <DownloadState stateUrl={currentState.output}/>
+              <DownloadState stateUrl={currentState.output} />
               <br />
               <span className="stateDetails">{currentState.relativeDate}</span>
             </Col>
@@ -253,7 +260,11 @@ export const States = ({
                     <ReactFlow
                       zoomOnScroll={false}
                       nodeTypes={nodeTypes}
-                      elements={resources}
+                      nodes={nodes}
+                      edges={edges}
+                      onNodesChange={onNodesChange}
+                      onEdgesChange={onEdgesChange}
+                      proOptions={{hideAttribution: true}}
                     >
                       <Controls />
                       <Background />
