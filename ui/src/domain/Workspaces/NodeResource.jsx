@@ -1,7 +1,8 @@
 import React, { memo } from "react";
-import { Card, Avatar } from "antd";
+import { Card, Avatar,Button } from "antd";
 import { Handle } from "reactflow";
 import { getServiceIcon } from "./Icons.js";
+import { HiOutlineExternalLink } from "react-icons/hi";
 const { Meta } = Card;
 
 export default memo(({ data, isConnectable }) => {
@@ -17,7 +18,15 @@ export default memo(({ data, isConnectable }) => {
       <Card style={{ width: 300 }}>
         <Meta
           avatar={GetResourceIcon(data)}
-          title={data.name}
+          title={
+            <>
+              {" "}
+              <Button onClick={() => data.showDrawer(data)} type="link">
+                {data.name} &nbsp;
+                <HiOutlineExternalLink />
+              </Button>{" "}
+            </>
+          }
           description={data.type}
         />
       </Card>

@@ -12,6 +12,8 @@ import NodeResource from "./NodeResource";
 import { DownloadState } from "./DownloadState";
 import { UserOutlined } from "@ant-design/icons";
 import 'reactflow/dist/style.css';
+import {ResourceDrawer} from "../Workspaces/ResourceDrawer";
+
 
 export const States = ({
   history,
@@ -23,6 +25,8 @@ export const States = ({
   const [activeTab, setactivetab] = useState("diagram");
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [resource, setResource] = useState({});
   const onNodesChange = useCallback(
     (changes) => setNodes((ns) => applyNodeChanges(changes, ns)),
     []
@@ -39,6 +43,11 @@ export const States = ({
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor;
   }
+  const showDrawer = (record) => {
+    setOpen(true);
+    setResource(record);
+  };
+
 
   function pushNode(nodes, dependencies, element, xmap, y) {
     nodes.push({
@@ -48,6 +57,9 @@ export const States = ({
         name: element.name,
         provider: element.provider_name,
         type: element.type,
+        values: element.values,
+        depends_on: element.depends_on,
+        showDrawer: showDrawer,
       },
       position: { x: xmap.get(dependencies), y: y + dependencies * 130 },
     });
@@ -257,6 +269,7 @@ export const States = ({
               >
                 {activeTab === "diagram" ? (
                   <div style={{ height: 500 }}>
+                    <ResourceDrawer resource={resource} setOpen={setOpen} open={open}/>
                     <ReactFlow
                       zoomOnScroll={false}
                       nodeTypes={nodeTypes}
