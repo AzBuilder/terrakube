@@ -18,7 +18,7 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "provider")
 public class Provider {
     @Id
     @Type(type = "uuid-char")

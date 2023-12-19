@@ -25,7 +25,7 @@ import java.util.*;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "module")
 public class Module extends GenericAuditFields {
     @Id
     @Type(type = "uuid-char")

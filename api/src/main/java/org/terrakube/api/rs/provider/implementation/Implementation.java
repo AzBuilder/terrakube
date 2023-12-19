@@ -11,7 +11,7 @@ import java.util.UUID;
 @Include
 @Getter
 @Setter
-@Entity
+@Entity(name = "implementation")
 public class Implementation {
 
     @Id

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "content")
 public class Content {
     @Id
     @Type(type="uuid-char")

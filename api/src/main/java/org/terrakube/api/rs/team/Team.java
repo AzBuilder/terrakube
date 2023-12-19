@@ -15,7 +15,7 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "team")
 public class Team {
 
     @Id

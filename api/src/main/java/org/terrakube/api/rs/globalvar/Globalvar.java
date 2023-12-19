@@ -16,7 +16,7 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "globalvar")
 public class Globalvar {
 
     @Id

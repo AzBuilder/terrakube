@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity
+@Entity(name = "pat")
 public class Pat extends GenericAuditFields {
     @Id
     @Type(type="uuid-char")

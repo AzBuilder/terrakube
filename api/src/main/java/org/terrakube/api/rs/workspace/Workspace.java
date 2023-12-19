@@ -30,7 +30,7 @@ import java.util.UUID;
 @Include
 @Getter
 @Setter
-@Entity
+@Entity(name = "workspace")
 @Where(clause = "deleted = false")
 public class Workspace extends GenericAuditFields {
 
