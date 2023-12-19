@@ -41,4 +41,5 @@
     <include file="/db/changelog/local/changelog-2.17.0-fix-state-archive.xml"/>
     <include file="/db/changelog/local/changelog-2.18.0-vcs-custom-endpoint.xml"/>
     <include file="/db/changelog/local/changelog-2.18.0-webhooks.xml"/>
+    <include file="/db/changelog/local/changelog-2.19.0-override-vcs.xml"/>
 </databaseChangeLog>

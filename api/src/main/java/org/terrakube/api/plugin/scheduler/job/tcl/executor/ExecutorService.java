@@ -98,8 +98,16 @@ public class ExecutorService {
         executorContext.setCommandList(flow.getCommands());
         executorContext.setType(flow.getType());
         executorContext.setTerraformVersion(job.getWorkspace().getTerraformVersion());
-        executorContext.setSource(job.getWorkspace().getSource());
-        executorContext.setBranch(job.getWorkspace().getBranch());
+        if(job.getOverrideSource() == null) {
+            executorContext.setSource(job.getWorkspace().getSource());
+        } else {
+            executorContext.setSource(job.getOverrideSource());
+        }
+        if(job.getOverrideBranch() == null) {
+            executorContext.setBranch(job.getWorkspace().getBranch());
+        } else {
+            executorContext.setBranch(job.getOverrideBranch());
+        }
         executorContext.setFolder(job.getWorkspace().getFolder());
         return sendToExecutor(job, executorContext);
     }

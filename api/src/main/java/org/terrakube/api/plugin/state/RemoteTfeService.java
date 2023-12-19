@@ -675,8 +675,12 @@ public class RemoteTfeService {
         log.info("Creating new Terrakube Job");
         log.info("Workspace {} Configuration {}", workspaceId, configurationId);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
-        workspace.setSource(String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz",
-                hostname, configurationId));
+        String sourceTarGz = String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz",
+                hostname, configurationId);
+        // we need to update the source only if the VCS connection is null and the branch is other than "remote-content"
+        if(workspace.getVcs() == null && workspace.getBranch().equals("remote-content")) {
+            workspace.setSource(sourceTarGz);
+        }
         workspace = workspaceRepository.save(workspace);
         Template template = templateRepository.getByOrganizationNameAndName(
                 workspace.getOrganization().getName(),
@@ -689,6 +693,12 @@ public class RemoteTfeService {
         job.setComments("terraform-cli");
         job.setVia("CLI");
         job.setTemplateReference(template.getId().toString());
+        // if the vcs connection is not null, we need to override the value inside the job
+        if(workspace.getVcs() != null){
+            log.warn("Workspace is using VCS connection, overriding vcs source and branch to run job using a remote plan");
+            job.setOverrideBranch("remote-content");
+            job.setOverrideBranch(sourceTarGz);
+        }
         job = jobRepository.save(job);
         log.info("Job Created");
         scheduleJobService.createJobContext(job);
