@@ -51,6 +51,14 @@ public class Job extends GenericAuditFields {
     @Column(name = "tcl")
     private String tcl;
 
+    @Exclude
+    @Column(name = "override_source")
+    private String overrideSource;
+
+    @Exclude
+    @Column(name = "override_branch")
+    private String overrideBranch;
+
     @Column(name = "template_reference")
     private String templateReference;
 
