@@ -697,7 +697,7 @@ public class RemoteTfeService {
         if(workspace.getVcs() != null){
             log.warn("Workspace is using VCS connection, overriding vcs source and branch to run job using a remote plan");
             job.setOverrideBranch("remote-content");
-            job.setOverrideBranch(sourceTarGz);
+            job.setOverrideSource(sourceTarGz);
         }
         job = jobRepository.save(job);
         log.info("Job Created");
