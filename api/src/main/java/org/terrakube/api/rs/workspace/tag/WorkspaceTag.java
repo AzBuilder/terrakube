@@ -13,7 +13,7 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "workspacetag")
 public class WorkspaceTag extends GenericAuditFields {
     @Id
     @Type(type = "uuid-char")

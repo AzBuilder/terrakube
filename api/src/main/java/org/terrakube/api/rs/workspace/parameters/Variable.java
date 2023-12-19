@@ -13,7 +13,7 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "variable")
 public class Variable {
 
     @Id

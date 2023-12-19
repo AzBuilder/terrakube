@@ -18,7 +18,7 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "schedule")
 public class Schedule extends GenericAuditFields {
 
     @Id

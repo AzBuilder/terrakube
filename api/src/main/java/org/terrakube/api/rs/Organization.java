@@ -30,7 +30,7 @@ import java.util.UUID;
 @Include
 @Getter
 @Setter
-@Entity
+@Entity(name = "organization")
 @Where(clause = "disabled = false")
 public class Organization {
 

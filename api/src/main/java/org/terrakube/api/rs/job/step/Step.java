@@ -15,7 +15,7 @@ import java.util.UUID;
 @Include
 @Getter
 @Setter
-@Entity
+@Entity(name = "step")
 public class Step {
 
     @Id

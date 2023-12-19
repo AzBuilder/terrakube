@@ -18,7 +18,7 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "vcs")
 public class Vcs extends GenericAuditFields {
 
     @Id

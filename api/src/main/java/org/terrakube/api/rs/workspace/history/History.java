@@ -18,7 +18,7 @@ import java.util.UUID;
 @DeletePermission(expression = "user is a super service")
 @Getter
 @Setter
-@Entity
+@Entity(name = "history")
 public class History extends GenericAuditFields {
 
     @Id

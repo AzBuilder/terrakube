@@ -15,7 +15,7 @@ import java.util.List;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "tag")
 public class Tag extends GenericAuditFields {
     @Id
     @Type(type = "uuid-char")

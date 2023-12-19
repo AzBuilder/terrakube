@@ -17,7 +17,7 @@ import java.util.UUID;
 @Include
 @Getter
 @Setter
-@Entity
+@Entity(name = "template")
 public class Template extends GenericAuditFields {
 
     @Id

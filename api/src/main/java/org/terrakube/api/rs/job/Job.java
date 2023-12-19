@@ -20,7 +20,7 @@ import java.util.List;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity
+@Entity(name = "job")
 public class Job extends GenericAuditFields {
 
     @Id
