@@ -124,44 +124,64 @@ export const OrganizationDetails = ({
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
   const applyFilters = (searchValue, filterValue, selectedTags) => {
+    // update values
+    sessionStorage.setItem("searchValue", searchValue);
+    sessionStorage.setItem("filterValue", filterValue);
+    sessionStorage.setItem("selectedTags", selectedTags);
     console.log(searchValue|| "serach empty");
     console.log(filterValue||"filter empty");
     console.log(selectedTags||"tags empty");
 
-      // filter by description and name
-      var filteredWorkspaces = workspaces.filter(
-        (workspace) =>{
-           if(workspace.description){
-             return (workspace.name.includes(searchValue || workspace.name )|| workspace.description?.includes(searchValue || workspace?.description))
-           }
-           else{
-              return (workspace.name.includes(searchValue || workspace.name ))
-            }
-        }
-      );
+    var filteredWorkspaces = filterWorkspaces(workspaces,searchValue, filterValue, selectedTags);     
+    setFilteredWorkspaces(filteredWorkspaces);
+    return;
+  };
 
-      // filter by status
-      filteredWorkspaces = filteredWorkspaces.filter(
-        (workspace) =>
-        workspace.lastStatus === (filterValue|| workspace.lastStatus)
-      );
+  const filterWorkspaces = (workspaces,searchValue, filterValue, selectedTags) => {
 
-      // filter by tag
-      filteredWorkspaces = filteredWorkspaces.filter( (workspace) => {   
-        if(selectedTags && selectedTags.length > 0){
-          return workspace.workspaceTag.edges.some((tag) => selectedTags.includes(tag.node.tagId))
-        }else{
-          return true;
-        }
-      });
-          
-      setFilteredWorkspaces(filteredWorkspaces);
-      return;
+     // filter by description and name
+     var filteredWorkspaces = workspaces.filter(
+      (workspace) =>{
+         if(workspace.description){
+           return (workspace.name.includes(searchValue || workspace.name )|| workspace.description?.includes(searchValue || workspace?.description))
+         }
+         else{
+            return (workspace.name.includes(searchValue || workspace.name ))
+          }
+      }
+    );
+
+    // filter by status
+    filteredWorkspaces = filteredWorkspaces.filter(
+      (workspace) =>
+      workspace.lastStatus === (filterValue|| workspace.lastStatus)
+    );
+
+    // filter by tag
+    filteredWorkspaces = filteredWorkspaces.filter( (workspace) => {   
+      if(selectedTags && selectedTags.length > 0){
+        return workspace.workspaceTag.edges.some((tag) => selectedTags.includes(tag.node.tagId))
+      }else{
+        return true;
+      }
+    });
+
+    return filteredWorkspaces;
   };
 
   useEffect(() => {
     setLoading(true);
     localStorage.setItem(ORGANIZATION_ARCHIVE, id);
+    // reload values
+    const _searchValue = sessionStorage.getItem("searchValue") || "";
+    const _filterValue = sessionStorage.getItem("filterValue") || "";
+    const _selectedTags = sessionStorage.getItem("selectedTags") || [];
+
+
+    setSearchValue(_searchValue);
+    setFilterValue(_filterValue);
+    setFilterTags(_selectedTags);
+    
 
     const body = {
       query: `{
@@ -219,7 +239,8 @@ export const OrganizationDetails = ({
         setupOrganizationIncludes(
           response.data.data.organization.edges[0].node.workspace.edges,
           setWorkspaces,
-          setFilteredWorkspaces
+          setFilteredWorkspaces,
+          filterWorkspaces
         );
 
         axiosInstance.get(`organization/${id}/tag`).then((response) => {
@@ -229,6 +250,7 @@ export const OrganizationDetails = ({
 
         localStorage.setItem(ORGANIZATION_NAME, organizationName);
         setOrganizationName(organizationName);
+
       });
   }, [id]);
 
@@ -322,6 +344,9 @@ export const OrganizationDetails = ({
                         options={tags.data.map(function (tag) {
                           return { label: tag.attributes.name, value: tag.id };
                         })}
+                        defaultValue={filterTags}
+                      
+                    
                       />
                     )}
                   </Col>
@@ -330,6 +355,7 @@ export const OrganizationDetails = ({
                     <Search
                       placeholder="Search by name, description"
                       onSearch={onSearch}
+                      defaultValue={searchValue}
                       allowClear
                     />
                   </Col>
@@ -463,7 +489,8 @@ function fixSshURL(source) {
 function setupOrganizationIncludes(
   includes,
   setWorkspaces,
-  setFilteredWorkspaces
+  setFilteredWorkspaces,
+  filter
 ) {
   let workspaces = [];
 
@@ -492,6 +519,12 @@ function setupOrganizationIncludes(
   });
 
   setWorkspaces(workspaces);
-  setFilteredWorkspaces(workspaces);
+  const _searchValue = sessionStorage.getItem("searchValue") || "";
+  const _filterValue = sessionStorage.getItem("filterValue") || "";
+  const _selectedTags = sessionStorage.getItem("selectedTags") || [];
+
+  var filteredWorkspaces = filter(workspaces,_searchValue, _filterValue, _selectedTags);
+
+  setFilteredWorkspaces(filteredWorkspaces);
   console.log(workspaces);
 }

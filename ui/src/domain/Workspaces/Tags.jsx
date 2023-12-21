@@ -55,7 +55,7 @@ export const Tags = ({ organizationId, workspaceId }) => {
   const addTagToWorkspace = (tagId) => {
     const body = {
       data: {
-        type: "workspaceTag",
+        type: "workspacetag",
         attributes: {
           tagId: tagId,
         },
