@@ -23,6 +23,8 @@ public class ExecutorContext {
     private String branch;
     private String folder;
     private String vcsType;
+    private boolean refresh;
+    private boolean refreshOnly;
     private boolean showHeader;
     private String accessToken;
     private HashMap<String, String> environmentVariables;

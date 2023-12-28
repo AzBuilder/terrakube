@@ -26,6 +26,8 @@ public class TerraformJob {
     private String accessToken;
     private String terraformOutput;
     private boolean showHeader;
+    private boolean refresh;
+    private boolean refreshOnly;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
 

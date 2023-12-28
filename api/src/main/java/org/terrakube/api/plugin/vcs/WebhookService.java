@@ -97,6 +97,8 @@ public class WebhookService {
                                     return result;
                                 }
                                 Job job = new Job();
+                                job.setRefresh(true);
+                                job.setRefreshOnly(false);
                                 job.setOrganization(workspace.getOrganization());
                                 job.setWorkspace(workspace);
                                 job.setTemplateReference(templateId);

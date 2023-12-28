@@ -45,6 +45,8 @@ public class ScheduleJobTrigger implements org.quartz.Job {
         if (!schedule.getWorkspace().isLocked()) {
             log.info("Creating new job for triggerId: {}", triggerId);
             Job job = new Job();
+            job.setRefresh(true);
+            job.setRefreshOnly(false);
             job.setWorkspace(schedule.getWorkspace());
             job.setOrganization(schedule.getWorkspace().getOrganization());
             if (schedule.getTemplateReference() != null) {
