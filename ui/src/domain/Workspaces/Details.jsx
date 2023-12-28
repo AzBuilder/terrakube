@@ -188,7 +188,7 @@ export const WorkspaceDetails = (props) => {
   const loadSSHKeys = () => {
     axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
       console.log(response.data.data);
-      setSSHKeys(response.data.data);
+      setModuleSshKey(response.data.data);
     });
   };
 
@@ -880,7 +880,7 @@ export const WorkspaceDetails = (props) => {
                               workspace.data.attributes.moduleSshKey
                               }
                               placeholder="select SSH Key" style={{ width: 250 }}>
-                            {sshKeys.map(function (sshKey, index) {
+                            {setModuleSshKey.map(function (sshKey, index) {
                               return (
                                   <Option key={sshKey?.id}>{sshKey?.attributes?.name}</Option>
                               );
