@@ -101,6 +101,7 @@ export const WorkspaceDetails = (props) => {
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
+  const [moduleSshKey, setModuleSshKey] = useState("...");
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
@@ -184,6 +185,13 @@ export const WorkspaceDetails = (props) => {
     switchKey(key);
   };
 
+  const loadSSHKeys = () => {
+    axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
+      console.log(response.data.data);
+      setSSHKeys(response.data.data);
+    });
+  };
+
   const showDrawer = (record) => {
     setOpen(true);
     setResource(record);
@@ -209,7 +217,7 @@ export const WorkspaceDetails = (props) => {
       setTerraformVersions(tfVersions.sort(compareVersions).reverse());
     });
     setLoading(false);
-
+    loadSSHKeys();
     const interval = setInterval(() => {
       loadWorkspace();
     }, 15000);
@@ -786,6 +794,7 @@ export const WorkspaceDetails = (props) => {
                           description: workspace.data.attributes.description,
                           folder: workspace.data.attributes.folder,
                           locked: workspace.data.attributes.locked,
+                          moduleSshKey: workspace.data.attributes.moduleSshKey,
                           executionMode:
                             workspace.data.attributes.executionMode,
                         }}
@@ -859,6 +868,23 @@ export const WorkspaceDetails = (props) => {
                           >
                             <Option key="remote">remote</Option>
                             <Option key="local">local</Option>
+                          </Select>
+                        </Form.Item>
+                        <Form.Item
+                            name="moduleSshKey"
+                            label="Module Ssh Key"
+                            extra="Use this option to add a SSH key to allow module downloads"
+                        >
+                          <Select
+                              defaultValue={
+                              workspace.data.attributes.moduleSshKey
+                              }
+                              placeholder="select SSH Key" style={{ width: 250 }}>
+                            {sshKeys.map(function (sshKey, index) {
+                              return (
+                                  <Option key={sshKey?.id}>{sshKey?.attributes?.name}</Option>
+                              );
+                            })}
                           </Select>
                         </Form.Item>
                         <Form.Item>

@@ -60,6 +60,9 @@ public class Workspace extends GenericAuditFields {
     @Column(name = "deleted")
     private boolean deleted;
 
+    @Column(name = "module_ssh_key")
+    private String moduleSshKey;
+
     @Column(name = "terraform_version")
     private String terraformVersion;
 
