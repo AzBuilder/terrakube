@@ -440,6 +440,8 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 .terraformVariables(terraformJob.getVariables())
                 .terraformEnvironmentVariables(terraformJob.getEnvironmentVariables())
                 .workingDirectory(workingDirectory)
+                .refresh(terraformJob.isRefresh())
+                .refreshOnly(terraformJob.isRefreshOnly())
                 .sshFile(sshKeyFile)
                 .build();
 

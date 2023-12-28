@@ -87,7 +87,7 @@
 
         <insert tableName="template">
             <column name="id"               value="d944e19d-bc3e-41b0-bdf9-1881e1a459c4" />
-            <column name="name"             value="Destroy" />
+            <column name="name"             value="Terraform-Destroy" />
             <column name="description"      value="Running terraform destroy" />
             <column name="version"          value="1.0.0" />
             <column name="tcl"              value="ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1EZXN0cm95IgogICAgc3RlcDogMTAwCg==" />

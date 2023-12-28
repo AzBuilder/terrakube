@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="28" author="alfespa17@gmail.com">
+        <addColumn tableName="job" >
+            <column name="refresh" valueBoolean="true"/>
+        </addColumn>
+        <addColumn tableName="job" >
+            <column name="refresh_only" type="false"/>
+        </addColumn>
+        <update tableName="job">
+            <column name="refresh" valueBoolean="true"/>
+        </update>
+        <update tableName="job">
+            <column name="refresh_only" valueBoolean="false"/>
+        </update>
+    </changeSet>
+</databaseChangeLog>

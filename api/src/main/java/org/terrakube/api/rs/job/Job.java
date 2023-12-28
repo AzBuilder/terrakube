@@ -65,6 +65,12 @@ public class Job extends GenericAuditFields {
     @Column(name = "via")
     private String via = "UI";
 
+    @Column(name = "refresh")
+    private boolean refresh = true;
+
+    @Column(name = "refresh_only")
+    private boolean refreshOnly = false;
+
     @ManyToOne
     private Organization organization;
 

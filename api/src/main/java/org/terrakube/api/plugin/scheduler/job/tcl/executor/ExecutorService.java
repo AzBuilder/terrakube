@@ -112,6 +112,8 @@ public class ExecutorService {
             executorContext.setBranch(job.getOverrideBranch());
         }
         executorContext.setFolder(job.getWorkspace().getFolder());
+        executorContext.setRefresh(job.isRefresh());
+        executorContext.setRefreshOnly(job.isRefreshOnly());
         return sendToExecutor(job, executorContext);
     }
 
