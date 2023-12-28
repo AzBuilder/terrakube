@@ -102,6 +102,7 @@ export const WorkspaceDetails = (props) => {
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
   const [moduleSshKey, setModuleSshKey] = useState("...");
+  const [sshKeys, setSSHKeys] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
@@ -188,7 +189,7 @@ export const WorkspaceDetails = (props) => {
   const loadSSHKeys = () => {
     axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
       console.log(response.data.data);
-      setModuleSshKey(response.data.data);
+      setSSHKeys(response.data.data);
     });
   };
 
@@ -880,7 +881,7 @@ export const WorkspaceDetails = (props) => {
                               workspace.data.attributes.moduleSshKey
                               }
                               placeholder="select SSH Key" style={{ width: 250 }}>
-                            {setModuleSshKey.map(function (sshKey, index) {
+                            {sshKeys.map(function (sshKey, index) {
                               return (
                                   <Option key={sshKey?.id}>{sshKey?.attributes?.name}</Option>
                               );
