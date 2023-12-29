@@ -101,7 +101,6 @@ export const WorkspaceDetails = (props) => {
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
-  const [moduleSshKey, setModuleSshKey] = useState("...");
   const [sshKeys, setSSHKeys] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
@@ -314,6 +313,7 @@ export const WorkspaceDetails = (props) => {
           folder: values.folder,
           locked: values.locked,
           executionMode: values.executionMode,
+          moduleSshKey: values.moduleSshKey,
           terraformVersion: values.terraformVersion,
         },
       },
