@@ -429,10 +429,24 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 terraformJob.getWorkspaceId(), workingDirectory, terraformJob.getTerraformVersion());
 
         File sshKeyFile = null;
-        if (terraformJob.getVcsType().startsWith("SSH")) {
+        if (terraformJob.getVcsType().startsWith("SSH") && terraformJob.getModuleSshKey() != null && terraformJob.getModuleSshKey().length() > 0) {
+            //USING MODULE SSH KEY TO DOWNLOAD THE MODULES AND NOT THE DEFAULT SSH KEY THAT WAS USED TO CLONE THE WORKSPACE
+            String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), terraformJob.getJobId());
+            log.warn("1 - Using SSH key from: {}", sshFilePath);
+            sshKeyFile = new File(sshFilePath);
+        } else if(terraformJob.getVcsType().startsWith("SSH")){
+            //USING THE SAME SSH KEY THAT WAS USED TO CLONE THE REPOSITORY
             String sshFileName = terraformJob.getVcsType().split("~")[1];
             String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), sshFileName);
+            log.warn("2 - Using SSH key from: {}", sshFilePath);
             sshKeyFile = new File(sshFilePath);
+        } else if(terraformJob.getModuleSshKey() != null && terraformJob.getModuleSshKey().length() > 0){
+            //USING MODULE SSH KEY TO DOWNLOAD THE MODULES IN OTHER CASE FOR EXAMPLE WHEN USING VCS WITH A MODULE SSH KEY
+            String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), terraformJob.getJobId());
+            log.warn("3 - Using SSH key from: {}", sshFilePath);
+            sshKeyFile = new File(sshFilePath);
+        } else {
+            log.warn("Not using any SSH key to download modules");
         }
 
         TerraformProcessData terraformProcessData = TerraformProcessData.builder()

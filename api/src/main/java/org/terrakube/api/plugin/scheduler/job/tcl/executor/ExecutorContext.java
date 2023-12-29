@@ -27,6 +27,7 @@ public class ExecutorContext {
     private boolean refreshOnly;
     private boolean showHeader;
     private String accessToken;
+    private String moduleSshKey;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
 }

@@ -5,6 +5,7 @@ import org.springframework.web.client.RestClientException;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.JobRepository;
+import org.terrakube.api.repository.SshRepository;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
@@ -20,9 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.swing.text.html.Option;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -36,6 +36,10 @@ public class ExecutorService {
 
     @Autowired
     GlobalVarRepository globalVarRepository;
+
+    @Autowired
+    SshRepository sshRepository;
+
 
     @Transactional
     public boolean execute(Job job, String stepId, Flow flow) {
@@ -111,6 +115,14 @@ public class ExecutorService {
             }
             executorContext.setBranch(job.getOverrideBranch());
         }
+
+        if(job.getWorkspace().getModuleSshKey() != null) {
+            String moduleSshId = job.getWorkspace().getModuleSshKey();
+            Optional<Ssh> ssh = sshRepository.findById(UUID.fromString(moduleSshId));
+            if(ssh.isPresent()){
+                executorContext.setModuleSshKey(ssh.get().getPrivateKey());
+            }
+        }
         executorContext.setFolder(job.getWorkspace().getFolder());
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
@@ -123,6 +135,7 @@ public class ExecutorService {
         try {
             ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(this.executorUrl, executorContext, ExecutorContext.class);
             executorContext.setAccessToken("****");
+            executorContext.setModuleSshKey("****");
             log.info("Sending Job: /n {}", executorContext);
             log.info("Response Status: {}", response.getStatusCode().value());
 
