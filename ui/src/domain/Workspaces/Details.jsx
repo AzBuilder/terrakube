@@ -873,7 +873,7 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
                         <Form.Item
                             name="moduleSshKey"
-                            label="Module Ssh Key"
+                            label="Download modules SSH Keys"
                             extra="Use this option to add a SSH key to allow module downloads"
                         >
                           <Select

@@ -58,7 +58,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             } else {
                 downloadWorkspaceTarGz(workspaceCloneFolder, terraformJob.getSource());
             }
-            if(terraformJob.getModuleSshKey() != null){
+            if(terraformJob.getModuleSshKey() != null && terraformJob.getModuleSshKey().length() > 0){
                 generateModuleSshFolder(terraformJob.getModuleSshKey(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), terraformJob.getJobId());
             }
 
@@ -247,12 +247,13 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     }
 
     private File generateModuleSshFolder(String privateKey, String organizationId, String workspaceId, String jobId) {
+        log.warn("Generate new file SSH Key for modules...");
         String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), organizationId, workspaceId, jobId);
         File sshFile = new File(sshFilePath);
         try {
 
             FileUtils.forceMkdirParent(sshFile);
-            log.info("Creating new module SSH folder for organization {} wordkspace {} with jobId {}", organizationId, workspaceId, jobId);
+            log.info("Creating new module SSH folder for organization {} workspace {} with jobId {}", organizationId, workspaceId, jobId);
             FileUtils.writeStringToFile(sshFile, privateKey + "\n", Charset.defaultCharset());
 
             Set<PosixFilePermission> perms = new HashSet<>();
