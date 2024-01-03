@@ -1,5 +1,6 @@
 package org.terrakube.api.plugin.vcs.provider.github;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Map;
 
@@ -31,7 +33,30 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
-        return handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", "Github", this::handleEvent);
+        WebhookResult temp = handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", "Github", this::handleEvent);
+        temp.setFileChanges(new ArrayList());
+        try {
+            GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload, GitHubWebhookModel.class);
+            gitHubWebhookModel.getCommits().forEach(commit -> {
+                for (String addedObject : commit.getAdded()) {
+                    log.info("New: {}", addedObject);
+                    temp.getFileChanges().add(addedObject);
+                }
+
+                for (String removedObject : commit.getRemoved()) {
+                    log.info("Removed: {}", removedObject);
+                    temp.getFileChanges().add(removedObject);
+                }
+
+                for (String modifedObject : commit.getModified()) {
+                    log.info("Modified: {}", modifedObject);
+                    temp.getFileChanges().add(modifedObject);
+                }
+            });
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+        return temp;
     }
 
     private WebhookResult handleEvent(String jsonPayload, WebhookResult result,  Map<String, String> headers) {

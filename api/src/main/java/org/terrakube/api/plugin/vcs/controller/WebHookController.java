@@ -31,6 +31,7 @@ public class WebHookController {
         log.info("Processing webhook {}", webhookId);
         try {
             String jsonPayload = objectMapper.writeValueAsString(payload);
+            log.info("webhook payload: {}", jsonPayload);
             webhookService.processWebhook(webhookId, jsonPayload,headers);
         } catch (Exception e) {
             log.error("Error processing webhook", e);

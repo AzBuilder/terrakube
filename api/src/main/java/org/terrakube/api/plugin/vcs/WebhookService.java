@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @AllArgsConstructor
 @Slf4j
@@ -82,7 +83,7 @@ public class WebhookService {
                     // if the webhook is a valid request we can create a new job
                     if(webhookResult.isValid()){
                         // only execute the job if the branch is the same
-                        if(webhookResult.getBranch().equals(workspace.getBranch()))
+                        if(webhookResult.getBranch().equals(workspace.getBranch()) && checkFileChanges(webhookResult.getFileChanges(), workspace.getFolder()))
                         {
                            ObjectMapper objectMapper = new ObjectMapper();
                             try {
@@ -125,6 +126,20 @@ public class WebhookService {
                 break;
         }
         return result;
+    }
+
+    private boolean checkFileChanges(List<String> files, String workspaceFolder){
+        if(files != null){
+            AtomicBoolean fileChanged = new AtomicBoolean(false);
+            files.forEach(file-> {
+                log.info("File: {} in {}: {}", file, workspaceFolder, file.startsWith(workspaceFolder));
+                if(file.startsWith(workspaceFolder) && !fileChanged.get()){
+                    fileChanged.set(true);
+                }
+            });
+            return fileChanged.get();
+        } else
+            return true;
     }
 
 
