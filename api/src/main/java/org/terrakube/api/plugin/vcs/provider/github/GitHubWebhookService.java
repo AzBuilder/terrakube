@@ -33,30 +33,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
-        WebhookResult temp = handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", "Github", this::handleEvent);
-        temp.setFileChanges(new ArrayList());
-        try {
-            GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload, GitHubWebhookModel.class);
-            gitHubWebhookModel.getCommits().forEach(commit -> {
-                for (String addedObject : commit.getAdded()) {
-                    log.info("New: {}", addedObject);
-                    temp.getFileChanges().add(addedObject);
-                }
-
-                for (String removedObject : commit.getRemoved()) {
-                    log.info("Removed: {}", removedObject);
-                    temp.getFileChanges().add(removedObject);
-                }
-
-                for (String modifedObject : commit.getModified()) {
-                    log.info("Modified: {}", modifedObject);
-                    temp.getFileChanges().add(modifedObject);
-                }
-            });
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-        return temp;
+        return handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", "Github", this::handleEvent);
     }
 
     private WebhookResult handleEvent(String jsonPayload, WebhookResult result,  Map<String, String> headers) {
@@ -81,6 +58,29 @@ public class GitHubWebhookService extends WebhookServiceBase {
             {
                 log.error("Error parsing JSON response", e);
                 result.setBranch("");
+            }
+
+            result.setFileChanges(new ArrayList());
+            try {
+                GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload, GitHubWebhookModel.class);
+                gitHubWebhookModel.getCommits().forEach(commit -> {
+                    for (String addedObject : commit.getAdded()) {
+                        log.info("New: {}", addedObject);
+                        result.getFileChanges().add(addedObject);
+                    }
+
+                    for (String removedObject : commit.getRemoved()) {
+                        log.info("Removed: {}", removedObject);
+                        result.getFileChanges().add(removedObject);
+                    }
+
+                    for (String modifedObject : commit.getModified()) {
+                        log.info("Modified: {}", modifedObject);
+                        result.getFileChanges().add(modifedObject);
+                    }
+                });
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
             }
         }
 
