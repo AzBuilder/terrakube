@@ -15,6 +15,7 @@ public class GitHubWebhookModel {
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Commit{
     List<String> added;
     List<String> modified;
