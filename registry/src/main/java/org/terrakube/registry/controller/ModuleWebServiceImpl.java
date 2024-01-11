@@ -51,7 +51,7 @@ public class ModuleWebServiceImpl {
         responseHeaders.set(
                 "Access-Control-Expose-Headers","X-Terraform-Get"
         );
-        return ResponseEntity.ok().headers(responseHeaders).body(null);
+        return ResponseEntity.noContent().headers(responseHeaders).build();
     }
 
     @GetMapping(
