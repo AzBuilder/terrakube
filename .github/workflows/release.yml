@@ -10,9 +10,9 @@ jobs:
     env:
        VERSION: ${{ github.event.release.tag_name }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'liberica'
@@ -25,7 +25,7 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         
     - name: Use Node.js 
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: 16
         cache: 'npm'
@@ -110,9 +110,9 @@ jobs:
     env:
       VERSION: ${{ github.event.release.tag_name }}-alpaquita
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'liberica'
