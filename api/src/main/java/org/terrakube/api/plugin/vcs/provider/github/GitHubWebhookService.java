@@ -49,6 +49,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
             String extractedBranch = ref.split("/")[2];
             result.setBranch(extractedBranch);
 
+
             // Extract the user who triggered the webhook
             JsonNode pusherNode = rootNode.path("pusher");
             String pusher = pusherNode.path("email").asText();
@@ -63,6 +64,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
             result.setFileChanges(new ArrayList());
             try {
                 GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload, GitHubWebhookModel.class);
+                result.setCommit(gitHubWebhookModel.getHead_commit().getId());
                 gitHubWebhookModel.getCommits().forEach(commit -> {
                     for (String addedObject : commit.getAdded()) {
                         log.info("New: {}", addedObject);

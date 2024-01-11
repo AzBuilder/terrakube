@@ -16,4 +16,5 @@ public class WebhookResult {
     private String createdBy;
     private String via;
     private List<String> fileChanges;
+    private String commit;
 }

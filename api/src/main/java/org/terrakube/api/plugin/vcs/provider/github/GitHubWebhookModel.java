@@ -11,6 +11,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GitHubWebhookModel {
     List<Commit> commits;
+    HeadCommit head_commit;
 }
 
 @Getter
@@ -20,4 +21,11 @@ class Commit{
     List<String> added;
     List<String> modified;
     List<String> removed;
+}
+
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+class HeadCommit{
+    String id;
 }

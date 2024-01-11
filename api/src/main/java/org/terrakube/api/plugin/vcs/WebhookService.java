@@ -109,6 +109,9 @@ public class WebhookService {
                                 job.setCreatedDate(triggerDate);
                                 job.setUpdatedDate(triggerDate);
                                 job.setVia(webhookResult.getVia());
+                                if(webhookResult.getCommit() != null){
+                                    job.setOverrideBranch(webhookResult.getCommit());
+                                }
                                 Job savedJob = jobRepository.save(job);
                                 scheduleJobService.createJobContext(savedJob);
                             } catch (Exception e) {
