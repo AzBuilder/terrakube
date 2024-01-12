@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
@@ -26,10 +27,7 @@ import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.terrakube.api.plugin.scheduler.ScheduleJobService.PREFIX_JOB_CONTEXT;
 
@@ -63,6 +61,25 @@ public class ScheduleJob implements org.quartz.Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         int jobId = jobExecutionContext.getJobDetail().getJobDataMap().getInt(JOB_ID);
         Job job = jobRepository.getReferenceById(jobId);
+
+        Date jobExpiration = DateUtils.addHours(job.getCreatedDate(), 6);
+        Date currentTime = new Date(System.currentTimeMillis());
+        log.info("Job {} should be completed before {}, current time {}", job.getId(), jobExpiration, currentTime);
+        if(currentTime.after(jobExpiration)){
+            log.error("Job has been running for more than 6 hours, cancelling running job");
+            try {
+                job.setStatus(JobStatus.failed);
+                jobRepository.save(job);
+                redisTemplate.delete(String.valueOf(job.getId()));
+                log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
+                updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+            log.warn("Closing Job");
+            return;
+        }
 
         log.info("Checking Job {} Status {}", job.getId(), job.getStatus());
         log.info("Checking previous jobs....");
