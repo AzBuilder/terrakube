@@ -100,9 +100,15 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .setCredentialsProvider(setupCredentials(terraformJob.getVcsType(), terraformJob.getAccessToken()))
                         .setBranch(terraformJob.getBranch())
                         .call();
-            }
 
-            getCommitId(gitCloneFolder);
+                if(terraformJob.getCommitId() != null && terraformJob.getCommitId().length() > 0) {
+                    log.info("Checkout commit id {}", terraformJob.getCommitId());
+                    Git.open(gitCloneFolder).checkout().setName(terraformJob.getCommitId()).call();
+                    getCommitId(gitCloneFolder, terraformJob.getCommitId());
+                } else {
+                    getCommitId(gitCloneFolder, null);
+                }
+            }
 
             log.info("Git clone: {} Branch: {} Folder {}", terraformJob.getSource(), terraformJob.getBranch(), gitCloneFolder.getPath());
 
@@ -177,20 +183,25 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         }
     }
 
-    private void getCommitId(File gitCloneFolder) {
+    private void getCommitId(File gitCloneFolder, String commitId) {
         RevCommit latestCommit = null;
         try {
-            latestCommit = Git.init().setDirectory(gitCloneFolder).call().
-                    log().
-                    setMaxCount(1).
-                    call().
-                    iterator().
-                    next();
-            String latestCommitHash = latestCommit.getName();
-            log.info("Commit Id: {}", latestCommitHash);
-            String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getCanonicalPath());
-            log.info("Writing commit id to {}", commitInfoFile);
-            FileUtils.writeStringToFile(new File(commitInfoFile), latestCommitHash, Charset.defaultCharset());
+            if(commitId == null) {
+                latestCommit = Git.init().setDirectory(gitCloneFolder).call().
+                        log().
+                        setMaxCount(1).
+                        call().
+                        iterator().
+                        next();
+                String latestCommitHash = latestCommit.getName();
+                log.info("Commit Id: {}", latestCommitHash);
+                String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getCanonicalPath());
+                log.info("Writing commit id to {}", commitInfoFile);
+                FileUtils.writeStringToFile(new File(commitInfoFile), latestCommitHash, Charset.defaultCharset());
+            } else {
+                String commitIdFile = String.format("%s/commitHash.info", gitCloneFolder.getCanonicalPath());
+                FileUtils.writeStringToFile(new File(commitIdFile), commitId, Charset.defaultCharset());
+            }
 
         } catch (GitAPIException | IOException e) {
             log.error(e.getMessage());
