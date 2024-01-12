@@ -1,5 +1,6 @@
 package org.terrakube.api.plugin.vcs.provider.github;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Map;
 
@@ -47,6 +49,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
             String extractedBranch = ref.split("/")[2];
             result.setBranch(extractedBranch);
 
+
             // Extract the user who triggered the webhook
             JsonNode pusherNode = rootNode.path("pusher");
             String pusher = pusherNode.path("email").asText();
@@ -56,6 +59,30 @@ public class GitHubWebhookService extends WebhookServiceBase {
             {
                 log.error("Error parsing JSON response", e);
                 result.setBranch("");
+            }
+
+            result.setFileChanges(new ArrayList());
+            try {
+                GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload, GitHubWebhookModel.class);
+                result.setCommit(gitHubWebhookModel.getHead_commit().getId());
+                gitHubWebhookModel.getCommits().forEach(commit -> {
+                    for (String addedObject : commit.getAdded()) {
+                        log.info("New: {}", addedObject);
+                        result.getFileChanges().add(addedObject);
+                    }
+
+                    for (String removedObject : commit.getRemoved()) {
+                        log.info("Removed: {}", removedObject);
+                        result.getFileChanges().add(removedObject);
+                    }
+
+                    for (String modifedObject : commit.getModified()) {
+                        log.info("Modified: {}", modifedObject);
+                        result.getFileChanges().add(modifedObject);
+                    }
+                });
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
             }
         }
 

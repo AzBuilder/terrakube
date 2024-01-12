@@ -26,6 +26,8 @@ import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
 
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,39 +65,45 @@ public class ScheduleJob implements org.quartz.Job {
         Job job = jobRepository.getReferenceById(jobId);
 
         log.info("Checking Job {} Status {}", job.getId(), job.getStatus());
+        log.info("Checking previous jobs....");
+        Optional<List<Job>> previousJobs = jobRepository.findByWorkspaceAndStatusNotInAndIdLessThan(job.getWorkspace(), Arrays.asList(JobStatus.failed, JobStatus.completed), job.getId());
+        if(previousJobs.isPresent() && previousJobs.get().size() > 0 ){
+           log.warn("Job {} is waiting for previous jobs to be completed...", jobId);
+        } else {
 
-        switch (job.getStatus()) {
-            case pending:
-                redisTemplate.delete(String.valueOf(job.getId()));
-                executePendingJob(job, jobExecutionContext);
-                break;
-            case approved:
-                executeApprovedJobs(job);
-                break;
-            case running:
-                log.info("Job {} running", job.getId());
-                break;
-            case completed:
-                redisTemplate.delete(String.valueOf(job.getId()));
-                removeJobContext(job, jobExecutionContext);
-                unlockWorkspace(job);
-                break;
-            case cancelled:
-            case failed:
-            case rejected:
-                redisTemplate.delete(String.valueOf(job.getId()));
-                try {
-                    log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
-                    updateJobStepsWithStatus(job.getId(), JobStatus.failed);
-                    jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
-                } catch (SchedulerException e) {
-                    log.error(e.getMessage());
-                }
-                unlockWorkspace(job);
-                break;
-            default:
-                log.info("Job {} Status {}", job.getId(), job.getStatus());
-                break;
+            switch (job.getStatus()) {
+                case pending:
+                    redisTemplate.delete(String.valueOf(job.getId()));
+                    executePendingJob(job, jobExecutionContext);
+                    break;
+                case approved:
+                    executeApprovedJobs(job);
+                    break;
+                case running:
+                    log.info("Job {} running", job.getId());
+                    break;
+                case completed:
+                    redisTemplate.delete(String.valueOf(job.getId()));
+                    removeJobContext(job, jobExecutionContext);
+                    unlockWorkspace(job);
+                    break;
+                case cancelled:
+                case failed:
+                case rejected:
+                    redisTemplate.delete(String.valueOf(job.getId()));
+                    try {
+                        log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
+                        updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                        jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+                    } catch (SchedulerException e) {
+                        log.error(e.getMessage());
+                    }
+                    unlockWorkspace(job);
+                    break;
+                default:
+                    log.info("Job {} Status {}", job.getId(), job.getStatus());
+                    break;
+            }
         }
     }
 

@@ -29,6 +29,7 @@ public class TerraformJob {
     private boolean refresh;
     private boolean refreshOnly;
     private String moduleSshKey;
+    private String commitId;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
 
