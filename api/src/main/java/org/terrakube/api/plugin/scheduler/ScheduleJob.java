@@ -63,18 +63,22 @@ public class ScheduleJob implements org.quartz.Job {
         Job job = jobRepository.getReferenceById(jobId);
 
         Date jobExpiration = DateUtils.addHours(job.getCreatedDate(), 6);
-        Date currentTime = new Date();
-        log.info("Job {} should be completed before {}, current time {}", jobExpiration, currentTime);
-        if(jobExpiration.before(currentTime)){
+        Date currentTime = new Date(System.currentTimeMillis());
+        log.info("Job {} should be completed before {}, current time {}", job.getId(), jobExpiration, currentTime);
+        if(currentTime.after(jobExpiration)){
             log.error("Job has been running for more than 6 hours, cancelling running job");
             try {
+                job.setStatus(JobStatus.failed);
+                jobRepository.save(job);
                 redisTemplate.delete(String.valueOf(job.getId()));
-                log.info("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
+                log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                 updateJobStepsWithStatus(job.getId(), JobStatus.failed);
                 jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
+            log.warn("Closing Job");
+            return;
         }
 
         log.info("Checking Job {} Status {}", job.getId(), job.getStatus());
