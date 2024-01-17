@@ -850,8 +850,8 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
                         <Form.Item
                             name="branch"
-                            label="Branch used in VCS connections (do not modify when using CLI driven workflow)"
-                            extra="Branch used in VCS connections (do not modify when using CLI driven workflow)"
+                            label="Branch used in VCS connections"
+                            extra="Don't update the value when using CLI Driven workflows"
                         >
                           <Input />
                         </Form.Item>
