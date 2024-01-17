@@ -107,7 +107,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             scriptBeforeSuccessPlan = executePreOperationScripts(terraformJob, terraformWorkingDir, planOutput);
 
-            showTerraformMessage("PLAN", planOutput);
+            showTerraformMessage(terraformJob,"PLAN", planOutput);
 
             if (scriptBeforeSuccessPlan)
                 if (isDestroy) {
@@ -180,7 +180,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             scriptBeforeSuccess = executePreOperationScripts(terraformJob, terraformWorkingDir, applyOutput);
 
-            showTerraformMessage("APPLY", applyOutput);
+            showTerraformMessage(terraformJob, "APPLY", applyOutput);
 
             if (scriptBeforeSuccess) {
                 TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, terraformWorkingDir);
@@ -245,7 +245,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
 
             scriptBeforeSuccess = executePreOperationScripts(terraformJob, terraformWorkingDir, outputDestroy);
 
-            showTerraformMessage("DESTROY", outputDestroy);
+            showTerraformMessage(terraformJob, "DESTROY", outputDestroy);
 
             if (scriptBeforeSuccess) {
                 execution = terraformClient.destroy(
@@ -410,15 +410,19 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         output.accept(
                 colorize("Initializing Terrakube Job " + terraformJob.getJobId() + " Step " + terraformJob.getStepId(),
                         colorMessage));
-        output.accept(colorize("Running Terraform " + terraformJob.getTerraformVersion(), colorMessage));
+        output.accept(colorize(String.format("Running %s ", getIaCType(terraformJob)) + terraformJob.getTerraformVersion(), colorMessage));
         output.accept(colorize("\n\n" + STEP_SEPARATOR, colorMessage));
-        output.accept(colorize("Running Terraform Init: ", colorMessage));
+        output.accept(colorize(String.format("Running %s Init: ",getIaCType(terraformJob)), colorMessage));
     }
 
-    private void showTerraformMessage(String operation, Consumer<String> output) throws InterruptedException {
+    private String getIaCType(TerraformJob terraformJob){
+        return terraformJob.isTofu() ? "Tofu": "Terraform";
+    }
+
+    private void showTerraformMessage(TerraformJob terraformJob, String operation, Consumer<String> output) throws InterruptedException {
         AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
-        output.accept(colorize("Running Terraform " + operation, colorMessage));
+        output.accept(colorize(String.format("Running %s ",getIaCType(terraformJob)) + operation, colorMessage));
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
         Thread.sleep(2000);
     }
