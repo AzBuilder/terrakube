@@ -315,6 +315,7 @@ export const WorkspaceDetails = (props) => {
           executionMode: values.executionMode,
           moduleSshKey: values.moduleSshKey,
           terraformVersion: values.terraformVersion,
+          tofu: values.tofu,
         },
       },
     };
@@ -798,6 +799,7 @@ export const WorkspaceDetails = (props) => {
                           moduleSshKey: workspace.data.attributes.moduleSshKey,
                           executionMode:
                             workspace.data.attributes.executionMode,
+                          tofu: workspace.data.attributes.tofu,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -857,15 +859,30 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
 
                         <Form.Item
-                          name="executionMode"
-                          label="Execution Mode"
-                          extra="Use this option with terraform remote state/cloud block if you want to execute Terraform CLI remotely and just upload the state to Terrakube"
+                          name="tofu"
+                          label="Use OpenTofu"
+                          extra="Use this if you want to run the workspace using OpenTofu instead of terraform"
                         >
                           <Select
                             defaultValue={
-                              workspace.data.attributes.executionMode
+                              workspace.data.attributes.tofu
                             }
                             style={{ width: 250 }}
+                          >
+                            <Option key="false">false</Option>
+                            <Option key="true">true</Option>
+                          </Select>
+                        </Form.Item>
+                        <Form.Item
+                            name="executionMode"
+                            label="Execution Mode"
+                            extra="Use this option with terraform remote state/cloud block if you want to execute Terraform CLI remotely and just upload the state to Terrakube"
+                        >
+                          <Select
+                              defaultValue={
+                                workspace.data.attributes.executionMode
+                              }
+                              style={{ width: 250 }}
                           >
                             <Option key="remote">remote</Option>
                             <Option key="local">local</Option>

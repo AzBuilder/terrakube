@@ -29,6 +29,7 @@ public class ExecutorContext {
     private String accessToken;
     private String moduleSshKey;
     private String commitId;
+    private boolean tofu;
     private HashMap<String, String> environmentVariables;
     private HashMap<String, String> variables;
 }

@@ -456,6 +456,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 .workingDirectory(workingDirectory)
                 .refresh(terraformJob.isRefresh())
                 .refreshOnly(terraformJob.isRefreshOnly())
+                .tofu(terraformJob.isTofu())
                 .sshFile(sshKeyFile)
                 .build();
 

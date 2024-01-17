@@ -123,6 +123,7 @@ public class ExecutorService {
                 executorContext.setModuleSshKey(ssh.get().getPrivateKey());
             }
         }
+        executorContext.setTofu(job.getWorkspace().isTofu());
         executorContext.setCommitId(job.getCommitId());
         executorContext.setFolder(job.getWorkspace().getFolder());
         executorContext.setRefresh(job.isRefresh());
