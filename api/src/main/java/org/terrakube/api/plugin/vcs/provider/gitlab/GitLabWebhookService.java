@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Map;
 
@@ -70,8 +71,32 @@ public class GitLabWebhookService {
                 JsonNode userNode = rootNode.path("user_username");
                 String user = userNode.asText();
                 result.setCreatedBy(user);
-            }
 
+                result.setFileChanges(new ArrayList());
+                try {
+                    GitlabWebhookModel gitlabWebhookModel = new ObjectMapper().readValue(jsonPayload, GitlabWebhookModel.class);
+                    result.setCommit(gitlabWebhookModel.getCheckoutSha());
+                    gitlabWebhookModel.getCommits().forEach(commit -> {
+                        for (String addedObject : commit.getAdded()) {
+                            log.info("New Gitlab Object: {}", addedObject);
+                            result.getFileChanges().add(addedObject);
+                        }
+
+                        for (String removedObject : commit.getRemoved()) {
+                            log.info("Removed Gitlab Object: {}", removedObject);
+                            result.getFileChanges().add(removedObject);
+                        }
+
+                        for (String modifedObject : commit.getModified()) {
+                            log.info("Modified Gitlab Object: {}", modifedObject);
+                            result.getFileChanges().add(modifedObject);
+                        }
+                    });
+                } catch (JsonProcessingException e) {
+                    log.error(e.getMessage());
+                }
+
+            }
         } catch (JsonProcessingException e) {
             log.error("Error parsing JSON payload", e);
         }
