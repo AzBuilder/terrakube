@@ -859,19 +859,15 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
 
                         <Form.Item
-                          name="tofu"
-                          label="Use OpenTofu"
-                          extra="Use this if you want to run the workspace using OpenTofu instead of terraform"
+                            name="tofu"
+                            valuePropName="checked"
+                            label="Use OpenTofu"
+                            tooltip={{
+                              title: "Use OpenTofu",
+                              icon: <InfoCircleOutlined />,
+                            }}
                         >
-                          <Select
-                            defaultValue={
-                              workspace.data.attributes.tofu
-                            }
-                            style={{ width: 250 }}
-                          >
-                            <Option key="false">false</Option>
-                            <Option key="true">true</Option>
-                          </Select>
+                          <Switch />
                         </Form.Item>
                         <Form.Item
                             name="executionMode"
