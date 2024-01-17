@@ -316,6 +316,7 @@ export const WorkspaceDetails = (props) => {
           moduleSshKey: values.moduleSshKey,
           terraformVersion: values.terraformVersion,
           tofu: values.tofu,
+          branch: values.branch
         },
       },
     };
@@ -800,6 +801,7 @@ export const WorkspaceDetails = (props) => {
                           executionMode:
                             workspace.data.attributes.executionMode,
                           tofu: workspace.data.attributes.tofu,
+                          branch: workspace.data.attributes.branch
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -843,6 +845,13 @@ export const WorkspaceDetails = (props) => {
                           name="folder"
                           label="Terraform Working Directory"
                           extra="The directory that Terraform will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                            name="branch"
+                            label="Branch used in VCS connections"
+                            extra="Don't update the value when using CLI Driven workflows"
                         >
                           <Input />
                         </Form.Item>
