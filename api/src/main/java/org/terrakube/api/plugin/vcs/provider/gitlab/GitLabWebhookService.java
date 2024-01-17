@@ -76,20 +76,21 @@ public class GitLabWebhookService {
                 try {
                     GitlabWebhookModel gitlabWebhookModel = new ObjectMapper().readValue(jsonPayload, GitlabWebhookModel.class);
                     result.setCommit(gitlabWebhookModel.getCheckoutSha());
-                    gitlabWebhookModel.getCommits().forEach(commit -> {
-                        for (String addedObject : commit.getAdded()) {
-                            log.info("New Gitlab Object: {}", addedObject);
-                            result.getFileChanges().add(addedObject);
+                    gitlabWebhookModel.getCommits().forEach(commitData -> {
+
+                        for (String gitlabmodified : commitData.getModified()) {
+                            result.getFileChanges().add(gitlabmodified);
+                            log.info("Modified Gitlab Object: {}", gitlabmodified);
                         }
 
-                        for (String removedObject : commit.getRemoved()) {
-                            log.info("Removed Gitlab Object: {}", removedObject);
-                            result.getFileChanges().add(removedObject);
+                        for (String gitlabRemoved : commitData.getRemoved()) {
+                            result.getFileChanges().add(gitlabRemoved);
+                            log.info("Removed Gitlab Object: {}", gitlabRemoved);
                         }
 
-                        for (String modifedObject : commit.getModified()) {
-                            log.info("Modified Gitlab Object: {}", modifedObject);
-                            result.getFileChanges().add(modifedObject);
+                        for (String gitlabAdded : commitData.getAdded()) {
+                            log.info("New Gitlab Object: {}", gitlabAdded);
+                            result.getFileChanges().add(gitlabAdded);
                         }
                     });
                 } catch (JsonProcessingException e) {
