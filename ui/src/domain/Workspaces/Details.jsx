@@ -315,6 +315,7 @@ export const WorkspaceDetails = (props) => {
           executionMode: values.executionMode,
           moduleSshKey: values.moduleSshKey,
           terraformVersion: values.terraformVersion,
+          tofu: values.tofu,
         },
       },
     };
@@ -798,6 +799,7 @@ export const WorkspaceDetails = (props) => {
                           moduleSshKey: workspace.data.attributes.moduleSshKey,
                           executionMode:
                             workspace.data.attributes.executionMode,
+                          tofu: workspace.data.attributes.tofu,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -857,15 +859,26 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
 
                         <Form.Item
-                          name="executionMode"
-                          label="Execution Mode"
-                          extra="Use this option with terraform remote state/cloud block if you want to execute Terraform CLI remotely and just upload the state to Terrakube"
+                            name="tofu"
+                            valuePropName="checked"
+                            label="Use OpenTofu"
+                            tooltip={{
+                              title: "Use OpenTofu",
+                              icon: <InfoCircleOutlined />,
+                            }}
+                        >
+                          <Switch />
+                        </Form.Item>
+                        <Form.Item
+                            name="executionMode"
+                            label="Execution Mode"
+                            extra="Use this option with terraform remote state/cloud block if you want to execute Terraform CLI remotely and just upload the state to Terrakube"
                         >
                           <Select
-                            defaultValue={
-                              workspace.data.attributes.executionMode
-                            }
-                            style={{ width: 250 }}
+                              defaultValue={
+                                workspace.data.attributes.executionMode
+                              }
+                              style={{ width: 250 }}
                           >
                             <Option key="remote">remote</Option>
                             <Option key="local">local</Option>
