@@ -123,12 +123,16 @@ public class ExecutorService {
                 executorContext.setModuleSshKey(ssh.get().getPrivateKey());
             }
         }
-        executorContext.setTofu(job.getWorkspace().getIacType() != null && job.getWorkspace().getIacType().equals("terraform") ? false: true);
+        executorContext.setTofu(iacType(job));
         executorContext.setCommitId(job.getCommitId());
         executorContext.setFolder(job.getWorkspace().getFolder());
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
         return sendToExecutor(job, executorContext);
+    }
+
+    private boolean iacType(Job job){
+        return job.getWorkspace().getIacType() != null && job.getWorkspace().getIacType().equals("terraform") ? false: true;
     }
 
     private boolean sendToExecutor(Job job, ExecutorContext executorContext) {
