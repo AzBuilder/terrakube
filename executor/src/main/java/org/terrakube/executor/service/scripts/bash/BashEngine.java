@@ -9,7 +9,9 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.scripts.CommandExecution;
 import org.terrakube.executor.service.scripts.ScriptEngineService;
+import org.terrakube.executor.service.workspace.security.WorkspaceSecurity;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -31,6 +33,15 @@ public class BashEngine implements CommandExecution {
     private static final String TERRAFORM_DIRECTORY="/.terraform-spring-boot/terraform/";
 
     private final ExecutorService executor = Executors.newWorkStealingPool();
+
+    private String terrakubeApi;
+
+    private WorkspaceSecurity workspaceSecurity;
+
+    public BashEngine(WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.api.url}") String terrakubeApi) {
+        this.terrakubeApi = terrakubeApi;
+        this.workspaceSecurity = workspaceSecurity;
+    }
 
     @Override
     public boolean execute(TerraformJob terraformJob, String script, File terraformWorkingDir, Consumer<String> output) {
@@ -87,6 +98,8 @@ public class BashEngine implements CommandExecution {
         processLauncher.setEnvironmentVariable("vcsType", terraformJob.getVcsType() != null ? terraformJob.getVcsType() : "");
         processLauncher.setEnvironmentVariable("accessToken", terraformJob.getAccessToken() != null ? terraformJob.getAccessToken() : "");
         processLauncher.setEnvironmentVariable("terraformOutput", terraformJob.getTerraformOutput() != null ? terraformJob.getTerraformOutput() : "");
+        processLauncher.setEnvironmentVariable("terrakubeApi", this.terrakubeApi);
+        processLauncher.setEnvironmentVariable("terrakubeToken", workspaceSecurity.generateAccessToken(5));
         terraformJob.getEnvironmentVariables().forEach((key, value) -> processLauncher.setEnvironmentVariable(key, value));
         terraformJob.getVariables().forEach((key, value) -> processLauncher.setEnvironmentVariable(key, value));
         processLauncher.setOrAppendEnvironmentVariable("PATH", workingDirectory.getAbsolutePath() + ScriptEngineService.TOOLS, ":");
