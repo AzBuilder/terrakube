@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="34" author="alfespa17@gmail.com">
+        <dropColumn tableName="workspace">
+            <column name="tofu"/>
+        </dropColumn>
+        <addColumn tableName="workspace" >
+            <column name="iac_type" type="varchar(36)" defaultValue="terraform"/>
+        </addColumn>
+        <update tableName="workspace">
+            <column name="iac_type" value="terraform"/>
+        </update>
+    </changeSet>
+</databaseChangeLog>

@@ -123,7 +123,7 @@ public class ExecutorService {
                 executorContext.setModuleSshKey(ssh.get().getPrivateKey());
             }
         }
-        executorContext.setTofu(job.getWorkspace().isTofu());
+        executorContext.setTofu(job.getWorkspace().getIacType() != null && job.getWorkspace().getIacType().equals("terraform") ? false: true);
         executorContext.setCommitId(job.getCommitId());
         executorContext.setFolder(job.getWorkspace().getFolder());
         executorContext.setRefresh(job.isRefresh());

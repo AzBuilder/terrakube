@@ -315,7 +315,7 @@ export const WorkspaceDetails = (props) => {
           executionMode: values.executionMode,
           moduleSshKey: values.moduleSshKey,
           terraformVersion: values.terraformVersion,
-          tofu: values.tofu,
+          iacType: values.iacType,
           branch: values.branch
         },
       },
@@ -800,7 +800,7 @@ export const WorkspaceDetails = (props) => {
                           moduleSshKey: workspace.data.attributes.moduleSshKey,
                           executionMode:
                             workspace.data.attributes.executionMode,
-                          tofu: workspace.data.attributes.tofu,
+                          iacType: workspace.data.attributes.iacType,
                           branch: workspace.data.attributes.branch
                         }}
                         layout="vertical"
@@ -868,15 +868,19 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
 
                         <Form.Item
-                            name="tofu"
-                            valuePropName="checked"
-                            label="Use OpenTofu"
-                            tooltip={{
-                              title: "Use OpenTofu",
-                              icon: <InfoCircleOutlined />,
-                            }}
+                            name="iacType"
+                            label="Select IaC type "
+                            extra="IaC type when running the workspace (Example: terraform or tofu) "
                         >
-                          <Switch />
+                          <Select
+                              defaultValue={
+                                workspace.data.attributes.iacType
+                              }
+                              style={{ width: 250 }}
+                          >
+                            <Option key="terraform">terraform</Option>
+                            <Option key="tofu">tofu</Option>
+                          </Select>
                         </Form.Item>
                         <Form.Item
                             name="executionMode"
