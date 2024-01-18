@@ -3,7 +3,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <changeSet author="demo-data" id="demo-6">
         <update tableName="workspace">
-            <column name="tofu" valueBoolean="false"/>
+            <column name="iac_type" value="terraform"/>
         </update>
     </changeSet>
 </databaseChangeLog>
