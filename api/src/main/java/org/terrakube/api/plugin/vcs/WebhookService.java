@@ -133,7 +133,7 @@ public class WebhookService {
         if(files != null){
             AtomicBoolean fileChanged = new AtomicBoolean(false);
             files.forEach(file-> {
-                log.info("File: {} in {}: {}", file, workspaceFolder.substring(1), file.startsWith(workspaceFolder));
+                log.info("File: {} in {}: {}", file, workspaceFolder.substring(1), file.startsWith(workspaceFolder.substring(1)));
                 if(file.startsWith(workspaceFolder.substring(1)) && !fileChanged.get()){
                     fileChanged.set(true);
                 }
