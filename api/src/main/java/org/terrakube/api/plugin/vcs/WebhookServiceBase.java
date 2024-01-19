@@ -14,9 +14,11 @@ import com.datical.liquibase.ext.checks.config.TriFunction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -93,6 +95,7 @@ public class WebhookServiceBase {
         WebhookResult result = new WebhookResult();
         result.setBranch("");
         result.setVia(via);
+        result.setWorkspaceId(Base64.getDecoder().decode(token).toString());
 
         log.info("verify signature for " + via + " webhook");
         result.setValid(verifySignature(headers, signatureHeader, token, jsonPayload));

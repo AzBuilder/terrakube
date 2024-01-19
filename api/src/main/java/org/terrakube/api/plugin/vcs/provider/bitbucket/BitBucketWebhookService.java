@@ -1,11 +1,16 @@
 package org.terrakube.api.plugin.vcs.provider.bitbucket;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.terrakube.api.plugin.vcs.WebhookResult;
 import org.terrakube.api.plugin.vcs.WebhookServiceBase;
+import org.terrakube.api.plugin.vcs.provider.gitlab.GitlabWebhookModel;
+import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,9 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Map;
+import java.time.Duration;
+import java.util.*;
 
 
 @Service
@@ -27,8 +36,11 @@ public class BitBucketWebhookService extends WebhookServiceBase {
     @Value("${org.terrakube.hostname}")
     private String hostname;
 
-    public BitBucketWebhookService(ObjectMapper objectMapper) {
+    private WorkspaceRepository workspaceRepository;
+
+    public BitBucketWebhookService(WorkspaceRepository workspaceRepository, ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        this.workspaceRepository =workspaceRepository;
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
@@ -59,6 +71,15 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                 JsonNode authorNode = changesNode.path("new").path("target").path("author").path("raw");
                 String author = authorNode.asText();
                 result.setCreatedBy(author);
+
+                BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload, BitbucketTokenModel.class);
+                if(bitbucketTokenModel.getPush().getChanges().size() == 1) {
+                    log.info("Bitbucket commit: {}", bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
+                    log.info("Bitbucket diff file: {}", bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
+                    result.setFileChanges(getFileChanges(bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(), result.getWorkspaceId()));
+                } else {
+                    log.error("Bitbucket webhook with more than 1 changes is not supported");
+                }
             } catch (Exception e) {
                 log.error("Error parsing JSON response", e);
                 result.setBranch("");
@@ -66,6 +87,43 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         }
 
         return result;
+    }
+
+    private List<String> getFileChanges(String diffFile, String workspaceId) {
+        List<String> fileChanges = new ArrayList<>();
+
+        try {
+            String accessToken = "bearer " + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
+            URL urlBitbucketApi = new URL(diffFile);
+            log.info("Base URL: {}", String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()));
+            log.info("URI: {}", urlBitbucketApi.getPath());
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()))
+                    .defaultHeader(HttpHeaders.AUTHORIZATION, accessToken)
+                    .build();
+
+            String diffContent = webClient.get()
+                    .uri(urlBitbucketApi.getPath())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .timeout(Duration.ofSeconds(10))
+                    .block();
+
+            new BufferedReader(new StringReader(diffContent)).lines().forEach(line ->{
+                if(line.startsWith("diff --git ")){
+                    log.warn("Checking change: {}", line);
+                    // Example
+                    // diff --git a/work1/main.tf b/work1/main.tf
+                    String file = line.split("\\s+")[2].substring(2);
+                    log.warn("Adding file: {}", file);
+                    fileChanges.add(file);
+                }
+            });
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        return fileChanges;
     }
 
     public String createWebhook(Workspace workspace, String webhookId) {
