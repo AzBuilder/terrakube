@@ -72,6 +72,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                 if(bitbucketTokenModel.getPush().getChanges().size() == 1) {
                     log.info("Bitbucket commit: {}", bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
                     log.info("Bitbucket diff file: {}", bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
+                    result.setCommit(bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
                     result.setFileChanges(getFileChanges(bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(), result.getWorkspaceId()));
                 } else {
                     log.error("Bitbucket webhook with more than 1 changes is not supported");
