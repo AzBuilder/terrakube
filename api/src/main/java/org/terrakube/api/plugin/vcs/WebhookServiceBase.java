@@ -95,7 +95,9 @@ public class WebhookServiceBase {
         WebhookResult result = new WebhookResult();
         result.setBranch("");
         result.setVia(via);
-        result.setWorkspaceId(Base64.getDecoder().decode(token).toString());
+        String workspaceId = new String(Base64.getMimeDecoder().decode(token.getBytes(StandardCharsets.UTF_8)));
+        log.info("WorkspaceId: {}", workspaceId);
+        result.setWorkspaceId(workspaceId);
 
         log.info("verify signature for " + via + " webhook");
         result.setValid(verifySignature(headers, signatureHeader, token, jsonPayload));
