@@ -1,15 +1,12 @@
 package org.terrakube.api.plugin.vcs.provider.bitbucket;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.terrakube.api.plugin.vcs.WebhookResult;
 import org.terrakube.api.plugin.vcs.WebhookServiceBase;
-import org.terrakube.api.plugin.vcs.provider.gitlab.GitlabWebhookModel;
 import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.workspace.Workspace;
 
@@ -20,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -93,7 +89,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         List<String> fileChanges = new ArrayList<>();
 
         try {
-            String accessToken = "bearer " + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
+            String accessToken = "Bearer " + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
             URL urlBitbucketApi = new URL(diffFile);
             log.info("Base URL: {}", String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()));
             log.info("URI: {}", urlBitbucketApi.getPath());
@@ -120,6 +116,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                 }
             });
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage());
         }
 
