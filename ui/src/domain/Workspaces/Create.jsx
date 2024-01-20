@@ -11,6 +11,7 @@ import {
   Select,
   message,
   Dropdown,
+  List,
 } from "antd";
 import {
   ORGANIZATION_ARCHIVE,
@@ -30,6 +31,7 @@ import { SiGit } from "react-icons/si";
 import { useHistory, Link } from "react-router-dom";
 const { Content } = Layout;
 const { Step } = Steps;
+const { Meta } = Card;
 const validateMessages = {
   required: "${label} is required!",
   types: {
@@ -50,18 +52,20 @@ export const CreateWorkspace = () => {
     new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
   }/terraform/index.json`;
   const [current, setCurrent] = useState(0);
-  const [step3Hidden, setStep3Hidden] = useState(true);
-  const [step2Hidden, setStep2Hidden] = useState(true);
+  const [step3Hidden, setStep4Hidden] = useState(true);
+  const [step2Hidden, setStep3Hidden] = useState(true);
   const [sshKeysVisible, setSSHKeysVisible] = useState(false);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const [iacTypes, setIacTypes] = useState([]);
+  const [iacType, setIacType] = useState({id:"terraform",name:"Terraform"});
   const gitlabItems = [
     {
       label: "Gitlab.com",
       key: "1",
       onClick: () => {
         handleVCSClick("GITLAB");
-      }
+      },
     },
     {
       label: "Gitlab Community Edition",
@@ -75,7 +79,7 @@ export const CreateWorkspace = () => {
       key: "3",
       onClick: () => {
         handleVCSClick("GITLAB_ENTERPRISE");
-      }
+      },
     },
   ];
 
@@ -85,14 +89,14 @@ export const CreateWorkspace = () => {
       key: "1",
       onClick: () => {
         handleVCSClick("GITHUB");
-      }
+      },
     },
     {
       label: "Github Enterprise",
       key: "2",
       onClick: () => {
         handleVCSClick("GITHUB_ENTERPRISE");
-      }
+      },
     },
   ];
 
@@ -102,7 +106,7 @@ export const CreateWorkspace = () => {
       key: "1",
       onClick: () => {
         handleVCSClick("BITBUCKET");
-      }
+      },
     },
   ];
 
@@ -112,7 +116,7 @@ export const CreateWorkspace = () => {
       key: "1",
       onClick: () => {
         handleVCSClick("AZURE_DEVOPS");
-      }
+      },
     },
   ];
   const history = useHistory();
@@ -130,11 +134,17 @@ export const CreateWorkspace = () => {
     });
     loadSSHKeys();
     loadVCS();
+    getIacTypes();
   }, [terraformVersionsApi]);
   const handleClick = (e) => {
-    setCurrent(1);
+    setCurrent(2);
     setVersionControlFlow(true);
     form.setFieldsValue({ source: "", branch: "" });
+  };
+
+  const handleIacTypeClick = (iacType) => {
+    setCurrent(1);
+    setIacType(iacType);
   };
 
   const handleGitClick = (id) => {
@@ -144,8 +154,8 @@ export const CreateWorkspace = () => {
       setSSHKeysVisible(false);
       setVcsId(id);
     }
-    setCurrent(2);
-    setStep2Hidden(false);
+    setCurrent(3);
+    setStep3Hidden(false);
   };
 
   const handleVCSClick = (vcsType) => {
@@ -203,8 +213,8 @@ export const CreateWorkspace = () => {
   const [form] = Form.useForm();
   const handleGitContinueClick = (e) => {
     setCurrent(3);
-    setStep3Hidden(false);
-    setStep2Hidden(true);
+    setStep4Hidden(false);
+    setStep3Hidden(true);
     var source = form.getFieldValue("source");
 
     if (source != null) {
@@ -218,7 +228,7 @@ export const CreateWorkspace = () => {
   const handleCliDriven = (e) => {
     setVersionControlFlow(false);
     setCurrent(1);
-    setStep3Hidden(false);
+    setStep4Hidden(false);
     setSSHKeysVisible(false);
     form.setFieldsValue({ source: "empty", branch: "remote-content" });
   };
@@ -239,6 +249,7 @@ export const CreateWorkspace = () => {
           terraformVersion: values.terraformVersion,
           branch: values.branch,
           executionMode: "remote",
+          iacType: iacType.id,
         },
       },
     };
@@ -254,6 +265,7 @@ export const CreateWorkspace = () => {
             terraformVersion: values.terraformVersion,
             branch: values.branch,
             executionMode: "remote",
+            iacType: iacType.id,
           },
           relationships: {
             vcs: {
@@ -277,6 +289,7 @@ export const CreateWorkspace = () => {
             terraformVersion: values.terraformVersion,
             branch: values.branch,
             executionMode: "remote",
+            iacType: iacType.id,
           },
           relationships: {
             ssh: {
@@ -328,21 +341,39 @@ export const CreateWorkspace = () => {
 
   const handleChange = (currentVal) => {
     setCurrent(currentVal);
-    if (currentVal === 2) {
-      setStep2Hidden(false);
-      setStep3Hidden(true);
-    }
-
     if (currentVal === 3) {
       setStep3Hidden(false);
-      setStep2Hidden(true);
+      setStep4Hidden(true);
     }
 
-    if (currentVal === 1 || currentVal === 0) {
+    if (currentVal === 4) {
+      setStep4Hidden(false);
       setStep3Hidden(true);
-      setStep2Hidden(true);
+    }
+
+    if (currentVal === 2 || currentVal === 1 || currentVal === 0) {
+      setStep4Hidden(true);
+      setStep3Hidden(true);
       setVersionControlFlow(true);
     }
+  };
+
+  const getIacTypes = () => {
+    let iacTypes = [
+      {
+        id: "terraform",
+        name: "Terraform",
+        description:
+          "Create an empty template. So you can define your template from scratch.",
+        icon: "/providers/terraform.svg",
+      },
+      { id: "tofu",
+        name: "OpenTofu",
+        icon: "/providers/opentofu.png",
+      },
+    ];
+
+    setIacTypes(iacTypes);
   };
 
   return (
@@ -361,9 +392,9 @@ export const CreateWorkspace = () => {
           <h2>Create a new Workspace</h2>
           <div className="App-text">
             Workspaces determine how Terrakube organizes infrastructure. A
-            workspace contains your Terraform configuration (infrastructure as
-            code), shared variable values, your current and historical Terraform
-            state, and run logs.
+            workspace contains your configuration (infrastructure as code),
+            shared variable values, your current and historical state, and run
+            logs.
           </div>
           <Steps
             direction="horizontal"
@@ -371,6 +402,7 @@ export const CreateWorkspace = () => {
             current={current}
             onChange={handleChange}
           >
+            <Step title="Choose IaC Type" />
             <Step title="Choose Type" />
             {versionControlFlow ? (
               <>
@@ -382,7 +414,39 @@ export const CreateWorkspace = () => {
             )}
             <Step title="Configure Settings" />
           </Steps>
-          {current === 0 && (
+          {current == 0 && (
+            <Space className="chooseType" direction="vertical">
+              <h3>Choose your IaC type </h3>
+              <List
+                grid={{ gutter: 5, column: 5 }}
+                dataSource={iacTypes}
+                renderItem={(item) => (
+                  <List.Item>
+                    <Card
+                    style={{ width: "150px", textAlign: "center" }}
+                      hoverable
+                      onClick={() => handleIacTypeClick(item)}
+                    >
+                     <Space direction="vertical">
+                      <img
+                        style={{
+                          padding: "10px",
+                          backgroundColor: item.color,
+                          width: "60px",
+                        }}
+                        alt="example"
+                        src={item.icon}
+                      />
+                      <span style={{fontWeight:"bold"}}>{item.name}</span>
+                      </Space>
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            </Space>
+          )}
+
+          {current === 1 && (
             <Space className="chooseType" direction="vertical">
               <h3>Choose your workflow </h3>
               <Card hoverable onClick={handleClick}>
@@ -391,7 +455,7 @@ export const CreateWorkspace = () => {
                 </IconContext.Provider>
                 <span className="workflowType">Version control workflow</span>
                 <div className="workflowDescription App-text">
-                  Store your Terraform configuration in a git repository, and
+                  Store your {iacType?.name} configuration in a git repository, and
                   trigger runs based on pull requests and merges.
                 </div>
                 <div className="workflowSelect"></div>
@@ -402,7 +466,7 @@ export const CreateWorkspace = () => {
                 </IconContext.Provider>
                 <span className="workflowType">CLI-driven workflow</span>
                 <div className="workflowDescription App-text">
-                  Trigger remote Terraform runs from your local command line.
+                  Trigger remote {iacType?.name} runs from your local command line.
                 </div>
               </Card>
               <Card hoverable onClick={handleCliDriven}>
@@ -411,18 +475,18 @@ export const CreateWorkspace = () => {
                 </IconContext.Provider>
                 <span className="workflowType">API-driven workflow</span>
                 <div className="workflowDescription App-text">
-                  A more advanced option. Integrate Terraform into a larger
-                  pipeline using the Terraform API.
+                  A more advanced option. Integrate {iacType?.name} into a larger
+                  pipeline using the {iacType?.name} API.
                 </div>
               </Card>
             </Space>
           )}
 
-          {current === 1 && versionControlFlow && (
+          {current === 2 && versionControlFlow && (
             <Space className="chooseType" direction="vertical">
               <h3>Connect to a version control provider</h3>
               <div className="workflowDescription2 App-text">
-                Choose the version control provider that hosts the Terraform
+                Choose the version control provider that hosts the {iacType?.name}&nbsp;
                 configuration for this workspace.
               </div>
 
@@ -484,16 +548,16 @@ export const CreateWorkspace = () => {
                       </Button>
                     </Dropdown>
                     <Dropdown menu={{ items: bitBucketItems }}>
-                    <Button size="large">
-                      <SiBitbucket /> &nbsp; Bitbucket <DownOutlined />
-                    </Button>
+                      <Button size="large">
+                        <SiBitbucket /> &nbsp; Bitbucket <DownOutlined />
+                      </Button>
                     </Dropdown>
                     <Dropdown menu={{ items: azDevOpsItems }}>
-                    <Button size="large">
-                      <Space>
-                     <SiAzuredevops /> Azure Devops <DownOutlined/>
-                      </Space>
-                    </Button>
+                      <Button size="large">
+                        <Space>
+                          <SiAzuredevops /> Azure Devops <DownOutlined />
+                        </Space>
+                      </Button>
                     </Dropdown>
                   </Space>
                   <br />
@@ -525,7 +589,7 @@ export const CreateWorkspace = () => {
             >
               <h3>Choose a repository</h3>
               <div className="workflowDescription2 App-text">
-                Choose the repository that hosts your Terraform source code.
+                Choose the repository that hosts your {iacType?.name} source code.
               </div>
               <Form.Item
                 name="source"
@@ -576,7 +640,7 @@ export const CreateWorkspace = () => {
               </Form.Item>
               <Form.Item
                 name="folder"
-                label="Terraform Working Directory"
+                label={iacType?.name  + " Working Directory"}
                 placeholder="/"
                 extra=" Default workspace directory. Use / for the root folder"
                 rules={[{ required: true }]}
@@ -586,9 +650,9 @@ export const CreateWorkspace = () => {
               </Form.Item>
               <Form.Item
                 name="terraformVersion"
-                label="Terraform Version"
+                label={iacType?.name + " Version"}
                 rules={[{ required: true }]}
-                extra="The version of Terraform to use for this workspace. It will not upgrade automatically."
+                extra={"The version of " + iacType?.name +" to use for this workspace. It will not upgrade automatically."}
               >
                 <Select placeholder="select version" style={{ width: 250 }}>
                   {terraformVersions.map(function (name, index) {
