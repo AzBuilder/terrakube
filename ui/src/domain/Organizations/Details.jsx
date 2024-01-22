@@ -56,6 +56,25 @@ export const OrganizationDetails = ({
     history.push("/workspaces/create");
   };
 
+  const iacTypes = [
+    {
+      id: "terraform",
+      name: "Terraform",
+      description:
+        "Create an empty template. So you can define your template from scratch.",
+      icon: (
+        <IconContext.Provider value={{ size: "1.3em" }}>
+          <SiTerraform />
+        </IconContext.Provider>
+      ),
+    },
+    {
+      id: "tofu",
+      name: "OpenTofu",
+      icon: <img width="18px" src="/providers/opentofu.png" />,
+    },
+  ];
+
   const renderVCSLogo = (hostname) => {
     if (hostname.includes("gitlab"))
       return (
@@ -123,6 +142,12 @@ export const OrganizationDetails = ({
   const filterOption = (input, option) =>
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
+
+  const getIaCIconById = (id) => {
+    const item = iacTypes.find((iacType) => iacType.id === id);
+    return item ? item.icon : null;
+  };
+
   const applyFilters = (searchValue, filterValue, selectedTags) => {
     // update values
     sessionStorage.setItem("searchValue", searchValue);
@@ -132,7 +157,7 @@ export const OrganizationDetails = ({
     console.log(filterValue||"filter empty");
     console.log(selectedTags||"tags empty");
 
-    var filteredWorkspaces = filterWorkspaces(workspaces,searchValue, filterValue, selectedTags);     
+    var filteredWorkspaces = filterWorkspaces(workspaces,searchValue, filterValue, selectedTags);
     setFilteredWorkspaces(filteredWorkspaces);
     return;
   };
@@ -199,6 +224,7 @@ export const OrganizationDetails = ({
                     source
                     branch
                     terraformVersion
+                    iacType
                     workspaceTag {
                       edges { 
                         node {
@@ -345,8 +371,6 @@ export const OrganizationDetails = ({
                           return { label: tag.attributes.name, value: tag.id };
                         })}
                         defaultValue={filterTags}
-                      
-                    
                       />
                     )}
                   </Col>
@@ -434,9 +458,7 @@ export const OrganizationDetails = ({
                               "never executed"}
                           </span>
                           <span>
-                            <IconContext.Provider value={{ size: "1.3em" }}>
-                              <SiTerraform />
-                            </IconContext.Provider>
+                            {getIaCIconById(item.iacType)}
                             &nbsp;&nbsp;{item.terraformVersion}
                           </span>
                           {item.branch !== "remote-content" ? (

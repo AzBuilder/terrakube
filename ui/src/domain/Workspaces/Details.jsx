@@ -37,7 +37,7 @@ import { Schedules } from "../Workspaces/Schedules";
 import { CLIDriven } from "../Workspaces/CLIDriven";
 import { Tags } from "../Workspaces/Tags";
 import { useParams, Link } from "react-router-dom";
-import {ResourceDrawer} from "../Workspaces/ResourceDrawer";
+import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -73,9 +73,25 @@ const include = {
   VCS: "vcs",
 };
 const { DateTime } = require("luxon");
-
 const { Content } = Layout;
-
+const iacTypes = [
+  {
+    id: "terraform",
+    name: "Terraform",
+    description:
+      "Create an empty template. So you can define your template from scratch.",
+    icon: (
+      <IconContext.Provider value={{ size: "1.4em" }}>
+        <SiTerraform />
+      </IconContext.Provider>
+    ),
+  },
+  {
+    id: "tofu",
+    name: "OpenTofu",
+    icon: <img width="18px" src="/providers/opentofu.png" />,
+  },
+];
 export const WorkspaceDetails = (props) => {
   const browserHistory = useHistory();
   const { id } = useParams();
@@ -145,7 +161,8 @@ export const WorkspaceDetails = (props) => {
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text, record) => (
         <Button onClick={() => showDrawer(record)} type="link">
-          {text} &nbsp;<HiOutlineExternalLink />
+          {text} &nbsp;
+          <HiOutlineExternalLink />
         </Button>
       ),
     },
@@ -183,6 +200,12 @@ export const WorkspaceDetails = (props) => {
   };
   const callback = (key) => {
     switchKey(key);
+  };
+
+
+  const getIaCIconById = (id) => {
+    const item = iacTypes.find((iacType) => iacType.id === id);
+    return item ? item.icon : null;
   };
 
   const loadSSHKeys = () => {
@@ -245,7 +268,7 @@ export const WorkspaceDetails = (props) => {
             console.log(response.data);
             if (response.data.included) {
               setupWorkspaceIncludes(
-                response.data.included,
+                response.data,
                 setVariables,
                 setJobs,
                 setEnvVariables,
@@ -316,7 +339,7 @@ export const WorkspaceDetails = (props) => {
           moduleSshKey: values.moduleSshKey,
           terraformVersion: values.terraformVersion,
           iacType: values.iacType,
-          branch: values.branch
+          branch: values.branch,
         },
       },
     };
@@ -457,16 +480,19 @@ export const WorkspaceDetails = (props) => {
                       {resources.length}
                     </span>
                   </span>
-                  <IconContext.Provider value={{ size: "1.0em" }}>
-                    <SiTerraform /> Terraform{" "}
-                    <a
+                  <Space direction="horizontal">
+                    {getIaCIconById(workspace.data.attributes?.iacType)}
+                    <span>     
+                    {getIaCNameById(workspace.data.attributes?.iacType)}{" "}               <a
                       onClick={handleClickSettings}
                       className="workspace-button"
                       style={{ color: "#3b3d45" }}
                     >
                       v{workspace.data.attributes.terraformVersion}
-                    </a>
-                  </IconContext.Provider>
+                    </a></span>
+
+                  </Space>
+
                   <span>
                     <ClockCircleOutlined /> Updated{" "}
                     <span style={{ fontWeight: "500" }}>
@@ -624,20 +650,30 @@ export const WorkspaceDetails = (props) => {
                             />
                           </div>
                           <Tabs type="card" style={{ marginTop: "30px" }}>
-                            <TabPane tab={<>Resources  ({resources.length})</> } key="1">
+                            <TabPane
+                              tab={<>Resources ({resources.length})</>}
+                              key="1"
+                            >
                               <Table
                                 dataSource={resources}
                                 columns={resourceColumns}
                               />
                             </TabPane>
-                            <TabPane tab={<>Outputs  ({outputs.length})</> } key="2">
+                            <TabPane
+                              tab={<>Outputs ({outputs.length})</>}
+                              key="2"
+                            >
                               <Table
                                 dataSource={outputs}
                                 columns={outputColumns}
                               />
                             </TabPane>
                           </Tabs>
-                          <ResourceDrawer resource={resource} setOpen={setOpen} open={open}/>
+                          <ResourceDrawer
+                            resource={resource}
+                            setOpen={setOpen}
+                            open={open}
+                          />
                         </div>
                       )}
                     </Col>
@@ -801,7 +837,7 @@ export const WorkspaceDetails = (props) => {
                           executionMode:
                             workspace.data.attributes.executionMode,
                           iacType: workspace.data.attributes.iacType,
-                          branch: workspace.data.attributes.branch
+                          branch: workspace.data.attributes.branch,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -824,11 +860,15 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
                         <Form.Item
                           name="terraformVersion"
-                          label="Terraform Version"
-                          extra="The version of Terraform to use for this workspace.
-                          Upon creating this workspace, the latest version was
-                          selected and will be used until it is changed
-                          manually. It will not upgrade automatically."
+                          label={
+                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            " Version"
+                          }
+                          extra={
+                            "The version of " +
+                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            " to use for this workspace. Upon creating this workspace, the latest version was selected and will be used until it is changed manually. It will not upgrade automatically."
+                          }
                         >
                           <Select
                             defaultValue={
@@ -843,15 +883,22 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
                         <Form.Item
                           name="folder"
-                          label="Terraform Working Directory"
-                          extra="The directory that Terraform will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
+                          label={
+                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            " Working Directory"
+                          }
+                          extra={
+                            "The directory that " +
+                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            " will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
+                          }
                         >
                           <Input />
                         </Form.Item>
                         <Form.Item
-                            name="branch"
-                            label="Branch used in VCS connections"
-                            extra="Don't update the value when using CLI Driven workflows"
+                          name="branch"
+                          label="Branch used in VCS connections"
+                          extra="Don't update the value when using CLI Driven workflows"
                         >
                           <Input />
                         </Form.Item>
@@ -868,48 +915,55 @@ export const WorkspaceDetails = (props) => {
                         </Form.Item>
 
                         <Form.Item
-                            name="iacType"
-                            label="Select IaC type "
-                            extra="IaC type when running the workspace (Example: terraform or tofu) "
+                          name="iacType"
+                          label="Select IaC type "
+                          extra="IaC type when running the workspace (Example: terraform or tofu) "
                         >
                           <Select
-                              defaultValue={
-                                workspace.data.attributes.iacType
-                              }
-                              style={{ width: 250 }}
+                            defaultValue={workspace.data.attributes?.iacType}
+                            style={{ width: 250 }}
                           >
-                            <Option key="terraform">terraform</Option>
-                            <Option key="tofu">tofu</Option>
+                            {iacTypes.map(function (iacType, index) {
+                                return <Option key={iacType.id}>{getIaCIconById(iacType.id)} {iacType.name} </Option>
+                            })}
                           </Select>
                         </Form.Item>
                         <Form.Item
-                            name="executionMode"
-                            label="Execution Mode"
-                            extra="Use this option with terraform remote state/cloud block if you want to execute Terraform CLI remotely and just upload the state to Terrakube"
+                          name="executionMode"
+                          label="Execution Mode"
+                          extra={
+                            "Use this option with terraform remote state/cloud block if you want to execute " +
+                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            " CLI remotely and just upload the state to Terrakube"
+                          }
                         >
                           <Select
-                              defaultValue={
-                                workspace.data.attributes.executionMode
-                              }
-                              style={{ width: 250 }}
+                            defaultValue={
+                              workspace.data.attributes.executionMode
+                            }
+                            style={{ width: 250 }}
                           >
                             <Option key="remote">remote</Option>
                             <Option key="local">local</Option>
                           </Select>
                         </Form.Item>
                         <Form.Item
-                            name="moduleSshKey"
-                            label="Download modules SSH Keys"
-                            extra="Use this option to add a SSH key to allow module downloads"
+                          name="moduleSshKey"
+                          label="Download modules SSH Keys"
+                          extra="Use this option to add a SSH key to allow module downloads"
                         >
                           <Select
-                              defaultValue={
+                            defaultValue={
                               workspace.data.attributes.moduleSshKey
-                              }
-                              placeholder="select SSH Key" style={{ width: 250 }}>
+                            }
+                            placeholder="select SSH Key"
+                            style={{ width: 250 }}
+                          >
                             {sshKeys.map(function (sshKey, index) {
                               return (
-                                  <Option key={sshKey?.id}>{sshKey?.attributes?.name}</Option>
+                                <Option key={sshKey?.id}>
+                                  {sshKey?.attributes?.name}
+                                </Option>
                               );
                             })}
                           </Select>
@@ -976,7 +1030,7 @@ function generateRandomString(length) {
 }
 
 function setupWorkspaceIncludes(
-  includes,
+  data,
   setVariables,
   setJobs,
   setEnvVariables,
@@ -996,6 +1050,8 @@ function setupWorkspaceIncludes(
   let envVariables = [];
   let history = [];
   let schedule = [];
+  let includes = data.included;
+  console.log(data.attributes?.iacType);
 
   includes.forEach((element) => {
     switch (element.type) {
@@ -1023,7 +1079,9 @@ function setupWorkspaceIncludes(
         }
         jobs.push({
           id: element.id,
-          title: "Queue manually using Terraform",
+          title:
+            "Queue manually using " +
+            getIaCNameById(data?.data?.attributes?.iacType),
           statusColor: finalColor,
           commitId: element.attributes.commitId,
           stepNumber: element.attributes.stepNumber,
@@ -1038,7 +1096,9 @@ function setupWorkspaceIncludes(
         console.log(element);
         history.push({
           id: element.id,
-          title: "Queue manually using Terraform",
+          title:
+            "Queue manually using " +
+            getIaCNameById(data?.data?.attributes?.iacType),
           relativeDate: DateTime.fromISO(
             element.attributes.createdDate
           ).toRelative(),
@@ -1185,3 +1245,8 @@ function fixSshURL(source) {
     return source;
   }
 }
+
+function getIaCNameById(id) {
+  const item = iacTypes.find((iacType) => iacType.id === id);
+  return item ? item.name : null;
+};
