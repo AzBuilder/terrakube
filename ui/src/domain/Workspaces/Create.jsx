@@ -259,7 +259,6 @@ export const CreateWorkspace = () => {
           branch: values.branch,
           executionMode: "remote",
           iacType: iacType.id,
-          defaultTemplate: values.defaultTemplate,
         },
       },
     };
