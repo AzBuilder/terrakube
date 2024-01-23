@@ -45,6 +45,7 @@ export const CreateWorkspace = () => {
   const [terraformVersions, setTerraformVersions] = useState([]);
   const [vcs, setVCS] = useState([]);
   const [sshKeys, setSSHKeys] = useState([]);
+  const [orgTemplates, setOrgTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
   const [vcsId, setVcsId] = useState("");
@@ -133,6 +134,7 @@ export const CreateWorkspace = () => {
       console.log(tfVersions);
     });
     loadSSHKeys();
+    loadOrgTemplates();
     loadVCS();
     getIacTypes();
   }, [terraformVersionsApi]);
@@ -207,6 +209,13 @@ export const CreateWorkspace = () => {
     axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
       console.log(response.data.data);
       setSSHKeys(response.data.data);
+    });
+  };
+
+  const loadOrgTemplates = () => {
+    axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
+      console.log(response.data.data);
+      setOrgTemplates(response.data.data);
     });
   };
 
@@ -657,6 +666,22 @@ export const CreateWorkspace = () => {
                 <Select placeholder="select version" style={{ width: 250 }}>
                   {terraformVersions.map(function (name, index) {
                     return <Option key={name}>{name}</Option>;
+                  })}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                  name="defaultTemplate"
+                  label="Default template (VCS Push)"
+                  tooltip="Template that will be executed by default when doing a git push to the repository."
+                  rules={[{ required: false }]}
+              >
+                <Select placeholder="Select Template" style={{ width: 250 }}>
+                  {orgTemplates.map(function (template, index) {
+                    return (
+                        <Option key={template?.id}>
+                          {template?.attributes?.name}
+                        </Option>
+                    );
                   })}
                 </Select>
               </Form.Item>

@@ -60,6 +60,9 @@ public class Workspace extends GenericAuditFields {
     @Column(name = "deleted")
     private boolean deleted;
 
+    @Column(name = "default_template")
+    private String defaultTemplate;
+
     @Column(name = "iac_type")
     private String iacType = "terraform";
 
