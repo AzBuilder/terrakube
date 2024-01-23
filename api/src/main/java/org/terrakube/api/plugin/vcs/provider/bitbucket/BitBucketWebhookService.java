@@ -117,7 +117,6 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e.getMessage());
         }
 
