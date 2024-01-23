@@ -118,7 +118,7 @@ export const WorkspaceDetails = (props) => {
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
   const [sshKeys, setSSHKeys] = useState([]);
-  const [sshOrgTemplates, setOrgTemplates] = useState([]);
+  const [orgTemplates, setOrgTemplates] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
@@ -970,7 +970,7 @@ export const WorkspaceDetails = (props) => {
                               placeholder="select default template"
                               style={{ width: 250 }}
                           >
-                            {templates.map(function (template, index) {
+                            {orgTemplates.map(function (template, index) {
                               return (
                                   <Option template={template?.id}>
                                     {template?.attributes?.name}
