@@ -972,7 +972,7 @@ export const WorkspaceDetails = (props) => {
                           >
                             {templates.map(function (template, index) {
                               return (
-                                  <Option template={sshKey?.id}>
+                                  <Option template={template?.id}>
                                     {template?.attributes?.name}
                                   </Option>
                               );
