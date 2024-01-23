@@ -972,7 +972,7 @@ export const WorkspaceDetails = (props) => {
                           >
                             {orgTemplates.map(function (template, index) {
                               return (
-                                  <Option template={template?.id}>
+                                  <Option key={template?.id}>
                                     {template?.attributes?.name}
                                   </Option>
                               );
