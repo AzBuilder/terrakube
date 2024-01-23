@@ -118,6 +118,7 @@ export const WorkspaceDetails = (props) => {
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
   const [sshKeys, setSSHKeys] = useState([]);
+  const [orgTemplates, setOrgTemplates] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
@@ -215,6 +216,13 @@ export const WorkspaceDetails = (props) => {
     });
   };
 
+  const loadOrgTemplates = () => {
+    axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
+      console.log(response.data.data);
+      setOrgTemplates(response.data.data);
+    });
+  };
+
   const showDrawer = (record) => {
     setOpen(true);
     setResource(record);
@@ -241,6 +249,7 @@ export const WorkspaceDetails = (props) => {
     });
     setLoading(false);
     loadSSHKeys();
+    loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace();
     }, 15000);
@@ -340,6 +349,7 @@ export const WorkspaceDetails = (props) => {
           terraformVersion: values.terraformVersion,
           iacType: values.iacType,
           branch: values.branch,
+          defaultTemplate: values.defaultTemplate,
         },
       },
     };
@@ -838,6 +848,7 @@ export const WorkspaceDetails = (props) => {
                             workspace.data.attributes.executionMode,
                           iacType: workspace.data.attributes.iacType,
                           branch: workspace.data.attributes.branch,
+                          defaultTemplate: workspace.data.attributes.defaultTemplate,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -945,6 +956,27 @@ export const WorkspaceDetails = (props) => {
                           >
                             <Option key="remote">remote</Option>
                             <Option key="local">local</Option>
+                          </Select>
+                        </Form.Item>
+                        <Form.Item
+                            name="defaultTemplate"
+                            label="Default template when doing a git push to the repository"
+                            extra="Default template when doing a git push to the repository"
+                        >
+                          <Select
+                              defaultValue={
+                                workspace.data.attributes.defaultTemplate
+                              }
+                              placeholder="select default template"
+                              style={{ width: 250 }}
+                          >
+                            {orgTemplates.map(function (template, index) {
+                              return (
+                                  <Option key={template?.id}>
+                                    {template?.attributes?.name}
+                                  </Option>
+                              );
+                            })}
                           </Select>
                         </Form.Item>
                         <Form.Item

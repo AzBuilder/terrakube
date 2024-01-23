@@ -152,18 +152,22 @@ public class WebhookService {
    // Get template id
     List<Template> templates = workspace.getOrganization().getTemplate();
     String templateId = "";
-    for (Template template : templates) {
-        // search for the template "Plan and apply"
-        if ("Plan and apply".equals(template.getName())) {
-            templateId = template.getId().toString();
-            break;
+    if(workspace.getDefaultTemplate() != null && workspace.getDefaultTemplate().length() > 0){
+        templateId = workspace.getDefaultTemplate();
+    } else {
+        for (Template template : templates) {
+            // search for the template "Plan and apply"
+            if ("Plan and apply".equals(template.getName())) {
+                templateId = template.getId().toString();
+                break;
+            }
+        }
+
+        if (templateId.isEmpty()) {
+            log.warn("Template 'Plan and apply' not found , getting first template");
+            templateId = templates.get(0).getId().toString();
         }
     }
-
-    if (templateId.isEmpty()) {
-        log.warn("Template 'Plan and apply' not found , getting first template");
-        templateId = templates.get(0).getId().toString();
-    } 
 
     // Template id is a json with the mapping of the event and the template id. 
     // In a future release we can trigger a different template for each event
