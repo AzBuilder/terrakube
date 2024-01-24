@@ -17,7 +17,7 @@ import {
   ORGANIZATION_ARCHIVE,
   ORGANIZATION_NAME,
 } from "../../config/actionTypes";
-import axiosInstance, { axiosClient } from "../../config/axiosConfig";
+import axiosInstance from "../../config/axiosConfig";
 import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
 import { compareVersions } from "./Workspaces";
 import { IconContext } from "react-icons";
@@ -31,7 +31,6 @@ import { SiGit } from "react-icons/si";
 import { useHistory, Link } from "react-router-dom";
 const { Content } = Layout;
 const { Step } = Steps;
-const { Meta } = Card;
 const validateMessages = {
   required: "${label} is required!",
   types: {
@@ -49,9 +48,6 @@ export const CreateWorkspace = () => {
   const [loading, setLoading] = useState(false);
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
   const [vcsId, setVcsId] = useState("");
-  const terraformVersionsApi = `${
-    new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-  }/terraform/index.json`;
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep4Hidden] = useState(true);
   const [step2Hidden, setStep3Hidden] = useState(true);
@@ -124,20 +120,12 @@ export const CreateWorkspace = () => {
   useEffect(() => {
     setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
     setLoading(true);
-    axiosInstance.get(terraformVersionsApi).then((resp) => {
-      console.log(resp);
-      const tfVersions = [];
-      for (const version in resp.data.versions) {
-        if (!version.includes("-")) tfVersions.push(version);
-      }
-      setTerraformVersions(tfVersions.sort(compareVersions).reverse());
-      console.log(tfVersions);
-    });
+    loadVersions(iacType);
     loadSSHKeys();
     loadOrgTemplates();
     loadVCS();
     getIacTypes();
-  }, [terraformVersionsApi]);
+  }, []);
   const handleClick = (e) => {
     setCurrent(2);
     setVersionControlFlow(true);
@@ -147,6 +135,7 @@ export const CreateWorkspace = () => {
   const handleIacTypeClick = (iacType) => {
     setCurrent(1);
     setIacType(iacType);
+    loadVersions(iacType);
   };
 
   const handleGitClick = (id) => {
@@ -246,6 +235,32 @@ export const CreateWorkspace = () => {
     console.log(values);
     console.log(errorFields);
   };
+
+  const loadVersions = (iacType)=>{
+    const versionsApi = `${
+      new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+    }/${iacType.id}/index.json`
+    axiosInstance.get(versionsApi).then((resp) => {
+      console.log(resp);
+      const tfVersions = [];
+      if(iacType.id ==="tofu")
+      {
+        resp.data.forEach(release => {
+          if (!release.tag_name.includes("-"))  tfVersions.push(release.tag_name.replace("v",""));
+        });
+
+    }
+    else{
+
+      for (const version in resp.data.versions) {
+        if (!version.includes("-")) tfVersions.push(version);
+      }
+
+    }
+      setTerraformVersions(tfVersions.sort(compareVersions).reverse());
+      console.log(tfVersions);
+    });
+  }
 
   const onFinish = (values) => {
     let body = {

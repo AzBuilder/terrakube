@@ -123,11 +123,13 @@ export const WorkspaceDetails = (props) => {
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
   const [currentStateId, setCurrentStateId] = useState(0);
-  const terraformVersionsApi = `${
-    new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-  }/terraform/index.json`;
+  const [selectedIac, setSelectedIac] = useState("");
   const handleClick = (id) => {
     changeJob(id);
+  };
+  const handleIacChange = (iac) => {
+    setSelectedIac(iac);
+    loadVersions(iac);
   };
   const outputColumns = [
     {
@@ -239,19 +241,12 @@ export const WorkspaceDetails = (props) => {
   };
   useEffect(() => {
     setLoading(true);
-    loadWorkspace();
-    axiosInstance.get(terraformVersionsApi).then((resp) => {
-      const tfVersions = [];
-      for (const version in resp.data.versions) {
-        if (!version.includes("-")) tfVersions.push(version);
-      }
-      setTerraformVersions(tfVersions.sort(compareVersions).reverse());
-    });
+    loadWorkspace(true);
     setLoading(false);
     loadSSHKeys();
     loadOrgTemplates();
     const interval = setInterval(() => {
-      loadWorkspace();
+      loadWorkspace(false);
     }, 15000);
     return () => clearInterval(interval);
   }, [id]);
@@ -263,7 +258,33 @@ export const WorkspaceDetails = (props) => {
     setActiveKey("2");
   };
 
-  const loadWorkspace = () => {
+  const loadVersions = (iacType)=>{
+    const versionsApi = `${
+      new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+    }/${iacType}/index.json`
+    axiosInstance.get(versionsApi).then((resp) => {
+      console.log(resp);
+      const tfVersions = [];
+      if(iacType ==="tofu")
+      {
+        resp.data.forEach(release => {
+          if (!release.tag_name.includes("-"))  tfVersions.push(release.tag_name.replace("v",""));
+        });
+
+    }
+    else{
+
+      for (const version in resp.data.versions) {
+        if (!version.includes("-")) tfVersions.push(version);
+      }
+
+    }
+      setTerraformVersions(tfVersions.sort(compareVersions).reverse());
+      console.log(tfVersions);
+    });
+  }
+
+  const loadWorkspace = (_loadVersions) => {
     axiosInstance
       .get(`organization/${organizationId}/template`)
       .then((template) => {
@@ -273,6 +294,7 @@ export const WorkspaceDetails = (props) => {
             `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs`
           )
           .then((response) => {
+            if(_loadVersions) loadVersions(response.data.data.attributes.iacType);
             setWorkspace(response.data);
             console.log(response.data);
             if (response.data.included) {
@@ -323,7 +345,7 @@ export const WorkspaceDetails = (props) => {
       .then((response) => {
         console.log(response);
         if (response.status == "204") {
-          loadWorkspace();
+          loadWorkspace(true);
           var newstatus = locked ? "unlocked" : "locked";
           message.success("Workspace " + newstatus + " successfully");
         } else {
@@ -872,12 +894,12 @@ export const WorkspaceDetails = (props) => {
                         <Form.Item
                           name="terraformVersion"
                           label={
-                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
                             " Version"
                           }
                           extra={
                             "The version of " +
-                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
                             " to use for this workspace. Upon creating this workspace, the latest version was selected and will be used until it is changed manually. It will not upgrade automatically."
                           }
                         >
@@ -895,12 +917,12 @@ export const WorkspaceDetails = (props) => {
                         <Form.Item
                           name="folder"
                           label={
-                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
                             " Working Directory"
                           }
                           extra={
                             "The directory that " +
-                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
                             " will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
                           }
                         >
@@ -933,6 +955,7 @@ export const WorkspaceDetails = (props) => {
                           <Select
                             defaultValue={workspace.data.attributes?.iacType}
                             style={{ width: 250 }}
+                            onChange={handleIacChange}
                           >
                             {iacTypes.map(function (iacType, index) {
                                 return <Option key={iacType.id}>{getIaCIconById(iacType.id)} {iacType.name} </Option>
@@ -944,7 +967,7 @@ export const WorkspaceDetails = (props) => {
                           label="Execution Mode"
                           extra={
                             "Use this option with terraform remote state/cloud block if you want to execute " +
-                            getIaCNameById(workspace.data.attributes?.iacType) +
+                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
                             " CLI remotely and just upload the state to Terrakube"
                           }
                         >
