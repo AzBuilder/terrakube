@@ -955,6 +955,7 @@ export const WorkspaceDetails = (props) => {
                           <Select
                             defaultValue={workspace.data.attributes?.iacType}
                             style={{ width: 250 }}
+                            onChange={handleIacChange}
                           >
                             {iacTypes.map(function (iacType, index) {
                                 return <Option key={iacType.id}>{getIaCIconById(iacType.id)} {iacType.name} </Option>
