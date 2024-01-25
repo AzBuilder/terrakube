@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.calcite.runtime.Pattern;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.authentication.ProviderManager;
@@ -17,10 +18,17 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.terrakube.api.plugin.token.team.TeamTokenController;
+import org.terrakube.api.repository.PatRepository;
+import org.terrakube.api.repository.TeamTokenRepository;
+import org.terrakube.api.rs.token.group.Group;
+import org.terrakube.api.rs.token.pat.Pat;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -33,11 +41,21 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
     private String dexIssuerUri;
     private String patJwtSecret;
     private String internalJwtSecret;
+    private PatRepository patRepository;
+    private TeamTokenRepository teamTokenRepository;
 
     @Override
     public AuthenticationManager resolve(HttpServletRequest request) {
         ProviderManager providerManager = null;
         String issuer = getIssuer(request);
+        try{
+            if (isTokenDeleted(getTokenId(request))){
+                // IF THE TOKEN IS DELETED FORCE TO VALIDATE WITH INTERNAL TOKEN SO IT CAN FAIL ALWAYS
+                issuer = jwtTypeInternal;
+            }
+        }catch (Exception ex){
+            log.info(ex.getMessage());
+        }
         switch (issuer) {
             case jwtTypePat:
                 log.debug("Using Terrakube Authentication Provider");
@@ -70,5 +88,33 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
         log.debug("Issuer {}", untrusted.getBody().getIssuer());
 
         return untrusted.getBody().getIssuer();
+    }
+
+    private String getTokenId(HttpServletRequest request) {
+        String searchToken = request.getHeader("authorization").replace("Bearer ", "");
+        String withoutSignature = searchToken.substring(0, searchToken.lastIndexOf('.') + 1);
+        Jwt<Header, Claims> untrusted = Jwts.parserBuilder().build().parseClaimsJwt(withoutSignature);
+        log.debug("TokenId {}", untrusted.getBody().getId());
+
+        return untrusted.getBody().getId();
+    }
+
+    private boolean isTokenDeleted(String tokenId){
+        Optional<Pat> searchPat = patRepository.findById(UUID.fromString(tokenId));
+        Optional<Group> searchGroupToken = teamTokenRepository.findById(UUID.fromString(tokenId));
+        if(searchPat.isPresent()){
+            Pat pat = searchPat.get();
+            if(pat.isDeleted()){
+                return true;
+            } else return false;
+        }
+
+        if(searchGroupToken.isPresent()){
+            Group group = searchGroupToken.get();
+            if(group.isDeleted()){
+                return true;
+            } else return false;
+        }
+        return false;
     }
 }
