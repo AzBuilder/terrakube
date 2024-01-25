@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.rs.token.pat.Pat;
 
@@ -40,6 +41,16 @@ public class PatController {
     @GetMapping
     public ResponseEntity<List<Pat>> searchToken(Principal principal){
         return new ResponseEntity<>(patService.searchToken(principal), HttpStatus.ACCEPTED);
+    }
+
+    @Transactional
+    @DeleteMapping(path = "/{tokenId}")
+    public ResponseEntity<String> deleteToken(@PathVariable("tokenId") String tokenId){
+        if(patService.deleteToken(tokenId)) {
+            return ResponseEntity.accepted().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Getter

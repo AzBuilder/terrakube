@@ -31,4 +31,5 @@ public class Group extends GenericAuditFields {
     @Column(name="group_name")
     private String group;
     private String description;
+    private boolean deleted;
 }

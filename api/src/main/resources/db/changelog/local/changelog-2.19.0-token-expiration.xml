@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="35" author="alfespa17@gmail.com">
+        <addColumn tableName="pat" >
+            <column name="deleted" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+        <update tableName="pat">
+            <column name="deleted" valueBoolean="false"/>
+        </update>
+        <addColumn tableName="team_token" >
+            <column name="deleted" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+        <update tableName="team_token">
+            <column name="deleted" valueBoolean="false"/>
+        </update>
+    </changeSet>
+</databaseChangeLog>

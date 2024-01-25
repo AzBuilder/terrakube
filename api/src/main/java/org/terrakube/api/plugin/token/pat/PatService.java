@@ -15,10 +15,7 @@ import javax.crypto.SecretKey;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -55,6 +52,7 @@ public class PatService {
         Pat pat = new Pat();
         pat.setId(keyId);
         pat.setDays(days);
+        pat.setDeleted(false);
         pat.setDescription(description);
 
         patRepository.save(pat);
@@ -63,13 +61,25 @@ public class PatService {
     }
 
 
+    public boolean deleteToken(String tokenId){
+        Optional<Pat> searchPat = patRepository.findById(UUID.fromString(tokenId));
+        if(searchPat.isPresent()){
+            Pat pat = searchPat.get();
+            pat.setDeleted(true);
+            patRepository.save(pat);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public List<Pat> searchToken(Principal principal) {
         JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
         List<Pat> patList = patRepository.findByCreatedBy((String) principalJwt.getTokenAttributes().get("email"));
         List<Pat> activeList = new ArrayList();
         patList.forEach(pat -> {
             Date jobExpiration = Date.from(pat.getCreatedDate().toInstant().plus(pat.getDays(), ChronoUnit.DAYS));
-            if(jobExpiration.after(new Date(System.currentTimeMillis())))
+            if(jobExpiration.after(new Date(System.currentTimeMillis())) && !pat.isDeleted())
                 activeList.add(pat);
 
         });
