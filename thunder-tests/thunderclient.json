@@ -2135,11 +2135,11 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "c1a81dd8-d9bf-4164-9db5-334d4f40cae1",
     "name": "search PAT",
-    "url": "{{terrakubeApi}}/context/v1/7",
+    "url": "{{terrakubeApi}}/pat/v1",
     "method": "GET",
     "sortNum": 735000,
     "created": "2022-08-11T00:45:45.083Z",
-    "modified": "2022-10-08T17:25:57.476Z",
+    "modified": "2024-01-25T22:40:22.723Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -2717,6 +2717,36 @@
     "sortNum": 745000,
     "created": "2023-09-18T22:57:10.544Z",
     "modified": "2023-09-18T22:57:18.752Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.id",
+        "action": "setto",
+        "value": "{{sshId}}"
+      }
+    ]
+  },
+  {
+    "_id": "4e7b7919-b7d6-43e5-a854-56cfb3579ca3",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "c1a81dd8-d9bf-4164-9db5-334d4f40cae1",
+    "name": "delete PAT",
+    "url": "{{terrakubeApi}}/path/v1/f83133bf-ba56-42d3-8e24-bd39bb3bfbd7",
+    "method": "DELETE",
+    "sortNum": 745000,
+    "created": "2024-01-25T22:39:43.144Z",
+    "modified": "2024-01-25T22:40:52.549Z",
     "headers": [
       {
         "name": "Content-Type",
