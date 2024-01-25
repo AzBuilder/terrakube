@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -84,7 +85,16 @@ public class TeamTokenService {
     }
 
     public List<Group> searchToken(JwtAuthenticationToken principalJwt){
-        return teamTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
+        List<Group> currentGroups = teamTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
+        List<Group> activeGroups = new ArrayList();
+        currentGroups.forEach(group -> {
+            Date groupTokenExpiration = Date.from(group.getCreatedDate().toInstant().plus(group.getDays(), ChronoUnit.DAYS).plus(group.getHours(), ChronoUnit.HOURS).plus(group.getMinutes(), ChronoUnit.MINUTES));
+            if(groupTokenExpiration.after(new Date(System.currentTimeMillis()))){
+                activeGroups.add(group);
+            }
+        });
+
+        return activeGroups;
     }
 
     public List<String> getCurrentGroups(JwtAuthenticationToken principalJwt) {

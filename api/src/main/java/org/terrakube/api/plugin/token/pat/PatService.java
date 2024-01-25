@@ -15,6 +15,7 @@ import javax.crypto.SecretKey;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -64,6 +65,14 @@ public class PatService {
 
     public List<Pat> searchToken(Principal principal) {
         JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
-        return patRepository.findByCreatedBy((String) principalJwt.getTokenAttributes().get("email"));
+        List<Pat> patList = patRepository.findByCreatedBy((String) principalJwt.getTokenAttributes().get("email"));
+        List<Pat> activeList = new ArrayList();
+        patList.forEach(pat -> {
+            Date jobExpiration = Date.from(pat.getCreatedDate().toInstant().plus(pat.getDays(), ChronoUnit.DAYS));
+            if(jobExpiration.after(new Date(System.currentTimeMillis())))
+                activeList.add(pat);
+
+        });
+        return activeList;
     }
 }
