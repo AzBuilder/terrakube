@@ -18,5 +18,6 @@ public class Pat extends GenericAuditFields {
     private UUID id;
 
     private int days;
+    private boolean deleted;
     private String description;
 }

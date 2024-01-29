@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.rs.token.group.Group;
 
@@ -44,6 +45,12 @@ public class TeamTokenController {
             groupList.getGroups().add(group);
         });
         return new ResponseEntity<>(groupList, HttpStatus.ACCEPTED);
+    }
+
+    @Transactional
+    @DeleteMapping(path = "/{groupTokenId}")
+    public ResponseEntity<String> deleteToken(@PathVariable("groupTokenId") String groupTokenId){
+        if (teamTokenService.deleteToken(groupTokenId)) return ResponseEntity.accepted().build(); else return ResponseEntity.badRequest().build();
     }
 
     @GetMapping

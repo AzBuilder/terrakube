@@ -2135,11 +2135,11 @@
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "c1a81dd8-d9bf-4164-9db5-334d4f40cae1",
     "name": "search PAT",
-    "url": "{{terrakubeApi}}/context/v1/7",
+    "url": "{{terrakubeApi}}/pat/v1",
     "method": "GET",
     "sortNum": 735000,
     "created": "2022-08-11T00:45:45.083Z",
-    "modified": "2022-10-08T17:25:57.476Z",
+    "modified": "2024-01-25T22:40:22.723Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -2717,6 +2717,59 @@
     "sortNum": 745000,
     "created": "2023-09-18T22:57:10.544Z",
     "modified": "2023-09-18T22:57:18.752Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": [
+      {
+        "type": "set-env-var",
+        "custom": "json.data.id",
+        "action": "setto",
+        "value": "{{sshId}}"
+      }
+    ]
+  },
+  {
+    "_id": "4e7b7919-b7d6-43e5-a854-56cfb3579ca3",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "c1a81dd8-d9bf-4164-9db5-334d4f40cae1",
+    "name": "delete PAT",
+    "url": "{{terrakubeApi}}/pat/v1/69253ef1-d7b3-4fb2-8d47-c59ac3d15a3f",
+    "method": "DELETE",
+    "sortNum": 745000,
+    "created": "2024-01-25T22:39:43.144Z",
+    "modified": "2024-01-29T17:42:21.123Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "b1f47cc6-a855-4907-a757-38586d98b3fe",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "656a462f-fabf-49d4-abcf-a5f66a8cecc6",
+    "name": "delete team token",
+    "url": "{{terrakubeApi}}/access-token/v1/teams/3214b236-e52f-4233-958f-32d23292f891",
+    "method": "DELETE",
+    "sortNum": 732500,
+    "created": "2024-01-29T17:44:19.820Z",
+    "modified": "2024-01-29T17:44:56.137Z",
     "headers": [
       {
         "name": "Content-Type",

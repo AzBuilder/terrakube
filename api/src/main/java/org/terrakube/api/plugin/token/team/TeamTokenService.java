@@ -15,10 +15,7 @@ import org.terrakube.api.rs.token.group.Group;
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -77,14 +74,36 @@ public class TeamTokenService {
         groupToken.setMinutes(minutes);
         groupToken.setGroup(groupName);
         groupToken.setDescription(description);
-
+        groupToken.setDeleted(false);
         teamTokenRepository.save(groupToken);
 
         return jws;
     }
 
+    public boolean deleteToken(String tokenId){
+        Optional<Group> searchGroupToken = teamTokenRepository.findById(UUID.fromString(tokenId));
+        if(searchGroupToken.isPresent()){
+            Group groupToken = searchGroupToken.get();
+            groupToken.setDeleted(true);
+            teamTokenRepository.save(groupToken);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public List<Group> searchToken(JwtAuthenticationToken principalJwt){
-        return teamTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
+        List<Group> currentGroups = teamTokenRepository.findByGroupIn(getCurrentGroups(principalJwt));
+        List<Group> activeGroups = new ArrayList();
+        currentGroups.forEach(group -> {
+            //Date groupTokenExpiration = Date.from(group.getCreatedDate().toInstant().plus(group.getDays(), ChronoUnit.DAYS).plus(group.getHours(), ChronoUnit.HOURS).plus(group.getMinutes(), ChronoUnit.MINUTES));
+            //if(groupTokenExpiration.after(new Date(System.currentTimeMillis())) && !group.isDeleted()){
+            if(!group.isDeleted()){
+                activeGroups.add(group);
+            }
+        });
+
+        return activeGroups;
     }
 
     public List<String> getCurrentGroups(JwtAuthenticationToken principalJwt) {

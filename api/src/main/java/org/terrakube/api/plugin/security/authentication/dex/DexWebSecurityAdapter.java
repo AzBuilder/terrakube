@@ -13,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.terrakube.api.repository.PatRepository;
+import org.terrakube.api.repository.TeamTokenRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -25,7 +27,7 @@ import java.util.List;
 public class DexWebSecurityAdapter {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret, PatRepository patRepository, TeamTokenRepository teamTokenRepository) throws Exception {
         http.cors().and().csrf().ignoringAntMatchers("/remote/tfe/v2/configuration-versions/*", "/tfstate/v1/archive/*/terraform.tfstate", "/tfstate/v1/archive/*/terraform.json.tfstate","/webhook/v1/**").and().authorizeRequests(authz -> {
                             authz
                                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -50,6 +52,8 @@ public class DexWebSecurityAdapter {
                             .dexIssuerUri(issuerUri)
                             .patJwtSecret(patJwtSecret)
                             .internalJwtSecret(internalJwtSecret)
+                            .patRepository(patRepository)
+                            .teamTokenRepository(teamTokenRepository)
                             .build();
                     oauth2.authenticationManagerResolver(authenticationManagerResolver);
                 });
