@@ -78,8 +78,8 @@ public class PatService {
         List<Pat> patList = patRepository.findByCreatedBy((String) principalJwt.getTokenAttributes().get("email"));
         List<Pat> activeList = new ArrayList();
         patList.forEach(pat -> {
-            Date jobExpiration = Date.from(pat.getCreatedDate().toInstant().plus(pat.getDays(), ChronoUnit.DAYS));
-            if(jobExpiration.after(new Date(System.currentTimeMillis())) && !pat.isDeleted())
+            //Date jobExpiration = Date.from(pat.getCreatedDate().toInstant().plus(pat.getDays(), ChronoUnit.DAYS));
+            //if(jobExpiration.after(new Date(System.currentTimeMillis())) && !pat.isDeleted())
                 activeList.add(pat);
 
         });

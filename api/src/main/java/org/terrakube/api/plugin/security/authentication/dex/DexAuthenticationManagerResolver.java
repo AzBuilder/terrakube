@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.calcite.runtime.Pattern;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.authentication.ProviderManager;
@@ -18,7 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
-import org.terrakube.api.plugin.token.team.TeamTokenController;
 import org.terrakube.api.repository.PatRepository;
 import org.terrakube.api.repository.TeamTokenRepository;
 import org.terrakube.api.rs.token.group.Group;
@@ -50,7 +48,7 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
         String issuer = getIssuer(request);
         try{
             if (isTokenDeleted(getTokenId(request))){
-                // IF THE TOKEN IS DELETED FORCE TO VALIDATE WITH INTERNAL TOKEN SO IT CAN FAIL ALWAYS
+                //FORCE TOKEN TO USE INTERNAL AUTH SO IT CAN ALWAYS FAIL
                 issuer = jwtTypeInternal;
             }
         }catch (Exception ex){
@@ -99,22 +97,25 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
         return untrusted.getBody().getId();
     }
 
-    private boolean isTokenDeleted(String tokenId){
-        Optional<Pat> searchPat = patRepository.findById(UUID.fromString(tokenId));
-        Optional<Group> searchGroupToken = teamTokenRepository.findById(UUID.fromString(tokenId));
-        if(searchPat.isPresent()){
-            Pat pat = searchPat.get();
-            if(pat.isDeleted()){
-                return true;
-            } else return false;
+    private boolean isTokenDeleted(String tokenId) {
+        if (tokenId != null) {
+            Optional<Pat> searchPat = patRepository.findById(UUID.fromString(tokenId));
+            Optional<Group> searchGroupToken = teamTokenRepository.findById(UUID.fromString(tokenId));
+            if (searchPat.isPresent()) {
+                Pat pat = searchPat.get();
+                if (pat.isDeleted()) {
+                    return true;
+                } else return false;
+            }
+
+            if (searchGroupToken.isPresent()) {
+                Group group = searchGroupToken.get();
+                if (group.isDeleted()) {
+                    return true;
+                } else return false;
+            }
         }
 
-        if(searchGroupToken.isPresent()){
-            Group group = searchGroupToken.get();
-            if(group.isDeleted()){
-                return true;
-            } else return false;
-        }
         return false;
     }
 }
