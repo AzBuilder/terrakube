@@ -80,6 +80,7 @@ public class PatService {
         patList.forEach(pat -> {
             //Date jobExpiration = Date.from(pat.getCreatedDate().toInstant().plus(pat.getDays(), ChronoUnit.DAYS));
             //if(jobExpiration.after(new Date(System.currentTimeMillis())) && !pat.isDeleted())
+            if(!pat.isDeleted())
                 activeList.add(pat);
 
         });

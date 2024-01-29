@@ -98,8 +98,9 @@ public class TeamTokenService {
         currentGroups.forEach(group -> {
             //Date groupTokenExpiration = Date.from(group.getCreatedDate().toInstant().plus(group.getDays(), ChronoUnit.DAYS).plus(group.getHours(), ChronoUnit.HOURS).plus(group.getMinutes(), ChronoUnit.MINUTES));
             //if(groupTokenExpiration.after(new Date(System.currentTimeMillis())) && !group.isDeleted()){
+            if(!group.isDeleted()){
                 activeGroups.add(group);
-            //}
+            }
         });
 
         return activeGroups;
