@@ -25,6 +25,7 @@ import {
   CloseCircleOutlined,
   StopOutlined,
   PlusOutlined,
+  ImportOutlined
 } from "@ant-design/icons";
 import { BiTerminal } from "react-icons/bi";
 import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
@@ -55,6 +56,10 @@ export const OrganizationDetails = ({
   const history = useHistory();
   const handleCreate = (e) => {
     history.push("/workspaces/create");
+  };
+
+  const handleImport = (e) => {
+    history.push("/workspaces/import");
   };
 
   const iacTypes = [
@@ -294,9 +299,14 @@ export const OrganizationDetails = ({
           <div className="workspaceWrapper">
             <div className="variableActions">
               <h2>Workspaces</h2>
+              <Space>
+              <Button icon={<ImportOutlined />}  htmlType="button" onClick={handleImport}>
+                Import workspaces
+              </Button>
               <Button icon={<PlusOutlined/>}  type="primary" htmlType="button" onClick={handleCreate}>
                 New workspace
               </Button>
+              </Space>
             </div>
             <Row>
               <Col span={12}>

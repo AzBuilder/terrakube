@@ -1,0 +1,18 @@
+package org.terrakube.api.plugin.importer.tfcloud;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class WorkspaceImportRequest {
+    private String id;
+    private String organizationId;
+    private String organization;
+    private String vcsId;
+    private String branch;
+    private String folder;
+    private String terraformVersion;
+    private String name;
+    private String source;
+    private String description;
+}
