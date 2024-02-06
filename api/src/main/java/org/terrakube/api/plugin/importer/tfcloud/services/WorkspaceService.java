@@ -98,9 +98,13 @@ public class WorkspaceService {
 
         String url = builder.toUriString();
         VariableResponse response = makeRequest(apiToken, url, VariableResponse.class);
-        return response.getData().stream()
-                .map(VariableData::getAttributes)
-                .toList();
+        if (response != null) {
+            return response.getData().stream()
+                    .map(VariableData::getAttributes)
+                    .toList();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public StateVersion.Attributes getCurrentState(String apiToken, String apiUrl, String workspaceId) {
@@ -124,7 +128,11 @@ public class WorkspaceService {
                 new HttpEntity<>(headers),
                 Resource.class);
 
-        return response.getBody();
+        if (response != null) {
+            return response.getBody();
+        } else {
+            throw new RuntimeException("Error: Response from State is null");
+        }
     }
 
     public boolean importWorkspace(String apiToken, String apiUrl, WorkspaceImportRequest workspaceImportRequest) {
