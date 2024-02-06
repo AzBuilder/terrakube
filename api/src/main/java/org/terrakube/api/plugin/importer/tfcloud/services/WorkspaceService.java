@@ -22,7 +22,7 @@ import org.terrakube.api.rs.workspace.parameters.Category;
 import org.terrakube.api.rs.workspace.parameters.Variable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +32,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class WorkspaceService {
 
@@ -73,14 +75,27 @@ public class WorkspaceService {
     }
 
     public List<WorkspaceImport.WorkspaceData> getWorkspaces(String apiToken,String apiUrl, String organization) {
-        String url = apiUrl + "/organizations/" + organization + "/workspaces";
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+        .pathSegment("organizations")
+        .pathSegment(organization)
+        .pathSegment("workspaces");
+
+        String url = builder.toUriString();
         WorkspaceListResponse response = makeRequest(apiToken, url, WorkspaceListResponse.class);
-        return response.getData();
+        if (response != null) {
+            return response.getData();
+        } else {
+            return null;
+        }
     }
 
     public List<VariableAttributes> getVariables(String apiToken,String apiUrl, String organizationName, String workspaceName) {
-        String url = apiUrl + "/vars?filter[organization][name]=" + organizationName + "&filter[workspace][name]="
-                + workspaceName;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+        .pathSegment("vars")
+        .queryParam("filter[organization][name]", organizationName)
+        .queryParam("filter[workspace][name]", workspaceName);
+
+        String url = builder.toUriString();
         VariableResponse response = makeRequest(apiToken, url, VariableResponse.class);
         return response.getData().stream()
                 .map(VariableData::getAttributes)
@@ -88,7 +103,12 @@ public class WorkspaceService {
     }
 
     public StateVersion.Attributes getCurrentState(String apiToken,String apiUrl, String workspaceId) {
-        String url = apiUrl + "/workspaces/" + workspaceId + "/current-state-version";
+         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+        .pathSegment("workspaces")
+        .pathSegment(workspaceId)
+        .pathSegment("current-state-version");
+
+        String url = builder.toUriString();
         StateVersion stateVersionResponse = makeRequest(apiToken, url, StateVersion.class);
         return stateVersionResponse.getData().getAttributes();
     }
@@ -146,7 +166,7 @@ public class WorkspaceService {
             variable.setValue(variableAttribute.getValue());
             variable.setDescription(variableAttribute.getDescription());
             variable.setSensitive(variableAttribute.isSensitive());
-            variable.setCategory(variableAttribute.getCategory() == "env" ? Category.ENV : Category.TERRAFORM);
+            variable.setCategory("env".equals(variableAttribute.getCategory()) ? Category.ENV : Category.TERRAFORM);
             variable.setHcl(variableAttribute.isHcl());
             variable.setWorkspace(workspace);
             variableRepository.save(variable);
@@ -186,7 +206,7 @@ public class WorkspaceService {
                 terraformState = readResourceToString(state);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
                 return false;
             }
             storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(),
@@ -195,7 +215,7 @@ public class WorkspaceService {
             storageTypeService.uploadState(workspace.getOrganization().getId().toString(),
                     workspace.getId().toString(), terraformState);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         }
         return true;
