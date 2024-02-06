@@ -27,8 +27,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,48 +74,47 @@ public class WorkspaceService {
         return response.getBody();
     }
 
-    public List<WorkspaceImport.WorkspaceData> getWorkspaces(String apiToken,String apiUrl, String organization) {
+    public List<WorkspaceImport.WorkspaceData> getWorkspaces(String apiToken, String apiUrl, String organization) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
-        .pathSegment("organizations")
-        .pathSegment(organization)
-        .pathSegment("workspaces");
+                .pathSegment("organizations")
+                .pathSegment(organization)
+                .pathSegment("workspaces");
 
         String url = builder.toUriString();
         WorkspaceListResponse response = makeRequest(apiToken, url, WorkspaceListResponse.class);
         if (response != null) {
             return response.getData();
         } else {
-            return null;
+            return Collections.emptyList();
         }
     }
 
-    public List<VariableAttributes> getVariables(String apiToken,String apiUrl, String organizationName, String workspaceName) {
+    public List<VariableAttributes> getVariables(String apiToken, String apiUrl, String organizationName,
+            String workspaceName) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
-        .pathSegment("vars")
-        .queryParam("filter[organization][name]", organizationName)
-        .queryParam("filter[workspace][name]", workspaceName);
+                .pathSegment("vars")
+                .queryParam("filter[organization][name]", organizationName)
+                .queryParam("filter[workspace][name]", workspaceName);
 
         String url = builder.toUriString();
         VariableResponse response = makeRequest(apiToken, url, VariableResponse.class);
         return response.getData().stream()
                 .map(VariableData::getAttributes)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public StateVersion.Attributes getCurrentState(String apiToken,String apiUrl, String workspaceId) {
-         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
-        .pathSegment("workspaces")
-        .pathSegment(workspaceId)
-        .pathSegment("current-state-version");
+    public StateVersion.Attributes getCurrentState(String apiToken, String apiUrl, String workspaceId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                .pathSegment("workspaces")
+                .pathSegment(workspaceId)
+                .pathSegment("current-state-version");
 
         String url = builder.toUriString();
         StateVersion stateVersionResponse = makeRequest(apiToken, url, StateVersion.class);
         return stateVersionResponse.getData().getAttributes();
     }
 
-    public Resource downloadState(String apiToken, String stateUrl) throws MalformedURLException {
-        RestTemplate restTemplate = new RestTemplate();
-
+    public Resource downloadState(String apiToken, String stateUrl) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiToken);
 
@@ -197,8 +196,8 @@ public class WorkspaceService {
         historyRepository.save(history);
 
         try {
-            Resource stateJson = downloadState(apiToken,stateDownloadJsonUrl);
-            Resource state = downloadState(apiToken,stateDownloadUrl);
+            Resource stateJson = downloadState(apiToken, stateDownloadJsonUrl);
+            Resource state = downloadState(apiToken, stateDownloadUrl);
             String terraformStateJson = "";
             String terraformState = "";
             try {
@@ -214,14 +213,16 @@ public class WorkspaceService {
 
             storageTypeService.uploadState(workspace.getOrganization().getId().toString(),
                     workspace.getId().toString(), terraformState);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
             return false;
         }
         return true;
     }
+
     private String readResourceToString(Resource resource) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining("\n"));
         }
     }
