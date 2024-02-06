@@ -63,6 +63,11 @@ public class WorkspaceService {
         this.variableRepository = variableRepositor;
         this.hostname = hostname;
     }
+    public class NullResponseException extends RuntimeException {
+        public NullResponseException(String message) {
+            super(message);
+        }
+    }
 
     private <T> T makeRequest(String apiToken, String url, Class<T> responseType) {
         HttpHeaders headers = new HttpHeaders();
@@ -82,11 +87,11 @@ public class WorkspaceService {
 
         String url = builder.toUriString();
         WorkspaceListResponse response = makeRequest(apiToken, url, WorkspaceListResponse.class);
-        if (response != null) {
-            return response.getData();
-        } else {
-            return Collections.emptyList();
-        }
+    if (response == null || response.getData() == null) {
+        return Collections.emptyList();
+    } else {
+        return response.getData();
+    }
     }
 
     public List<VariableAttributes> getVariables(String apiToken, String apiUrl, String organizationName,
@@ -112,10 +117,14 @@ public class WorkspaceService {
                 .pathSegment("workspaces")
                 .pathSegment(workspaceId)
                 .pathSegment("current-state-version");
-
+    
         String url = builder.toUriString();
         StateVersion stateVersionResponse = makeRequest(apiToken, url, StateVersion.class);
-        return stateVersionResponse.getData().getAttributes();
+        if (stateVersionResponse != null && stateVersionResponse.getData() != null) {
+            return stateVersionResponse.getData().getAttributes();
+        } else {
+            throw new NullResponseException("Error: Response from State is null");
+        }
     }
 
     public Resource downloadState(String apiToken, String stateUrl) {
@@ -128,10 +137,10 @@ public class WorkspaceService {
                 new HttpEntity<>(headers),
                 Resource.class);
 
-        if (response != null) {
+        if (response != null && response.getBody() != null){
             return response.getBody();
         } else {
-            throw new RuntimeException("Error: Response from State is null");
+            throw new NullResponseException("Error: Response from State is null");
         }
     }
 
