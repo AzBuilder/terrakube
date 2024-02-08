@@ -63,6 +63,7 @@ public class WorkspaceService {
         this.variableRepository = variableRepositor;
         this.hostname = hostname;
     }
+
     public class NullResponseException extends RuntimeException {
         public NullResponseException(String message) {
             super(message);
@@ -83,23 +84,24 @@ public class WorkspaceService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .pathSegment("organizations")
                 .pathSegment(organization)
-                .pathSegment("workspaces");
+                .pathSegment("workspaces")
+                .queryParam("page[size]", 100);
 
         String url = builder.toUriString();
         WorkspaceListResponse response = makeRequest(apiToken, url, WorkspaceListResponse.class);
-    if (response == null || response.getData() == null) {
-        return Collections.emptyList();
-    } else {
-        return response.getData();
-    }
+        if (response == null || response.getData() == null) {
+            return Collections.emptyList();
+        } else {
+            return response.getData();
+        }
     }
 
     public List<VariableAttributes> getVariables(String apiToken, String apiUrl, String organizationName,
             String workspaceName) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
-                .pathSegment("vars")
-                .queryParam("filter[organization][name]", organizationName)
-                .queryParam("filter[workspace][name]", workspaceName);
+                .pathSegment("workspaces")
+                .pathSegment(workspaceName)
+                .pathSegment("vars");
 
         String url = builder.toUriString();
         VariableResponse response = makeRequest(apiToken, url, VariableResponse.class);
@@ -117,7 +119,7 @@ public class WorkspaceService {
                 .pathSegment("workspaces")
                 .pathSegment(workspaceId)
                 .pathSegment("current-state-version");
-    
+
         String url = builder.toUriString();
         StateVersion stateVersionResponse = makeRequest(apiToken, url, StateVersion.class);
         if (stateVersionResponse != null && stateVersionResponse.getData() != null) {
@@ -137,7 +139,7 @@ public class WorkspaceService {
                 new HttpEntity<>(headers),
                 Resource.class);
 
-        if (response != null && response.getBody() != null){
+        if (response != null && response.getBody() != null) {
             return response.getBody();
         } else {
             throw new NullResponseException("Error: Response from State is null");
@@ -151,9 +153,10 @@ public class WorkspaceService {
         workspace.setName(workspaceImportRequest.getName());
         workspace.setDescription(workspaceImportRequest.getDescription());
         workspace.setTerraformVersion(workspaceImportRequest.getTerraformVersion());
+        workspace.setExecutionMode("remote");
 
         // If the workspace has a VCS, set it
-        if (workspaceImportRequest.getVcsId() != null) {
+        if (workspaceImportRequest.getVcsId() != null && !workspaceImportRequest.getVcsId().isEmpty()) {
             UUID vcsId = UUID.fromString(workspaceImportRequest.getVcsId());
             vcsRepository.findById(vcsId).ifPresent(workspace::setVcs);
             // if branch is not set, set it to main
@@ -161,6 +164,9 @@ public class WorkspaceService {
                     workspaceImportRequest.getBranch() == null ? "main" : workspaceImportRequest.getBranch());
             workspace.setFolder(workspaceImportRequest.getFolder());
             workspace.setSource(workspaceImportRequest.getSource());
+        } else {
+            workspace.setBranch("remote-content");
+            workspace.setSource("empty");
         }
 
         // Set the organization
@@ -174,12 +180,12 @@ public class WorkspaceService {
                 apiToken,
                 apiUrl,
                 workspaceImportRequest.getOrganization(),
-                workspaceImportRequest.getName());
+                workspaceImportRequest.getId());
 
         for (VariableAttributes variableAttribute : variablesImporter) {
             Variable variable = new Variable();
             variable.setKey(variableAttribute.getKey());
-            variable.setValue(variableAttribute.getValue());
+            variable.setValue(variableAttribute.getValue() != null ? variableAttribute.getValue() : "");
             variable.setDescription(variableAttribute.getDescription());
             variable.setSensitive(variableAttribute.isSensitive());
             variable.setCategory("env".equals(variableAttribute.getCategory()) ? Category.ENV : Category.TERRAFORM);

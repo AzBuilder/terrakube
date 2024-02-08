@@ -667,9 +667,9 @@ export const ImportWorkspace = () => {
                   dataSource={workspaces}
                   columns={columns}
                   pagination={{
-                    defaultPageSize: 10,
+                    defaultPageSize: 50,
                     showSizeChanger: true,
-                    pageSizeOptions: ["10", "20", "30"],
+                    pageSizeOptions: ["20", "50", "100"],
                   }}
                 />
                 <br />
