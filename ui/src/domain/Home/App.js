@@ -17,6 +17,7 @@ import { OrganizationSettings } from "../Settings/Settings";
 import { UserSettings } from "../UserSettings/UserSettings";
 import { ProfilePicture } from "./ProfilePicture";
 import { useAuth } from "../../config/authConfig";
+import { ImportWorkspace } from "../Workspaces/Import";
 const { Header, Footer } = Layout;
 const App = () => {
   const auth = useAuth();
@@ -57,6 +58,7 @@ const App = () => {
             />
           </Route>
           <Route exact path="/workspaces/create" component={CreateWorkspace} />
+          <Route exact path="/workspaces/import" component={ImportWorkspace} />
           <Route exact path="/workspaces/:id" component={WorkspaceDetails} />
 
           <Route
