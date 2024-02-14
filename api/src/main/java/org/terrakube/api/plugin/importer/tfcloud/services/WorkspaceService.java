@@ -171,6 +171,7 @@ public class WorkspaceService {
         workspace.setExecutionMode("remote");
 
         // If the workspace has a VCS, set it
+        log.info("VCS ID: {}", workspaceImportRequest.getVcsId());
         if (workspaceImportRequest.getVcsId() != null && !workspaceImportRequest.getVcsId().isEmpty()) {
             UUID vcsId = UUID.fromString(workspaceImportRequest.getVcsId());
             vcsRepository.findById(vcsId).ifPresent(workspace::setVcs);
@@ -188,7 +189,6 @@ public class WorkspaceService {
         organizationRepository.findById(UUID.fromString(workspaceImportRequest.getOrganizationId()))
                 .ifPresent(workspace::setOrganization);
         workspace.setIacType("terraform");
-        workspace.setSource(workspaceImportRequest.getSource());
         workspace = workspaceRepository.save(workspace);
 
         List<VariableAttributes> variablesImporter = getVariables(
