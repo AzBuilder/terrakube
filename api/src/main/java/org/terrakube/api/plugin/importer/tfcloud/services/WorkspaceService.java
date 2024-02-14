@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -81,19 +82,33 @@ public class WorkspaceService {
     }
 
     public List<WorkspaceImport.WorkspaceData> getWorkspaces(String apiToken, String apiUrl, String organization) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
-                .pathSegment("organizations")
-                .pathSegment(organization)
-                .pathSegment("workspaces")
-                .queryParam("page[size]", 100);
+        List<WorkspaceImport.WorkspaceData> allData = new ArrayList<>();
+        int currentPage = 1;
 
-        String url = builder.toUriString();
-        WorkspaceListResponse response = makeRequest(apiToken, url, WorkspaceListResponse.class);
-        if (response == null || response.getData() == null) {
-            return Collections.emptyList();
-        } else {
-            return response.getData();
+        while (true) {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                    .pathSegment("organizations")
+                    .pathSegment(organization)
+                    .pathSegment("workspaces");
+
+            String url = builder.toUriString() + "?page[size]=50&page[number]=" + currentPage;
+            log.info("url: {}", url);
+            WorkspaceListResponse response = makeRequest(apiToken, url, WorkspaceListResponse.class);
+
+            if (response == null || response.getData() == null) {
+                break;
+            } else {
+                allData.addAll(response.getData());
+            }
+
+            if (response.getMeta().getPagination().getNextPage() == null) {
+                break;
+            }
+
+            currentPage++;
         }
+
+        return allData;
     }
 
     public List<VariableAttributes> getVariables(String apiToken, String apiUrl, String organizationName,
@@ -156,6 +171,7 @@ public class WorkspaceService {
         workspace.setExecutionMode("remote");
 
         // If the workspace has a VCS, set it
+        log.info("VCS ID: {}", workspaceImportRequest.getVcsId());
         if (workspaceImportRequest.getVcsId() != null && !workspaceImportRequest.getVcsId().isEmpty()) {
             UUID vcsId = UUID.fromString(workspaceImportRequest.getVcsId());
             vcsRepository.findById(vcsId).ifPresent(workspace::setVcs);
@@ -173,7 +189,6 @@ public class WorkspaceService {
         organizationRepository.findById(UUID.fromString(workspaceImportRequest.getOrganizationId()))
                 .ifPresent(workspace::setOrganization);
         workspace.setIacType("terraform");
-        workspace.setSource(workspaceImportRequest.getSource());
         workspace = workspaceRepository.save(workspace);
 
         List<VariableAttributes> variablesImporter = getVariables(
