@@ -4,11 +4,9 @@ import com.yahoo.elide.annotation.*;
 import com.yahoo.elide.core.RequestScope;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.module.ModuleManageHook;
-import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.hibernate.annotations.Type;
@@ -21,7 +19,6 @@ import java.util.*;
 @UpdatePermission(expression = "team manage module OR user is a super service")
 @DeletePermission(expression = "team manage module")
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.DELETE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = ModuleManageHook.class)
-@Slf4j
 @Include(rootLevel = false)
 @Getter
 @Setter
