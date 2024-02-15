@@ -18,35 +18,98 @@ import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.*;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 @Slf4j
 public class GitTagsCache {
     private static JedisPool jedisPool;
 
+    private static SSLSocketFactory createTrustStoreSSLSocketFactory(String jksFile, String password) throws Exception {
+        KeyStore trustStore = KeyStore.getInstance("jks");
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(jksFile);
+            trustStore.load(inputStream, password.toCharArray());
+        } finally {
+            inputStream.close();
+        }
+
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
+        trustManagerFactory.init(trustStore);
+        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, trustManagers, new SecureRandom());
+        return sslContext.getSocketFactory();
+    }
+
+    private String getFromEnvOrDefault(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return value;
+        }
+    }
+
     public GitTagsCache() {
         log.debug("Init Module Cache...");
 
+        String truststorePath = System.getenv("TerrakubeRedisTruststorePath");
+        String truststorePassword = System.getenv("TerrakubeRedisTruststorePassword");
+        Boolean useSSL = Boolean.parseBoolean(getFromEnvOrDefault("TerrakubeRedisSSL", "false").trim()) && truststorePath != null
+                && truststorePassword != null;
+
         String hostname = System.getenv("TerrakubeRedisHostname");
+        String username = getFromEnvOrDefault("TerrakubeRedisUsername", "default");
         String port = System.getenv("TerrakubeRedisPort");
         String password = System.getenv("TerrakubeRedisPassword");
-        String maxTotal = System.getenv("ModuleCacheMaxTotal") != null ? System.getenv("ModuleCacheMaxTotal"): "128";
-        String maxIdle = System.getenv("ModuleCacheMaxIdle") != null ? System.getenv("ModuleCacheMaxIdle"): "128";
-        String minIdle = System.getenv("ModuleCacheMinIdle") != null ? System.getenv("ModuleCacheMinIdle"): "64";
-        String timeout = System.getenv("ModuleCacheTimeout") != null ? System.getenv("ModuleCacheTimeout"): "600000";
-        String schedule = System.getenv("ModuleCacheSchedule") != null ? System.getenv("ModuleCacheSchedule"): "0 */3 * ? * *";
+        String maxTotal = getFromEnvOrDefault("ModuleCacheMaxTotal", "128");
+        String maxIdle = getFromEnvOrDefault("ModuleCacheMaxIdle", "128");
+        String minIdle = getFromEnvOrDefault("ModuleCacheMinIdle", "64");
+        String timeout = getFromEnvOrDefault("ModuleCacheTimeout", "600000");
+        String schedule = getFromEnvOrDefault("ModuleCacheSchedule", "0 */3 * ? * *");
 
-        synchronized (this) {
-            if (jedisPool == null) {
-                if (hostname != null && port != null && password != null) {
-                    log.warn("Module Config: MaxTotal {} MaxIdle {} MinIdle {} Timeout {} Schedule {}", maxTotal, maxIdle, minIdle, timeout, schedule);
-                    JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-                    jedisPoolConfig.setMaxTotal(Integer.valueOf(maxTotal));
-                    jedisPoolConfig.setMaxIdle(Integer.valueOf(maxIdle));
-                    jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
-                    jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
-                    log.info("Redis connection completed...");
+        try {
+            SSLSocketFactory sslSocketFactory = null;
+            if (useSSL) {
+                sslSocketFactory = createTrustStoreSSLSocketFactory(truststorePath, truststorePassword);
+            }
+
+            synchronized (this) {
+                if (jedisPool == null) {
+                    if (hostname != null && port != null && password != null && username != null) {
+                        log.warn("Module Config: MaxTotal {} MaxIdle {} MinIdle {} Timeout {} Schedule {}", maxTotal,
+                                maxIdle, minIdle, timeout, schedule);
+                        log.error("{} {} {} {}", hostname, port, username, password);
+                        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+                        jedisPoolConfig.setMaxTotal(Integer.valueOf(maxTotal));
+                        jedisPoolConfig.setMaxIdle(Integer.valueOf(maxIdle));
+                        jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
+
+                        if (useSSL) {
+                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
+                                    Integer.valueOf(timeout), Integer.valueOf(timeout), username, password, 0, null,
+                                    true, sslSocketFactory, null, null);
+                        } else {
+                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
+                                    Integer.valueOf(timeout), username, password, true);
+                        }
+                        log.info("Redis connection completed...");
+                    }
                 }
             }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
 
     }
@@ -93,7 +156,8 @@ public class GitTagsCache {
                         credentialsProvider = new UsernamePasswordCredentialsProvider(vcs.getAccessToken(), "");
                         break;
                     case BITBUCKET:
-                        credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", vcs.getAccessToken());
+                        credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth",
+                                vcs.getAccessToken());
                         break;
                     case GITLAB:
                         credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", vcs.getAccessToken());
@@ -125,7 +189,8 @@ public class GitTagsCache {
                                     .sshFileName(ssh.getSshType().getFileName())
                                     .privateKey(ssh.getPrivateKey())
                                     .build();
-                            ((SshTransport) transport).setSshSessionFactory(terrakubeSshdSessionFactory.getSshdSessionFactory());
+                            ((SshTransport) transport)
+                                    .setSshSessionFactory(terrakubeSshdSessionFactory.getSshdSessionFactory());
                         }
                     }
                 };

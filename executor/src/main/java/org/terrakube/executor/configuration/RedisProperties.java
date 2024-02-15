@@ -15,5 +15,9 @@ import org.springframework.stereotype.Component;
 public class RedisProperties {
     private String hostname;
     private int port;
+    private String username;
     private String password;
+    private boolean ssl;
+    private String truststorePath;
+    private String truststorePassword;
 }

@@ -13,8 +13,11 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
 @ConfigurationProperties(prefix = "org.terrakube.api.redis")
 public class StreamingProperties {
-
     private String hostname;
     private int port;
+    private String username;
     private String password;
+    private boolean ssl;
+    private String truststorePath;
+    private String truststorePassword;
 }
