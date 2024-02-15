@@ -83,7 +83,10 @@ public class ScheduleJob implements org.quartz.Job {
 
         log.info("Checking Job {} Status {}", job.getId(), job.getStatus());
         log.info("Checking previous jobs....");
-        Optional<List<Job>> previousJobs = jobRepository.findByWorkspaceAndStatusNotInAndIdLessThan(job.getWorkspace(), Arrays.asList(JobStatus.failed, JobStatus.completed), job.getId());
+        Optional<List<Job>> previousJobs = jobRepository.findByWorkspaceAndStatusNotInAndIdLessThan(job.getWorkspace(),
+                Arrays.asList(JobStatus.failed, JobStatus.completed, JobStatus.rejected, JobStatus.cancelled, JobStatus.waitingApproval, JobStatus.approved),
+                job.getId()
+        );
         if(previousJobs.isPresent() && previousJobs.get().size() > 0 ){
            log.warn("Job {} is waiting for previous jobs to be completed...", jobId);
         } else {
