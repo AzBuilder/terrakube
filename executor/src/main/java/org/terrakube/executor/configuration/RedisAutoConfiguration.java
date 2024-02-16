@@ -62,21 +62,17 @@ public class RedisAutoConfiguration {
         redisStandaloneConfiguration.setPassword(password);
         redisStandaloneConfiguration.setUsername(username);
 
-        JedisConnectionFactory jedisConFactory;
-
         if (redisProperties.isSsl()) {
-            JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration
+            JedisClientConfiguration clientConfiguration = JedisClientConfiguration
                     .builder()
                     .useSsl()
                     .sslSocketFactory(sslSocketFactory)
                     .build();
 
-            jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration, jedisClientConfiguration);
-        } else {
-            jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
-        }
+            return new JedisConnectionFactory(redisStandaloneConfiguration, clientConfiguration);
+        } else
+            return new JedisConnectionFactory(redisStandaloneConfiguration);
 
-        return jedisConFactory;
     }
 
     @Bean
