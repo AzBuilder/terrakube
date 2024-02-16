@@ -1275,6 +1275,33 @@ function parseState(state) {
   if (state?.values?.root_module?.child_modules?.length > 0) {
     state?.values?.root_module?.child_modules?.forEach((moduleVal, index) => {
       console.log(`Checking child ${moduleVal.address} with index ${index}`);
+      if(moduleVal.resources != null)
+        for (const [key, value] of Object.entries(moduleVal.resources)) {
+          resources.push({
+            name: value.name,
+            type: value.type,
+            provider: value.provider_name,
+            module: moduleVal.address,
+            values: value.values,
+            depends_on: value.depends_on,
+          });
+        }
+
+      if(moduleVal.child_modules?.length > 0) {
+        resources = parseChildModules(resources , moduleVal.child_modules);
+      }
+    });
+  } else {
+    console.log("State has no child modules resources");
+  }
+
+  return { resources: resources, outputs: outputs };
+}
+
+function parseChildModules(resources, child_modules){
+  child_modules?.forEach((moduleVal, index) => {
+    console.log(`Checking nested child ${moduleVal.address} with index ${index}`);
+    if(moduleVal.resources != null)
       for (const [key, value] of Object.entries(moduleVal.resources)) {
         resources.push({
           name: value.name,
@@ -1285,12 +1312,13 @@ function parseState(state) {
           depends_on: value.depends_on,
         });
       }
-    });
-  } else {
-    console.log("State has no child modules resources");
-  }
 
-  return { resources: resources, outputs: outputs };
+    if(moduleVal.child_modules?.length > 0) {
+      resources = parseChildModules(resources);
+    }
+  });
+
+  return resources;
 }
 
 function fixSshURL(source) {
