@@ -39,7 +39,8 @@ public class GitTagsCache {
             inputStream = new FileInputStream(jksFile);
             trustStore.load(inputStream, password.toCharArray());
         } finally {
-            inputStream.close();
+            if (inputStream != null)
+                inputStream.close();
         }
 
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
