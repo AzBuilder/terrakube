@@ -2,6 +2,7 @@ package org.terrakube.api.plugin.importer.tfcloud.services;
 
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.terrakube.api.plugin.importer.tfcloud.StateVersion;
 import org.terrakube.api.plugin.importer.tfcloud.VariableResponse;
@@ -130,17 +131,22 @@ public class WorkspaceService {
     }
 
     public StateVersion.Attributes getCurrentState(String apiToken, String apiUrl, String workspaceId) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
-                .pathSegment("workspaces")
-                .pathSegment(workspaceId)
-                .pathSegment("current-state-version");
+        try {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                    .pathSegment("workspaces")
+                    .pathSegment(workspaceId)
+                    .pathSegment("current-state-version");
 
-        String url = builder.toUriString();
-        StateVersion stateVersionResponse = makeRequest(apiToken, url, StateVersion.class);
-        if (stateVersionResponse != null && stateVersionResponse.getData() != null) {
-            return stateVersionResponse.getData().getAttributes();
-        } else {
-            throw new NullResponseException("Error: Response from State is null");
+            String url = builder.toUriString();
+            StateVersion stateVersionResponse = makeRequest(apiToken, url, StateVersion.class);
+            if (stateVersionResponse != null && stateVersionResponse.getData() != null) {
+                return stateVersionResponse.getData().getAttributes();
+            } else {
+                throw new NullResponseException("Error: Response from State is null");
+            }
+        } catch (HttpClientErrorException.NotFound ex) {
+            log.info("State not found for workspace: {}", workspaceId);
+            return null;
         }
     }
 
@@ -163,56 +169,24 @@ public class WorkspaceService {
 
     public boolean importWorkspace(String apiToken, String apiUrl, WorkspaceImportRequest workspaceImportRequest) {
 
-        // create workspace
-        Workspace workspace = new Workspace();
-        workspace.setName(workspaceImportRequest.getName());
-        workspace.setDescription(workspaceImportRequest.getDescription());
-        workspace.setTerraformVersion(workspaceImportRequest.getTerraformVersion());
-        workspace.setExecutionMode("remote");
-
-        // If the workspace has a VCS, set it
-        log.info("VCS ID: {}", workspaceImportRequest.getVcsId());
-        if (workspaceImportRequest.getVcsId() != null && !workspaceImportRequest.getVcsId().isEmpty()) {
-            UUID vcsId = UUID.fromString(workspaceImportRequest.getVcsId());
-            vcsRepository.findById(vcsId).ifPresent(workspace::setVcs);
-            // if branch is not set, set it to main
-            workspace.setBranch(
-                    workspaceImportRequest.getBranch() == null ? "main" : workspaceImportRequest.getBranch());
-            workspace.setFolder(workspaceImportRequest.getFolder());
-            workspace.setSource(workspaceImportRequest.getSource());
-        } else {
-            workspace.setBranch("remote-content");
-            workspace.setSource("empty");
-        }
-
-        // Set the organization
-        organizationRepository.findById(UUID.fromString(workspaceImportRequest.getOrganizationId()))
-                .ifPresent(workspace::setOrganization);
-        workspace.setIacType("terraform");
+        Workspace workspace = createWorkspaceFromRequest(workspaceImportRequest);
         workspace = workspaceRepository.save(workspace);
-
         List<VariableAttributes> variablesImporter = getVariables(
                 apiToken,
                 apiUrl,
                 workspaceImportRequest.getOrganization(),
                 workspaceImportRequest.getId());
 
-        for (VariableAttributes variableAttribute : variablesImporter) {
-            Variable variable = new Variable();
-            variable.setKey(variableAttribute.getKey());
-            variable.setValue(variableAttribute.getValue() != null ? variableAttribute.getValue() : "");
-            variable.setDescription(variableAttribute.getDescription());
-            variable.setSensitive(variableAttribute.isSensitive());
-            variable.setCategory("env".equals(variableAttribute.getCategory()) ? Category.ENV : Category.TERRAFORM);
-            variable.setHcl(variableAttribute.isHcl());
-            variable.setWorkspace(workspace);
-            variableRepository.save(variable);
-        }
+        importVariables(variablesImporter, workspace);
 
         StateVersion.Attributes lastState = getCurrentState(
                 apiToken,
                 apiUrl,
                 workspaceImportRequest.getId());
+
+        if (lastState == null) {
+            return true;
+        }
 
         String stateDownloadUrl = lastState.getHostedStateDownloadUrl();
         String stateDownloadJsonUrl = lastState.getHostedJsonStateDownloadUrl();
@@ -262,6 +236,50 @@ public class WorkspaceService {
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining("\n"));
+        }
+    }
+
+    private Workspace createWorkspaceFromRequest(WorkspaceImportRequest workspaceImportRequest) {
+        Workspace workspace = new Workspace();
+        workspace.setName(workspaceImportRequest.getName());
+        workspace.setDescription(workspaceImportRequest.getDescription());
+        workspace.setTerraformVersion(workspaceImportRequest.getTerraformVersion());
+        workspace.setExecutionMode("remote");
+
+        // If the workspace has a VCS, set it
+        log.info("VCS ID: {}", workspaceImportRequest.getVcsId());
+        if (workspaceImportRequest.getVcsId() != null && !workspaceImportRequest.getVcsId().isEmpty()) {
+            UUID vcsId = UUID.fromString(workspaceImportRequest.getVcsId());
+            vcsRepository.findById(vcsId).ifPresent(workspace::setVcs);
+            // if branch is not set, set it to main
+            workspace.setBranch(
+                    workspaceImportRequest.getBranch() == null ? "main" : workspaceImportRequest.getBranch());
+            workspace.setFolder(workspaceImportRequest.getFolder());
+            workspace.setSource(workspaceImportRequest.getSource());
+        } else {
+            workspace.setBranch("remote-content");
+            workspace.setSource("empty");
+        }
+
+        // Set the organization
+        organizationRepository.findById(UUID.fromString(workspaceImportRequest.getOrganizationId()))
+                .ifPresent(workspace::setOrganization);
+        workspace.setIacType("terraform");
+
+        return workspace;
+    }
+
+    private void importVariables(List<VariableAttributes> variablesImporter, Workspace workspace) {
+        for (VariableAttributes variableAttribute : variablesImporter) {
+            Variable variable = new Variable();
+            variable.setKey(variableAttribute.getKey());
+            variable.setValue(variableAttribute.getValue() != null ? variableAttribute.getValue() : "");
+            variable.setDescription(variableAttribute.getDescription());
+            variable.setSensitive(variableAttribute.isSensitive());
+            variable.setCategory("env".equals(variableAttribute.getCategory()) ? Category.ENV : Category.TERRAFORM);
+            variable.setHcl(variableAttribute.isHcl());
+            variable.setWorkspace(workspace);
+            variableRepository.save(variable);
         }
     }
 }
