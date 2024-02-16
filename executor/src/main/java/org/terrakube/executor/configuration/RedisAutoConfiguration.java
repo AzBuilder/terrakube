@@ -24,15 +24,16 @@ import lombok.extern.slf4j.Slf4j;
 public class RedisAutoConfiguration {
 
     @Bean
-    SSLSocketFactory sslSocketFactory(RedisProperties props) throws Exception {
-        if (!props.isSsl()) {
+    SSLSocketFactory sslSocketFactory(RedisProperties properties) throws Exception {
+        if (!properties.isSsl())
             return SSLContext.getDefault().getSocketFactory();
-        }
-        KeyStore trustStore = KeyStore.getInstance("jks");
+
+        KeyStore jksTrustStore = KeyStore.getInstance("jks");
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(props.getTruststorePath());
-            trustStore.load(inputStream, props.getTruststorePassword().toCharArray());
+            inputStream = new FileInputStream(properties.getTruststorePath());
+            char[] truststorePassword = properties.getTruststorePassword().toCharArray();
+            jksTrustStore.load(inputStream, truststorePassword);
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {
@@ -41,9 +42,9 @@ public class RedisAutoConfiguration {
             }
         }
 
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
-        trustManagerFactory.init(trustStore);
-        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+        TrustManagerFactory managerFactory = TrustManagerFactory.getInstance("PKIX");
+        managerFactory.init(jksTrustStore);
+        TrustManager[] trustManagers = managerFactory.getTrustManagers();
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, trustManagers, new SecureRandom());
@@ -51,20 +52,26 @@ public class RedisAutoConfiguration {
     }
 
     @Bean
-    JedisConnectionFactory jedisConnectionFactory(RedisProperties props, SSLSocketFactory sslSocketFactory) {
+    JedisConnectionFactory jedisConnectionFactory(RedisProperties redisProperties, SSLSocketFactory sslSocketFactory) {
+        String hostname = redisProperties.getHostname();
+        int port = redisProperties.getPort();
+        String username = redisProperties.getUsername();
+        String password = redisProperties.getPassword();
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
-                props.getHostname(), props.getPort());
-        redisStandaloneConfiguration.setPassword(props.getPassword());
-        redisStandaloneConfiguration.setUsername(props.getUsername());
+                hostname, port);
+        redisStandaloneConfiguration.setPassword(password);
+        redisStandaloneConfiguration.setUsername(username);
 
         JedisConnectionFactory jedisConFactory;
 
-        if (props.isSsl()) {
-            JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration.builder().useSsl()
-                    .sslSocketFactory(sslSocketFactory).build();
+        if (redisProperties.isSsl()) {
+            JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration
+                    .builder()
+                    .useSsl()
+                    .sslSocketFactory(sslSocketFactory)
+                    .build();
 
-            jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration,
-                    jedisClientConfiguration);
+            jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration, jedisClientConfiguration);
         } else {
             jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
         }
