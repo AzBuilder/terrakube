@@ -48,6 +48,8 @@
                         <exclude>org/terrakube/api/plugin/security/authentication/local/*</exclude>
                         <exclude>org/terrakube/api/plugin/security/groups/local/*</exclude>
                         <exclude>org/terrakube/api/plugin/security/user/local/*</exclude>
+                        <exclude>org/terrakube/api/plugin/streaming/StreamingConfiguration.java</exclude>
+                        <exclude>org/terrakube/executor/configuration/RedisAutoConfiguration.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>
