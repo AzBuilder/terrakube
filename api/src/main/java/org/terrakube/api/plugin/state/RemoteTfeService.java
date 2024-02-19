@@ -20,11 +20,14 @@ import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.generic.Resource;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
+import org.terrakube.api.plugin.state.model.outputs.OutputData;
+import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
 import org.terrakube.api.plugin.state.model.plan.PlanRunModel;
 import org.terrakube.api.plugin.state.model.runs.*;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
+import org.terrakube.api.plugin.state.model.terraform.TerraformState;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
@@ -968,5 +971,45 @@ public class RemoteTfeService {
                 }
             }
         return logs;
+    }
+
+    StateOutputs getCurrentOutputs(String workspaceId) {
+        StateOutputs stateOutputs = new StateOutputs();
+        stateOutputs.setData(new ArrayList());
+        try {
+            Optional<Workspace> searchWorkspace = workspaceRepository.findById(UUID.fromString(workspaceId));
+            if (searchWorkspace.isPresent()) {
+                Workspace workspace = searchWorkspace.get();
+                byte[] currentState = storageTypeService.getCurrentTerraformState(workspace.getOrganization().getId().toString(), workspaceId);
+                String state = new String(currentState, StandardCharsets.UTF_8);
+                TerraformState terraformState = new ObjectMapper().readValue(state, TerraformState.class);
+                log.info(terraformState.toString());
+
+                terraformState.getOutputs().forEach((key,value) ->{
+                    String outputKey = key;
+                    String type = value.get("type").toString();
+                    log.info("output key: {}", key);
+                    log.info("output type: {}", value.get("type").toString());
+                    log.info("output value: {}", value.get("value"));
+
+                    if(type.equals("string")){
+                        OutputData outputData = new OutputData();
+                        outputData.setId(UUID.randomUUID().toString());
+                        outputData.setType("state-version-outputs");
+                        outputData.setAttributes(new HashMap());
+                        outputData.getAttributes().put("detailed-type", "string");
+                        outputData.getAttributes().put("name", outputKey);
+                        outputData.getAttributes().put("value", value.get("value").toString());
+
+                        stateOutputs.getData().add(outputData);
+                    }
+
+                });
+            }
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+
+        return stateOutputs;
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
+import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
@@ -238,6 +239,13 @@ public class RemoteTfeController {
     @GetMapping(produces = "application/vnd.api+json", path = "/applies/{applyId}/logs")
     public ResponseEntity<String> getApplyLogs(@PathVariable("applyId") int planId) throws IOException {
         return ResponseEntity.of(Optional.ofNullable(new String(remoteTfeService.getApplyLogs(planId), StandardCharsets.UTF_8)));
+    }
+
+    @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{applyId}/current-state-version-outputs")
+    public ResponseEntity<StateOutputs> getCurrentOutputs(@PathVariable("workspaceId") String workspaceId) {
+        log.info("Get current outputs for: {}", workspaceId);
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getCurrentOutputs(workspaceId)));
     }
 
     @GetMapping(
