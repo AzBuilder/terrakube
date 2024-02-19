@@ -2789,5 +2789,23 @@
         "value": "{{sshId}}"
       }
     ]
+  },
+  {
+    "_id": "0638c31f-c560-4322-bb92-8465d95eb72d",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "1e847596-c3bf-42d4-90d4-26e522a90d0d",
+    "name": "current outputs",
+    "url": "{{terrakubeApi}}/remote/tfe/v2/workspaces/{{workspaceId}}/current-state-version-outputs",
+    "method": "GET",
+    "sortNum": 220000,
+    "created": "2024-02-19T21:57:17.767Z",
+    "modified": "2024-02-19T22:04:20.313Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]
