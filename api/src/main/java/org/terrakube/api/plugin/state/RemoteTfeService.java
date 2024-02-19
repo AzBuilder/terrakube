@@ -983,26 +983,25 @@ public class RemoteTfeService {
                 byte[] currentState = storageTypeService.getCurrentTerraformState(workspace.getOrganization().getId().toString(), workspaceId);
                 String state = new String(currentState, StandardCharsets.UTF_8);
                 TerraformState terraformState = new ObjectMapper().readValue(state, TerraformState.class);
-                log.info(terraformState.toString());
 
-                terraformState.getOutputs().forEach((key,value) ->{
-                    String outputKey = key;
-                    String type = value.get("type").toString();
-                    log.info("output key: {}", key);
-                    log.info("output type: {}", value.get("type").toString());
-                    log.info("output value: {}", value.get("value"));
+                terraformState.getOutputs().forEach((mapKey, mapValue) ->{
+                    log.info("Processing Key output: {}", mapKey);
 
-                    if(type.equals("string")){
-                        OutputData outputData = new OutputData();
-                        outputData.setId(UUID.randomUUID().toString());
-                        outputData.setType("state-version-outputs");
-                        outputData.setAttributes(new HashMap());
-                        outputData.getAttributes().put("detailed-type", "string");
-                        outputData.getAttributes().put("name", outputKey);
-                        outputData.getAttributes().put("value", value.get("value").toString());
+                    OutputData outputData = new OutputData();
+                    outputData.setId(UUID.randomUUID().toString());
+                    outputData.setType("state-version-outputs");
+                    outputData.setAttributes(new HashMap());
+                    outputData.getAttributes().put("name", mapKey);
 
-                        stateOutputs.getData().add(outputData);
+                    LinkedHashMap linkedHashMap = (LinkedHashMap)  mapValue;
+                    Set<String> keys = linkedHashMap.keySet();
+
+                    for (String key : keys) {
+                        log.info("Checking Key: {}", key);
+                        outputData.getAttributes().put(key, linkedHashMap.get(key));
                     }
+                    outputData.getAttributes().put("detailed-type", "detailed-type");
+                    stateOutputs.getData().add(outputData);
 
                 });
             }

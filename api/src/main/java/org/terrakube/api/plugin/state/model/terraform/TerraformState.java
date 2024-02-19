@@ -12,5 +12,5 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public class TerraformState {
-    Map<String, Map<String, OutputObject>> outputs;
+    Map<String, Map<String, Object>> outputs;
 }
