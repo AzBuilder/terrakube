@@ -17,5 +17,5 @@ public class OutputObject {
     boolean sensitive;
     String type;
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    List<String> value;
+    List<Object> value;
 }
