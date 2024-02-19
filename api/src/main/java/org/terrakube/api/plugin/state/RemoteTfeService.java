@@ -973,7 +973,7 @@ public class RemoteTfeService {
         return logs;
     }
 
-    StateOutputs getCurrentOutputs(String workspaceId) {
+StateOutputs getCurrentOutputs(String workspaceId) {
         StateOutputs stateOutputs = new StateOutputs();
         stateOutputs.setData(new ArrayList());
         try {
@@ -994,13 +994,21 @@ public class RemoteTfeService {
                     outputData.getAttributes().put("name", mapKey);
 
                     LinkedHashMap linkedHashMap = (LinkedHashMap)  mapValue;
-                    Set<String> keys = linkedHashMap.keySet();
 
-                    for (String key : keys) {
-                        log.info("Checking Key: {}", key);
-                        outputData.getAttributes().put(key, linkedHashMap.get(key));
+                    outputData.getAttributes().put("value", linkedHashMap.get("value"));
+
+                    if (linkedHashMap.get("sensitive") != null)
+                       outputData.getAttributes().put("sensitive", linkedHashMap.get("sensitive") );
+                    else
+                        outputData.getAttributes().put("sensitive", false );
+
+                    if (linkedHashMap.get("type") instanceof String ) {
+                        outputData.getAttributes().put("type", "string");
+                        outputData.getAttributes().put("detailed-type", "string");
+                    } else {
+                        outputData.getAttributes().put("type", "object");
+                        outputData.getAttributes().put("detailed-type", linkedHashMap.get("type"));
                     }
-                    outputData.getAttributes().put("detailed-type", "string");
                     stateOutputs.getData().add(outputData);
 
                 });
