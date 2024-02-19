@@ -1000,7 +1000,7 @@ public class RemoteTfeService {
                         log.info("Checking Key: {}", key);
                         outputData.getAttributes().put(key, linkedHashMap.get(key));
                     }
-                    outputData.getAttributes().put("detailed-type", "detailed-type");
+                    outputData.getAttributes().put("detailed-type", "string");
                     stateOutputs.getData().add(outputData);
 
                 });
