@@ -242,7 +242,7 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{applyId}/current-state-version-outputs")
+    @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/current-state-version-outputs")
     public ResponseEntity<StateOutputs> getCurrentOutputs(@PathVariable("workspaceId") String workspaceId) {
         log.info("Get current outputs for: {}", workspaceId);
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getCurrentOutputs(workspaceId)));
