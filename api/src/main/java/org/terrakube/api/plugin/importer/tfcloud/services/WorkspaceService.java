@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.terrakube.api.plugin.importer.tfcloud.StateVersion;
+import org.terrakube.api.plugin.importer.tfcloud.TagResponse;
+import org.terrakube.api.plugin.importer.tfcloud.TagResponse.TagData;
+import org.terrakube.api.plugin.importer.tfcloud.TagResponse.TagData.TagAttributes;
 import org.terrakube.api.plugin.importer.tfcloud.VariableResponse;
 import org.terrakube.api.plugin.importer.tfcloud.VariableResponse.VariableData;
 import org.terrakube.api.plugin.importer.tfcloud.VariableResponse.VariableData.VariableAttributes;
@@ -14,13 +17,17 @@ import org.terrakube.api.plugin.importer.tfcloud.WorkspaceListResponse;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.repository.HistoryRepository;
 import org.terrakube.api.repository.OrganizationRepository;
+import org.terrakube.api.repository.TagRepository;
 import org.terrakube.api.repository.VariableRepository;
 import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
+import org.terrakube.api.repository.WorkspaceTagRepository;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.history.History;
 import org.terrakube.api.rs.workspace.parameters.Category;
 import org.terrakube.api.rs.workspace.parameters.Variable;
+import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
+import org.terrakube.api.rs.tag.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,6 +53,9 @@ public class WorkspaceService {
     VcsRepository vcsRepository;
     OrganizationRepository organizationRepository;
     VariableRepository variableRepository;
+    WorkspaceTagRepository workspaceTagRepository;
+    TagRepository tagRepository;
+
     private StorageTypeService storageTypeService;
     private String hostname;
 
@@ -55,7 +65,9 @@ public class WorkspaceService {
             StorageTypeService storageTypeService,
             VcsRepository vcsRepository,
             OrganizationRepository organizationRepository,
-            VariableRepository variableRepositor) {
+            VariableRepository variableRepositor,
+            WorkspaceTagRepository workspaceTagRepository,
+            TagRepository tagRepository) {
         this.restTemplate = new RestTemplate();
         this.workspaceRepository = workspaceRepository;
         this.historyRepository = historyRepository;
@@ -64,6 +76,8 @@ public class WorkspaceService {
         this.organizationRepository = organizationRepository;
         this.variableRepository = variableRepositor;
         this.hostname = hostname;
+        this.workspaceTagRepository = workspaceTagRepository;
+        this.tagRepository = tagRepository;
     }
 
     public class NullResponseException extends RuntimeException {
@@ -150,6 +164,24 @@ public class WorkspaceService {
         }
     }
 
+    public List<TagAttributes> getTags(String apiToken, String apiUrl, String workspaceId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                .pathSegment("workspaces")
+                .pathSegment(workspaceId)
+                .pathSegment("relationships")
+                .pathSegment("tags");
+
+        String url = builder.toUriString();
+        TagResponse response = makeRequest(apiToken, url, TagResponse.class);
+        if (response != null) {
+            return response.getData().stream()
+                    .map(TagData::getAttributes)
+                    .toList();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     public Resource downloadState(String apiToken, String stateUrl) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiToken);
@@ -178,6 +210,10 @@ public class WorkspaceService {
                 workspaceImportRequest.getId());
 
         importVariables(variablesImporter, workspace);
+
+        List<TagAttributes> tags = getTags(apiToken, apiUrl, workspaceImportRequest.getId());
+
+        importTags(tags, workspace);
 
         StateVersion.Attributes lastState = getCurrentState(
                 apiToken,
@@ -244,7 +280,7 @@ public class WorkspaceService {
         workspace.setName(workspaceImportRequest.getName());
         workspace.setDescription(workspaceImportRequest.getDescription());
         workspace.setTerraformVersion(workspaceImportRequest.getTerraformVersion());
-        workspace.setExecutionMode(workspaceImportRequest.getExecutionMode().equals("local") ? "local" : "remote"); //Tfcloud supports agent execution mode, but Terrakkube not
+        workspace.setExecutionMode(workspaceImportRequest.getExecutionMode().equals("local") ? "local" : "remote");
 
         // If the workspace has a VCS, set it
         log.info("VCS ID: {}", workspaceImportRequest.getVcsId());
@@ -280,6 +316,25 @@ public class WorkspaceService {
             variable.setHcl(variableAttribute.isHcl());
             variable.setWorkspace(workspace);
             variableRepository.save(variable);
+        }
+    }
+
+    private void importTags(List<TagAttributes> tags, Workspace workspace) {
+        for (TagAttributes tagAttribute : tags) {
+
+            // check if tag exists if not create it
+            Tag tag = tagRepository.getByOrganizationNameAndName(workspace.getOrganization().getName(),
+                    tagAttribute.getName());
+            if (tag == null) {
+                tag = new Tag();
+                tag.setName(tagAttribute.getName());
+                tag.setOrganization(workspace.getOrganization());
+                tag = tagRepository.save(tag);
+            }
+            WorkspaceTag workspaceTag = new WorkspaceTag();
+            workspaceTag.setWorkspace(workspace);
+            workspaceTag.setTagId(tag.getId().toString());
+            workspaceTagRepository.save(workspaceTag);
         }
     }
 }
