@@ -244,7 +244,7 @@ public class WorkspaceService {
         workspace.setName(workspaceImportRequest.getName());
         workspace.setDescription(workspaceImportRequest.getDescription());
         workspace.setTerraformVersion(workspaceImportRequest.getTerraformVersion());
-        workspace.setExecutionMode("remote");
+        workspace.setExecutionMode(workspaceImportRequest.getExecutionMode().equals("local") ? "local" : "remote"); //Tfcloud supports agent execution mode, but Terrakkube not
 
         // If the workspace has a VCS, set it
         log.info("VCS ID: {}", workspaceImportRequest.getVcsId());
