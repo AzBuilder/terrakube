@@ -15,4 +15,5 @@ public class WorkspaceImportRequest {
     private String name;
     private String source;
     private String description;
+    private String executionMode;
 }

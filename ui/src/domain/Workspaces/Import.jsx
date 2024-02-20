@@ -290,6 +290,7 @@ export const ImportWorkspace = () => {
           name: workspace.attributes.name,
           terraformVersion: workspace.attributes["terraform-version"],
           source: workspace.attributes["vcs-repo"]?.["repository-http-url"],
+          executionMode: workspace?.attributes["execution-mode"],
           description: workspace.attributes.description,
         },
         {

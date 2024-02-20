@@ -27,6 +27,8 @@ public class WorkspaceImport {
             private VcsRepo vcsRepo;
             @JsonProperty("terraform-version")
             private String terraformVersion;
+            @JsonProperty("execution-mode")
+            private String executionMode;
         }
 
         @Getter
