@@ -27,6 +27,9 @@ import org.terrakube.api.rs.workspace.history.History;
 import org.terrakube.api.rs.workspace.parameters.Category;
 import org.terrakube.api.rs.workspace.parameters.Variable;
 import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
+
+import liquibase.pro.packaged.lo;
+
 import org.terrakube.api.rs.tag.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -199,33 +202,72 @@ public class WorkspaceService {
         }
     }
 
-    public boolean importWorkspace(String apiToken, String apiUrl, WorkspaceImportRequest workspaceImportRequest) {
+    public String importWorkspace(String apiToken, String apiUrl, WorkspaceImportRequest workspaceImportRequest) {
 
+        String result = "";
+
+        // Create the workspace
+        log.info("Importing Workspace: {}" , workspaceImportRequest.getName());
         Workspace workspace = createWorkspaceFromRequest(workspaceImportRequest);
-        workspace = workspaceRepository.save(workspace);
-        List<VariableAttributes> variablesImporter = getVariables(
-                apiToken,
-                apiUrl,
-                workspaceImportRequest.getOrganization(),
-                workspaceImportRequest.getId());
+        try {
+            workspace = workspaceRepository.save(workspace);
+            log.info("Workspace created: {}", workspace.getId());
+            result = "<li>Workspace created successfully.</li>";
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            result = "<li>There was an error creating the workspace:" + e.getMessage() + "</li>";
+            return result;
+        }
 
-        importVariables(variablesImporter, workspace);
+        // Import variables
+        try {
+            List<VariableAttributes> variablesImporter = getVariables(
+                    apiToken,
+                    apiUrl,
+                    workspaceImportRequest.getOrganization(),
+                    workspaceImportRequest.getId());
 
-        List<TagAttributes> tags = getTags(apiToken, apiUrl, workspaceImportRequest.getId());
+            importVariables(variablesImporter, workspace);
+            log.info("Variables imported: {}", variablesImporter.size());
+            if(variablesImporter.size() > 0)
+              result += "<li>Variables imported successfully.</li>";
+            else
+              result += "<li>No variables to import.</li>";
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            result += "<li>There was an error importing the variables:" + e.getMessage() + "</li>";
+        }
 
-        importTags(tags, workspace);
+        // Import tags
+        try {
+            List<TagAttributes> tags = getTags(apiToken, apiUrl, workspaceImportRequest.getId());
+            importTags(tags, workspace);
+            log.info("Tags imported: {}", tags.size());
+            if(tags.size() > 0)
+              result += "<li>Tags imported successfully.</li>";
+            else
+              result += "<li>No tags to import.</li>";
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            result += "<li>There was an error importing the tags:" + e.getMessage() + "</li>";
+        }
 
+        // Import state
         StateVersion.Attributes lastState = getCurrentState(
                 apiToken,
                 apiUrl,
                 workspaceImportRequest.getId());
 
         if (lastState == null) {
-            return true;
+            result += "<li>No state to import.</li>";
+            return result;
         }
+ 
 
         String stateDownloadUrl = lastState.getHostedStateDownloadUrl();
         String stateDownloadJsonUrl = lastState.getHostedJsonStateDownloadUrl();
+        log.info("State download URL: {}", stateDownloadUrl);
+        log.info("State download JSON URL: {}", stateDownloadJsonUrl);
 
         History history = new History();
         history.setWorkspace(workspace);
@@ -241,7 +283,15 @@ public class WorkspaceService {
                         workspace.getOrganization().getId().toString(),
                         workspace.getId().toString(),
                         history.getId().toString()));
-        historyRepository.save(history);
+
+        try{
+          historyRepository.save(history);
+          log.info("History created: {}", history.getId());
+        }
+        catch(Exception e){
+            log.error(e.getMessage());
+            result += "<li>There was an error importing the state:" + e.getMessage() + "</li>";
+        }
 
         try {
             Resource stateJson = downloadState(apiToken, stateDownloadJsonUrl);
@@ -251,10 +301,13 @@ public class WorkspaceService {
             try {
                 terraformStateJson = readResourceToString(stateJson);
                 terraformState = readResourceToString(state);
+                log.info("State downloaded: {}", terraformState.length());
+                log.info("State JSON downloaded: {}", terraformStateJson.length());
 
             } catch (IOException e) {
                 log.error(e.getMessage());
-                return false;
+                result += "<li>There was an error importing the state:" + e.getMessage() + "</li>";
+                return result;
             }
             storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(),
                     workspace.getId().toString(), terraformStateJson, history.getId().toString());
@@ -263,9 +316,11 @@ public class WorkspaceService {
                     workspace.getId().toString(), terraformState);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return false;
+            result += "<li>There was an error importing the state:" + e.getMessage() + "</li>";
+            return result;
         }
-        return true;
+        result += "<li>State imported successfully.</li>";
+        return result;
     }
 
     private String readResourceToString(Resource resource) throws IOException {
@@ -283,7 +338,6 @@ public class WorkspaceService {
         workspace.setExecutionMode(workspaceImportRequest.getExecutionMode().equals("local") ? "local" : "remote");
 
         // If the workspace has a VCS, set it
-        log.info("VCS ID: {}", workspaceImportRequest.getVcsId());
         if (workspaceImportRequest.getVcsId() != null && !workspaceImportRequest.getVcsId().isEmpty()) {
             UUID vcsId = UUID.fromString(workspaceImportRequest.getVcsId());
             vcsRepository.findById(vcsId).ifPresent(workspace::setVcs);

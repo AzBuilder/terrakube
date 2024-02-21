@@ -26,8 +26,8 @@ public class TfCloudController {
 
     @PostMapping("/workspaces")
     public ResponseEntity<?> importWorkspaces(@RequestHeader("X-TFC-Url") String apiUrl,@RequestHeader("X-TFC-Token") String apiToken,@RequestBody WorkspaceImportRequest request) {
-        service.importWorkspace(apiToken,apiUrl,request);
-        return ResponseEntity.ok().build();
+        String result = service.importWorkspace(apiToken,apiUrl,request);
+        return ResponseEntity.ok().body(result);
     }
 
 }
