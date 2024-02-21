@@ -21,6 +21,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 
@@ -151,12 +152,10 @@ public class GitLabWebhookService {
         try {
             URL url = new URL(repoUrl);
             String[] parts = url.getPath().split("/");
-            String owner = parts[1];
-            String repo = parts[2].replace(".git", "");
-            String ownerAndRepo = owner + "/" + repo;
+            String ownerAndRepo = String.join("/", Arrays.copyOfRange(parts, 1, parts.length)).replace(".git", "");
             return URLEncoder.encode(ownerAndRepo, "UTF-8");
         } catch (Exception e) {
-           log.info("Error extracting owner and repo from URL", e);
+           log.error("Error extracting owner and repo from URL", e);
         }
         return "";
     }
