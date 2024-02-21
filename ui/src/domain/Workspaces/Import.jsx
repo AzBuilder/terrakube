@@ -28,6 +28,7 @@ import {
 } from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { useHistory, Link } from "react-router-dom";
+import parse from "html-react-parser";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -302,7 +303,7 @@ export const ImportWorkspace = () => {
       );
       console.log(response);
       return (
-        "Workspace has been successfully imported. You can now view the workspace in the organization."
+        response?.data
       );
     } catch (error) {
       console.error("Error importing workspace:", error);
@@ -695,7 +696,7 @@ export const ImportWorkspace = () => {
             renderItem={(item) => (
               <List.Item>
                 {" "}
-                <List.Item.Meta title={item.name} description={item.status} />
+                <List.Item.Meta title={item.name} description={<ul>{parse(item.status || "Waiting...")}</ul>} />
               </List.Item>
             )}
           ></List>
