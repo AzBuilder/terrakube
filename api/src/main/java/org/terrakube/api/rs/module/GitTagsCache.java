@@ -70,7 +70,7 @@ public class GitTagsCache {
                 && truststorePassword != null;
 
         String hostname = System.getenv("TerrakubeRedisHostname");
-        String username = getFromEnvOrDefault("TerrakubeRedisUsername", "default");
+        String username = getFromEnvOrDefault("TerrakubeRedisUsername", null);
         String port = System.getenv("TerrakubeRedisPort");
         String password = System.getenv("TerrakubeRedisPassword");
         String maxTotal = getFromEnvOrDefault("ModuleCacheMaxTotal", "128");
@@ -87,25 +87,29 @@ public class GitTagsCache {
 
             synchronized (this) {
                 if (jedisPool == null) {
-                    if (hostname != null && port != null && password != null && username != null) {
+                    if (hostname != null && port != null && password != null) {
                         log.warn("Module Config: MaxTotal {} MaxIdle {} MinIdle {} Timeout {} Schedule {}", maxTotal,
                                 maxIdle, minIdle, timeout, schedule);
-                        log.error("{} {} {} {}", hostname, port, username, password);
                         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
                         jedisPoolConfig.setMaxTotal(Integer.valueOf(maxTotal));
                         jedisPoolConfig.setMaxIdle(Integer.valueOf(maxIdle));
                         jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
 
-                        if (useSSL) {
+                        if (useSSL && username != null) {
+                            log.warn("Connecting Redis using hostname, port, username, password and sslSocketFactory");
                             jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                     Integer.valueOf(timeout), Integer.valueOf(timeout), username, password, 0, null,
                                     true, sslSocketFactory, null, null);
-                        } else {
+                        } else if (username != null) {
+                            log.warn("Connecting Redis using hostname, port, username, password with SSL enabled", username);
                             jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                     Integer.valueOf(timeout), username, password, true);
+                        } else {
+                            log.warn("Connecting Default Redis using hostname, port and password");
+                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
                         }
-                        log.info("Redis connection completed...");
                     }
+                    log.info("Redis connection completed...");
                 }
             }
 
