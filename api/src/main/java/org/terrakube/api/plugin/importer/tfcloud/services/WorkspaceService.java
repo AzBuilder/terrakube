@@ -317,7 +317,7 @@ public class WorkspaceService {
                     workspace.getId().toString(), terraformStateJson, history.getId().toString());
         } catch (Exception e) {
             log.error(e.getMessage());
-            result += "<li><b>Warning:</b> The JSON state file was not available. This means you can still execute plan, apply, and destroy operations, but you will not be able to view the JSON output in the Terrakube UI. <a href='https://developer.hashicorp.com/terraform/cloud-docs/api-docs/state-versions' >This feature is accessible for workspaces utilizing Terraform v1.3.0 or later.<a>" + e.getMessage() + "</li>";
+            result += "<li><b>Warning:</b> The JSON state file was not available. This means you can still execute plan, apply, and destroy operations, but you will not be able to view the JSON output in the Terrakube UI. <a href='https://developer.hashicorp.com/terraform/cloud-docs/api-docs/state-versions' >This feature is accessible for workspaces utilizing Terraform v1.3.0 or later.</a> Error:" + e.getMessage() + "</li>";
             return result;
         }
 
