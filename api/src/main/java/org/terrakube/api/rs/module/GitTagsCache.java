@@ -87,7 +87,7 @@ public class GitTagsCache {
 
             synchronized (this) {
                 if (jedisPool == null) {
-                    if (hostname != null && port != null && password != null && username != null) {
+                    if (hostname != null && port != null && password != null) {
                         log.warn("Module Config: MaxTotal {} MaxIdle {} MinIdle {} Timeout {} Schedule {}", maxTotal,
                                 maxIdle, minIdle, timeout, schedule);
                         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
@@ -96,17 +96,17 @@ public class GitTagsCache {
                         jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
 
                         if (useSSL) {
-                            log.info("Connecting Redis using username and using SSL factory");
+                            log.warn("Connecting Redis using hostname, port, username, password and sslSocketFactory");
                             jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                     Integer.valueOf(timeout), Integer.valueOf(timeout), username, password, 0, null,
                                     true, sslSocketFactory, null, null);
                         } else {
                             if (username != null) {
-                                log.info("Connecting Redis using username and ssl {}", username);
+                                log.warn("Connecting Redis using hostname, port, username, password with SSL enabled", username);
                                 jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                         Integer.valueOf(timeout), username, password, true);
                             } else {
-                                log.info("Connecting Redis using default connection method");
+                                log.info("Connecting Default Redis using hostname, port and password");
                                 jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
                             }
                         }
