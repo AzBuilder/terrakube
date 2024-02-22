@@ -53,7 +53,7 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
                 issuer = jwtTypeInternal;
             }
         }catch (Exception ex){
-            log.error(ex.getMessage());
+            log.info(ex.getMessage());
         }
         switch (issuer) {
             case jwtTypePat:
