@@ -46,8 +46,9 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
     @Override
     public AuthenticationManager resolve(HttpServletRequest request) {
         ProviderManager providerManager = null;
-        String issuer = getIssuer(request);
+        String issuer = "";
         try{
+            issuer = getIssuer(request);
             if (isTokenDeleted(getTokenId(request))){
                 //FORCE TOKEN TO USE INTERNAL AUTH SO IT CAN ALWAYS FAIL
                 issuer = jwtTypeInternal;
