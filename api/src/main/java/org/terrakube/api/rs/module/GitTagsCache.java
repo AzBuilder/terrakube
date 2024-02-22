@@ -70,7 +70,7 @@ public class GitTagsCache {
                 && truststorePassword != null;
 
         String hostname = System.getenv("TerrakubeRedisHostname");
-        String username = getFromEnvOrDefault("TerrakubeRedisUsername", "default");
+        String username = getFromEnvOrDefault("TerrakubeRedisUsername", null);
         String port = System.getenv("TerrakubeRedisPort");
         String password = System.getenv("TerrakubeRedisPassword");
         String maxTotal = getFromEnvOrDefault("ModuleCacheMaxTotal", "128");
@@ -90,7 +90,6 @@ public class GitTagsCache {
                     if (hostname != null && port != null && password != null && username != null) {
                         log.warn("Module Config: MaxTotal {} MaxIdle {} MinIdle {} Timeout {} Schedule {}", maxTotal,
                                 maxIdle, minIdle, timeout, schedule);
-                        log.error("{} {} {} {}", hostname, port, username, password);
                         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
                         jedisPoolConfig.setMaxTotal(Integer.valueOf(maxTotal));
                         jedisPoolConfig.setMaxIdle(Integer.valueOf(maxIdle));
@@ -101,8 +100,12 @@ public class GitTagsCache {
                                     Integer.valueOf(timeout), Integer.valueOf(timeout), username, password, 0, null,
                                     true, sslSocketFactory, null, null);
                         } else {
-                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
-                                    Integer.valueOf(timeout), username, password, true);
+                            if (username != null) {
+                                jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
+                                        Integer.valueOf(timeout), username, password, true);
+                            } else {
+                                jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
+                            }
                         }
                         log.info("Redis connection completed...");
                     }
