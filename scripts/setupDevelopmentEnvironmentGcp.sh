@@ -52,7 +52,7 @@ function generateApiVars(){
   echo "TerrakubeRedisHostname=localhost" >> .envApi
   echo "TerrakubeRedisPort=6379" >> .envApi
   echo "TerrakubeRedisSSL=false" >> .envApi
-  echo "TerrakubeRedisUsername=default" >> .envApi
+  echo "#TerrakubeRedisUsername=default" >> .envApi
   echo "TerrakubeRedisPassword=password123456" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
