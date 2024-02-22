@@ -1,5 +1,7 @@
 package org.terrakube.api.plugin.security.authentication.dex;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
@@ -25,8 +27,7 @@ import org.terrakube.api.rs.token.pat.Pat;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Builder
 @Getter
@@ -78,14 +79,23 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
     }
 
     private String getIssuer(HttpServletRequest request) {
-        String token = request.getHeader("authorization").replace("Bearer ", "");
-        String withoutSignature = token.substring(0, token.lastIndexOf('.') + 1);
-        Jwt<Header, Claims> untrusted = Jwts.parserBuilder().build().parseClaimsJwt(withoutSignature);
-        log.debug("Token {}", token);
-        log.debug("Token Without Signature {}", withoutSignature);
-        log.debug("Issuer {}", untrusted.getBody().getIssuer());
+        Map<String, Object> jwtBodyMap = getJwtBodyData(request);
+        log.debug("Issuer {}", (String) jwtBodyMap.get("iss"));
+        return (String) jwtBodyMap.get("iss");
+    }
 
-        return untrusted.getBody().getIssuer();
+    private Map<String, Object> getJwtBodyData(HttpServletRequest request){
+        String tokenBase64 = request.getHeader("authorization").replace("Bearer ", "");
+        String[] tokenChunks = tokenBase64.split("\\.");
+        Base64.Decoder defaultDecoder = Base64.getDecoder();
+        String tokenBodyData = new String(defaultDecoder.decode(tokenChunks[1]));
+        Map<String,Object> jwtBodyMap = new HashMap();
+        try {
+            jwtBodyMap = new ObjectMapper().readValue(tokenBodyData, HashMap.class);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+        return jwtBodyMap;
     }
 
     private String getTokenId(HttpServletRequest request) {
