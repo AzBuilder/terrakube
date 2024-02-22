@@ -207,7 +207,7 @@ public class WorkspaceService {
         String result = "";
 
         // Create the workspace
-        log.info("Importing Workspace: {}" , workspaceImportRequest.getName());
+        log.info("Importing Workspace: {}", workspaceImportRequest.getName());
         Workspace workspace = createWorkspaceFromRequest(workspaceImportRequest);
         try {
             workspace = workspaceRepository.save(workspace);
@@ -229,10 +229,10 @@ public class WorkspaceService {
 
             importVariables(variablesImporter, workspace);
             log.info("Variables imported: {}", variablesImporter.size());
-            if(variablesImporter.size() > 0)
-              result += "<li>Variables imported successfully.</li>";
+            if (variablesImporter.size() > 0)
+                result += "<li>Variables imported successfully.</li>";
             else
-              result += "<li>No variables to import.</li>";
+                result += "<li>No variables to import.</li>";
         } catch (Exception e) {
             log.error(e.getMessage());
             result += "<li>There was an error importing the variables:" + e.getMessage() + "</li>";
@@ -243,10 +243,10 @@ public class WorkspaceService {
             List<TagAttributes> tags = getTags(apiToken, apiUrl, workspaceImportRequest.getId());
             importTags(tags, workspace);
             log.info("Tags imported: {}", tags.size());
-            if(tags.size() > 0)
-              result += "<li>Tags imported successfully.</li>";
+            if (tags.size() > 0)
+                result += "<li>Tags imported successfully.</li>";
             else
-              result += "<li>No tags to import.</li>";
+                result += "<li>No tags to import.</li>";
         } catch (Exception e) {
             log.error(e.getMessage());
             result += "<li>There was an error importing the tags:" + e.getMessage() + "</li>";
@@ -262,7 +262,6 @@ public class WorkspaceService {
             result += "<li>No state to import.</li>";
             return result;
         }
- 
 
         String stateDownloadUrl = lastState.getHostedStateDownloadUrl();
         String stateDownloadJsonUrl = lastState.getHostedJsonStateDownloadUrl();
@@ -284,42 +283,44 @@ public class WorkspaceService {
                         workspace.getId().toString(),
                         history.getId().toString()));
 
-        try{
-          historyRepository.save(history);
-          log.info("History created: {}", history.getId());
-        }
-        catch(Exception e){
+        try {
+            historyRepository.save(history);
+            log.info("History created: {}", history.getId());
+        } catch (Exception e) {
             log.error(e.getMessage());
             result += "<li>There was an error importing the state:" + e.getMessage() + "</li>";
         }
 
+        // Download state
         try {
-            Resource stateJson = downloadState(apiToken, stateDownloadJsonUrl);
             Resource state = downloadState(apiToken, stateDownloadUrl);
-            String terraformStateJson = "";
             String terraformState = "";
-            try {
-                terraformStateJson = readResourceToString(stateJson);
-                terraformState = readResourceToString(state);
-                log.info("State downloaded: {}", terraformState.length());
-                log.info("State JSON downloaded: {}", terraformStateJson.length());
-
-            } catch (IOException e) {
-                log.error(e.getMessage());
-                result += "<li>There was an error importing the state:" + e.getMessage() + "</li>";
-                return result;
-            }
-            storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(),
-                    workspace.getId().toString(), terraformStateJson, history.getId().toString());
-
+            terraformState = readResourceToString(state);
+            log.info("State downloaded: {}", terraformState.length());
             storageTypeService.uploadState(workspace.getOrganization().getId().toString(),
                     workspace.getId().toString(), terraformState);
-        } catch (Exception e) {
+            result += "<li>State imported successfully.</li>";
+
+        } catch (IOException e) {
             log.error(e.getMessage());
             result += "<li>There was an error importing the state:" + e.getMessage() + "</li>";
             return result;
         }
-        result += "<li>State imported successfully.</li>";
+
+        // Download JSON state
+        try {
+            Resource stateJson = downloadState(apiToken, stateDownloadJsonUrl);
+            String terraformStateJson = "";
+            terraformStateJson = readResourceToString(stateJson);
+            log.info("State JSON downloaded: {}", terraformStateJson.length());
+            storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(),
+                    workspace.getId().toString(), terraformStateJson, history.getId().toString());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            result += "<li><b>Warning:</b> The JSON state file was not available. This means you can still execute plan, apply, and destroy operations, but you will not be able to view the JSON output in the Terrakube UI. <a href='https://developer.hashicorp.com/terraform/cloud-docs/api-docs/state-versions' >This feature is accessible for workspaces utilizing Terraform v1.3.0 or later.<a>" + e.getMessage() + "</li>";
+            return result;
+        }
+
         return result;
     }
 
