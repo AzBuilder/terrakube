@@ -330,9 +330,8 @@ public class RemoteTfeService {
         }
 
         if (searchName.isPresent()) {
-            String searchNameData = searchTags.get();
-            List<String> listNames = Arrays.stream(searchNameData.split(",")).toList();
-            log.info("Searching workspaces with name: {}", listNames);
+            String searchNameData = searchName.get();
+            log.info("Searching workspaces with name prefix: {}", searchNameData);
             Optional<List<Workspace>> workspaceListByName = workspaceRepository.findWorkspacesByOrganizationNameAndNameStartingWith(organizationName, searchNameData);
             if(workspaceListByName.isPresent())
                 for (Workspace workspace : workspaceListByName.get()) {
