@@ -79,9 +79,10 @@ public class RemoteTfeController {
 
     @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/workspaces")
-    public ResponseEntity<WorkspaceList> listWorkspace(@PathVariable("organizationName") String organizationName, @RequestParam("search[tags]") String searchTags, Principal principal) {
-        log.info("Searching: {} {}", organizationName, searchTags);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName, searchTags, (JwtAuthenticationToken) principal)));
+    public ResponseEntity<WorkspaceList> listWorkspace(@PathVariable("organizationName") String organizationName, @RequestParam("search[tags]") Optional<String> searchTags, @RequestParam("search[name]") Optional<String> searchName,  Principal principal) {
+        log.info("Searching Tags: {} {}", organizationName, searchTags.isPresent() ? searchTags.get(): null);
+        log.info("Searching Names: {} {}", organizationName, searchName.isPresent() ? searchName.get(): null);
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.listWorkspace(organizationName, searchTags, searchName, (JwtAuthenticationToken) principal)));
     }
 
     @Transactional
