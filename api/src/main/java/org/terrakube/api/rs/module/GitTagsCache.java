@@ -96,14 +96,17 @@ public class GitTagsCache {
                         jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
 
                         if (useSSL) {
+                            log.info("Connecting Redis using username and using SSL factory");
                             jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                     Integer.valueOf(timeout), Integer.valueOf(timeout), username, password, 0, null,
                                     true, sslSocketFactory, null, null);
                         } else {
                             if (username != null) {
+                                log.info("Connecting Redis using username and ssl");
                                 jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                         Integer.valueOf(timeout), username, password, true);
                             } else {
+                                log.info("Connecting Redis using default connection method");
                                 jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
                             }
                         }
