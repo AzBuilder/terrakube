@@ -106,7 +106,7 @@ public class GitTagsCache {
                                 jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                         Integer.valueOf(timeout), username, password, true);
                             } else {
-                                log.info("Connecting Default Redis using hostname, port and password");
+                                log.warn("Connecting Default Redis using hostname, port and password");
                                 jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
                             }
                         }
