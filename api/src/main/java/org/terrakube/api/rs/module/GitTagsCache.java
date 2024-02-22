@@ -95,23 +95,21 @@ public class GitTagsCache {
                         jedisPoolConfig.setMaxIdle(Integer.valueOf(maxIdle));
                         jedisPoolConfig.setMinIdle(Integer.valueOf(minIdle));
 
-                        if (useSSL) {
+                        if (useSSL && username != null) {
                             log.warn("Connecting Redis using hostname, port, username, password and sslSocketFactory");
                             jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                     Integer.valueOf(timeout), Integer.valueOf(timeout), username, password, 0, null,
                                     true, sslSocketFactory, null, null);
+                        } else if (username != null) {
+                            log.warn("Connecting Redis using hostname, port, username, password with SSL enabled", username);
+                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
+                                    Integer.valueOf(timeout), username, password, true);
                         } else {
-                            if (username != null) {
-                                log.warn("Connecting Redis using hostname, port, username, password with SSL enabled", username);
-                                jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
-                                        Integer.valueOf(timeout), username, password, true);
-                            } else {
-                                log.warn("Connecting Default Redis using hostname, port and password");
-                                jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
-                            }
+                            log.warn("Connecting Default Redis using hostname, port and password");
+                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
                         }
-                        log.info("Redis connection completed...");
                     }
+                    log.info("Redis connection completed...");
                 }
             }
 
