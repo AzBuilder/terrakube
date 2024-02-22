@@ -304,26 +304,40 @@ public class RemoteTfeService {
 
     }
 
-    WorkspaceList listWorkspace(String organizationName, String searchTags, JwtAuthenticationToken currentUser) {
+    WorkspaceList listWorkspace(String organizationName, Optional<String> searchTags, Optional<String> searchName, JwtAuthenticationToken currentUser) {
         WorkspaceList workspaceList = new WorkspaceList();
         workspaceList.setData(new ArrayList());
 
-        List<String> listTags = Arrays.stream(searchTags.split(",")).toList();
-        log.info("Searching workspaces with tags: {}", searchTags);
-        for (Workspace workspace : organizationRepository.getOrganizationByName(organizationName).getWorkspace()) {
-            List<WorkspaceTag> workspaceTagList = workspace.getWorkspaceTag();
-            int matchingTags = 0;
+        if (searchTags.isPresent()) {
+            String searchTagData = searchTags.get();
+            List<String> listTags = Arrays.stream(searchTagData.split(",")).toList();
+            log.info("Searching workspaces with tags: {}", searchTags);
+            for (Workspace workspace : organizationRepository.getOrganizationByName(organizationName).getWorkspace()) {
+                List<WorkspaceTag> workspaceTagList = workspace.getWorkspaceTag();
+                int matchingTags = 0;
 
-            for (WorkspaceTag workspaceTag : workspaceTagList) {
-                Tag tag = tagRepository.getReferenceById(UUID.fromString(workspaceTag.getTagId()));
-                if (listTags.indexOf(tag.getName()) > -1) {
-                    matchingTags++;
+                for (WorkspaceTag workspaceTag : workspaceTagList) {
+                    Tag tag = tagRepository.getReferenceById(UUID.fromString(workspaceTag.getTagId()));
+                    if (listTags.indexOf(tag.getName()) > -1) {
+                        matchingTags++;
+                    }
+                }
+                log.info("Workspace {} Tags Count {} Searching Tag Quantity {} Matched {}", workspace.getName(), workspaceTagList.size(), listTags.size(), matchingTags);
+                if (matchingTags == listTags.size()) {
+                    workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
                 }
             }
-            log.info("Workspace {} Tags Count {} Searching Tag Quantity {} Matched {}", workspace.getName(), workspaceTagList.size(), listTags.size(), matchingTags);
-            if (matchingTags == listTags.size()) {
-                workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
-            }
+        }
+
+        if (searchName.isPresent()) {
+            String searchNameData = searchTags.get();
+            List<String> listNames = Arrays.stream(searchNameData.split(",")).toList();
+            log.info("Searching workspaces with name: {}", listNames);
+            Optional<List<Workspace>> workspaceListByName = workspaceRepository.findWorkspacesByOrganizationNameAndNameStartingWith(organizationName, searchNameData);
+            if(workspaceListByName.isPresent())
+                for (Workspace workspace : workspaceListByName.get()) {
+                        workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
+                }
         }
         return workspaceList;
     }
