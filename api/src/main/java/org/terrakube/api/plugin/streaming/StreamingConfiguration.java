@@ -52,20 +52,35 @@ public class StreamingConfiguration {
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory(StreamingProperties props, SSLSocketFactory sslSocketFactory) {
+        log.info("Redis Configuration=> User: {}, Hostname: {}, Port: {}, Ssl: {}",
+                (props.getUsername() != null && !props.getUsername().isEmpty()) ? props.getUsername(): "username is null",
+                props.getHostname(),
+                props.getPort(),
+                props.isSsl()
+        );
+
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
                 props.getHostname(), props.getPort());
         redisStandaloneConfiguration.setPassword(props.getPassword());
-        redisStandaloneConfiguration.setUsername(props.getUsername());
+
+        if( props.getUsername() != null && !props.getUsername().isEmpty()) {
+            log.info("Setting redis connection username");
+            redisStandaloneConfiguration.setUsername(props.getUsername());
+        } else {
+            log.info("Redis connection is not using username parameter");
+        }
 
         JedisConnectionFactory jedisConFactory;
 
         if (props.isSsl()) {
+            log.info("Setup Redis connection using SSL");
             JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration.builder().useSsl()
                     .sslSocketFactory(sslSocketFactory).build();
 
             jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration,
                     jedisClientConfiguration);
         } else {
+            log.info("Using default Redis connection");
             jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
         }
 
