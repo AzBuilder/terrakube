@@ -10,6 +10,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -53,14 +54,7 @@ public class RedisAutoConfiguration {
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory(RedisProperties redisProperties, SSLSocketFactory sslSocketFactory) {
-        String hostname = redisProperties.getHostname();
-        int port = redisProperties.getPort();
-        String username = redisProperties.getUsername();
-        String password = redisProperties.getPassword();
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
-                hostname, port);
-        redisStandaloneConfiguration.setPassword(password);
-        redisStandaloneConfiguration.setUsername(username);
+        RedisStandaloneConfiguration redisStandaloneConfiguration = getRedisStandaloneConfiguration(redisProperties);
 
         if (redisProperties.isSsl()) {
             JedisClientConfiguration clientConfiguration = JedisClientConfiguration
@@ -68,11 +62,35 @@ public class RedisAutoConfiguration {
                     .useSsl()
                     .sslSocketFactory(sslSocketFactory)
                     .build();
-
+            log.info("Redis connection with SSL configuration");
             return new JedisConnectionFactory(redisStandaloneConfiguration, clientConfiguration);
-        } else
+        } else {
+            log.info("Redis connection with default configuration");
             return new JedisConnectionFactory(redisStandaloneConfiguration);
+        }
 
+    }
+
+    @NotNull
+    private static RedisStandaloneConfiguration getRedisStandaloneConfiguration(RedisProperties redisProperties) {
+        String hostname = redisProperties.getHostname();
+        int port = redisProperties.getPort();
+        String username = redisProperties.getUsername();
+        String password = redisProperties.getPassword();
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
+                hostname, port);
+        redisStandaloneConfiguration.setPassword(password);
+
+        if (redisProperties.getUsername() != null && !redisProperties.getUsername().isEmpty())
+           redisStandaloneConfiguration.setUsername(username);
+
+        log.info("Redis User: {}, Hostname: {}, Port: {}, Ssl: {}",
+                (username != null && !username.isEmpty()) ? username: "NULL username",
+                hostname,
+                port,
+                redisProperties.isSsl()
+        );
+        return redisStandaloneConfiguration;
     }
 
     @Bean
