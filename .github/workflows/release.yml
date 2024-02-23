@@ -42,7 +42,7 @@ jobs:
     - name: docker build ui
       working-directory: ./ui
       run: |
-        docker build -t terrakube-ui:latest  . 
+        docker build --build-arg REACT_APP_TERRAKUBE_VERSION=v$VERSION -t terrakube-ui:latest  . 
         
     - name: docker login
       env:

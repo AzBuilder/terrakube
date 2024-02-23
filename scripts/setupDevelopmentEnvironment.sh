@@ -153,6 +153,7 @@ function generateUiVars(){
 
   REACT_CONFIG_CLIENT_ID="example-app"
   REACT_CONFIG_SCOPE="email openid profile offline_access groups"
+  REACT_APP_TERRAKUBE_VERSION=v$(git describe --tags --abbrev=0)
 
   rm -f .envUi
 
@@ -162,6 +163,7 @@ function generateUiVars(){
   echo "REACT_APP_REDIRECT_URI=$REACT_CONFIG_REDIRECT" >>.envUi;
   echo "REACT_APP_REGISTRY_URI=$REACT_CONFIG_REGISTRY_URI" >>.envUi;
   echo "REACT_APP_SCOPE"=$REACT_CONFIG_SCOPE >>.envUi
+  echo "REACT_APP_TERRAKUBE_VERSION"=$REACT_APP_TERRAKUBE_VERSION >>.envUi
 
   generateUiConfigFile
 }
