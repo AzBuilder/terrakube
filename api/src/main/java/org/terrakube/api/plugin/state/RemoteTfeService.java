@@ -247,6 +247,10 @@ public class RemoteTfeService {
             attributes.put("execution-mode", workspace.get().getExecutionMode());
             attributes.put("global-remote-state", true);
 
+            if (workspace.get().getFolder() != null && workspace.get().getVcs() != null && !workspace.get().getFolder().equals("/")){
+                attributes.put("working-directory", workspace.get().getFolder());
+            }
+
             boolean isManageWorkspace = validateUserManageWorkspace(workspace.get().getOrganization(), currentUser);
 
             Map<String, Boolean> defaultAttributes = new HashMap<>();
