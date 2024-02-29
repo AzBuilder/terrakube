@@ -1198,6 +1198,7 @@ function setupWorkspaceIncludes(
   setHistory(history);
   setSchedule(schedule);
 
+  console.log(`Parsing state for worksapce ${data.id} `);
   // set state data
   var lastState = history
     .sort((a, b) => a.jobReference - b.jobReference)
@@ -1205,17 +1206,29 @@ function setupWorkspaceIncludes(
   // reload state only if there is a new version
   console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
-    loadState(lastState, axiosInstance, setOutputs, setResources);
+    loadState(lastState, axiosInstance, setOutputs, setResources, data.id);
   }
   setCurrentStateId(lastState?.id);
 }
 
-function loadState(state, axiosInstance, setOutputs, setResources) {
+function loadState(state, axiosInstance, setOutputs, setResources, workspaceId) {
   if (!state) {
     return;
   }
+
+  var currentState;
+  axiosInstance.get(`https://${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`).then((currentStateData) => {
+      currentState = JSON.parse(currentStateData)
+  }).catch(function (error) {console.error(error)});
+
+
   axiosInstance.get(state.output).then((resp) => {
     var result = parseState(resp.data);
+
+    if(result.length < 1){
+      console.log("Parsing state using current state data instead of json representation")
+      result = parseOldState(currentState)
+    }
     console.log("result", result);
     setResources(result.resources);
     setOutputs(result.outputs);
@@ -1293,6 +1306,69 @@ function parseState(state) {
     });
   } else {
     console.log("State has no child modules resources");
+  }
+
+  return { resources: resources, outputs: outputs };
+}
+
+function parseOldState(state) {
+  var resources = [];
+  var outputs = [];
+  console.log("Current State Data using fallback parsing method");
+  console.log(state);
+
+  console.log("Parsing outputs fallback method");
+  if (state?.outputs != null) {
+    for (const [key, value] of Object.entries(state?.outputs)) {
+      if (typeof value.type === "string") {
+        console.log(typeof value.type);
+        outputs.push({
+          name: key,
+          type: value.type,
+          value: value.value,
+        });
+      } else {
+        console.log(typeof value.type);
+        const jsonObject = JSON.stringify(value.value);
+        console.log(jsonObject);
+        outputs.push({
+          name: key,
+          type: "Other type",
+          value: jsonObject,
+        });
+      }
+    }
+  } else {
+    console.log("State has no outputs");
+  }
+
+  console.log("Parsing resources and modules fallback method");
+  if (state?.resources != null && state?.resources.length > 0) {
+    state?.resources.forEach((value) => {
+      if(value.module != null) {
+        value.push({
+          name: value.name,
+          type: value.type,
+          provider: value.provider.replace("provider[","").replace("]",""),
+          module: value.module,
+          values: value.instances[0].attributes,
+          depends_on: value.instances[0].dependencies,
+        });
+      } else {
+        value.push({
+          name: value.name,
+          type: value.type,
+          provider: value.provider.replace("provider[","").replace("]",""),
+          module: "root_module",
+          values: value.instances[0].attributes,
+          depends_on: value.instances[0].dependencies,
+        });
+      }
+
+    });
+
+  } else {
+    console.log("State has no resources/modules");
   }
 
   return { resources: resources, outputs: outputs };
