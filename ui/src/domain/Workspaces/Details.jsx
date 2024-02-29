@@ -1367,7 +1367,7 @@ function parseOldState(state) {
         resources.push({
           name: value.name,
           type: value.type,
-          provider: value.provider.replace("provider[","").replace("]",""),
+          provider: value.provider.replace("provider[\"","").replace("\"]",""),
           module: "root_module",
           values: value.instances[0].attributes,
           depends_on: value.instances[0].dependencies,
