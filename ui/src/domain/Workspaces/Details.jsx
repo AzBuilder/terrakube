@@ -1198,7 +1198,7 @@ function setupWorkspaceIncludes(
   setHistory(history);
   setSchedule(schedule);
 
-  console.log(`Parsing state for worksapce ${data.id} `);
+  console.log(`Parsing state for workspace ${localStorage.getItem(WORKSPACE_ARCHIVE)} `);
   // set state data
   var lastState = history
     .sort((a, b) => a.jobReference - b.jobReference)
@@ -1206,7 +1206,7 @@ function setupWorkspaceIncludes(
   // reload state only if there is a new version
   console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
-    loadState(lastState, axiosInstance, setOutputs, setResources, data.id);
+    loadState(lastState, axiosInstance, setOutputs, setResources, localStorage.getItem(WORKSPACE_ARCHIVE));
   }
   setCurrentStateId(lastState?.id);
 }
@@ -1217,21 +1217,30 @@ function loadState(state, axiosInstance, setOutputs, setResources, workspaceId) 
   }
 
   var currentState;
-  axiosInstance.get(`https://${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`).then((currentStateData) => {
-      currentState = JSON.parse(currentStateData)
-  }).catch(function (error) {console.error(error)});
-
+  var organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
 
   axiosInstance.get(state.output).then((resp) => {
     var result = parseState(resp.data);
 
-    if(result.length < 1){
-      console.log("Parsing state using current state data instead of json representation")
-      result = parseOldState(currentState)
+    if(result.outputs.length < 1 && result.resources.length < 1){
+      axiosInstance.get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`).then((currentStateData) => {
+        console.log("Current State Data")
+        console.log(currentStateData.data)
+        currentState = currentStateData.data
+
+        console.log("Parsing state using current state data instead of json representation")
+        result = parseOldState(currentState)
+
+        console.log("result parsing state", result);
+        setResources(result.resources);
+        setOutputs(result.outputs);
+      }).catch(function (error) {console.error(error)});
+
+    } else {
+      console.log("result parsing state", result);
+      setResources(result.resources);
+      setOutputs(result.outputs);
     }
-    console.log("result", result);
-    setResources(result.resources);
-    setOutputs(result.outputs);
   });
 }
 
@@ -1346,7 +1355,7 @@ function parseOldState(state) {
   if (state?.resources != null && state?.resources.length > 0) {
     state?.resources.forEach((value) => {
       if(value.module != null) {
-        value.push({
+        resources.push({
           name: value.name,
           type: value.type,
           provider: value.provider.replace("provider[","").replace("]",""),
@@ -1355,7 +1364,7 @@ function parseOldState(state) {
           depends_on: value.instances[0].dependencies,
         });
       } else {
-        value.push({
+        resources.push({
           name: value.name,
           type: value.type,
           provider: value.provider.replace("provider[","").replace("]",""),
@@ -1370,6 +1379,8 @@ function parseOldState(state) {
   } else {
     console.log("State has no resources/modules");
   }
+
+  console.log({ resources: resources, outputs: outputs })
 
   return { resources: resources, outputs: outputs };
 }
