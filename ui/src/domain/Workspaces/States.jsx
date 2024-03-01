@@ -22,7 +22,6 @@ export const States = ({
 }) => {
   const [currentState, setCurrentState] = useState({});
   const [stateContent, setStateContent] = useState("");
-  const [rawStateContent, setRawStateContent] = useState("");
   const [activeTab, setactivetab] = useState("diagram");
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
@@ -161,27 +160,16 @@ export const States = ({
 
     const apiDomain = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL)
       .hostname;
-    if (state.output.includes(apiDomain)) {
+    if (state.output.includes(apiDomain))
       axiosInstance
-          .get(state.output)
-          .then((resp) => {
-            setStateContent(JSON.stringify(resp.data, null, "\t"));
-            loadData(resp);
-          })
-          .catch((err) =>
-              setStateContent(`{"error":"Failed to load state ${err}"}`)
-          );
-
-      axiosInstance
-          .get(state.output.replace(".json",".raw.json"))
-          .then((resp) => {
-            setStateContent(JSON.stringify(resp.data, null, "\t"));
-            loadData(resp);
-          })
-          .catch((err) =>
-              setRawStateContent(`{"error":"Failed to load raw state ${err}"}`)
-          );
-    }
+        .get(state.output)
+        .then((resp) => {
+          setStateContent(JSON.stringify(resp.data, null, "\t"));
+          loadData(resp);
+        })
+        .catch((err) =>
+          setStateContent(`{"error":"Failed to load state ${err}"}`)
+        );
     else
       axiosClient
         .get(state.output)
