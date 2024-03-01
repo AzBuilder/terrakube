@@ -9,11 +9,21 @@ import {
   InputNumber,
   Typography,
   Alert,
+  Row,
+  Col,
+  Card,
+  Tag,
+  Popconfirm,
 } from "antd";
 import "./UserSettings.css";
 import { axiosClientAuth } from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import {
+  InfoCircleOutlined,
+  DeleteOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 export const Tokens = () => {
   const { orgid } = useParams();
   const [tokens, setTokens] = useState([]);
@@ -61,6 +71,16 @@ export const Tokens = () => {
       });
   };
 
+  const onDelete = (id) => {
+    console.log("deleted " + id);
+    axiosClientAuth
+      .delete(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1/${id}`)
+      .then((response) => {
+        console.log(response);
+        loadTokens();
+      });
+  };
+
   const loadTokens = () => {
     axiosClientAuth
       .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1`)
@@ -95,21 +115,60 @@ export const Tokens = () => {
         <List
           itemLayout="horizontal"
           dataSource={tokens}
+          split={false}
           renderItem={(item) => (
             <List.Item>
               <List.Item.Meta
-                title={item.description}
                 description={
-                  <span>
-                    Created{" "}
-                    <b>{DateTime.fromISO(item.createdDate).toRelative()}</b> by
-                    user <b>{item.createdBy}</b> and expires{" "}
-                    <b>
-                      {DateTime.fromISO(item.createdDate)
-                        .plus({ days: item.days })
-                        .toLocaleString(DateTime.DATETIME_MED)}
-                    </b>
-                  </span>
+                  <Card style={{ width: "100%" }}>
+                    <Row>
+                      <Col span={23}>
+                        <h3>{item.description}</h3>
+                      </Col>
+                      <Col span={1}>
+                        <Popconfirm
+                          onConfirm={() => {
+                            onDelete(item.id);
+                          }}
+                          style={{ width: "20px" }}
+                          title={
+                            <p>
+                              This operation is irreversible.<br/>
+                              Are you sure you want to proceed? <br />
+                            </p>
+                          }
+                          okText="Yes"
+                          cancelText="No"
+                        >
+                          <Button icon={<DeleteOutlined />}></Button>
+                        </Popconfirm>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={20}>
+                        <Tag
+                          icon={<ExclamationCircleOutlined />}
+                          color="warning"
+                        >
+                          {" "}
+                          <b>
+                            Expires{" "}
+                            {DateTime.fromISO(item.createdDate)
+                              .plus({ days: item.days })
+                              .toLocaleString(DateTime.DATETIME_MED)}
+                          </b>
+                        </Tag>
+                      </Col>
+                    </Row>
+                    <br />
+                    <Row>
+                      <Col span={20} style={{ color: "rgb(82, 87, 97)" }}>
+                        <ClockCircleOutlined /> Created{" "}
+                        <b>{DateTime.fromISO(item.createdDate).toRelative()}</b>{" "}
+                        by user <b>{item.createdBy}</b>
+                      </Col>
+                    </Row>
+                  </Card>
                 }
               />
             </List.Item>
