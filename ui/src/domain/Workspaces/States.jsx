@@ -302,14 +302,7 @@ export const States = ({
                     onMount={handleEditorDidMount}
                     defaultLanguage="json"
                     defaultValue={stateContent}
-                  />,
-                  <Editor
-                  height="60vh"
-                  options={{ readOnly: "true" }}
-                  onMount={handleEditorDidMount}
-                  defaultLanguage="json"
-                  defaultValue={rawStateContent}
-                 />
+                  />
                 )}
               </Card>
             </Col>
