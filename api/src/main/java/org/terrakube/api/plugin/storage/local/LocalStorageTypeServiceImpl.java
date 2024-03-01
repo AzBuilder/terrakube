@@ -30,7 +30,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     private static final String NO_DATA_FOUND = "";
     private static final String NO_CONTEXT_FOUND = "{}";
     private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate";
-    private static final String LOCAL_HISTORY_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/state/%s.raw.json";
+    private static final String LOCAL_HISTORY_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/state/%s.raw.json";
 
     @Override
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
