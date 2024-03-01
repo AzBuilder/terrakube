@@ -11,12 +11,21 @@ import {
   InputNumber,
   Typography,
   Alert,
-  Avatar,
+  Row,
   Tooltip,
+  Col,
+  Popconfirm,
+  Tag,
+  Card
 } from "antd";
 import axiosInstance, { axiosClientAuth } from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
-import { InfoCircleOutlined, LockOutlined } from "@ant-design/icons";
+import {
+  InfoCircleOutlined,
+  DeleteOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
 const { DateTime } = require("luxon");
 const { Paragraph } = Typography;
@@ -133,6 +142,16 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     } else {
       onCreate(values);
     }
+  };
+
+  const onDelete = (id) => {
+    console.log("deleted " + id);
+    axiosClientAuth
+      .delete(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/${id}`)
+      .then((response) => {
+        console.log(response);
+        loadTokens();
+      });
   };
 
   const onCancel = () => {
@@ -344,24 +363,59 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
-                    title={item.description}
-                    avatar={
-                      <Avatar
-                        style={{ backgroundColor: "#1890ff" }}
-                        icon={<LockOutlined />}
-                      ></Avatar>
-                    }
                     description={
-                      <span>
-                        Created{" "}
-                        <b>{DateTime.fromISO(item.createdDate).toRelative()}</b>{" "}
-                        by user <b>{item.createdBy}</b> and expires{" "}
-                        <b>
-                          {DateTime.fromISO(item.createdDate)
-                            .plus({ days: item.days, hours: item.hours, minutes: item.minutes })
-                            .toLocaleString(DateTime.DATETIME_MED)}
-                        </b>
-                      </span>
+                      <Card style={{ width: "100%" }}>
+                        <Row>
+                          <Col span={23}>
+                            <h3>{item.description}</h3>
+                          </Col>
+                          <Col span={1}>
+                            <Popconfirm
+                              onConfirm={() => {
+                                onDelete(item.id);
+                              }}
+                              style={{ width: "20px" }}
+                              title={
+                                <p>
+                                  This operation is irreversible.
+                                  <br />
+                                  Are you sure you want to proceed? <br />
+                                </p>
+                              }
+                              okText="Yes"
+                              cancelText="No"
+                            >
+                              <Button icon={<DeleteOutlined />}></Button>
+                            </Popconfirm>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col span={20}>
+                            <Tag
+                              icon={<ExclamationCircleOutlined />}
+                              color="warning"
+                            >
+                              {" "}
+                              <b>
+                                Expires{" "}
+                                {DateTime.fromISO(item.createdDate)
+                                  .plus({ days: item.days })
+                                  .toLocaleString(DateTime.DATETIME_MED)}
+                              </b>
+                            </Tag>
+                          </Col>
+                        </Row>
+                        <br />
+                        <Row>
+                          <Col span={20} style={{ color: "rgb(82, 87, 97)" }}>
+                            <ClockCircleOutlined /> Created{" "}
+                            <b>
+                              {DateTime.fromISO(item.createdDate).toRelative()}
+                            </b>{" "}
+                            by user <b>{item.createdBy}</b>
+                          </Col>
+                        </Row>
+                      </Card>
                     }
                   />
                 </List.Item>
@@ -392,7 +446,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
             <Space style={{ width: "100%" }} direction="vertical">
               <Form
                 name="tokens"
-                initialValues={{ minutes: 0, hours: 0, days:0 }}
+                initialValues={{ minutes: 0, hours: 0, days: 0 }}
                 form={formToken}
                 layout="vertical"
               >
