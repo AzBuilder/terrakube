@@ -497,7 +497,7 @@ public class RemoteTfeService {
 
         if (terraformState != null) {
             //upload state to backend storage
-            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState);
+            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState, history.getId().toString());
         } else {
             log.warn("State field is empty, workspace state should be uploaded, creating new archive ...");
             Archive archiveState = new Archive();

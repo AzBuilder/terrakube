@@ -142,18 +142,25 @@ public class GcpTerraformStateImpl implements TerraformState {
     }
 
     @Override
-    public void saveStateJson(TerraformJob terraformJob, String applyJSON) {
+    public void saveStateJson(TerraformJob terraformJob, String applyJSON, String rawState) {
         if (applyJSON != null) {
             String stateFilename = UUID.randomUUID().toString();
             String blobKey = String.format("tfstate/%s/%s/state/%s.json", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename);
+            String rawBlobKey = String.format("tfstate/%s/%s/state/%s.raw.json", terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename);
             log.info("terraformGcpStateFile: {}", blobKey);
+            log.info("terraformGcpRawStateFile: {}", rawBlobKey);
 
             String utf8EncodedString = StringUtils.newStringUtf8(StringUtils.getBytesUtf8(applyJSON));
+            String rawUtf8EncodedString = StringUtils.newStringUtf8(StringUtils.getBytesUtf8(rawState));
 
             BlobId blobId = BlobId.of(bucketName, blobKey);
+            BlobId rawBlobId = BlobId.of(bucketName, rawBlobKey);
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+            BlobInfo rawBlobInfo = BlobInfo.newBuilder(rawBlobId).build();
             storage.create(blobInfo, utf8EncodedString.getBytes());
+            storage.create(rawBlobInfo, rawUtf8EncodedString.getBytes());
             log.info("File uploaded to bucket {} as {}", bucketName, blobKey);
+            log.info("File uploaded to bucket {} as {}", bucketName, rawBlobKey);
 
             HistoryRequest historyRequest = new HistoryRequest();
             History newHistory = new History();

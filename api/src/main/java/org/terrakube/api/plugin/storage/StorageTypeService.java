@@ -15,7 +15,7 @@ public interface StorageTypeService {
 
     byte[] getCurrentTerraformState(String organizationId, String workspaceId);
 
-    void uploadState(String organizationId, String workspaceId, String terraformState);
+    void uploadState(String organizationId, String workspaceId, String terraformState, String historyId);
 
     String saveContext(int jobId, String jobContext);
 

@@ -284,7 +284,7 @@ public class WorkspaceService {
                         history.getId().toString()));
 
         try {
-            historyRepository.save(history);
+            history = historyRepository.save(history);
             log.info("History created: {}", history.getId());
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -298,7 +298,7 @@ public class WorkspaceService {
             terraformState = readResourceToString(state);
             log.info("State downloaded: {}", terraformState.length());
             storageTypeService.uploadState(workspace.getOrganization().getId().toString(),
-                    workspace.getId().toString(), terraformState);
+                    workspace.getId().toString(), terraformState, history.getId().toString());
             result += "<li>State imported successfully.</li>";
 
         } catch (IOException e) {

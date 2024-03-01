@@ -126,7 +126,7 @@ public class LocalTerraformStateImpl implements TerraformState {
     }
 
     @Override
-    public void saveStateJson(TerraformJob terraformJob, String applyJSON) {
+    public void saveStateJson(TerraformJob terraformJob, String applyJSON, String rawState) {
         if (applyJSON != null) {
             String stateFilenameUUID = UUID.randomUUID().toString();
             String stateFileName = String.format(LOCAL_PLAN_DIRECTORY_JSON, terraformJob.getOrganizationId(),
@@ -138,8 +138,14 @@ public class LocalTerraformStateImpl implements TerraformState {
                             FilenameUtils.separatorsToSystem(
                                     stateFileName)));
 
+            File localRawStateFile = new File(FileUtils.getUserDirectoryPath()
+                    .concat(
+                            FilenameUtils.separatorsToSystem(
+                                    stateFileName.replace(".json", ".raw.json"))));
+
             try {
                 FileUtils.writeStringToFile(localStateFile, applyJSON, Charset.defaultCharset());
+                FileUtils.writeStringToFile(localRawStateFile, rawState, Charset.defaultCharset());
 
                 String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(),
                         terraformJob.getWorkspaceId(), stateFilenameUUID);

@@ -160,19 +160,29 @@ public class AwsTerraformStateImpl implements TerraformState {
     }
 
     @Override
-    public void saveStateJson(TerraformJob terraformJob, String applyJSON) {
+    public void saveStateJson(TerraformJob terraformJob, String applyJSON, String rawState) {
         if (applyJSON != null) {
             String stateFilename = UUID.randomUUID().toString();
             String blobKey = "tfstate/" + terraformJob.getOrganizationId() + "/" + terraformJob.getWorkspaceId() + "/state/" + stateFilename + ".json";
+            String blobKeyRaw = "tfstate/" + terraformJob.getOrganizationId() + "/" + terraformJob.getWorkspaceId() + "/state/" + stateFilename + ".raw.json";
             log.info("terraformStateFile: {}", blobKey);
+            log.info("terraformRawStateFile: {}", blobKeyRaw);
 
             byte[] bytes = StringUtils.getBytesUtf8(applyJSON);
+            byte[] rawBytes = StringUtils.getBytesUtf8(rawState);
             String utf8EncodedString = StringUtils.newStringUtf8(bytes);
+            String rawUtf8EncodedString = StringUtils.newStringUtf8(rawBytes);
 
             s3client.putObject(
                     bucketName,
                     blobKey,
                     utf8EncodedString
+            );
+
+            s3client.putObject(
+                    bucketName,
+                    blobKeyRaw,
+                    rawUtf8EncodedString
             );
 
             String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename);
