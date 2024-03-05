@@ -44,6 +44,7 @@ export const States = ({
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor;
   }
+
   const showDrawer = (record) => {
     setOpen(true);
     setResource(record);
@@ -171,7 +172,8 @@ export const States = ({
           //GET RAW STATE BASICALLY JUST ADDING .raw.json
           axiosInstance.get(state.output.replace(".json",".raw.json"))
               .then((response) => {
-                setRawStateContent(JSON.stringify(response.data, null, "\t"))
+                console.log("Downloading raw state successful...")
+                setRawStateContent(JSON.stringify(response.data, null, "\t"));
               }).catch((err) =>{
             setStateContent(`{"error":"Failed to load raw state${err}"}`)
           })
@@ -200,8 +202,8 @@ export const States = ({
       tab: "code",
     },
     {
-      key: "rawState",
-      tab: "rawState",
+      key: "raw",
+      tab: "raw",
     },
   ];
 
@@ -277,6 +279,7 @@ export const States = ({
                 tabList={tabs}
                 activeTabKey={activeTab}
                 onTabChange={(key) => {
+                  console.log(key)
                   onTabChange(key);
                 }}
               >
@@ -296,7 +299,7 @@ export const States = ({
                       <Background />
                     </ReactFlow>
                   </div>
-                ) : activeTab === "rawState" ? (
+                ) : activeTab === "raw" ? (
                     <Editor
                         height="60vh"
                         options={{ readOnly: "true" }}
