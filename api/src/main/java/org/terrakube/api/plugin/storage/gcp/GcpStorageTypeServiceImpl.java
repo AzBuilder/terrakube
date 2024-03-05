@@ -88,17 +88,13 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
         String currentStateKey = String.format(GCP_STATE_JSON, organizationId, workspaceId, stateJsonHistoryId);
         log.info("Define new Json State File: {}", currentStateKey);
 
-        BlobId blobId = BlobId.of(bucketName, currentStateKey);
-        Blob blob = storage.get(blobId);
-        if (blob != null) {
-            log.info("Creating new JSON state...");
-            try {
-                WritableByteChannel channel = blob.writer();
-                channel.write(ByteBuffer.wrap(stateJson.getBytes(Charset.defaultCharset())));
-                channel.close();
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
+        BlobId blobJsonId = BlobId.of(bucketName, currentStateKey);
+        try {
+            log.info("creating new json state history...");
+            BlobInfo blobJsonStateHistory = BlobInfo.newBuilder(blobJsonId).build();
+            storage.create(blobJsonStateHistory, stateJson.getBytes(Charset.defaultCharset()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 
@@ -128,9 +124,8 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
         BlobId blobId = BlobId.of(bucketName, currentStateKey);
         BlobId rawBlobId = BlobId.of(bucketName, rawStateKey);
         Blob blob = storage.get(blobId);
-        Blob rawBlob = storage.get(rawBlobId);
         if (blob != null) {
-            log.info("State does not exists...");
+            log.info("State does exists...");
             try {
                 WritableByteChannel channel = blob.writer();
                 channel.write(ByteBuffer.wrap(terraformState.getBytes(Charset.defaultCharset())));
@@ -139,21 +134,19 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
                 log.error(e.getMessage());
             }
         } else {
-            log.info("Updating state...");
+            log.info("Creating new state...");
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
             storage.create(blobInfo, terraformState.getBytes(Charset.defaultCharset()));
         }
 
-        if (rawBlob != null) {
-            log.info("history raw does not exists...");
-            try {
-                WritableByteChannel channel = rawBlob.writer();
-                channel.write(ByteBuffer.wrap(terraformState.getBytes(Charset.defaultCharset())));
-                channel.close();
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
+        try {
+            log.info("creating new raw state history...");
+            BlobInfo blobRawStateHistory = BlobInfo.newBuilder(rawBlobId).build();
+            storage.create(blobRawStateHistory, terraformState.getBytes(Charset.defaultCharset()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
+
     }
 
     @Override
