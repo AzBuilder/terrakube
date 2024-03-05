@@ -22,6 +22,7 @@ export const States = ({
 }) => {
   const [currentState, setCurrentState] = useState({});
   const [stateContent, setStateContent] = useState("");
+  const [rawStateContent, setRawStateContent] = useState("");
   const [activeTab, setactivetab] = useState("diagram");
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
@@ -166,6 +167,14 @@ export const States = ({
         .then((resp) => {
           setStateContent(JSON.stringify(resp.data, null, "\t"));
           loadData(resp);
+
+          //GET RAW STATE BASICALLY JUST ADDING .raw.json
+          axiosInstance.get(state.output.replace(".json",".raw.json"))
+              .then((response) => {
+                setRawStateContent(JSON.stringify(response.data, null, "\t"))
+              }).catch((err) =>{
+            setStateContent(`{"error":"Failed to load raw state${err}"}`)
+          })
         })
         .catch((err) =>
           setStateContent(`{"error":"Failed to load state ${err}"}`)
@@ -189,6 +198,10 @@ export const States = ({
     {
       key: "code",
       tab: "code",
+    },
+    {
+      key: "rawState",
+      tab: "rawState",
     },
   ];
 
@@ -283,6 +296,14 @@ export const States = ({
                       <Background />
                     </ReactFlow>
                   </div>
+                ) : activeTab === "rawState" ? (
+                    <Editor
+                        height="60vh"
+                        options={{ readOnly: "true" }}
+                        onMount={handleEditorDidMount}
+                        defaultLanguage="json"
+                        defaultValue={rawStateContent}
+                    />
                 ) : (
                   <Editor
                     height="60vh"
@@ -291,7 +312,9 @@ export const States = ({
                     defaultLanguage="json"
                     defaultValue={stateContent}
                   />
-                )}
+                )
+
+                }
               </Card>
             </Col>
           </Row>
