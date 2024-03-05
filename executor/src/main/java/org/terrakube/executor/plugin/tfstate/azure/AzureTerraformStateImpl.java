@@ -119,7 +119,7 @@ public class AzureTerraformStateImpl implements TerraformState {
             }
             String stateFilename = UUID.randomUUID().toString();
             String blobName = terraformJob.getOrganizationId() + "/" + terraformJob.getWorkspaceId() + "/state/" + stateFilename + ".json";
-            String blobRawName = terraformJob.getOrganizationId() + "/" + terraformJob.getWorkspaceId() + "/state/" + stateFilename + "raw.json";
+            String blobRawName = terraformJob.getOrganizationId() + "/" + terraformJob.getWorkspaceId() + "/state/" + stateFilename + ".raw.json";
             log.info("terraform state file: {}", blobName);
             log.info("terraform raw state file: {}", blobRawName);
             BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
