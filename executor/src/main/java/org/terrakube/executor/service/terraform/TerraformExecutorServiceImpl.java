@@ -323,14 +323,21 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             throws IOException, ExecutionException, InterruptedException {
         log.info("Running Terraform show");
         TextStringBuilder jsonState = new TextStringBuilder();
+        TextStringBuilder rawTfState = new TextStringBuilder();
         Consumer<String> applyJSON = getStringConsumer(jsonState);
+        Consumer<String> rawStateJSON = getStringConsumer(rawTfState);
         TerraformProcessData terraformProcessData = getTerraformProcessData(terraformJob, workingDirectory);
         terraformProcessData.setTerraformVariables(new HashMap());
         terraformProcessData.setTerraformEnvironmentVariables(new HashMap());
-        Boolean showPlan = terraformClient.show(terraformProcessData, applyJSON, applyJSON).get();
-        if (Boolean.TRUE.equals(showPlan)) {
+        Boolean showJsonState = terraformClient.show(terraformProcessData, applyJSON, applyJSON).get();
+        Boolean showRawState = terraformClient.statePull(terraformProcessData, rawStateJSON, rawStateJSON).get();
+
+        if (Boolean.TRUE.equals(showRawState))
+            terraformJob.setRawState(rawStateJSON.toString());
+
+        if (Boolean.TRUE.equals(showJsonState)) {
             log.info("Uploading terraform state json");
-            terraformState.saveStateJson(terraformJob, jsonState.toString());
+            terraformState.saveStateJson(terraformJob, jsonState.toString(), rawTfState.toString());
 
             TextStringBuilder jsonOutput = new TextStringBuilder();
             Consumer<String> terraformJsonOutput = getStringConsumer(jsonOutput);
@@ -339,6 +346,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             Boolean showOutput = terraformClient.output(terraformProcessData, terraformJsonOutput, terraformJsonOutput).get();
             if (Boolean.TRUE.equals(showOutput))
                 terraformJob.setTerraformOutput(jsonOutput.toString());
+
         }
     }
 

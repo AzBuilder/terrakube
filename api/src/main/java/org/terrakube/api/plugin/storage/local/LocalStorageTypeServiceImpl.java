@@ -30,6 +30,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     private static final String NO_DATA_FOUND = "";
     private static final String NO_CONTEXT_FOUND = "{}";
     private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate";
+    private static final String LOCAL_HISTORY_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/state/%s.raw.json";
 
     @Override
     public byte[] getStepOutput(String organizationId, String jobId, String stepId) {
@@ -73,13 +74,18 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
-    public void uploadState(String organizationId, String workspaceId, String terraformState) {
+    public void uploadState(String organizationId, String workspaceId, String terraformState, String historyId) {
         try {
             String newStateFile = String.format(LOCAL_BACKEND_DIRECTORY, organizationId, workspaceId);
+            String newRawStateFile = String.format(LOCAL_HISTORY_BACKEND_DIRECTORY, organizationId, workspaceId, historyId);
             log.info("newFilename: {}", newStateFile);
+            log.info("newRawFilename: {}", newRawStateFile);
             File stateFile = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(newStateFile)));
+            File rawStateFile = new File(FileUtils.getUserDirectoryPath().concat(FilenameUtils.separatorsToSystem(newRawStateFile)));
             FileUtils.forceMkdir(stateFile.getParentFile());
+            FileUtils.forceMkdir(rawStateFile.getParentFile());
             FileUtils.writeStringToFile(stateFile, terraformState, Charset.defaultCharset().toString());
+            FileUtils.writeStringToFile(rawStateFile, terraformState, Charset.defaultCharset().toString());
         } catch (IOException e) {
             log.error(e.getMessage());
         }

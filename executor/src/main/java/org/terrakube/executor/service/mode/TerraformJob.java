@@ -25,6 +25,7 @@ public class TerraformJob {
     private String vcsType;
     private String accessToken;
     private String terraformOutput;
+    private String rawState;
     private boolean showHeader;
     private boolean refresh;
     private boolean refreshOnly;

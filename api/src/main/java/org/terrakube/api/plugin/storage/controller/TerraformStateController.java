@@ -66,7 +66,8 @@ public class TerraformStateController {
             storageTypeService.uploadState(
                     archiveData.getHistory().getWorkspace().getOrganization().getId().toString(),
                     archiveData.getHistory().getWorkspace().getId().toString(),
-                    terraformState
+                    terraformState,
+                    archiveData.getHistory().getId().toString()
             );
             archiveRepository.deleteById(archiveData.getId());
             return ResponseEntity.status(201).body("");

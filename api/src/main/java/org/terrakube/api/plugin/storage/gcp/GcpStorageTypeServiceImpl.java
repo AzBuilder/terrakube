@@ -24,6 +24,7 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     private static final String GCP_LOCATION_OUTPUT = "tfoutput/%s/%s/%s.tfoutput";
     private static final String GCP_STATE_LOCATION = "tfstate/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String GCP_STATE_JSON = "tfstate/%s/%s/state/%s.json";
+    private static final String GCP_HISTORY_RAW_STATE = "tfstate/%s/%s/state/%s.raw.json";
     private static final String GCP_CURRENT_STATE = "tfstate/%s/%s/terraform.tfstate/default.tfstate";
     private static final String CONTEXT_JSON = "tfoutput/context/%s/context.json";
 
@@ -87,17 +88,13 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
         String currentStateKey = String.format(GCP_STATE_JSON, organizationId, workspaceId, stateJsonHistoryId);
         log.info("Define new Json State File: {}", currentStateKey);
 
-        BlobId blobId = BlobId.of(bucketName, currentStateKey);
-        Blob blob = storage.get(blobId);
-        if (blob != null) {
-            log.info("Creating new JSON state...");
-            try {
-                WritableByteChannel channel = blob.writer();
-                channel.write(ByteBuffer.wrap(stateJson.getBytes(Charset.defaultCharset())));
-                channel.close();
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
+        BlobId blobJsonId = BlobId.of(bucketName, currentStateKey);
+        try {
+            log.info("creating new json state history...");
+            BlobInfo blobJsonStateHistory = BlobInfo.newBuilder(blobJsonId).build();
+            storage.create(blobJsonStateHistory, stateJson.getBytes(Charset.defaultCharset()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 
@@ -118,14 +115,17 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
     }
 
     @Override
-    public void uploadState(String organizationId, String workspaceId, String terraformState) {
+    public void uploadState(String organizationId, String workspaceId, String terraformState, String historyId) {
         String currentStateKey = String.format(GCP_CURRENT_STATE, organizationId, workspaceId);
+        String rawStateKey = String.format(GCP_HISTORY_RAW_STATE, organizationId, workspaceId, historyId);
         log.info("Define new Current State File: {}", currentStateKey);
+        log.info("Define new Current Raw History State File: {}", rawStateKey);
 
         BlobId blobId = BlobId.of(bucketName, currentStateKey);
+        BlobId rawBlobId = BlobId.of(bucketName, rawStateKey);
         Blob blob = storage.get(blobId);
         if (blob != null) {
-            log.info("State does not exists...");
+            log.info("State does exists...");
             try {
                 WritableByteChannel channel = blob.writer();
                 channel.write(ByteBuffer.wrap(terraformState.getBytes(Charset.defaultCharset())));
@@ -134,10 +134,19 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
                 log.error(e.getMessage());
             }
         } else {
-            log.info("Updating state...");
+            log.info("Creating new state...");
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
             storage.create(blobInfo, terraformState.getBytes(Charset.defaultCharset()));
         }
+
+        try {
+            log.info("creating new raw state history...");
+            BlobInfo blobRawStateHistory = BlobInfo.newBuilder(rawBlobId).build();
+            storage.create(blobRawStateHistory, terraformState.getBytes(Charset.defaultCharset()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
     }
 
     @Override

@@ -109,7 +109,7 @@ public class AzureTerraformStateImpl implements TerraformState {
     }
 
     @Override
-    public void saveStateJson(TerraformJob terraformJob, String applyJSON) {
+    public void saveStateJson(TerraformJob terraformJob, String applyJSON, String rawState) {
         if (applyJSON != null) {
             BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
 
@@ -119,12 +119,18 @@ public class AzureTerraformStateImpl implements TerraformState {
             }
             String stateFilename = UUID.randomUUID().toString();
             String blobName = terraformJob.getOrganizationId() + "/" + terraformJob.getWorkspaceId() + "/state/" + stateFilename + ".json";
-            log.info("terraformStateFile: {}", blobName);
+            String blobRawName = terraformJob.getOrganizationId() + "/" + terraformJob.getWorkspaceId() + "/state/" + stateFilename + ".raw.json";
+            log.info("terraform state file: {}", blobName);
+            log.info("terraform raw state file: {}", blobRawName);
             BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
+            BlobClient blobRawClient = blobContainerClient.getBlobClient(blobRawName);
 
             byte[] bytes = StringUtils.getBytesUtf8(applyJSON);
+            byte[] rawBytes = StringUtils.getBytesUtf8(rawState);
             String utf8EncodedString = StringUtils.newStringUtf8(bytes);
+            String rawUtf8EncodedString = StringUtils.newStringUtf8(rawBytes);
             blobClient.upload(BinaryData.fromString(utf8EncodedString));
+            blobRawClient.upload(BinaryData.fromString(rawUtf8EncodedString));
 
             String stateURL =  terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename);
 
