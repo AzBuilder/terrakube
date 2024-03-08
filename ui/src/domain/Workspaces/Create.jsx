@@ -272,7 +272,6 @@ export const CreateWorkspace = () => {
           name: values.name,
           terraformVersion: values.terraformVersion,
           branch: values.branch,
-          executionMode: "remote",
           iacType: iacType.id,
         },
       },
@@ -288,7 +287,6 @@ export const CreateWorkspace = () => {
             name: values.name,
             terraformVersion: values.terraformVersion,
             branch: values.branch,
-            executionMode: "remote",
             iacType: iacType.id,
             defaultTemplate: values.defaultTemplate,
           },
@@ -313,7 +311,6 @@ export const CreateWorkspace = () => {
             name: values.name,
             terraformVersion: values.terraformVersion,
             branch: values.branch,
-            executionMode: "remote",
             iacType: iacType.id,
           },
           relationships: {
