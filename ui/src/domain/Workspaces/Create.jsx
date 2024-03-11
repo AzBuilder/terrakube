@@ -225,7 +225,7 @@ export const CreateWorkspace = () => {
 
   const handleCliDriven = (e) => {
     setVersionControlFlow(false);
-    setCurrent(1);
+    setCurrent(2);
     setStep4Hidden(false);
     setSSHKeysVisible(false);
     form.setFieldsValue({ source: "empty", branch: "remote-content" });
@@ -687,6 +687,7 @@ export const CreateWorkspace = () => {
                   label="Default template (VCS Push)"
                   tooltip="Template that will be executed by default when doing a git push to the repository."
                   rules={[{ required: false }]}
+                  hidden={!versionControlFlow}
               >
                 <Select placeholder="Select Template" style={{ width: 250 }}>
                   {orgTemplates.map(function (template, index) {

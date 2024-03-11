@@ -25,7 +25,7 @@ import {
   CloseCircleOutlined,
   StopOutlined,
   PlusOutlined,
-  ImportOutlined
+  ImportOutlined,
 } from "@ant-design/icons";
 import { BiTerminal } from "react-icons/bi";
 import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
@@ -119,14 +119,14 @@ export const OrganizationDetails = ({
 
   const onFilterChange = (e) => {
     setFilterValue(e.target.value);
-    applyFilters(searchValue, e.target.value,filterTags);
+    applyFilters(searchValue, e.target.value, filterTags);
   };
 
   const onRadioClick = (e) => {
     const tag = e.target;
     if (tag.type === "radio" && filterValue === tag.value.toString()) {
       setFilterValue("");
-      applyFilters(searchValue, "",filterTags);
+      applyFilters(searchValue, "", filterTags);
     }
   };
 
@@ -138,7 +138,7 @@ export const OrganizationDetails = ({
 
   const onSearch = (value) => {
     setSearchValue(value);
-    applyFilters(value, filterValue,filterTags);
+    applyFilters(value, filterValue, filterTags);
   };
 
   const getTagName = (tagId) => {
@@ -146,8 +146,7 @@ export const OrganizationDetails = ({
   };
 
   const filterOption = (input, option) =>
-  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
-
+    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const getIaCIconById = (id) => {
     const item = iacTypes.find((iacType) => iacType.id === id);
@@ -159,40 +158,51 @@ export const OrganizationDetails = ({
     sessionStorage.setItem("searchValue", searchValue);
     sessionStorage.setItem("filterValue", filterValue);
     sessionStorage.setItem("selectedTags", selectedTags);
-    console.log(searchValue|| "serach empty");
-    console.log(filterValue||"filter empty");
-    console.log(selectedTags||"tags empty");
+    console.log(searchValue || "serach empty");
+    console.log(filterValue || "filter empty");
+    console.log(selectedTags || "tags empty");
 
-    var filteredWorkspaces = filterWorkspaces(workspaces,searchValue, filterValue, selectedTags);
+    var filteredWorkspaces = filterWorkspaces(
+      workspaces,
+      searchValue,
+      filterValue,
+      selectedTags
+    );
     setFilteredWorkspaces(filteredWorkspaces);
     return;
   };
 
-  const filterWorkspaces = (workspaces,searchValue, filterValue, selectedTags) => {
-
-     // filter by description and name
-     var filteredWorkspaces = workspaces.filter(
-      (workspace) =>{
-         if(workspace.description){
-           return (workspace.name.includes(searchValue || workspace.name )|| workspace.description?.includes(searchValue || workspace?.description))
-         }
-         else{
-            return (workspace.name.includes(searchValue || workspace.name ))
-          }
+  const filterWorkspaces = (
+    workspaces,
+    searchValue,
+    filterValue,
+    selectedTags
+  ) => {
+    // filter by description and name
+    var filteredWorkspaces = workspaces.filter((workspace) => {
+      if (workspace.description) {
+        return (
+          workspace.name.includes(searchValue || workspace.name) ||
+          workspace.description?.includes(searchValue || workspace?.description)
+        );
+      } else {
+        return workspace.name.includes(searchValue || workspace.name);
       }
-    );
+    });
 
     // filter by status
     filteredWorkspaces = filteredWorkspaces.filter(
       (workspace) =>
-      workspace.lastStatus === (filterValue|| workspace.lastStatus)
+        workspace.lastStatus === (filterValue || workspace.lastStatus)
     );
 
     // filter by tag
-    filteredWorkspaces = filteredWorkspaces.filter( (workspace) => {   
-      if(selectedTags && selectedTags.length > 0){
-        return workspace.workspaceTag.edges.some((tag) => selectedTags.includes(tag.node.tagId))
-      }else{
+    filteredWorkspaces = filteredWorkspaces.filter((workspace) => {
+      if (selectedTags && selectedTags.length > 0) {
+        return workspace.workspaceTag.edges.some((tag) =>
+          selectedTags.includes(tag.node.tagId)
+        );
+      } else {
         return true;
       }
     });
@@ -208,11 +218,9 @@ export const OrganizationDetails = ({
     const _filterValue = sessionStorage.getItem("filterValue") || "";
     const _selectedTags = sessionStorage.getItem("selectedTags") || [];
 
-
     setSearchValue(_searchValue);
     setFilterValue(_filterValue);
     setFilterTags(_selectedTags);
-    
 
     const body = {
       query: `{
@@ -282,7 +290,6 @@ export const OrganizationDetails = ({
 
         localStorage.setItem(ORGANIZATION_NAME, organizationName);
         setOrganizationName(organizationName);
-
       });
   }, [id]);
 
@@ -300,12 +307,21 @@ export const OrganizationDetails = ({
             <div className="variableActions">
               <h2>Workspaces</h2>
               <Space>
-              <Button icon={<ImportOutlined />}  htmlType="button" onClick={handleImport}>
-                Import workspaces
-              </Button>
-              <Button icon={<PlusOutlined/>}  type="primary" htmlType="button" onClick={handleCreate}>
-                New workspace
-              </Button>
+                <Button
+                  icon={<ImportOutlined />}
+                  htmlType="button"
+                  onClick={handleImport}
+                >
+                  Import workspaces
+                </Button>
+                <Button
+                  icon={<PlusOutlined />}
+                  type="primary"
+                  htmlType="button"
+                  onClick={handleCreate}
+                >
+                  New workspace
+                </Button>
               </Space>
             </div>
             <Row>
@@ -372,11 +388,13 @@ export const OrganizationDetails = ({
                         optionFilterProp="children"
                         allowClear
                         filterOption={filterOption}
-                        style={{ width: '100%' }}
+                        style={{ width: "100%" }}
                         placeholder="Search by tag"
                         onChange={handleChange}
                         filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                          (optionA?.label ?? "")
+                            .toLowerCase()
+                            .localeCompare((optionB?.label ?? "").toLowerCase())
                         }
                         options={tags.data.map(function (tag) {
                           return { label: tag.attributes.name, value: tag.id };
@@ -402,6 +420,7 @@ export const OrganizationDetails = ({
                 split=""
                 className="workspaceList"
                 dataSource={filteredWorkspaces}
+                pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
                 renderItem={(item) => (
                   <List.Item>
                     <Card
@@ -556,7 +575,12 @@ function setupOrganizationIncludes(
   const _filterValue = sessionStorage.getItem("filterValue") || "";
   const _selectedTags = sessionStorage.getItem("selectedTags") || [];
 
-  var filteredWorkspaces = filter(workspaces,_searchValue, _filterValue, _selectedTags);
+  var filteredWorkspaces = filter(
+    workspaces,
+    _searchValue,
+    _filterValue,
+    _selectedTags
+  );
 
   setFilteredWorkspaces(filteredWorkspaces);
   console.log(workspaces);
