@@ -50,4 +50,5 @@
     <include file="/db/changelog/local/changelog-2.19.0-workspace-default-template.xml"/>
     <include file="/db/changelog/local/changelog-2.19.0-token-expiration.xml"/>
     <include file="/db/changelog/local/changelog-2.20.0-detault-execution-mode.xml"/>
+    <include file="/db/changelog/local/changelog-2.20.0-executor-agent.xml"/>
 </databaseChangeLog>

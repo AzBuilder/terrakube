@@ -128,7 +128,14 @@ public class ExecutorService {
         executorContext.setFolder(job.getWorkspace().getFolder());
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
+        executorContext.setAgentUrl(getExecutorUrl(job));
         return sendToExecutor(job, executorContext);
+    }
+
+    private String getExecutorUrl(Job job){
+        String agentUrl = job.getWorkspace().getAgent() != null ? job.getWorkspace().getAgent().getUrl() : this.executorUrl;
+        log.info("Job {} Executor agent url: {}", job.getId(), agentUrl);
+        return agentUrl;
     }
 
     private boolean iacType(Job job){

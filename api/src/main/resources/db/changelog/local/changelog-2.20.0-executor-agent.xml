@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="37" author="javier-canizalez@outlook.com">
+        <createTable tableName="agent">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(64)"/>
+            <column name="description" type="varchar2(64)"/>
+            <column name="url" type="varchar2(256)"/>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_agent_org" references="organization(id)"/>
+            </column>
+        </createTable>
+        <addColumn tableName="workspace" >
+            <column name="agent_id" type="varchar(36)">
+                <constraints nullable="true" foreignKeyName="fk_workspace_agent" references="agent(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
