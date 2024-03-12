@@ -9,11 +9,10 @@ import org.terrakube.api.rs.Organization;
 import javax.persistence.*;
 import java.util.UUID;
 
-@ReadPermission(expression = "user belongs organization")
 @CreatePermission(expression = "user is a superuser")
 @UpdatePermission(expression = "user is a superuser")
 @DeletePermission(expression = "user is a superuser")
-@Include
+@Include(rootLevel = false)
 @Getter
 @Setter
 @Entity(name = "agent")

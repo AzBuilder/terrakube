@@ -133,7 +133,7 @@ public class ExecutorService {
     }
 
     private String getExecutorUrl(Job job){
-        String agentUrl = job.getWorkspace().getAgent() != null ? job.getWorkspace().getAgent().getUrl() : this.executorUrl;
+        String agentUrl = job.getWorkspace().getAgent() != null ? job.getWorkspace().getAgent().getUrl() + "/api/v1/terraform-rs" : this.executorUrl;
         log.info("Job {} Executor agent url: {}", job.getId(), agentUrl);
         return agentUrl;
     }

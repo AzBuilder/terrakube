@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
+import org.terrakube.api.rs.agent.Agent;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.hooks.organization.OrganizationManageHook;
 import org.terrakube.api.rs.job.Job;
@@ -74,6 +75,10 @@ public class Organization {
     @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
     private List<Ssh> ssh;
+
+    @UpdatePermission(expression = "user belongs organization")
+    @OneToMany(mappedBy = "organization")
+    private List<Agent> agent;
 
     @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")
