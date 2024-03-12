@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.agent.Agent;
 import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
@@ -104,5 +105,8 @@ public class Workspace extends GenericAuditFields {
 
     @OneToOne
     private Ssh ssh;
+
+    @OneToOne
+    private Agent agent;
     
 }

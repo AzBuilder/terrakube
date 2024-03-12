@@ -2807,5 +2807,135 @@
       "bearer": "{{access_token}}"
     },
     "tests": []
+  },
+  {
+    "_id": "129038a1-f63c-4271-b895-6916a8829767",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "00747fa3-1147-42f8-834d-21cbd57712a2",
+    "name": "create agent",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/agent",
+    "method": "POST",
+    "sortNum": 730000,
+    "created": "2024-03-12T22:39:02.553Z",
+    "modified": "2024-03-12T22:41:48.989Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n    \"type\": \"agent\",\n    \"attributes\": {\n      \"name\": \"sample-agent\",\n      \"url\": \"http://localhost:8090\",\n      \"description\": \"This is a sample agent\"\n    }\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "e95afb49-9132-44e4-bcec-2a330a9e02b6",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "00747fa3-1147-42f8-834d-21cbd57712a2",
+    "name": "search all agents",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/agent",
+    "method": "GET",
+    "sortNum": 735000,
+    "created": "2024-03-12T22:39:02.554Z",
+    "modified": "2024-03-12T22:48:04.504Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "cdd719db-7103-4e8a-89ef-1418d4d17d37",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "00747fa3-1147-42f8-834d-21cbd57712a2",
+    "name": "update workspace with agent",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/relationships/agent",
+    "method": "PATCH",
+    "sortNum": 732500,
+    "created": "2024-03-12T22:53:30.698Z",
+    "modified": "2024-03-12T23:13:04.295Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": {\n      \"type\": \"agent\",\n      \"id\": \"f0ddb2e5-c390-4451-bd7f-fe84e74010de\"\n  }\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "9f02cece-c891-44ed-bb59-eb6f6f7066ce",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "00747fa3-1147-42f8-834d-21cbd57712a2",
+    "name": "get workspace data",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/relationships/agent",
+    "method": "GET",
+    "sortNum": 733750,
+    "created": "2024-03-12T23:09:01.394Z",
+    "modified": "2024-03-12T23:15:27.913Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "75759a1e-a884-471f-bed6-542baa65a0cf",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "00747fa3-1147-42f8-834d-21cbd57712a2",
+    "name": "remove worskapce agent",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/relationships/agent",
+    "method": "PATCH",
+    "sortNum": 733125,
+    "created": "2024-03-12T23:14:33.452Z",
+    "modified": "2024-03-12T23:15:47.763Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"data\": null\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
   }
 ]
