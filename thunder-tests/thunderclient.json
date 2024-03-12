@@ -2868,7 +2868,7 @@
     "method": "PATCH",
     "sortNum": 732500,
     "created": "2024-03-12T22:53:30.698Z",
-    "modified": "2024-03-12T23:08:09.520Z",
+    "modified": "2024-03-12T23:13:04.295Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -2891,12 +2891,35 @@
     "_id": "9f02cece-c891-44ed-bb59-eb6f6f7066ce",
     "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
     "containerId": "00747fa3-1147-42f8-834d-21cbd57712a2",
-    "name": "update workspace with agent Copy",
-    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc",
+    "name": "get workspace data",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/relationships/agent",
     "method": "GET",
     "sortNum": 733750,
     "created": "2024-03-12T23:09:01.394Z",
-    "modified": "2024-03-12T23:09:15.381Z",
+    "modified": "2024-03-12T23:15:27.913Z",
+    "headers": [
+      {
+        "name": "Content-Type",
+        "value": "application/vnd.api+json"
+      }
+    ],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{access_token}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "75759a1e-a884-471f-bed6-542baa65a0cf",
+    "colId": "59b30fd1-9a5b-4dab-aaf1-a6bfc4706ff2",
+    "containerId": "00747fa3-1147-42f8-834d-21cbd57712a2",
+    "name": "remove worskapce agent",
+    "url": "{{terrakubeApi}}/api/v1/organization/{{organizationId}}/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/relationships/agent",
+    "method": "PATCH",
+    "sortNum": 733125,
+    "created": "2024-03-12T23:14:33.452Z",
+    "modified": "2024-03-12T23:15:47.763Z",
     "headers": [
       {
         "name": "Content-Type",
@@ -2906,7 +2929,7 @@
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"data\": {\n      \"type\": \"agent\",\n      \"id\": \"f0ddb2e5-c390-4451-bd7f-fe84e74010de\"\n  }\n}",
+      "raw": "{\n  \"data\": null\n}",
       "form": []
     },
     "auth": {
