@@ -399,6 +399,28 @@ export const WorkspaceDetails = (props) => {
         console.log(response);
         if (response.status == "204") {
           message.success("Workspace updated successfully");
+
+          var bodyAgent;
+          console.log(`Using Agent: ${values.executorAgent}`)
+          if (values.executorAgent.equals("default")){
+            bodyAgent = {
+              data:  null
+            }
+          } else {
+            bodyAgent = {
+              data: {
+                type: "agent",
+                id: values.executorAgent
+              }
+            }
+          }
+          axiosInstance.patch(`/api/v1/organization/${organizationId}/workspace/${id}/relationships/agent`, bodyAgent, {
+            headers: {
+              "Content-Type": "application/vnd.api+json",
+            },
+          }).then((response) => {
+            console.log("Update Workspace agent successfully")
+          })
         } else {
           message.error("Workspace update failed");
         }
