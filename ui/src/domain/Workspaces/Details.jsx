@@ -883,6 +883,7 @@ export const WorkspaceDetails = (props) => {
                           iacType: workspace.data.attributes.iacType,
                           branch: workspace.data.attributes.branch,
                           defaultTemplate: workspace.data.attributes.defaultTemplate,
+                          executorAgent: workspace.data.relationships.agent.data?.id,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -1054,7 +1055,7 @@ export const WorkspaceDetails = (props) => {
                                   </Option>
                               );
                             })}
-                            <Option key="default">"default"</Option>
+                            <Option key="default">default</Option>
                           </Select>
                         </Form.Item>
                         <Form.Item>
