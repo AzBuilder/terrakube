@@ -408,7 +408,7 @@ export const WorkspaceDetails = (props) => {
 
     var bodyAgent;
     console.log(`Using Agent: ${values.executorAgent}`)
-    if (values.executorAgent.equals("default")){
+    if (values.executorAgent === "default"){
       bodyAgent = {
         data:  null
       }
