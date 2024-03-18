@@ -1054,6 +1054,7 @@ export const WorkspaceDetails = (props) => {
                                   </Option>
                               );
                             })}
+                            <Option key="default">"default"</Option>
                           </Select>
                         </Form.Item>
                         <Form.Item>
