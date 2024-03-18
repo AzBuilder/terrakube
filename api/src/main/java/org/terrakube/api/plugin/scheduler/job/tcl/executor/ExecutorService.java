@@ -146,7 +146,7 @@ public class ExecutorService {
         RestTemplate restTemplate = new RestTemplate();
         boolean executed = false;
         try {
-            ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(this.executorUrl, executorContext, ExecutorContext.class);
+            ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(getExecutorUrl(job), executorContext, ExecutorContext.class);
             executorContext.setAccessToken("****");
             executorContext.setModuleSshKey("****");
             log.info("Sending Job: /n {}", executorContext);

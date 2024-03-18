@@ -71,6 +71,7 @@ const include = {
   HISTORY: "history",
   SCHEDULE: "schedule",
   VCS: "vcs",
+  AGENT: "agent",
 };
 const { DateTime } = require("luxon");
 const { Content } = Layout;
@@ -117,7 +118,9 @@ export const WorkspaceDetails = (props) => {
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
+  const [agent, setAgent] = useState("...");
   const [sshKeys, setSSHKeys] = useState([]);
+  const [agentList, setAgentList] = useState([]);
   const [orgTemplates, setOrgTemplates] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
@@ -218,6 +221,13 @@ export const WorkspaceDetails = (props) => {
     });
   };
 
+  const loadAgentlist = () => {
+    axiosInstance.get(`organization/${organizationId}/agent`).then((response) => {
+      console.log(response.data.data);
+      setAgentList(response.data.data);
+    });
+  };
+
   const loadOrgTemplates = () => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
       console.log(response.data.data);
@@ -244,6 +254,7 @@ export const WorkspaceDetails = (props) => {
     loadWorkspace(true);
     setLoading(false);
     loadSSHKeys();
+    loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false);
@@ -291,7 +302,7 @@ export const WorkspaceDetails = (props) => {
         setTemplates(template.data.data);
         axiosInstance
           .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs`
+            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent`
           )
           .then((response) => {
             if(_loadVersions) loadVersions(response.data.data.attributes.iacType);
@@ -312,7 +323,8 @@ export const WorkspaceDetails = (props) => {
                 currentStateId,
                 axiosInstance,
                 setResources,
-                setOutputs
+                setOutputs,
+                  setAgent,
               );
             }
             setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
@@ -387,11 +399,42 @@ export const WorkspaceDetails = (props) => {
         console.log(response);
         if (response.status == "204") {
           message.success("Workspace updated successfully");
+
         } else {
           message.error("Workspace update failed");
         }
         setWaiting(false);
       });
+
+    var bodyAgent;
+    console.log(`Using Agent: ${values.executorAgent}`)
+    if (values.executorAgent === "default"){
+      bodyAgent = {
+        data:  null
+      }
+    } else {
+      bodyAgent = {
+        data: {
+          type: "agent",
+          id: values.executorAgent
+        }
+      }
+    }
+    console.log(bodyAgent);
+    axiosInstance.patch(`/organization/${organizationId}/workspace/${id}/relationships/agent`, bodyAgent, {
+      headers: {
+        "Content-Type": "application/vnd.api+json",
+      },
+    }).then((response) => {
+      console.log("Update Workspace agent successfully")
+      console.log(response);
+      if (response.status == "204") {
+        console.log("Workspace agent updated successfully");
+
+      } else {
+        console.log("Workspace agent update failed");
+      }
+    })
   };
 
   const renderVCSLogo = (vcs) => {
@@ -871,6 +914,7 @@ export const WorkspaceDetails = (props) => {
                           iacType: workspace.data.attributes.iacType,
                           branch: workspace.data.attributes.branch,
                           defaultTemplate: workspace.data.attributes.defaultTemplate,
+                          executorAgent: workspace.data.relationships.agent.data?.id == null ? "default": workspace.data.relationships.agent.data?.id ,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -1023,6 +1067,28 @@ export const WorkspaceDetails = (props) => {
                             })}
                           </Select>
                         </Form.Item>
+                        <Form.Item
+                            name="executorAgent"
+                            label="Executor agent to run the job"
+                            extra="Use this option to select which executor agent will run the job remotely"
+                        >
+                          <Select
+                              defaultValue={
+                                workspace.data.attributes.moduleSshKey
+                              }
+                              placeholder="select Job Agent"
+                              style={{ width: 250 }}
+                          >
+                            {agentList.map(function (agentKey, index) {
+                              return (
+                                  <Option key={agentKey?.id}>
+                                    {agentKey?.attributes?.name}
+                                  </Option>
+                              );
+                            })}
+                            <Option key="default">default</Option>
+                          </Select>
+                        </Form.Item>
                         <Form.Item>
                           <Button type="primary" htmlType="submit">
                             Save settings
@@ -1098,7 +1164,8 @@ function setupWorkspaceIncludes(
   currentStateId,
   axiosInstance,
   setResources,
-  setOutputs
+  setOutputs,
+  setAgent,
 ) {
   let variables = [];
   let jobs = [];
@@ -1173,6 +1240,9 @@ function setupWorkspaceIncludes(
         break;
       case include.VCS:
         setVCSProvider(element.attributes.vcsType);
+        break;
+      case include.AGENT:
+        setAgent(element.id)
         break;
       case include.VARIABLE:
         if (element.attributes.category == "ENV") {
