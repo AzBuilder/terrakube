@@ -120,6 +120,7 @@ export const WorkspaceDetails = (props) => {
   const [executionMode, setExecutionMode] = useState("...");
   const [agent, setAgent] = useState("...");
   const [sshKeys, setSSHKeys] = useState([]);
+  const [agentList, setAgentList] = useState([]);
   const [orgTemplates, setOrgTemplates] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
@@ -220,6 +221,13 @@ export const WorkspaceDetails = (props) => {
     });
   };
 
+  const loadAgentlist = () => {
+    axiosInstance.get(`organization/${organizationId}/agent`).then((response) => {
+      console.log(response.data.data);
+      setAgentList(response.data.data);
+    });
+  };
+
   const loadOrgTemplates = () => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
       console.log(response.data.data);
@@ -246,6 +254,7 @@ export const WorkspaceDetails = (props) => {
     loadWorkspace(true);
     setLoading(false);
     loadSSHKeys();
+    loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false);
@@ -1038,10 +1047,10 @@ export const WorkspaceDetails = (props) => {
                               placeholder="select SSH Key"
                               style={{ width: 250 }}
                           >
-                            {sshKeys.map(function (sshKey, index) {
+                            {agentList.map(function (agentKey, index) {
                               return (
-                                  <Option key={sshKey?.id}>
-                                    {sshKey?.attributes?.name}
+                                  <Option key={agentKey?.id}>
+                                    {agentKey?.attributes?.name}
                                   </Option>
                               );
                             })}
