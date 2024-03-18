@@ -71,6 +71,7 @@ const include = {
   HISTORY: "history",
   SCHEDULE: "schedule",
   VCS: "vcs",
+  AGENT: "agent",
 };
 const { DateTime } = require("luxon");
 const { Content } = Layout;
@@ -117,6 +118,7 @@ export const WorkspaceDetails = (props) => {
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
+  const [agent, setAgent] = useState("...");
   const [sshKeys, setSSHKeys] = useState([]);
   const [orgTemplates, setOrgTemplates] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
@@ -291,7 +293,7 @@ export const WorkspaceDetails = (props) => {
         setTemplates(template.data.data);
         axiosInstance
           .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs`
+            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent`
           )
           .then((response) => {
             if(_loadVersions) loadVersions(response.data.data.attributes.iacType);
@@ -312,7 +314,8 @@ export const WorkspaceDetails = (props) => {
                 currentStateId,
                 axiosInstance,
                 setResources,
-                setOutputs
+                setOutputs,
+                  setAgent,
               );
             }
             setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
@@ -1023,6 +1026,27 @@ export const WorkspaceDetails = (props) => {
                             })}
                           </Select>
                         </Form.Item>
+                        <Form.Item
+                            name="executorAgent"
+                            label="Executor agent to run the job"
+                            extra="Use this option to select which executor agent will run the job remotely"
+                        >
+                          <Select
+                              defaultValue={
+                                workspace.data.attributes.moduleSshKey
+                              }
+                              placeholder="select SSH Key"
+                              style={{ width: 250 }}
+                          >
+                            {sshKeys.map(function (sshKey, index) {
+                              return (
+                                  <Option key={sshKey?.id}>
+                                    {sshKey?.attributes?.name}
+                                  </Option>
+                              );
+                            })}
+                          </Select>
+                        </Form.Item>
                         <Form.Item>
                           <Button type="primary" htmlType="submit">
                             Save settings
@@ -1098,7 +1122,8 @@ function setupWorkspaceIncludes(
   currentStateId,
   axiosInstance,
   setResources,
-  setOutputs
+  setOutputs,
+  setAgent,
 ) {
   let variables = [];
   let jobs = [];
@@ -1173,6 +1198,9 @@ function setupWorkspaceIncludes(
         break;
       case include.VCS:
         setVCSProvider(element.attributes.vcsType);
+        break;
+      case include.AGENT:
+        setAgent(element.id)
         break;
       case include.VARIABLE:
         if (element.attributes.category == "ENV") {
