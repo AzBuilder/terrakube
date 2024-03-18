@@ -428,10 +428,10 @@ export const WorkspaceDetails = (props) => {
       console.log("Update Workspace agent successfully")
       console.log(response);
       if (response.status == "204") {
-        message.success("Workspace agent updated successfully");
+        console.log("Workspace agent updated successfully");
 
       } else {
-        message.error("Workspace agent update failed");
+        console.log("Workspace agent update failed");
       }
     })
   };
