@@ -1044,7 +1044,7 @@ export const WorkspaceDetails = (props) => {
                               defaultValue={
                                 workspace.data.attributes.moduleSshKey
                               }
-                              placeholder="select SSH Key"
+                              placeholder="select Job Agent"
                               style={{ width: 250 }}
                           >
                             {agentList.map(function (agentKey, index) {
