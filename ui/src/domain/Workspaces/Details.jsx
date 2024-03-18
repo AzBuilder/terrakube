@@ -420,6 +420,7 @@ export const WorkspaceDetails = (props) => {
         }
       }
     }
+    console.log(bodyAgent);
     axiosInstance.patch(`/organization/${organizationId}/workspace/${id}/relationships/agent`, bodyAgent, {
       headers: {
         "Content-Type": "application/vnd.api+json",
