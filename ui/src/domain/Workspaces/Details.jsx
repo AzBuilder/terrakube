@@ -883,7 +883,7 @@ export const WorkspaceDetails = (props) => {
                           iacType: workspace.data.attributes.iacType,
                           branch: workspace.data.attributes.branch,
                           defaultTemplate: workspace.data.attributes.defaultTemplate,
-                          executorAgent: workspace.data.relationships.agent.data?.id,
+                          executorAgent: workspace.data.relationships.agent.data?.id == null ? "default": workspace.data.relationships.agent.data?.id ,
                         }}
                         layout="vertical"
                         name="form-settings"
