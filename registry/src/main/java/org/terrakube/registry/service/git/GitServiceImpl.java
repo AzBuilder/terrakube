@@ -48,6 +48,7 @@ public class GitServiceImpl implements GitService {
 
             String correctTag = validateCorrectTag(tag, repository, vcsType, accessToken, tempFolder, tagPrefix);
 
+            log.info("Cloning {} using {}", repository, correctTag);
             Git.cloneRepository()
                     .setURI(repository)
                     .setDirectory(gitCloneRepository)
