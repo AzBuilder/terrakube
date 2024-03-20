@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="38" author="alfespa17@gmail.com">
+        <addColumn tableName="module" >
+            <column name="tag_prefix" type="varchar(36)"/>
+            <column name="folder" type="varchar(256)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

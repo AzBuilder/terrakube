@@ -32,7 +32,7 @@ public class GcpStorageServiceImpl implements StorageService {
     private GitService gitService;
 
     @Override
-    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
+    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken, String tagPrefix, String folder) {
         String blobKey = String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion);
         log.info("Searching module: {}", blobKey);
         BlobId blobId = BlobId.of(
@@ -42,7 +42,7 @@ public class GcpStorageServiceImpl implements StorageService {
         log.info("Checking GCP Object exist {}", blobKey);
         if (storage.get(blobId) == null) {
             try {
-                File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken);
+                File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken, tagPrefix, folder);
                 File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
                 ZipUtil.pack(gitCloneDirectory, moduleZip);
 
