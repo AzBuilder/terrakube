@@ -95,7 +95,7 @@ public class GitServiceImpl implements GitService {
 
     private String validateCorrectTag(String originalTag, String repository, String vcsType, String accessToken, String folderName, String tagPrefix) {
         List<String> versionList = new ArrayList<>();
-        String finalTag = originalTag;
+        String finalTag = tagPrefix + originalTag;
         Map<String, Ref> tags = null;
         try {
             tags = Git.lsRemoteRepository()
