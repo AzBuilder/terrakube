@@ -219,7 +219,7 @@ public class GitTagsCache {
                 if(tagPrefix == null) {
                     versionList.add(originalTag);
                 } else if (originalTag.startsWith(tagPrefix)) {
-                    versionList.add(originalTag);
+                    versionList.add(originalTag.replace(tagPrefix, ""));
                 }
             });
         } catch (GitAPIException e) {
