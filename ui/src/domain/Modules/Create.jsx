@@ -442,15 +442,15 @@ export const CreateModule = () => {
                   name="tagPrefix"
                   label="Tag prefix for modules"
                   rules={[{ required: false }]}
-                  extra="To filter only specific tags from the repository. Example vmlinux/"
+                  extra="Leave the field empty unless you are using a monorepository configuration. Example vmlinux/"
               >
                 <Input />
               </Form.Item>
               <Form.Item
                   name="folder"
-                  label="Folder from the repository that contains the tf module"
+                  label="Folder for the terraform module inside the repository"
                   rules={[{ required: false }]}
-                  extra="This is usefull when using the modules in a monorepository"
+                  extra="Leave the field empty unless you are using a monorepository configuration"
               >
                 <Input />
               </Form.Item>
