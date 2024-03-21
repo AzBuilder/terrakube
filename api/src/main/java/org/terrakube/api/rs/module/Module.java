@@ -41,6 +41,12 @@ public class Module extends GenericAuditFields {
     @Column(name = "source")
     private String source;
 
+    @Column(name = "tag_prefix")
+    private String tagPrefix;
+
+    @Column(name = "folder")
+    private String folder;
+
     @Column(name = "download_quantity")
     private int downloadQuantity = 0;
 
@@ -59,7 +65,7 @@ public class Module extends GenericAuditFields {
     @Transient
     @ComputedAttribute
     public List<String> getVersions(RequestScope requestScope) {
-        return gitTagsCache.getVersions(getRegistryPath(requestScope), this.source, this.vcs, this.ssh);
+        return gitTagsCache.getVersions(getRegistryPath(requestScope), this.tagPrefix, this.source, this.vcs, this.ssh);
     }
 
     @OneToOne

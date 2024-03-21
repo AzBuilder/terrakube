@@ -27,7 +27,7 @@ public class LocalStorageServiceImpl implements StorageService {
 
     @Override
     public synchronized String searchModule(String organizationName, String moduleName, String providerName,
-            String moduleVersion, String source, String vcsType, String accessToken) {
+            String moduleVersion, String source, String vcsType, String accessToken, String tagPrefix, String folder) {
         String moduleFilePath = String.format(MODULE_LOCATION_ZIP, organizationName, moduleName, providerName,
                 moduleVersion);
         log.info("moduleZip: {}", moduleFilePath);
@@ -37,7 +37,7 @@ public class LocalStorageServiceImpl implements StorageService {
             FileUtils.forceMkdirParent(moduleFile);
             if (!moduleFile.exists()) {
                 File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType,
-                        accessToken);
+                        accessToken, tagPrefix, folder);
                 log.info("Git Clone Directory {}", gitCloneDirectory.getAbsolutePath());
                 log.info("moduleZip {}", moduleFile.getAbsolutePath());
                 ZipUtil.pack(gitCloneDirectory, moduleFile);

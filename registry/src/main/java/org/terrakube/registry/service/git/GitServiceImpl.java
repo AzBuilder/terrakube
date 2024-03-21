@@ -32,7 +32,7 @@ public class GitServiceImpl implements GitService {
     private static final String SSH_REGISTRY_DIRECTORY = "%s/.terraform-spring-boot/ssh/registry/%s/id_%s";
 
     @Override
-    public File getCloneRepositoryByTag(String repository, String tag, String vcsType, String accessToken) {
+    public File getCloneRepositoryByTag(String repository, String tag, String vcsType, String accessToken, String tagPrefix, String folder) {
         File gitCloneRepository = null;
         try {
             String userHomeDirectory = FileUtils.getUserDirectoryPath();
@@ -41,12 +41,14 @@ public class GitServiceImpl implements GitService {
                     FilenameUtils.separatorsToSystem(
                             GIT_DIRECTORY + "/" + tempFolder
                     ));
+
             gitCloneRepository = new File(gitRepositoryPath);
             FileUtils.forceMkdir(gitCloneRepository);
             FileUtils.cleanDirectory(gitCloneRepository);
 
-            String correctTag = validateCorrectTag(tag, repository, vcsType, accessToken, tempFolder);
+            String correctTag = validateCorrectTag(tag, repository, vcsType, accessToken, tempFolder, tagPrefix);
 
+            log.info("Cloning {} using {}", repository, correctTag);
             Git.cloneRepository()
                     .setURI(repository)
                     .setDirectory(gitCloneRepository)
@@ -54,6 +56,14 @@ public class GitServiceImpl implements GitService {
                     .setCredentialsProvider(setupCredentials(vcsType, accessToken))
                     .setTransportConfigCallback(setupTransportConfigCallback(vcsType, accessToken, tempFolder))
                     .call();
+
+            if (folder != null && !folder.isEmpty()){
+                gitRepositoryPath = userHomeDirectory.concat(
+                        FilenameUtils.separatorsToSystem(
+                                GIT_DIRECTORY + "/" + tempFolder + folder
+                        ));
+                gitCloneRepository = new File(gitRepositoryPath);
+            }
 
         } catch (GitAPIException | IOException ex) {
             log.error(ex.getMessage());
@@ -83,9 +93,9 @@ public class GitServiceImpl implements GitService {
         return credentialsProvider;
     }
 
-    private String validateCorrectTag(String originalTag, String repository, String vcsType, String accessToken, String folderName) {
+    private String validateCorrectTag(String originalTag, String repository, String vcsType, String accessToken, String folderName, String tagPrefix) {
         List<String> versionList = new ArrayList<>();
-        String finalTag = originalTag;
+        String finalTag = (tagPrefix == null ? "": tagPrefix) + originalTag;
         Map<String, Ref> tags = null;
         try {
             tags = Git.lsRemoteRepository()
@@ -101,8 +111,8 @@ public class GitServiceImpl implements GitService {
             versionList.add(key.replace("refs/tags/", ""));
         });
 
-        if (versionList.contains("v" + originalTag))
-            finalTag = "v" + originalTag;
+        if (versionList.contains((tagPrefix == null ? "": tagPrefix) + "v" + originalTag))
+            finalTag = (tagPrefix == null ? "": tagPrefix) + "v" + originalTag;
 
         return finalTag;
     }

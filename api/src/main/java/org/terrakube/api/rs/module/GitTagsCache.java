@@ -123,7 +123,7 @@ public class GitTagsCache {
         return jedisPool.getResource();
     }
 
-    public List<String> getVersions(String modulePath, String source, Vcs vcs, Ssh ssh) {
+    public List<String> getVersions(String modulePath, String tagPrefix, String source, Vcs vcs, Ssh ssh) {
         Jedis connection;
         String cacheFromRedis = null;
         if (jedisPool != null) {
@@ -137,7 +137,7 @@ public class GitTagsCache {
             return Arrays.asList(StringUtils.split(currentList.get().toString(), "|"));
         } else {
             log.info("Module {} is not in cache, adding to cache (this should not happen...)", modulePath);
-            List<String> fromRepository = getVersionFromRepository(source, vcs, ssh);
+            List<String> fromRepository = getVersionFromRepository(source, tagPrefix, vcs, ssh);
             if (jedisPool != null) {
                 connection = getJedisConnection();
                 connection.set(modulePath, StringUtils.join(fromRepository, "|"));
@@ -148,7 +148,7 @@ public class GitTagsCache {
         }
     }
 
-    public List<String> getVersionFromRepository(String source, Vcs vcs, Ssh ssh) {
+    public List<String> getVersionFromRepository(String source, String tagPrefix, Vcs vcs, Ssh ssh) {
         List<String> versionList = new ArrayList<>();
         try {
             CredentialsProvider credentialsProvider = null;
@@ -215,7 +215,12 @@ public class GitTagsCache {
             }
 
             tags.forEach((key, value) -> {
-                versionList.add(key.replace("refs/tags/", ""));
+                String originalTag = key.replace("refs/tags/", "");
+                if(tagPrefix == null) {
+                    versionList.add(originalTag);
+                } else if (originalTag.startsWith(tagPrefix)) {
+                    versionList.add(originalTag.replace(tagPrefix, ""));
+                }
             });
         } catch (GitAPIException e) {
             log.error(e.getMessage());

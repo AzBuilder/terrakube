@@ -41,7 +41,7 @@
         <maven-artifact.version>3.8.8</maven-artifact.version>
         <!--BUILDPACK DATA-->
         <buildpack.builder>paketobuildpacks/builder-jammy-base</buildpack.builder>
-        <buildpack.java>gcr.io/paketo-buildpacks/java:10.6.0</buildpack.java>
+        <buildpack.java>gcr.io/paketo-buildpacks/java:12.0.0</buildpack.java>
         <buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry</buildpack.telemetry>
     </properties>
     <build>

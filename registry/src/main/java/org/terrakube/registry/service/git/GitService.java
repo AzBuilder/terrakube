@@ -4,5 +4,5 @@ import java.io.File;
 
 public interface GitService {
 
-    File getCloneRepositoryByTag(String repository, String tag, String vcsType, String accessToken);
+    File getCloneRepositoryByTag(String repository, String tag, String vcsType, String accessToken, String tagPrefix, String folder);
 }

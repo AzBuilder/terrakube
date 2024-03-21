@@ -47,6 +47,9 @@ public class ModuleServiceImpl implements ModuleService {
         String moduleSource = module.getAttributes().getSource();
         String vcsType = "PUBLIC";
         String accessToken = null;
+        String folder = module.getAttributes().getFolder();
+        String tagPrefix = module.getAttributes().getTagPrefix();
+
         if (module.getRelationships().getVcs().getData() != null) {
             Vcs vcsInformation = getVcsInformation(organizationId, module.getRelationships().getVcs().getData().getId());
             vcsType = vcsInformation.getAttributes().getVcsType();
@@ -60,7 +63,7 @@ public class ModuleServiceImpl implements ModuleService {
         }
 
         moduleVersionPath = storageService.searchModule(
-                organizationName, moduleName, providerName, version, moduleSource, vcsType, accessToken
+                organizationName, moduleName, providerName, version, moduleSource, vcsType, accessToken, tagPrefix, folder
         );
 
         if (countDownload)

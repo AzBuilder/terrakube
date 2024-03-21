@@ -34,12 +34,12 @@ public class AwsStorageServiceImpl implements StorageService {
     String registryHostname;
 
     @Override
-    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
+    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken, String tagPrefix, String folder) {
         String blobKey = String.format(BUCKET_ZIP_MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion);
         log.info("Checking Aws S3 Object exist {}", blobKey);
 
         if (!s3client.doesObjectExist(bucketName, blobKey)) {
-            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken);
+            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken, tagPrefix, folder);
             File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
             ZipUtil.pack(gitCloneDirectory, moduleZip);
 

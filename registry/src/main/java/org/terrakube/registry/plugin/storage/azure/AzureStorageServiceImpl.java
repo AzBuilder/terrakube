@@ -32,7 +32,7 @@ public class AzureStorageServiceImpl implements StorageService {
     String registryHostname;
 
     @Override
-    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken) {
+    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken, String tagPrefix, String folder) {
 
         BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
 
@@ -45,7 +45,7 @@ public class AzureStorageServiceImpl implements StorageService {
         BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
 
         if (!blobClient.exists()) {
-            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken);
+            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken, tagPrefix, folder);
             File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
             ZipUtil.pack(gitCloneDirectory, moduleZip);
             blobClient.uploadFromFile(moduleZip.getAbsolutePath());

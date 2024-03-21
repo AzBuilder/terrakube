@@ -137,6 +137,8 @@ export const CreateModule = () => {
           description: values.description,
           provider: values.provider,
           source: values.source,
+          folder: values.folder != null ? values.folder : null,
+          tagPrefix: values.tagPrefix != null ? values.tagPrefix : null,
         },
       },
     };
@@ -150,6 +152,8 @@ export const CreateModule = () => {
             description: values.description,
             provider: values.provider,
             source: values.source,
+            folder: values.folder != null ? values.folder : null,
+            tagPrefix: values.tagPrefix != null ? values.tagPrefix : null,
           },
           relationships: {
             vcs: {
@@ -172,6 +176,8 @@ export const CreateModule = () => {
             description: values.description,
             provider: values.provider,
             source: values.source,
+            folder: values.folder != null ? values.folder : null,
+            tagPrefix: values.tagPrefix != null ? values.tagPrefix : null,
           },
           relationships: {
             ssh: {
@@ -429,6 +435,22 @@ export const CreateModule = () => {
                 label="Provider"
                 rules={[{ required: true }]}
                 extra="The name of a remote system that the module is primarily written to target."
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                  name="tagPrefix"
+                  label="Tag prefix for modules"
+                  rules={[{ required: false }]}
+                  extra="To filter only specific tags from the repository. Example vmlinux/"
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                  name="folder"
+                  label="Folder from the repository that contains the tf module"
+                  rules={[{ required: false }]}
+                  extra="This is usefull when using the modules in a monorepository"
               >
                 <Input />
               </Form.Item>
