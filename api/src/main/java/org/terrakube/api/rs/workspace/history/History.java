@@ -8,7 +8,7 @@ import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 import org.terrakube.api.rs.workspace.history.archive.Archive;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +22,7 @@ import java.util.UUID;
 public class History extends GenericAuditFields {
 
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "job_reference")

@@ -5,9 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.provider.implementation.Version;
-import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,8 +20,7 @@ import java.util.UUID;
 @Entity(name = "provider")
 public class Provider {
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")

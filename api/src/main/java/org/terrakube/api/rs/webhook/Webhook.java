@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Include(rootLevel = false)
@@ -15,8 +15,7 @@ import java.util.UUID;
 public class Webhook {
 
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name="type")

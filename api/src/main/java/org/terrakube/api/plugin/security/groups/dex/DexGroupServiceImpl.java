@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.security.groups.dex;
 
-import com.nimbusds.jose.shaded.json.JSONArray;
 import com.yahoo.elide.core.security.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +15,7 @@ public class DexGroupServiceImpl implements GroupService {
     public boolean isMember(User user, String group) {
         JwtAuthenticationToken principal = ((JwtAuthenticationToken) user.getPrincipal());
         boolean isMember = false;
-        for (String groupName : toStringArray((JSONArray) principal.getTokenAttributes().get("groups"))) {
+        for (String groupName : toStringArray((java.util.ArrayList) principal.getTokenAttributes().get("groups"))) {
             if (groupName.equals(group))
                 isMember = true;
         }
@@ -29,7 +28,7 @@ public class DexGroupServiceImpl implements GroupService {
         JwtAuthenticationToken principal = ((JwtAuthenticationToken) user.getPrincipal());
         boolean isMember = principal.getTokenAttributes().get("iss").equals("TerrakubeInternal")? true: false;
         if(!isMember) {
-            for (String groupName : toStringArray((JSONArray) principal.getTokenAttributes().get("groups"))) {
+            for (String groupName : toStringArray((java.util.ArrayList) principal.getTokenAttributes().get("groups"))) {
                 if (groupName.equals(group))
                     isMember = true;
             }
@@ -40,7 +39,7 @@ public class DexGroupServiceImpl implements GroupService {
         return isMember;
     }
 
-    private String[] toStringArray(JSONArray array) {
+    private String[] toStringArray(java.util.ArrayList array) {
         if (array == null)
             return new String[0];
 

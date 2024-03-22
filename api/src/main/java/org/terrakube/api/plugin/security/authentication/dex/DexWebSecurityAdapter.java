@@ -16,7 +16,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.terrakube.api.repository.PatRepository;
 import org.terrakube.api.repository.TeamTokenRepository;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,21 +28,21 @@ public class DexWebSecurityAdapter {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret, PatRepository patRepository, TeamTokenRepository teamTokenRepository) throws Exception {
-        http.cors().and().csrf().ignoringAntMatchers("/remote/tfe/v2/configuration-versions/*", "/tfstate/v1/archive/*/terraform.tfstate", "/tfstate/v1/archive/*/terraform.json.tfstate","/webhook/v1/**").and().authorizeRequests(authz -> {
+        http.cors().and().csrf().ignoringRequestMatchers("/remote/tfe/v2/configuration-versions/*", "/tfstate/v1/archive/*/terraform.tfstate", "/tfstate/v1/archive/*/terraform.json.tfstate","/webhook/v1/**").and().authorizeRequests(authz -> {
                             authz
-                                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                    .antMatchers("/actuator/**").permitAll()
-                                    .antMatchers("/error").permitAll()
-                                    .antMatchers("/callback/v1/**").permitAll()
-                                    .antMatchers("/webhook/v1/**").permitAll()
-                                    .antMatchers("/.well-known/terraform.json").permitAll()
-                                    .antMatchers("/remote/tfe/v2/ping").permitAll()
-                                    .antMatchers(HttpMethod.PUT, "/remote/tfe/v2/configuration-versions/*").permitAll()
-                                    .antMatchers(HttpMethod.PUT,"/tfstate/v1/archive/*/terraform.tfstate").permitAll()
-                                    .antMatchers(HttpMethod.PUT,"/tfstate/v1/archive/*/terraform.json.tfstate").permitAll()
-                                    .antMatchers("/remote/tfe/v2/plans/*/logs").permitAll()
-                                    .antMatchers("/remote/tfe/v2/applies/*/logs").permitAll()
-                                    .antMatchers("/app/*/*/runs/*").permitAll()
+                                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                    .requestMatchers("/actuator/**").permitAll()
+                                    .requestMatchers("/error").permitAll()
+                                    .requestMatchers("/callback/v1/**").permitAll()
+                                    .requestMatchers("/webhook/v1/**").permitAll()
+                                    .requestMatchers("/.well-known/terraform.json").permitAll()
+                                    .requestMatchers("/remote/tfe/v2/ping").permitAll()
+                                    .requestMatchers(HttpMethod.PUT, "/remote/tfe/v2/configuration-versions/*").permitAll()
+                                    .requestMatchers(HttpMethod.PUT,"/tfstate/v1/archive/*/terraform.tfstate").permitAll()
+                                    .requestMatchers(HttpMethod.PUT,"/tfstate/v1/archive/*/terraform.json.tfstate").permitAll()
+                                    .requestMatchers("/remote/tfe/v2/plans/*/logs").permitAll()
+                                    .requestMatchers("/remote/tfe/v2/applies/*/logs").permitAll()
+                                    .requestMatchers("/app/*/*/runs/*").permitAll()
                                     .anyRequest().authenticated();
                         }
                 )

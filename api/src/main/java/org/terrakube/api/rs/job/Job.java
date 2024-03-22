@@ -9,7 +9,7 @@ import org.terrakube.api.rs.hooks.job.JobManageHook;
 import org.terrakube.api.rs.job.step.Step;
 import org.terrakube.api.rs.workspace.Workspace;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)

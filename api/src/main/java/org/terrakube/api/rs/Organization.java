@@ -18,7 +18,7 @@ import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,8 +36,7 @@ import java.util.UUID;
 public class Organization {
 
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")

@@ -18,7 +18,7 @@ import org.terrakube.api.rs.workspace.schedule.Schedule;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,8 +37,7 @@ import java.util.UUID;
 public class Workspace extends GenericAuditFields {
 
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")

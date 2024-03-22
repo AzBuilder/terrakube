@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.terrakube.api.rs.workspace.history.History;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Getter
@@ -13,8 +13,7 @@ import java.util.UUID;
 @Entity(name = "temp_archive")
 public class Archive {
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Enumerated(EnumType.STRING)
