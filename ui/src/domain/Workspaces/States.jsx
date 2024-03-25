@@ -1,5 +1,5 @@
 import { React, useState, useRef, useCallback, useMemo } from "react";
-import { List, Space, Card, Row, Col, Avatar } from "antd";
+import { List, Space, Card, Row, Col, Avatar, Tooltip } from "antd";
 import Editor from "@monaco-editor/react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import ReactFlow, {
@@ -10,10 +10,9 @@ import ReactFlow, {
 } from "reactflow";
 import NodeResource from "./NodeResource";
 import { DownloadState } from "./DownloadState";
-import { UserOutlined } from "@ant-design/icons";
-import 'reactflow/dist/style.css';
-import {ResourceDrawer} from "../Workspaces/ResourceDrawer";
-
+import { InfoCircleOutlined, UserOutlined } from "@ant-design/icons";
+import "reactflow/dist/style.css";
+import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
 
 export const States = ({
   history,
@@ -37,6 +36,7 @@ export const States = ({
     []
   );
   const editorRef = useRef(null);
+  const jsonEditorRef = useRef(null);
   const handleClick = (state) => {
     changeState(state);
   };
@@ -45,11 +45,13 @@ export const States = ({
     editorRef.current = editor;
   }
 
+  function handleJSONEditorDidMount(editor, monaco) {
+    jsonEditorRef.current = editor;
+  }
   const showDrawer = (record) => {
     setOpen(true);
     setResource(record);
   };
-
 
   function pushNode(nodes, dependencies, element, xmap, y) {
     nodes.push({
@@ -170,13 +172,15 @@ export const States = ({
           loadData(resp);
 
           //GET RAW STATE BASICALLY JUST ADDING .raw.json
-          axiosInstance.get(state.output.replace(".json",".raw.json"))
-              .then((response) => {
-                console.log("Downloading raw state successful...")
-                setRawStateContent(JSON.stringify(response.data, null, "\t"));
-              }).catch((err) =>{
-            setStateContent(`{"error":"Failed to load raw state${err}"}`)
-          })
+          axiosInstance
+            .get(state.output.replace(".json", ".raw.json"))
+            .then((response) => {
+              console.log("Downloading raw state successful...");
+              setRawStateContent(JSON.stringify(response.data, null, "\t"));
+            })
+            .catch((err) => {
+              setStateContent(`{"error":"Failed to load raw state${err}"}`);
+            });
         })
         .catch((err) =>
           setStateContent(`{"error":"Failed to load state ${err}"}`)
@@ -198,17 +202,36 @@ export const States = ({
       tab: "diagram",
     },
     {
-      key: "code",
-      tab: "code",
+      key: "raw",
+      tab: (
+        <span>
+          code&nbsp;
+          <Tooltip title="This is the terraform/opentofu state">
+            <InfoCircleOutlined style={{ fontSize: "12px" }} />
+          </Tooltip>
+        </span>
+      ),
     },
     {
-      key: "raw",
-      tab: "raw",
+      key: "json",
+      tab: (
+        <span>
+          json&nbsp;
+          <Tooltip title="This is the result from terraform/tofu show -json">
+            <InfoCircleOutlined style={{ fontSize: "12px" }} />
+          </Tooltip>
+        </span>
+      ),
     },
   ];
 
   const onTabChange = (key) => {
     setactivetab(key);
+    if (key === "json") {
+      jsonEditorRef.current.layout();
+    } else {
+      editorRef.current.layout();
+    }
   };
 
   const nodeTypes = useMemo(
@@ -279,13 +302,17 @@ export const States = ({
                 tabList={tabs}
                 activeTabKey={activeTab}
                 onTabChange={(key) => {
-                  console.log(key)
+                  console.log(key);
                   onTabChange(key);
                 }}
               >
                 {activeTab === "diagram" ? (
                   <div style={{ height: 500 }}>
-                    <ResourceDrawer resource={resource} setOpen={setOpen} open={open}/>
+                    <ResourceDrawer
+                      resource={resource}
+                      setOpen={setOpen}
+                      open={open}
+                    />
                     <ReactFlow
                       zoomOnScroll={false}
                       nodeTypes={nodeTypes}
@@ -293,31 +320,31 @@ export const States = ({
                       edges={edges}
                       onNodesChange={onNodesChange}
                       onEdgesChange={onEdgesChange}
-                      proOptions={{hideAttribution: true}}
+                      proOptions={{ hideAttribution: true }}
                     >
                       <Controls />
                       <Background />
                     </ReactFlow>
                   </div>
                 ) : activeTab === "raw" ? (
-                    <Editor
-                        height="60vh"
-                        options={{ readOnly: "true" }}
-                        onMount={handleEditorDidMount}
-                        defaultLanguage="json"
-                        defaultValue={rawStateContent}
-                    />
-                ) : (
                   <Editor
+                    key="raw"
                     height="60vh"
                     options={{ readOnly: "true" }}
                     onMount={handleEditorDidMount}
                     defaultLanguage="json"
+                    defaultValue={rawStateContent}
+                  />
+                ) : (
+                  <Editor
+                    key="json"
+                    height="60vh"
+                    options={{ readOnly: "true" }}
+                    onMount={handleJSONEditorDidMount}
+                    defaultLanguage="json"
                     defaultValue={stateContent}
                   />
-                )
-
-                }
+                )}
               </Card>
             </Col>
           </Row>
