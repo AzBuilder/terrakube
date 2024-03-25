@@ -1,18 +1,24 @@
 package org.terrakube.registry.configuration.authentication.local;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 @ConditionalOnProperty(prefix = "org.terrakube.registry.authentication", name = "type", havingValue = "LOCAL")
-public class LocalWebSecurityAdapter extends WebSecurityConfigurerAdapter {
+public class LocalWebSecurityAdapter{
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().regexMatchers("/*");
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors().and().authorizeRequests(authz -> {
+                            authz.requestMatchers("/**").permitAll();
+                        });
+
+        return http.build();
     }
+
 }

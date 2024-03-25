@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.token.team;
 
-// import com.nimbusds.jose.shaded.json.JSONArray;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
