@@ -108,7 +108,7 @@ public class TeamTokenService {
 
     public List<String> getCurrentGroups(JwtAuthenticationToken principalJwt) {
         Object groups = principalJwt.getTokenAttributes().get("groups");
-        JSONArray array = (JSONArray) groups;
+        List array = (java.util.ArrayList) groups;
         List<String> list = new ArrayList();
         for (int i = 0; i < array.size(); i++) {
             list.add(array.get(i).toString());
