@@ -9,7 +9,7 @@ import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = ScheduleManageHook.class)
@@ -22,8 +22,7 @@ import java.util.UUID;
 public class Schedule extends GenericAuditFields {
 
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "cron")

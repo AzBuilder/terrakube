@@ -6,10 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -19,7 +16,7 @@ import java.util.UUID;
 @Table(name = "team_token")
 public class Group extends GenericAuditFields {
     @Id
-    @Type(type="uuid-char")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private int days;

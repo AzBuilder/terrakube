@@ -5,9 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.parameters.Category;
-import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @CreatePermission(expression = "user is a superuser")
@@ -20,8 +19,7 @@ import java.util.UUID;
 public class Globalvar {
 
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name="variable_description")

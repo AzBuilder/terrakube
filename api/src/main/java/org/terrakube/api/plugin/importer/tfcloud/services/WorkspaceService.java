@@ -28,7 +28,6 @@ import org.terrakube.api.rs.workspace.parameters.Category;
 import org.terrakube.api.rs.workspace.parameters.Variable;
 import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
 
-import liquibase.pro.packaged.lo;
 
 import org.terrakube.api.rs.tag.Tag;
 import org.springframework.beans.factory.annotation.Value;

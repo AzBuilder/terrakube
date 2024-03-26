@@ -4,8 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -14,7 +13,7 @@ import java.util.UUID;
 @Entity(name = "pat")
 public class Pat extends GenericAuditFields {
     @Id
-    @Type(type="uuid-char")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private int days;

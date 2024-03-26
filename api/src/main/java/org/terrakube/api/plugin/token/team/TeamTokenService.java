@@ -1,10 +1,10 @@
 package org.terrakube.api.plugin.token.team;
 
-import com.nimbusds.jose.shaded.json.JSONArray;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -108,7 +108,7 @@ public class TeamTokenService {
 
     public List<String> getCurrentGroups(JwtAuthenticationToken principalJwt) {
         Object groups = principalJwt.getTokenAttributes().get("groups");
-        JSONArray array = (JSONArray) groups;
+        List array = (java.util.ArrayList) groups;
         List<String> list = new ArrayList();
         for (int i = 0; i < array.size(); i++) {
             list.add(array.get(i).toString());

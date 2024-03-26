@@ -15,7 +15,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,10 +29,10 @@ public class DexWebSecurityAdapter {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret) throws Exception {
         http.cors().and().authorizeRequests(authz -> authz
-                        .antMatchers("/.well-known/**").permitAll()
-                        .antMatchers("/actuator/**").permitAll()
-                        .antMatchers("/terraform/modules/v1/download/**").permitAll()
-                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/.well-known/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/terraform/modules/v1/download/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> {

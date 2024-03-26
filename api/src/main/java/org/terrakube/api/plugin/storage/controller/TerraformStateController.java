@@ -8,11 +8,9 @@ import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.repository.ArchiveRepository;
-import org.terrakube.api.repository.HistoryRepository;
-import org.terrakube.api.rs.workspace.history.History;
 import org.terrakube.api.rs.workspace.history.archive.Archive;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;

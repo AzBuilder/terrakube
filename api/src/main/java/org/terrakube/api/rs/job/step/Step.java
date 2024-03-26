@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
-import org.hibernate.annotations.Type;
 import org.terrakube.api.rs.job.LogStatus;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Include
@@ -19,8 +18,7 @@ import java.util.UUID;
 public class Step {
 
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "step_number")
