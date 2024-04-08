@@ -28,8 +28,6 @@ import java.util.List;
 public class Job extends GenericAuditFields {
 
     @Id
-    @JdbcTypeCode(Types.VARCHAR)
-    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
