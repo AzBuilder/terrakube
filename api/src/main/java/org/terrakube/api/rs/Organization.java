@@ -36,6 +36,7 @@ import java.util.UUID;
 public class Organization {
 
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
