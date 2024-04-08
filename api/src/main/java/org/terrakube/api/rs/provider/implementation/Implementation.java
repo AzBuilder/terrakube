@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
+import org.terrakube.api.rs.IdConverter;
+
 import java.util.UUID;
 
 @Include
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class Implementation {
 
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

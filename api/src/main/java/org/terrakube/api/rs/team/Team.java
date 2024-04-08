@@ -3,6 +3,7 @@ package org.terrakube.api.rs.team;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.hibernate.annotations.Type;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class Team {
 
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

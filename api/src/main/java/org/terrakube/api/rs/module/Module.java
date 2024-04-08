@@ -5,6 +5,7 @@ import com.yahoo.elide.core.RequestScope;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.module.ModuleManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
@@ -24,6 +25,7 @@ import java.util.*;
 @Entity(name = "module")
 public class Module extends GenericAuditFields {
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

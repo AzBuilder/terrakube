@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.Exclude;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.LogStatus;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class Step {
 
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

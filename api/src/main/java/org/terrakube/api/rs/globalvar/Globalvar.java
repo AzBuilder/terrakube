@@ -3,6 +3,7 @@ package org.terrakube.api.rs.globalvar;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.parameters.Category;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class Globalvar {
 
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

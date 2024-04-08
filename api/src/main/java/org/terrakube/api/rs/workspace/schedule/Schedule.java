@@ -5,6 +5,7 @@ import com.yahoo.elide.annotation.LifeCycleHookBinding;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class Schedule extends GenericAuditFields {
 
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

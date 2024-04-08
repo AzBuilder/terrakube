@@ -4,6 +4,7 @@ import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.job.JobManageHook;
 import org.terrakube.api.rs.job.step.Step;
@@ -24,6 +25,7 @@ import java.util.List;
 public class Job extends GenericAuditFields {
 
     @Id
+    @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
