@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
-import org.terrakube.api.plugin.scheduler.module.DeleteStorageCacheJob;
 import org.terrakube.api.plugin.scheduler.workspace.DeleteStorageBackendJob;
 import org.terrakube.api.repository.ScheduleRepository;
 import org.terrakube.api.repository.WorkspaceRepository;

@@ -49,8 +49,6 @@ import org.terrakube.api.rs.workspace.history.archive.Archive;
 import org.terrakube.api.rs.workspace.history.archive.ArchiveType;
 import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
