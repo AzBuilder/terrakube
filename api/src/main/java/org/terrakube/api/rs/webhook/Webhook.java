@@ -3,11 +3,13 @@ package org.terrakube.api.rs.webhook;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
 import org.terrakube.api.rs.IdConverter;
 
+import java.sql.Types;
 import java.util.UUID;
 
 @Include(rootLevel = false)
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class Webhook {
 
     @Id
+    @JdbcTypeCode(Types.VARCHAR)
     @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

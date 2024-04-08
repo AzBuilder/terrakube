@@ -3,9 +3,12 @@ package org.terrakube.api.rs.provider.implementation;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.rs.provider.Provider;
 
 import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +19,7 @@ import java.util.UUID;
 public class Version {
 
     @Id
+    @JdbcTypeCode(Types.VARCHAR)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

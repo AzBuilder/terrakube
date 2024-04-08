@@ -2,11 +2,14 @@ package org.terrakube.api.rs.workspace.history.archive;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.workspace.history.History;
 
 import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.UUID;
 
 @Getter
@@ -14,6 +17,7 @@ import java.util.UUID;
 @Entity(name = "temp_archive")
 public class Archive {
     @Id
+    @JdbcTypeCode(Types.VARCHAR)
     @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

@@ -4,11 +4,14 @@ import com.yahoo.elide.annotation.Include;
 import com.yahoo.elide.annotation.ReadPermission;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.UUID;
 
 @Include(rootLevel = false)
@@ -18,6 +21,7 @@ import java.util.UUID;
 public class Variable {
 
     @Id
+    @JdbcTypeCode(Types.VARCHAR)
     @Convert(converter = IdConverter.class)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
