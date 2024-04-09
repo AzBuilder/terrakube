@@ -93,9 +93,9 @@ const iacTypes = [
     icon: <img width="18px" src="/providers/opentofu.png" />,
   },
 ];
-export const WorkspaceDetails = (props) => {
+export const WorkspaceDetails = ({ selectedTab }) => {
   const browserHistory = useHistory();
-  const { id } = useParams();
+  const { id, runid } = useParams();
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
   localStorage.setItem(WORKSPACE_ARCHIVE, id);
   const [workspace, setWorkspace] = useState({});
@@ -112,7 +112,7 @@ export const WorkspaceDetails = (props) => {
   const [jobVisible, setjobVisible] = useState(false);
   const [organizationName, setOrganizationName] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState(selectedTab !== null ? selectedTab : "1");
   const [terraformVersions, setTerraformVersions] = useState([]);
   const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
@@ -242,11 +242,29 @@ export const WorkspaceDetails = (props) => {
 
   const switchKey = (key) => {
     setActiveKey(key);
-    if (key == "2") {
-      setjobVisible(false);
-    }
-    if (key == "3") {
-      setStateDetailsVisible(false);
+    switch (key) {
+      case "1":
+        browserHistory.push(`/workspaces/${id}`);
+        break;
+      case "2":
+        setjobVisible(false);
+        browserHistory.push(`/workspaces/${id}/runs`);
+        break;
+      case "3":
+        setStateDetailsVisible(false);
+        browserHistory.push(`/workspaces/${id}/states`);
+        break;
+      case "4":
+        browserHistory.push(`/workspaces/${id}/variables`);
+        break;
+      case "5":
+        browserHistory.push(`/workspaces/${id}/schedules`);
+        break;
+      case "6":
+        browserHistory.push(`/workspaces/${id}/settings`);
+        break;  
+      default:
+        break;
     }
   };
   useEffect(() => {
@@ -330,12 +348,13 @@ export const WorkspaceDetails = (props) => {
             setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
             setWorkspaceName(response.data.data.attributes.name);
             setExecutionMode(response.data.data.attributes.executionMode);
+            if(runid) changeJob(runid);  // if runid is provided, show the job details
           });
       });
   };
 
   const handleClickSettings = () => {
-    setActiveKey("6");
+    switchKey("6");
   };
 
   const handleLockButton = (locked) => {
@@ -579,6 +598,7 @@ export const WorkspaceDetails = (props) => {
               </Space>
               <Tabs
                 activeKey={activeKey}
+                defaultActiveKey={selectedTab}
                 onTabClick={handleStatesClick}
                 tabBarExtraContent={
                   <>
