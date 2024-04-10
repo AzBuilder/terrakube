@@ -208,7 +208,6 @@ export const WorkspaceDetails = (props) => {
     switchKey(key);
   };
 
-
   const getIaCIconById = (id) => {
     const item = iacTypes.find((iacType) => iacType.id === id);
     return item ? item.icon : null;
@@ -222,17 +221,21 @@ export const WorkspaceDetails = (props) => {
   };
 
   const loadAgentlist = () => {
-    axiosInstance.get(`organization/${organizationId}/agent`).then((response) => {
-      console.log(response.data.data);
-      setAgentList(response.data.data);
-    });
+    axiosInstance
+      .get(`organization/${organizationId}/agent`)
+      .then((response) => {
+        console.log(response.data.data);
+        setAgentList(response.data.data);
+      });
   };
 
   const loadOrgTemplates = () => {
-    axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
-      console.log(response.data.data);
-      setOrgTemplates(response.data.data);
-    });
+    axiosInstance
+      .get(`organization/${organizationId}/template`)
+      .then((response) => {
+        console.log(response.data.data);
+        setOrgTemplates(response.data.data);
+      });
   };
 
   const showDrawer = (record) => {
@@ -269,31 +272,27 @@ export const WorkspaceDetails = (props) => {
     setActiveKey("2");
   };
 
-  const loadVersions = (iacType)=>{
+  const loadVersions = (iacType) => {
     const versionsApi = `${
       new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-    }/${iacType}/index.json`
+    }/${iacType}/index.json`;
     axiosInstance.get(versionsApi).then((resp) => {
       console.log(resp);
       const tfVersions = [];
-      if(iacType ==="tofu")
-      {
-        resp.data.forEach(release => {
-          if (!release.tag_name.includes("-"))  tfVersions.push(release.tag_name.replace("v",""));
+      if (iacType === "tofu") {
+        resp.data.forEach((release) => {
+          if (!release.tag_name.includes("-"))
+            tfVersions.push(release.tag_name.replace("v", ""));
         });
-
-    }
-    else{
-
-      for (const version in resp.data.versions) {
-        if (!version.includes("-")) tfVersions.push(version);
+      } else {
+        for (const version in resp.data.versions) {
+          if (!version.includes("-")) tfVersions.push(version);
+        }
       }
-
-    }
       setTerraformVersions(tfVersions.sort(compareVersions).reverse());
       console.log(tfVersions);
     });
-  }
+  };
 
   const loadWorkspace = (_loadVersions) => {
     axiosInstance
@@ -305,7 +304,8 @@ export const WorkspaceDetails = (props) => {
             `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent`
           )
           .then((response) => {
-            if(_loadVersions) loadVersions(response.data.data.attributes.iacType);
+            if (_loadVersions)
+              loadVersions(response.data.data.attributes.iacType);
             setWorkspace(response.data);
             console.log(response.data);
             if (response.data.included) {
@@ -324,7 +324,7 @@ export const WorkspaceDetails = (props) => {
                 axiosInstance,
                 setResources,
                 setOutputs,
-                  setAgent,
+                setAgent
               );
             }
             setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
@@ -399,7 +399,6 @@ export const WorkspaceDetails = (props) => {
         console.log(response);
         if (response.status == "204") {
           message.success("Workspace updated successfully");
-
         } else {
           message.error("Workspace update failed");
         }
@@ -407,34 +406,39 @@ export const WorkspaceDetails = (props) => {
       });
 
     var bodyAgent;
-    console.log(`Using Agent: ${values.executorAgent}`)
-    if (values.executorAgent === "default"){
+    console.log(`Using Agent: ${values.executorAgent}`);
+    if (values.executorAgent === "default") {
       bodyAgent = {
-        data:  null
-      }
+        data: null,
+      };
     } else {
       bodyAgent = {
         data: {
           type: "agent",
-          id: values.executorAgent
-        }
-      }
+          id: values.executorAgent,
+        },
+      };
     }
     console.log(bodyAgent);
-    axiosInstance.patch(`/organization/${organizationId}/workspace/${id}/relationships/agent`, bodyAgent, {
-      headers: {
-        "Content-Type": "application/vnd.api+json",
-      },
-    }).then((response) => {
-      console.log("Update Workspace agent successfully")
-      console.log(response);
-      if (response.status == "204") {
-        console.log("Workspace agent updated successfully");
-
-      } else {
-        console.log("Workspace agent update failed");
-      }
-    })
+    axiosInstance
+      .patch(
+        `/organization/${organizationId}/workspace/${id}/relationships/agent`,
+        bodyAgent,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Update Workspace agent successfully");
+        console.log(response);
+        if (response.status == "204") {
+          console.log("Workspace agent updated successfully");
+        } else {
+          console.log("Workspace agent update failed");
+        }
+      });
   };
 
   const renderVCSLogo = (vcs) => {
@@ -557,15 +561,16 @@ export const WorkspaceDetails = (props) => {
                   </span>
                   <Space direction="horizontal">
                     {getIaCIconById(workspace.data.attributes?.iacType)}
-                    <span>     
-                    {getIaCNameById(workspace.data.attributes?.iacType)}{" "}               <a
-                      onClick={handleClickSettings}
-                      className="workspace-button"
-                      style={{ color: "#3b3d45" }}
-                    >
-                      v{workspace.data.attributes.terraformVersion}
-                    </a></span>
-
+                    <span>
+                      {getIaCNameById(workspace.data.attributes?.iacType)}{" "}
+                      <a
+                        onClick={handleClickSettings}
+                        className="workspace-button"
+                        style={{ color: "#3b3d45" }}
+                      >
+                        v{workspace.data.attributes.terraformVersion}
+                      </a>
+                    </span>
                   </Space>
 
                   <span>
@@ -913,8 +918,12 @@ export const WorkspaceDetails = (props) => {
                             workspace.data.attributes.executionMode,
                           iacType: workspace.data.attributes.iacType,
                           branch: workspace.data.attributes.branch,
-                          defaultTemplate: workspace.data.attributes.defaultTemplate,
-                          executorAgent: workspace.data.relationships.agent.data?.id == null ? "default": workspace.data.relationships.agent.data?.id ,
+                          defaultTemplate:
+                            workspace.data.attributes.defaultTemplate,
+                          executorAgent:
+                            workspace.data.relationships.agent.data?.id == null
+                              ? "default"
+                              : workspace.data.relationships.agent.data?.id,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -924,7 +933,18 @@ export const WorkspaceDetails = (props) => {
                             <span className="App-text"> {id}</span>
                           </Paragraph>
                         </Form.Item>
-                        <Form.Item name="name" label="Name">
+                        <Form.Item
+                          name="name"
+                          rules={[
+                            { required: true },
+                            {
+                              pattern: /^[A-Za-z0-9_-]+$/,
+                              message:
+                                "Only dashes, underscores, and alphanumeric characters are permitted.",
+                            },
+                          ]}
+                          label="Name"
+                        >
                           <Input />
                         </Form.Item>
 
@@ -938,12 +958,15 @@ export const WorkspaceDetails = (props) => {
                         <Form.Item
                           name="terraformVersion"
                           label={
-                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
-                            " Version"
+                            getIaCNameById(
+                              selectedIac || workspace.data.attributes?.iacType
+                            ) + " Version"
                           }
                           extra={
                             "The version of " +
-                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
+                            getIaCNameById(
+                              selectedIac || workspace.data.attributes?.iacType
+                            ) +
                             " to use for this workspace. Upon creating this workspace, the latest version was selected and will be used until it is changed manually. It will not upgrade automatically."
                           }
                         >
@@ -961,12 +984,15 @@ export const WorkspaceDetails = (props) => {
                         <Form.Item
                           name="folder"
                           label={
-                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
-                            " Working Directory"
+                            getIaCNameById(
+                              selectedIac || workspace.data.attributes?.iacType
+                            ) + " Working Directory"
                           }
                           extra={
                             "The directory that " +
-                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
+                            getIaCNameById(
+                              selectedIac || workspace.data.attributes?.iacType
+                            ) +
                             " will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
                           }
                         >
@@ -1002,7 +1028,11 @@ export const WorkspaceDetails = (props) => {
                             onChange={handleIacChange}
                           >
                             {iacTypes.map(function (iacType, index) {
-                                return <Option key={iacType.id}>{getIaCIconById(iacType.id)} {iacType.name} </Option>
+                              return (
+                                <Option key={iacType.id}>
+                                  {getIaCIconById(iacType.id)} {iacType.name}{" "}
+                                </Option>
+                              );
                             })}
                           </Select>
                         </Form.Item>
@@ -1011,7 +1041,9 @@ export const WorkspaceDetails = (props) => {
                           label="Execution Mode"
                           extra={
                             "Use this option with terraform remote state/cloud block if you want to execute " +
-                            getIaCNameById(selectedIac || workspace.data.attributes?.iacType) +
+                            getIaCNameById(
+                              selectedIac || workspace.data.attributes?.iacType
+                            ) +
                             " CLI remotely and just upload the state to Terrakube"
                           }
                         >
@@ -1026,22 +1058,22 @@ export const WorkspaceDetails = (props) => {
                           </Select>
                         </Form.Item>
                         <Form.Item
-                            name="defaultTemplate"
-                            label="Default template when doing a git push to the repository"
-                            extra="Default template when doing a git push to the repository"
+                          name="defaultTemplate"
+                          label="Default template when doing a git push to the repository"
+                          extra="Default template when doing a git push to the repository"
                         >
                           <Select
-                              defaultValue={
-                                workspace.data.attributes.defaultTemplate
-                              }
-                              placeholder="select default template"
-                              style={{ width: 250 }}
+                            defaultValue={
+                              workspace.data.attributes.defaultTemplate
+                            }
+                            placeholder="select default template"
+                            style={{ width: 250 }}
                           >
                             {orgTemplates.map(function (template, index) {
                               return (
-                                  <Option key={template?.id}>
-                                    {template?.attributes?.name}
-                                  </Option>
+                                <Option key={template?.id}>
+                                  {template?.attributes?.name}
+                                </Option>
                               );
                             })}
                           </Select>
@@ -1068,22 +1100,22 @@ export const WorkspaceDetails = (props) => {
                           </Select>
                         </Form.Item>
                         <Form.Item
-                            name="executorAgent"
-                            label="Executor agent to run the job"
-                            extra="Use this option to select which executor agent will run the job remotely"
+                          name="executorAgent"
+                          label="Executor agent to run the job"
+                          extra="Use this option to select which executor agent will run the job remotely"
                         >
                           <Select
-                              defaultValue={
-                                workspace.data.attributes.moduleSshKey
-                              }
-                              placeholder="select Job Agent"
-                              style={{ width: 250 }}
+                            defaultValue={
+                              workspace.data.attributes.moduleSshKey
+                            }
+                            placeholder="select Job Agent"
+                            style={{ width: 250 }}
                           >
                             {agentList.map(function (agentKey, index) {
                               return (
-                                  <Option key={agentKey?.id}>
-                                    {agentKey?.attributes?.name}
-                                  </Option>
+                                <Option key={agentKey?.id}>
+                                  {agentKey?.attributes?.name}
+                                </Option>
                               );
                             })}
                             <Option key="default">default</Option>
@@ -1165,7 +1197,7 @@ function setupWorkspaceIncludes(
   axiosInstance,
   setResources,
   setOutputs,
-  setAgent,
+  setAgent
 ) {
   let variables = [];
   let jobs = [];
@@ -1242,7 +1274,7 @@ function setupWorkspaceIncludes(
         setVCSProvider(element.attributes.vcsType);
         break;
       case include.AGENT:
-        setAgent(element.id)
+        setAgent(element.id);
         break;
       case include.VARIABLE:
         if (element.attributes.category == "ENV") {
@@ -1268,7 +1300,9 @@ function setupWorkspaceIncludes(
   setHistory(history);
   setSchedule(schedule);
 
-  console.log(`Parsing state for workspace ${localStorage.getItem(WORKSPACE_ARCHIVE)} `);
+  console.log(
+    `Parsing state for workspace ${localStorage.getItem(WORKSPACE_ARCHIVE)} `
+  );
   // set state data
   var lastState = history
     .sort((a, b) => a.jobReference - b.jobReference)
@@ -1276,12 +1310,24 @@ function setupWorkspaceIncludes(
   // reload state only if there is a new version
   console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
-    loadState(lastState, axiosInstance, setOutputs, setResources, localStorage.getItem(WORKSPACE_ARCHIVE));
+    loadState(
+      lastState,
+      axiosInstance,
+      setOutputs,
+      setResources,
+      localStorage.getItem(WORKSPACE_ARCHIVE)
+    );
   }
   setCurrentStateId(lastState?.id);
 }
 
-function loadState(state, axiosInstance, setOutputs, setResources, workspaceId) {
+function loadState(
+  state,
+  axiosInstance,
+  setOutputs,
+  setResources,
+  workspaceId
+) {
   if (!state) {
     return;
   }
@@ -1292,20 +1338,30 @@ function loadState(state, axiosInstance, setOutputs, setResources, workspaceId) 
   axiosInstance.get(state.output).then((resp) => {
     var result = parseState(resp.data);
 
-    if(result.outputs.length < 1 && result.resources.length < 1){
-      axiosInstance.get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`).then((currentStateData) => {
-        console.log("Current State Data")
-        console.log(currentStateData.data)
-        currentState = currentStateData.data
+    if (result.outputs.length < 1 && result.resources.length < 1) {
+      axiosInstance
+        .get(
+          `${
+            new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+          }/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`
+        )
+        .then((currentStateData) => {
+          console.log("Current State Data");
+          console.log(currentStateData.data);
+          currentState = currentStateData.data;
 
-        console.log("Parsing state using current state data instead of json representation")
-        result = parseOldState(currentState)
+          console.log(
+            "Parsing state using current state data instead of json representation"
+          );
+          result = parseOldState(currentState);
 
-        console.log("result parsing state", result);
-        setResources(result.resources);
-        setOutputs(result.outputs);
-      }).catch(function (error) {console.error(error)});
-
+          console.log("result parsing state", result);
+          setResources(result.resources);
+          setOutputs(result.outputs);
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
     } else {
       console.log("result parsing state", result);
       setResources(result.resources);
@@ -1367,7 +1423,7 @@ function parseState(state) {
   if (state?.values?.root_module?.child_modules?.length > 0) {
     state?.values?.root_module?.child_modules?.forEach((moduleVal, index) => {
       console.log(`Checking child ${moduleVal.address} with index ${index}`);
-      if(moduleVal.resources != null)
+      if (moduleVal.resources != null)
         for (const [key, value] of Object.entries(moduleVal.resources)) {
           resources.push({
             name: value.name,
@@ -1379,8 +1435,8 @@ function parseState(state) {
           });
         }
 
-      if(moduleVal.child_modules?.length > 0) {
-        resources = parseChildModules(resources , moduleVal.child_modules);
+      if (moduleVal.child_modules?.length > 0) {
+        resources = parseChildModules(resources, moduleVal.child_modules);
       }
     });
   } else {
@@ -1424,11 +1480,11 @@ function parseOldState(state) {
   console.log("Parsing resources and modules fallback method");
   if (state?.resources != null && state?.resources.length > 0) {
     state?.resources.forEach((value) => {
-      if(value.module != null) {
+      if (value.module != null) {
         resources.push({
           name: value.name,
           type: value.type,
-          provider: value.provider.replace("provider[","").replace("]",""),
+          provider: value.provider.replace("provider[", "").replace("]", ""),
           module: value.module,
           values: value.instances[0].attributes,
           depends_on: value.instances[0].dependencies,
@@ -1437,28 +1493,28 @@ function parseOldState(state) {
         resources.push({
           name: value.name,
           type: value.type,
-          provider: value.provider.replace("provider[\"","").replace("\"]",""),
+          provider: value.provider.replace('provider["', "").replace('"]', ""),
           module: "root_module",
           values: value.instances[0].attributes,
           depends_on: value.instances[0].dependencies,
         });
       }
-
     });
-
   } else {
     console.log("State has no resources/modules");
   }
 
-  console.log({ resources: resources, outputs: outputs })
+  console.log({ resources: resources, outputs: outputs });
 
   return { resources: resources, outputs: outputs };
 }
 
-function parseChildModules(resources, child_modules){
+function parseChildModules(resources, child_modules) {
   child_modules?.forEach((moduleVal, index) => {
-    console.log(`Checking nested child ${moduleVal.address} with index ${index}`);
-    if(moduleVal.resources != null)
+    console.log(
+      `Checking nested child ${moduleVal.address} with index ${index}`
+    );
+    if (moduleVal.resources != null)
       for (const [key, value] of Object.entries(moduleVal.resources)) {
         resources.push({
           name: value.name,
@@ -1470,7 +1526,7 @@ function parseChildModules(resources, child_modules){
         });
       }
 
-    if(moduleVal.child_modules?.length > 0) {
+    if (moduleVal.child_modules?.length > 0) {
       resources = parseChildModules(resources);
     }
   });
@@ -1489,4 +1545,4 @@ function fixSshURL(source) {
 function getIaCNameById(id) {
   const item = iacTypes.find((iacType) => iacType.id === id);
   return item ? item.name : null;
-};
+}
