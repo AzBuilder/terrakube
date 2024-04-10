@@ -644,7 +644,13 @@ export const CreateWorkspace = () => {
               <Form.Item
                 name="name"
                 label="Workspace Name"
-                rules={[{ required: true }]}
+                rules={[
+                  { required: true },
+                  {
+                    pattern: /^[A-Za-z0-9_-]+$/,
+                    message: 'Only dashes, underscores, and alphanumeric characters are permitted.',
+                  },
+                ]}
                 extra="The name of your workspace is unique and used in tools, routing, and UI. Dashes, underscores, and alphanumeric characters are permitted."
               >
                 <Input />
