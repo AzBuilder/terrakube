@@ -59,8 +59,27 @@ const App = () => {
           </Route>
           <Route exact path="/workspaces/create" component={CreateWorkspace} />
           <Route exact path="/workspaces/import" component={ImportWorkspace} />
-          <Route exact path="/workspaces/:id" component={WorkspaceDetails} />
-
+          <Route exact path="/workspaces/:id">
+            <WorkspaceDetails />
+          </Route>
+          <Route exact path="/workspaces/:id/runs">
+            <WorkspaceDetails selectedTab="2" />
+          </Route>
+          <Route exact path="/workspaces/:id/runs/:runid">
+            <WorkspaceDetails selectedTab="2" />
+          </Route>
+          <Route exact path="/workspaces/:id/states">
+            <WorkspaceDetails selectedTab="3" />
+          </Route>
+          <Route exact path="/workspaces/:id/variables">
+            <WorkspaceDetails selectedTab="4" />
+          </Route>
+          <Route exact path="/workspaces/:id/schedules">
+            <WorkspaceDetails selectedTab="5" />
+          </Route>
+          <Route exact path="/workspaces/:id/settings">
+            <WorkspaceDetails selectedTab="6" />
+          </Route>
           <Route
             exact
             path="/organizations/:orgid/registry/create"
@@ -99,7 +118,9 @@ const App = () => {
             <UserSettings />
           </Route>
         </Switch>
-        <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION } ©2024</Footer>
+        <Footer style={{ textAlign: "center" }}>
+          Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2024
+        </Footer>
       </Layout>
     </Router>
   );
