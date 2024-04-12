@@ -110,7 +110,7 @@ class JobTests extends ServerApplicationTests {
                 .assertThat()
                 .log()
                 .all()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+                .statusCode(HttpStatus.CREATED.value());
 
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
