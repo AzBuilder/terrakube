@@ -118,9 +118,7 @@ const App = () => {
             <UserSettings />
           </Route>
         </Switch>
-        <Footer style={{ textAlign: "center" }}>
-          Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2024
-        </Footer>
+        <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2024</Footer>
       </Layout>
     </Router>
   );
