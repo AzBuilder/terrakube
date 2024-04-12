@@ -17,21 +17,21 @@
 		<azure.version>5.7.0</azure.version>
 		<java.version>17</java.version>
 		<lombok.version>1.18.20</lombok.version>
-		<terrakube-client-starter.version>0.14.0</terrakube-client-starter.version>
+		<terrakube-client-starter.version>0.15.0-beta.3</terrakube-client-starter.version>
 		<jgit.version>6.6.1.202309021850-r</jgit.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
 		<rest-assured.version>4.5.1</rest-assured.version>
 		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
-		<groovy.version>3.0.8</groovy.version>
+		<!--groovy.version>3.0.8</groovy.version-->
 		<aws-sdk.version>1.12.261</aws-sdk.version>
 		<zt-zip.version>1.14</zt-zip.version>
 		<gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 		<!--BUILDPACK DATA-->
-		<buildpack.builder>paketobuildpacks/builder-jammy-tiny</buildpack.builder>
-		<buildpack.java>gcr.io/paketo-buildpacks/java:12.0.0</buildpack.java>
-		<buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry</buildpack.telemetry>
+		<buildpack.builder>paketobuildpacks/builder-jammy-base</buildpack.builder>
+		<buildpack.java>gcr.io/paketo-buildpacks/java:12.1.0</buildpack.java>
+		<buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:1.7.1</buildpack.telemetry>
 	</properties>
 	<build>
         <plugins>
@@ -73,6 +73,10 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
@@ -86,6 +90,12 @@
 			<groupId>org.terrakube.client</groupId>
 			<artifactId>terrakube-spring-boot-starter</artifactId>
 			<version>${terrakube-client-starter.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.squareup.okio:okio-jvm</groupId>
+					<artifactId>3.0.0 </artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>

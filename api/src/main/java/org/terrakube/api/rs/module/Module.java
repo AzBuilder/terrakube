@@ -4,14 +4,17 @@ import com.yahoo.elide.annotation.*;
 import com.yahoo.elide.core.RequestScope;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.module.ModuleManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
-import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.*;
 
 @ReadPermission(expression = "team view module")
@@ -25,8 +28,9 @@ import java.util.*;
 @Entity(name = "module")
 public class Module extends GenericAuditFields {
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")

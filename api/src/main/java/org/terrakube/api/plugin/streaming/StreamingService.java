@@ -1,6 +1,5 @@
 package org.terrakube.api.plugin.streaming;
 
-import liquibase.repackaged.org.apache.commons.text.TextStringBuilder;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.*;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.terrakube.api.repository.StepRepository;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.step.Step;
+import org.apache.commons.text.TextStringBuilder;
 
 import java.util.List;
 import java.util.UUID;

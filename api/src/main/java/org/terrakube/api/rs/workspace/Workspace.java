@@ -3,7 +3,9 @@ package org.terrakube.api.rs.workspace;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.agent.Agent;
 import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
@@ -18,7 +20,9 @@ import org.terrakube.api.rs.workspace.schedule.Schedule;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,8 +41,9 @@ import java.util.UUID;
 public class Workspace extends GenericAuditFields {
 
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")

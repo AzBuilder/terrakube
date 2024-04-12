@@ -4,12 +4,15 @@ import com.yahoo.elide.annotation.Exclude;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
-import org.hibernate.annotations.Type;
 import org.terrakube.api.rs.job.LogStatus;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.UUID;
 
 @Include
@@ -19,8 +22,9 @@ import java.util.UUID;
 public class Step {
 
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "step_number")

@@ -3,12 +3,16 @@ package org.terrakube.api.rs.workspace.history;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 import org.terrakube.api.rs.workspace.history.archive.Archive;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +26,9 @@ import java.util.UUID;
 public class History extends GenericAuditFields {
 
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "job_reference")

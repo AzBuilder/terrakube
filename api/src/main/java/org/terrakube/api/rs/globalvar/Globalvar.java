@@ -3,11 +3,14 @@ package org.terrakube.api.rs.globalvar;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.parameters.Category;
-import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.UUID;
 
 @CreatePermission(expression = "user is a superuser")
@@ -20,8 +23,9 @@ import java.util.UUID;
 public class Globalvar {
 
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name="variable_description")

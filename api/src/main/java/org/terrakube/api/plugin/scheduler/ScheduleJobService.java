@@ -2,7 +2,6 @@ package org.terrakube.api.plugin.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.StepRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.job.Job;

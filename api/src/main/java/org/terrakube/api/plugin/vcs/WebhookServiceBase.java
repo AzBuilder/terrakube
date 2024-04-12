@@ -3,6 +3,7 @@ package org.terrakube.api.plugin.vcs;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.function.TriFunction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -10,17 +11,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.datical.liquibase.ext.checks.config.TriFunction;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

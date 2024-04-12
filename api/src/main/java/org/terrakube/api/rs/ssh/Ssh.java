@@ -3,11 +3,14 @@ package org.terrakube.api.rs.ssh;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
+import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.UUID;
 
 @ReadPermission(expression = "team view ssh")
@@ -21,8 +24,9 @@ import java.util.UUID;
 public class Ssh extends GenericAuditFields {
 
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")

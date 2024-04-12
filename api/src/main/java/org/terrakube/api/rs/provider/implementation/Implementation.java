@@ -3,9 +3,13 @@ package org.terrakube.api.rs.provider.implementation;
 import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.terrakube.api.rs.IdConverter;
+
+import java.sql.Types;
 import java.util.UUID;
 
 @Include
@@ -15,8 +19,9 @@ import java.util.UUID;
 public class Implementation {
 
     @Id
-    @Type(type="uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name="os")

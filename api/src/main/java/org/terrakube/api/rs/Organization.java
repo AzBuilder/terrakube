@@ -3,6 +3,7 @@ package org.terrakube.api.rs;
 import com.yahoo.elide.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Where;
 import org.terrakube.api.rs.agent.Agent;
 import org.terrakube.api.rs.globalvar.Globalvar;
@@ -18,7 +19,9 @@ import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,8 +39,9 @@ import java.util.UUID;
 public class Organization {
 
     @Id
-    @Type(type = "uuid-char")
-    @GeneratedValue
+    @JdbcTypeCode(Types.VARCHAR)
+    @Convert(converter = IdConverter.class)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name")
