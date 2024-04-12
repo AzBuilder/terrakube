@@ -30,17 +30,13 @@ public class TeamManageJob extends OperationCheck<Job> {
         log.debug("team manage job {}", job.getId());
         List<Team> teamList = job.getOrganization().getTeam();
         boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
-        boolean isWorkspaceLock = job.getWorkspace().isLocked();
-        if(isWorkspaceLock){
-            log.warn("Workspace {} {} is locked, job creation is denied", job.getWorkspace().getId(), job.getWorkspace().getName());
-        }
         for (Team team : teamList) {
             if (isServiceAccount){
-                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageWorkspace() && !isWorkspaceLock ){
+                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageWorkspace()){
                     return true;
                 }
             } else {
-                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageWorkspace() && !isWorkspaceLock)
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageWorkspace())
                     return true;
             }
         }
