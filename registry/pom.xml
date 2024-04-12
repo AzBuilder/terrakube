@@ -29,7 +29,7 @@
 		<gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 		<!--BUILDPACK DATA-->
-		<buildpack.builder>paketobuildpacks/builder-jammy-base</buildpack.builder>
+		<buildpack.builder>paketobuildpacks/builder-jammy-tiny</buildpack.builder>
 		<buildpack.java>gcr.io/paketo-buildpacks/java:12.0.0</buildpack.java>
 		<buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry</buildpack.telemetry>
 	</properties>
