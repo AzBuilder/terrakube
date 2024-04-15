@@ -39,6 +39,7 @@ function generateApiVars(){
   echo "PatSecret=$PatSecret" >> .envApi
   echo "InternalSecret=$InternalSecret" >> .envApi
   echo "DexIssuerUri=$DexIssuerUri" >> .envApi
+  echo "DexInternalIssuerUri=http://terrakube-dex:5556/dex" >> .envApi
   echo "StorageType=$StorageType" >> .envApi
 
   echo "GcpStorageProjectId=$GCP_PROJECT_ID" >> .envApi
