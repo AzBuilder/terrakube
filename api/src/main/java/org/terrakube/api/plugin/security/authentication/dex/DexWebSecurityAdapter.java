@@ -27,7 +27,8 @@ import java.util.List;
 public class DexWebSecurityAdapter {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret, PatRepository patRepository, TeamTokenRepository teamTokenRepository) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, @Value("${org.terrakube.token.internal-issuer-uri}") String internalIssuerUri, @Value("${org.terrakube.token.issuer-uri}") String issuerUri, @Value("${org.terrakube.token.pat}") String patJwtSecret, @Value("${org.terrakube.token.internal}") String internalJwtSecret, PatRepository patRepository, TeamTokenRepository teamTokenRepository) throws Exception {
+        log.info("DexIssuerUri: {} InternalDexIssuerUri: {}", issuerUri, internalIssuerUri);
         http.cors().and().csrf().ignoringRequestMatchers("/remote/tfe/v2/configuration-versions/*", "/tfstate/v1/archive/*/terraform.tfstate", "/tfstate/v1/archive/*/terraform.json.tfstate","/webhook/v1/**").and().authorizeRequests(authz -> {
                             authz
                                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -50,6 +51,7 @@ public class DexWebSecurityAdapter {
                     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver = DexAuthenticationManagerResolver
                             .builder()
                             .dexIssuerUri(issuerUri)
+                            .dexInternalIssuerUri(internalIssuerUri)
                             .patJwtSecret(patJwtSecret)
                             .internalJwtSecret(internalJwtSecret)
                             .patRepository(patRepository)

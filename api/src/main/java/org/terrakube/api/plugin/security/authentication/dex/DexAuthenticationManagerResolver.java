@@ -15,6 +15,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.terrakube.api.repository.PatRepository;
@@ -24,7 +25,9 @@ import org.terrakube.api.rs.token.pat.Pat;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,9 +37,10 @@ import java.util.UUID;
 @Slf4j
 public class DexAuthenticationManagerResolver implements AuthenticationManagerResolver<HttpServletRequest> {
 
-    private static final String jwtTypePat="Terrakube";
-    private static final String jwtTypeInternal="TerrakubeInternal";
+    private static final String jwtTypePat = "Terrakube";
+    private static final String jwtTypeInternal = "TerrakubeInternal";
     private String dexIssuerUri;
+    private String dexInternalIssuerUri;
     private String patJwtSecret;
     private String internalJwtSecret;
     private PatRepository patRepository;
@@ -46,13 +50,13 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
     public AuthenticationManager resolve(HttpServletRequest request) {
         ProviderManager providerManager = null;
         String issuer = "";
-        try{
+        try {
             issuer = getIssuer(request);
-            if (isTokenDeleted(getTokenId(request))){
+            if (isTokenDeleted(getTokenId(request))) {
                 //FORCE TOKEN TO USE INTERNAL AUTH SO IT CAN ALWAYS FAIL
                 issuer = jwtTypeInternal;
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log.info(ex.getMessage());
         }
         switch (issuer) {
@@ -66,7 +70,20 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
                 break;
             default:
                 log.debug("Using Dex JWT Authentication Provider");
-                providerManager = new ProviderManager(new JwtAuthenticationProvider(JwtDecoders.fromIssuerLocation(this.dexIssuerUri)));
+                if (dexInternalIssuerUri != null && !dexInternalIssuerUri.isEmpty()) {
+                    // Using dex internal URI to authenticate
+                    NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
+                            .withIssuerLocation(this.dexIssuerUri)
+                            .build();
+                    jwtDecoder.setJwtValidator(
+                            JwtValidators.createDefaultWithIssuer(this.dexInternalIssuerUri)
+                    );
+                    providerManager = new ProviderManager(new JwtAuthenticationProvider(jwtDecoder));
+                } else {
+                    // Using dex external URI to authenticate
+                    providerManager = new ProviderManager(new JwtAuthenticationProvider(JwtDecoders.fromIssuerLocation(this.dexIssuerUri)));
+                }
+
                 break;
         }
         return providerManager;
