@@ -44,6 +44,10 @@ public class Job extends GenericAuditFields {
     @Column(name = "commit_id")
     private String commitId;
 
+    @Exclude
+    @Column(name = "auto_apply")
+    private boolean autoApply = false;
+
     @Column(name = "terraform_plan")
     private String terraformPlan;
 

@@ -692,8 +692,14 @@ public class RemoteTfeService {
         boolean isDestroy = runsData.getData().getAttributes().get("is-destroy") != null
                 ? (boolean) runsData.getData().getAttributes().get("is-destroy")
                 : false;
+
+        boolean autoApply = runsData.getData().getAttributes().get("auto-apply") != null
+                ? (boolean) runsData.getData().getAttributes().get("auto-apply")
+                : false;
+
         log.info("Creating new Terrakube Job");
         log.info("Workspace {} Configuration {}", workspaceId, configurationId);
+        log.info("isDestroy {} autoApply {}", isDestroy, autoApply);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
         String sourceTarGz = String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz",
                 hostname, configurationId);
@@ -712,6 +718,7 @@ public class RemoteTfeService {
         job.setWorkspace(workspace);
         job.setOrganization(workspace.getOrganization());
         job.setStatus(JobStatus.pending);
+        job.setAutoApply(autoApply);
         job.setComments("terraform-cli");
         job.setVia("CLI");
         job.setTemplateReference(template.getId().toString());

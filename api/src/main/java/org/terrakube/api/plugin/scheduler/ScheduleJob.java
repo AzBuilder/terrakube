@@ -153,10 +153,15 @@ public class ScheduleJob implements org.quartz.Job {
                     }
                     break;
                 case approval:
-                    job.setStatus(JobStatus.waitingApproval);
-                    job.setApprovalTeam(flow.get().getTeam());
-                    jobRepository.save(job);
-                    log.info("Waiting Approval for Job {} Step Id {}", job.getId(), stepId);
+                    if(!job.isAutoApply()) {
+                        job.setStatus(JobStatus.waitingApproval);
+                        job.setApprovalTeam(flow.get().getTeam());
+                        jobRepository.save(job);
+                        log.info("Waiting Approval for Job {} Step Id {}", job.getId(), stepId);
+                    } else {
+                        log.info("Auto Approving is enabled for Job {} Step Id {}", job.getId(), stepId);
+                        executeApprovedJobs(job);
+                    }
                     break;
                 case disableWorkspace:
                     log.warn("Disable workspace {} updating status to COMPLETED", job.getId());
