@@ -1,9 +1,7 @@
 package org.terrakube.api.plugin.security.authentication.dex;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,10 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.jwt.JwtValidators;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.terrakube.api.repository.PatRepository;
 import org.terrakube.api.repository.TeamTokenRepository;
@@ -72,6 +67,7 @@ public class DexAuthenticationManagerResolver implements AuthenticationManagerRe
                 log.debug("Using Dex JWT Authentication Provider");
                 if (dexInternalIssuerUri != null && !dexInternalIssuerUri.isEmpty()) {
                     // Using dex internal URI to authenticate
+                    log.info("new internal communication {} {}", dexIssuerUri, dexInternalIssuerUri);
                     NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
                             .withIssuerLocation(this.dexIssuerUri)
                             .build();
