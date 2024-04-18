@@ -47,3 +47,6 @@ terrakubeDemo1.crt
 terrakubeDemo2.crt
 bindings/ca-certificates/terrakubeDemo1.pem
 bindings/ca-certificates/terrakubeDemo2.pem
+
+private.pem
+public.pem
