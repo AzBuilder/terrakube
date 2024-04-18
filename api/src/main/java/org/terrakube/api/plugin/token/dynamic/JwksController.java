@@ -86,6 +86,8 @@ public class JwksController {
         jwkElement.setUse("sig");
         jwkElement.setAlg("RS256");
 
+        jwkData.getKeys().add(jwkElement);
+
         return  jwkData;
     }
 }
