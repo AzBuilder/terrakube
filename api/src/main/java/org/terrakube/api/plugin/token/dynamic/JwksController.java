@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -52,11 +54,17 @@ public class JwksController {
         publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----", "");
         publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
 
-        publicKeyPEM = StringUtils.strip(publicKeyPEM, "\n");
+        String publicKeyPEMFinal = "";
+        String line;
+        BufferedReader bufReader = new BufferedReader(new StringReader(publicKeyPEM));
+        while( (line=bufReader.readLine()) != null )
+        {
+            publicKeyPEMFinal += line;
+        }
 
-        log.info("Dynamic Credentials Public Key: {}", publicKeyPEM);
+        log.info("Dynamic Credentials Public Key: {}", publicKeyPEMFinal);
 
-        byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);
+        byte[] encoded = Base64.getDecoder().decode(publicKeyPEMFinal);
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
