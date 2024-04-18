@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +51,8 @@ public class JwksController {
 
         publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----", "");
         publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
+
+        publicKeyPEM = StringUtils.strip(publicKeyPEM, "\n");
 
         log.info("Dynamic Credentials Public Key: {}", publicKeyPEM);
 
