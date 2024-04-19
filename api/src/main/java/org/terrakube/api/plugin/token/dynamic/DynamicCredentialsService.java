@@ -73,6 +73,18 @@ public class DynamicCredentialsService {
         return workspaceEnvVariables;
     }
 
+    @Transactional
+    public HashMap<String, String> generateDynamicCredentialsAws(Job job, HashMap<String, String> workspaceEnvVariables) {
+        log.warn("AWS Dynamic Credentials not implemented yet");
+        return workspaceEnvVariables;
+    }
+
+    @Transactional
+    public HashMap<String, String> generateDynamicCredentialsGcp(Job job, HashMap<String, String> workspaceEnvVariables) {
+        log.warn("GCP Dynamic Credentials not implemented yet");
+        return workspaceEnvVariables;
+    }
+
     private PrivateKey getPrivateKey() throws Exception {
         String rsaPrivateKey = FileUtils.readFileToString(new File(privateKeyPath), StandardCharsets.UTF_8);
 

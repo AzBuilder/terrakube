@@ -204,6 +204,14 @@ public class ExecutorService {
         if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_AZURE")) {
             workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsAzure(job, workspaceEnvVariables);
         }
+
+        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_GCP")) {
+            workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsAws(job, workspaceEnvVariables);
+        }
+
+        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_AWS")) {
+            workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsGcp(job, workspaceEnvVariables);
+        }
         return workspaceEnvVariables;
     }
 
