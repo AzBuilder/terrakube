@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.web.client.RestClientException;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
+import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
 import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.SshRepository;
@@ -54,8 +55,8 @@ public class ExecutorService {
     @Autowired
     SshRepository sshRepository;
 
-    @Value("${org.terrakube.dynamic.credentials.private-key-path}")
-    String privateKeyPath;
+    @Autowired
+    DynamicCredentialsService dynamicCredentialsService;
 
 
     @Transactional
@@ -200,8 +201,8 @@ public class ExecutorService {
             workspaceEnvVariables = loadDefault(job, Category.ENV, workspaceEnvVariables);
         }
 
-        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS")) {
-            workspaceEnvVariables = generateDynamicCredentials(job, workspaceEnvVariables);
+        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_AZURE")) {
+            workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsAzure(job, workspaceEnvVariables);
         }
         return workspaceEnvVariables;
     }
@@ -250,48 +251,7 @@ public class ExecutorService {
         return workspaceData;
     }
 
-    private HashMap<String, String> generateDynamicCredentials(Job job, HashMap<String, String> workspaceEnvVariables) {
-        Instant now = Instant.now();
-        String jwtToken = null;
-        try {
-            jwtToken = Jwts.builder()
-                    .setSubject(String.format("organization:%s:workspace:%s", job.getOrganization().getName(), job.getWorkspace().getName()))
-                    .setAudience(workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE"))
-                    .setId(UUID.randomUUID().toString())
-                    .setHeaderParam("kid", "03446895-220d-47e1-9564-4eeaa3691b42")
-                    .claim("terrakube_workspace_id", job.getWorkspace().getId())
-                    .claim("terrakube_organization_id", job.getOrganization().getId())
-                    .claim("terrakube_job_id", String.valueOf(job.getId()))
-                    .setIssuedAt(Date.from(now))
-                    .setIssuer(String.format("https://%s", hostname))
-                    .setExpiration(Date.from(now.plus(30, ChronoUnit.MINUTES)))
-                    .signWith(getPrivateKey())
-                    .compact();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
 
-        log.info("ARM_OIDC_TOKEN: {}", jwtToken);
-        workspaceEnvVariables.put("ARM_OIDC_TOKEN", jwtToken);
-        return workspaceEnvVariables;
-    }
 
-    private PrivateKey getPrivateKey() throws Exception {
-        String rsaPrivateKey = FileUtils.readFileToString(new File(privateKeyPath), StandardCharsets.UTF_8);
 
-        rsaPrivateKey = rsaPrivateKey.replace("-----BEGIN PRIVATE KEY-----", "");
-        rsaPrivateKey = rsaPrivateKey.replace("-----END PRIVATE KEY-----", "");
-
-        String privateKeyPEMFinal = "";
-        String line;
-        BufferedReader bufReader = new BufferedReader(new StringReader(rsaPrivateKey));
-        while( (line=bufReader.readLine()) != null )
-        {
-            privateKeyPEMFinal += line;
-        }
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyPEMFinal));
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-
-        return kf.generatePrivate(keySpec);
-    }
 }

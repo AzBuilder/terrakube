@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,15 +32,16 @@ import java.util.Optional;
 @RequestMapping("/.well-known/jwks")
 public class JwksController {
 
-    private JwkData jwkData;
-    public static final String kid = "03446895-220d-47e1-9564-4eeaa3691b42";
+    @Autowired
+    DynamicCredentialsService dynamicCredentialsService;
 
-    @Value("${org.terrakube.dynamic.credentials.public-key-path}")
-    String publicKeyPath;
+    @Value("${org.terrakube.dynamic.credentials.kid}")
+    String kid;
+
+    private JwkData jwkData;
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<JwkData> jwksEndpoint() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-
         if (jwkData == null) {
             jwkData = getJwkData();
         }
@@ -48,47 +50,38 @@ public class JwksController {
     }
 
     private JwkData getJwkData() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String publicKey = dynamicCredentialsService.getPublicKey();
 
-        String publicKeyPEM = FileUtils.readFileToString(new File(publicKeyPath), StandardCharsets.UTF_8);
+        if(publicKey != null && !publicKey.isEmpty()) {
 
-        publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----", "");
-        publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
+            byte[] encoded = Base64.getDecoder().decode(publicKey);
 
-        String publicKeyPEMFinal = "";
-        String line;
-        BufferedReader bufReader = new BufferedReader(new StringReader(publicKeyPEM));
-        while( (line=bufReader.readLine()) != null )
-        {
-            publicKeyPEMFinal += line;
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+
+            RSAPublicKey rsa = (RSAPublicKey) keyFactory.generatePublic(keySpec);
+            String exponent = Base64.getUrlEncoder().encodeToString(rsa.getPublicExponent().toByteArray());
+            String modulus = Base64.getUrlEncoder().encodeToString(rsa.getModulus().toByteArray());
+            log.info("RSA Exponent: {}", exponent);
+            log.info("RSA Modulus: {}", modulus);
+
+            JwkData jwkData = new JwkData();
+            jwkData.setKeys(new ArrayList());
+
+            JwkElement jwkElement = new JwkElement();
+            jwkElement.setKty("RSA");
+            jwkElement.setN(modulus);
+            jwkElement.setE(exponent);
+            jwkElement.setKid(kid);
+            jwkElement.setUse("sig");
+            jwkElement.setAlg("RS256");
+
+            jwkData.getKeys().add(jwkElement);
+
+            return jwkData;
+        } else {
+            return new JwkData();
         }
-
-        log.info("Dynamic Credentials Public Key: {}", publicKeyPEMFinal);
-
-        byte[] encoded = Base64.getDecoder().decode(publicKeyPEMFinal);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
-
-        RSAPublicKey rsa = (RSAPublicKey) keyFactory.generatePublic(keySpec);
-        String exponent = Base64.getUrlEncoder().encodeToString(rsa.getPublicExponent().toByteArray());
-        String modulus = Base64.getUrlEncoder().encodeToString(rsa.getModulus().toByteArray());
-        log.info("RSA Exponent: {}", exponent);
-        log.info("RSA Modulus: {}", modulus);
-
-        JwkData jwkData = new JwkData();
-        jwkData.setKeys(new ArrayList());
-
-        JwkElement jwkElement = new JwkElement();
-        jwkElement.setKty("RSA");
-        jwkElement.setN(modulus);
-        jwkElement.setE(exponent);
-        jwkElement.setKid(kid);
-        jwkElement.setUse("sig");
-        jwkElement.setAlg("RS256");
-
-        jwkData.getKeys().add(jwkElement);
-
-        return  jwkData;
     }
 }
 
