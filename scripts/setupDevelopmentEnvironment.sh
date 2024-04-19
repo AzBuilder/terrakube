@@ -277,7 +277,9 @@ fi
 cp ./scripts/template/azure/.envAzureSample .envAzure
 cp ./scripts/template/google/.envGcpSample .envGcp
 
-openssl genrsa -out private.pem 2048
-openssl rsa -in private.pem -outform PEM -pubout -out public.pem
+openssl genrsa -out private_temp.pem 2048
+openssl rsa -in private_temp.pem -outform PEM -pubout -out public.pem
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in private_temp.pem -out private.pem
+rm private_temp.pem
 
 echo "Setup Development Environment Completed"
