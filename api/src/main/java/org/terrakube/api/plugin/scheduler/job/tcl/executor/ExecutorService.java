@@ -284,12 +284,12 @@ public class ExecutorService {
 
         String privateKeyPEMFinal = "";
         String line;
-        BufferedReader bufReader = new BufferedReader(new StringReader(privateKeyPEMFinal));
+        BufferedReader bufReader = new BufferedReader(new StringReader(rsaPrivateKey));
         while( (line=bufReader.readLine()) != null )
         {
             privateKeyPEMFinal += line;
         }
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(rsaPrivateKey));
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyPEMFinal));
         KeyFactory kf = KeyFactory.getInstance("RSA");
 
         return kf.generatePrivate(keySpec);
