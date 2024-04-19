@@ -36,6 +36,8 @@ public class DexWebSecurityAdapter {
                                     .requestMatchers("/callback/v1/**").permitAll()
                                     .requestMatchers("/webhook/v1/**").permitAll()
                                     .requestMatchers("/.well-known/terraform.json").permitAll()
+                                    .requestMatchers("/.well-known/openid-configuration").permitAll()
+                                    .requestMatchers("/.well-known/jwks").permitAll()
                                     .requestMatchers("/remote/tfe/v2/ping").permitAll()
                                     .requestMatchers(HttpMethod.PUT, "/remote/tfe/v2/configuration-versions/*").permitAll()
                                     .requestMatchers(HttpMethod.PUT,"/tfstate/v1/archive/*/terraform.tfstate").permitAll()

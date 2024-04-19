@@ -1,8 +1,11 @@
 package org.terrakube.api.plugin.scheduler.job.tcl.executor;
 
+import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.web.client.RestClientException;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
+import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
 import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.SshRepository;
@@ -21,6 +24,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -30,6 +43,9 @@ public class ExecutorService {
     @Value("${org.terrakube.executor.url}")
     private String executorUrl;
 
+    @Value("${org.terrakube.hostname}")
+    String hostname;
+
     @Autowired
     JobRepository jobRepository;
 
@@ -38,6 +54,9 @@ public class ExecutorService {
 
     @Autowired
     SshRepository sshRepository;
+
+    @Autowired
+    DynamicCredentialsService dynamicCredentialsService;
 
 
     @Transactional
@@ -50,7 +69,7 @@ public class ExecutorService {
         executorContext.setJobId(String.valueOf(job.getId()));
         executorContext.setStepId(stepId);
 
-        if(job.getWorkspace().getBranch().equals("remote-content")){
+        if (job.getWorkspace().getBranch().equals("remote-content")) {
             log.warn("Running remote operation, disable headers");
             executorContext.setShowHeader(false);
         } else {
@@ -101,12 +120,12 @@ public class ExecutorService {
         executorContext.setCommandList(flow.getCommands());
         executorContext.setType(flow.getType());
         executorContext.setTerraformVersion(job.getWorkspace().getTerraformVersion());
-        if(job.getOverrideSource() == null) {
+        if (job.getOverrideSource() == null) {
             executorContext.setSource(job.getWorkspace().getSource());
         } else {
             executorContext.setSource(job.getOverrideSource());
         }
-        if(job.getOverrideBranch() == null) {
+        if (job.getOverrideBranch() == null) {
             executorContext.setBranch(job.getWorkspace().getBranch());
         } else {
             if (job.getOverrideBranch().equals("remote-content")) {
@@ -115,10 +134,10 @@ public class ExecutorService {
             executorContext.setBranch(job.getOverrideBranch());
         }
 
-        if(job.getWorkspace().getModuleSshKey() != null) {
+        if (job.getWorkspace().getModuleSshKey() != null) {
             String moduleSshId = job.getWorkspace().getModuleSshKey();
             Optional<Ssh> ssh = sshRepository.findById(UUID.fromString(moduleSshId));
-            if(ssh.isPresent()){
+            if (ssh.isPresent()) {
                 executorContext.setModuleSshKey(ssh.get().getPrivateKey());
             }
         }
@@ -131,14 +150,14 @@ public class ExecutorService {
         return sendToExecutor(job, executorContext);
     }
 
-    private String getExecutorUrl(Job job){
+    private String getExecutorUrl(Job job) {
         String agentUrl = job.getWorkspace().getAgent() != null ? job.getWorkspace().getAgent().getUrl() + "/api/v1/terraform-rs" : this.executorUrl;
         log.info("Job {} Executor agent url: {}", job.getId(), agentUrl);
         return agentUrl;
     }
 
-    private boolean iacType(Job job){
-        return job.getWorkspace().getIacType() != null && job.getWorkspace().getIacType().equals("terraform") ? false: true;
+    private boolean iacType(Job job) {
+        return job.getWorkspace().getIacType() != null && job.getWorkspace().getIacType().equals("terraform") ? false : true;
     }
 
     private boolean sendToExecutor(Job job, ExecutorContext executorContext) {
@@ -180,6 +199,18 @@ public class ExecutorService {
         } else {
             log.info("Loading default env variables to job");
             workspaceEnvVariables = loadDefault(job, Category.ENV, workspaceEnvVariables);
+        }
+
+        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_AZURE")) {
+            workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsAzure(job, workspaceEnvVariables);
+        }
+
+        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_GCP")) {
+            workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsAws(job, workspaceEnvVariables);
+        }
+
+        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_AWS")) {
+            workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsGcp(job, workspaceEnvVariables);
         }
         return workspaceEnvVariables;
     }
@@ -227,4 +258,8 @@ public class ExecutorService {
             }
         return workspaceData;
     }
+
+
+
+
 }

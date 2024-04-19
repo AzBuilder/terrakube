@@ -47,6 +47,8 @@ function generateApiVars(){
   echo "TerrakubeRedisPort=6379" >> .envApi
   echo "TerrakubeRedisSSL=false" >> .envApi
   echo "#TerrakubeRedisUsername=default" >> .envApi
+  echo "DynamicCredentialPublicKeyPath=/gitpod/" >> .envApi
+  echo "DynamicCredentialPrivateKeyPath=/gitpod/" >> .envApi
   echo "TerrakubeRedisPassword=password123456" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
@@ -274,4 +276,10 @@ fi
 
 cp ./scripts/template/azure/.envAzureSample .envAzure
 cp ./scripts/template/google/.envGcpSample .envGcp
+
+openssl genrsa -out private_temp.pem 2048
+openssl rsa -in private_temp.pem -outform PEM -pubout -out public.pem
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in private_temp.pem -out private.pem
+rm private_temp.pem
+
 echo "Setup Development Environment Completed"
