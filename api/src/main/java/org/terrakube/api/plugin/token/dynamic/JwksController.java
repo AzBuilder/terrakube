@@ -3,8 +3,6 @@ package org.terrakube.api.plugin.token.dynamic;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
@@ -41,7 +35,7 @@ public class JwksController {
     private JwkData jwkData;
 
     @GetMapping(produces = "application/json")
-    public ResponseEntity<JwkData> jwksEndpoint() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public ResponseEntity<JwkData> jwksEndpoint() throws NoSuchAlgorithmException, InvalidKeySpecException {
         if (jwkData == null) {
             jwkData = getJwkData();
         }
@@ -49,7 +43,7 @@ public class JwksController {
 
     }
 
-    private JwkData getJwkData() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    private JwkData getJwkData() throws NoSuchAlgorithmException, InvalidKeySpecException {
         String publicKey = dynamicCredentialsService.getPublicKey();
 
         if(publicKey != null && !publicKey.isEmpty()) {
