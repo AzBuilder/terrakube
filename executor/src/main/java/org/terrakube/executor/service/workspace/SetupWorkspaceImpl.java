@@ -84,15 +84,13 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     private void setupGcpDynamicCredentials(File workspaceCloneFolder, String gcpCredentialsFileContent, String gcpCredentialConfigFileContent) {
         try {
             log.info("Generating GCP dynamic credentials files inside the workspace execution");
-            String gcpCredentialsFile = Base64.getDecoder().decode(gcpCredentialsFileContent).toString();
-            String gcpCredentialsConfigFile = Base64.getDecoder().decode(gcpCredentialConfigFileContent).toString();
 
             log.info("WorkingDir: {}", workspaceCloneFolder);
             log.info("Writing GCP credentials to {}/terrakube_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
             log.info("Writing GCP credentials Configuration File to {}/terrakube_config_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
 
-            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_dynamic_credentials.json"), gcpCredentialsFile, Charset.defaultCharset());
-            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials.json"), gcpCredentialsConfigFile, Charset.defaultCharset());
+            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_dynamic_credentials.json"), gcpCredentialsFileContent, Charset.defaultCharset());
+            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials.json"), gcpCredentialConfigFileContent, Charset.defaultCharset());
         } catch (Exception ex) {
             log.error(ex.getMessage());
         }
