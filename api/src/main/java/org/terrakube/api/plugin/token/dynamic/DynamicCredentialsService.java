@@ -126,7 +126,8 @@ public class DynamicCredentialsService {
                 "  }";
 
         String executorDirectory = String.format(
-                "/home/cnb/.terraform-spring-boot/executor/%s/%s",
+                "/%s/.terraform-spring-boot/executor/%s/%s",
+                FileUtils.getUserDirectoryPath(),
                 job.getOrganization().getId().toString(),
                 job.getWorkspace().getId().toString()
         );
