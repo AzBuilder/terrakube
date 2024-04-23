@@ -141,7 +141,7 @@ public class DynamicCredentialsService {
 
         workspaceEnvVariables.put("TERRAKUBE_GCP_CREDENTIALS_FILE", Base64.getEncoder().encodeToString(googleCredentialsFile.getBytes(StandardCharsets.UTF_8)));
         workspaceEnvVariables.put("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE", Base64.getEncoder().encodeToString(googleCredentialsFile.getBytes(StandardCharsets.UTF_8)));
-        workspaceEnvVariables.put("GOOGLE_APPLICATION_CREDENTIALS", executorDirectory);
+        workspaceEnvVariables.put("GOOGLE_APPLICATION_CREDENTIALS", executorDirectory + "/terrakube_dynamic_credentials.json");
 
         return workspaceEnvVariables;
     }
