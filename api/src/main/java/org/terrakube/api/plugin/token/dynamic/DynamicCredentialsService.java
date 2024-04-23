@@ -126,7 +126,7 @@ public class DynamicCredentialsService {
                 "  }";
 
         String executorDirectory = String.format(
-                "/home/cnb/.terraform-spring-boot/executor/%s/%s/terrakube_config_dynamic_credentials.json",
+                "/home/cnb/.terraform-spring-boot/executor/%s/%s",
                 job.getOrganization().getId().toString(),
                 job.getWorkspace().getId().toString()
         );
