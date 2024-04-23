@@ -53,4 +53,5 @@
     <include file="/db/changelog/local/changelog-2.20.0-executor-agent.xml"/>
     <include file="/db/changelog/local/changelog-2.20.0-registry-monorepo.xml"/>
     <include file="/db/changelog/local/changelog-2.21.0-auto-apply.xml"/>
+    <include file="/db/changelog/local/changelog-2.21.0-gcp-dynamic.xml"/>
 </databaseChangeLog>
