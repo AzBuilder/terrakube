@@ -43,34 +43,48 @@ public class DynamicCredentialsService {
 
     @Transactional
     public HashMap<String, String> generateDynamicCredentialsAzure(Job job, HashMap<String, String> workspaceEnvVariables) {
-        Instant now = Instant.now();
+        String jwtToken = generateJwt(
+                job.getOrganization().getName(),
+                job.getWorkspace().getName(),
+                workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_AZURE"),
+                job.getOrganization().getId().toString(),
+                job.getWorkspace().getId().toString(),
+                job.getId()
+        );
+
+        log.info("ARM_OIDC_TOKEN: {}", jwtToken);
+        workspaceEnvVariables.put("ARM_OIDC_TOKEN", jwtToken);
+
+        return workspaceEnvVariables;
+    }
+
+    private String generateJwt(String organizationName, String workspaceName, String tokenAudience, String organizationId, String workspaceId, int jobId) {
         String jwtToken = "";
-        if (privateKeyPath != null && !privateKeyPath.isEmpty())
+        if (privateKeyPath != null && !privateKeyPath.isEmpty()) {
             try {
+                Instant now = Instant.now();
                 jwtToken = Jwts.builder()
-                        .setSubject(String.format("organization:%s:workspace:%s", job.getOrganization().getName(), job.getWorkspace().getName()))
-                        .setAudience(workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_AZURE"))
+                        .setSubject(String.format("organization:%s:workspace:%s", organizationName, workspaceName))
+                        .setAudience(tokenAudience)
                         .setId(UUID.randomUUID().toString())
                         .setHeaderParam("kid", kid)
-                        .claim("terrakube_workspace_id", job.getWorkspace().getId())
-                        .claim("terrakube_organization_id", job.getOrganization().getId())
-                        .claim("terrakube_job_id", String.valueOf(job.getId()))
+                        .claim("terrakube_workspace_id", organizationId)
+                        .claim("terrakube_organization_id", workspaceId)
+                        .claim("terrakube_job_id", String.valueOf(jobId))
                         .setIssuedAt(Date.from(now))
                         .setIssuer(String.format("https://%s", hostname))
                         .setExpiration(Date.from(now.plus(dynamicCredentialTtl, ChronoUnit.MINUTES)))
                         .signWith(getPrivateKey())
                         .compact();
 
-                log.info("ARM_OIDC_TOKEN: {}", jwtToken);
-                workspaceEnvVariables.put("ARM_OIDC_TOKEN", jwtToken);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
-        else {
-            log.error("DynamicCredentialPrivateKeyPath not set, to generate Azure Dynamic Credentials the value is need it");
+        } else {
+            log.error("DynamicCredentialPrivateKeyPath not set, to generate Dynamic Credentials the value is need it");
         }
 
-        return workspaceEnvVariables;
+        return jwtToken;
     }
 
     @Transactional
@@ -81,7 +95,54 @@ public class DynamicCredentialsService {
 
     @Transactional
     public HashMap<String, String> generateDynamicCredentialsGcp(Job job, HashMap<String, String> workspaceEnvVariables) {
-        log.warn("GCP Dynamic Credentials not implemented yet");
+        String jwtToken = generateJwt(
+                job.getOrganization().getName(),
+                job.getWorkspace().getName(),
+                workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_GCP"),
+                job.getOrganization().getId().toString(),
+                job.getWorkspace().getId().toString(),
+                job.getId()
+        );
+
+        String googleCredentialsFile = "{\n" +
+                "    \"access_token\": \"%s\"\n" +
+                "} ";
+
+        googleCredentialsFile = String.format(googleCredentialsFile, jwtToken);
+
+        String googleCredentialConfigFile = "{\n" +
+                "    \"type\": \"external_account\",\n" +
+                "    \"audience\": \"%s\",\n" +
+                "    \"subject_token_type\": \"urn:ietf:params:oauth:token-type:jwt\",\n" +
+                "    \"token_url\": \"https://sts.googleapis.com/v1/token\",\n" +
+                "    \"service_account_impersonation_url\": \"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/%s:generateAccessToken\",\n" +
+                "    \"credential_source\": {\n" +
+                "      \"file\": \"%s/terrakube_dynamic_credentials.json\",\n" +
+                "      \"format\": {\n" +
+                "        \"type\": \"json\",\n" +
+                "        \"subject_token_field_name\": \"access_token\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }";
+
+        String executorDirectory = String.format(
+                "/home/cnb/.terraform-spring-boot/executor/%s/%s/terrakube_config_dynamic_credentials.json",
+                job.getOrganization().getId().toString(),
+                job.getWorkspace().getId().toString()
+        );
+
+        String audience = workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_GCP");
+        String serviceAccountEmail = workspaceEnvVariables.get("WORKLOAD_IDENTITY_SERVICE_ACCOUNT_EMAIL");
+
+        googleCredentialConfigFile = String.format(googleCredentialConfigFile, audience, serviceAccountEmail, executorDirectory);
+
+        log.info("TERRAKUBE_GCP_CREDENTIALS_FILE: {}", googleCredentialsFile);
+        log.info("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE: {}", googleCredentialConfigFile);
+
+        workspaceEnvVariables.put("TERRAKUBE_GCP_CREDENTIALS_FILE", Base64.getEncoder().encodeToString(googleCredentialsFile.getBytes(StandardCharsets.UTF_8)));
+        workspaceEnvVariables.put("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE", Base64.getEncoder().encodeToString(googleCredentialsFile.getBytes(StandardCharsets.UTF_8)));
+        workspaceEnvVariables.put("GOOGLE_APPLICATION_CREDENTIALS", executorDirectory);
+
         return workspaceEnvVariables;
     }
 
