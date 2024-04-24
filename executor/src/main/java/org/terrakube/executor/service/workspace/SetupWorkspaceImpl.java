@@ -20,6 +20,7 @@ import org.eclipse.jgit.util.FS;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.terrakube.executor.service.mode.TerraformJob;
+import org.terrakube.executor.service.terraform.TerraformExecutor;
 import org.terrakube.executor.service.workspace.security.WorkspaceSecurity;
 
 import java.io.*;
@@ -42,10 +43,12 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
     WorkspaceSecurity workspaceSecurity;
     boolean enableRegistrySecurity;
+    TerraformExecutor terraformExecutor;
 
-    public SetupWorkspaceImpl(WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity) {
+    public SetupWorkspaceImpl(WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity, TerraformExecutor terraformExecutor) {
         this.workspaceSecurity = workspaceSecurity;
         this.enableRegistrySecurity = enableRegistrySecurity;
+        this.terraformExecutor = terraformExecutor;
     }
 
     @Override
@@ -58,16 +61,39 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             } else {
                 downloadWorkspaceTarGz(workspaceCloneFolder, terraformJob.getSource());
             }
-            if(terraformJob.getModuleSshKey() != null && terraformJob.getModuleSshKey().length() > 0){
+            if (terraformJob.getModuleSshKey() != null && terraformJob.getModuleSshKey().length() > 0) {
                 generateModuleSshFolder(terraformJob.getModuleSshKey(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), terraformJob.getJobId());
             }
 
             if (enableRegistrySecurity)
                 workspaceSecurity.addTerraformCredentials();
+
+            if (terraformJob.getEnvironmentVariables().containsKey("ENABLE_DYNAMIC_CREDENTIALS_GCP")) {
+                setupGcpDynamicCredentials(
+                        workspaceCloneFolder,
+                        terraformJob.getEnvironmentVariables().get("TERRAKUBE_GCP_CREDENTIALS_FILE"),
+                        terraformJob.getEnvironmentVariables().get("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE")
+                );
+            }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
         return workspaceCloneFolder != null ? workspaceCloneFolder : new File("/tmp/" + UUID.randomUUID());
+    }
+
+    private void setupGcpDynamicCredentials(File workspaceCloneFolder, String gcpCredentialsFileContent, String gcpCredentialConfigFileContent) {
+        try {
+            log.info("Generating GCP dynamic credentials files inside the workspace execution");
+
+            log.info("WorkingDir: {}", workspaceCloneFolder);
+            log.info("Writing GCP credentials to {}/terrakube_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
+            log.info("Writing GCP credentials Configuration File to {}/terrakube_config_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
+
+            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_dynamic_credentials.json"), gcpCredentialsFileContent, Charset.defaultCharset());
+            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials.json"), gcpCredentialConfigFileContent, Charset.defaultCharset());
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
     }
 
     private File setupWorkspaceDirectory(String organizationId, String workspaceId) throws IOException {
@@ -101,7 +127,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .setBranch(terraformJob.getBranch())
                         .call();
 
-                if(terraformJob.getCommitId() != null && terraformJob.getCommitId().length() > 0) {
+                if (terraformJob.getCommitId() != null && terraformJob.getCommitId().length() > 0) {
                     log.info("Checkout commit id {}", terraformJob.getCommitId());
                     Git.open(gitCloneFolder).checkout().setName(terraformJob.getCommitId()).call();
                     getCommitId(gitCloneFolder, terraformJob.getCommitId());
@@ -186,7 +212,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     private void getCommitId(File gitCloneFolder, String commitId) {
         RevCommit latestCommit = null;
         try {
-            if(commitId == null) {
+            if (commitId == null) {
                 latestCommit = Git.init().setDirectory(gitCloneFolder).call().
                         log().
                         setMaxCount(1).

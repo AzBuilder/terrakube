@@ -57,7 +57,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         }
     }
 
-    private File getTerraformWorkingDir(TerraformJob terraformJob, File workingDirectory) throws IOException {
+    public File getTerraformWorkingDir(TerraformJob terraformJob, File workingDirectory) throws IOException {
         File terraformWorkingDir = workingDirectory;
         try {
             if (!terraformJob.getBranch().equals("remote-content") || (terraformJob.getFolder() != null && !terraformJob.getFolder().equals("/"))) {
