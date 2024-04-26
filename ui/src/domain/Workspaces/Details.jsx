@@ -93,9 +93,12 @@ const iacTypes = [
     icon: <img width="18px" src="/providers/opentofu.png" />,
   },
 ];
-export const WorkspaceDetails = ({ selectedTab }) => {
+export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
   const browserHistory = useHistory();
-  const { id, runid } = useParams();
+  const { id, runid,orgid } = useParams();
+  if (orgid !== null && orgid !== undefined && orgid !== "") {
+    localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
+  }
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
   localStorage.setItem(WORKSPACE_ARCHIVE, id);
   const [workspace, setWorkspace] = useState({});
@@ -110,7 +113,7 @@ export const WorkspaceDetails = ({ selectedTab }) => {
   const [jobId, setJobId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [jobVisible, setjobVisible] = useState(false);
-  const [organizationName, setOrganizationName] = useState([]);
+  const [organizationNameLocal, setOrganizationNameLocal] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
   const [activeKey, setActiveKey] = useState(selectedTab !== null ? selectedTab : "1");
   const [terraformVersions, setTerraformVersions] = useState([]);
@@ -127,8 +130,9 @@ export const WorkspaceDetails = ({ selectedTab }) => {
   const [outputs, setOutputs] = useState([]);
   const [currentStateId, setCurrentStateId] = useState(0);
   const [selectedIac, setSelectedIac] = useState("");
-  const handleClick = (id) => {
-    changeJob(id);
+  const handleClick = (jobid) => {
+    changeJob(jobid);
+    browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`);
   };
   const handleIacChange = (iac) => {
     setSelectedIac(iac);
@@ -247,24 +251,24 @@ export const WorkspaceDetails = ({ selectedTab }) => {
     setActiveKey(key);
     switch (key) {
       case "1":
-        browserHistory.push(`/workspaces/${id}`);
+        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}`);
         break;
       case "2":
         setjobVisible(false);
-        browserHistory.push(`/workspaces/${id}/runs`);
+        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/runs`);
         break;
       case "3":
         setStateDetailsVisible(false);
-        browserHistory.push(`/workspaces/${id}/states`);
+        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/states`);
         break;
       case "4":
-        browserHistory.push(`/workspaces/${id}/variables`);
+        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/variables`);
         break;
       case "5":
-        browserHistory.push(`/workspaces/${id}/schedules`);
+        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/schedules`);
         break;
       case "6":
-        browserHistory.push(`/workspaces/${id}/settings`);
+        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/settings`);
         break;  
       default:
         break;
@@ -319,7 +323,7 @@ export const WorkspaceDetails = ({ selectedTab }) => {
         setTemplates(template.data.data);
         axiosInstance
           .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent`
+            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization`
           )
           .then((response) => {
             if (_loadVersions)
@@ -345,7 +349,18 @@ export const WorkspaceDetails = ({ selectedTab }) => {
                 setAgent
               );
             }
-            setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+
+
+            const organization = response.data.included.find(
+              (item) => item.type === "organization"
+            );
+            if (organization) {
+              const organizationName = organization.attributes.name;
+              setOrganizationName(organizationName);
+              localStorage.setItem(ORGANIZATION_NAME, organizationName);
+              console.log(organizationName);
+            }
+            setOrganizationNameLocal(localStorage.getItem(ORGANIZATION_NAME));
             setWorkspaceName(response.data.data.attributes.name);
             setExecutionMode(response.data.data.attributes.executionMode);
             if(runid) changeJob(runid);  // if runid is provided, show the job details
@@ -521,7 +536,7 @@ export const WorkspaceDetails = ({ selectedTab }) => {
   return (
     <Content style={{ padding: "0 50px" }}>
       <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
+        <Breadcrumb.Item>{organizationNameLocal}</Breadcrumb.Item>
         <Breadcrumb.Item>
           <Link to={`/organizations/${organizationId}/workspaces`}>
             Workspaces
@@ -638,7 +653,7 @@ export const WorkspaceDetails = ({ selectedTab }) => {
                       workspace.data.attributes.branch === "remote-content" &&
                       workspace.data.relationships.history.data.length < 1 ? (
                         <CLIDriven
-                          organizationName={organizationName}
+                          organizationName={organizationNameLocal}
                           workspaceName={workspaceName}
                         />
                       ) : (

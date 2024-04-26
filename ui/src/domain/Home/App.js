@@ -60,25 +60,46 @@ const App = () => {
           <Route exact path="/workspaces/create" component={CreateWorkspace} />
           <Route exact path="/workspaces/import" component={ImportWorkspace} />
           <Route exact path="/workspaces/:id">
-            <WorkspaceDetails />
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} />
+          </Route>
+          <Route exact path="/organizations/:orgid/workspaces/:id">
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} />
           </Route>
           <Route exact path="/workspaces/:id/runs">
-            <WorkspaceDetails selectedTab="2" />
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="2" />
+          </Route>
+          <Route exact path="/organizations/:orgid/workspaces/:id/runs">
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="2" />
           </Route>
           <Route exact path="/workspaces/:id/runs/:runid">
-            <WorkspaceDetails selectedTab="2" />
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="2" />
+          </Route>
+          <Route exact path="/organizations/:orgid/workspaces/:id/runs/:runid">
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="2" />
           </Route>
           <Route exact path="/workspaces/:id/states">
-            <WorkspaceDetails selectedTab="3" />
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="3" />
+          </Route>
+          <Route exact path="/organizations/:orgid/workspaces/:id/states">
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="3" />
           </Route>
           <Route exact path="/workspaces/:id/variables">
-            <WorkspaceDetails selectedTab="4" />
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="4" />
+          </Route>
+          <Route exact path="/organizations/:orgid/workspaces/:id/variables">
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="4" />
           </Route>
           <Route exact path="/workspaces/:id/schedules">
-            <WorkspaceDetails selectedTab="5" />
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="5" />
+          </Route>
+          <Route exact path="/organizations/:orgid/workspaces/:id/schedules">
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="5" />
           </Route>
           <Route exact path="/workspaces/:id/settings">
-            <WorkspaceDetails selectedTab="6" />
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="6" />
+          </Route>
+          <Route exact path="/organizations/:orgid/workspaces/:id/settings">
+            <WorkspaceDetails  setOrganizationName={setOrganizationName} selectedTab="6" />
           </Route>
           <Route
             exact
