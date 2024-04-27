@@ -112,9 +112,9 @@ export const OrganizationDetails = ({
     );
   };
 
-  const handleClick = (id) => {
+  const handleClick = (workspaceId) => {
     console.log(id);
-    history.push("/workspaces/" + id);
+    history.push("/organizations/" + id+ "/workspaces/" + workspaceId);
   };
 
   const onFilterChange = (e) => {
