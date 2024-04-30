@@ -299,7 +299,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false);
-    }, 15000);
+    }, 10000);
     return () => clearInterval(interval);
   }, [id]);
 
@@ -378,7 +378,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             setOrganizationNameLocal(localStorage.getItem(ORGANIZATION_NAME));
             setWorkspaceName(response.data.data.attributes.name);
             setExecutionMode(response.data.data.attributes.executionMode);
-            if (runid) changeJob(runid); // if runid is provided, show the job details
+            if (runid && _loadVersions) changeJob(runid); // if runid is provided, show the job details
           });
       });
   };

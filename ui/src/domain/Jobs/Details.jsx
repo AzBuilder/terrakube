@@ -291,66 +291,75 @@ export const DetailsJob = ({ jobId }) => {
           />
           {steps.length > 0 ? (
             steps.map((item) => (
-              <Collapse
-                style={{ width: "100%" }}
-                defaultActiveKey={item.status === "running" ? ["2"] : []}
-                items={[
-                  {
-                    key: "2",
-                    label: (
-                      <span>
-                        {getIconStatus(item)}
-                        <h3 style={{ display: "inline" }}>
-                          &nbsp; {item.name} {item.status}
-                        </h3>
-                      </span>
-                    ),
-                    children: (
-                      <>
-                        {console.log(uiTemplates)}
-                        {uiTemplates.hasOwnProperty(item.stepNumber) ? (
-                          <>
-                            <div
-                              style={{
-                                textAlign: "right",
-                                padding: "5px",
-                              }}
-                            >
-                              <Radio.Group
-                                onChange={onChange}
-                                value={uiType}
-                                size="small"
+              <>
+                <style>
+                  {`
+                .ant-collapse .ant-collapse-content > .ant-collapse-content-box {
+                  padding: 0 !important;
+                }
+              `}
+                </style>
+                <Collapse
+                  style={{ width: "100%" }}
+                  defaultActiveKey={item.status === "running" ? ["2"] : []}
+                  items={[
+                    {
+                      key: "2",
+                      label: (
+                        <span>
+                          {getIconStatus(item)}
+                          <h3 style={{ display: "inline" }}>
+                            &nbsp; {item.name} {item.status}
+                          </h3>
+                        </span>
+                      ),
+                      children: (
+                        <>
+                          {console.log(uiTemplates)}
+                          {uiTemplates.hasOwnProperty(item.stepNumber) ? (
+                            <>
+                              <div
+                                style={{
+                                  textAlign: "right",
+                                  padding: "5px",
+                                }}
                               >
-                                <Radio.Button value="structured">
-                                  Structured
-                                </Radio.Button>
-                                <Radio.Button value="console">
-                                  Console
-                                </Radio.Button>
-                              </Radio.Group>
-                            </div>
-                            {uiType === "structured" ? (
-                              <div>{parse(uiTemplates[item.stepNumber])}</div>
-                            ) : (
-                              <div id="code-container">
-                                <div id="code-content">
-                                  <Ansi>{item.outputLog}</Ansi>
-                                </div>
+                                <Radio.Group
+                                  onChange={onChange}
+                                  value={uiType}
+                                  size="small"
+                                >
+                                  <Radio.Button value="structured">
+                                    Structured
+                                  </Radio.Button>
+                                  <Radio.Button value="console">
+                                    Console
+                                  </Radio.Button>
+                                </Radio.Group>
                               </div>
-                            )}
-                          </>
-                        ) : (
-                          <div id="code-container">
-                            <div id="code-content">
-                              <Ansi>{item.outputLog}</Ansi>
+                              {uiType === "structured" ? (
+                                <div>{parse(uiTemplates[item.stepNumber])}</div>
+                              ) : (
+                                <div id="code-container">
+                                  <div id="code-content">
+                                    <Ansi>{item.outputLog}</Ansi>
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div id="code-container">
+                              <div id="code-content">
+                                <Ansi>{item.outputLog}</Ansi>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </>
-                    ),
-                  },
-                ]}
-              />
+                          )}
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+              </>
             ))
           ) : (
             <span />
