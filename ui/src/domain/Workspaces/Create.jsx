@@ -398,15 +398,25 @@ export const CreateWorkspace = () => {
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={`/organizations/${organizationId}/workspaces`}>
-            Workspaces
-          </Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>New Workspace</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: organizationName,
+          },
+          {
+            title: (
+              <Link to={`/organizations/${organizationId}/workspaces`}>
+                Workspaces
+              </Link>
+            ),
+          },
+          {
+            title: "New Workspace",
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
         <div className="createWorkspace">
           <h2>Create a new Workspace</h2>

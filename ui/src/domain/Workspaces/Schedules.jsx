@@ -237,7 +237,7 @@ export const Schedules = ({ schedules }) => {
 
       <Modal
         width="600px"
-        visible={visible}
+        open={visible}
         title={mode === "edit" ? "Edit schedule" : "Create new schedule"}
         okText="Save schedule"
         cancelText="Cancel"

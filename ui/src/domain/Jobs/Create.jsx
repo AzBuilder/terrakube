@@ -88,7 +88,7 @@ export const CreateJob = ({ changeJob }) => {
       </Button>
 
       <Modal
-        visible={visible}
+        open={visible}
         title="Start a new job"
         okText="Start"
         cancelText="Cancel"

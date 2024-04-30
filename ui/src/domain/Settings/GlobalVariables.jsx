@@ -167,7 +167,7 @@ export const GlobalVariablesSettings = () => {
         ) : (
           <Table dataSource={globalVariables.data} columns={VARIABLES_COLUMS(orgid,onEdit)} rowKey='key' />)}
 
-   <Modal width="600px" visible={visible} title={mode === "edit" ? "Edit global variable " + variableKey : "Create new global variable"} okText="Save global variable" onCancel={onCancel} cancelText="Cancel" 
+   <Modal width="600px" open={visible} title={mode === "edit" ? "Edit global variable " + variableKey : "Create new global variable"} okText="Save global variable" onCancel={onCancel} cancelText="Cancel" 
         onOk={() => {
           form.validateFields().then((values) => {
             if(mode === "create")

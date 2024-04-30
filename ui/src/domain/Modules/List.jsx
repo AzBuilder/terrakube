@@ -41,19 +41,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const onFilterChange = (e) => {
-    setFilterValue(e.target.value);
-    applyFilters(searchValue, e.target.value);
-  };
-
-  const onRadioClick = (e) => {
-    const tag = e.target;
-    if (tag.type === "radio" && filterValue === tag.value.toString()) {
-      setFilterValue("");
-      applyFilters(searchValue, "");
-    }
-  };
-
   const onSearch = (value) => {
     setSearchValue(value);
     applyFilters(value, filterValue);
@@ -146,16 +133,19 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={`/organizations/${orgid}/registry`}>Modules</Link>
-        </Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: organizationName,
+          },
+          {
+            title: <Link to={`/organizations/${orgid}/registry`}>Modules</Link>,
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
-        {loading || !organization.data || !modules ? (
-          <p>Data loading...</p>
-        ) : (
           <div className="modulesWrapper">
             <div className="variableActions">
               <h2>Modules</h2>
@@ -172,10 +162,11 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
               placeholder="Filter modules"
               onSearch={onSearch}
               allowClear
-              style={{ width: "100%" }}
+              style={{ width: "100%", marginTop: "10px" }}
             />
             <List
               split=""
+              loading={{ spinning: loading, tip: "Loading Modules..."}}
               className="moduleList"
               dataSource={filteredModules}
               pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
@@ -224,7 +215,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
               )}
             />
           </div>
-        )}
       </div>
     </Content>
   );

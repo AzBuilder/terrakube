@@ -69,10 +69,17 @@ export const CreateOrganization = ({ setOrganizationName }) => {
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>Organizations</Breadcrumb.Item>
-        <Breadcrumb.Item>New</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: "Organizations",
+          },
+          {
+            title: "New",
+          },
+        ]}
+      />
       <div className="site-layout-content">
         <div className="createOrganization">
           <h1>Create a new organization</h1>

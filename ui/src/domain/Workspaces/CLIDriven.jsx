@@ -25,42 +25,50 @@ export const CLIDriven = ({ organizationName, workspaceName }) => {
             file in the directory where you run Terraform. <br />
             <br />
             <b>Example Code</b>
-            <Tabs type="card" style={{ marginTop: "30px" }}>
-              <TabPane tab="cloud block" key="1">
-                <pre className="moduleCode">
-                  terraform {"{"} <br />
-                  &nbsp;&nbsp;cloud {"{"} <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;organization = "{
-                    organizationName
-                  }" <br />
-                  <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "{
-                    workspaceName
-                  }" <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
-                  &nbsp;&nbsp;{"}"} <br />
-                  {"}"} <br />
-                </pre>
-              </TabPane>
-              <TabPane tab="remote backend" key="2">
-                <pre className="moduleCode">
-                  terraform {"{"} <br />
-                  &nbsp;&nbsp;backend "remote" {"{"} <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;organization = "{
-                    organizationName
-                  }" <br />
-                  <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "{
-                    workspaceName
-                  }" <br />
-                  &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
-                  &nbsp;&nbsp;{"}"} <br />
-                  {"}"} <br />
-                </pre>
-              </TabPane>
-            </Tabs>
+            <Tabs
+              type="card"
+              style={{ marginTop: "30px" }}
+              items={[
+                {
+                  label: "cloud block",
+                  key: "1",
+                  children: (
+                    <pre className="moduleCode">
+                      terraform {"{"} <br />
+                      &nbsp;&nbsp;cloud {"{"} <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;organization = "{organizationName}
+                      " <br />
+                      <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "
+                      {workspaceName}" <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
+                      &nbsp;&nbsp;{"}"} <br />
+                      {"}"} <br />
+                    </pre>
+                  ),
+                },
+                {
+                  label: "remote backend",
+                  key: "2",
+                  children: (
+                    <pre className="moduleCode">
+                      terraform {"{"} <br />
+                      &nbsp;&nbsp;backend "remote" {"{"} <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;organization = "{organizationName}
+                      " <br />
+                      <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;workspaces {"{"} <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "
+                      {workspaceName}" <br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;{"}"} <br />
+                      &nbsp;&nbsp;{"}"} <br />
+                      {"}"} <br />
+                    </pre>
+                  ),
+                },
+              ]}
+            />
           </li>
           <br />
           <li>

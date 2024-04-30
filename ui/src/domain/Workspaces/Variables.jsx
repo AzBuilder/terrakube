@@ -248,7 +248,7 @@ export const Variables = ({ vars, env }) => {
 
       <Modal
         width="600px"
-        visible={visible}
+        open={visible}
         title={
           mode === "edit"
             ? "Edit variable " + variableName

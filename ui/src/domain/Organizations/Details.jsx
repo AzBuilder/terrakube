@@ -114,7 +114,7 @@ export const OrganizationDetails = ({
 
   const handleClick = (workspaceId) => {
     console.log(id);
-    history.push("/organizations/" + id+ "/workspaces/" + workspaceId);
+    history.push("/organizations/" + id + "/workspaces/" + workspaceId);
   };
 
   const onFilterChange = (e) => {
@@ -295,14 +295,19 @@ export const OrganizationDetails = ({
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>Workspaces</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: organizationName,
+          },
+          {
+            title: "Workspaces",
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
-        {loading || !organization || !workspaces ? (
-          <p>Data loading...</p>
-        ) : (
           <div className="workspaceWrapper">
             <div className="variableActions">
               <h2>Workspaces</h2>
@@ -324,12 +329,10 @@ export const OrganizationDetails = ({
                 </Button>
               </Space>
             </div>
-            <Row>
+            <Row style={{marginTop:"10px"}}>
               <Col span={12}>
                 <div onClick={onRadioClick}>
-                  {" "}
                   <Radio.Group onChange={onFilterChange} value={filterValue}>
-                    {" "}
                     <Tooltip
                       placement="bottom"
                       title="Show only workspaces needing attention"
@@ -338,7 +341,7 @@ export const OrganizationDetails = ({
                         <ExclamationCircleOutlined
                           style={{ color: "#fa8f37" }}
                         />
-                      </Radio.Button>{" "}
+                      </Radio.Button>
                     </Tooltip>
                     <Tooltip
                       placement="bottom"
@@ -346,14 +349,13 @@ export const OrganizationDetails = ({
                     >
                       <Radio.Button value="failed">
                         <StopOutlined style={{ color: "#FB0136" }} />
-                      </Radio.Button>{" "}
+                      </Radio.Button>
                     </Tooltip>
                     <Tooltip
                       placement="bottom"
                       title="Show only running workspaces"
                     >
                       <Radio.Button value="running">
-                        {" "}
                         <SyncOutlined style={{ color: "#108ee9" }} />
                       </Radio.Button>
                     </Tooltip>
@@ -364,7 +366,7 @@ export const OrganizationDetails = ({
                       <Radio.Button value="completed">
                         <CheckCircleOutlined style={{ color: "#2eb039" }} />
                       </Radio.Button>
-                    </Tooltip>{" "}
+                    </Tooltip>
                     <Tooltip
                       placement="bottom"
                       title="Show only never executed workspaces"
@@ -379,9 +381,6 @@ export const OrganizationDetails = ({
               <Col span={12}>
                 <Row justify="end">
                   <Col span={11}>
-                    {!tags.data ? (
-                      <p>loading...</p>
-                    ) : (
                       <Select
                         mode="multiple"
                         showSearch
@@ -396,12 +395,12 @@ export const OrganizationDetails = ({
                             .toLowerCase()
                             .localeCompare((optionB?.label ?? "").toLowerCase())
                         }
-                        options={tags.data.map(function (tag) {
+                        loading={!tags.data}
+                        options={tags?.data?.map(function (tag) {
                           return { label: tag.attributes.name, value: tag.id };
                         })}
                         defaultValue={filterTags}
                       />
-                    )}
                   </Col>
                   <Col span={1}></Col>
                   <Col span={12}>
@@ -418,6 +417,7 @@ export const OrganizationDetails = ({
             <div style={{ clear: "both", paddingTop: "10px" }}>
               <List
                 split=""
+                loading={{ spinning: loading, tip: "Loading Workspaces..."}}
                 className="workspaceList"
                 dataSource={filteredWorkspaces}
                 pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
@@ -442,7 +442,7 @@ export const OrganizationDetails = ({
                               <Col span={24}>
                                 <Tooltip title="Workspace Tags">
                                   {loading || !tags ? (
-                                    <p>Tags loading...</p>
+                                    <p></p>
                                   ) : (
                                     item.workspaceTag.edges.map((tag) => (
                                       <Tag color="geekblue">
@@ -524,7 +524,6 @@ export const OrganizationDetails = ({
               />
             </div>
           </div>
-        )}
       </div>
     </Content>
   );

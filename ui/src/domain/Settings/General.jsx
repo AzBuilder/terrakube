@@ -1,5 +1,14 @@
 import { React, useState, useEffect } from "react";
-import { Button, Form, Input, message, Spin, Popconfirm, Space,Radio } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  message,
+  Spin,
+  Popconfirm,
+  Space,
+  Radio,
+} from "antd";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -88,28 +97,38 @@ export const GeneralSettings = () => {
         <p>Data loading...</p>
       ) : (
         <Spin spinning={waiting}>
-          <Form onFinish={onFinish} layout="vertical" name="form-settings">
+          <Form
+            onFinish={onFinish}
+            layout="vertical"
+            name="form-settings"
+            initialValues={{
+              name: organization.data.attributes.name,
+              description: organization.data.attributes.description,
+              executionMode: organization.data.attributes.executionMode,
+            }}
+          >
             <Form.Item name="name" label="Name">
-              <Input defaultValue={organization.data.attributes.name} />
+              <Input />
             </Form.Item>
             <Form.Item name="description" label="Description">
-              <Input.TextArea
-                defaultValue={organization.data.attributes.description}
-              />
+              <Input.TextArea />
             </Form.Item>
-            <Form.Item name="executionMode" label="Default Exection Mode">
-              <Radio.Group defaultValue={organization.data.attributes.executionMode}>
+            <Form.Item name="executionMode" label="Default Execution Mode">
+              <Radio.Group>
                 <Space direction="vertical">
                   <Radio value="remote">
                     <b>Remote</b>
-                    <p style={{color:"#656a76"}}>
-                      Terrakube hosts your plans and applies, allowing you and your team to collaborate and review jobs in the app.
+                    <p style={{ color: "#656a76" }}>
+                      Terrakube hosts your plans and applies, allowing you and
+                      your team to collaborate and review jobs in the app.
                     </p>
                   </Radio>
                   <Radio value="local">
-                   <b>Local</b>
-                   <p style={{color:"#656a76"}}>
-                     Your planning and applying jobs are performed on your own machines. Terrakube is used just for storing and syncing the state.
+                    <b>Local</b>
+                    <p style={{ color: "#656a76" }}>
+                      Your planning and applying jobs are performed on your own
+                      machines. Terrakube is used just for storing and syncing
+                      the state.
                     </p>
                   </Radio>
                 </Space>
