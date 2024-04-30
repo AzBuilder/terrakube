@@ -167,7 +167,7 @@ export const SSHKeysSettings = () => {
 
       <Modal
         width="650px"
-        visible={visible}
+        open={visible}
         title={
           mode === "edit"
             ? "Edit Private SSH Key " + sshKeyName

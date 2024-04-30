@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from "react";
-import "antd/dist/antd.css";
+import "antd/dist/reset.css";
 import "./Home.css";
 import { Avatar, Dropdown, Menu, message } from "antd";
 import {
@@ -19,41 +19,11 @@ export const ProfilePicture = (props) => {
   const [username, setUsername] = useState(null);
   const auth = useAuth();
   const history = useHistory();
-  const handleUserSettings = (e) => {
+
+  const handleUserSettings = () => {
     history.push(`/settings/tokens`);
   };
-  const userMenu = (
-    <Menu theme="dark">
-      <Menu.Item onClick={() => message.info("Coming Soon")} key="user-id">
-        Signed in as <br />
-        <b>{username}</b>
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item
-        icon={<UserOutlined />}
-        onClick={handleUserSettings}
-        key="user-settings"
-      >
-        User Settings
-      </Menu.Item>
-      <Menu.Item icon={<QuestionCircleOutlined />} key="help">
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://docs.terrakube.io/"
-        >
-          Help
-        </a>
-      </Menu.Item>
-      <Menu.Item
-        icon={<PoweroffOutlined />}
-        key="sign-out"
-        onClick={() => signOutClickHandler()}
-      >
-        Sign Out
-      </Menu.Item>
-    </Menu>
-  );
+
   const signOutClickHandler = () => {
     auth.removeUser();
     localStorage.removeItem(ORGANIZATION_NAME);
@@ -61,21 +31,64 @@ export const ProfilePicture = (props) => {
   };
 
   useEffect(() => {
-    GetProfileImage();
+    const user = getUserFromStorage();
+    if (user && user.profile) {
+      setUsername(user.profile.name);
+    }
   }, []);
 
-  const GetProfileImage = () => {
-    const user = getUserFromStorage();
-    console.log(user);
-    setUsername(user.profile.name);
-  };
+  const menuItems = [
+    {
+      key: "user-id",
+      label: (
+        <>
+          Signed in as <br />
+          <b>{username}</b>
+        </>
+      ),
+      onClick: () => message.info("Coming Soon"),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "user-settings",
+      icon: <UserOutlined />,
+      label: "User Settings",
+      onClick: handleUserSettings,
+    },
+    {
+      key: "help",
+      icon: <QuestionCircleOutlined />,
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://docs.terrakube.io/"
+        >
+          Help
+        </a>
+      ),
+    },
+    {
+      key: "sign-out",
+      icon: <PoweroffOutlined />,
+      label: "Sign Out",
+      onClick: signOutClickHandler,
+    },
+  ];
 
   return (
     <>
-      <Dropdown overlay={userMenu} trigger={["click"]}>
+      <Dropdown
+        menu={{
+          items: menuItems,
+          theme: "dark",
+        }}
+        trigger={["click"]}
+      >
         <Avatar
-          shape="square"
-          style={{ cursor: "pointer" }}
+          className="avatar-hover-effect"
           size="default"
           icon={<UserOutlined />}
         />

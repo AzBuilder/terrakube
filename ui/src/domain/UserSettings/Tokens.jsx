@@ -178,7 +178,7 @@ export const Tokens = () => {
 
       <Modal
         width="600px"
-        visible={visible}
+        open={visible}
         title={"Create API token"}
         okText="Create API token"
         onCancel={onCancel}
@@ -226,7 +226,7 @@ export const Tokens = () => {
       </Modal>
       <Modal
         width="600px"
-        visible={visibleToken}
+        open={visibleToken}
         title={"Create API token"}
         okText="Done"
         onOk={() => {

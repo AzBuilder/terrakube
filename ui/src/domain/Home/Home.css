@@ -28,3 +28,12 @@
     padding: 24px;
     background: #fff;
 }
+
+.avatar-hover-effect {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.65); 
+}
+
+.avatar-hover-effect:hover {
+  color: #fff; 
+}

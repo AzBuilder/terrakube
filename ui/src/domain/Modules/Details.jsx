@@ -15,6 +15,7 @@ import {
   Button,
   Popconfirm,
   message,
+  Spin,
 } from "antd";
 import { useParams, Link } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -24,7 +25,7 @@ import {
   ClockCircleOutlined,
   DownloadOutlined,
   DeleteOutlined,
-  ArrowLeftOutlined
+  ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { GitlabOutlined, GithubOutlined } from "@ant-design/icons";
 import {
@@ -165,7 +166,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     setSubmodule(e.key);
     setSubmodulePath("//modules/" + e.key);
     loadModuleDetails(module.data.attributes.registryPath, version, e.key);
-    if(markdown == "loading..."){
+    if (markdown == "loading...") {
       setMarkdown("");
     }
   };
@@ -281,16 +282,26 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={`/organizations/${orgid}/registry`}>Modules</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>{moduleName}</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: organizationName,
+          },
+          {
+            title: <Link to={`/organizations/${orgid}/registry`}>Modules</Link>,
+          },
+          {
+            title: moduleName,
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
         {loading || !module.data ? (
-          <p>Data loading...</p>
+          <Spin spinning={loading}  tip="Loading Module...">
+          <p style={{marginTop: "50px"}}></p>
+          </Spin>
         ) : (
           <div>
             <Row>
@@ -420,7 +431,14 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                   {submodule !== "" && (
                     <>
                       <div>
-                        <Button style={{paddingLeft:"0px", marginBottom:"10px"}} type="link" onClick={handleClickBack} icon={<ArrowLeftOutlined />}>Back to {moduleName}</Button>
+                        <Button
+                          style={{ paddingLeft: "0px", marginBottom: "10px" }}
+                          type="link"
+                          onClick={handleClickBack}
+                          icon={<ArrowLeftOutlined />}
+                        >
+                          Back to {moduleName}
+                        </Button>
                         <h2 className="moduleTitle">
                           submodules/
                           <Dropdown
@@ -448,146 +466,164 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                     className="moduleTabs"
                     onChange={onChange}
                     defaultActiveKey="1"
-                  >
-                    <TabPane className="markdown-body" tab="Readme" key="1">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {markdown}
-                      </ReactMarkdown>
-                    </TabPane>
-                    <TabPane tab={inputs} key="2">
-                      {hclObject && hclObject?.variable ? (
-                        <Space direction="vertical">
-                          <h3>Inputs</h3>
-                          <span>
-                            These variables should be set in the module block
-                            when using this module.
-                          </span>
-                          <table
-                            style={{ width: "100%", tableLayout: "fixed" }}
-                          >
-                            <thead className="ant-table-thead">
-                              <tr>
-                                <th style={{ width: "25%" }}>Name</th>
-                                <th style={{ width: "15%" }}>Type</th>
-                                <th style={{ width: "40%" }}>Description</th>
-                                <th style={{ width: "20%" }}>Default</th>
-                              </tr>
-                            </thead>
-                            <tbody className="ant-table-tbody">
-                              {Object.keys(hclObject?.variable).map(
-                                (keyName, i) => (
-                                  <tr key={i}>
-                                    <td
-                                      style={{ width: "10%" }}
-                                      className="ant-table-cell"
-                                    >
-                                      <b>{keyName}</b>
-                                    </td>
-                                    <td className="ant-table-cell">
-                                      <Tag>
-                                        {hclObject?.variable[
-                                          keyName
-                                        ][0]?.type?.replace(/{|}|\$/g, "")}
-                                      </Tag>
-                                    </td>
-                                    <td className="ant-table-cell">
-                                      {JSON.stringify(
-                                        hclObject?.variable[keyName][0]
-                                          ?.description
-                                      )?.replaceAll('"', "")}
-                                    </td>
-
-                                    <td className="ant-table-cell">
-                                      {JSON.stringify(
-                                        hclObject?.variable[keyName][0]?.default
-                                      )}
-                                    </td>
+                    items={[
+                      {
+                        label: "Readme",
+                        key: "1",
+                        children: (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {markdown}
+                          </ReactMarkdown>
+                        ),
+                        className: "markdown-body",
+                      },
+                      {
+                        label: inputs,
+                        key: "2",
+                        children:
+                          hclObject && hclObject?.variable ? (
+                            <Space direction="vertical">
+                              <h3>Inputs</h3>
+                              <span>
+                                These variables should be set in the module
+                                block when using this module.
+                              </span>
+                              <table
+                                style={{ width: "100%", tableLayout: "fixed" }}
+                              >
+                                <thead className="ant-table-thead">
+                                  <tr>
+                                    <th style={{ width: "25%" }}>Name</th>
+                                    <th style={{ width: "15%" }}>Type</th>
+                                    <th style={{ width: "40%" }}>
+                                      Description
+                                    </th>
+                                    <th style={{ width: "20%" }}>Default</th>
                                   </tr>
-                                )
-                              )}
-                            </tbody>
-                          </table>
-                        </Space>
-                      ) : (
-                        <p>{loadingInputs}</p>
-                      )}
-                    </TabPane>
-                    <TabPane tab={outputs} key="3">
-                      {hclObject && hclObject?.output ? (
-                        <Space direction="vertical">
-                          <h3>Outputs</h3>
-                          <span>
-                            These outputs will be returned by this module.
-                          </span>
-                          <table
-                            style={{ width: "100%", tableLayout: "fixed" }}
-                          >
-                            <thead className="ant-table-thead">
-                              <tr>
-                                <th style={{ width: "30%" }}>Name</th>
-                                <th style={{ width: "70%" }}>Description</th>
-                              </tr>
-                            </thead>
-                            <tbody className="ant-table-tbody">
-                              {Object.keys(hclObject?.output).map(
-                                (keyName, i) => (
-                                  <tr key={i}>
-                                    <td
-                                      style={{ width: "10%" }}
-                                      className="ant-table-cell"
-                                    >
-                                      <b>{keyName}</b>
-                                    </td>
-
-                                    <td className="ant-table-cell">
-                                      {JSON.stringify(
-                                        hclObject?.output[keyName][0]
-                                          ?.description
-                                      )?.replaceAll('"', "")}
-                                    </td>
+                                </thead>
+                                <tbody className="ant-table-tbody">
+                                  {Object.keys(hclObject?.variable).map(
+                                    (keyName, i) => (
+                                      <tr key={i}>
+                                        <td
+                                          style={{ width: "10%" }}
+                                          className="ant-table-cell"
+                                        >
+                                          <b>{keyName}</b>
+                                        </td>
+                                        <td className="ant-table-cell">
+                                          <Tag>
+                                            {hclObject?.variable[
+                                              keyName
+                                            ][0]?.type?.replace(/{|}|\$/g, "")}
+                                          </Tag>
+                                        </td>
+                                        <td className="ant-table-cell">
+                                          {JSON.stringify(
+                                            hclObject?.variable[keyName][0]
+                                              ?.description
+                                          )?.replaceAll('"', "")}
+                                        </td>
+                                        <td className="ant-table-cell">
+                                          {JSON.stringify(
+                                            hclObject?.variable[keyName][0]
+                                              ?.default
+                                          )}
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                                </tbody>
+                              </table>
+                            </Space>
+                          ) : (
+                            <p>{loadingInputs}</p>
+                          ),
+                      },
+                      {
+                        label: outputs,
+                        key: "3",
+                        children:
+                          hclObject && hclObject?.output ? (
+                            <Space direction="vertical">
+                              <h3>Outputs</h3>
+                              <span>
+                                These outputs will be returned by this module.
+                              </span>
+                              <table
+                                style={{ width: "100%", tableLayout: "fixed" }}
+                              >
+                                <thead className="ant-table-thead">
+                                  <tr>
+                                    <th style={{ width: "30%" }}>Name</th>
+                                    <th style={{ width: "70%" }}>
+                                      Description
+                                    </th>
                                   </tr>
-                                )
-                              )}
-                            </tbody>
-                          </table>
-                        </Space>
-                      ) : (
-                        <p>{loadingOutputs}</p>
-                      )}
-                    </TabPane>
-                    <TabPane tab={resources} key="5">
-                      {hclObject && hclObject?.resource ? (
-                        <Space direction="vertical">
-                          <h3>Resources</h3>
-                          <span>
-                            This is the list of resources that the module may
-                            create.
-                          </span>
-                          <span>
-                            This module defines{" "}
-                            {Object.keys(hclObject?.resource)?.length}{" "}
-                            resources.
-                          </span>
-                          <ul>
-                            {Object.keys(hclObject?.resource).map(
-                              (resourceType, i) =>
-                                Object.keys(
-                                  hclObject?.resource[resourceType]
-                                ).map((resourceName, j) => (
-                                  <li>
-                                    <Tag>
-                                      {resourceType}.{resourceName}
-                                    </Tag>
-                                  </li>
-                                ))
-                            )}
-                          </ul>
-                        </Space>
-                      ) : (
-                        <p>{loadingResources}</p>
-                      )}
-                    </TabPane>
-                  </Tabs>
+                                </thead>
+                                <tbody className="ant-table-tbody">
+                                  {Object.keys(hclObject?.output).map(
+                                    (keyName, i) => (
+                                      <tr key={i}>
+                                        <td
+                                          style={{ width: "10%" }}
+                                          className="ant-table-cell"
+                                        >
+                                          <b>{keyName}</b>
+                                        </td>
+                                        <td className="ant-table-cell">
+                                          {JSON.stringify(
+                                            hclObject?.output[keyName][0]
+                                              ?.description
+                                          )?.replaceAll('"', "")}
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                                </tbody>
+                              </table>
+                            </Space>
+                          ) : (
+                            <p>{loadingOutputs}</p>
+                          ),
+                      },
+                      {
+                        label: resources,
+                        key: "5",
+                        children:
+                          hclObject && hclObject?.resource ? (
+                            <Space direction="vertical">
+                              <h3>Resources</h3>
+                              <span>
+                                This is the list of resources that the module
+                                may create.
+                              </span>
+                              <span>
+                                This module defines{" "}
+                                {Object.keys(hclObject?.resource)?.length}{" "}
+                                resources.
+                              </span>
+                              <ul>
+                                {Object.keys(hclObject?.resource).map(
+                                  (resourceType, i) =>
+                                    Object.keys(
+                                      hclObject?.resource[resourceType]
+                                    ).map((resourceName, j) => (
+                                      <li key={`${i}-${j}`}>
+                                        <Tag>
+                                          {resourceType}.{resourceName}
+                                        </Tag>
+                                      </li>
+                                    ))
+                                )}
+                              </ul>
+                            </Space>
+                          ) : (
+                            <p>{loadingResources}</p>
+                          ),
+                      },
+                    ]}
+                  />
                 </Space>
               </Col>
               <Col span={7}>

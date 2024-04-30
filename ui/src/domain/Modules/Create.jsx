@@ -244,15 +244,25 @@ export const CreateModule = () => {
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>
-          {localStorage.getItem(ORGANIZATION_NAME)}
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={`/organizations/${organizationId}/registry`}>Modules</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>New Module</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: localStorage.getItem(ORGANIZATION_NAME),
+          },
+          {
+            title: (
+              <Link to={`/organizations/${organizationId}/registry`}>
+                Modules
+              </Link>
+            ),
+          },
+          {
+            title: "New Module",
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
         <div className="createWorkspace">
           <h2>Add Module</h2>
@@ -439,18 +449,18 @@ export const CreateModule = () => {
                 <Input />
               </Form.Item>
               <Form.Item
-                  name="tagPrefix"
-                  label="Tag prefix for modules"
-                  rules={[{ required: false }]}
-                  extra="Leave the field empty unless you are using a monorepository configuration. Example vmlinux/"
+                name="tagPrefix"
+                label="Tag prefix for modules"
+                rules={[{ required: false }]}
+                extra="Leave the field empty unless you are using a monorepository configuration. Example vmlinux/"
               >
                 <Input />
               </Form.Item>
               <Form.Item
-                  name="folder"
-                  label="Folder for the terraform module inside the repository"
-                  rules={[{ required: false }]}
-                  extra="Leave the field empty unless you are using a monorepository configuration"
+                name="folder"
+                label="Folder for the terraform module inside the repository"
+                rules={[{ required: false }]}
+                extra="Leave the field empty unless you are using a monorepository configuration"
               >
                 <Input />
               </Form.Item>

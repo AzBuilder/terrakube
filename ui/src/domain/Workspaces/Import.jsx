@@ -302,9 +302,7 @@ export const ImportWorkspace = () => {
         }
       );
       console.log(response);
-      return (
-        response?.data
-      );
+      return response?.data;
     } catch (error) {
       console.error("Error importing workspace:", error);
       return "Failed to import workspace: " + error;
@@ -396,15 +394,25 @@ export const ImportWorkspace = () => {
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>{organizationName}</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={`/organizations/${organizationId}/workspaces`}>
-            Workspaces
-          </Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Import Workspaces</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: organizationName,
+          },
+          {
+            title: (
+              <Link to={`/organizations/${organizationId}/workspaces`}>
+                Workspaces
+              </Link>
+            ),
+          },
+          {
+            title: "Import Workspaces",
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
         <div className="importWorkspace">
           <h2>Import Workspaces</h2>
@@ -687,19 +695,23 @@ export const ImportWorkspace = () => {
             </Space>
           </Content>
           <Space hidden={listHidden} direction="vertical">
-          <h3>Importing Workspaces</h3>
-              <div className="workflowDescription2 App-text">
-              Import of the selected workspaces is underway. You can monitor the progress for each workspace in the section below.
-              </div>
-          <List
-            dataSource={workspacesImport}
-            renderItem={(item) => (
-              <List.Item>
-                {" "}
-                <List.Item.Meta title={item.name} description={<ul>{parse(item.status || "Waiting...")}</ul>} />
-              </List.Item>
-            )}
-          ></List>
+            <h3>Importing Workspaces</h3>
+            <div className="workflowDescription2 App-text">
+              Import of the selected workspaces is underway. You can monitor the
+              progress for each workspace in the section below.
+            </div>
+            <List
+              dataSource={workspacesImport}
+              renderItem={(item) => (
+                <List.Item>
+                  {" "}
+                  <List.Item.Meta
+                    title={item.name}
+                    description={<ul>{parse(item.status || "Waiting...")}</ul>}
+                  />
+                </List.Item>
+              )}
+            ></List>
           </Space>
         </div>
       </div>

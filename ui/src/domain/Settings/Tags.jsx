@@ -193,7 +193,7 @@ export const TagsSettings = () => {
 
       <Modal
         width="600px"
-        visible={visible}
+        open={visible}
         title={mode === "edit" ? "Edit tag " + tagName : "Create new tag"}
         okText="Save tag"
         onCancel={onCancel}

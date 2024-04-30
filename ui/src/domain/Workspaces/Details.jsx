@@ -93,9 +93,9 @@ const iacTypes = [
     icon: <img width="18px" src="/providers/opentofu.png" />,
   },
 ];
-export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
+export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const browserHistory = useHistory();
-  const { id, runid,orgid } = useParams();
+  const { id, runid, orgid } = useParams();
   if (orgid !== null && orgid !== undefined && orgid !== "") {
     localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
   }
@@ -115,7 +115,9 @@ export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
   const [jobVisible, setjobVisible] = useState(false);
   const [organizationNameLocal, setOrganizationNameLocal] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
-  const [activeKey, setActiveKey] = useState(selectedTab !== null ? selectedTab : "1");
+  const [activeKey, setActiveKey] = useState(
+    selectedTab !== null ? selectedTab : "1"
+  );
   const [terraformVersions, setTerraformVersions] = useState([]);
   const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
@@ -132,7 +134,9 @@ export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
   const [selectedIac, setSelectedIac] = useState("");
   const handleClick = (jobid) => {
     changeJob(jobid);
-    browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`);
+    browserHistory.push(
+      `/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`
+    );
   };
   const handleIacChange = (iac) => {
     setSelectedIac(iac);
@@ -251,25 +255,37 @@ export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
     setActiveKey(key);
     switch (key) {
       case "1":
-        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}`);
+        browserHistory.push(
+          `/organizations/${organizationId}/workspaces/${id}`
+        );
         break;
       case "2":
         setjobVisible(false);
-        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/runs`);
+        browserHistory.push(
+          `/organizations/${organizationId}/workspaces/${id}/runs`
+        );
         break;
       case "3":
         setStateDetailsVisible(false);
-        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/states`);
+        browserHistory.push(
+          `/organizations/${organizationId}/workspaces/${id}/states`
+        );
         break;
       case "4":
-        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/variables`);
+        browserHistory.push(
+          `/organizations/${organizationId}/workspaces/${id}/variables`
+        );
         break;
       case "5":
-        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/schedules`);
+        browserHistory.push(
+          `/organizations/${organizationId}/workspaces/${id}/schedules`
+        );
         break;
       case "6":
-        browserHistory.push(`/organizations/${organizationId}/workspaces/${id}/settings`);
-        break;  
+        browserHistory.push(
+          `/organizations/${organizationId}/workspaces/${id}/settings`
+        );
+        break;
       default:
         break;
     }
@@ -350,7 +366,6 @@ export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
               );
             }
 
-
             const organization = response.data.included.find(
               (item) => item.type === "organization"
             );
@@ -363,7 +378,7 @@ export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
             setOrganizationNameLocal(localStorage.getItem(ORGANIZATION_NAME));
             setWorkspaceName(response.data.data.attributes.name);
             setExecutionMode(response.data.data.attributes.executionMode);
-            if(runid) changeJob(runid);  // if runid is provided, show the job details
+            if (runid) changeJob(runid); // if runid is provided, show the job details
           });
       });
   };
@@ -535,19 +550,31 @@ export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
 
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>{organizationNameLocal}</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={`/organizations/${organizationId}/workspaces`}>
-            Workspaces
-          </Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>{workspaceName}</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: organizationNameLocal,
+          },
+          {
+            title: (
+              <Link to={`/organizations/${organizationId}/workspaces`}>
+                Workspaces
+              </Link>
+            ),
+          },
+          {
+            title: workspaceName,
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
         <div className="workspaceDisplay">
           {loading || !workspace.data || !variables || !jobs ? (
-            <p>Data loading...</p>
+            <Spin spinning={true} tip="Loading Workspace...">
+              <p style={{ marginTop: "50px" }}></p>
+            </Spin>
           ) : (
             <div className="orgWrapper">
               <div className="variableActions">
@@ -764,26 +791,33 @@ export const WorkspaceDetails = ({  setOrganizationName, selectedTab }) => {
                               )}
                             />
                           </div>
-                          <Tabs type="card" style={{ marginTop: "30px" }}>
-                            <TabPane
-                              tab={<>Resources ({resources.length})</>}
-                              key="1"
-                            >
-                              <Table
-                                dataSource={resources}
-                                columns={resourceColumns}
-                              />
-                            </TabPane>
-                            <TabPane
-                              tab={<>Outputs ({outputs.length})</>}
-                              key="2"
-                            >
-                              <Table
-                                dataSource={outputs}
-                                columns={outputColumns}
-                              />
-                            </TabPane>
-                          </Tabs>
+                          <Tabs
+                            type="card"
+                            style={{ marginTop: "30px" }}
+                            items={[
+                              {
+                                label: `Resources (${resources.length})`,
+                                key: "1",
+                                children: (
+                                  <Table
+                                    dataSource={resources}
+                                    columns={resourceColumns}
+                                  />
+                                ),
+                              },
+                              {
+                                label: `Outputs (${outputs.length})`,
+                                key: "2",
+                                children: (
+                                  <Table
+                                    dataSource={outputs}
+                                    columns={outputColumns}
+                                  />
+                                ),
+                              },
+                            ]}
+                          />
+
                           <ResourceDrawer
                             resource={resource}
                             setOpen={setOpen}

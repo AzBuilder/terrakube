@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import "antd/dist/antd.css";
+import "antd/dist/reset.css";
 import "./Home.css";
 import axiosInstance from "../../config/axiosConfig";
 import { Layout, Breadcrumb, List, Card } from "antd";

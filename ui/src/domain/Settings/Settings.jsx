@@ -19,40 +19,61 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
   }
   return (
     <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>
-          {localStorage.getItem(ORGANIZATION_NAME)}
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Settings</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: localStorage.getItem(ORGANIZATION_NAME),
+          },
+          {
+            title: "Settings",
+          },
+        ]}
+      />
+
       <div className="site-layout-content">
         <Tabs
           tabPosition="left"
           defaultActiveKey={selectedTab}
           onTabClick={callback}
-        >
-          <TabPane tab="General" key="1">
-            <GeneralSettings />
-          </TabPane>
-          <TabPane tab="Teams" key="2">
-            <TeamSettings key={key}/>
-          </TabPane>
-          <TabPane tab="Global Variables" key="3">
-            <GlobalVariablesSettings />
-          </TabPane>
-          <TabPane tab="VCS Providers" key="4">
-            <VCSSettings vcsMode={vcsMode} />
-          </TabPane>
-          <TabPane tab="Templates" key="5">
-            <TemplatesSettings key={key} />
-          </TabPane>
-          <TabPane tab="SSH Keys" key="6">
-            <SSHKeysSettings />
-          </TabPane>
-          <TabPane tab="Tags" key="7">
-            <TagsSettings />
-          </TabPane>
-        </Tabs>
+          items={[
+            {
+              label: "General",
+              key: "1",
+              children: <GeneralSettings />,
+            },
+            {
+              label: "Teams",
+              key: "2",
+              children: <TeamSettings key={key} />,
+            },
+            {
+              label: "Global Variables",
+              key: "3",
+              children: <GlobalVariablesSettings />,
+            },
+            {
+              label: "VCS Providers",
+              key: "4",
+              children: <VCSSettings vcsMode={vcsMode} />,
+            },
+            {
+              label: "Templates",
+              key: "5",
+              children: <TemplatesSettings key={key} />,
+            },
+            {
+              label: "SSH Keys",
+              key: "6",
+              children: <SSHKeysSettings />,
+            },
+            {
+              label: "Tags",
+              key: "7",
+              children: <TagsSettings />,
+            },
+          ]}
+        />
       </div>
     </Content>
   );

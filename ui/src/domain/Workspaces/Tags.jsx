@@ -139,7 +139,6 @@ export const Tags = ({ organizationId, workspaceId }) => {
         return { label: tag.attributes.name, value: tag.id };
       })}
       placeholder="Add a tag"
-      showArrow={true}
     />
   );
 };

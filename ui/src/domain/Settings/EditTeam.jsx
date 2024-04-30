@@ -424,7 +424,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           )}
           <Modal
             width="600px"
-            visible={visible}
+            open={visible}
             title={"Creating a team token"}
             okText="Generate token"
             onCancel={onCancelToken}

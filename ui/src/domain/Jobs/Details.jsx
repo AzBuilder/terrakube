@@ -8,6 +8,7 @@ import {
   Button,
   message,
   Radio,
+  Spin,
 } from "antd";
 import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
@@ -28,7 +29,6 @@ import Ansi from "ansi-to-react";
 import parse from "html-react-parser";
 
 const { DateTime } = require("luxon");
-const { Panel } = Collapse;
 
 export const DetailsJob = ({ jobId }) => {
   const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
@@ -219,14 +219,16 @@ export const DetailsJob = ({ jobId }) => {
       .then((response) => {
         console.log("terrakube");
         console.log(response?.data?.terrakubeUI);
-        if(response?.data?.terrakubeUI)
-           setUITemplates(response?.data?.terrakubeUI);
+        if (response?.data?.terrakubeUI)
+          setUITemplates(response?.data?.terrakubeUI);
       });
   };
   return (
     <div style={{ marginTop: "14px" }}>
       {loading || !job.data || !steps ? (
-        <p>Data loading...</p>
+        <Spin spinning={true} tip="Loading Job...">
+          <p style={{ marginTop: "50px" }}></p>
+        </Spin>
       ) : (
         <Space direction="vertical" style={{ width: "100%" }}>
           <div>
@@ -265,79 +267,90 @@ export const DetailsJob = ({ jobId }) => {
             <h2 style={{ display: "inline" }}>Triggered via UI</h2>
           </div>
 
-          <Collapse>
-            <Panel
-              header={
-                <span>
-                  <Avatar size="small" shape="square" icon={<UserOutlined />} />{" "}
-                  <b>{job.data.attributes.createdBy}</b> triggered a run from {job.data.attributes.via || "UI"}{" "}
-                  {DateTime.fromISO(
-                    job.data.attributes.createdDate
-                  ).toRelative()}
-                </span>
-              }
-              key="1"
-            >
-              <p></p>
-            </Panel>
-          </Collapse>
+          <Collapse
+            items={[
+              {
+                key: "1",
+                label: (
+                  <span>
+                    <Avatar
+                      size="small"
+                      shape="square"
+                      icon={<UserOutlined />}
+                    />{" "}
+                    <b>{job.data.attributes.createdBy}</b> triggered a run from{" "}
+                    {job.data.attributes.via || "UI"}{" "}
+                    {DateTime.fromISO(
+                      job.data.attributes.createdDate
+                    ).toRelative()}
+                  </span>
+                ),
+                children: <p></p>,
+              },
+            ]}
+          />
           {steps.length > 0 ? (
             steps.map((item) => (
               <Collapse
                 style={{ width: "100%" }}
                 defaultActiveKey={item.status === "running" ? ["2"] : []}
-              >
-                <Panel
-                  header={
-                    <span>
-                      {getIconStatus(item)}
-                      <h3 style={{ display: "inline" }}>
-                        {" "}
-                        {item.name} {item.status}
-                      </h3>
-                    </span>
-                  }
-                  key="2"
-                >
-                  {console.log(uiTemplates)}
-                  {uiTemplates.hasOwnProperty(item.stepNumber) ? (
-                    <>
-                      <div
-                        style={{
-                          textAlign: "right",
-                          padding: "5px",
-                        }}
-                      >
-                        <Radio.Group
-                          onChange={onChange}
-                          value={uiType}
-                          size="small"
-                        >
-                          <Radio.Button value="structured">
-                            Structured
-                          </Radio.Button>
-                          <Radio.Button value="console">Console</Radio.Button>
-                        </Radio.Group>
-                      </div>{" "}
-                      {uiType === "structured" ? (
-                        <div>{parse(uiTemplates[item.stepNumber])}</div>
-                      ) : (
-                        <div id="code-container">
-                          <div id="code-content">
-                            <Ansi>{item.outputLog}</Ansi>
+                items={[
+                  {
+                    key: "2",
+                    label: (
+                      <span>
+                        {getIconStatus(item)}
+                        <h3 style={{ display: "inline" }}>
+                          &nbsp; {item.name} {item.status}
+                        </h3>
+                      </span>
+                    ),
+                    children: (
+                      <>
+                        {console.log(uiTemplates)}
+                        {uiTemplates.hasOwnProperty(item.stepNumber) ? (
+                          <>
+                            <div
+                              style={{
+                                textAlign: "right",
+                                padding: "5px",
+                              }}
+                            >
+                              <Radio.Group
+                                onChange={onChange}
+                                value={uiType}
+                                size="small"
+                              >
+                                <Radio.Button value="structured">
+                                  Structured
+                                </Radio.Button>
+                                <Radio.Button value="console">
+                                  Console
+                                </Radio.Button>
+                              </Radio.Group>
+                            </div>
+                            {uiType === "structured" ? (
+                              <div>{parse(uiTemplates[item.stepNumber])}</div>
+                            ) : (
+                              <div id="code-container">
+                                <div id="code-content">
+                                  <Ansi>{item.outputLog}</Ansi>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div id="code-container">
+                            <div id="code-content">
+                              <Ansi>{item.outputLog}</Ansi>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div id="code-container">
-                      <div id="code-content">
-                        <Ansi>{item.outputLog}</Ansi>
-                      </div>
-                    </div>
-                  )}
-                </Panel>
-              </Collapse>
+                        )}
+                      </>
+                    ),
+                  },
+                ]}
+              />
             ))
           ) : (
             <span />
