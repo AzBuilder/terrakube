@@ -13,7 +13,6 @@ import org.terrakube.executor.configuration.ExecutorFlagsProperties;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 import org.terrakube.executor.service.mode.TerraformJob;
-import org.terrakube.executor.service.logs.LogsService;
 
 @Slf4j
 @Service
@@ -26,8 +25,6 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     private TerraformOutput terraformOutput;
 
     private ExecutorFlagsProperties executorFlagsProperties;
-
-    private LogsService logsService;
 
     private TerraformOutputPathService terraformOutputPathService;
 
@@ -105,6 +102,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
 
     private void updateStepLogs(String organizationId, String jobId, String stepId) {
         StepAttributes stepAttributes = new StepAttributes();
+        stepAttributes.setStatus("running");
         stepAttributes.setOutput(terraformOutputPathService.getOutputPath(organizationId, jobId, stepId));
 
         Step step = new Step();
