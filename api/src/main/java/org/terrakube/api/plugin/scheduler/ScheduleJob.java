@@ -76,9 +76,7 @@ public class ScheduleJob implements org.quartz.Job {
                 jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
                 if (job.getWorkspace().isLocked()) {
                     log.warn("Release Workspace {} Lock for job id {}", job.getWorkspace().getId(), job.getId());
-                    Workspace workspace = job.getWorkspace();
-                    workspace.setLocked(false);
-                    workspaceRepository.save(workspace);
+                    unlockWorkspace(job);
                 }
             } catch (Exception e) {
                 log.error(e.getMessage());
