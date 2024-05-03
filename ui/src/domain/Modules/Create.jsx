@@ -425,7 +425,7 @@ export const CreateModule = () => {
               <Form.Item
                 name="name"
                 label="Module Name"
-                rules={[{ required: true }, { maxLength: 32, message: "Value should be less than 32 character",},]}
+                rules={[{ required: true }, { maxLength: 32, message: "Value should be less than 32 character"}]}
                 extra="The name of your module generally names the abstraction that the module is intending to create."
               >
                 <Input />
