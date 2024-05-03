@@ -65,7 +65,7 @@ public class ScheduleJob implements org.quartz.Job {
         Date jobExpiration = DateUtils.addHours(job.getCreatedDate(), 6);
         Date currentTime = new Date(System.currentTimeMillis());
         log.info("Job {} should be completed before {}, current time {}", job.getId(), jobExpiration, currentTime);
-        if(currentTime.after(jobExpiration)){
+        if (currentTime.after(jobExpiration)) {
             log.error("Job has been running for more than 6 hours, cancelling running job");
             try {
                 job.setStatus(JobStatus.failed);
@@ -74,8 +74,8 @@ public class ScheduleJob implements org.quartz.Job {
                 log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                 updateJobStepsWithStatus(job.getId(), JobStatus.failed);
                 jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
-                if(job.getWorkspace().isLocked()){
-                    log.warn("Release Workspace Lock {}",  job.getId());
+                if (job.getWorkspace().isLocked()) {
+                    log.warn("Release Workspace {} Lock for job id {}", job.getWorkspace().getId(), job.getId());
                     Workspace workspace = job.getWorkspace();
                     workspace.setLocked(false);
                     workspaceRepository.save(workspace);
@@ -93,8 +93,8 @@ public class ScheduleJob implements org.quartz.Job {
                 Arrays.asList(JobStatus.failed, JobStatus.completed, JobStatus.rejected, JobStatus.cancelled, JobStatus.waitingApproval, JobStatus.approved),
                 job.getId()
         );
-        if(previousJobs.isPresent() && previousJobs.get().size() > 0 ){
-           log.warn("Job {} is waiting for previous jobs to be completed...", jobId);
+        if (previousJobs.isPresent() && previousJobs.get().size() > 0) {
+            log.warn("Job {} is waiting for previous jobs to be completed...", jobId);
         } else {
 
             switch (job.getStatus()) {
@@ -159,7 +159,7 @@ public class ScheduleJob implements org.quartz.Job {
                     }
                     break;
                 case approval:
-                    if(!job.isAutoApply()) {
+                    if (!job.isAutoApply()) {
                         job.setStatus(JobStatus.waitingApproval);
                         job.setApprovalTeam(flow.get().getTeam());
                         jobRepository.save(job);
