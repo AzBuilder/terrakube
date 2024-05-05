@@ -101,7 +101,7 @@ public class DynamicCredentialsService {
         log.info("TERRAKUBE_AWS_CREDENTIALS_FILE: {}", awsWebIdentityToken);
 
         workspaceEnvVariables.put("TERRAKUBE_AWS_CREDENTIALS_FILE", awsWebIdentityToken);
-        workspaceEnvVariables.put("AWS_ROLE_ARN", workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_AWS"));
+        workspaceEnvVariables.put("AWS_ROLE_ARN", workspaceEnvVariables.get("WORKLOAD_IDENTITY_ROLE_AWS"));
         workspaceEnvVariables.put("AWS_WEB_IDENTITY_TOKEN_FILE", getDefaultExecutorPath(job) + "/terrakube_config_dynamic_credentials_aws.txt");
 
         return workspaceEnvVariables;
