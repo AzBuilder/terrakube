@@ -89,7 +89,21 @@ public class DynamicCredentialsService {
 
     @Transactional
     public HashMap<String, String> generateDynamicCredentialsAws(Job job, HashMap<String, String> workspaceEnvVariables) {
-        log.warn("AWS Dynamic Credentials not implemented yet");
+        String awsWebIdentityToken = generateJwt(
+                job.getOrganization().getName(),
+                job.getWorkspace().getName(),
+                workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_AWS"),
+                job.getOrganization().getId().toString(),
+                job.getWorkspace().getId().toString(),
+                job.getId()
+        );
+
+        log.info("TERRAKUBE_AWS_CREDENTIALS_FILE: {}", awsWebIdentityToken);
+
+        workspaceEnvVariables.put("TERRAKUBE_AWS_CREDENTIALS_FILE", awsWebIdentityToken);
+        workspaceEnvVariables.put("AWS_ROLE_ARN", workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_AWS"));
+        workspaceEnvVariables.put("AWS_WEB_IDENTITY_TOKEN_FILE", getDefaultExecutorPath(job) + "/terrakube_config_dynamic_credentials_aws.txt");
+
         return workspaceEnvVariables;
     }
 
@@ -125,12 +139,7 @@ public class DynamicCredentialsService {
                 "    }\n" +
                 "  }";
 
-        String executorDirectory = String.format(
-                "%s/.terraform-spring-boot/executor/%s/%s",
-                FileUtils.getUserDirectoryPath(),
-                job.getOrganization().getId().toString(),
-                job.getWorkspace().getId().toString()
-        );
+        String executorDirectory = getDefaultExecutorPath(job);
 
         String audience = workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_GCP");
         String serviceAccountEmail = workspaceEnvVariables.get("WORKLOAD_IDENTITY_SERVICE_ACCOUNT_EMAIL");
@@ -188,5 +197,14 @@ public class DynamicCredentialsService {
         }
 
         return publicKeyPEM;
+    }
+
+    private static String getDefaultExecutorPath(Job job) {
+        return String.format(
+                "%s/.terraform-spring-boot/executor/%s/%s",
+                FileUtils.getUserDirectoryPath(),
+                job.getOrganization().getId().toString(),
+                job.getWorkspace().getId().toString()
+        );
     }
 }
