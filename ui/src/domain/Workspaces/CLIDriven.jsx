@@ -36,7 +36,7 @@ export const CLIDriven = ({ organizationName, workspaceName }) => {
                     <pre className="moduleCode">
                       terraform {"{"} <br />
                       &nbsp;&nbsp;cloud {"{"} <br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;hostname = "{new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}}"<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;hostname = "{new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}"<br/>
                       &nbsp;&nbsp;&nbsp;&nbsp;organization = "{organizationName}
                       " <br />
                       <br />
@@ -56,7 +56,7 @@ export const CLIDriven = ({ organizationName, workspaceName }) => {
                       <pre className="moduleCode">
                       terraform {"{"} <br/>
                           &nbsp;&nbsp;backend "remote" {"{"} <br/>
-                          &nbsp;&nbsp;&nbsp;&nbsp;hostname = "{new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}}"<br/>
+                          &nbsp;&nbsp;&nbsp;&nbsp;hostname = "{new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}"<br/>
                           &nbsp;&nbsp;&nbsp;&nbsp;organization = "{organizationName}
                           " <br/>
                       <br/>
