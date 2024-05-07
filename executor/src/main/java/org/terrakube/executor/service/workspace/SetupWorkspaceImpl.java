@@ -68,11 +68,19 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             if (enableRegistrySecurity)
                 workspaceSecurity.addTerraformCredentials();
 
+            log.info("Executor WorkingDir: {}", workspaceCloneFolder);
             if (terraformJob.getEnvironmentVariables().containsKey("ENABLE_DYNAMIC_CREDENTIALS_GCP")) {
                 setupGcpDynamicCredentials(
                         workspaceCloneFolder,
                         terraformJob.getEnvironmentVariables().get("TERRAKUBE_GCP_CREDENTIALS_FILE"),
                         terraformJob.getEnvironmentVariables().get("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE")
+                );
+            }
+
+            if (terraformJob.getEnvironmentVariables().containsKey("ENABLE_DYNAMIC_CREDENTIALS_AWS")) {
+                setupAwsDynamicCredentials(
+                        workspaceCloneFolder,
+                        terraformJob.getEnvironmentVariables().get("TERRAKUBE_AWS_CREDENTIALS_FILE")
                 );
             }
         } catch (IOException e) {
@@ -81,11 +89,20 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return workspaceCloneFolder != null ? workspaceCloneFolder : new File("/tmp/" + UUID.randomUUID());
     }
 
+    private void setupAwsDynamicCredentials(File workspaceCloneFolder, String awsCredentialsFileContent ) {
+        try {
+            log.info("Generating AWS dynamic credentials files inside the workspace execution");
+            log.info("Writing AWS credentials to {}/terrakube_config_dynamic_credentials_aws.txt", workspaceCloneFolder.getAbsolutePath());
+            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials_aws.txt"), awsCredentialsFileContent, Charset.defaultCharset());
+            } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
     private void setupGcpDynamicCredentials(File workspaceCloneFolder, String gcpCredentialsFileContent, String gcpCredentialConfigFileContent) {
         try {
             log.info("Generating GCP dynamic credentials files inside the workspace execution");
 
-            log.info("WorkingDir: {}", workspaceCloneFolder);
             log.info("Writing GCP credentials to {}/terrakube_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
             log.info("Writing GCP credentials Configuration File to {}/terrakube_config_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
 
