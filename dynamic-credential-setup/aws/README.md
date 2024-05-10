@@ -1,4 +1,4 @@
-# Setup Terrakube Dynamic Credentials (GCP)
+# Setup Terrakube Dynamic Credentials (AWS)
 
 ## Requirements
 
@@ -15,10 +15,11 @@ Set terraform variables using: ***"variables.auto.tfvars"***
 
 ```terraform
 terrakube_token = "TERRAKUBE_PERSONAL_ACCESS_TOKEN"
-terrakube_hostname = "terrakube-api.mydomain.com"
-terrakube_organization_name = "simple"
-terrakube_workspace_name = "dynamic-workspace"
-gcp_project_id = "my-gcp-project"
+terrakube_api_hostname = "TERRAKUBE-API.MYCLUSTER.COM"
+terrakube_federated_credentials_audience="aws.workload.identity"
+terrakube_organization_name="simple"
+terrakube_workspace_name = "dynamic-workspace-aws"
+aws_region = "us-east-1"
 ```
 
 > To generate the API token check [here](https://docs.terrakube.io/user-guide/organizations/api-tokens)
@@ -41,17 +42,17 @@ terraform {
   }
 }
 
-provider "google" {
-  project     = "my-gcp-project"
-  region      = "us-central1"
-  zone        = "us-central1-c"
+provider "aws" {
+
+
 }
 
-resource "google_storage_bucket" "auto-expire" {
-  name          = "mysuperbukcetname"
-  location      = "US"
-  force_destroy = true
+resource "aws_s3_bucket" "example" {
+  bucket = "my-tf-superbucket-awerqerq"
 
-  public_access_prevention = "enforced"
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
 }
 ```
