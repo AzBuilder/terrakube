@@ -50,3 +50,8 @@ bindings/ca-certificates/terrakubeDemo2.pem
 
 private.pem
 public.pem
+
+*.terraform*
+terraform.tfstate
+terraform.tfstate.backup
+variables.auto.tfvars
