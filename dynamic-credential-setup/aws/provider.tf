@@ -12,5 +12,5 @@ provider "terrakube" {
 }
 
 provider "aws" {
-
+  region = var.aws_region
 }

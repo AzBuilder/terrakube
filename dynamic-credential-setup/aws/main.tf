@@ -1,3 +1,11 @@
+resource "random_string" "random" {
+  length  = 3
+  special = false
+  lower   = true
+  upper   = false
+  numeric = false
+}
+
 resource "aws_iam_openid_connect_provider" "terrakube_provider" {
   url             = data.tls_certificate.terrakube_certificate.url
   client_id_list  = [var.terrakube_federated_credentials_audience]
@@ -5,7 +13,7 @@ resource "aws_iam_openid_connect_provider" "terrakube_provider" {
 }
 
 resource "aws_iam_role" "terrakube_role" {
-  name = "terrakube-role"
+  name = "terrakube-role${random_string.random.result}"
 
   assume_role_policy = <<EOF
 {
@@ -30,7 +38,7 @@ EOF
 }
 
 resource "aws_iam_policy" "terrakube_policy" {
-  name        = "terrakube-policy"
+  name        = "terrakube-policy${random_string.random.result}"
   description = "terrakube policy"
 
   policy = <<EOF
@@ -53,7 +61,6 @@ resource "aws_iam_role_policy_attachment" "terrakube_policy_attachment" {
   role       = aws_iam_role.terrakube_role.name
   policy_arn = aws_iam_policy.terrakube_policy.arn
 }
-
 
 resource "terrakube_workspace_cli" "dynamic_credentials_workspace" {
   organization_id = data.terrakube_organization.org.id
