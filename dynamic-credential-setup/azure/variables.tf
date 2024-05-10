@@ -11,7 +11,7 @@ variable "terrakube_organization_name" {
 
 variable "terrakube_workspace_name" {
   type        = string
-  default     = "my-aws-workspace"
+  default     = "my-azure-workspace"
   description = "The name of the workspace that you'd like to create and connect to AWS"
 }
 
