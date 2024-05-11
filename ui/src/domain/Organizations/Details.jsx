@@ -247,7 +247,7 @@ export const OrganizationDetails = ({
                         }
                       } 
                     }
-                    job{
+                    job(sort: "id") {
                       edges {
                         node {
                           id
