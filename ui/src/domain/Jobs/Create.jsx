@@ -1,4 +1,3 @@
-
 import { React, useState, useEffect } from "react";
 import { Form, Button, Select, Modal, Space } from "antd";
 import {
@@ -6,7 +5,11 @@ import {
   WORKSPACE_ARCHIVE,
 } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
-import { InfoCircleTwoTone,PlusOutlined } from "@ant-design/icons";
+import {
+  InfoCircleTwoTone,
+  PlusOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 
 const validateMessages = { required: "${label} is required!" };
 
@@ -127,7 +130,18 @@ export const CreateJob = ({ changeJob }) => {
                 <Select>
                   {templates.map((item) => (
                     <Select.Option value={item.id}>
-                      {item.attributes.name}
+                      <span
+                        style={
+                          item.attributes.name.includes("Destroy")
+                            ? { color: "red" }
+                            : {}
+                        }
+                      >
+                        {item.attributes.name.includes("Destroy") && (
+                          <DeleteOutlined style={{ marginRight: 8 }} />
+                        )}
+                        {item.attributes.name}
+                      </span>
                     </Select.Option>
                   ))}
                 </Select>
