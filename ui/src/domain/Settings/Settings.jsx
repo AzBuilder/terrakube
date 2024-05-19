@@ -1,16 +1,16 @@
 import { React, useState } from "react";
-import { Layout, Breadcrumb, Tabs } from "antd";
+import { Layout, Breadcrumb, Tabs,Tag } from "antd";
 import "./Settings.css";
 import { GeneralSettings } from "./General";
 import { TeamSettings } from "./Teams";
 import { VCSSettings } from "./VCS";
 import { TemplatesSettings } from "./Templates";
+import { ActionSettings } from "./Actions"
 import { TagsSettings } from "./Tags";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
 import { SSHKeysSettings } from "./SSHKeys";
 import { GlobalVariablesSettings } from "./GlobalVariables";
 const { Content } = Layout;
-const { TabPane } = Tabs;
 
 export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
   const [key, setKey] = useState("");
@@ -71,6 +71,11 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
               label: "Tags",
               key: "7",
               children: <TagsSettings />,
+            },
+            {
+              label: <>Actions <Tag color="blue">beta</Tag></>,
+              key: "8",
+              children: <ActionSettings/>,
             },
           ]}
         />

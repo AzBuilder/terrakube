@@ -773,7 +773,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                         <br />
                                         <br />
                                         <Row>
-                                          <Col span={20} />
+                                          <Col span={20}>
+                                          </Col>
                                           <Col>
                                             <Button
                                               onClick={() =>

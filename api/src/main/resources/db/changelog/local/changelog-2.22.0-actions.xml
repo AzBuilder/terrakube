@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="41" author="javier-canizalez@outlook.com">
+        <createTable tableName="action">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1024)"/>
+            <column name="type" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action" type="clob">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_criteria" type="clob">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="boolean" defaultValueBoolean="true">
+              <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+        </createTable>
+        <insert tableName="action">
+            <column name="id" value="terrakube.open-documentation"/>
+            <column name="name" value="Open Documentation"/>
+            <column name="label" value="Open Documentation"/>
+            <column name="category" value="General"/>
+            <column name="description" value="Open Terraform registry documentation"/>
+            <column name="type" value="Workspace/ResourceDrawer/Action"/>
+            <column name="action" value="Cih7IGNvbnRleHQgfSkgPT4gewogIGNvbnN0IHsgcHJvdmlkZXIsIHR5cGUgfSA9IGNvbnRleHQuc3RhdGU7CiAgY29uc3QgdXJsID0gYGh0dHBzOi8vcmVnaXN0cnkudGVycmFmb3JtLmlvL3Byb3ZpZGVycy8ke3Byb3ZpZGVyPy5zcGxpdCgnLycpPy5zbGljZSgtMik/LmpvaW4oJy8nKX0vbGF0ZXN0L2RvY3MvcmVzb3VyY2VzLyR7dHlwZT8uc3BsaXQoJ18nKT8uc2xpY2UoMSk/LmpvaW4oJ18nKX1gOwoKICByZXR1cm4gKAogICAgICA8QnV0dG9uIHRhcmdldD0iX2JsYW5rIiBocmVmPXt1cmx9IGljb249ezxRdWVzdGlvbkNpcmNsZU91dGxpbmVkIC8+fT4KICAgICAgICBPcGVuIGRvY3VtZW50YXRpb24KICAgICAgPC9CdXR0b24+CiAgKQp9CiAgICAgIA=="/>
+            <column name="display_criteria">
+                <![CDATA[[{"filter": "true"}]]]>
+            </column>
+            <column name="version" value="1.0.0"/>
+            <column name="active" value="true"/>
+        </insert>
+        <insert tableName="action">
+            <column name="id" value="terrakube.resource-details"/>
+            <column name="name" value="Resource Details"/>
+            <column name="label" value="Details"/>
+            <column name="category" value="General"/>
+            <column name="description" value="Show resource details from the state"/>
+            <column name="type" value="Workspace/ResourceDrawer/Tab"/>
+            <column name="action" value="Cih7Y29udGV4dH0pID0+IHsKICBjb25zdCB7IHZhbHVlcywgZGVwZW5kc19vbiB9ID0gY29udGV4dC5zdGF0ZTsKICByZXR1cm4gKAogICAgPFNwYWNlIHNpemU9ezEwfSBzdHlsZT17eyB3aWR0aDogIjEwMCUiIH19IGRpcmVjdGlvbj0idmVydGljYWwiPgogICAgICA8Q29sbGFwc2UgZGVmYXVsdEFjdGl2ZUtleT17WyIxIl19PgogICAgICAgIDxQYW5lbCBoZWFkZXI9ezxoND5BdHRyaWJ1dGVzPC9oND59IGtleT0iMSI+CiAgICAgICAgICA8RGVzY3JpcHRpb25zIGJvcmRlcmVkIGNvbHVtbj17MX0+CiAgICAgICAgICAgIHtPYmplY3QuZW50cmllcyh2YWx1ZXMgfHwge30pLm1hcCgoW2tleSwgdmFsdWVdKSA9PiAoCiAgICAgICAgICAgICAgPERlc2NyaXB0aW9ucy5JdGVtIGxhYmVsPXtrZXl9IGtleT17a2V5fT4KICAgICAgICAgICAgICAgIDxQYXJhZ3JhcGgKICAgICAgICAgICAgICAgICAgc3R5bGU9e3sgbWFyZ2luOiAiMHB4IiB9fQogICAgICAgICAgICAgICAgICBjb3B5YWJsZT17dmFsdWUgIT09IG51bGwgPyB7IHRvb2x0aXBzOiBmYWxzZSB9IDogZmFsc2V9CiAgICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICAgIHt2YWx1ZSA9PT0gbnVsbAogICAgICAgICAgICAgICAgICAgID8gIiIKICAgICAgICAgICAgICAgICAgICA6IHR5cGVvZiB2YWx1ZSA9PT0gIm9iamVjdCIKICAgICAgICAgICAgICAgICAgICA/IEpTT04uc3RyaW5naWZ5KHZhbHVlLCBudWxsLCAyKQogICAgICAgICAgICAgICAgICAgIDogdmFsdWV9CiAgICAgICAgICAgICAgICA8L1BhcmFncmFwaD4KICAgICAgICAgICAgICA8L0Rlc2NyaXB0aW9ucy5JdGVtPgogICAgICAgICAgICApKX0KICAgICAgICAgIDwvRGVzY3JpcHRpb25zPgogICAgICAgIDwvUGFuZWw+CiAgICAgIDwvQ29sbGFwc2U+CgogICAgICA8Q29sbGFwc2UKICAgICAgICBzdHlsZT17eyBkaXNwbGF5OiBkZXBlbmRzX29uPy5sZW5ndGggPiAwID8gImJsb2NrIiA6ICJub25lIiB9fQogICAgICAgIGRlZmF1bHRBY3RpdmVLZXk9e1siMiJdfQogICAgICA+CiAgICAgICAgPFBhbmVsIGhlYWRlcj17PGg0PkRlcGVuZHMgb248L2g0Pn0ga2V5PSIyIj4KICAgICAgICAgIDxiciAvPgogICAgICAgICAgPHVsPgogICAgICAgICAgICB7ZGVwZW5kc19vbj8ubWFwKChkZXBlbmRlbmN5KSA9PiAoCiAgICAgICAgICAgICAgPGxpIGtleT17ZGVwZW5kZW5jeX0+CiAgICAgICAgICAgICAgICA8VGFnPntkZXBlbmRlbmN5fTwvVGFnPgogICAgICAgICAgICAgIDwvbGk+CiAgICAgICAgICAgICkpfQogICAgICAgICAgPC91bD4KICAgICAgICA8L1BhbmVsPgogICAgICA8L0NvbGxhcHNlPgogICAgPC9TcGFjZT4KICApOwp9CiAgICAgIA=="/>
+            <column name="display_criteria">
+                <![CDATA[[{"filter": "true"}]]]>
+            </column>
+            <column name="version" value="1.0.0"/>
+            <column name="active" value="true"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

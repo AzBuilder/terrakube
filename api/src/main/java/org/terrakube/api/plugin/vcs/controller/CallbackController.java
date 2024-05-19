@@ -3,8 +3,6 @@ package org.terrakube.api.plugin.vcs.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.vcs.TokenService;
 
-import com.amazonaws.services.s3.internal.eventstreaming.HeaderValue;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
