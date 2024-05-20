@@ -101,7 +101,7 @@ public class ScheduleJob implements org.quartz.Job {
                     executePendingJob(job, jobExecutionContext);
                     break;
                 case noChanges:
-                    completeJob(job);
+                    log.warn("Job {} completed with no changes...", jobId);
                     redisTemplate.delete(String.valueOf(job.getId()));
                     removeJobContext(job, jobExecutionContext);
                     unlockWorkspace(job);
