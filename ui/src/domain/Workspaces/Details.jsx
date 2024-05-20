@@ -1290,7 +1290,7 @@ function setupWorkspaceIncludes(
             finalColor = "#2eb039";
             break;
           case "noChanges":
-            finalColor = "#2eb039";
+            finalColor = "#9f37fa";
             break;
           case "rejected":
             finalColor = "#FB0136";
