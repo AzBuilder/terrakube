@@ -97,10 +97,10 @@ export const DetailsJob = ({ jobId }) => {
             style={{ fontSize: "20px" }}
           />
         );
-      case "notExecuted":
+      case "noChanges":
         return (
             <CheckCircleTwoTone
-                twoToneColor="#fa8f37"
+                twoToneColor="#52c41a"
                 style={{ fontSize: "20px" }}
             />
         );
