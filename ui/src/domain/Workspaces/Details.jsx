@@ -758,6 +758,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                                     ) : item.status ===
                                                       "failed" ? (
                                                       <StopOutlined />
+                                                    ) : item.status ===
+                                                      "notExecuted" ? (
+                                                        <CheckCircleOutlined />
                                                     ) : (
                                                       <ClockCircleOutlined />
                                                     )

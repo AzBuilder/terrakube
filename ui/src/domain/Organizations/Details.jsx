@@ -460,6 +460,8 @@ export const OrganizationDetails = ({
                             icon={
                               item.lastStatus == "completed" ? (
                                 <CheckCircleOutlined />
+                              ) : item.lastStatus == "noChanges" ? (
+                                  <CheckCircleOutlined />
                               ) : item.lastStatus == "running" ? (
                                 <SyncOutlined spin />
                               ) : item.lastStatus === "waitingApproval" ? (
@@ -564,6 +566,8 @@ function setupOrganizationIncludes(
           ? "#FB0136"
           : lastStatus === "failed"
           ? "#FB0136"
+          : lastStatus == "noChanges"
+          ? "#2eb039"
           : "",
       ...element.node,
     });

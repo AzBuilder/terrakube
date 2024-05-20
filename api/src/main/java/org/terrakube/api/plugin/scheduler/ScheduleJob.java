@@ -103,6 +103,7 @@ public class ScheduleJob implements org.quartz.Job {
                 case noChanges:
                     log.warn("Job {} completed with no changes...", jobId);
                     redisTemplate.delete(String.valueOf(job.getId()));
+                    updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
                     removeJobContext(job, jobExecutionContext);
                     unlockWorkspace(job);
                     break;
