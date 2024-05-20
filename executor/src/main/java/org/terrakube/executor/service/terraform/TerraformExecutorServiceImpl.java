@@ -113,7 +113,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             if (scriptBeforeSuccessPlan)
                 if (isDestroy) {
                     log.warn("Executor running a plan to destroy resources...");
-                    exitCode = terraformClient.planDetailExitCode(
+                    exitCode = terraformClient.planDestroyDetailExitCode(
                             getTerraformProcessData(terraformJob, terraformWorkingDir),
                             planOutput,
                             planOutputError).get();
