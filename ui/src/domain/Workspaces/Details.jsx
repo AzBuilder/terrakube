@@ -895,7 +895,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                   icon={
                                     item.status == "completed" ? (
                                       <CheckCircleOutlined />
-                                    ) : item.status == "running" ? (
+                                    ) :item.status == "noChanges" ? (
+                                       <CheckCircleOutlined />
+                                    ): item.status == "running" ? (
                                       <SyncOutlined spin />
                                     ) : item.status === "waitingApproval" ? (
                                       <ExclamationCircleOutlined />
