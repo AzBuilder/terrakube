@@ -344,16 +344,6 @@ export const OrganizationDetails = ({
                       </Radio.Button>
                     </Tooltip>
                     <Tooltip
-                        placement="bottom"
-                        title="Show only workspaces with no changes"
-                    >
-                      <Radio.Button value="noChanges">
-                        <ExclamationCircleOutlined
-                            style={{ color: "#9f37fa" }}
-                        />
-                      </Radio.Button>
-                    </Tooltip>
-                    <Tooltip
                       placement="bottom"
                       title="Show only workspaces with error"
                     >
