@@ -257,7 +257,9 @@ export const DetailsJob = ({ jobId }) => {
               }
               color={
                 job.data.attributes.status === "completed"
-                  ? "#2eb039"
+                  ? "#2eb039":
+                  job.data.attributes.status === "notExecuted"
+                  ? "#fa8f37"
                   : job.data.attributes.status === "running"
                   ? "#108ee9"
                   : job.data.attributes.status == "waitingApproval"
