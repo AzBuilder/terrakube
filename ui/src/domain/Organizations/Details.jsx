@@ -345,6 +345,16 @@ export const OrganizationDetails = ({
                     </Tooltip>
                     <Tooltip
                         placement="bottom"
+                        title="Show only workspaces with no changes after running a plan command"
+                    >
+                      <Radio.Button value="noChanges">
+                        <CheckCircleOutlined
+                            style={{ color: "#e037fa" }}
+                        />
+                      </Radio.Button>
+                    </Tooltip>
+                    <Tooltip
+                        placement="bottom"
                         title="Show only workspaces with error"
                     >
                       <Radio.Button value="failed">
@@ -460,6 +470,8 @@ export const OrganizationDetails = ({
                                   icon={
                                     item.lastStatus == "completed" ? (
                                         <CheckCircleOutlined />
+                                    ) : item.lastStatus == "noChanges" ? (
+                                        <CheckCircleOutlined />
                                     ) : item.lastStatus == "running" ? (
                                         <SyncOutlined spin />
                                     ) : item.lastStatus === "waitingApproval" ? (
@@ -564,7 +576,9 @@ function setupOrganizationIncludes(
                           ? "#FB0136"
                           : lastStatus === "failed"
                               ? "#FB0136"
-                              : "",
+                              : lastStatus == "noChanges"
+                                  ? "#e037fa"
+                                  : "",
       ...element.node,
     });
   });
