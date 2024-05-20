@@ -10,4 +10,6 @@ public class ExecutorJobResult {
     String planFile;
     String outputLog;
     String outputErrorLog;
+    int exitCode;
+    boolean isPlan;
 }

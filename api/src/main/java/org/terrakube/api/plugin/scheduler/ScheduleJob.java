@@ -100,6 +100,12 @@ public class ScheduleJob implements org.quartz.Job {
                     redisTemplate.delete(String.valueOf(job.getId()));
                     executePendingJob(job, jobExecutionContext);
                     break;
+                case noChanges:
+                    completeJob(job);
+                    redisTemplate.delete(String.valueOf(job.getId()));
+                    removeJobContext(job, jobExecutionContext);
+                    unlockWorkspace(job);
+                    break;
                 case approved:
                     executeApprovedJobs(job);
                     break;

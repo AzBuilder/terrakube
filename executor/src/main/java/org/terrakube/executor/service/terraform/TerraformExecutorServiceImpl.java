@@ -80,6 +80,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
         try {
             File terraformWorkingDir = getTerraformWorkingDir(terraformJob, workingDirectory);
             boolean executionPlan = false;
+            int exitCode = 0;
             boolean scriptBeforeSuccessPlan;
             boolean scriptAfterSuccessPlan;
 
@@ -112,21 +113,24 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             if (scriptBeforeSuccessPlan)
                 if (isDestroy) {
                     log.warn("Executor running a plan to destroy resources...");
-                    executionPlan = terraformClient.planDestroy(
+                    exitCode = terraformClient.planDetailExitCode(
                             getTerraformProcessData(terraformJob, terraformWorkingDir),
                             planOutput,
                             planOutputError).get();
                 } else {
-                    executionPlan = terraformClient.plan(
+                    exitCode = terraformClient.planDetailExitCode(
                             getTerraformProcessData(terraformJob, terraformWorkingDir),
                             planOutput,
                             planOutputError).get();
                 }
 
-            log.warn("Terraform plan Executed Successfully: {}", executionPlan);
+            if(exitCode != 1) {
+                executionPlan = true;
+            }
+
+            log.warn("Terraform plan Executed Successfully: {} Exit Code: {}", executionPlan, exitCode);
 
             scriptAfterSuccessPlan = executePostOperationScripts(terraformJob, terraformWorkingDir, planOutput, executionPlan);
-
 
             Thread.sleep(10000);
 
@@ -134,8 +138,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             result.setPlanFile(executionPlan ? terraformState.saveTerraformPlan(terraformJob.getOrganizationId(),
                     terraformJob.getWorkspaceId(), terraformJob.getJobId(), terraformJob.getStepId(), terraformWorkingDir)
                     : "");
+            result.setPlan(true);
+            result.setExitCode(exitCode);
         } catch (IOException | ExecutionException | InterruptedException exception) {
             result = setError(exception);
+            result.setExitCode(1);
         }
         return result;
 
