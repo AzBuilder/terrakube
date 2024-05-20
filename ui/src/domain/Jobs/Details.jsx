@@ -97,6 +97,13 @@ export const DetailsJob = ({ jobId }) => {
             style={{ fontSize: "20px" }}
           />
         );
+      case "notExecuted":
+        return (
+            <CheckCircleTwoTone
+                twoToneColor="#52c41a"
+                style={{ fontSize: "20px" }}
+            />
+        );
       case "running":
         return (
           <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} />
