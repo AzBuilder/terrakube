@@ -41,9 +41,9 @@ const { DateTime } = require("luxon");
 const { Search } = Input;
 
 export const OrganizationDetails = ({
-  setOrganizationName,
-  organizationName,
-}) => {
+                                      setOrganizationName,
+                                      organizationName,
+                                    }) => {
   const { id } = useParams();
   const [organization, setOrganization] = useState({});
   const [workspaces, setWorkspaces] = useState([]);
@@ -67,11 +67,11 @@ export const OrganizationDetails = ({
       id: "terraform",
       name: "Terraform",
       description:
-        "Create an empty template. So you can define your template from scratch.",
+          "Create an empty template. So you can define your template from scratch.",
       icon: (
-        <IconContext.Provider value={{ size: "1.3em" }}>
-          <SiTerraform />
-        </IconContext.Provider>
+          <IconContext.Provider value={{ size: "1.3em" }}>
+            <SiTerraform />
+          </IconContext.Provider>
       ),
     },
     {
@@ -84,31 +84,31 @@ export const OrganizationDetails = ({
   const renderVCSLogo = (hostname) => {
     if (hostname.includes("gitlab"))
       return (
-        <Tooltip title="Gitlab">
-          <GitlabOutlined style={{ fontSize: "18px" }} />
-        </Tooltip>
+          <Tooltip title="Gitlab">
+            <GitlabOutlined style={{ fontSize: "18px" }} />
+          </Tooltip>
       );
     if (hostname.includes("bitbucket"))
       return (
-        <IconContext.Provider value={{ size: "18px" }}>
-          <Tooltip title="Bit Bucket">
-            <SiBitbucket />
-          </Tooltip>
-        </IconContext.Provider>
+          <IconContext.Provider value={{ size: "18px" }}>
+            <Tooltip title="Bit Bucket">
+              <SiBitbucket />
+            </Tooltip>
+          </IconContext.Provider>
       );
     if (hostname.includes("azure"))
       return (
-        <IconContext.Provider value={{ size: "18px" }}>
-          <Tooltip title="Azure Devops">
-            <SiAzuredevops />
-          </Tooltip>
-        </IconContext.Provider>
+          <IconContext.Provider value={{ size: "18px" }}>
+            <Tooltip title="Azure Devops">
+              <SiAzuredevops />
+            </Tooltip>
+          </IconContext.Provider>
       );
 
     return (
-      <Tooltip title="Github">
-        <GithubOutlined style={{ fontSize: "18px" }} />
-      </Tooltip>
+        <Tooltip title="Github">
+          <GithubOutlined style={{ fontSize: "18px" }} />
+        </Tooltip>
     );
   };
 
@@ -146,7 +146,7 @@ export const OrganizationDetails = ({
   };
 
   const filterOption = (input, option) =>
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+      (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const getIaCIconById = (id) => {
     const item = iacTypes.find((iacType) => iacType.id === id);
@@ -163,27 +163,27 @@ export const OrganizationDetails = ({
     console.log(selectedTags || "tags empty");
 
     var filteredWorkspaces = filterWorkspaces(
-      workspaces,
-      searchValue,
-      filterValue,
-      selectedTags
+        workspaces,
+        searchValue,
+        filterValue,
+        selectedTags
     );
     setFilteredWorkspaces(filteredWorkspaces);
     return;
   };
 
   const filterWorkspaces = (
-    workspaces,
-    searchValue,
-    filterValue,
-    selectedTags
+      workspaces,
+      searchValue,
+      filterValue,
+      selectedTags
   ) => {
     // filter by description and name
     var filteredWorkspaces = workspaces.filter((workspace) => {
       if (workspace.description) {
         return (
-          workspace.name.includes(searchValue || workspace.name) ||
-          workspace.description?.includes(searchValue || workspace?.description)
+            workspace.name.includes(searchValue || workspace.name) ||
+            workspace.description?.includes(searchValue || workspace?.description)
         );
       } else {
         return workspace.name.includes(searchValue || workspace.name);
@@ -192,15 +192,15 @@ export const OrganizationDetails = ({
 
     // filter by status
     filteredWorkspaces = filteredWorkspaces.filter(
-      (workspace) =>
-        workspace.lastStatus === (filterValue || workspace.lastStatus)
+        (workspace) =>
+            workspace.lastStatus === (filterValue || workspace.lastStatus)
     );
 
     // filter by tag
     filteredWorkspaces = filteredWorkspaces.filter((workspace) => {
       if (selectedTags && selectedTags.length > 0) {
         return workspace.workspaceTag.edges.some((tag) =>
-          selectedTags.includes(tag.node.tagId)
+            selectedTags.includes(tag.node.tagId)
         );
       } else {
         return true;
@@ -265,65 +265,65 @@ export const OrganizationDetails = ({
       }`,
     };
     axiosGraphQL
-      .post("", body, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        var organizationName =
-          response.data.data.organization.edges[0].node.name;
-        setOrganization(response.data.data.organization.edges[0].node);
+        .post("", body, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          var organizationName =
+              response.data.data.organization.edges[0].node.name;
+          setOrganization(response.data.data.organization.edges[0].node);
 
-        setupOrganizationIncludes(
-          response.data.data.organization.edges[0].node.workspace.edges,
-          setWorkspaces,
-          setFilteredWorkspaces,
-          filterWorkspaces
-        );
+          setupOrganizationIncludes(
+              response.data.data.organization.edges[0].node.workspace.edges,
+              setWorkspaces,
+              setFilteredWorkspaces,
+              filterWorkspaces
+          );
 
-        axiosInstance.get(`organization/${id}/tag`).then((response) => {
-          setTags(response.data);
-          setLoading(false);
+          axiosInstance.get(`organization/${id}/tag`).then((response) => {
+            setTags(response.data);
+            setLoading(false);
+          });
+
+          localStorage.setItem(ORGANIZATION_NAME, organizationName);
+          setOrganizationName(organizationName);
         });
-
-        localStorage.setItem(ORGANIZATION_NAME, organizationName);
-        setOrganizationName(organizationName);
-      });
   }, [id]);
 
   return (
-    <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb
-        style={{ margin: "16px 0" }}
-        items={[
-          {
-            title: organizationName,
-          },
-          {
-            title: "Workspaces",
-          },
-        ]}
-      />
+      <Content style={{ padding: "0 50px" }}>
+        <Breadcrumb
+            style={{ margin: "16px 0" }}
+            items={[
+              {
+                title: organizationName,
+              },
+              {
+                title: "Workspaces",
+              },
+            ]}
+        />
 
-      <div className="site-layout-content">
+        <div className="site-layout-content">
           <div className="workspaceWrapper">
             <div className="variableActions">
               <h2>Workspaces</h2>
               <Space>
                 <Button
-                  icon={<ImportOutlined />}
-                  htmlType="button"
-                  onClick={handleImport}
+                    icon={<ImportOutlined />}
+                    htmlType="button"
+                    onClick={handleImport}
                 >
                   Import workspaces
                 </Button>
                 <Button
-                  icon={<PlusOutlined />}
-                  type="primary"
-                  htmlType="button"
-                  onClick={handleCreate}
+                    icon={<PlusOutlined />}
+                    type="primary"
+                    htmlType="button"
+                    onClick={handleCreate}
                 >
                   New workspace
                 </Button>
@@ -334,42 +334,42 @@ export const OrganizationDetails = ({
                 <div onClick={onRadioClick}>
                   <Radio.Group onChange={onFilterChange} value={filterValue}>
                     <Tooltip
-                      placement="bottom"
-                      title="Show only workspaces needing attention"
+                        placement="bottom"
+                        title="Show only workspaces needing attention"
                     >
                       <Radio.Button value="waitingApproval">
                         <ExclamationCircleOutlined
-                          style={{ color: "#fa8f37" }}
+                            style={{ color: "#fa8f37" }}
                         />
                       </Radio.Button>
                     </Tooltip>
                     <Tooltip
-                      placement="bottom"
-                      title="Show only workspaces with error"
+                        placement="bottom"
+                        title="Show only workspaces with error"
                     >
                       <Radio.Button value="failed">
                         <StopOutlined style={{ color: "#FB0136" }} />
                       </Radio.Button>
                     </Tooltip>
                     <Tooltip
-                      placement="bottom"
-                      title="Show only running workspaces"
+                        placement="bottom"
+                        title="Show only running workspaces"
                     >
                       <Radio.Button value="running">
                         <SyncOutlined style={{ color: "#108ee9" }} />
                       </Radio.Button>
                     </Tooltip>
                     <Tooltip
-                      placement="bottom"
-                      title="Show only successfully completed workspaces"
+                        placement="bottom"
+                        title="Show only successfully completed workspaces"
                     >
                       <Radio.Button value="completed">
                         <CheckCircleOutlined style={{ color: "#2eb039" }} />
                       </Radio.Button>
                     </Tooltip>
                     <Tooltip
-                      placement="bottom"
-                      title="Show only never executed workspaces"
+                        placement="bottom"
+                        title="Show only never executed workspaces"
                     >
                       <Radio.Button value="never executed">
                         <InfoCircleOutlined />
@@ -381,7 +381,7 @@ export const OrganizationDetails = ({
               <Col span={12}>
                 <Row justify="end">
                   <Col span={11}>
-                      <Select
+                    <Select
                         mode="multiple"
                         showSearch
                         optionFilterProp="children"
@@ -391,24 +391,24 @@ export const OrganizationDetails = ({
                         placeholder="Search by tag"
                         onChange={handleChange}
                         filterSort={(optionA, optionB) =>
-                          (optionA?.label ?? "")
-                            .toLowerCase()
-                            .localeCompare((optionB?.label ?? "").toLowerCase())
+                            (optionA?.label ?? "")
+                                .toLowerCase()
+                                .localeCompare((optionB?.label ?? "").toLowerCase())
                         }
                         loading={!tags.data}
                         options={tags?.data?.map(function (tag) {
                           return { label: tag.attributes.name, value: tag.id };
                         })}
                         defaultValue={filterTags}
-                      />
+                    />
                   </Col>
                   <Col span={1}></Col>
                   <Col span={12}>
                     <Search
-                      placeholder="Search by name, description"
-                      onSearch={onSearch}
-                      defaultValue={searchValue}
-                      allowClear
+                        placeholder="Search by name, description"
+                        onSearch={onSearch}
+                        defaultValue={searchValue}
+                        allowClear
                     />
                   </Col>
                 </Row>
@@ -416,118 +416,116 @@ export const OrganizationDetails = ({
             </Row>
             <div style={{ clear: "both", paddingTop: "10px" }}>
               <List
-                split=""
-                loading={{ spinning: loading, tip: "Loading Workspaces..."}}
-                className="workspaceList"
-                dataSource={filteredWorkspaces}
-                pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
-                renderItem={(item) => (
-                  <List.Item>
-                    <Card
-                      onClick={() => handleClick(item.id)}
-                      style={{ width: "100%" }}
-                      hoverable
-                    >
-                      <Space
-                        style={{ color: "rgb(82, 87, 97)", width: "100%" }}
-                        direction="vertical"
-                      >
-                        <Row>
-                          <Col span={12}>
-                            <h3>{item.name}</h3>
-                            {item.description}
-                          </Col>
-                          <Col span={10}>
-                            <Row justify="start">
-                              <Col span={24}>
-                                <Tooltip title="Workspace Tags">
-                                  {loading || !tags ? (
-                                    <p></p>
-                                  ) : (
-                                    item.workspaceTag.edges.map((tag) => (
-                                      <Tag color="geekblue">
-                                        {getTagName(tag.node.tagId)}
-                                      </Tag>
-                                    ))
-                                  )}
-                                </Tooltip>
+                  split=""
+                  loading={{ spinning: loading, tip: "Loading Workspaces..."}}
+                  className="workspaceList"
+                  dataSource={filteredWorkspaces}
+                  pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
+                  renderItem={(item) => (
+                      <List.Item>
+                        <Card
+                            onClick={() => handleClick(item.id)}
+                            style={{ width: "100%" }}
+                            hoverable
+                        >
+                          <Space
+                              style={{ color: "rgb(82, 87, 97)", width: "100%" }}
+                              direction="vertical"
+                          >
+                            <Row>
+                              <Col span={12}>
+                                <h3>{item.name}</h3>
+                                {item.description}
+                              </Col>
+                              <Col span={10}>
+                                <Row justify="start">
+                                  <Col span={24}>
+                                    <Tooltip title="Workspace Tags">
+                                      {loading || !tags ? (
+                                          <p></p>
+                                      ) : (
+                                          item.workspaceTag.edges.map((tag) => (
+                                              <Tag color="geekblue">
+                                                {getTagName(tag.node.tagId)}
+                                              </Tag>
+                                          ))
+                                      )}
+                                    </Tooltip>
+                                  </Col>
+                                </Row>
                               </Col>
                             </Row>
-                          </Col>
-                        </Row>
-                        <Space size={40} style={{ marginTop: "25px" }}>
-                          <Tag
-                            icon={
-                              item.lastStatus == "completed" ? (
-                                <CheckCircleOutlined />
-                              ) : item.lastStatus == "noChanges" ? (
-                                  <CheckCircleOutlined />
-                              ) : item.lastStatus == "running" ? (
-                                <SyncOutlined spin />
-                              ) : item.lastStatus === "waitingApproval" ? (
-                                <ExclamationCircleOutlined />
-                              ) : item.lastStatus === "never executed" ? (
-                                <InfoCircleOutlined />
-                              ) : item.lastStatus === "rejected" ? (
-                                <CloseCircleOutlined />
-                              ) : item.lastStatus === "cancelled" ? (
-                                <StopOutlined />
-                              ) : item.lastStatus === "failed" ? (
-                                <StopOutlined />
-                              ) : (
-                                <ClockCircleOutlined />
-                              )
-                            }
-                            color={item.statusColor}
-                          >
-                            {item.lastStatus}
-                          </Tag>{" "}
-                          <br />
-                          <span>
+                            <Space size={40} style={{ marginTop: "25px" }}>
+                              <Tag
+                                  icon={
+                                    item.lastStatus == "completed" ? (
+                                        <CheckCircleOutlined />
+                                    ) : item.lastStatus == "running" ? (
+                                        <SyncOutlined spin />
+                                    ) : item.lastStatus === "waitingApproval" ? (
+                                        <ExclamationCircleOutlined />
+                                    ) : item.lastStatus === "never executed" ? (
+                                        <InfoCircleOutlined />
+                                    ) : item.lastStatus === "rejected" ? (
+                                        <CloseCircleOutlined />
+                                    ) : item.lastStatus === "cancelled" ? (
+                                        <StopOutlined />
+                                    ) : item.lastStatus === "failed" ? (
+                                        <StopOutlined />
+                                    ) : (
+                                        <ClockCircleOutlined />
+                                    )
+                                  }
+                                  color={item.statusColor}
+                              >
+                                {item.lastStatus}
+                              </Tag>{" "}
+                              <br />
+                              <span>
                             <ClockCircleOutlined />
-                            &nbsp;&nbsp;
-                            {DateTime.fromISO(item.lastRun).toRelative() ??
-                              "never executed"}
+                                &nbsp;&nbsp;
+                                {DateTime.fromISO(item.lastRun).toRelative() ??
+                                    "never executed"}
                           </span>
-                          <span>
+                              <span>
                             {getIaCIconById(item.iacType)}
-                            &nbsp;&nbsp;{item.terraformVersion}
+                                &nbsp;&nbsp;{item.terraformVersion}
                           </span>
-                          {item.branch !== "remote-content" ? (
-                            <span>
+                              {item.branch !== "remote-content" ? (
+                                  <span>
                               {renderVCSLogo(
-                                new URL(fixSshURL(item.source)).hostname
+                                  new URL(fixSshURL(item.source)).hostname
                               )}
-                              &nbsp;{" "}
-                              <a href={fixSshURL(item.source)} target="_blank">
+                                    &nbsp;{" "}
+                                    <a href={fixSshURL(item.source)} target="_blank">
                                 {new URL(fixSshURL(item.source))?.pathname
-                                  ?.replace(".git", "")
-                                  ?.substring(1)}
+                                    ?.replace(".git", "")
+                                    ?.substring(1)}
                               </a>
                             </span>
-                          ) : (
-                            <span
-                              style={{
-                                verticalAlign: "middle",
-                                display: "inline-block",
-                              }}
-                            >
+                              ) : (
+                                  <span
+                                      style={{
+                                        verticalAlign: "middle",
+                                        display: "inline-block",
+                                      }}
+                                  >
                               <IconContext.Provider value={{ size: "1.4em" }}>
                                 <BiTerminal />
                               </IconContext.Provider>
-                              &nbsp;&nbsp;cli/api driven workflow
+                                    &nbsp;&nbsp;cli/api driven workflow
                             </span>
-                          )}
-                        </Space>
-                      </Space>
-                    </Card>
-                  </List.Item>
-                )}
+                              )}
+                            </Space>
+                          </Space>
+                        </Card>
+                      </List.Item>
+                  )}
               />
             </div>
           </div>
-      </div>
-    </Content>
+        </div>
+      </Content>
   );
 };
 
@@ -540,10 +538,10 @@ function fixSshURL(source) {
 }
 
 function setupOrganizationIncludes(
-  includes,
-  setWorkspaces,
-  setFilteredWorkspaces,
-  filter
+    includes,
+    setWorkspaces,
+    setFilteredWorkspaces,
+    filter
 ) {
   let workspaces = [];
 
@@ -556,19 +554,17 @@ function setupOrganizationIncludes(
       lastRun: lastJob?.updatedDate,
       lastStatus: lastJob?.status ?? "never executed",
       statusColor:
-        lastStatus == "completed"
-          ? "#2eb039"
-          : lastStatus == "running"
-          ? "#108ee9"
-          : lastStatus == "waitingApproval"
-          ? "#fa8f37"
-          : lastStatus === "rejected"
-          ? "#FB0136"
-          : lastStatus === "failed"
-          ? "#FB0136"
-          : lastStatus == "noChanges"
-          ? "#2eb039"
-          : "",
+          lastStatus == "completed"
+              ? "#2eb039"
+              : lastStatus == "running"
+                  ? "#108ee9"
+                  : lastStatus == "waitingApproval"
+                      ? "#fa8f37"
+                      : lastStatus === "rejected"
+                          ? "#FB0136"
+                          : lastStatus === "failed"
+                              ? "#FB0136"
+                              : "",
       ...element.node,
     });
   });
@@ -579,10 +575,10 @@ function setupOrganizationIncludes(
   const _selectedTags = sessionStorage.getItem("selectedTags") || [];
 
   var filteredWorkspaces = filter(
-    workspaces,
-    _searchValue,
-    _filterValue,
-    _selectedTags
+      workspaces,
+      _searchValue,
+      _filterValue,
+      _selectedTags
   );
 
   setFilteredWorkspaces(filteredWorkspaces);
