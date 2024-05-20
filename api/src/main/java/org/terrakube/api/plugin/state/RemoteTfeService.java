@@ -773,7 +773,7 @@ public class RemoteTfeService {
         }
 
         runsModel.getAttributes().put("status", planStatus);
-        runsModel.getAttributes().put("has-changes", true);
+        runsModel.getAttributes().put("has-changes", job.getStatus().equals(JobStatus.noChanges) ? false: true);
         runsModel.getAttributes().put("resource-additions", 1);
         runsModel.getAttributes().put("resource-changes", 1);
         runsModel.getAttributes().put("resource-destructions", 0);

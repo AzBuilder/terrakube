@@ -97,6 +97,20 @@ export const DetailsJob = ({ jobId }) => {
             style={{ fontSize: "20px" }}
           />
         );
+      case "noChanges":
+        return (
+            <CheckCircleTwoTone
+                twoToneColor="#52c41a"
+                style={{ fontSize: "20px" }}
+            />
+        );
+      case "notExecuted":
+        return (
+            <CheckCircleTwoTone
+                twoToneColor="#fa8f37"
+                style={{ fontSize: "20px" }}
+            />
+        );
       case "running":
         return (
           <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} />
@@ -250,7 +264,11 @@ export const DetailsJob = ({ jobId }) => {
               }
               color={
                 job.data.attributes.status === "completed"
-                  ? "#2eb039"
+                  ? "#2eb039":
+                  job.data.attributes.status === "noChanges"
+                  ? "#2eb039" :
+                  job.data.attributes.status === "notExecuted"
+                  ? "#fa8f37"
                   : job.data.attributes.status === "running"
                   ? "#108ee9"
                   : job.data.attributes.status == "waitingApproval"

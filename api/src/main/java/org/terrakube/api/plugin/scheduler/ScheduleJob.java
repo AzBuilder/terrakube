@@ -88,7 +88,7 @@ public class ScheduleJob implements org.quartz.Job {
         log.info("Checking Job {} Status {}", job.getId(), job.getStatus());
         log.info("Checking previous jobs....");
         Optional<List<Job>> previousJobs = jobRepository.findByWorkspaceAndStatusNotInAndIdLessThan(job.getWorkspace(),
-                Arrays.asList(JobStatus.failed, JobStatus.completed, JobStatus.rejected, JobStatus.cancelled, JobStatus.waitingApproval, JobStatus.approved),
+                Arrays.asList(JobStatus.failed, JobStatus.completed, JobStatus.rejected, JobStatus.cancelled, JobStatus.waitingApproval, JobStatus.approved, JobStatus.noChanges),
                 job.getId()
         );
         if (previousJobs.isPresent() && previousJobs.get().size() > 0) {
@@ -99,6 +99,13 @@ public class ScheduleJob implements org.quartz.Job {
                 case pending:
                     redisTemplate.delete(String.valueOf(job.getId()));
                     executePendingJob(job, jobExecutionContext);
+                    break;
+                case noChanges:
+                    log.warn("Job {} completed with no changes...", jobId);
+                    redisTemplate.delete(String.valueOf(job.getId()));
+                    updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
+                    removeJobContext(job, jobExecutionContext);
+                    unlockWorkspace(job);
                     break;
                 case approved:
                     executeApprovedJobs(job);
