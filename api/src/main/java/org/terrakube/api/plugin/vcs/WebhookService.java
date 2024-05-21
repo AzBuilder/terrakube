@@ -99,6 +99,7 @@ public class WebhookService {
                                 }
                                 Job job = new Job();
                                 job.setRefresh(true);
+                                job.setPlanChanges(true);
                                 job.setRefreshOnly(false);
                                 job.setOrganization(workspace.getOrganization());
                                 job.setWorkspace(workspace);

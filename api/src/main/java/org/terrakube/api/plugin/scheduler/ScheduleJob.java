@@ -97,15 +97,18 @@ public class ScheduleJob implements org.quartz.Job {
 
             switch (job.getStatus()) {
                 case pending:
-                    redisTemplate.delete(String.valueOf(job.getId()));
-                    executePendingJob(job, jobExecutionContext);
-                    break;
-                case noChanges:
-                    log.warn("Job {} completed with no changes...", jobId);
-                    redisTemplate.delete(String.valueOf(job.getId()));
-                    updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
-                    removeJobContext(job, jobExecutionContext);
-                    unlockWorkspace(job);
+                    log.info("Pending with plan changes {}", job.isPlanChanges());
+                    if(job.isPlanChanges()) {
+                        redisTemplate.delete(String.valueOf(job.getId()));
+                        executePendingJob(job, jobExecutionContext);
+                    } else {
+                        log.warn("Job {} completed with no changes...", jobId);
+                        completeJob(job);
+                        redisTemplate.delete(String.valueOf(job.getId()));
+                        updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
+                        removeJobContext(job, jobExecutionContext);
+                        unlockWorkspace(job);
+                    }
                     break;
                 case approved:
                     executeApprovedJobs(job);
