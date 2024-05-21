@@ -76,6 +76,9 @@ public class Job extends GenericAuditFields {
     @Column(name = "refresh")
     private boolean refresh = true;
 
+    @Column(name = "plan_changes")
+    private boolean planChanges = true;
+
     @Column(name = "refresh_only")
     private boolean refreshOnly = false;
 

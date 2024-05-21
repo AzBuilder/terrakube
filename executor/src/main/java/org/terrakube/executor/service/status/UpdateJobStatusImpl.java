@@ -68,13 +68,15 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     private void updateJobStatus(boolean successful, boolean isPlan, int exitCode, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput, String jobPlan, String commitId) {
         Job job = terrakubeClient.getJobById(organizationId, jobId).getData();
         String status = "";
+        boolean planChanges = true;
         if (successful) {
             status = "pending";
 
             if (isPlan) {
                 switch (exitCode){
                     case 0:
-                        status = "noChanges";
+                        status = "pending";
+                        planChanges = false;
                         break;
                     case 1:
                         status = "failed";
@@ -88,6 +90,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
             status = "failed";
         }
         job.getAttributes().setStatus(status);
+        job.getAttributes().setPlanChanges(planChanges);
         log.info("JobStatus: {}", status);
         log.info("StepId: {}", stepId);
         log.info("output: {}", jobOutput.length());
