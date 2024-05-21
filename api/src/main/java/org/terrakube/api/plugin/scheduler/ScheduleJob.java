@@ -98,7 +98,7 @@ public class ScheduleJob implements org.quartz.Job {
             switch (job.getStatus()) {
                 case pending:
                     log.info("Pending with plan changes {}", job.isPlanChanges());
-                    if(!job.isPlanChanges()) {
+                    if(job.isPlanChanges()) {
                         redisTemplate.delete(String.valueOf(job.getId()));
                         executePendingJob(job, jobExecutionContext);
                     } else {
