@@ -345,16 +345,6 @@ export const OrganizationDetails = ({
                     </Tooltip>
                     <Tooltip
                         placement="bottom"
-                        title="Show only workspaces with no changes after running a plan command"
-                    >
-                      <Radio.Button value="noChanges">
-                        <CheckCircleOutlined
-                            style={{ color: "#e037fa" }}
-                        />
-                      </Radio.Button>
-                    </Tooltip>
-                    <Tooltip
-                        placement="bottom"
                         title="Show only workspaces with error"
                     >
                       <Radio.Button value="failed">
