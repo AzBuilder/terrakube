@@ -463,6 +463,7 @@ public class RemoteTfeService {
         job.setOrganization(workspace.getOrganization());
         job.setStatus(JobStatus.completed);
         job.setRefresh(true);
+        job.setPlanChanges(true);
         job.setRefreshOnly(false);
         job = jobRepository.save(job);
 
@@ -713,6 +714,7 @@ public class RemoteTfeService {
                 getTemplateName(configurationId, isDestroy));
         log.info("Creating Job");
         Job job = new Job();
+        job.setPlanChanges(true);
         job.setRefresh(runsData.getData().getAttributes().get("refresh") != null ? (boolean) runsData.getData().getAttributes().get("refresh") : true);
         job.setRefreshOnly(runsData.getData().getAttributes().get("refresh-only") != null ? (boolean) runsData.getData().getAttributes().get("refresh-only") : false);
         job.setWorkspace(workspace);
