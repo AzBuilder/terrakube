@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Component } from "react";
 import * as Icons from "@ant-design/icons";
 import { transform } from "@babel/standalone";
 import { Typography, Collapse } from "antd";
@@ -123,6 +123,59 @@ const importAntdIcons = async (icons) => {
   return importedIcons;
 };
 
+// List of react-icons to consider for dynamic importing
+const reactIcons = [
+  "SiMicrosoftazure",
+  "SiAmazonaws",
+  "SiGithub",
+  "SiGrafana",
+  "SiKubernetes",
+  "SiTerraform",
+  "SiDocker",
+  "SiPrometheus",
+  "SiGooglecloud",
+];
+
+// Function to identify required react-icons components
+const getRequiredReactIcons = (componentString) => {
+  return reactIcons.filter((icon) => componentString.includes(icon));
+};
+
+// Function to dynamically import react-icons components
+const importReactIcons = async (icons) => {
+  const imports = await Promise.all(
+    icons.map((icon) => import(`react-icons/si`))
+  );
+  const importedIcons = {};
+  icons.forEach((icon, index) => {
+    importedIcons[icon] = imports[index][icon];
+  });
+  return importedIcons;
+};
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <div>An error occurred while rendering this action.</div>;
+    }
+
+    return this.props.children;
+  }
+}
+
 const ActionLoader = ({ action, context }) => {
   const [Component, setComponent] = useState(null);
 
@@ -135,11 +188,14 @@ const ActionLoader = ({ action, context }) => {
         const requiredAntdComponents =
           getRequiredAntdComponents(componentString);
         const requiredAntdIcons = getRequiredAntdIcons(componentString);
+        const requiredReactIcons = getRequiredReactIcons(componentString);
 
-        const [importedComponents, importedIcons] = await Promise.all([
-          importAntdComponents(requiredAntdComponents),
-          importAntdIcons(requiredAntdIcons),
-        ]);
+        const [importedComponents, importedIcons, importedReactIcons] =
+          await Promise.all([
+            importAntdComponents(requiredAntdComponents),
+            importAntdIcons(requiredAntdIcons),
+            importReactIcons(requiredReactIcons),
+          ]);
 
         // Transform JSX to JavaScript
         let transpiledCode = transform(componentString, {
@@ -170,6 +226,7 @@ const ActionLoader = ({ action, context }) => {
           "axiosInstance",
           ...requiredAntdComponents,
           ...requiredAntdIcons,
+          ...requiredReactIcons,
           `return (${transpiledCode})`
         );
         const component = createComponent(
@@ -189,13 +246,15 @@ const ActionLoader = ({ action, context }) => {
           ...requiredAntdComponents.map(
             (component) => importedComponents[component]
           ),
-          ...requiredAntdIcons.map((icon) => importedIcons[icon])
+          ...requiredAntdIcons.map((icon) => importedIcons[icon]),
+          ...requiredReactIcons.map((icon) => importedReactIcons[icon])
         );
         console.debug("Component Function:", component);
 
         setComponent(() => component);
       } catch (error) {
         console.error("Error creating component:", error);
+        setComponent(() => () => <div>Error loading component</div>);
       }
     };
 
@@ -206,7 +265,11 @@ const ActionLoader = ({ action, context }) => {
     return <div>Loading...</div>;
   }
 
-  return <Component context={context} />;
+  return (
+    <ErrorBoundary>
+      <Component context={context} />
+    </ErrorBoundary>
+  );
 };
 
 export default ActionLoader;

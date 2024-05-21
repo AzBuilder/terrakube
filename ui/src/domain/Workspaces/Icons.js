@@ -135,6 +135,10 @@ const AzureIcons = [
     { type: "azurerm_app_service", path:"/providers/azurerm/App Services/10035-icon-service-App-Services.svg"},
     { type: "azurerm_app_service_plan", path:"providers/azurerm/App Services/00046-icon-service-App-Service-Plans.svg"},
     { type: "azurerm_resource_group", path:"/providers/azurerm/General/10007-icon-service-Resource-Groups.svg"},
+    { type: "azurerm_virtual_network", path:"/providers/azurerm/Networking/10061-icon-service-Virtual-Networks.svg"},
+    { type: "azurerm_network_interface", path:"/providers/azurerm/Networking/10080-icon-service-Network-Interfaces.svg"},
+    { type: "azurerm_subnet", path:"/providers/azurerm/Networking/10061-icon-service-Virtual-Networks.svg"},
+    { type: "azurerm_virtual_machine", path:"/providers/azurerm/Compute/10021-icon-service-Virtual-Machine.svg"},
 ]
 
 export function getServiceIcon (providerType,resourceType){

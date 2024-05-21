@@ -117,6 +117,7 @@ export const ResourceDrawer = ({ open, resource, setOpen }) => {
         <Space size={10} style={{ width: "100%" }} direction="vertical">
           <Row>
             <Col span={24}>
+              <Space size={5} direction="horizontal">
               {actions &&
                 actions
                   .filter(
@@ -131,6 +132,7 @@ export const ResourceDrawer = ({ open, resource, setOpen }) => {
                       context={{ ...context, settings: action.settings }}
                     />
                   ))}
+              </Space>
             </Col>
           </Row>
 

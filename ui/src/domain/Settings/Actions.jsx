@@ -66,8 +66,8 @@ export const ActionSettings = () => {
             <Button danger type="link" icon={<DeleteOutlined />}>Delete</Button>
           </Popconfirm>
           <Tooltip title="Open the documentation for this Action">
-              <Button icon={<QuestionCircleOutlined/>} target="_blank" rel="noreferrer" href={"https://docs.terrakube.io/user-guide/workspaces/actions/built-in-actions/"+record.id} type="link"></Button>
-           </Tooltip>
+            <Button icon={<QuestionCircleOutlined />} target="_blank" rel="noreferrer" href={"https://docs.terrakube.io/user-guide/workspaces/actions/built-in-actions/" + record.id} type="link"></Button>
+          </Tooltip>
         </div>
       ),
     }
@@ -84,9 +84,9 @@ export const ActionSettings = () => {
     setIsEditing(true);
     axiosInstance.get(`action/${id}`)
       .then(response => {
-        const action = response.data.data.attributes;
-        form.setFieldsValue({ ...action, displayCriteria: JSON.parse(action.displayCriteria) });
-        const actionDecoded = Buffer.from(action.action, 'base64').toString('ascii');
+        const action = response.data.data;
+        form.setFieldsValue({ id: action.id, ...action.attributes, displayCriteria: JSON.parse(action.attributes.displayCriteria) });
+        const actionDecoded = Buffer.from(action.attributes.action, 'base64').toString('ascii');
         editorRef.current.setValue(actionDecoded);
       });
   };
@@ -110,6 +110,7 @@ export const ActionSettings = () => {
     const body = {
       data: {
         type: "action",
+        id: values.id,
         attributes: { ...values, action: actionEncoded, displayCriteria }
       }
     };
@@ -172,7 +173,7 @@ export const ActionSettings = () => {
       </div>
       {!isEditing ? (
         <>
-          <Button type="primary" icon={<PlusOutlined/>} onClick={onNew}>Create Action</Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onNew}>Create Action</Button>
           <h3 style={{ marginTop: "30px" }}>Actions</h3>
           {loading || !actions.data ? (
             <p>Data loading...</p>
@@ -183,11 +184,15 @@ export const ActionSettings = () => {
       ) : (
         <div>
           <h3>{mode === "edit" ? "Edit Action" : "Create New Action"}</h3>
-          {mode === "edit" ? <Tooltip title="Open the documentation for this Action">
-              <Button icon={<QuestionCircleOutlined/>} target="_blank" rel="noreferrer" href={"https://docs.terrakube.io/user-guide/workspaces/actions/built-in-actions/"+ actionId} type="link">Action Documentation</Button>
-           </Tooltip>:<Tooltip title="See a quick start guide in how to create Actions">
-              <Button icon={<QuestionCircleOutlined/>} target="_blank" rel="noreferrer" href={"https://docs.terrakube.io/user-guide/workspaces/actions/developing-actions/quick-start"} type="link">Actions Documentation</Button>
-           </Tooltip>}
+          {mode === "edit" ? (
+            <Tooltip title="Open the documentation for this Action">
+              <Button icon={<QuestionCircleOutlined />} target="_blank" rel="noreferrer" href={"https://docs.terrakube.io/user-guide/workspaces/actions/built-in-actions/" + actionId} type="link">Action Documentation</Button>
+            </Tooltip>
+          ) : (
+            <Tooltip title="See a quick start guide in how to create Actions">
+              <Button icon={<QuestionCircleOutlined />} target="_blank" rel="noreferrer" href={"https://docs.terrakube.io/user-guide/workspaces/actions/developing-actions/quick-start"} type="link">Actions Documentation</Button>
+            </Tooltip>
+          )}
           <Form
             form={form}
             layout="vertical"
@@ -197,6 +202,9 @@ export const ActionSettings = () => {
             }}
             validateMessages={validateMessages}
           >
+            <Form.Item name="id" label="ID" rules={[{ required: true }]}>
+              <Input disabled={mode !== "create"} />
+            </Form.Item>
             <Form.Item name="name" label="Name" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
@@ -264,24 +272,29 @@ export const ActionSettings = () => {
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name, ...restField }) => (
-                    <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'filter']}
-                        tooltip={{
-                          title: "Defines if the action appears or not.",
-                          icon: <InfoCircleOutlined />,
-                        }}
-                        width="50%"
-                        rules={[{ required: true, message: 'Missing filter' }]}
-                      >
-                        <Input width={"100px"} placeholder="Filter" />
-                      </Form.Item>
+                    <div key={key} style={{ marginBottom: 16 }}>
+                      <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }} align="baseline">
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'filter']}
+                          tooltip={{
+                            title: "Defines if the action appears or not.",
+                            icon: <InfoCircleOutlined />,
+                          }}
+                          style={{ width: 'calc(100% - 24px)' }}
+                          rules={[{ required: true, message: 'Missing filter' }]}
+                        >
+                          <Input placeholder="Filter" />
+                        </Form.Item>
+                        <Tooltip title="Remove Display Criteria">
+                          <MinusCircleOutlined onClick={() => remove(name)} />
+                        </Tooltip>
+                      </Space>
                       <Form.List name={[name, 'settings']}>
                         {(settingFields, { add: addSetting, remove: removeSetting }) => (
                           <>
                             {settingFields.map(({ key: settingKey, name: settingName, ...settingRestField }) => (
-                              <Space key={settingKey} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                              <Space key={settingKey} style={{ display: 'flex', marginBottom: 8, marginLeft: 24 }} align="baseline">
                                 <Form.Item
                                   {...settingRestField}
                                   name={[settingName, 'key']}
@@ -301,7 +314,7 @@ export const ActionSettings = () => {
                                 </Tooltip>
                               </Space>
                             ))}
-                            <Form.Item>
+                            <Form.Item style={{ marginLeft: 24 }}>
                               <Button type="dashed" onClick={() => addSetting()} block icon={<PlusOutlined />}>
                                 Add Setting
                               </Button>
@@ -309,10 +322,7 @@ export const ActionSettings = () => {
                           </>
                         )}
                       </Form.List>
-                      <Tooltip title="Remove Display Criteria">
-                          <MinusCircleOutlined onClick={() => remove(name)} />
-                        </Tooltip>
-                    </Space>
+                    </div>
                   ))}
                   <Form.Item>
                     <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
