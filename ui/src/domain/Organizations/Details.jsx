@@ -229,7 +229,7 @@ export const OrganizationDetails = ({
             node {
               id
               name
-              workspace {
+              workspace(sort: "name") {
                 edges {
                   node {
                     id
