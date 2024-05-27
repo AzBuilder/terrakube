@@ -71,7 +71,7 @@ public class ProxyController {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private ResponseEntity<String> proxyRequest(RequestEntity<String> requestEntity, String targetUrl, String proxyHeadersJson, UUID workspaceId) {
+    public ResponseEntity<String> proxyRequest(RequestEntity<String> requestEntity, String targetUrl, String proxyHeadersJson, UUID workspaceId) {
         HttpMethod method = requestEntity.getMethod();
         HttpHeaders headers = new HttpHeaders();
 
@@ -130,7 +130,7 @@ public class ProxyController {
     }
 
     @Transactional
-    private void fetchWorkspaceVars(UUID workspaceId) {
+    public void fetchWorkspaceVars(UUID workspaceId) {
         VARS.clear();
         Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(() -> new IllegalArgumentException("Invalid workspace ID"));
         Organization organization = workspace.getOrganization();
