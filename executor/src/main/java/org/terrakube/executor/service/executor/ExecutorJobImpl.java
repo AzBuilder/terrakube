@@ -81,7 +81,7 @@ public class ExecutorJobImpl implements ExecutorJob {
 
 
         executionSuccess = terraformResult.isSuccessfulExecution();
-        updateJobStatus.setCompletedStatus(executionSuccess, terraformJob, terraformResult.getOutputLog(), terraformResult.getOutputErrorLog(), terraformResult.getPlanFile(), commitId);
+        updateJobStatus.setCompletedStatus(executionSuccess, terraformResult.isPlan, terraformResult.getExitCode(), terraformJob, terraformResult.getOutputLog(), terraformResult.getOutputErrorLog(), terraformResult.getPlanFile(), commitId);
 
         try {
             FileUtils.cleanDirectory(terraformWorkingDir);

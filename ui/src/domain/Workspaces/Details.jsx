@@ -850,6 +850,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                                     ) : item.status ===
                                                       "failed" ? (
                                                       <StopOutlined />
+                                                    ) : item.status ===
+                                                      "notExecuted" ? (
+                                                        <CheckCircleOutlined />
                                                     ) : (
                                                       <ClockCircleOutlined />
                                                     )
@@ -987,7 +990,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                   icon={
                                     item.status == "completed" ? (
                                       <CheckCircleOutlined />
-                                    ) : item.status == "running" ? (
+                                    ) :item.status == "noChanges" ? (
+                                       <CheckCircleOutlined />
+                                    ): item.status == "running" ? (
                                       <SyncOutlined spin />
                                     ) : item.status === "waitingApproval" ? (
                                       <ExclamationCircleOutlined />
@@ -1381,6 +1386,9 @@ function setupWorkspaceIncludes(
         switch (element.attributes.status) {
           case "completed":
             finalColor = "#2eb039";
+            break;
+          case "noChanges":
+            finalColor = "#9f37fa";
             break;
           case "rejected":
             finalColor = "#FB0136";

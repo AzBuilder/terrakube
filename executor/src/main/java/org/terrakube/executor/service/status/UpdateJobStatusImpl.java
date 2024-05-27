@@ -45,11 +45,11 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     }
 
     @Override
-    public void setCompletedStatus(boolean successful, TerraformJob terraformJob, String jobOutput, String jobErrorOutput, String jobPlan, String commitId) {
+    public void setCompletedStatus(boolean successful, boolean isPlan, int exitCode, TerraformJob terraformJob, String jobOutput, String jobErrorOutput, String jobPlan, String commitId) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
             updateStepStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput);
             if(!isJobCancelled(terraformJob))
-                updateJobStatus(successful, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput, jobPlan, commitId);
+                updateJobStatus(successful, isPlan, exitCode, terraformJob.getOrganizationId(), terraformJob.getJobId(), terraformJob.getStepId(), jobOutput, jobErrorOutput, jobPlan, commitId);
         }
     }
 
@@ -65,10 +65,33 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
         }
     }
 
-    private void updateJobStatus(boolean successful, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput, String jobPlan, String commitId) {
+    private void updateJobStatus(boolean successful, boolean isPlan, int exitCode, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput, String jobPlan, String commitId) {
         Job job = terrakubeClient.getJobById(organizationId, jobId).getData();
-        job.getAttributes().setStatus(successful ? "pending" : "failed");
+        String status = "";
+        boolean planChanges = true;
+        if (successful) {
+            status = "pending";
 
+            if (isPlan) {
+                switch (exitCode){
+                    case 0:
+                        status = "pending";
+                        planChanges = false;
+                        break;
+                    case 1:
+                        status = "failed";
+                        break;
+                    case 2:
+                        status = "pending";
+                        break;
+                }
+            }
+        } else {
+            status = "failed";
+        }
+        job.getAttributes().setStatus(status);
+        job.getAttributes().setPlanChanges(planChanges);
+        log.info("JobStatus: {}", status);
         log.info("StepId: {}", stepId);
         log.info("output: {}", jobOutput.length());
         log.info("outputError: {}", jobErrorOutput.length());
