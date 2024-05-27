@@ -45,17 +45,17 @@ public class ProxyController {
 
     private static final Map<String, String> VARS = new HashMap<>();
 
-    @RequestMapping(value = "/**", method = RequestMethod.GET)
+    @GetMapping("/**")
     public ResponseEntity<String> proxyGetRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
         return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
-    @RequestMapping(value = "/**", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    @PostMapping(value = "/**", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<String> proxyPostRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
         return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
-    @RequestMapping(value = "/**", method = RequestMethod.PUT)
+    @PutMapping("/**")
     public ResponseEntity<String> proxyPutRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
         return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
@@ -65,13 +65,13 @@ public class ProxyController {
         return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
-    @RequestMapping(value = "/**", method = RequestMethod.PATCH)
+    @PatchMapping("/**")
     public ResponseEntity<String> proxyPatchRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
         return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public ResponseEntity<String> proxyRequest(RequestEntity<String> requestEntity, String targetUrl, String proxyHeadersJson, UUID workspaceId) {
+    private ResponseEntity<String> proxyRequest(RequestEntity<String> requestEntity, String targetUrl, String proxyHeadersJson, UUID workspaceId) {
         HttpMethod method = requestEntity.getMethod();
         HttpHeaders headers = new HttpHeaders();
 
@@ -130,20 +130,16 @@ public class ProxyController {
     }
 
     @Transactional
-    public void fetchWorkspaceVars(UUID workspaceId) {
+    private void fetchWorkspaceVars(UUID workspaceId) {
         VARS.clear();
         Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(() -> new IllegalArgumentException("Invalid workspace ID"));
         Organization organization = workspace.getOrganization();
 
         List<Globalvar> globalVariables = globalVarRepository.findByOrganization(organization);
-        globalVariables.forEach(globalvar -> {
-            VARS.put(globalvar.getKey(), globalvar.getValue());
-        });
+        globalVariables.forEach(globalvar -> VARS.put(globalvar.getKey(), globalvar.getValue()));
 
         List<Variable> variables = variableRepository.findByWorkspace(workspace);
-        variables.forEach(variable -> {
-            VARS.put(variable.getKey(), variable.getValue());
-        });
+        variables.forEach(variable -> VARS.put(variable.getKey(), variable.getValue()));
     }
 
     private String replaceVars(String input) {
