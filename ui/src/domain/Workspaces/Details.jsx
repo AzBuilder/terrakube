@@ -38,6 +38,7 @@ import { CLIDriven } from "../Workspaces/CLIDriven";
 import { Tags } from "../Workspaces/Tags";
 import { useParams, Link } from "react-router-dom";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
+import ActionLoader from "../../ActionLoader.jsx";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -62,7 +63,6 @@ import { FiGitCommit } from "react-icons/fi";
 import { BiTerminal } from "react-icons/bi";
 import "./Workspaces.css";
 import { getServiceIcon } from "./Icons.js";
-const { TabPane } = Tabs;
 const { Option } = Select;
 const { Paragraph } = Typography;
 const include = {
@@ -75,6 +75,7 @@ const include = {
 };
 const { DateTime } = require("luxon");
 const { Content } = Layout;
+const { TabPane } = Tabs;
 const iacTypes = [
   {
     id: "terraform",
@@ -132,6 +133,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [outputs, setOutputs] = useState([]);
   const [currentStateId, setCurrentStateId] = useState(0);
   const [selectedIac, setSelectedIac] = useState("");
+  const [actions, setActions] = useState([]);
+  const [contextState, setContextState] = useState({});
   const handleClick = (jobid) => {
     changeJob(jobid);
     browserHistory.push(
@@ -142,6 +145,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     setSelectedIac(iac);
     loadVersions(iac);
   };
+
   const outputColumns = [
     {
       title: "Name",
@@ -290,6 +294,73 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
         break;
     }
   };
+
+  const evaluateCriteria = (criteria, context) => {
+    try {
+      console.log('Evaluating criteria:', criteria);
+      const result = eval(criteria.filter);
+      console.log('Result:', result);
+      if (result) {
+        if (!criteria.settings) {
+          return {};
+        }
+        return criteria.settings.reduce((acc, setting) => {
+          acc[setting.key] = setting.value;
+          return acc;
+        }, {});
+      }
+    } catch (error) {
+      console.error('Error evaluating criteria:', error);
+    }
+    return null;
+  };
+
+  const fetchActions = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `action?filter[action]=active==true;type=in=('Workspace/Action')`
+      );
+      console.log("Actions:", response.data);
+      const fetchedActions = response.data.data || [];
+
+      // Filter actions and attach settings to each action
+      const filteredActions = fetchedActions.reduce((acc, action) => {
+        if (!action.attributes.displayCriteria) {
+          acc.push(action);
+          return acc;
+        }
+
+        let displayCriteria;
+        try {
+          displayCriteria = JSON.parse(action.attributes.displayCriteria);
+        } catch (error) {
+          console.error("Error parsing displayCriteria JSON:", error);
+          return acc;
+        }
+
+        for (const criteria of displayCriteria) {
+          const settings = evaluateCriteria(criteria, {
+            state: resource,
+            apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
+          });
+          if (settings) {
+            action.settings = settings; // Attach settings to the action
+            console.log("settings");
+            console.log(action);
+            acc.push(action);
+            break;
+          }
+        }
+
+        return acc;
+      }, []);
+
+      setActions(filteredActions);
+    } catch (error) {
+      console.error("Error fetching actions:", error);
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     loadWorkspace(true);
@@ -297,6 +368,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
+    fetchActions();
     const interval = setInterval(() => {
       loadWorkspace(false);
     }, 10000);
@@ -362,7 +434,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 axiosInstance,
                 setResources,
                 setOutputs,
-                setAgent
+                setAgent,
+                setContextState,
               );
             }
 
@@ -650,7 +723,26 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 tabBarExtraContent={
                   <>
                     <Space direction="horizontal">
-                      {" "}
+                      {actions &&
+                        actions
+                          .filter(
+                            (action) =>
+                              action?.attributes.type ===
+                              "Workspace/Action"
+                          )
+                          .map((action, index) => (
+                            <ActionLoader
+                              key={index}
+                              action={action?.attributes.action}
+                              context={{
+                                workspace: workspace.data,
+                                state: contextState,
+                                resources: resources,
+                                apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
+                                settings: action.settings,
+                              }}
+                            />
+                          ))}
                       <Button
                         type="default"
                         htmlType="button"
@@ -773,8 +865,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                         <br />
                                         <br />
                                         <Row>
-                                          <Col span={20}>
-                                          </Col>
+                                          <Col span={20}></Col>
                                           <Col>
                                             <Button
                                               onClick={() =>
@@ -821,8 +912,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
 
                           <ResourceDrawer
                             resource={resource}
+                            workspace={workspace.data}
                             setOpen={setOpen}
                             open={open}
+                            organizationId={organizationId}
+                            organizationName={organizationNameLocal}
                           />
                         </div>
                       )}
@@ -960,6 +1054,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     history={history}
                     setStateDetailsVisible={setStateDetailsVisible}
                     stateDetailsVisible={stateDetailsVisible}
+                    workspace={workspace.data}
+                    organizationId={organizationId}
+                    organizationName={organizationNameLocal}
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
@@ -1267,7 +1364,8 @@ function setupWorkspaceIncludes(
   axiosInstance,
   setResources,
   setOutputs,
-  setAgent
+  setAgent,
+  setContextState
 ) {
   let variables = [];
   let jobs = [];
@@ -1276,7 +1374,6 @@ function setupWorkspaceIncludes(
   let schedule = [];
   let includes = data.included;
   console.log(data.attributes?.iacType);
-
   includes.forEach((element) => {
     switch (element.type) {
       case include.JOB:
@@ -1385,7 +1482,8 @@ function setupWorkspaceIncludes(
       axiosInstance,
       setOutputs,
       setResources,
-      localStorage.getItem(WORKSPACE_ARCHIVE)
+      localStorage.getItem(WORKSPACE_ARCHIVE),
+      setContextState,
     );
   }
   setCurrentStateId(lastState?.id);
@@ -1396,7 +1494,8 @@ function loadState(
   axiosInstance,
   setOutputs,
   setResources,
-  workspaceId
+  workspaceId,
+  setContextState
 ) {
   if (!state) {
     return;
@@ -1407,7 +1506,7 @@ function loadState(
 
   axiosInstance.get(state.output).then((resp) => {
     var result = parseState(resp.data);
-
+    setContextState(resp.data);
     if (result.outputs.length < 1 && result.resources.length < 1) {
       axiosInstance
         .get(
@@ -1419,7 +1518,7 @@ function loadState(
           console.log("Current State Data");
           console.log(currentStateData.data);
           currentState = currentStateData.data;
-
+          setContextState(currentState);
           console.log(
             "Parsing state using current state data instead of json representation"
           );

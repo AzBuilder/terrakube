@@ -2,14 +2,27 @@ package org.terrakube.api.plugin.proxy;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.terrakube.api.repository.GlobalVarRepository;
+import org.terrakube.api.repository.VariableRepository;
+import org.terrakube.api.repository.WorkspaceRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.workspace.Workspace;
+import org.terrakube.api.rs.workspace.parameters.Variable;
+import org.terrakube.api.rs.globalvar.Globalvar;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,52 +33,59 @@ public class ProxyController {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final WorkspaceRepository workspaceRepository;
+    private final VariableRepository variableRepository;
+    private final GlobalVarRepository globalVarRepository;
 
-    // Hardcoded map for global variables
-    private static final Map<String, String> GLOBAL_VARS = new HashMap<>();
-    static {
-        GLOBAL_VARS.put("ARM_TENANT_ID", "");
-        GLOBAL_VARS.put("CLIENT_ID", "");
-        GLOBAL_VARS.put("CLIENT_SECRET", "");
+    public ProxyController(WorkspaceRepository workspaceRepository, VariableRepository variableRepository, GlobalVarRepository globalVarRepository) {
+        this.workspaceRepository = workspaceRepository;
+        this.variableRepository = variableRepository;
+        this.globalVarRepository = globalVarRepository;
     }
+
+    private static final Map<String, String> VARS = new HashMap<>();
 
     @RequestMapping(value = "/**", method = RequestMethod.GET)
-    public ResponseEntity<String> proxyGetRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders) {
-        return proxyRequest(requestEntity, targetUrl, proxyHeaders);
+    public ResponseEntity<String> proxyGetRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
+        return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
-    @RequestMapping(value = "/**", method = RequestMethod.POST)
-    public ResponseEntity<String> proxyPostRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders) {
-        return proxyRequest(requestEntity, targetUrl, proxyHeaders);
+    @RequestMapping(value = "/**", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public ResponseEntity<String> proxyPostRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
+        return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
     @RequestMapping(value = "/**", method = RequestMethod.PUT)
-    public ResponseEntity<String> proxyPutRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders) {
-        return proxyRequest(requestEntity, targetUrl, proxyHeaders);
+    public ResponseEntity<String> proxyPutRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
+        return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
     @RequestMapping(value = "/**", method = RequestMethod.DELETE)
-    public ResponseEntity<String> proxyDeleteRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders) {
-        return proxyRequest(requestEntity, targetUrl, proxyHeaders);
+    public ResponseEntity<String> proxyDeleteRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
+        return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
     @RequestMapping(value = "/**", method = RequestMethod.PATCH)
-    public ResponseEntity<String> proxyPatchRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders) {
-        return proxyRequest(requestEntity, targetUrl, proxyHeaders);
+    public ResponseEntity<String> proxyPatchRequest(RequestEntity<String> requestEntity, @RequestParam("targetUrl") String targetUrl, @RequestParam(value = "proxyheaders", required = false) String proxyHeaders, @RequestParam("workspaceId") UUID workspaceId) {
+        return proxyRequest(requestEntity, targetUrl, proxyHeaders, workspaceId);
     }
 
-    private ResponseEntity<String> proxyRequest(RequestEntity<String> requestEntity, String targetUrl, String proxyHeadersJson) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    private ResponseEntity<String> proxyRequest(RequestEntity<String> requestEntity, String targetUrl, String proxyHeadersJson, UUID workspaceId) {
         HttpMethod method = requestEntity.getMethod();
         HttpHeaders headers = new HttpHeaders();
 
-        // Replace global variables in targetUrl
-        targetUrl = replaceGlobalVars(targetUrl);
+        // Fetch workspace and variables
+        fetchWorkspaceVars(workspaceId);
+
+        // Replace variables in targetUrl
+        targetUrl = replaceVars(targetUrl);
 
         // Add custom headers
         if (proxyHeadersJson != null) {
             try {
                 Map<String, String> customHeaders = objectMapper.readValue(proxyHeadersJson, Map.class);
-                customHeaders.forEach((key, value) -> headers.set(key, replaceGlobalVars(value)));
+                customHeaders.forEach((key, value) -> headers.set(key, replaceVars(value)));
             } catch (Exception e) {
                 log.error("Error parsing proxyheaders JSON: ", e);
             }
@@ -73,19 +93,30 @@ public class ProxyController {
 
         String body = requestEntity.getBody();
         if (body != null) {
-            // Decode the body
-            String decodedBody = URLDecoder.decode(body, StandardCharsets.UTF_8);
+            try {
+                // Decode the body
+                String decodedBody = URLDecoder.decode(body, StandardCharsets.UTF_8);
 
-            // Replace global variables in the decoded body
-            String replacedBody = replaceGlobalVars(decodedBody);
+                // Extract proxyBody if present
+                JsonNode jsonNode = objectMapper.readTree(decodedBody);
+                JsonNode proxyBodyNode = jsonNode.get("proxyBody");
+                if (proxyBodyNode != null) {
+                    String proxyBodyString = proxyBodyNode.asText();
+                    // Replace variables in the proxy body
+                    String replacedBody = replaceVars(proxyBodyString);
 
-            body = replacedBody;
+                    // Reassign the processed body
+                    body = replacedBody;
+                }
+            } catch (Exception e) {
+                log.error("Error processing request body: ", e);
+            }
         }
 
         // Log headers and body for debugging
-        log.debug("Request Headers: {}", headers);
-        log.debug("Request Body: {}", body);
-        log.debug("Target URL: {}", targetUrl);
+        log.info("Request Headers: {}", headers);
+        log.info("Request Body: {}", body);
+        log.info("Target URL: {}", targetUrl);
 
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
@@ -98,17 +129,34 @@ public class ProxyController {
         }
     }
 
-    private String replaceGlobalVars(String input) {
+    @Transactional
+    private void fetchWorkspaceVars(UUID workspaceId) {
+        VARS.clear();
+        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(() -> new IllegalArgumentException("Invalid workspace ID"));
+        Organization organization = workspace.getOrganization();
+
+        List<Globalvar> globalVariables = globalVarRepository.findByOrganization(organization);
+        globalVariables.forEach(globalvar -> {
+            VARS.put(globalvar.getKey(), globalvar.getValue());
+        });
+
+        List<Variable> variables = variableRepository.findByWorkspace(workspace);
+        variables.forEach(variable -> {
+            VARS.put(variable.getKey(), variable.getValue());
+        });
+    }
+
+    private String replaceVars(String input) {
         if (input == null) {
             return null;
         }
 
-        Pattern pattern = Pattern.compile("\\{\\{globalvar\\.([a-zA-Z0-9_]+)\\}\\}");
+        Pattern pattern = Pattern.compile("\\{\\{var\\.([a-zA-Z0-9_]+)\\}\\}");
         Matcher matcher = pattern.matcher(input);
         StringBuffer buffer = new StringBuffer();
 
         while (matcher.find()) {
-            String replacement = GLOBAL_VARS.getOrDefault(matcher.group(1), matcher.group(0));
+            String replacement = VARS.getOrDefault(matcher.group(1), matcher.group(0));
             matcher.appendReplacement(buffer, replacement);
         }
         matcher.appendTail(buffer);

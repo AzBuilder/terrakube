@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Drawer, Avatar, Space, Tabs, Col, Row, Spin, Button } from "antd";
+import { Drawer, Avatar, Space, Tabs, Col, Row, Spin } from "antd";
 import { getServiceIcon } from "./Icons.js";
 import ActionLoader from "../../ActionLoader.jsx";
 import axiosInstance from "../../config/axiosConfig";
-export const ResourceDrawer = ({ open, resource, setOpen }) => {
+export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {
   const [drawerOpen, setDrawerOpen] = useState(open);
   const [actions, setActions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +69,7 @@ export const ResourceDrawer = ({ open, resource, setOpen }) => {
   const context = {
     state: resource,
     apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
+    workspace: workspace
   };
 
   // Function to evaluate display criteria and return settings

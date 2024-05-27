@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Component } from "react";
 import * as Icons from "@ant-design/icons";
 import { transform } from "@babel/standalone";
-import { Typography, Collapse } from "antd";
+import { Typography, Collapse, DatePicker} from "antd";
 import {
   XYPlot,
   XAxis,
@@ -9,9 +9,12 @@ import {
   HorizontalGridLines,
   VerticalGridLines,
   LineSeries,
+  Hint,
+  Crosshair
 } from "react-vis";
 import "react-vis/dist/style.css";
 import axiosInstance from "./config/axiosConfig";
+import ReactMarkdown from "react-markdown";
 
 // List of antd components to consider for dynamic importing
 const antdComponents = [
@@ -81,6 +84,8 @@ const antdComponents = [
 
 const { Panel } = Collapse;
 const { Paragraph, Text } = Typography;
+const {RangePicker} = DatePicker;
+const { DateTime } = require("luxon");
 
 // List of antd icons to consider for dynamic importing
 const antdIcons = Object.keys(Icons).filter((name) =>
@@ -134,6 +139,7 @@ const reactIcons = [
   "SiDocker",
   "SiPrometheus",
   "SiGooglecloud",
+  "SiOpenai",
 ];
 
 // Function to identify required react-icons components
@@ -221,9 +227,14 @@ const ActionLoader = ({ action, context }) => {
           "LineSeries",
           "XAxis",
           "YAxis",
+          "Hint",
+          "Crosshair",
           "HorizontalGridLines",
           "VerticalGridLines",
           "axiosInstance",
+          "RangePicker",
+          "DateTime",
+          "ReactMarkdown",
           ...requiredAntdComponents,
           ...requiredAntdIcons,
           ...requiredReactIcons,
@@ -240,9 +251,14 @@ const ActionLoader = ({ action, context }) => {
           LineSeries,
           XAxis,
           YAxis,
+          Hint,
+          Crosshair,
           HorizontalGridLines,
           VerticalGridLines,
           axiosInstance,
+          RangePicker,
+          DateTime,
+          ReactMarkdown,
           ...requiredAntdComponents.map(
             (component) => importedComponents[component]
           ),
