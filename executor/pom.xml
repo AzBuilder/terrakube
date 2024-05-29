@@ -23,7 +23,7 @@
 		<okhttp.version>4.12.0</okhttp.version>
 		<azure-storage-blob.version>12.26.0</azure-storage-blob.version>
 		<jgit.version>6.6.1.202309021850-r</jgit.version>
-		<lombok.version>1.18.26</lombok.version>
+		<lombok.version>1.18.32</lombok.version>
 		<groovy.version>4.0.20</groovy.version>
 		<ivy.version>2.5.2</ivy.version>
 		<jcolor.version>5.2.0</jcolor.version>
