@@ -38,7 +38,7 @@
     "react-social-login-buttons": "^3.6.1",
     "react-vis": "^1.12.1",
     "reactflow": "^11.10.1",
-    "redux": "^4.2.0",
+    "redux": "^5.0.1",
     "remark-gfm": "^3.0.1",
     "unzipit": "^1.4.3",
     "uuid": "^9.0.0",
