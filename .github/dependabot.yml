@@ -1,0 +1,37 @@
+version: 2
+updates:
+  # Maven: API project
+  - package-ecosystem: "maven"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+
+  # Yarn: React application
+  - package-ecosystem: "npm"
+    directory: "/ui"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+
+  # Maven: Executor project
+  - package-ecosystem: "maven"
+    directory: "/executor"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+
+  # Maven: Registry project
+  - package-ecosystem: "maven"
+    directory: "/registry"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
