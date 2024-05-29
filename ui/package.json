@@ -9,7 +9,7 @@
     "@babel/standalone": "^7.24.5",
     "@monaco-editor/react": "^4.4.6",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^11.1.0",
+    "@testing-library/react": "^12.1.5",
     "@testing-library/user-event": "^12.1.10",
     "ansi-to-react": "^6.1.6",
     "antd": "^5.16.5",
