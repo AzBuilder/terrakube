@@ -21,7 +21,7 @@
         <sonar.project.key>AzBuilder_azb-server</sonar.project.key>
         <!-- plugins -->
         <sonar.version>3.8.0.2131</sonar.version>
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.12</jacoco.version>
         <aggregate.report.dir>coverage/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
     </properties>
 
