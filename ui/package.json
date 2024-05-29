@@ -35,7 +35,7 @@
     "react-oidc-context": "^2.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "5.0.1",
-    "react-social-login-buttons": "^3.6.1",
+    "react-social-login-buttons": "^4.1.0",
     "react-vis": "^1.12.1",
     "reactflow": "^11.10.1",
     "redux": "^5.0.1",
