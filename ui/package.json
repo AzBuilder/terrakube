@@ -26,7 +26,7 @@
     "loader-utils": "2.0.4",
     "luxon": "^3.3.4",
     "minimatch": "^9.0.4",
-    "oidc-client-ts": "^2.1.0",
+    "oidc-client-ts": "^2.4.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.11.0",
