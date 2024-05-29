@@ -106,7 +106,7 @@ const getRequiredAntdIcons = (componentString) => {
 // Function to dynamically import antd components
 const importAntdComponents = async (components) => {
   const imports = await Promise.all(
-    components.map((component) => import(`antd/es/${component.toLowerCase()}`))
+    components.map((component) => import(`antd/es/${component.toLowerCase()}/index.js`))
   );
   const importedComponents = {};
   components.forEach((component, index) => {
