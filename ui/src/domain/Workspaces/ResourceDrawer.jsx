@@ -1,22 +1,98 @@
-import { React } from "react";
-import {
-  Drawer,
-  Avatar,
-  Descriptions,
-  Typography,
-  Collapse,
-  Space,
-  Button,
-  Tag
-} from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Drawer, Avatar, Space, Tabs, Col, Row, Spin } from "antd";
 import { getServiceIcon } from "./Icons.js";
-const { Panel } = Collapse;
-const { Paragraph } = Typography;
-export const ResourceDrawer = ({ open, resource, setOpen }) => {
+import ActionLoader from "../../ActionLoader.jsx";
+import axiosInstance from "../../config/axiosConfig";
+export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {
+  const [drawerOpen, setDrawerOpen] = useState(open);
+  const [actions, setActions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchActions = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(`action?filter[action]=active==true;type=in=('Workspace/ResourceDrawer/Action','Workspace/ResourceDrawer/Tab')`);
+        console.log("Actions:", response.data);
+        const fetchedActions = response.data.data || [];
+
+        // Filter actions and attach settings to each action
+        const filteredActions = fetchedActions.reduce((acc, action) => {
+          if (!action.attributes.displayCriteria) {
+            acc.push(action);
+            return acc;
+          }
+
+          let displayCriteria;
+          try {
+            displayCriteria = JSON.parse(action.attributes.displayCriteria);
+          } catch (error) {
+            console.error('Error parsing displayCriteria JSON:', error);
+            return acc;
+          }
+
+          for (const criteria of displayCriteria) {
+            const settings = evaluateCriteria(criteria, { state: resource, apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin });
+            if (settings) {
+              action.settings = settings; // Attach settings to the action
+              console.log("settings");
+              console.log(action);
+              acc.push(action);
+              break;
+            }
+          }
+
+          return acc;
+        }, []);
+
+        setActions(filteredActions);
+      } catch (error) {
+        console.error("Error fetching actions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActions();
+    if (!open) {
+      setDrawerOpen(false);
+    } else {
+      setDrawerOpen(true);
+    }
+  }, [open, resource]);
+
   const onClose = () => {
     setOpen(false);
+    setDrawerOpen(false);
   };
+
+  const context = {
+    state: resource,
+    apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
+    workspace: workspace
+  };
+
+  // Function to evaluate display criteria and return settings
+  const evaluateCriteria = (criteria, context) => {
+    try {
+      console.log('Evaluating criteria:', criteria);
+      const result = eval(criteria.filter);
+      console.log('Result:', result);
+      if (result) {
+        if (!criteria.settings) {
+          return {};
+        }
+        return criteria.settings.reduce((acc, setting) => {
+          acc[setting.key] = setting.value;
+          return acc;
+        }, {});
+      }
+    } catch (error) {
+      console.error('Error evaluating criteria:', error);
+    }
+    return null;
+  };  
+
   return (
     <Drawer
       width={640}
@@ -32,48 +108,57 @@ export const ResourceDrawer = ({ open, resource, setOpen }) => {
       }
       placement="right"
       onClose={onClose}
-      open={open}
+      open={drawerOpen}
     >
-      <Space size={10} style={{ width: "100%" }} direction="vertical">
-        <Space direction="horizontal">
-          <Button target="_blank" href={"https://registry.terraform.io/providers/" + resource.provider?.split('/')?.slice(-2)?.join('/')  + "/latest/docs/resources/" + resource?.type?.split('_')?.slice(1)?.join('_')} icon={<QuestionCircleOutlined />}>Open documentation</Button>
+      {loading ? (
+        <Spin tip="Loading...">
+          <Space size={10} style={{ width: "100%" }} direction="vertical" />
+        </Spin>
+      ) : (
+        <Space size={10} style={{ width: "100%" }} direction="vertical">
+          <Row>
+            <Col span={24}>
+              <Space size={5} direction="horizontal">
+              {actions &&
+                actions
+                  .filter(
+                    (action) =>
+                      action?.attributes.type ===
+                      "Workspace/ResourceDrawer/Action"
+                  )
+                  .map((action, index) => (
+                    <ActionLoader
+                      key={index}
+                      action={action?.attributes.action}
+                      context={{ ...context, settings: action.settings }}
+                    />
+                  ))}
+              </Space>
+            </Col>
+          </Row>
+
+          <Tabs
+            defaultActiveKey="1"
+            items={[
+              ...actions
+                .filter(
+                  (action) => action?.attributes.type === "Workspace/ResourceDrawer/Tab"
+                )
+                .map((action, index) => ({
+                  key: `tab-${index + 1}`,
+                  label: action.attributes.label,
+                  children: (
+                    <ActionLoader
+                      key={index}
+                      action={action?.attributes.action}
+                      context={{ ...context, settings: action.settings }}
+                    />
+                  ),
+                })),
+            ]}
+          />
         </Space>
-
-        <Collapse defaultActiveKey={["1"]}>
-          <Panel header={<h4>Attributes</h4>} key="1">
-            <Descriptions bordered column={1}>
-              {Object.entries(resource?.values || {}).map(([key, value]) => {
-                return (
-                  <Descriptions.Item label={key}>
-                    <Paragraph
-                      style={{ margin: "0px" }}
-                      copyable={value !== null ? { tooltips: false } : false}
-                    >
-                      {value === null
-                        ? ""
-                        : typeof value === "object"
-                        ? JSON.stringify(value, null, 2)
-                        : value}
-                    </Paragraph>
-                  </Descriptions.Item>
-                );
-              })}
-            </Descriptions>
-          </Panel>
-        </Collapse>
-        <Collapse style={{display: resource?.depends_on?.length > 0 ? "block":"none"}} defaultActiveKey={["2"]}>
-          <Panel header={<h4>Depends on</h4>} key="2">
-            <br/>
-          <ul>
-              {resource?.depends_on?.map((dependency) => {
-                return <li><Tag>{dependency}</Tag></li>;
-              })}
-            </ul>
-          </Panel>
-
-          
-        </Collapse>
-      </Space>
+      )}
     </Drawer>
   );
 };

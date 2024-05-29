@@ -138,6 +138,15 @@ const App = () => {
           <Route exact path="/settings/tokens">
             <UserSettings />
           </Route>
+          <Route exact path="/organizations/:orgid/settings/ssh">
+            <OrganizationSettings selectedTab="6" />
+          </Route>
+          <Route exact path="/organizations/:orgid/settings/tags">
+            <OrganizationSettings selectedTab="7" />
+          </Route>
+          <Route exact path="/organizations/:orgid/settings/actions">
+            <OrganizationSettings selectedTab="8" />
+          </Route>
         </Switch>
         <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2024</Footer>
       </Layout>

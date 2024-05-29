@@ -1,6 +1,7 @@
 const AWSIcons = [
     // AWS Compute
     { type: "aws_ec2_", path: "/providers/aws/Arch_Compute/32/Arch_Amazon-EC2_32.svg"},
+    { type: "aws_instance", path: "/providers/aws/Arch_Compute/32/Arch_Amazon-EC2_32.svg"},
     { type: "aws_autoscaling_", path:"/providers/aws/Arch_Compute/32/Arch_Amazon-EC2-Auto-Scaling_32.svg"},
     { type: "aws_imagebuilder_", path:"/providers/aws/Arch_Compute/32/Arch_Amazon-EC2-Image-Builder_32.svg"},
     { type: "aws_lightsail_", path:"/providers/aws/Arch_Compute/32/Arch_Amazon-Lightsail_32.svg"},
@@ -128,13 +129,17 @@ const AWSIcons = [
 
 ]
 
-
 const AzureIcons = [
     { type: "azurerm_aadb2c_directory", path: "/providers/azurerm/Identity/10228-icon-service-Azure-AD-B2C.svg"},
     { type: "azurerm_api_management", path: "/providers/azurerm/App Services/10042-icon-service-API-Management-Services.svg"},
     { type: "azurerm_app_service", path:"/providers/azurerm/App Services/10035-icon-service-App-Services.svg"},
     { type: "azurerm_app_service_plan", path:"providers/azurerm/App Services/00046-icon-service-App-Service-Plans.svg"},
     { type: "azurerm_resource_group", path:"/providers/azurerm/General/10007-icon-service-Resource-Groups.svg"},
+    { type: "azurerm_virtual_network", path:"/providers/azurerm/Networking/10061-icon-service-Virtual-Networks.svg"},
+    { type: "azurerm_network_interface", path:"/providers/azurerm/Networking/10080-icon-service-Network-Interfaces.svg"},
+    { type: "azurerm_subnet", path:"/providers/azurerm/Networking/10061-icon-service-Virtual-Networks.svg"},
+    { type: "azurerm_virtual_machine", path:"/providers/azurerm/Compute/10021-icon-service-Virtual-Machine.svg"},
+    { type: "azurerm_sql_server", path:"/providers/azurerm/Databases/02390-icon-service-Azure-SQL.svg"},
 ]
 
 export function getServiceIcon (providerType,resourceType){

@@ -18,6 +18,9 @@ export const States = ({
   history,
   setStateDetailsVisible,
   stateDetailsVisible,
+  workspace,
+  organizationId,
+  organizationName
 }) => {
   const [currentState, setCurrentState] = useState({});
   const [stateContent, setStateContent] = useState("");
@@ -312,6 +315,9 @@ export const States = ({
                       resource={resource}
                       setOpen={setOpen}
                       open={open}
+                      workspace={workspace}
+                      organizationId={organizationId}
+                      organizationName={organizationName}
                     />
                     <ReactFlow
                       zoomOnScroll={false}
