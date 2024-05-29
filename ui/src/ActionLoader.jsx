@@ -34,7 +34,6 @@ const antdComponents = [
   "Cascader",
   "Checkbox",
   "Col",
-  "Comment",
   "ConfigProvider",
   "DatePicker",
   "Descriptions",

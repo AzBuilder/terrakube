@@ -121,7 +121,7 @@
                 <![CDATA[[{"filter": "true"}]]]>
             </column>
             <column name="version" value="0.1.0"/>
-            <column name="active" value="true"/>
+            <column name="active" value="false"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

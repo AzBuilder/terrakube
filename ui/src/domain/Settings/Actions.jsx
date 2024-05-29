@@ -218,6 +218,7 @@ export const ActionSettings = () => {
               rules={[{ required: true }]}
             >
               <Select placeholder="Please select a type">
+                <Select.Option value="Workspace/Action">Workspace/Action</Select.Option>
                 <Select.Option value="Workspace/ResourceDrawer/Action">Workspace/ResourceDrawer/Action</Select.Option>
                 <Select.Option value="Workspace/ResourceDrawer/Tab">Workspace/ResourceDrawer/Tab</Select.Option>
               </Select>

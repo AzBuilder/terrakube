@@ -297,9 +297,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
 
   const evaluateCriteria = (criteria, context) => {
     try {
-      console.log('Evaluating criteria:', criteria);
+      console.log("Evaluating criteria:", criteria);
+      console.log(context);
       const result = eval(criteria.filter);
-      console.log('Result:', result);
+      console.log("Result:", result);
       if (result) {
         if (!criteria.settings) {
           return {};
@@ -310,7 +311,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
         }, {});
       }
     } catch (error) {
-      console.error('Error evaluating criteria:', error);
+      console.error("Error evaluating criteria:", error);
     }
     return null;
   };
@@ -322,40 +323,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       );
       console.log("Actions:", response.data);
       const fetchedActions = response.data.data || [];
-
-      // Filter actions and attach settings to each action
-      const filteredActions = fetchedActions.reduce((acc, action) => {
-        if (!action.attributes.displayCriteria) {
-          acc.push(action);
-          return acc;
-        }
-
-        let displayCriteria;
-        try {
-          displayCriteria = JSON.parse(action.attributes.displayCriteria);
-        } catch (error) {
-          console.error("Error parsing displayCriteria JSON:", error);
-          return acc;
-        }
-
-        for (const criteria of displayCriteria) {
-          const settings = evaluateCriteria(criteria, {
-            state: resource,
-            apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
-          });
-          if (settings) {
-            action.settings = settings; // Attach settings to the action
-            console.log("settings");
-            console.log(action);
-            acc.push(action);
-            break;
-          }
-        }
-
-        return acc;
-      }, []);
-
-      setActions(filteredActions);
+      setActions(fetchedActions);
     } catch (error) {
       console.error("Error fetching actions:", error);
     }
@@ -368,7 +336,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
-    fetchActions();
     const interval = setInterval(() => {
       loadWorkspace(false);
     }, 10000);
@@ -435,7 +402,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 setResources,
                 setOutputs,
                 setAgent,
-                setContextState,
+                setContextState
               );
             }
 
@@ -452,6 +419,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             setWorkspaceName(response.data.data.attributes.name);
             setExecutionMode(response.data.data.attributes.executionMode);
             if (runid && _loadVersions) changeJob(runid); // if runid is provided, show the job details
+            fetchActions();
           });
       });
   };
@@ -725,10 +693,49 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     <Space direction="horizontal">
                       {actions &&
                         actions
+                          .reduce((acc, action) => {
+                            if (!action.attributes.displayCriteria) {
+                              acc.push(action);
+                              return acc;
+                            }
+
+                            let displayCriteria;
+                            try {
+                              displayCriteria = JSON.parse(
+                                action.attributes.displayCriteria
+                              );
+                            } catch (error) {
+                              console.error(
+                                "Error parsing displayCriteria JSON:",
+                                error
+                              );
+                              return acc;
+                            }
+
+                            for (const criteria of displayCriteria) {
+                              const settings = evaluateCriteria(criteria, {
+                                workspace: workspace.data,
+                                state: contextState,
+                                resources: resources,
+                                apiUrl: new URL(
+                                  window._env_.REACT_APP_TERRAKUBE_API_URL
+                                ).origin,
+                                settings: action.settings,
+                              });
+                              if (settings) {
+                                action.settings = settings; // Attach settings to the action
+                                console.log("settings");
+                                console.log(action);
+                                acc.push(action);
+                                break;
+                              }
+                            }
+
+                            return acc;
+                          }, [])
                           .filter(
                             (action) =>
-                              action?.attributes.type ===
-                              "Workspace/Action"
+                              action?.attributes.type === "Workspace/Action"
                           )
                           .map((action, index) => (
                             <ActionLoader
@@ -738,7 +745,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                 workspace: workspace.data,
                                 state: contextState,
                                 resources: resources,
-                                apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
+                                apiUrl: new URL(
+                                  window._env_.REACT_APP_TERRAKUBE_API_URL
+                                ).origin,
                                 settings: action.settings,
                               }}
                             />
@@ -852,7 +861,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                                       <StopOutlined />
                                                     ) : item.status ===
                                                       "notExecuted" ? (
-                                                        <CheckCircleOutlined />
+                                                      <CheckCircleOutlined />
                                                     ) : (
                                                       <ClockCircleOutlined />
                                                     )
@@ -990,9 +999,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                   icon={
                                     item.status == "completed" ? (
                                       <CheckCircleOutlined />
-                                    ) :item.status == "noChanges" ? (
-                                       <CheckCircleOutlined />
-                                    ): item.status == "running" ? (
+                                    ) : item.status == "noChanges" ? (
+                                      <CheckCircleOutlined />
+                                    ) : item.status == "running" ? (
                                       <SyncOutlined spin />
                                     ) : item.status === "waitingApproval" ? (
                                       <ExclamationCircleOutlined />
@@ -1491,7 +1500,7 @@ function setupWorkspaceIncludes(
       setOutputs,
       setResources,
       localStorage.getItem(WORKSPACE_ARCHIVE),
-      setContextState,
+      setContextState
     );
   }
   setCurrentStateId(lastState?.id);
