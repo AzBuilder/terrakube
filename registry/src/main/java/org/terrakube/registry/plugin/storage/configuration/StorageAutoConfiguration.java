@@ -75,6 +75,7 @@ public class StorageAutoConfiguration {
                 AWSStaticCredentialsProvider awsStaticCredentialsProvider = null;
 
                 if(awsStorageServiceProperties.isEnableRoleAuthentication()) {
+                    log.warn("Using aws role authentication");
                     AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder
                             .standard()
                             .withRegion(awsStorageServiceProperties.getRegion())
@@ -95,6 +96,7 @@ public class StorageAutoConfiguration {
                     awsStaticCredentialsProvider= new AWSStaticCredentialsProvider(basicSessionCredentials);
 
                 } else {
+                    log.warn("Using aws access key and secret key for authentication");
                     AWSCredentials credentials = new BasicAWSCredentials(
                             awsStorageServiceProperties.getAccessKey(),
                             awsStorageServiceProperties.getSecretKey()
