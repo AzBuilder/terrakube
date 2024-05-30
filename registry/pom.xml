@@ -24,7 +24,7 @@
 		<rest-assured.version>4.5.1</rest-assured.version>
 		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
 		<!--groovy.version>3.0.8</groovy.version-->
-		<aws-sdk.version>1.12.261</aws-sdk.version>
+		<aws-sdk.version>1.12.731</aws-sdk.version>
 		<zt-zip.version>1.14</zt-zip.version>
 		<gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
