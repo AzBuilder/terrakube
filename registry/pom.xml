@@ -135,6 +135,10 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-sts</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-spring-test-listener</artifactId>
 			<version>${mockserver-spring-test-listener.version}</version>
