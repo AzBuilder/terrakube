@@ -25,7 +25,7 @@
         <rest-assured.version>4.5.1</rest-assured.version>
         <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
         <!--groovy.version>4.0.20</groovy.version-->
-        <postgresql.version>42.7.2</postgresql.version>
+        <postgresql.version>42.7.3</postgresql.version>
         <mysql.version>8.0.28</mysql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.0</snakeyaml.version>
