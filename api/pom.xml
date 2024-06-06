@@ -50,7 +50,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.1.10</version>
                 <configuration>
                 <image>
                     <builder>${buildpack.builder}</builder>
