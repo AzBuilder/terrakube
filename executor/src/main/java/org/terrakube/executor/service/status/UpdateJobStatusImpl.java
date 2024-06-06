@@ -80,6 +80,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
                         break;
                     case 1:
                         status = "failed";
+                        planChanges = false;
                         break;
                     case 2:
                         status = "pending";
