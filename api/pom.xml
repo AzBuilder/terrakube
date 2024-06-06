@@ -22,7 +22,7 @@
         <msal4j.version>1.15.0</msal4j.version>
         <lombok.version>1.18.32</lombok.version>
         <jgit.version>6.6.1.202309021850-r</jgit.version>
-        <rest-assured.version>4.5.1</rest-assured.version>
+        <rest-assured.version>5.4.0</rest-assured.version>
         <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.3</postgresql.version>
