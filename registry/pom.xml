@@ -16,7 +16,7 @@
 	<properties>
 		<azure.version>5.12.0</azure.version>
 		<java.version>17</java.version>
-		<lombok.version>1.18.20</lombok.version>
+		<lombok.version>1.18.32</lombok.version>
 		<terrakube-client-starter.version>0.15.1</terrakube-client-starter.version>
 		<jgit.version>6.6.1.202309021850-r</jgit.version>
 		<commons-io.version>2.16.1</commons-io.version>
