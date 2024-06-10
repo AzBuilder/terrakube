@@ -11179,10 +11179,10 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-web-vitals@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/web-vitals/-/web-vitals-4.0.1.tgz#9fa4dfcd26130d6721717c5f2ff73adf3adbbe76"
-  integrity sha512-AW6qT/vXK3pbf+WgVcEBXY//AWCpXjVKgdb6rt0cARSUdtT+NUtZCOeo+CSLUX7PjSQ275DmxfkAs7QlPbtR6w==
+web-vitals@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/web-vitals/-/web-vitals-4.1.0.tgz#27074f32f4cc672260814c20d89d6ace1465c6bf"
+  integrity sha512-wz5ubPZK7DSKrlQvjsaCqdfa+9AjAYoUzj9GDzUmBTdfyfyl1fOIjfTh46DGKM8MdN+lcbNY8ObXo6TmHqRzVw==
 
 webidl-conversions@^4.0.2:
   version "4.0.2"
