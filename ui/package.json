@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@ant-design/icons": "^4.6.2",
+    "@ant-design/icons": "^5.3.7",
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.6",
     "@babel/standalone": "^7.24.6",
