@@ -23,7 +23,7 @@
     "hcl2-parser": "^1.0.3",
     "html-react-parser": "^3.0.9",
     "html-to-image": "^1.11.11",
-    "loader-utils": "3.2.2",
+    "loader-utils": "3.3.1",
     "luxon": "^3.4.4",
     "minimatch": "^9.0.4",
     "oidc-client-ts": "^2.4.0",
