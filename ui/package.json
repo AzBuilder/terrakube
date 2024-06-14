@@ -39,7 +39,7 @@
     "react-vis": "^1.12.1",
     "reactflow": "^11.11.3",
     "redux": "^5.0.1",
-    "remark-gfm": "^3.0.1",
+    "remark-gfm": "^4.0.0",
     "unzipit": "^1.4.3",
     "uuid": "^10.0.0",
     "web-vitals": "^4.1.0"
