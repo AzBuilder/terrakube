@@ -74,14 +74,15 @@ public class ScheduleJob implements org.quartz.Job {
                 log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                 updateJobStepsWithStatus(job.getId(), JobStatus.failed);
                 jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
-                if (job.getWorkspace().isLocked()) {
-                    log.warn("Release Workspace {} Lock for job id {}", job.getWorkspace().getId(), job.getId());
-                    unlockWorkspace(job);
-                }
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
             log.warn("Closing Job");
+            return;
+        }
+
+        if (job.getWorkspace().isLocked()) {
+            log.warn("Job {}, Workspace is locked. It must be unlocked before Terrakube can execute it.", jobId);
             return;
         }
 
@@ -91,7 +92,7 @@ public class ScheduleJob implements org.quartz.Job {
                 Arrays.asList(JobStatus.failed, JobStatus.completed, JobStatus.rejected, JobStatus.cancelled, JobStatus.waitingApproval, JobStatus.approved, JobStatus.noChanges),
                 job.getId()
         );
-        if (previousJobs.isPresent() && previousJobs.get().size() > 0) {
+        if (previousJobs.isPresent() && !previousJobs.get().isEmpty()) {
             log.warn("Job {} is waiting for previous jobs to be completed...", jobId);
         } else {
 
@@ -107,7 +108,6 @@ public class ScheduleJob implements org.quartz.Job {
                         redisTemplate.delete(String.valueOf(job.getId()));
                         updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
                         removeJobContext(job, jobExecutionContext);
-                        unlockWorkspace(job);
                     }
                     break;
                 case approved:
@@ -119,7 +119,6 @@ public class ScheduleJob implements org.quartz.Job {
                 case completed:
                     redisTemplate.delete(String.valueOf(job.getId()));
                     removeJobContext(job, jobExecutionContext);
-                    unlockWorkspace(job);
                     break;
                 case cancelled:
                 case failed:
@@ -132,7 +131,6 @@ public class ScheduleJob implements org.quartz.Job {
                     } catch (SchedulerException e) {
                         log.error(e.getMessage());
                     }
-                    unlockWorkspace(job);
                     break;
                 default:
                     log.info("Job {} Status {}", job.getId(), job.getStatus());
@@ -185,8 +183,6 @@ public class ScheduleJob implements org.quartz.Job {
                     softDeleteService.disableWorkspaceSchedules(job.getWorkspace());
                     log.warn("Remove current job context");
                     removeJobContext(job, jobExecutionContext);
-                    log.warn("Unlock workspace");
-                    unlockWorkspace(job);
                     log.warn("Update workspace deleted to true");
                     Workspace workspace = job.getWorkspace();
                     workspace.setDeleted(true);
@@ -224,7 +220,6 @@ public class ScheduleJob implements org.quartz.Job {
         } else {
             completeJob(job);
             removeJobContext(job, jobExecutionContext);
-            unlockWorkspace(job);
         }
     }
 
@@ -301,10 +296,4 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
-    private void unlockWorkspace(Job job) {
-        Workspace workspace = job.getWorkspace();
-        workspace.setLocked(false);
-        log.info("Unlock workspace {} in job {}", workspace.getId(), job.getId());
-        workspaceRepository.save(workspace);
-    }
 }

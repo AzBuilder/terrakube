@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import java.text.ParseException;
-import java.util.UUID;
 
 @AllArgsConstructor
 @Slf4j
@@ -77,7 +76,6 @@ public class ScheduleJobService {
         log.info("Create Job Context {}", jobDetail.getKey());
 
         Workspace workspace = job.getWorkspace();
-        workspace.setLocked(true);
         workspaceRepository.save(workspace);
         scheduler.scheduleJob(jobDetail, trigger);
     }
@@ -97,13 +95,6 @@ public class ScheduleJobService {
                 stepRepository.save(step);
             }
         }
-    }
-
-    @Transactional
-    public void unlockWorkpace(UUID workspaceId){
-        Workspace workspace = workspaceRepository.getReferenceById(workspaceId);
-        workspace.setLocked(false);
-        workspaceRepository.save(workspace);
     }
 
 }

@@ -124,6 +124,7 @@ public class RemoteTfeController {
         }
     }
 
+    // Only used for local runs
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/lock")
     public ResponseEntity<WorkspaceData> lockWorkspace(@PathVariable("workspaceId") String workspaceId, Principal principal) {
@@ -131,6 +132,7 @@ public class RemoteTfeController {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, true, (JwtAuthenticationToken) principal)));
     }
 
+    // Only used for local runs
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/unlock")
     public ResponseEntity<WorkspaceData> unlockWorkspace(@PathVariable("workspaceId") String workspaceId, Principal principal) {

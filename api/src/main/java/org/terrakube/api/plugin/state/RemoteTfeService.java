@@ -849,7 +849,6 @@ public class RemoteTfeService {
             Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
             job.setStatus(JobStatus.cancelled);
             jobRepository.save(job);
-            scheduleJobService.unlockWorkpace(job.getWorkspace().getId());
             scheduleJobService.deleteJobContext(job.getId());
         } catch (ParseException | SchedulerException e) {
             log.error(e.getMessage());
