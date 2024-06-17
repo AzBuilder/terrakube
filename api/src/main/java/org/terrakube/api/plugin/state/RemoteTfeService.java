@@ -778,6 +778,9 @@ public class RemoteTfeService {
                 planStatus = "finished";
                 break;
             case running:
+            case pending:
+                planStatus = "pending";
+                break;
             case queue:
                 planStatus = "running";
                 break;
