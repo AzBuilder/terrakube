@@ -28,6 +28,7 @@ import org.terrakube.api.plugin.state.model.runs.*;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.terraform.TerraformState;
+import org.terrakube.api.plugin.state.model.workspace.CurrentRunModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
@@ -277,6 +278,17 @@ public class RemoteTfeService {
 
             workspaceModel.setAttributes(attributes);
             workspaceData.setData(workspaceModel);
+
+            Optional<Job> currentJob = jobRepository.findFirstByWorkspaceAndAndStatusINOrderByIdAsc(workspace.get(), Arrays.asList(JobStatus.pending, JobStatus.running));
+            if (currentJob.isPresent()) {
+                log.info("Found Current Job Id: {}", currentJob.get().getId());
+                workspaceModel.setRelationships(new org.terrakube.api.plugin.state.model.workspace.Relationships());
+                CurrentRunModel currentRunModel = new CurrentRunModel();
+                currentRunModel.setData(new Resource());
+                currentRunModel.getData().setId(String.valueOf(currentJob.get().getId()));
+                currentRunModel.getData().setType("runs");
+                workspaceModel.getRelationships().setCurrentRun(currentRunModel);
+            }
 
             return workspaceData;
         } else {

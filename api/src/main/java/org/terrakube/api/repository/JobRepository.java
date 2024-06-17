@@ -12,4 +12,5 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
 
     List<Job> findAllByStatus(JobStatus status);
     Optional<List<Job>> findByWorkspaceAndStatusNotInAndIdLessThan(Workspace workspace, List<JobStatus> jobStatuses, int jobId);
+    Optional<Job> findFirstByWorkspaceAndAndStatusINOrderByIdAsc(Workspace workspace, List<JobStatus> jobStatuses);
 }
