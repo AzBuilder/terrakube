@@ -18,7 +18,7 @@
 		<java.version>17</java.version>
 		<lombok.version>1.18.32</lombok.version>
 		<terrakube-client-starter.version>0.15.1</terrakube-client-starter.version>
-		<jgit.version>6.9.0.202403050737-r</jgit.version>
+		<jgit.version>6.10.0.202406032230-r</jgit.version>
 		<commons-io.version>2.16.1</commons-io.version>
 		<mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
 		<rest-assured.version>5.4.0</rest-assured.version>
