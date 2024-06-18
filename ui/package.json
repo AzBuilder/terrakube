@@ -17,7 +17,7 @@
     "azure-react-icons": "^0.10.1",
     "buffer": "^6.0.3",
     "cron-to-quartz": "^1.4.7",
-    "cronstrue": "^2.15.0",
+    "cronstrue": "^2.50.0",
     "dotenv": "^16.4.5",
     "dotenv-expand": "^11.0.6",
     "hcl2-parser": "^1.0.3",
