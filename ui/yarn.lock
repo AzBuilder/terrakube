@@ -9770,10 +9770,10 @@ react-motion@^0.5.2:
     prop-types "^15.5.8"
     raf "^3.1.0"
 
-react-oidc-context@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.npmjs.org/react-oidc-context/-/react-oidc-context-2.2.0.tgz"
-  integrity sha512-CsmRLN/eSvh5fvFeyzT3Ppb++StdGap8nnYahwLoaHS5Jvg8NQWweDNLaaq8WKQTq2onRDtkQTQ4WY4JroAJ/Q==
+react-oidc-context@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/react-oidc-context/-/react-oidc-context-2.3.1.tgz#04eea5aaea972af1a49de6b8d5ff103b9daa0e73"
+  integrity sha512-WdhmEU6odNzMk9pvOScxUkf6/1aduiI/nQryr7+iCl2VDnYLASDTIV/zy58KuK4VXG3fBaRKukc/mRpMjF9a3Q==
 
 react-property@2.0.0:
   version "2.0.0"
