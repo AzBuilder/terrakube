@@ -10,7 +10,7 @@ import {
   Tag,
 } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import { useParams, useHistory, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   CloudUploadOutlined,
   CloudOutlined,
@@ -102,10 +102,10 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
         setOrganizationName(response.data.data.attributes.name);
       });
   }, [orgid]);
-  const history = useHistory();
+  const navigate = useNavigate();
   const handleClick = (id) => {
     console.log(id);
-    history.push("/organizations/" + orgid + "/registry/" + id);
+    navigate("/organizations/" + orgid + "/registry/" + id);
   };
 
   const renderLogo = (provider) => {
@@ -128,7 +128,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
   };
 
   const handlePublish = () => {
-    history.push("/organizations/" + orgid + "/registry/create");
+    navigate("/organizations/" + orgid + "/registry/create");
   };
 
   return (

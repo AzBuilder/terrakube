@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
-import { useHistory } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,
@@ -36,7 +36,6 @@ import { States } from "../Workspaces/States";
 import { Schedules } from "../Workspaces/Schedules";
 import { CLIDriven } from "../Workspaces/CLIDriven";
 import { Tags } from "../Workspaces/Tags";
-import { useParams, Link } from "react-router-dom";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
 import ActionLoader from "../../ActionLoader.jsx";
 import {
@@ -94,8 +93,9 @@ const iacTypes = [
     icon: <img width="18px" src="/providers/opentofu.png" />,
   },
 ];
+
 export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
-  const browserHistory = useHistory();
+  const navigate = useNavigate();
   const { id, runid, orgid } = useParams();
   if (orgid !== null && orgid !== undefined && orgid !== "") {
     localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
@@ -113,7 +113,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [stateDetailsVisible, setStateDetailsVisible] = useState(false);
   const [jobId, setJobId] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [jobVisible, setjobVisible] = useState(false);
+  const [jobVisible, setJobVisible] = useState(false);
   const [organizationNameLocal, setOrganizationNameLocal] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
   const [activeKey, setActiveKey] = useState(
@@ -137,7 +137,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [contextState, setContextState] = useState({});
   const handleClick = (jobid) => {
     changeJob(jobid);
-    browserHistory.push(
+    navigate(
       `/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`
     );
   };
@@ -259,34 +259,34 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     setActiveKey(key);
     switch (key) {
       case "1":
-        browserHistory.push(
+        navigate(
           `/organizations/${organizationId}/workspaces/${id}`
         );
         break;
       case "2":
-        setjobVisible(false);
-        browserHistory.push(
+        setJobVisible(false);
+        navigate(
           `/organizations/${organizationId}/workspaces/${id}/runs`
         );
         break;
       case "3":
         setStateDetailsVisible(false);
-        browserHistory.push(
+        navigate(
           `/organizations/${organizationId}/workspaces/${id}/states`
         );
         break;
       case "4":
-        browserHistory.push(
+        navigate(
           `/organizations/${organizationId}/workspaces/${id}/variables`
         );
         break;
       case "5":
-        browserHistory.push(
+        navigate(
           `/organizations/${organizationId}/workspaces/${id}/schedules`
         );
         break;
       case "6":
-        browserHistory.push(
+        navigate(
           `/organizations/${organizationId}/workspaces/${id}/settings`
         );
         break;
@@ -345,7 +345,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const changeJob = (id) => {
     console.log(id);
     setJobId(id);
-    setjobVisible(true);
+    setJobVisible(true);
     setActiveKey("2");
   };
 
@@ -446,7 +446,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       })
       .then((response) => {
         console.log(response);
-        if (response.status == "204") {
+        if (response.status === 204) {
           loadWorkspace(true);
           var newstatus = locked ? "unlocked" : "locked";
           message.success("Workspace " + newstatus + " successfully");
@@ -487,7 +487,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       })
       .then((response) => {
         console.log(response);
-        if (response.status == "204") {
+        if (response.status === 204) {
           message.success("Workspace updated successfully");
         } else {
           message.error("Workspace update failed");
@@ -523,7 +523,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       .then((response) => {
         console.log("Update Workspace agent successfully");
         console.log(response);
-        if (response.status == "204") {
+        if (response.status === 204) {
           console.log("Workspace agent updated successfully");
         } else {
           console.log("Workspace agent update failed");
@@ -579,10 +579,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       })
       .then((response) => {
         console.log(response);
-        if (response.status == "204") {
+        if (response.status === 204) {
           console.log(response);
           message.success("Workspace deleted successfully");
-          browserHistory.push(`/organizations/${organizationId}/workspaces`);
+          navigate(`/organizations/${organizationId}/workspaces`);
         } else {
           message.error("Workspace deletion failed");
         }

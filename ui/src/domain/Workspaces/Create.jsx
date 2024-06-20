@@ -28,7 +28,7 @@ import {
 } from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { SiGit } from "react-icons/si";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -119,7 +119,7 @@ export const CreateWorkspace = () => {
       },
     },
   ];
-  const history = useHistory();
+  const navigate = useNavigate();
   useEffect(() => {
     setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
     setLoading(true);
@@ -153,7 +153,7 @@ export const CreateWorkspace = () => {
   };
 
   const handleVCSClick = (vcsType) => {
-    history.push(
+    navigate(
       `/organizations/${organizationId}/settings/vcs/new/${vcsType}`
     );
   };
@@ -336,7 +336,7 @@ export const CreateWorkspace = () => {
         console.log(response.status);
         if (response.status === 201) {
           console.log("/workspaces/" + response.data.data.id);
-          history.push("/workspaces/" + response.data.data.id);
+          navigate("/workspaces/" + response.data.data.id);
         }
       })
       .catch((error) => {
