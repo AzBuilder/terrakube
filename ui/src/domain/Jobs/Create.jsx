@@ -44,6 +44,7 @@ export const CreateJob = ({ changeJob }) => {
         setLoading(false);
       });
   };
+
   const onCreate = (values) => {
     const body = {
       data: {
@@ -129,7 +130,7 @@ export const CreateJob = ({ changeJob }) => {
               ) : (
                 <Select>
                   {templates.map((item) => (
-                    <Select.Option value={item.id}>
+                    <Select.Option key={item.id} value={item.id}>
                       <span
                         style={
                           item.attributes.name.includes("Destroy")

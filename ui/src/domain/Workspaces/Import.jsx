@@ -27,7 +27,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import parse from "html-react-parser";
 const { Content } = Layout;
 const { Step } = Steps;
@@ -165,7 +165,7 @@ export const ImportWorkspace = () => {
       },
     },
   ];
-  const history = useHistory();
+  const navigate = useNavigate();
   useEffect(() => {
     setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
     setLoading(true);
@@ -196,9 +196,7 @@ export const ImportWorkspace = () => {
   };
 
   const handleVCSClick = (vcsType) => {
-    history.push(
-      `/organizations/${organizationId}/settings/vcs/new/${vcsType}`
-    );
+    navigate(`/organizations/${organizationId}/settings/vcs/new/${vcsType}`);
   };
 
   const handleConnectDifferent = () => {
