@@ -1,5 +1,4 @@
 import React from 'react';
-import { MicrosoftLoginButton } from 'react-social-login-buttons';
 import './Login.css';
 import { Card ,Space} from "antd";
 import logo from './logo.jpg';
