@@ -852,10 +852,10 @@ public class RemoteTfeService {
         return runsData;
     }
 
-    RunsDataList getRunsQueue(String organizationId) {
+    RunsDataList getRunsQueue(String organizationName) {
         RunsDataList runsDataList = new RunsDataList();
         runsDataList.setData(new ArrayList());
-        Organization organization = organizationRepository.findById(UUID.fromString(organizationId)).get();
+        Organization organization = organizationRepository.getOrganizationByName(organizationName);
         List<Job> jobList = jobRepository.findAllByOrganizationAndStatusNotInOrderByIdAsc(
                 organization,
                 Arrays.asList(

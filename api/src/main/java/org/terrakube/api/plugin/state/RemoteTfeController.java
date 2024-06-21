@@ -194,9 +194,9 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @GetMapping(produces = "application/vnd.api+json", path = "/organization/{organizationId}/runs/queue")
-    public ResponseEntity<RunsDataList> getRunQueue(@PathVariable("organizationId") String organizationId) {
-        return ResponseEntity.ok(remoteTfeService.getRunsQueue(organizationId));
+    @GetMapping(produces = "application/vnd.api+json", path = "/organizations/{organizationName}/runs/queue")
+    public ResponseEntity<RunsDataList> getRunQueue(@PathVariable("organizationName") String organizationName) {
+        return ResponseEntity.ok(remoteTfeService.getRunsQueue(organizationName));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "/runs/{runsId}/run-events")
