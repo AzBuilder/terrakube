@@ -778,7 +778,18 @@ public class RemoteTfeService {
                 planStatus = "finished";
                 break;
             case pending:
-                planStatus = "pending";
+                //check if any step is in status pending else we need to return running
+                Optional<Step> optionalStep = stepRepository.findFirstByJobIdOOrderByStepNumber(job.getId());
+                if (optionalStep.isPresent()) {
+                    Step step = optionalStep.get();
+                    if (step.getLogStatus().equals(JobStatus.pending)){
+                        planStatus = "pending";
+                    } else  {
+                        planStatus = "running";
+                    }
+                } else {
+                    planStatus = "pending";
+                }
                 break;
             case running:
             case queue:
