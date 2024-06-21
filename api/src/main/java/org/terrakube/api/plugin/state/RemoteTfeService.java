@@ -779,7 +779,7 @@ public class RemoteTfeService {
                 break;
             case pending:
                 //check if any step is in status pending else we need to return running
-                Optional<Step> optionalStep = stepRepository.findFirstByJobIdOOrderByStepNumber(job.getId());
+                Optional<Step> optionalStep = stepRepository.findFirstByJobIdrderByStepNumber(job.getId());
                 if (optionalStep.isPresent()) {
                     Step step = optionalStep.get();
                     if (step.getLogStatus().equals(JobStatus.pending)){

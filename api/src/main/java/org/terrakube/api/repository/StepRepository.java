@@ -11,5 +11,5 @@ public interface StepRepository extends JpaRepository<Step, UUID> {
 
     List<Step> findByJobId(int jobId);
 
-    Optional<Step> findFirstByJobIdOOrderByStepNumber(int jobId);
+    Optional<Step> findFirstByJobIdrderByStepNumber(int jobId);
 }
