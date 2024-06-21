@@ -779,6 +779,7 @@ public class RemoteTfeService {
                 break;
             case pending:
                 //check if any step is in status pending else we need to return running
+                //check if workspace is not lock return running too
                 Optional<Step> optionalStep = stepRepository.findFirstByJobIdOrderByStepNumber(job.getId());
                 if (optionalStep.isPresent()) {
                     Step step = optionalStep.get();
@@ -849,6 +850,33 @@ public class RemoteTfeService {
 
         log.info("{}", runsData.toString());
         return runsData;
+    }
+
+    RunsDataList getRunsQueue(String organizationId) {
+        RunsDataList runsDataList = new RunsDataList();
+        runsDataList.setData(new ArrayList());
+        Organization organization = organizationRepository.findById(UUID.fromString(organizationId)).get();
+        List<Job> jobList = jobRepository.findAllByOrganizationAndStatusNotInOrderByIdAsc(
+                organization,
+                Arrays.asList(
+                        JobStatus.failed,
+                        JobStatus.completed,
+                        JobStatus.rejected,
+                        JobStatus.cancelled,
+                        JobStatus.approved)
+        );
+        int runQueue = 0;
+        for (Job job : jobList) {
+            log.info("Run Queue {} job {}", runQueue, job.getId());
+            RunsData runsData = getRun(job.getId(), null);
+            RunsModel runsModel = runsData.getData();
+            runsModel.getAttributes().put("position-in-queue", runQueue);
+            runsDataList.getData().add(runsModel);
+            runQueue = runQueue + 1;
+        }
+        runsDataList.setCurrentPage(1);
+        runsDataList.setTotalPages(1);
+        return runsDataList;
     }
 
     RunsData runApply(int runId) {

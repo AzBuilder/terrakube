@@ -18,6 +18,7 @@ import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
+import org.terrakube.api.plugin.state.model.runs.RunsDataList;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
@@ -190,6 +191,12 @@ public class RemoteTfeController {
     public ResponseEntity<RunsData> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
         log.info("Create new run");
         return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
+    }
+
+    @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "/organization/{organizationId}/runs/queue")
+    public ResponseEntity<RunsDataList> getRunQueue(@PathVariable("organizationId") String organizationId) {
+        return ResponseEntity.ok(remoteTfeService.getRunsQueue(organizationId));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "/runs/{runsId}/run-events")
