@@ -31,6 +31,7 @@ import static com.diogonunes.jcolor.Attribute.*;
 public class BashEngine implements CommandExecution {
     private static final String USER_BASH_SCRIPT = "/userScript.sh";
     private static final String TERRAFORM_DIRECTORY="/.terraform-spring-boot/terraform/";
+    private static final String TOFU_DIRECTORY="/.terraform-spring-boot/tofu/";
 
     private final ExecutorService executor = Executors.newWorkStealingPool();
 
@@ -108,7 +109,8 @@ public class BashEngine implements CommandExecution {
         String bashToolsCompletePath = String.join(
                 ":",
                 loadingBashTools(workingDirectory),
-                FileUtils.getUserDirectoryPath() + TERRAFORM_DIRECTORY + terraformJob.getTerraformVersion()
+                FileUtils.getUserDirectoryPath() + TERRAFORM_DIRECTORY + terraformJob.getTerraformVersion(),
+                FileUtils.getUserDirectoryPath() + TOFU_DIRECTORY + terraformJob.getTerraformVersion()
         );
 
         log.info("Job Complete Path {}", bashToolsCompletePath);
