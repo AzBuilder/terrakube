@@ -82,8 +82,16 @@ public class WebhookService {
 
                     // if the webhook is a valid request we can create a new job
                     if(webhookResult.isValid()){
-                        // only execute the job if the branch is the same
-                        if(webhookResult.getBranch().equals(workspace.getBranch()) && checkFileChanges(webhookResult.getFileChanges(), workspace.getFolder()))
+                        // Verify the branch matches a comma separated list
+                        boolean found = false;
+                        String[] branchList = workspace.getBranch().split(",");
+                        String webhookBranch = webhookResult.getBranch();
+                        for (String branch: branchList){
+                            if (webhookBranch.matches(branch)) {
+                                found = true;
+                            }
+                        }
+                        if(found && checkFileChanges(webhookResult.getFileChanges(), workspace.getFolder()))
                         {
                            ObjectMapper objectMapper = new ObjectMapper();
                             try {
