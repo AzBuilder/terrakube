@@ -783,7 +783,7 @@ public class RemoteTfeService {
                 Optional<Step> optionalStep = stepRepository.findFirstByJobIdOrderByStepNumber(job.getId());
                 if (optionalStep.isPresent()) {
                     Step step = optionalStep.get();
-                    if (step.getLogStatus().equals(JobStatus.pending)){
+                    if (step.getStatus().equals(JobStatus.pending)){
                         planStatus = "pending";
                     } else  {
                         planStatus = "running";
