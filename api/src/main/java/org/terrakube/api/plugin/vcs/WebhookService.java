@@ -109,6 +109,7 @@ public class WebhookService {
                                 job.setRefresh(true);
                                 job.setPlanChanges(true);
                                 job.setRefreshOnly(false);
+                                job.setOverrideBranch(webhookBranch);
                                 job.setOrganization(workspace.getOrganization());
                                 job.setWorkspace(workspace);
                                 job.setTemplateReference(templateId);
