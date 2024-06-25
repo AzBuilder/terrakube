@@ -47,7 +47,7 @@ jobs:
         if [ "${{ matrix.os }}" == "alpaquita" ]; then
           mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
         elif [ "${{ matrix.os }}" == "jammy-arm" ]; then
-          DOCKER_CLI_PLATFORM=linux/arm64 mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=dashaun/builder:base
+          DOCKER_CLI_PLATFORM=linux/arm64 mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=dashaun/builder-arm:20240403
         else
           mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true
         fi
