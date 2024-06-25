@@ -11,7 +11,7 @@ jobs:
         os: [jammy, jammy-arm, alpaquita]
     env:
       VERSION: ${{ github.event.release.tag_name }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os == 'jammy-arm' && 'self-hosted' || 'ubuntu-latest' }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -20,14 +20,6 @@ jobs:
         java-version: '17'
         distribution: 'liberica'
 
-    - name: Set up QEMU
-      if: matrix.os == 'jammy-arm'
-      uses: docker/setup-qemu-action@v3
-
-    - name: Set up Docker Buildx
-      if: matrix.os == 'jammy-arm'
-      uses: docker/setup-buildx-action@v3
-
     - name: docker login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -35,9 +27,13 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-    - name: Set environment label
+    - name: Set environment label for Alpaquita
       if: matrix.os == 'alpaquita'
       run: echo "VERSION=${{ env.VERSION }}-alpaquita" >> $GITHUB_ENV
+
+    - name: Set environment label for Jammy-ARM
+      if: matrix.os == 'jammy-arm'
+      run: echo "VERSION=${{ env.VERSION }}-arm" >> $GITHUB_ENV
 
     - name: Update POM Version
       run: mvn versions:set-property -Dproperty=revision -DnewVersion=${{ env.VERSION }} -DgenerateBackupPoms=false
@@ -47,7 +43,7 @@ jobs:
         if [ "${{ matrix.os }}" == "alpaquita" ]; then
           mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
         elif [ "${{ matrix.os }}" == "jammy-arm" ]; then
-          DOCKER_CLI_PLATFORM=linux/arm64 mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=dashaun/builder-arm:20240403
+          mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=dashaun/builder-arm:20240403
         else
           mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true
         fi
@@ -79,15 +75,8 @@ jobs:
         docker push azbuilder/open-registry:${{ env.VERSION }}
         docker push azbuilder/open-registry:latest
 
-    - name: Build and Push UI Images for AMD64
-      if: matrix.os == 'jammy'
+    - name: Build and Push UI Images
+      if: matrix.os == 'jammy' || matrix.os == 'jammy-arm'
       working-directory: ./ui
       run: |
         docker build --build-arg REACT_APP_TERRAKUBE_VERSION=v${{ env.VERSION }} -t azbuilder/terrakube-ui:latest -t azbuilder/terrakube-ui:${{ env.VERSION }} --push .
-
-    - name: Build and Push UI Images for ARM using QEMU
-      if: matrix.os == 'jammy-arm'
-      working-directory: ./ui
-      run: |
-        docker buildx create --use
-        docker buildx build --platform linux/arm64 --build-arg REACT_APP_TERRAKUBE_VERSION=v${{ env.VERSION }} -t azbuilder/terrakube-ui:latest -t azbuilder/terrakube-ui:${{ env.VERSION }} --push .
