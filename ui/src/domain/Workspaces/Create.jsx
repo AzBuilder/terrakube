@@ -358,6 +358,13 @@ export const CreateWorkspace = () => {
               </span>
             );
           }
+          else {
+            message.error(
+              <span>
+                An error occurred while submitting the workspace. Please contact your system administrator.
+              </span>
+            )
+          }
         }
       });
   };
