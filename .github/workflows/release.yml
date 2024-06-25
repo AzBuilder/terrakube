@@ -5,10 +5,13 @@ on:
     types: [created]
 
 jobs:
-  build-jammy:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [jammy, jammy-arm, alpaquita]
     env:
-       VERSION: ${{ github.event.release.tag_name }}
+      VERSION: ${{ github.event.release.tag_name }}
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -16,34 +19,15 @@ jobs:
       with:
         java-version: '17'
         distribution: 'liberica'
-    - name: Update POM Version
-      run: mvn versions:set-property -Dproperty=revision -DnewVersion=$VERSION -DgenerateBackupPoms=false
-    - name: Build Image with Maven
-      run: mvn -pl "api,registry,executor" spring-boot:build-image -B  --file pom.xml -Dmaven.test.skip=true
-      env:
-        USER_NAME: ${{ secrets.USER_NAME }}
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        
-    - name: Use Node.js 
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
-        cache-dependency-path: ui/package.json
-    
-    - run: yarn install --frozen-lockfile
-      working-directory: ./ui
-      
-    - run: npm run build --if-present
-      working-directory: ./ui
-      env:
-         CI: false
-    
-    - name: docker build ui
-      working-directory: ./ui
-      run: |
-        docker build --build-arg REACT_APP_TERRAKUBE_VERSION=v$VERSION -t terrakube-ui:latest  . 
-        
+
+    - name: Set up QEMU
+      if: matrix.os == 'jammy-arm'
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      if: matrix.os == 'jammy-arm'
+      uses: docker/setup-buildx-action@v3
+
     - name: docker login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -51,101 +35,59 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-    - name: Add Git to Executor
-      run: docker run --user="root" --entrypoint launcher $(docker images executor -q) "apt-get update && apt-get install git jq curl -y"
+    - name: Set environment label
+      if: matrix.os == 'alpaquita'
+      run: echo "VERSION=${{ env.VERSION }}-alpaquita" >> $GITHUB_ENV
 
-    - name: Restore default user and entrypoint
-      run: docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER cnb' $(docker ps -lq) executortemp
-    
-    - name: Docker tag API Image 
-      run: docker tag $(docker images api-server -q) azbuilder/api-server:$VERSION
-      
-    - name: Docker tag API Image latest
-      run: docker tag $(docker images api-server -q) azbuilder/api-server:latest
-    
-    - name: Docker Push API latest
-      run: docker push azbuilder/api-server:$VERSION
-      
-    - name: Docker Push API latest
-      run: docker push azbuilder/api-server:latest
+    - name: Update POM Version
+      run: mvn versions:set-property -Dproperty=revision -DnewVersion=${{ env.VERSION }} -DgenerateBackupPoms=false
 
-    - name: Docker tag Registry Image
-      run: docker tag $(docker images open-registry -q) azbuilder/open-registry:$VERSION
+    - name: Build Image with Maven
+      run: |
+        if [ "${{ matrix.os }}" == "alpaquita" ]; then
+          mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
+        elif [ "${{ matrix.os }}" == "jammy-arm" ]; then
+          DOCKER_CLI_PLATFORM=linux/arm64 mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=dashaun/builder:base
+        else
+          mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true
+        fi
+      env:
+        USER_NAME: ${{ secrets.USER_NAME }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
-    - name: Docker tag Registry Image latest
-      run: docker tag $(docker images open-registry -q) azbuilder/open-registry:latest
+    - name: Tag and Push Executor Images
+      run: |
+        IMAGE_ID=$(docker images executor -q)
+        docker tag $IMAGE_ID azbuilder/executor:${{ env.VERSION }}
+        docker tag $IMAGE_ID azbuilder/executor:latest
+        docker push azbuilder/executor:${{ env.VERSION }}
+        docker push azbuilder/executor:latest
 
-    - name: Docker Push Registry
-      run: docker push azbuilder/open-registry:$VERSION
+    - name: Tag and Push API Images
+      run: |
+        IMAGE_ID=$(docker images api-server -q)
+        docker tag $IMAGE_ID azbuilder/api-server:${{ env.VERSION }}
+        docker tag $IMAGE_ID azbuilder/api-server:latest
+        docker push azbuilder/api-server:${{ env.VERSION }}
+        docker push azbuilder/api-server:latest
 
-    - name: Docker Push Registry latest
-      run: docker push azbuilder/open-registry:latest
+    - name: Tag and Push Registry Images
+      run: |
+        IMAGE_ID=$(docker images open-registry -q)
+        docker tag $IMAGE_ID azbuilder/open-registry:${{ env.VERSION }}
+        docker tag $IMAGE_ID azbuilder/open-registry:latest
+        docker push azbuilder/open-registry:${{ env.VERSION }}
+        docker push azbuilder/open-registry:latest
 
-    - name: Docker tag EXECUTOR Image
-      run: docker tag $(docker images executortemp -q) azbuilder/executor:$VERSION
+    - name: Build and Push UI Images for AMD64
+      if: matrix.os == 'jammy'
+      working-directory: ./ui
+      run: |
+        docker build --build-arg REACT_APP_TERRAKUBE_VERSION=v${{ env.VERSION }} -t azbuilder/terrakube-ui:latest -t azbuilder/terrakube-ui:${{ env.VERSION }} --push .
 
-    - name: Docker tag EXECUTOR Image latest
-      run: docker tag $(docker images executortemp -q) azbuilder/executor:latest
-
-    - name: Docker Push EXECUTOR latest
-      run: docker push azbuilder/executor:$VERSION
-
-    - name: Docker Push EXECUTOR latest
-      run: docker push azbuilder/executor:latest
-      
-    - name: Docker tag UI Image 
-      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:$VERSION
-
-    - name: Docker tag UI Image latest
-      run: docker tag $(docker images terrakube-ui -q) azbuilder/terrakube-ui:latest
-
-    - name: Docker Push UI Version
-      run: docker push azbuilder/terrakube-ui:$VERSION
-
-    - name: Docker Push UI Latest
-      run: docker push azbuilder/terrakube-ui:latest
-
-  build-alpaquita:
-    runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ github.event.release.tag_name }}-alpaquita
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'liberica'
-      - name: Update POM Version
-        run: mvn versions:set-property -Dproperty=revision -DnewVersion=$VERSION -DgenerateBackupPoms=false
-      - name: Build Image with Maven
-        run: mvn -pl "api,registry, executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
-        env:
-          USER_NAME: ${{ secrets.USER_NAME }}
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-
-      - name: docker login
-        env:
-          DOCKER_USER: ${{secrets.DOCKER_USER}}
-          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-        run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-
-      - name: Docker tag API Alpaquita
-        run: docker tag $(docker images api-server -q) azbuilder/api-server:$VERSION
-
-      - name: Docker Push API Alpaquita
-        run: docker push azbuilder/api-server:$VERSION
-
-      - name: Docker tag Registry Alpaquita
-        run: docker tag $(docker images open-registry -q) azbuilder/open-registry:$VERSION
-
-      - name: Docker Push Registry Alpaquita
-        run: docker push azbuilder/open-registry:$VERSION
-
-      - name: Docker tag EXECUTOR Alpaquita
-        run: docker tag $(docker images executor -q) azbuilder/executor:$VERSION
-
-      - name: Docker Push EXECUTOR Alpaquita
-        run: docker push azbuilder/executor:$VERSION
-
+    - name: Build and Push UI Images for ARM using QEMU
+      if: matrix.os == 'jammy-arm'
+      working-directory: ./ui
+      run: |
+        docker buildx create --use
+        docker buildx build --platform linux/arm64 --build-arg REACT_APP_TERRAKUBE_VERSION=v${{ env.VERSION }} -t azbuilder/terrakube-ui:latest -t azbuilder/terrakube-ui:${{ env.VERSION }} --push .
