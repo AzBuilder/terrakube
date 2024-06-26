@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface JobRepository extends JpaRepository<Job, Integer> {
 
     List<Job> findAllByOrganizationAndStatusNotInOrderByIdAsc(Organization organization, List<JobStatus> status);
+
+    Optional<List<Job>> findAllByWorkspaceAndStatusNotInOrderByIdAsc(Workspace workspace, List<JobStatus> status);
     Optional<List<Job>> findByWorkspaceAndStatusNotInAndIdLessThan(Workspace workspace, List<JobStatus> jobStatuses, int jobId);
 
     Optional<Job> findFirstByWorkspaceAndAndStatusInOrderByIdAsc(Workspace workspace, List<JobStatus> jobStatuses);

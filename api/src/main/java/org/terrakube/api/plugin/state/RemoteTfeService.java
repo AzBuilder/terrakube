@@ -806,6 +806,7 @@ public class RemoteTfeService {
         runsModel.getAttributes().put("resource-additions", 1);
         runsModel.getAttributes().put("resource-changes", 1);
         runsModel.getAttributes().put("resource-destructions", 0);
+        runsModel.getAttributes().put("position-in-queue", calculateRunPositionInQueue(job));
 
         HashMap<String, Object> actions = new HashMap<>();
         actions.put("is-confirmable", true);
@@ -850,6 +851,28 @@ public class RemoteTfeService {
 
         log.info("{}", runsData.toString());
         return runsData;
+    }
+
+    int calculateRunPositionInQueue(Job job){
+        Optional<List<Job>> jobList = jobRepository.findAllByWorkspaceAndStatusNotInOrderByIdAsc(
+                job.getWorkspace(),
+                Arrays.asList(
+                        JobStatus.failed,
+                        JobStatus.completed,
+                        JobStatus.rejected,
+                        JobStatus.cancelled,
+                        JobStatus.approved)
+        );
+        int positionQueueInQueue = 0;
+        if(jobList.isPresent()){
+            for(Job jobInQueue : jobList.get()){
+                if(jobInQueue.getId() == job.getId()){
+                    break;
+                }
+                positionQueueInQueue += 1;
+            }
+        }
+        return positionQueueInQueue;
     }
 
     RunsDataList getRunsQueue(String organizationName) {
