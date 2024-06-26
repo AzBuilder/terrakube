@@ -3,12 +3,8 @@ name: Build Terrakube UI
 on:
   push:
     branches: [ main ]
-    paths: 
-      - 'ui/**'
   pull_request:
     branches: [ opened, synchronize, reopened ]
-    paths: 
-      - 'ui/**'
 
 jobs:
   buildui:
@@ -20,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
 
     steps:
     - uses: actions/checkout@v4

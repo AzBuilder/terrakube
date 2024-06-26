@@ -280,7 +280,7 @@ export const ImportWorkspace = () => {
       const response = await axiosInstance.post(
         `${
           new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-        }/importer/tfcloud/workspaces/`,
+        }/importer/tfcloud/workspaces`,
         {
           organizationId: organizationId,
           vcsId: vcsId,

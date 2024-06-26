@@ -16,30 +16,30 @@
     <properties>
         <java.version>17</java.version>
         <elide.version>7.0.5</elide.version>
-        <liquibase-core.version>4.26.0</liquibase-core.version>
-        <azure.version>5.7.0</azure.version>
+        <liquibase-core.version>4.28.0</liquibase-core.version>
+        <azure.version>5.12.0</azure.version>
         <mssql-jdbc.version>11.2.3.jre17</mssql-jdbc.version>
-        <msal4j.version>1.11.2</msal4j.version>
-        <lombok.version>1.18.28</lombok.version>
-        <jgit.version>6.6.1.202309021850-r</jgit.version>
-        <rest-assured.version>4.5.1</rest-assured.version>
+        <msal4j.version>1.15.1</msal4j.version>
+        <lombok.version>1.18.32</lombok.version>
+        <jgit.version>6.10.0.202406032230-r</jgit.version>
+        <rest-assured.version>5.4.0</rest-assured.version>
         <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
         <!--groovy.version>4.0.20</groovy.version-->
-        <postgresql.version>42.7.2</postgresql.version>
-        <mysql.version>8.0.28</mysql.version>
-        <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
+        <postgresql.version>42.7.3</postgresql.version>
+        <mysql.version>8.0.30</mysql.version>
+        <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <quartz.version>2.5.0-rc1</quartz.version>
-        <aws-sdk.version>1.12.261</aws-sdk.version>
+        <aws-sdk.version>1.12.744</aws-sdk.version>
         <gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
-        <jedis.version>4.4.7</jedis.version>
+        <jedis.version>4.4.8</jedis.version>
         <commons-text.version>1.11.0</commons-text.version>
         <commons-lang3.version>3.13.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <maven-artifact.version>3.8.8</maven-artifact.version>
-        <commons-io.version>2.15.1</commons-io.version>
+        <commons-io.version>2.16.1</commons-io.version>
         <!--BUILDPACK DATA-->
         <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.292</buildpack.builder>
         <buildpack.java>gcr.io/paketo-buildpacks/java:13.0.1</buildpack.java>
@@ -50,7 +50,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.1.10</version>
                 <configuration>
                 <image>
                     <builder>${buildpack.builder}</builder>

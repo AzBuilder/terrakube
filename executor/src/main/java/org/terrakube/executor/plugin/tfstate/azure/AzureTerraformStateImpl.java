@@ -159,7 +159,7 @@ public class AzureTerraformStateImpl implements TerraformState {
                         log.info("Downloading state from {}:", stateUrl);
 
                         URL blobURL = new URL(stateUrl);
-                        String blobName = blobURL.getPath().replace("/tfstate/", "");
+                        String blobName = blobURL.getPath().replace("/tfstate/", "").replace("%2F","/");
 
                         log.info("BlobName: {}", blobName);
 

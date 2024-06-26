@@ -15,24 +15,24 @@
 	<description>Terrakube Spring Boot Executor</description>
 	<properties>
 		<java.version>17</java.version>
-		<commons-text.version>1.10.0</commons-text.version>
+		<commons-text.version>1.12.0</commons-text.version>
 		<terraform-spring-boot-starter.version>0.15.0</terraform-spring-boot-starter.version>
 		<terrakube-client-starter.version>0.15.1</terrakube-client-starter.version>
-		<commons-io.version>2.8.0</commons-io.version>
-		<commons-codec>1.15</commons-codec>
+		<commons-io.version>2.16.1</commons-io.version>
+		<commons-codec>1.17.0</commons-codec>
 		<okhttp.version>4.12.0</okhttp.version>
-		<azure-storage-blob.version>12.25.1</azure-storage-blob.version>
-		<jgit.version>6.6.1.202309021850-r</jgit.version>
-		<lombok.version>1.18.26</lombok.version>
-		<groovy.version>4.0.20</groovy.version>
+		<azure-storage-blob.version>12.26.1</azure-storage-blob.version>
+		<jgit.version>6.10.0.202406032230-r</jgit.version>
+		<lombok.version>1.18.32</lombok.version>
+		<groovy.version>4.0.21</groovy.version>
 		<ivy.version>2.5.2</ivy.version>
-		<jcolor.version>5.2.0</jcolor.version>
-		<aws-sdk.version>1.12.261</aws-sdk.version>
+		<jcolor.version>5.5.1</jcolor.version>
+		<aws-sdk.version>1.12.744</aws-sdk.version>
 		<google-storage.version>1.17.0</google-storage.version>
-		<slf4j.version>1.7.36</slf4j.version>
-		<gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
-		<commons-compress.version>1.26.0</commons-compress.version>
-		<jedis.version>4.4.7</jedis.version>
+		<slf4j.version>2.0.13</slf4j.version>
+		<gcp-libraries-bom.version>26.40.0</gcp-libraries-bom.version>
+		<commons-compress.version>1.26.2</commons-compress.version>
+		<jedis.version>4.4.8</jedis.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
 		</sonar.coverage.jacoco.xmlReportPaths>
 		<!--BUILDPACK DATA-->
