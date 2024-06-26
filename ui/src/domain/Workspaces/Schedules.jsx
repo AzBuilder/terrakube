@@ -11,6 +11,7 @@ import {
   Popconfirm,
 } from "antd";
 import { Cron } from "react-js-cron";
+import "react-js-cron/dist/styles.css"
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,

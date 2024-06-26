@@ -22,12 +22,12 @@
 		<commons-codec>1.17.0</commons-codec>
 		<okhttp.version>4.12.0</okhttp.version>
 		<azure-storage-blob.version>12.26.1</azure-storage-blob.version>
-		<jgit.version>6.9.0.202403050737-r</jgit.version>
+		<jgit.version>6.10.0.202406032230-r</jgit.version>
 		<lombok.version>1.18.32</lombok.version>
 		<groovy.version>4.0.21</groovy.version>
 		<ivy.version>2.5.2</ivy.version>
 		<jcolor.version>5.5.1</jcolor.version>
-		<aws-sdk.version>1.12.734</aws-sdk.version>
+		<aws-sdk.version>1.12.744</aws-sdk.version>
 		<google-storage.version>1.17.0</google-storage.version>
 		<slf4j.version>2.0.13</slf4j.version>
 		<gcp-libraries-bom.version>26.40.0</gcp-libraries-bom.version>

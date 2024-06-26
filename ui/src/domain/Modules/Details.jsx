@@ -38,7 +38,7 @@ import { BiBookBookmark } from "react-icons/bi";
 import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from "react-icons/md";
-import ReactMarkdown from "react-markdown";
+import Markdown from "react-markdown";
 import { compareVersions } from "../Workspaces/Workspaces";
 import { unzip } from "unzipit";
 import "./Module.css";
@@ -471,9 +471,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         label: "Readme",
                         key: "1",
                         children: (
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          <Markdown remarkPlugins={[remarkGfm]}>
                             {markdown}
-                          </ReactMarkdown>
+                          </Markdown>
                         ),
                         className: "markdown-body",
                       },
