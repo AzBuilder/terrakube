@@ -872,6 +872,7 @@ public class RemoteTfeService {
                 positionQueueInQueue += 1;
             }
         }
+        log.info("Position in queue {} for workspace {}", positionQueueInQueue, job.getWorkspace().getName());
         return positionQueueInQueue;
     }
 
