@@ -46,7 +46,7 @@ public class Workspace extends GenericAuditFields {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name", unique = true)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "description")
