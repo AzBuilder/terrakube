@@ -187,10 +187,17 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @PostMapping(produces = "application/vnd.api+json", path = "/runs")
+    @PostMapping(produces = "application/vnd.api+json", path = "/configuration-versions/{configurationid}/runs")
     public ResponseEntity<RunsData> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
         log.info("Create new run");
         return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
+    }
+
+    @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/runs")
+    public ResponseEntity<RunsDataList> getWorkspaceRuns(@PathVariable("workspaceId") String workspaceId) {
+        log.info("Get workspace runs for {}", workspaceId);
+        return ResponseEntity.ok(remoteTfeService.getWorkspaceRuns(workspaceId));
     }
 
     @Transactional

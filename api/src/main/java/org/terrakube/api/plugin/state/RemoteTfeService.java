@@ -60,7 +60,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class RemoteTfeService {
 
-    private static final String GENERIC_STATE_PATH = "%s/tfstate/v1/organization/%s/workspace/%s/jobId/%s/step/%s/terraform.tfstate";
     private JobRepository jobRepository;
     private ContentRepository contentRepository;
     private OrganizationRepository organizationRepository;
@@ -898,6 +897,39 @@ public class RemoteTfeService {
             runsDataList.getData().add(runsModel);
             runQueue = runQueue + 1;
         }
+        runsDataList.setCurrentPage(1);
+        runsDataList.setTotalPages(1);
+        return runsDataList;
+    }
+
+    RunsDataList getWorkspaceRuns(String workspaceId) {
+        RunsDataList runsDataList = new RunsDataList();
+        runsDataList.setData(new ArrayList());
+        Optional<Workspace> workspaceList = workspaceRepository.findById(UUID.fromString(workspaceId));
+        if(workspaceList.isPresent()){
+            Workspace workspace = workspaceList.get();
+            Optional<List<Job>> jobList = jobRepository.findAllByWorkspaceAndStatusNotInOrderByIdAsc(
+                    workspace,
+                    Arrays.asList(
+                            JobStatus.failed,
+                            JobStatus.completed,
+                            JobStatus.rejected,
+                            JobStatus.cancelled,
+                            JobStatus.approved));
+
+            int runWorkspace = 0;
+            if(jobList.isPresent()){
+                for(Job job : jobList.get()){
+                    log.info("Run Workspace {} job {}", runWorkspace, job.getId());
+                    RunsData runsData = getRun(job.getId(), null);
+                    RunsModel runsModel = runsData.getData();
+                    runsModel.getAttributes().put("position-in-queue", runWorkspace);
+                    runsDataList.getData().add(runsModel);
+                    runWorkspace = runWorkspace + 1;
+                }
+            }
+        }
+
         runsDataList.setCurrentPage(1);
         runsDataList.setTotalPages(1);
         return runsDataList;
