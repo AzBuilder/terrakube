@@ -187,7 +187,7 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @PostMapping(produces = "application/vnd.api+json", path = "/configuration-versions/{configurationid}/runs")
+    @PostMapping(produces = "application/vnd.api+json", path = "/runs")
     public ResponseEntity<RunsData> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
         log.info("Create new run");
         return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
