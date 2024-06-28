@@ -20,6 +20,9 @@ import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.generic.Resource;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityAttributes;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityData;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityModel;
 import org.terrakube.api.plugin.state.model.outputs.OutputData;
 import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
@@ -173,6 +176,34 @@ public class RemoteTfeService {
 
             log.info(entitlementData.toString());
             return entitlementData;
+        } else {
+            return null;
+        }
+
+    }
+
+    OrgCapacityData getOrgCapacity(String organizationName, JwtAuthenticationToken currentUser) {
+        Organization organization = organizationRepository.getOrganizationByName(organizationName);
+
+        if (organization != null && validateUserIsMemberOrg(organization, currentUser)) {
+            OrgCapacityData orgCapacityData = new OrgCapacityData();
+            orgCapacityData.setData(new OrgCapacityModel());
+            orgCapacityData.getData().setAttributes(new OrgCapacityAttributes());
+            orgCapacityData.getData().getAttributes().setPending(0);
+
+            List<Job> jobList = jobRepository.findAllByOrganizationAndStatusNotInOrderByIdAsc(
+                    organization,
+                    Arrays.asList(
+                            JobStatus.failed,
+                            JobStatus.completed,
+                            JobStatus.rejected,
+                            JobStatus.cancelled,
+                            JobStatus.approved)
+            );
+
+            orgCapacityData.getData().getAttributes().setRunning(jobList.size());
+            log.info("orgCapacityData: {}", orgCapacityData);
+            return orgCapacityData;
         } else {
             return null;
         }

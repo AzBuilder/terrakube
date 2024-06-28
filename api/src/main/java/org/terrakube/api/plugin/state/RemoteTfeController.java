@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityData;
 import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
@@ -47,6 +48,12 @@ public class RemoteTfeController {
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/entitlement-set")
     public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName, Principal principal) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName, ((JwtAuthenticationToken) principal))));
+    }
+
+    @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/capacity")
+    public ResponseEntity<OrgCapacityData> getOrgCapacity(@PathVariable("organizationName") String organizationName, Principal principal) {
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgCapacity(organizationName, ((JwtAuthenticationToken) principal))));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "ping")
