@@ -200,7 +200,7 @@ public class RemoteTfeService {
                             JobStatus.cancelled,
                             JobStatus.approved)
             );
-
+            orgCapacityData.getData().setType("organization-capacity");
             orgCapacityData.getData().getAttributes().setRunning(jobList.size());
             log.info("orgCapacityData: {}", orgCapacityData);
             return orgCapacityData;
