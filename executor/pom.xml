@@ -24,7 +24,7 @@
 		<azure-storage-blob.version>12.26.1</azure-storage-blob.version>
 		<jgit.version>6.10.0.202406032230-r</jgit.version>
 		<lombok.version>1.18.34</lombok.version>
-		<groovy.version>4.0.21</groovy.version>
+		<groovy.version>4.0.22</groovy.version>
 		<ivy.version>2.5.2</ivy.version>
 		<jcolor.version>5.5.1</jcolor.version>
 		<aws-sdk.version>1.12.753</aws-sdk.version>
