@@ -28,7 +28,7 @@
         <postgresql.version>42.7.3</postgresql.version>
         <mysql.version>8.0.30</mysql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
-        <snakeyaml.version>2.0</snakeyaml.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <quartz.version>2.5.0-rc1</quartz.version>
         <aws-sdk.version>1.12.748</aws-sdk.version>
         <gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
