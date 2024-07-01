@@ -104,7 +104,7 @@ public class ScheduleJobService {
                 .startNow()
                 .build();
 
-        log.info("Running Job Context Now: {}", job.getId());
+        log.info("Running Job Context Now: {}, Identity: {}", job.getId(), PREFIX_JOB_CONTEXT + job.getId() + "_" + random);
         scheduler.scheduleJob(jobDetail, trigger);
     }
 

@@ -977,6 +977,11 @@ public class RemoteTfeService {
                     stepRepository.save(step);
                     job.setStatus(JobStatus.pending);
                     jobRepository.save(job);
+                    try {
+                        scheduleJobService.createJobContextNow(job);
+                    } catch (SchedulerException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 }
             }
