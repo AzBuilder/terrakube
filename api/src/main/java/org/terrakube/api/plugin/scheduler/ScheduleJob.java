@@ -73,7 +73,7 @@ public class ScheduleJob implements org.quartz.Job {
                 redisTemplate.delete(String.valueOf(job.getId()));
                 log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                 updateJobStepsWithStatus(job.getId(), JobStatus.failed);
-                jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+                removeJobContext(job, jobExecutionContext);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
@@ -102,12 +102,12 @@ public class ScheduleJob implements org.quartz.Job {
                     if(job.isPlanChanges()) {
                         redisTemplate.delete(String.valueOf(job.getId()));
                         executePendingJob(job, jobExecutionContext);
+                        removeJobContext(job, jobExecutionContext);
                     } else {
                         log.warn("Job {} completed with no changes...", jobId);
                         completeJob(job);
                         redisTemplate.delete(String.valueOf(job.getId()));
                         updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
-                        removeJobContext(job, jobExecutionContext);
                     }
                     break;
                 case approved:
@@ -124,13 +124,9 @@ public class ScheduleJob implements org.quartz.Job {
                 case failed:
                 case rejected:
                     redisTemplate.delete(String.valueOf(job.getId()));
-                    try {
-                        log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
-                        updateJobStepsWithStatus(job.getId(), JobStatus.failed);
-                        jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
-                    } catch (SchedulerException e) {
-                        log.error(e.getMessage());
-                    }
+                    log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
+                    updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                    removeJobContext(job, jobExecutionContext);
                     break;
                 default:
                     log.info("Job {} Status {}", job.getId(), job.getStatus());
@@ -266,8 +262,14 @@ public class ScheduleJob implements org.quartz.Job {
 
     private void removeJobContext(Job job, JobExecutionContext jobExecutionContext) {
         try {
-            log.info("Deleting Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
-            jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+            Boolean triggerByStatusChange = jobExecutionContext.getJobDetail().getJobDataMap().getBooleanFromString("isTriggerFromStatusChange");
+            if(!triggerByStatusChange.booleanValue()) {
+                log.info("Deleting Schedule Job Context {}, InstanceId {}", PREFIX_JOB_CONTEXT + job.getId(), jobExecutionContext.getFireInstanceId());
+                jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+            } else {
+                String jobIdentity = jobExecutionContext.getJobDetail().getJobDataMap().getString("identity");
+                jobExecutionContext.getScheduler().deleteJob(new JobKey(jobIdentity));
+            }
         } catch (SchedulerException e) {
             log.error(e.getMessage());
         }

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import java.text.ParseException;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Slf4j
@@ -77,6 +78,33 @@ public class ScheduleJobService {
 
         Workspace workspace = job.getWorkspace();
         workspaceRepository.save(workspace);
+        scheduler.scheduleJob(jobDetail, trigger);
+    }
+
+    public void createJobContextNow(Job job) throws SchedulerException {
+
+        String random = UUID.randomUUID().toString();
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put(ScheduleJob.JOB_ID, job.getId());
+        jobDataMap.put("isTriggerFromStatusChange", "true");
+        jobDataMap.put("identity", PREFIX_JOB_CONTEXT + job.getId() + "_" + random);
+
+        JobDetail jobDetail = JobBuilder.newJob().ofType(ScheduleJob.class)
+                .storeDurably()
+                .setJobData(jobDataMap)
+                .withIdentity(PREFIX_JOB_CONTEXT + job.getId() + "_" + random)
+                .withDescription(String.valueOf(job.getId()))
+                .build();
+
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .startNow()
+                .forJob(jobDetail)
+                .withIdentity(PREFIX_JOB_CONTEXT + job.getId() + "_" + random)
+                .withDescription(String.valueOf(job.getId()))
+                .startNow()
+                .build();
+
+        log.info("Running Job Context Now: {}", job.getId());
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
