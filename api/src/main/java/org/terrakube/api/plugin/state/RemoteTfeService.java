@@ -20,6 +20,9 @@ import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.generic.Resource;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityAttributes;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityData;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityModel;
 import org.terrakube.api.plugin.state.model.outputs.OutputData;
 import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
@@ -28,6 +31,7 @@ import org.terrakube.api.plugin.state.model.runs.*;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.terraform.TerraformState;
+import org.terrakube.api.plugin.state.model.workspace.CurrentRunModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
@@ -59,7 +63,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class RemoteTfeService {
 
-    private static final String GENERIC_STATE_PATH = "%s/tfstate/v1/organization/%s/workspace/%s/jobId/%s/step/%s/terraform.tfstate";
     private JobRepository jobRepository;
     private ContentRepository contentRepository;
     private OrganizationRepository organizationRepository;
@@ -179,6 +182,34 @@ public class RemoteTfeService {
 
     }
 
+    OrgCapacityData getOrgCapacity(String organizationName, JwtAuthenticationToken currentUser) {
+        Organization organization = organizationRepository.getOrganizationByName(organizationName);
+
+        if (organization != null && validateUserIsMemberOrg(organization, currentUser)) {
+            OrgCapacityData orgCapacityData = new OrgCapacityData();
+            orgCapacityData.setData(new OrgCapacityModel());
+            orgCapacityData.getData().setAttributes(new OrgCapacityAttributes());
+            orgCapacityData.getData().getAttributes().setPending(0);
+
+            List<Job> jobList = jobRepository.findAllByOrganizationAndStatusNotInOrderByIdAsc(
+                    organization,
+                    Arrays.asList(
+                            JobStatus.failed,
+                            JobStatus.completed,
+                            JobStatus.rejected,
+                            JobStatus.cancelled,
+                            JobStatus.approved)
+            );
+            orgCapacityData.getData().setType("organization-capacity");
+            orgCapacityData.getData().getAttributes().setRunning(jobList.size());
+            log.info("orgCapacityData: {}", orgCapacityData);
+            return orgCapacityData;
+        } else {
+            return null;
+        }
+
+    }
+
     OrganizationData getOrgInformation(String organizationName, JwtAuthenticationToken currentUser) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
         if (organization != null && validateUserIsMemberOrg(organization, currentUser)) {
@@ -277,6 +308,17 @@ public class RemoteTfeService {
 
             workspaceModel.setAttributes(attributes);
             workspaceData.setData(workspaceModel);
+
+            Optional<Job> currentJob = jobRepository.findFirstByWorkspaceAndAndStatusInOrderByIdAsc(workspace.get(), Arrays.asList(JobStatus.pending, JobStatus.running, JobStatus.waitingApproval));
+            if (currentJob.isPresent()) {
+                log.info("Found Current Job Id: {}", currentJob.get().getId());
+                workspaceModel.setRelationships(new org.terrakube.api.plugin.state.model.workspace.Relationships());
+                CurrentRunModel currentRunModel = new CurrentRunModel();
+                currentRunModel.setData(new Resource());
+                currentRunModel.getData().setId(String.valueOf(currentJob.get().getId()));
+                currentRunModel.getData().setType("runs");
+                workspaceModel.getRelationships().setCurrentRun(currentRunModel);
+            }
 
             return workspaceData;
         } else {
@@ -765,6 +807,21 @@ public class RemoteTfeService {
             case completed:
                 planStatus = "finished";
                 break;
+            case pending:
+                //check if any step is in status pending else we need to return running
+                //check if workspace is not lock return running too
+                Optional<Step> optionalStep = stepRepository.findFirstByJobIdOrderByStepNumber(job.getId());
+                if (optionalStep.isPresent()) {
+                    Step step = optionalStep.get();
+                    if (step.getStatus().equals(JobStatus.pending)){
+                        planStatus = "pending";
+                    } else  {
+                        planStatus = "running";
+                    }
+                } else {
+                    planStatus = "pending";
+                }
+                break;
             case running:
             case queue:
                 planStatus = "running";
@@ -779,6 +836,7 @@ public class RemoteTfeService {
         runsModel.getAttributes().put("resource-additions", 1);
         runsModel.getAttributes().put("resource-changes", 1);
         runsModel.getAttributes().put("resource-destructions", 0);
+        runsModel.getAttributes().put("position-in-queue", calculateRunPositionInQueue(job));
 
         HashMap<String, Object> actions = new HashMap<>();
         actions.put("is-confirmable", true);
@@ -825,6 +883,89 @@ public class RemoteTfeService {
         return runsData;
     }
 
+    int calculateRunPositionInQueue(Job job){
+        Optional<List<Job>> jobList = jobRepository.findAllByWorkspaceAndStatusNotInOrderByIdAsc(
+                job.getWorkspace(),
+                Arrays.asList(
+                        JobStatus.failed,
+                        JobStatus.completed,
+                        JobStatus.rejected,
+                        JobStatus.cancelled,
+                        JobStatus.approved)
+        );
+        int positionQueueInQueue = 0;
+        if(jobList.isPresent()){
+            for(Job jobInQueue : jobList.get()){
+                if(jobInQueue.getId() == job.getId()){
+                    break;
+                }
+                positionQueueInQueue += 1;
+            }
+        }
+        log.info("Position in queue {} for workspace {}", positionQueueInQueue, job.getWorkspace().getName());
+        return positionQueueInQueue;
+    }
+
+    RunsDataList getRunsQueue(String organizationName) {
+        RunsDataList runsDataList = new RunsDataList();
+        runsDataList.setData(new ArrayList());
+        Organization organization = organizationRepository.getOrganizationByName(organizationName);
+        List<Job> jobList = jobRepository.findAllByOrganizationAndStatusNotInOrderByIdAsc(
+                organization,
+                Arrays.asList(
+                        JobStatus.failed,
+                        JobStatus.completed,
+                        JobStatus.rejected,
+                        JobStatus.cancelled,
+                        JobStatus.approved)
+        );
+        int runQueue = 0;
+        for (Job job : jobList) {
+            log.info("Run Queue {} job {}", runQueue, job.getId());
+            RunsData runsData = getRun(job.getId(), null);
+            RunsModel runsModel = runsData.getData();
+            runsModel.getAttributes().put("position-in-queue", runQueue);
+            runsDataList.getData().add(runsModel);
+            runQueue = runQueue + 1;
+        }
+        runsDataList.setCurrentPage(1);
+        runsDataList.setTotalPages(1);
+        return runsDataList;
+    }
+
+    RunsDataList getWorkspaceRuns(String workspaceId) {
+        RunsDataList runsDataList = new RunsDataList();
+        runsDataList.setData(new ArrayList());
+        Optional<Workspace> workspaceList = workspaceRepository.findById(UUID.fromString(workspaceId));
+        if(workspaceList.isPresent()){
+            Workspace workspace = workspaceList.get();
+            Optional<List<Job>> jobList = jobRepository.findAllByWorkspaceAndStatusNotInOrderByIdAsc(
+                    workspace,
+                    Arrays.asList(
+                            JobStatus.failed,
+                            JobStatus.completed,
+                            JobStatus.rejected,
+                            JobStatus.cancelled,
+                            JobStatus.approved));
+
+            int runWorkspace = 0;
+            if(jobList.isPresent()){
+                for(Job job : jobList.get()){
+                    log.info("Run Workspace {} job {}", runWorkspace, job.getId());
+                    RunsData runsData = getRun(job.getId(), null);
+                    RunsModel runsModel = runsData.getData();
+                    runsModel.getAttributes().put("position-in-queue", runWorkspace);
+                    runsDataList.getData().add(runsModel);
+                    runWorkspace = runWorkspace + 1;
+                }
+            }
+        }
+
+        runsDataList.setCurrentPage(1);
+        runsDataList.setTotalPages(1);
+        return runsDataList;
+    }
+
     RunsData runApply(int runId) {
         Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
         if (job.getStep() != null && !job.getStep().isEmpty()) {
@@ -836,6 +977,11 @@ public class RemoteTfeService {
                     stepRepository.save(step);
                     job.setStatus(JobStatus.pending);
                     jobRepository.save(job);
+                    try {
+                        scheduleJobService.createJobContextNow(job);
+                    } catch (SchedulerException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 }
             }
@@ -849,7 +995,6 @@ public class RemoteTfeService {
             Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
             job.setStatus(JobStatus.cancelled);
             jobRepository.save(job);
-            scheduleJobService.unlockWorkpace(job.getWorkspace().getId());
             scheduleJobService.deleteJobContext(job.getId());
         } catch (ParseException | SchedulerException e) {
             log.error(e.getMessage());

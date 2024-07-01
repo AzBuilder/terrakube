@@ -30,8 +30,9 @@ public class JobManageHook implements LifeCycleHook<Job> {
                     break;
                 case UPDATE:
                     if(job.getStatus().equals(JobStatus.cancelled)) {
-                        scheduleJobService.unlockWorkpace(job.getWorkspace().getId());
                         scheduleJobService.deleteJobContext(job.getId());
+                    } else {
+                        scheduleJobService.createJobContextNow(job);
                     }
                     break;
                 default:

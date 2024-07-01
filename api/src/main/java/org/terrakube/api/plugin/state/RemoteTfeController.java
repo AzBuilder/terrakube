@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
 import org.terrakube.api.plugin.state.model.entitlement.EntitlementData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityData;
 import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.runs.RunsData;
+import org.terrakube.api.plugin.state.model.runs.RunsDataList;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
@@ -46,6 +48,12 @@ public class RemoteTfeController {
     @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/entitlement-set")
     public ResponseEntity<EntitlementData> getOrgEntitlementSet(@PathVariable("organizationName") String organizationName, Principal principal) {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgEntitlementSet(organizationName, ((JwtAuthenticationToken) principal))));
+    }
+
+    @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "organizations/{organizationName}/capacity")
+    public ResponseEntity<OrgCapacityData> getOrgCapacity(@PathVariable("organizationName") String organizationName, Principal principal) {
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getOrgCapacity(organizationName, ((JwtAuthenticationToken) principal))));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "ping")
@@ -124,6 +132,7 @@ public class RemoteTfeController {
         }
     }
 
+    // Only used for local runs
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/lock")
     public ResponseEntity<WorkspaceData> lockWorkspace(@PathVariable("workspaceId") String workspaceId, Principal principal) {
@@ -131,6 +140,7 @@ public class RemoteTfeController {
         return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, true, (JwtAuthenticationToken) principal)));
     }
 
+    // Only used for local runs
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/unlock")
     public ResponseEntity<WorkspaceData> unlockWorkspace(@PathVariable("workspaceId") String workspaceId, Principal principal) {
@@ -188,6 +198,19 @@ public class RemoteTfeController {
     public ResponseEntity<RunsData> createRun(@RequestBody RunsData runsData) throws SchedulerException, ParseException {
         log.info("Create new run");
         return ResponseEntity.status(201).body(remoteTfeService.createRun(runsData));
+    }
+
+    @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/runs")
+    public ResponseEntity<RunsDataList> getWorkspaceRuns(@PathVariable("workspaceId") String workspaceId) {
+        log.info("Get workspace runs for {}", workspaceId);
+        return ResponseEntity.ok(remoteTfeService.getWorkspaceRuns(workspaceId));
+    }
+
+    @Transactional
+    @GetMapping(produces = "application/vnd.api+json", path = "/organizations/{organizationName}/runs/queue")
+    public ResponseEntity<RunsDataList> getRunQueue(@PathVariable("organizationName") String organizationName) {
+        return ResponseEntity.ok(remoteTfeService.getRunsQueue(organizationName));
     }
 
     @GetMapping(produces = "application/vnd.api+json", path = "/runs/{runsId}/run-events")
