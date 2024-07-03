@@ -19,13 +19,19 @@ import java.nio.charset.Charset;
 @RequestMapping("/tofu")
 public class TofuJsonController {
 
+    TofuJsonProperties tofuJsonProperties;
 
     @GetMapping(value= "/index.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createToken() throws IOException {
         String tofuIndex = "";
-        String defaultUrl="https://api.github.com/repos/opentofu/opentofu/releases";
-        log.warn("Using tofu releases URL {}", defaultUrl);
-        tofuIndex = IOUtils.toString(URI.create(defaultUrl), Charset.defaultCharset().toString());
+        if(tofuJsonProperties.getReleasesUrl() != null && !tofuJsonProperties.getReleasesUrl().isEmpty()) {
+            log.info("Using tofu releases URL {}", tofuJsonProperties.getReleasesUrl());
+            tofuIndex = IOUtils.toString(URI.create(tofuJsonProperties.getReleasesUrl()), Charset.defaultCharset().toString());
+        } else {
+            String defaultUrl="https://api.github.com/repos/opentofu/opentofu/releases";
+            log.warn("Using tofu releases URL {}", defaultUrl);
+            tofuIndex = IOUtils.toString(URI.create(defaultUrl), Charset.defaultCharset().toString());
+        }
         return new ResponseEntity<>(tofuIndex, HttpStatus.OK);
     }
 }
