@@ -43,7 +43,7 @@
         <!--BUILDPACK DATA-->
         <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.292</buildpack.builder>
         <buildpack.java>gcr.io/paketo-buildpacks/java:13.0.1</buildpack.java>
-        <buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:1.7.1</buildpack.telemetry>
+        <buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:1.9.0</buildpack.telemetry>
     </properties>
     <build>
         <plugins>
