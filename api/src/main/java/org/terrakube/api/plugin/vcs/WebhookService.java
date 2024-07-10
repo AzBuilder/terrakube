@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.terrakube.api.repository.JobRepository;
+import org.terrakube.api.repository.TemplateRepository;
 import org.terrakube.api.repository.WebhookRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.Organization;
@@ -33,6 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class WebhookService {
 
+    private final TemplateRepository templateRepository;
     WebhookRepository webhookRepository;
     WorkspaceRepository workspaceRepository;
     GitHubWebhookService gitHubWebhookService;
@@ -160,11 +162,9 @@ public class WebhookService {
     String webhookRemoteId = "";
 
   if(workspace.getVcs() != null){
-      log.info("Checking organization");
       Organization organization = workspace.getOrganization();
-      log.info("Organization: {}", organization.getName());
-      log.info("Checking templates");
-    List<Template> templates = organization.getTemplate();
+      log.info("Checking templates for : {}", organization.getName());
+    List<Template> templates = templateRepository.findByOrganization(workspace.getOrganization()).get();
     log.info("Templates: {}", templates.size());
     String templateId = "";
     if(workspace.getDefaultTemplate() != null && workspace.getDefaultTemplate().length() > 0){
