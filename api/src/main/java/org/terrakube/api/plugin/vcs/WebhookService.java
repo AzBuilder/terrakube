@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class WebhookService {
 
-    private final TemplateRepository templateRepository;
+    TemplateRepository templateRepository;
     WebhookRepository webhookRepository;
     WorkspaceRepository workspaceRepository;
     GitHubWebhookService gitHubWebhookService;
