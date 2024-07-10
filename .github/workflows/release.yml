@@ -47,7 +47,7 @@ jobs:
         if [ "${{ matrix.os }}" == "alpaquita" ]; then
           mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=bellsoft/buildpacks.builder:glibc
         elif [ "${{ matrix.os }}" == "jammy-arm" ]; then
-          mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=paketobuildpacks/builder-jammy-tiny
+          mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true -Dbuildpack.builder=heroku/builder:24
         else
           mvn -pl "api,registry,executor" spring-boot:build-image -B --file pom.xml -Dmaven.test.skip=true
         fi
@@ -60,17 +60,11 @@ jobs:
           IMAGE_ID=$(docker images executor:${{ env.VERSION }} -q)
       
           # Install Git
-          if [ "${{ matrix.os }}" == "jammy" ]; then
+          if [ "${{ matrix.os }}" == "alpaquita" ]; then
+            docker tag $IMAGE_ID executortemp
+          else
             docker run --user="root" --entrypoint launcher $IMAGE_ID "apt-get update && apt-get install git jq curl -y"
             docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER cnb' $(docker ps -lq) executortemp
-          else
-            echo "FROM ubuntu:jammy as builder" > Dockerfile
-            echo "RUN apt-get update && apt-get install -y git jq curl" >> Dockerfile
-            echo "FROM executor:${{ env.VERSION }}" >> Dockerfile
-            echo "COPY --from=builder /usr/bin/git /usr/bin/git" >> Dockerfile
-            echo "COPY --from=builder /usr/bin/jq /usr/bin/jq" >> Dockerfile
-            echo "COPY --from=builder /usr/bin/curl /usr/bin/curl" >> Dockerfile
-            docker build -t executortemp .
           fi
       
           IMAGE_ID=$(docker images executortemp -q)
