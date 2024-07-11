@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component;
 @Setter
 @PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
-@ConfigurationProperties(prefix = "org.executor.executor.flags")
+@ConfigurationProperties(prefix = "org.terrakube.executor.flags")
 public class ExecutorFlagsProperties {
 
-    private boolean batch;
-    private String batchJobFilePath;
+    private boolean ephemeral;
+    private String ephemeralJobData;
+    private String batchJobFile;
     private boolean disableAcknowledge;
 
 }

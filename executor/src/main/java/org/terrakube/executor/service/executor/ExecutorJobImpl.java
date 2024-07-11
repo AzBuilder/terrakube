@@ -89,7 +89,7 @@ public class ExecutorJobImpl implements ExecutorJob {
             log.error(e.getMessage());
         }
 
-        if (executorFlagsProperties.isBatch())
+        if (executorFlagsProperties.isEphemeral())
             shutdownService.shutdownApplication();
     }
 
