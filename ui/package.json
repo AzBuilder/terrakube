@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
-    "@babel/core": "^7.24.7",
+    "@babel/core": "^7.24.8",
     "@babel/preset-env": "^7.24.8",
     "@babel/standalone": "^7.24.7",
     "@monaco-editor/react": "^4.6.0",
