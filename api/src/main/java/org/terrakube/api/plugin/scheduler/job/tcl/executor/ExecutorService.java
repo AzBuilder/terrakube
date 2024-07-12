@@ -1,14 +1,8 @@
 package org.terrakube.api.plugin.scheduler.job.tcl.executor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fabric8.kubernetes.api.model.*;
-import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.web.client.RestClientException;
+import org.terrakube.api.plugin.scheduler.job.tcl.executor.ephemeral.EphemeralExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
 import org.terrakube.api.repository.GlobalVarRepository;
@@ -29,9 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.*;
 
 @Slf4j
@@ -56,8 +47,8 @@ public class ExecutorService {
     @Autowired
     DynamicCredentialsService dynamicCredentialsService;
 
-    KubernetesClient kubernetesClient = new DefaultKubernetesClient();
-
+    @Autowired
+    EphemeralExecutorService ephemeralExecutorService;
 
     @Transactional
     public boolean execute(Job job, String stepId, Flow flow) {
@@ -147,7 +138,7 @@ public class ExecutorService {
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
         executorContext.setAgentUrl(getExecutorUrl(job));
-        return sendToEphemeralExecutor(job, executorContext);
+        return executorContext.getEnvironmentVariables().containsKey("TERRAKUBE_ENABLE_EPHEMERAL_EXECUTOR") ? ephemeralExecutorService.sendToEphemeralExecutor(job, executorContext) : sendToExecutor(job, executorContext);
     }
 
     private String getExecutorUrl(Job job) {
@@ -182,77 +173,6 @@ public class ExecutorService {
         }
 
         return executed;
-    }
-
-    private boolean sendToEphemeralExecutor(Job job, ExecutorContext executorContext) {
-        final String imageName = "executor:2.22.0";
-        final String jobName = "job-" + job.getId() + "-" + UUID.randomUUID();
-        final String jobNamespace = "terrakube";
-
-        log.info("Ephemeral Executor Image {}, Job: {}", imageName, jobName);
-        SecretEnvSource secretEnvSource = new SecretEnvSource();
-        secretEnvSource.setName("terrakube-executor-secrets");
-        EnvFromSource envFromSource = new EnvFromSource();
-        envFromSource.setSecretRef(secretEnvSource);
-        final List<EnvFromSource> executorEnvVarFromSecret = Arrays.asList(envFromSource);
-
-        EnvVar executorFlagBatch = new EnvVar();
-        executorFlagBatch.setName("EphemeralFlagBatch");
-        executorFlagBatch.setValue("true");
-
-        EnvVar executorFlagBatchJobFilePath = new EnvVar();
-        String jobJson = "";
-        try {
-            executorFlagBatchJobFilePath.setName("EphemeralJobData");
-            ObjectMapper mapper = new ObjectMapper();
-            jobJson = mapper.writeValueAsString(executorContext);
-            executorFlagBatchJobFilePath.setValue(Base64.getEncoder().encodeToString(jobJson.getBytes("UTF-8")));
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-
-        final List<EnvVar> executorEnvVarFlags = Arrays.asList(executorFlagBatch, executorFlagBatchJobFilePath);
-
-
-        io.fabric8.kubernetes.api.model.batch.v1.Job k8sJob = new JobBuilder()
-                .withApiVersion("batch/v1")
-                .withNewMetadata()
-                .withName(jobName)
-                .withNamespace(jobNamespace)
-                .withLabels(Collections.singletonMap("jobId", executorContext.getJobId()))
-                .withLabels(Collections.singletonMap("organizationId", executorContext.getOrganizationId()))
-                .withLabels(Collections.singletonMap("workspaceId", executorContext.getWorkspaceId()))
-                .endMetadata()
-                .withNewSpec()
-                .withNewTemplate()
-                .withNewSpec()
-                .addNewContainer()
-                .withName(jobName)
-                .withEnvFrom(executorEnvVarFromSecret)
-                .withImage(imageName)
-                .withEnv(executorEnvVarFlags)
-                .endContainer()
-                .withRestartPolicy("Never")
-                .endSpec()
-                .endTemplate()
-                .endSpec()
-                .build();
-
-        log.info("Running ephemeral job");
-        kubernetesClient.batch().v1().jobs().inNamespace("terrakube").createOrReplace(k8sJob);
-
-        return true;
-    }
-
-    private void createJobFile(String jobName, ExecutorContext executorContext) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String terraformJson = mapper.writeValueAsString(executorContext);
-            FileUtils.writeStringToFile(new File("/terrakube/job/" + jobName + ".json"), terraformJson, Charset.defaultCharset(), false);
-
-        } catch (IOException exception) {
-            log.error(exception.getMessage());
-        }
     }
 
     private HashMap<String, String> loadOtherEnvironmentVariables(Job job, Flow flow, HashMap<String, String> workspaceEnvVariables) {
