@@ -40,6 +40,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <maven-artifact.version>3.8.8</maven-artifact.version>
         <commons-io.version>2.16.1</commons-io.version>
+        <kubernetes-client.version>6.13.1</kubernetes-client.version>
         <!--BUILDPACK DATA-->
         <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.292</buildpack.builder>
         <buildpack.java>gcr.io/paketo-buildpacks/java:13.0.1</buildpack.java>
@@ -315,6 +316,12 @@
             <version>9.37.3</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>${kubernetes-client.version}</version>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>

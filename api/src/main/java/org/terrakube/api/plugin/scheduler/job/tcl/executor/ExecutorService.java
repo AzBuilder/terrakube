@@ -1,9 +1,8 @@
 package org.terrakube.api.plugin.scheduler.job.tcl.executor;
 
-import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.web.client.RestClientException;
+import org.terrakube.api.plugin.scheduler.job.tcl.executor.ephemeral.EphemeralExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
 import org.terrakube.api.repository.GlobalVarRepository;
@@ -24,16 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -58,6 +47,8 @@ public class ExecutorService {
     @Autowired
     DynamicCredentialsService dynamicCredentialsService;
 
+    @Autowired
+    EphemeralExecutorService ephemeralExecutorService;
 
     @Transactional
     public boolean execute(Job job, String stepId, Flow flow) {
@@ -147,7 +138,7 @@ public class ExecutorService {
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
         executorContext.setAgentUrl(getExecutorUrl(job));
-        return sendToExecutor(job, executorContext);
+        return executorContext.getEnvironmentVariables().containsKey("TERRAKUBE_ENABLE_EPHEMERAL_EXECUTOR") ? ephemeralExecutorService.sendToEphemeralExecutor(job, executorContext) : sendToExecutor(job, executorContext);
     }
 
     private String getExecutorUrl(Job job) {

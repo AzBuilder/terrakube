@@ -8,6 +8,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
+import org.terrakube.api.plugin.scheduler.job.tcl.executor.ephemeral.EphemeralExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.FlowType;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.ScheduleTemplate;
@@ -41,6 +42,7 @@ public class ScheduleJob implements org.quartz.Job {
     private final TemplateRepository templateRepository;
 
     public static final String JOB_ID = "jobId";
+    private final EphemeralExecutorService ephemeralExecutorService;
 
     JobRepository jobRepository;
 
@@ -119,6 +121,7 @@ public class ScheduleJob implements org.quartz.Job {
                 case completed:
                     redisTemplate.delete(String.valueOf(job.getId()));
                     removeJobContext(job, jobExecutionContext);
+                    ephemeralExecutorService.deleteEphemeralJob(job);
                     break;
                 case cancelled:
                 case failed:
@@ -127,6 +130,7 @@ public class ScheduleJob implements org.quartz.Job {
                     log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                     updateJobStepsWithStatus(job.getId(), JobStatus.failed);
                     removeJobContext(job, jobExecutionContext);
+                    ephemeralExecutorService.deleteEphemeralJob(job);
                     break;
                 default:
                     log.info("Job {} Status {}", job.getId(), job.getStatus());
@@ -257,6 +261,7 @@ public class ScheduleJob implements org.quartz.Job {
     private void completeJob(Job job) {
         job.setStatus(JobStatus.completed);
         jobRepository.save(job);
+        ephemeralExecutorService.deleteEphemeralJob(job);
         log.info("Update Job {} to completed", job.getId());
     }
 
