@@ -158,7 +158,7 @@ public class ExecutorService {
             ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(getExecutorUrl(job), executorContext, ExecutorContext.class);
             executorContext.setAccessToken("****");
             executorContext.setModuleSshKey("****");
-            log.info("Sending Job: /n {}", executorContext);
+            log.debug("Sending Job: /n {}", executorContext);
             log.info("Response Status: {}", response.getStatusCode().value());
 
             if (response.getStatusCode().equals(HttpStatus.ACCEPTED)) {
