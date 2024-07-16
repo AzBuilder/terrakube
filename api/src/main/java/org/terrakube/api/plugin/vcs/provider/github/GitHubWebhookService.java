@@ -7,6 +7,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.vcs.WebhookResult;
 import org.terrakube.api.plugin.vcs.WebhookServiceBase;
+import org.terrakube.api.rs.job.Job;
+import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.JobVia;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,13 +30,15 @@ public class GitHubWebhookService extends WebhookServiceBase {
 
     @Value("${org.terrakube.hostname}")
     private String hostname;
+    @Value("${org.terrakube.ui.url}")
+    private String uiUrl;
 
     public GitHubWebhookService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
-        return handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", "Github", this::handleEvent);
+        return handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", JobVia.Github.name(), this::handleEvent);
     }
 
     private WebhookResult handleEvent(String jsonPayload, WebhookResult result,  Map<String, String> headers) {
@@ -88,6 +93,53 @@ public class GitHubWebhookService extends WebhookServiceBase {
 
         return result;
     }
+    
+    public void sendCommitStatus(Job job, JobStatus jobStatus) {
+        GithubCommitStatus commitStatus = GithubCommitStatus.pending;
+        String commitStatusDescription = "Your task is in Terrakube queue.";
+        switch (jobStatus) {
+            case completed:
+                commitStatus = GithubCommitStatus.success;
+                commitStatusDescription = "Your task has been completed successfully."; 
+                break;
+            case failed:
+            case rejected:
+            case cancelled:
+                commitStatus = GithubCommitStatus.failure;
+                commitStatusDescription = "Your task has failed.";
+                break;
+            case unknown:
+                commitStatus = GithubCommitStatus.error;
+                commitStatusDescription = "Your task ran into errors.";
+                break;
+            default:
+                break;
+        }
+        Workspace workspace = job.getWorkspace();
+        String jobUrl = String.format("%s/organizations/%s/workspaces/%s/runs/%s", uiUrl,
+                workspace.getOrganization().getId(), workspace.getId(), job.getId());
+        String ownerAndRepos = extractOwnerAndRepo(workspace.getSource());
+        String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + ownerAndRepos + "/statuses/" + job.getCommitId();
+
+        // Create the headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/vnd.github+json");
+        headers.set("Authorization", "Bearer " + workspace.getVcs().getAccessToken());
+        headers.set("X-GitHub-Api-Version", "2022-11-28");
+
+        log.info(String.format("Sending job status %s to GitHub for commit %s", job.getStatus(), job.getCommitId()));
+        // Create the body
+        String body = "{\"state\":\""+ commitStatus.name() 
+                + "\",\"description\":\"" + commitStatusDescription + "\",\"target_url\":\""
+                + jobUrl + "\",\"context\":\"Terrakube\"}";
+
+        ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
+        if (response.getStatusCode().value() == 201) {
+            log.info("Job status sent successfully to GitHub");
+        } else {
+            log.error(String.format("Failed to send job status to Github, message %s", response.getBody()));
+        }
+    }
 
     public String createWebhook(Workspace workspace, String webhookId) {
         String url = "";
@@ -110,7 +162,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
 
         ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
         // Extract the id from the response
-        if (response.getStatusCodeValue() == 201) {
+        if (response.getStatusCode().value() == 201) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());

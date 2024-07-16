@@ -13,9 +13,11 @@ import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.FlowType;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.ScheduleTemplate;
 import org.terrakube.api.plugin.softdelete.SoftDeleteService;
+import org.terrakube.api.plugin.vcs.provider.github.GitHubWebhookService;
 import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.JobVia;
 import org.terrakube.api.rs.job.step.Step;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -57,6 +59,8 @@ public class ScheduleJob implements org.quartz.Job {
     ScheduleJobService scheduleJobService;
 
     RedisTemplate redisTemplate;
+    
+    GitHubWebhookService gitHubWebhookService;
 
     @Transactional
     @Override
@@ -75,6 +79,7 @@ public class ScheduleJob implements org.quartz.Job {
                 redisTemplate.delete(String.valueOf(job.getId()));
                 log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                 updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                updateJobStatusOnVcs(job, JobStatus.unknown);
                 removeJobContext(job, jobExecutionContext);
             } catch (Exception e) {
                 log.error(e.getMessage());
@@ -110,6 +115,7 @@ public class ScheduleJob implements org.quartz.Job {
                         completeJob(job);
                         redisTemplate.delete(String.valueOf(job.getId()));
                         updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
+                        updateJobStatusOnVcs(job, JobStatus.completed);
                     }
                     break;
                 case approved:
@@ -122,6 +128,7 @@ public class ScheduleJob implements org.quartz.Job {
                     redisTemplate.delete(String.valueOf(job.getId()));
                     removeJobContext(job, jobExecutionContext);
                     ephemeralExecutorService.deleteEphemeralJob(job);
+                    updateJobStatusOnVcs(job, JobStatus.completed);
                     break;
                 case cancelled:
                 case failed:
@@ -129,6 +136,7 @@ public class ScheduleJob implements org.quartz.Job {
                     redisTemplate.delete(String.valueOf(job.getId()));
                     log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                     updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                    updateJobStatusOnVcs(job, JobStatus.failed);
                     removeJobContext(job, jobExecutionContext);
                     ephemeralExecutorService.deleteEphemeralJob(job);
                     break;
@@ -212,6 +220,7 @@ public class ScheduleJob implements org.quartz.Job {
                     job.setStatus(JobStatus.failed);
                     jobRepository.save(job);
                     updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                    updateJobStatusOnVcs(job, JobStatus.unknown);
                     break;
                 default:
                     log.error("FlowType not supported");
@@ -292,7 +301,7 @@ public class ScheduleJob implements org.quartz.Job {
                 log.info("Executing Job {} Step Id {}", job.getId(), stepId);
         }
     }
-
+    
     private void updateJobStepsWithStatus(int jobId, JobStatus jobStatus) {
         log.warn("Cancelling pending steps");
         for (Step step : stepRepository.findByJobId(jobId)) {
@@ -303,4 +312,17 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
+    private void updateJobStatusOnVcs(Job job, JobStatus jobStatus) {
+        if (job.getVia().equals(JobVia.UI.name()) || job.getVia().equals(JobVia.CLI.name())) {
+            return; 
+        }
+        
+        switch (job.getWorkspace().getVcs().getVcsType()) {
+            case GITHUB:
+                gitHubWebhookService.sendCommitStatus(job, jobStatus);
+                break;
+            default:
+                break;
+        }
+    }
 }
