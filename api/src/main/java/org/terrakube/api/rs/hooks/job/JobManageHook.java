@@ -32,8 +32,12 @@ public class JobManageHook implements LifeCycleHook<Job> {
                     if(job.getStatus().equals(JobStatus.cancelled)) {
                         scheduleJobService.deleteJobContext(job.getId());
                     } else {
-                        if (!job.getStatus().equals(JobStatus.running))
-                          scheduleJobService.createJobContextNow(job);
+                        if (!job.getStatus().equals(JobStatus.running)) {
+                            log.info("Creating new quartz job");
+                            scheduleJobService.createJobContextNow(job);
+                        } else {
+                            log.warn("Skip new quartz job");
+                        }
                     }
                     break;
                 default:
