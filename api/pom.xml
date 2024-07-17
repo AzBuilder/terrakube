@@ -63,6 +63,7 @@
                     </bindings>
                     <env>
                         <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
+                        <BP_JVM_VERSION>17</BP_JVM_VERSION>
                     </env>
                 </image>
             </configuration>
