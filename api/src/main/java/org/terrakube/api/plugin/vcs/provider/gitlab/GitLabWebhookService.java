@@ -64,9 +64,9 @@ public class GitLabWebhookService {
 
             if (event.equals("push")) {
                 // Extract branch from the ref
-                String ref = rootNode.path("ref").asText();
-                String extractedBranch = ref.split("/")[2];
-                result.setBranch(extractedBranch);
+                String[] ref = rootNode.path("ref").asText().split("/");
+                String[] extractedBranch = Arrays.copyOfRange(ref, 2, ref.length);
+                result.setBranch(String.join("/", extractedBranch));
 
                 // Extract the user who triggered the webhook
                 JsonNode userNode = rootNode.path("user_username");

@@ -90,7 +90,7 @@ public class WebhookService {
                         String[] branchList = workspace.getBranch().split(",");
                         String webhookBranch = webhookResult.getBranch();
                         for (String branch: branchList){
-                            if (webhookBranch.matches(branch)) {
+                            if (webhookBranch.startsWith(branch)) {
                                 found = true;
                             }
                         }
