@@ -9,6 +9,7 @@ import org.terrakube.api.repository.WebhookRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.job.Job;
+import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.webhook.Webhook;
@@ -124,11 +125,11 @@ public class WebhookService {
                                 job.setVia(webhookResult.getVia());
                                 job.setCommitId(webhookResult.getCommit());
                                 Job savedJob = jobRepository.save(job);
+                                sendCommitStatus(savedJob);
                                 scheduleJobService.createJobContext(savedJob);
                             } catch (Exception e) {
                                 log.error("Error creating the job", e);
                             }
-
                         }
                     }
                 }
@@ -221,5 +222,15 @@ public class WebhookService {
     webhookRepository.save(savedWebhook);
   }
  }
-
+ 
+ 
+ private void sendCommitStatus(Job job) {
+    switch (job.getWorkspace().getVcs().getVcsType()) {
+        case GITHUB:
+            gitHubWebhookService.sendCommitStatus(job, JobStatus.pending);
+            break;
+        default:
+            break;
+    }
+ }
 }
