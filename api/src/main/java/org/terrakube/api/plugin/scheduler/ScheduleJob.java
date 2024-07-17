@@ -271,6 +271,7 @@ public class ScheduleJob implements org.quartz.Job {
         job.setStatus(JobStatus.completed);
         jobRepository.save(job);
         ephemeralExecutorService.deleteEphemeralJob(job);
+        updateJobStatusOnVcs(job, JobStatus.completed);
         log.info("Update Job {} to completed", job.getId());
     }
 
