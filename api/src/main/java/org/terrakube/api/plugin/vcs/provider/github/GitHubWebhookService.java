@@ -1,6 +1,7 @@
 package org.terrakube.api.plugin.vcs.provider.github;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 
@@ -45,9 +47,9 @@ public class GitHubWebhookService extends WebhookServiceBase {
             try{
             // Extract branch from the ref
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
-            String ref = rootNode.path("ref").asText();
-            String extractedBranch = ref.split("/")[2];
-            result.setBranch(extractedBranch);
+            String[] ref = rootNode.path("ref").asText().split("/");
+            String[] extractedBranch = Arrays.copyOfRange(ref, 0, ref.length);
+            result.setBranch(String.join("/", extractedBranch));
 
 
             // Extract the user who triggered the webhook
