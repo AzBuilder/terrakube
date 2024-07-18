@@ -676,9 +676,9 @@ export const CreateWorkspace = () => {
 
               <Form.Item
                 name="branch"
-                label="VCS branch"
+                label="VCS branches"
                 placeholder="(default branch)"
-                extra=" The branch from which to import new versions. This defaults to the value your version control provides as the default branch for this repository."
+                extra=" The branches from which the runs are allowed to kick off, separated by comma. The first one is used as the default for runs kicked off from UI. All braches are compared as prefixes against the branch name in a git push."
                 rules={[{ required: true }]}
                 hidden={!versionControlFlow}
               >

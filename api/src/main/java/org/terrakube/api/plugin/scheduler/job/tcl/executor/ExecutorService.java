@@ -117,7 +117,7 @@ public class ExecutorService {
             executorContext.setSource(job.getOverrideSource());
         }
         if (job.getOverrideBranch() == null) {
-            executorContext.setBranch(job.getWorkspace().getBranch());
+            executorContext.setBranch(job.getWorkspace().getBranch().split(",")[0]);
         } else {
             if (job.getOverrideBranch().equals("remote-content")) {
                 executorContext.setShowHeader(false);
