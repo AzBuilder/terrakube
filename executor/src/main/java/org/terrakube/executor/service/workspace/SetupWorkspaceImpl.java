@@ -142,6 +142,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .setDirectory(gitCloneFolder)
                         .setCredentialsProvider(setupCredentials(terraformJob.getVcsType(), terraformJob.getAccessToken()))
                         .setBranch(terraformJob.getBranch())
+                        .setCloneSubmodules(true)
                         .call();
 
                 if (terraformJob.getCommitId() != null && terraformJob.getCommitId().length() > 0) {
