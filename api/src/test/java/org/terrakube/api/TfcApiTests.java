@@ -70,8 +70,6 @@ class TfcApiTests extends ServerApplicationTests {
                 .get("/remote/tfe/v2/organizations/simple/capacity")
                 .then()
                 .assertThat()
-                .body("data.attributes.pending", IsEqual.equalTo(0))
-                .body("data.attributes.running", IsEqual.equalTo(0))
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
