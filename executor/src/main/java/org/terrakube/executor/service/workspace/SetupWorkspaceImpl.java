@@ -135,6 +135,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .setTransportConfigCallback(transport -> {
                             ((SshTransport) transport).setSshSessionFactory(getSshdSessionFactory(terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()));
                         })
+                        .setCloneSubmodules(true)
                         .call();
             } else {
                 Git.cloneRepository()
@@ -142,6 +143,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .setDirectory(gitCloneFolder)
                         .setCredentialsProvider(setupCredentials(terraformJob.getVcsType(), terraformJob.getAccessToken()))
                         .setBranch(terraformJob.getBranch())
+                        .setCloneSubmodules(true)
                         .call();
 
                 if (terraformJob.getCommitId() != null && terraformJob.getCommitId().length() > 0) {
