@@ -56,4 +56,5 @@
     <include file="/db/changelog/local/changelog-2.21.0-gcp-dynamic.xml"/>
     <include file="/db/changelog/local/changelog-2.22.0-actions.xml"/>
     <include file="/db/changelog/local/changelog-2.21.0-has-changes.xml"/>
+    <include file="/db/changelog/local/changelog-2.22.0-global-vars-size.xml"/>
 </databaseChangeLog>
