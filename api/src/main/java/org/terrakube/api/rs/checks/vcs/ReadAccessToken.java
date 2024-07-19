@@ -19,7 +19,7 @@ public class ReadAccessToken extends OperationCheck<Vcs> {
 
     @Override
     public boolean ok(Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> optional) {
-        if(authenticatedUser.isServiceAccount(requestScope.getUser()) && authenticatedUser.isSuperUser(requestScope.getUser())){
+        if(authenticatedUser.isServiceAccountInternal(requestScope.getUser()) && authenticatedUser.isSuperUser(requestScope.getUser())){
             return true;
         }
         return false;
