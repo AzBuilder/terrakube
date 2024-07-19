@@ -7,7 +7,7 @@
     <changeSet id="40" author="alfespa17@gmail.com">
         <modifyDataType
                 columnName="variable_value"
-                newDataType="varchar(4096)"
+                newDataType="varchar(5120)"
                 tableName="globalvar"/>
     </changeSet>
 </databaseChangeLog>
