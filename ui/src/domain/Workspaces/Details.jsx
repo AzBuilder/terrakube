@@ -1181,8 +1181,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         </Form.Item>
                         <Form.Item
                           name="branch"
-                          label="Branch list separated by commas used in VCS connections"
-                          extra="Don't update the value when using CLI Driven workflows"
+                          label="Branch list separated by comma used in VCS worklfow. The first is used as the default branch for runs kicked off from UI."
+                          extra="Don't update the value when using CLI Driven workflows. In the VCS driven workflow, the first branch is used for any runs from UI. All values in the list are compared as prefixes for runs kicked off from VCS webhooks."
                         >
                           <Input />
                         </Form.Item>
