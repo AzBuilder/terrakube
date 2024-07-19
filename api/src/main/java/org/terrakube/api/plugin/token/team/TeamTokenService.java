@@ -39,44 +39,49 @@ public class TeamTokenService {
     }
 
     public String createToken(int days, int hours, int minutes, String description, String groupName, String ownerEmail) {
-
+        String jws = "";
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.base64Key));
-        UUID keyId = UUID.randomUUID();
-
-        log.info("Generated Team Token {}", keyId);
-
-        JSONArray groupArray = new JSONArray();
-        groupArray.add(groupName);
-
-        Date expiration = Date.from(Instant.now().plus(days, ChronoUnit.DAYS).plus(hours, ChronoUnit.HOURS).plus(minutes, ChronoUnit.MINUTES));
-
-        log.info("Team token will expire: {}", expiration);
-
-        String jws = Jwts.builder()
-                .setIssuer(ISSUER)
-                .setSubject(String.format("%s (Team Token)", groupName))
-                .setAudience(ISSUER)
-                .setId(keyId.toString())
-                .claim("email", ownerEmail)
-                .claim("description", description)
-                .claim("email_verified", true)
-                .claim("name", String.format("%s (Token)", groupName))
-                .claim("groups", groupArray)
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(expiration)
-                .signWith(key)
-                .compact();
 
         Group groupToken = new Group();
-        groupToken.setId(keyId);
         groupToken.setDays(days);
         groupToken.setHours(hours);
         groupToken.setMinutes(minutes);
         groupToken.setGroup(groupName);
         groupToken.setDescription(description);
         groupToken.setDeleted(false);
-        teamTokenRepository.save(groupToken);
+        groupToken = teamTokenRepository.save(groupToken);
 
+        try {
+            log.info("Generated Team Token {}", groupToken.getId());
+
+            JSONArray groupArray = new JSONArray();
+            groupArray.add(groupName);
+
+            Date expiration = Date.from(Instant.now().plus(days, ChronoUnit.DAYS).plus(hours, ChronoUnit.HOURS).plus(minutes, ChronoUnit.MINUTES));
+
+            log.info("Team token will expire: {}", expiration);
+
+            jws = Jwts.builder()
+                    .setIssuer(ISSUER)
+                    .setSubject(String.format("%s (Team Token)", groupName))
+                    .setAudience(ISSUER)
+                    .setId(groupToken.getId().toString())
+                    .claim("email", ownerEmail)
+                    .claim("description", description)
+                    .claim("email_verified", true)
+                    .claim("name", String.format("%s (Token)", groupName))
+                    .claim("groups", groupArray)
+                    .setIssuedAt(Date.from(Instant.now()))
+                    .setExpiration(expiration)
+                    .signWith(key)
+                    .compact();
+
+        } catch (Exception e) {
+            log.error("Error generating token.", e);
+            
+            teamTokenRepository.delete(groupToken);
+        }
+        
         return jws;
     }
 
