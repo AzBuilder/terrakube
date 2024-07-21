@@ -77,7 +77,7 @@ public class EphemeralExecutorService {
                 .build();
 
         log.info("Running ephemeral job");
-        kubernetesClient.batch().v1().jobs().inNamespace("terrakube").createOrReplace(k8sJob);
+        kubernetesClient.batch().v1().jobs().inNamespace(ephemeralConfiguration.getNamespace()).createOrReplace(k8sJob);
         return true;
     }
 
