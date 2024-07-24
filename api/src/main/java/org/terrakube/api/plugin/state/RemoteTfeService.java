@@ -276,7 +276,7 @@ public class RemoteTfeService {
             attributes.put("execution-mode", workspace.get().getExecutionMode());
             attributes.put("global-remote-state", true);
 
-            if (workspace.get().getFolder() != null && workspace.get().getVcs() != null && !workspace.get().getFolder().equals("/")){
+            if (workspace.get().getFolder() != null && (workspace.get().getVcs() != null || workspace.get().getSsh() != null) && !workspace.get().getFolder().equals("/")){
                 attributes.put("working-directory", workspace.get().getFolder());
             }
 
@@ -767,11 +767,12 @@ public class RemoteTfeService {
         job.setVia("CLI");
         job.setTemplateReference(template.getId().toString());
         // if the vcs connection is not null, we need to override the value inside the job
-        if(workspace.getVcs() != null){
+        if(workspace.getVcs() != null || workspace.getSsh() != null){
             log.warn("Workspace is using VCS connection, overriding vcs source and branch to run job using a remote plan");
             job.setOverrideBranch("remote-content");
             job.setOverrideSource(sourceTarGz);
         }
+
         job = jobRepository.save(job);
         log.info("Job Created");
         scheduleJobService.createJobContext(job);
