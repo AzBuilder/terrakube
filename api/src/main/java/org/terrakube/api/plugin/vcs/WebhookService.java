@@ -93,6 +93,7 @@ public class WebhookService {
                         for (String branch: branchList){
                             if (webhookBranch.startsWith(branch)) {
                                 found = true;
+                                break;
                             }
                         }
                         if(found && checkFileChanges(webhookResult.getFileChanges(), workspace.getFolder()))

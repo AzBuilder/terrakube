@@ -53,7 +53,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
             // Extract branch from the ref
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
             String[] ref = rootNode.path("ref").asText().split("/");
-            String[] extractedBranch = Arrays.copyOfRange(ref, 0, ref.length);
+            String[] extractedBranch = Arrays.copyOfRange(ref, 2, ref.length);
             result.setBranch(String.join("/", extractedBranch));
 
 
