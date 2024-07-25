@@ -14,6 +14,8 @@ import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 import org.terrakube.executor.service.mode.TerraformJob;
 
+import java.io.IOException;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -35,16 +37,11 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
             for(int retry=0; retry<5; retry++) {
                 job = terrakubeClient.getJobById(terraformJob.getOrganizationId(), terraformJob.getJobId()).getData();
 
-                if(job.getRelationships().getStep().getData().isEmpty()){
-                    try {
-                        log.info("Waiting step list...");
-                        Thread.sleep(2000);
-                    } catch (Exception e) {
-                        log.error(e.getMessage());
-                    }
-                } else {
+                if(!job.getRelationships().getStep().getData().isEmpty()){
                     log.info("Step list is not empty...");
                     break;
+                } else {
+                    log.error("Step list is empty for some reason...");
                 }
             }
 
