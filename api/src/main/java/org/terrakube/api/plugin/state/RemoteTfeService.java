@@ -795,93 +795,96 @@ public class RemoteTfeService {
 
     RunsData getRun(int runId, String include) {
         log.info("Searching Run {}", runId);
-        RunsData runsData = new RunsData();
-        RunsModel runsModel = new RunsModel();
-        runsModel.setId(String.valueOf(runId));
-        runsModel.setType("runs");
-        runsModel.setAttributes(new HashMap<>());
-
-        String planStatus = "running";
         Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
 
-        switch (job.getStatus()) {
-            case completed:
-                planStatus = "finished";
-                break;
-            case pending:
-                //check if any step is in status pending else we need to return running
-                //check if workspace is not lock return running too
-                Optional<Step> optionalStep = stepRepository.findFirstByJobIdOrderByStepNumber(job.getId());
-                if (optionalStep.isPresent()) {
-                    Step step = optionalStep.get();
-                    if (step.getStatus().equals(JobStatus.pending)){
+        if(job.getWorkspace() != null) {
+            RunsData runsData = new RunsData();
+            RunsModel runsModel = new RunsModel();
+            runsModel.setId(String.valueOf(runId));
+            runsModel.setType("runs");
+            runsModel.setAttributes(new HashMap<>());
+
+            String planStatus = "running";
+
+            switch (job.getStatus()) {
+                case completed:
+                    planStatus = "finished";
+                    break;
+                case pending:
+                    //check if any step is in status pending else we need to return running
+                    //check if workspace is not lock return running too
+                    Optional<Step> optionalStep = stepRepository.findFirstByJobIdOrderByStepNumber(job.getId());
+                    if (optionalStep.isPresent()) {
+                        Step step = optionalStep.get();
+                        if (step.getStatus().equals(JobStatus.pending)) {
+                            planStatus = "pending";
+                        } else {
+                            planStatus = "running";
+                        }
+                    } else {
                         planStatus = "pending";
-                    } else  {
-                        planStatus = "running";
                     }
-                } else {
-                    planStatus = "pending";
-                }
-                break;
-            case running:
-            case queue:
-                planStatus = "running";
-                break;
-            case failed:
-                planStatus = "errored";
-                break;
-        }
+                    break;
+                case running:
+                case queue:
+                    planStatus = "running";
+                    break;
+                case failed:
+                    planStatus = "errored";
+                    break;
+            }
 
-        runsModel.getAttributes().put("status", planStatus);
-        runsModel.getAttributes().put("has-changes", job.isPlanChanges());
-        runsModel.getAttributes().put("resource-additions", 1);
-        runsModel.getAttributes().put("resource-changes", 1);
-        runsModel.getAttributes().put("resource-destructions", 0);
-        runsModel.getAttributes().put("position-in-queue", calculateRunPositionInQueue(job));
+            runsModel.getAttributes().put("status", planStatus);
+            runsModel.getAttributes().put("has-changes", job.isPlanChanges());
+            runsModel.getAttributes().put("resource-additions", 1);
+            runsModel.getAttributes().put("resource-changes", 1);
+            runsModel.getAttributes().put("resource-destructions", 0);
+            runsModel.getAttributes().put("position-in-queue", calculateRunPositionInQueue(job));
 
-        HashMap<String, Object> actions = new HashMap<>();
-        actions.put("is-confirmable", true);
-        actions.put("is-discardable", true);
-        runsModel.getAttributes().put("actions", actions);
+            HashMap<String, Object> actions = new HashMap<>();
+            actions.put("is-confirmable", true);
+            actions.put("is-discardable", true);
+            runsModel.getAttributes().put("actions", actions);
 
-        HashMap<String, Object> permissions = new HashMap<>();
-        permissions.put("can-apply", true);
-        runsModel.getAttributes().put("permissions", permissions);
+            HashMap<String, Object> permissions = new HashMap<>();
+            permissions.put("can-apply", true);
+            runsModel.getAttributes().put("permissions", permissions);
 
-        runsData.setData(runsModel);
-        Relationships relationships = new Relationships();
-        org.terrakube.api.plugin.state.model.runs.PlanModel planModel = new org.terrakube.api.plugin.state.model.runs.PlanModel();
-        planModel.setData(new Resource());
-        planModel.getData().setType("plans");
-        planModel.getData().setId(String.valueOf(runId));
-        relationships.setPlan(planModel);
+            runsData.setData(runsModel);
+            Relationships relationships = new Relationships();
+            org.terrakube.api.plugin.state.model.runs.PlanModel planModel = new org.terrakube.api.plugin.state.model.runs.PlanModel();
+            planModel.setData(new Resource());
+            planModel.getData().setType("plans");
+            planModel.getData().setId(String.valueOf(runId));
+            relationships.setPlan(planModel);
 
-        ApplyModel applyModel = new ApplyModel();
-        applyModel.setData(new Resource());
-        applyModel.getData().setType("applies");
-        applyModel.getData().setId(String.valueOf(runId));
-        relationships.setApply(applyModel);
+            ApplyModel applyModel = new ApplyModel();
+            applyModel.setData(new Resource());
+            applyModel.getData().setType("applies");
+            applyModel.getData().setId(String.valueOf(runId));
+            relationships.setApply(applyModel);
 
-        org.terrakube.api.plugin.state.model.runs.WorkspaceModel workspaceModel = new org.terrakube.api.plugin.state.model.runs.WorkspaceModel();
-        workspaceModel.setData(new Resource());
-        workspaceModel.getData().setId(job.getWorkspace().getId().toString());
-        workspaceModel.getData().setType("workspaces");
-        relationships.setWorkspace(workspaceModel);
+            org.terrakube.api.plugin.state.model.runs.WorkspaceModel workspaceModel = new org.terrakube.api.plugin.state.model.runs.WorkspaceModel();
+            workspaceModel.setData(new Resource());
+            workspaceModel.getData().setId(job.getWorkspace().getId().toString());
+            workspaceModel.getData().setType("workspaces");
+            relationships.setWorkspace(workspaceModel);
 
-        RunEventsModel runEventsModel = new RunEventsModel();
-        runEventsModel.setData(new ArrayList());
-        relationships.setRunEventsModel(runEventsModel);
+            RunEventsModel runEventsModel = new RunEventsModel();
+            runEventsModel.setData(new ArrayList());
+            relationships.setRunEventsModel(runEventsModel);
 
-        log.info("Included: {}", include);
-        //if(include != null && include.equals("workspace")){
-        //    runsData.setIncluded(new ArrayList());
-        //    runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(), job.getWorkspace().getName(), new HashMap<>()));
-        //}
+            log.info("Included: {}", include);
+            //if(include != null && include.equals("workspace")){
+            //    runsData.setIncluded(new ArrayList());
+            //    runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(), job.getWorkspace().getName(), new HashMap<>()));
+            //}
 
-        runsData.getData().setRelationships(relationships);
+            runsData.getData().setRelationships(relationships);
 
-        log.info("{}", runsData.toString());
-        return runsData;
+            log.info("{}", runsData.toString());
+            return runsData;
+        } else return null;
     }
 
     int calculateRunPositionInQueue(Job job){
@@ -923,11 +926,13 @@ public class RemoteTfeService {
         int runQueue = 0;
         for (Job job : jobList) {
             log.info("Run Queue {} job {}", runQueue, job.getId());
-            RunsData runsData = getRun(job.getId(), null);
-            RunsModel runsModel = runsData.getData();
-            runsModel.getAttributes().put("position-in-queue", runQueue);
-            runsDataList.getData().add(runsModel);
-            runQueue = runQueue + 1;
+            Optional<RunsData> runsData = Optional.ofNullable(getRun(job.getId(), null));
+            if (runsData.isPresent()) {
+                RunsModel runsModel = runsData.get().getData();
+                runsModel.getAttributes().put("position-in-queue", runQueue);
+                runsDataList.getData().add(runsModel);
+                runQueue = runQueue + 1;
+            }
         }
         runsDataList.setCurrentPage(1);
         runsDataList.setTotalPages(1);
@@ -953,11 +958,14 @@ public class RemoteTfeService {
             if(jobList.isPresent()){
                 for(Job job : jobList.get()){
                     log.info("Run Workspace {} job {}", runWorkspace, job.getId());
-                    RunsData runsData = getRun(job.getId(), null);
-                    RunsModel runsModel = runsData.getData();
-                    runsModel.getAttributes().put("position-in-queue", runWorkspace);
-                    runsDataList.getData().add(runsModel);
-                    runWorkspace = runWorkspace + 1;
+                    Optional<RunsData> runsData = Optional.ofNullable(getRun(job.getId(), null));
+                    if(runsData.isPresent()){
+                        RunsModel runsModel = runsData.get().getData();
+                        runsModel.getAttributes().put("position-in-queue", runWorkspace);
+                        runsDataList.getData().add(runsModel);
+                        runWorkspace = runWorkspace + 1;
+                    }
+
                 }
             }
         }
