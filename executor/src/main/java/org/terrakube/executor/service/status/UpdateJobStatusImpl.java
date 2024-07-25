@@ -31,7 +31,23 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     @Override
     public void setRunningStatus(TerraformJob terraformJob, String commitId) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
-            Job job = terrakubeClient.getJobById(terraformJob.getOrganizationId(), terraformJob.getJobId()).getData();
+            Job job = null;
+            for(int retry=0; retry<5; retry++) {
+                job = terrakubeClient.getJobById(terraformJob.getOrganizationId(), terraformJob.getJobId()).getData();
+
+                if(job.getRelationships().getStep().getData().isEmpty()){
+                    try {
+                        log.info("Waiting step list...");
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        log.error(e.getMessage());
+                    }
+                } else {
+                    log.info("Step list is not empty...");
+                    break;
+                }
+            }
+
             job.getAttributes().setStatus("running");
             job.getAttributes().setCommitId(commitId);
 
