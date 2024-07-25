@@ -39,13 +39,8 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
                     try {
                         log.info("Waiting step list...");
                         Thread.sleep(2000);
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
                         log.error(e.getMessage());
-                        try {
-                            throw new Exception("Error reading job data");
-                        } catch (Exception ex) {
-                            log.error(ex.getMessage());
-                        }
                     }
                 } else {
                     log.info("Step list is not empty...");
