@@ -9,9 +9,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.terrakube.api.plugin.softdelete.SoftDeleteService;
 import org.terrakube.api.plugin.vcs.WebhookService;
+import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.WebhookRepository;
+import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.webhook.Webhook;
 import org.terrakube.api.rs.workspace.Workspace;
+import org.terrakube.api.rs.workspace.parameters.Category;
 
 import java.util.Optional;
 
@@ -22,6 +25,7 @@ public class WorkspaceManageHook implements LifeCycleHook<Workspace> {
     SoftDeleteService softDeleteService;
     WebhookService webhookService;
     WebhookRepository webhookRepository;
+    GlobalVarRepository globalVarRepository;
 
     @Override
     public void execute(LifeCycleHookBinding.Operation operation,
@@ -55,7 +59,12 @@ public class WorkspaceManageHook implements LifeCycleHook<Workspace> {
                         break;
 
                     case POSTCOMMIT:
-                        webhookService.createWorkspaceWebhook(workspace);
+                        if(globalVarRepository.getGlobalvarByOrganizationAndCategoryAndKey(workspace.getOrganization(), Category.ENV, "TERRAKUBE_DISABLE_WEBHOOK") == null) {
+                            log.info("Webhook support is enabled");
+                            webhookService.createWorkspaceWebhook(workspace);
+                        } else {
+                            log.warn("Webhook support is disabled");
+                        }
                         break;
 
                     default:
