@@ -59,8 +59,11 @@ public class WorkspaceManageHook implements LifeCycleHook<Workspace> {
                         break;
 
                     case POSTCOMMIT:
-                        if(globalVarRepository.getGlobalvarByOrganizationAndCategoryAndKey(workspace.getOrganization(), Category.ENV, "TERRAKUBE_DISABLE_WEBHOOK") != null) {
+                        if(globalVarRepository.getGlobalvarByOrganizationAndCategoryAndKey(workspace.getOrganization(), Category.ENV, "TERRAKUBE_DISABLE_WEBHOOK") == null) {
+                            log.info("Webhook support is enabled");
                             webhookService.createWorkspaceWebhook(workspace);
+                        } else {
+                            log.warn("Webhook support is disabled");
                         }
                         break;
 
