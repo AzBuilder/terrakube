@@ -1,22 +1,32 @@
 package org.terrakube.api.plugin.scheduler;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.terrakube.api.plugin.vcs.TokenService;
-import org.terrakube.api.repository.VcsRepository;
-import org.terrakube.api.rs.vcs.Vcs;
-import org.terrakube.api.rs.vcs.VcsStatus;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.plugin.vcs.StandAloneTokenService;
+import org.terrakube.api.plugin.vcs.TokenService;
+import org.terrakube.api.repository.GitHubAppTokenRepository;
+import org.terrakube.api.repository.VcsRepository;
+import org.terrakube.api.rs.vcs.GitHubAppToken;
+import org.terrakube.api.rs.vcs.Vcs;
+import org.terrakube.api.rs.vcs.VcsConnectionType;
+import org.terrakube.api.rs.vcs.VcsStatus;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Component
@@ -29,6 +39,9 @@ public class ScheduleVcs implements org.quartz.Job {
 
     TokenService tokenService;
     VcsRepository vcsRepository;
+    GitHubAppTokenRepository gitHubAppTokenRepository;
+    StandAloneTokenService standAloneTokenService;
+    ScheduleGitHubAppTokenService scheduleGitHubAppTokenService;
 
     @Transactional
     @Override
@@ -42,13 +55,24 @@ public class ScheduleVcs implements org.quartz.Job {
         } else {
             vcs = vcsRepository.findByCallback(vcsId);
             if (vcs == null) {
-                log.warn("VCS Job Id {} is still active but no longer needed it, vcs connection cannot be found in the database", vcsId);
+                log.warn(
+                        "VCS Job Id {} is still active but no longer needed it, vcs connection cannot be found in the database",
+                        vcsId);
                 return;
             }
             log.info("VCS found with custom callback");
         }
 
+        if (vcs.getConnectionType() == VcsConnectionType.STANDALONE) {
+            refreshStandAloneVcsTokens(vcs);
+        } else {
+            refreshOAuthVcsTokens(vcs);
+        }
+    }
+
+    private void refreshOAuthVcsTokens(Vcs vcs) {
         if (vcs.getStatus().equals(VcsStatus.COMPLETED)) {
+            @SuppressWarnings("unchecked")
             Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(
                     vcs.getId().toString(),
                     vcs.getVcsType(),
@@ -57,8 +81,7 @@ public class ScheduleVcs implements org.quartz.Job {
                     vcs.getClientSecret(),
                     vcs.getRefreshToken(),
                     vcs.getCallback(),
-                    vcs.getEndpoint()
-            );
+                    vcs.getEndpoint());
 
             if (!newTokenInformation.isEmpty()) {
                 Vcs tempVcs = vcsRepository.getReferenceById(vcs.getId());
@@ -69,5 +92,18 @@ public class ScheduleVcs implements org.quartz.Job {
             }
         }
 
+    }
+
+    private void refreshStandAloneVcsTokens(Vcs vcs) {
+        log.info("Refreshing Standalone VCS Tokens");
+        List<GitHubAppToken> tokens = null;
+        try {
+            tokens = standAloneTokenService.refreshAccessToken(vcs);
+        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            log.info("Failed to refresh Standalone VCS Tokens, error {}", e);
+        }
+        if (tokens == null)  return;
+
+        gitHubAppTokenRepository.saveAll(tokens);
     }
 }

@@ -1,19 +1,38 @@
 package org.terrakube.api.rs.vcs;
 
-import com.yahoo.elide.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.sql.Types;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
-import org.hibernate.annotations.Type;
 
-import jakarta.persistence.*;
+import com.yahoo.elide.annotation.CreatePermission;
+import com.yahoo.elide.annotation.DeletePermission;
+import com.yahoo.elide.annotation.Exclude;
+import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.ReadPermission;
+import com.yahoo.elide.annotation.UpdatePermission;
 
-import java.sql.Types;
-import java.util.Date;
-import java.util.UUID;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import lombok.Getter;
+import lombok.Setter;
 
 @ReadPermission(expression = "team view vcs")
 @CreatePermission(expression = "team manage vcs")
@@ -23,6 +42,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity(name = "vcs")
+@EntityListeners(VcsEntityListener.class)
 public class Vcs extends GenericAuditFields {
 
     @Id
@@ -57,6 +77,14 @@ public class Vcs extends GenericAuditFields {
     @Column(name = "client_secret")
     private String clientSecret;
 
+    @ReadPermission(expression = "read vcs secret")
+    @Column(name = "private_key")
+    private String privateKey;
+
+    @Column(name = "connection_type")
+    @Enumerated(EnumType.STRING)
+    private VcsConnectionType connectionType = VcsConnectionType.OAUTH;
+   
     @UpdatePermission(expression = "user is a super service")
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -81,4 +109,6 @@ public class Vcs extends GenericAuditFields {
     @ManyToOne
     private Organization organization;
 
+    @OneToMany(mappedBy = "vcs", orphanRemoval = true, cascade = {CascadeType.REMOVE}) 
+    private List<GitHubAppToken> gitHubAppToken;
 }

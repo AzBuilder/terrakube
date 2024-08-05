@@ -1,7 +1,17 @@
 package org.terrakube.api.plugin.vcs;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.quartz.SchedulerException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.plugin.scheduler.ScheduleVcsService;
 import org.terrakube.api.plugin.vcs.provider.azdevops.AzDevOpsToken;
 import org.terrakube.api.plugin.vcs.provider.azdevops.AzDevOpsTokenService;
@@ -16,12 +26,9 @@ import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.vcs.VcsStatus;
 import org.terrakube.api.rs.vcs.VcsType;
-import org.quartz.SchedulerException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.util.*;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
@@ -103,7 +110,7 @@ public class TokenService {
 
         return result;
     }
-
+    
     public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId,
             String clientSecret, String refreshToken, String callback, String endpoint) {
         Map<String, Object> tokenInformation = new HashMap<>();
@@ -151,5 +158,4 @@ public class TokenService {
         }
         return tokenInformation;
     }
-
 }

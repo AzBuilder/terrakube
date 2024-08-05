@@ -127,7 +127,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         String url = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
 
         // Create the headers
@@ -140,12 +140,12 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         String body = "{\"description\":\"Terrakube\",\"url\":\"" + webhookUrl
                 + "\",\"active\":true,\"events\":[\"repo:push\"],\"secret\":\"" + secret + "\"}";
 
-        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks";
+        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + String.join("/", ownerAndRepo) + "/hooks";
 
         ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
 
         // Extract the id from the response
-        if (response.getStatusCodeValue() == 201) {
+        if (response.getStatusCode().value() == 201) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
