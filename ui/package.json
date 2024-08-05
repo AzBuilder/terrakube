@@ -23,7 +23,7 @@
     "html-react-parser": "^5.1.12",
     "html-to-image": "^1.11.11",
     "loader-utils": "3.3.1",
-    "luxon": "^3.4.4",
+    "luxon": "^3.5.0",
     "minimatch": "^10.0.1",
     "oidc-client-ts": "3.0.1",
     "react": "18.3.1",
