@@ -10,7 +10,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.terrakube.api.plugin.vcs.StandAloneTokenService;
+import org.terrakube.api.plugin.vcs.provider.github.GitHubTokenService;
 import org.terrakube.api.repository.GitHubAppTokenRepository;
 import org.terrakube.api.rs.vcs.GitHubAppToken;
 
@@ -25,9 +25,9 @@ public class ScheduleGitHubAppToken implements Job {
     @Autowired
     GitHubAppTokenRepository gitHubAppTokenRepository;
     @Autowired
-    StandAloneTokenService standAloneTokenService;
-    @Autowired
     ScheduleGitHubAppTokenService scheduleGitHubAppTokenService;
+    @Autowired
+    GitHubTokenService gitHubTokenService;
 
     @Override
     @Transactional
@@ -39,7 +39,7 @@ public class ScheduleGitHubAppToken implements Job {
         if (search.isEmpty()) return;
         GitHubAppToken appToken = search.get();
         try {
-            token = standAloneTokenService.refreshAccessToken(appToken);
+            token = gitHubTokenService.refreshAccessToken(appToken);
             log.debug("Token refreshed for GitHub installation {} on organization/user {}", appToken.getId(), appToken.getOwner());
         } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             log.error("Failed to refresh token for GitHub installation {} on organization/user {}, error {}", appToken.getId(), appToken.getOwner(), e);

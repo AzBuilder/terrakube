@@ -1,6 +1,8 @@
 package org.terrakube.api.plugin.scheduler;
 
 import java.text.ParseException;
+import java.time.Instant;
+import java.util.Date;
 
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
@@ -32,7 +34,7 @@ public abstract class ScheduleServiceBase {
             createQuartzJob(cronExpression, id);
         }
     }
-    
+
     // Fire a repeated job that accepts a frequency in seconds
     public void createTask(int frequencyInSeconds, String id) throws SchedulerException {
         if (jobExists(id)) {
@@ -41,10 +43,6 @@ public abstract class ScheduleServiceBase {
         } else {
             createQuartzJob(frequencyInSeconds, id);
         }
-    }
-    // Fire an one-off job
-    public void createTask(String id) throws ParseException, SchedulerException {
-        createQuartzJob(id);
     }
 
     private void createQuartzJob(String cronExpression, String id) throws SchedulerException, ParseException {
@@ -87,36 +85,18 @@ public abstract class ScheduleServiceBase {
                 .withIdentity(getJobPrefix() + id)
                 .withDescription(id)
                 .build();
-       
+
         Trigger trigger = TriggerBuilder.newTrigger()
+                .startAt(Date.from(Instant.now().plusSeconds(frequencyInSeconds)))
                 .forJob(jobDetail)
                 .withIdentity(getJobPrefix() + id)
                 .withDescription(id)
-                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(frequencyInSeconds))
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(frequencyInSeconds)
+                        .withMisfireHandlingInstructionFireNow())
                 .build();
 
         log.info("Create {} Trigger {}", getJobType(), jobDetail.getKey());
         scheduler.scheduleJob(jobDetail, trigger);
-    }
-
-    // Fire an one-off job
-    private void createQuartzJob(String id) throws SchedulerException {
-        JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(getJobDataKey(), id);
-
-        scheduler.getJobGroupNames();
-
-        @SuppressWarnings("unchecked")
-        JobDetail jobDetail = JobBuilder.newJob().ofType(getJobClass())
-                .storeDurably()
-                .setJobData(jobDataMap)
-                .withIdentity(getJobPrefix() + id)
-                .withDescription(id)
-                .build();
-
-        scheduler.addJob(jobDetail, true);
-        log.info("Triggering {} Job {} with ID {}", getJobType(), jobDetail.getKey(), getJobType(), id);
-        scheduler.triggerJob(new JobKey(getJobPrefix() + id));
     }
 
     public void deleteTask(String id) throws SchedulerException {
@@ -130,7 +110,7 @@ public abstract class ScheduleServiceBase {
 
     @SuppressWarnings("rawtypes")
     protected abstract Class getJobClass();
-    
+
     public abstract String getJobDataKey();
 
     private boolean jobExists(String id) {

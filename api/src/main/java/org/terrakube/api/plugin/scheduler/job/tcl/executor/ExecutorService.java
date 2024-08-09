@@ -1,11 +1,26 @@
 package org.terrakube.api.plugin.scheduler.job.tcl.executor;
 
-import lombok.extern.slf4j.Slf4j;
+import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.terrakube.api.plugin.scheduler.job.tcl.executor.ephemeral.EphemeralExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
-import org.terrakube.api.plugin.vcs.VcsTokenService;
+import org.terrakube.api.plugin.vcs.TokenService;
 import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.SshRepository;
@@ -19,19 +34,7 @@ import org.terrakube.api.rs.workspace.parameters.Variable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
-import java.net.URISyntaxException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -58,7 +61,7 @@ public class ExecutorService {
     @Autowired
     EphemeralExecutorService ephemeralExecutorService;
     @Autowired
-    VcsTokenService vcsTokenService;
+    TokenService tokenService;
 
     @Transactional
     public boolean execute(Job job, String stepId, Flow flow) {
@@ -83,9 +86,9 @@ public class ExecutorService {
             Vcs vcs = job.getWorkspace().getVcs();
             executorContext.setVcsType(vcs.getVcsType().toString());
             try {
-                executorContext.setAccessToken(vcsTokenService.getAccessToken(job.getWorkspace().getSource(), vcs));
-            } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException | URISyntaxException
-                    | SchedulerException e) {
+                executorContext.setAccessToken(tokenService.getAccessToken(job.getWorkspace().getSource(), vcs));
+            } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException
+                    | URISyntaxException e) {
                 log.error("Failed to fetch access token for job {} on workspace {}, error {}", job.getId(),
                         job.getWorkspace().getName(), e);
             }

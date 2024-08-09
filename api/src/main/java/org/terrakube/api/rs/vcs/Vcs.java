@@ -21,7 +21,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -42,7 +41,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity(name = "vcs")
-@EntityListeners(VcsEntityListener.class)
 public class Vcs extends GenericAuditFields {
 
     @Id
