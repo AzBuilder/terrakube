@@ -8,12 +8,11 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.terrakube.api.plugin.vcs.VcsTokenService;
+import org.terrakube.api.plugin.vcs.TokenService;
 import org.terrakube.api.plugin.vcs.WebhookResult;
 import org.terrakube.api.plugin.vcs.WebhookServiceBase;
 import org.terrakube.api.rs.job.Job;
@@ -32,16 +31,16 @@ import lombok.extern.slf4j.Slf4j;
 public class GitHubWebhookService extends WebhookServiceBase {
 
     private final ObjectMapper objectMapper;
-    private final VcsTokenService vcsTokenService;
+    private final TokenService tokenService;
 
     @Value("${org.terrakube.hostname}")
     private String hostname;
     @Value("${org.terrakube.ui.url}")
     private String uiUrl;
 
-    public GitHubWebhookService(ObjectMapper objectMapper, VcsTokenService vcsTokenService) {
+    public GitHubWebhookService(ObjectMapper objectMapper, TokenService tokenService) {
         this.objectMapper = objectMapper;
-        this.vcsTokenService = vcsTokenService;
+        this.tokenService = tokenService;
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
@@ -108,9 +107,9 @@ public class GitHubWebhookService extends WebhookServiceBase {
 
         String token = "";
         try {
-            token = vcsTokenService.getAccessToken(ownerAndRepos, workspace.getVcs());
-        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException | SchedulerException e) {
-            log.error("Error retrieving tokens for access to owner/organization {}, error {}", ownerAndRepos[0],  e);
+            token = tokenService.getAccessToken(ownerAndRepos, workspace.getVcs());
+        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            log.error("Error retrieving tokens for access to owner/organization {}, error {}", ownerAndRepos[0], e);
             return;
         }
 
@@ -162,9 +161,9 @@ public class GitHubWebhookService extends WebhookServiceBase {
         String token = "";
         String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
         try {
-            token = vcsTokenService.getAccessToken(ownerAndRepo, workspace.getVcs());
-        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException | SchedulerException e) {
-            log.error("Error retrieving tokens for access to owner/organization {}, error {}", ownerAndRepo[0],  e);
+            token = tokenService.getAccessToken(ownerAndRepo, workspace.getVcs());
+        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            log.error("Error retrieving tokens for access to owner/organization {}, error {}", ownerAndRepo[0], e);
             return "";
         }
 

@@ -13,6 +13,8 @@ import com.yahoo.elide.annotation.ReadPermission;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -26,8 +28,7 @@ public class GitHubAppToken extends GenericAuditFields {
     @Id
     @JdbcTypeCode(Types.VARCHAR)
     @Convert(converter = IdConverter.class)
-    // Not using JPA UUID generation strategy because we need the ID to schedule quartz jobs
-    // @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "owner")

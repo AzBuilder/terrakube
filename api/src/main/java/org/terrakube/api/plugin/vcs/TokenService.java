@@ -1,8 +1,11 @@
 package org.terrakube.api.plugin.vcs;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +29,9 @@ import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.vcs.VcsStatus;
 import org.terrakube.api.rs.vcs.VcsType;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -110,7 +116,7 @@ public class TokenService {
 
         return result;
     }
-    
+
     public Map refreshAccessToken(String vcsId, VcsType vcsType, Date tokenExpiration, String clientId,
             String clientSecret, String refreshToken, String callback, String endpoint) {
         Map<String, Object> tokenInformation = new HashMap<>();
@@ -157,5 +163,30 @@ public class TokenService {
                 break;
         }
         return tokenInformation;
+    }
+    
+    // Get the access token for access to the supplied repository, ownerAndRepo is
+    // an array of the owner and the repository name
+    public String getAccessToken(String[] ownerAndRepo, Vcs vcs)
+            throws JsonMappingException, JsonProcessingException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String token = vcs.getAccessToken();
+        // If the token is already set, return it, normally this is oAuth token
+        if (token!=null && !token.isEmpty()) return token;
+        
+        // Otherwise, get the token from other table, currently only Github is supported.
+        return  gitHubTokenService.getAccessToken(vcs, ownerAndRepo);
+    }
+
+    // Get the access token for access to the supplied repository in full URL
+    public String getAccessToken(String gitPath, Vcs vcs) throws URISyntaxException, JsonMappingException,
+            JsonProcessingException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String token = vcs.getAccessToken();
+        // If the token is already set, return it, normally this is oAuth token
+        if (token!=null && !token.isEmpty()) return token;
+
+        URI uri = new URI(gitPath);
+        String[] ownerAndRepo = Arrays.copyOfRange(uri.getPath().replaceAll("\\.git$", "").split("/"), 1, 3);
+        // Otherwise, get the token from other table, currently only Github is supported.
+        return  gitHubTokenService.getAccessToken(vcs, ownerAndRepo);
     }
 }

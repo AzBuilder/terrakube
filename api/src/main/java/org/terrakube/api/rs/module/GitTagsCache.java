@@ -1,6 +1,20 @@
 package org.terrakube.api.rs.module;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -9,41 +23,20 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.terrakube.api.plugin.ssh.TerrakubeSshdSessionFactory;
-import org.terrakube.api.plugin.vcs.VcsTokenService;
 import org.terrakube.api.rs.ssh.Ssh;
+import org.terrakube.api.rs.vcs.GitHubAppToken;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.vcs.VcsConnectionType;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
+import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.util.*;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-
 @Slf4j
 public class GitTagsCache {
     private static JedisPool jedisPool;
-
-    @Autowired
-    private VcsTokenService vcsTokenService;
 
     private static SSLSocketFactory createTrustStoreSSLSocketFactory(String jksFile, String password) throws Exception {
         KeyStore trustStore = KeyStore.getInstance("jks");
@@ -139,7 +132,8 @@ public class GitTagsCache {
         return jedisPool.getResource();
     }
 
-    public List<String> getVersions(String modulePath, String tagPrefix, String source, Vcs vcs, Ssh ssh) {
+    public List<String> getVersions(String modulePath, String tagPrefix, String source, Vcs vcs, Ssh ssh,
+            GitHubAppToken gitHubAppToken) {
         Jedis connection;
         String cacheFromRedis = null;
         if (jedisPool != null) {
@@ -153,7 +147,7 @@ public class GitTagsCache {
             return Arrays.asList(StringUtils.split(currentList.get().toString(), "|"));
         } else {
             log.info("Module {} is not in cache, adding to cache (this should not happen...)", modulePath);
-            List<String> fromRepository = getVersionFromRepository(source, tagPrefix, vcs, ssh);
+            List<String> fromRepository = getVersionFromRepository(source, tagPrefix, vcs, ssh, gitHubAppToken);
             if (jedisPool != null) {
                 connection = getJedisConnection();
                 connection.set(modulePath, StringUtils.join(fromRepository, "|"));
@@ -164,7 +158,8 @@ public class GitTagsCache {
         }
     }
 
-    public List<String> getVersionFromRepository(String source, String tagPrefix, Vcs vcs, Ssh ssh) {
+    public List<String> getVersionFromRepository(String source, String tagPrefix, Vcs vcs, Ssh ssh,
+            GitHubAppToken gitHubAppToken) {
         List<String> versionList = new ArrayList<>();
         try {
             CredentialsProvider credentialsProvider = null;
@@ -178,7 +173,7 @@ public class GitTagsCache {
                             credentialsProvider = new UsernamePasswordCredentialsProvider(vcs.getAccessToken(), "");
                         } else {
                             credentialsProvider = new UsernamePasswordCredentialsProvider("x-access-token",
-                                    vcsTokenService.getAccessToken(source, vcs));
+                                    gitHubAppToken.getToken());
                         }
                         break;
                     case BITBUCKET:
@@ -243,8 +238,7 @@ public class GitTagsCache {
                     versionList.add(originalTag.replace(tagPrefix, ""));
                 }
             });
-        } catch (GitAPIException | JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException
-                | URISyntaxException | SchedulerException e) {
+        } catch (GitAPIException e) {
             log.error(e.getMessage());
         }
         return versionList;

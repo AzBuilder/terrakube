@@ -10,6 +10,7 @@ import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.module.ModuleManageHook;
 import org.terrakube.api.rs.ssh.Ssh;
+import org.terrakube.api.rs.vcs.GitHubAppToken;
 import org.terrakube.api.rs.vcs.Vcs;
 
 import jakarta.persistence.*;
@@ -22,6 +23,7 @@ import java.util.*;
 @UpdatePermission(expression = "team manage module OR user is a super service")
 @DeletePermission(expression = "team manage module")
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.DELETE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = ModuleManageHook.class)
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = ModuleManageHook.class)
 @Include(rootLevel = false)
 @Getter
 @Setter
@@ -69,7 +71,7 @@ public class Module extends GenericAuditFields {
     @Transient
     @ComputedAttribute
     public List<String> getVersions(RequestScope requestScope) {
-        return gitTagsCache.getVersions(getRegistryPath(requestScope), this.tagPrefix, this.source, this.vcs, this.ssh);
+        return gitTagsCache.getVersions(getRegistryPath(requestScope), this.tagPrefix, this.source, this.vcs, this.ssh, this.gitHubAppToken);
     }
 
     @OneToOne
@@ -77,4 +79,9 @@ public class Module extends GenericAuditFields {
 
     @OneToOne
     private Ssh ssh;
+    
+    // This can go if the the logic in the above GitTagsCache is moved to serivce layer
+    @OneToOne
+    @PrimaryKeyJoinColumn(name = "github_app_token_id")
+    private GitHubAppToken gitHubAppToken;
 }

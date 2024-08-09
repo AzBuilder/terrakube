@@ -11,5 +11,9 @@
         <addColumn tableName="vcs">
             <column name="private_key" type="varchar(4098)" />
         </addColumn>
+        <update tableName="vcs">
+            <column name="connection_type" value="OAUTH" />
+            <where>connection_type = ''</where>
+        </update>
     </changeSet>
 </databaseChangeLog>
