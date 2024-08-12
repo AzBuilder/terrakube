@@ -40,7 +40,7 @@
     "remark-gfm": "4.0.0",
     "unzipit": "^1.4.3",
     "uuid": "^10.0.0",
-    "web-vitals": "^4.2.2"
+    "web-vitals": "^4.2.3"
   },
   "scripts": {
     "dev": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && react-scripts start",
