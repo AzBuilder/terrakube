@@ -97,7 +97,9 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
     
     public void sendCommitStatus(Job job, JobStatus jobStatus) {
+        Workspace workspace = job.getWorkspace();
         GithubCommitStatus commitStatus = GithubCommitStatus.pending;
+        String commitStatusContext = "Terrakube - " + workspace.getOrganization().getName() + " - " + workspace.getName();
         String commitStatusDescription = "Your task is in Terrakube queue.";
         switch (jobStatus) {
             case completed:
@@ -117,7 +119,6 @@ public class GitHubWebhookService extends WebhookServiceBase {
             default:
                 break;
         }
-        Workspace workspace = job.getWorkspace();
         String jobUrl = String.format("%s/organizations/%s/workspaces/%s/runs/%s", uiUrl,
                 workspace.getOrganization().getId(), workspace.getId(), job.getId());
         String ownerAndRepos = extractOwnerAndRepo(workspace.getSource());
@@ -133,7 +134,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
         // Create the body
         String body = "{\"state\":\""+ commitStatus.name() 
                 + "\",\"description\":\"" + commitStatusDescription + "\",\"target_url\":\""
-                + jobUrl + "\",\"context\":\"Terrakube\"}";
+                + jobUrl + "\",\"context\":\"" + commitStatusContext + "\"}";
 
         ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
         if (response.getStatusCode().value() == 201) {
