@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.vcs.WebhookResult;
 import org.terrakube.api.plugin.vcs.WebhookServiceBase;
@@ -40,37 +41,36 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
-        return handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", JobVia.Github.name(), this::handleEvent);
+        return handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", JobVia.Github.name(),
+                this::handleEvent);
     }
 
-    private WebhookResult handleEvent(String jsonPayload, WebhookResult result,  Map<String, String> headers) {
+    private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers) {
         // Extract event
         String event = headers.get("x-github-event");
         result.setEvent(event);
 
         if (event.equals("push")) {
-            try{
-            // Extract branch from the ref
-            JsonNode rootNode = objectMapper.readTree(jsonPayload);
-            String[] ref = rootNode.path("ref").asText().split("/");
-            String[] extractedBranch = Arrays.copyOfRange(ref, 2, ref.length);
-            result.setBranch(String.join("/", extractedBranch));
+            try {
+                // Extract branch from the ref
+                JsonNode rootNode = objectMapper.readTree(jsonPayload);
+                String[] ref = rootNode.path("ref").asText().split("/");
+                String[] extractedBranch = Arrays.copyOfRange(ref, 2, ref.length);
+                result.setBranch(String.join("/", extractedBranch));
 
-
-            // Extract the user who triggered the webhook
-            JsonNode pusherNode = rootNode.path("pusher");
-            String pusher = pusherNode.path("email").asText();
-            result.setCreatedBy(pusher);
-            }
-            catch(Exception e)
-            {
+                // Extract the user who triggered the webhook
+                JsonNode pusherNode = rootNode.path("pusher");
+                String pusher = pusherNode.path("email").asText();
+                result.setCreatedBy(pusher);
+            } catch (Exception e) {
                 log.error("Error parsing JSON response", e);
                 result.setBranch("");
             }
 
             result.setFileChanges(new ArrayList());
             try {
-                GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload, GitHubWebhookModel.class);
+                GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload,
+                        GitHubWebhookModel.class);
                 result.setCommit(gitHubWebhookModel.getHead_commit().getId());
                 gitHubWebhookModel.getCommits().forEach(commit -> {
                     for (String addedObject : commit.getAdded()) {
@@ -95,7 +95,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
 
         return result;
     }
-    
+
     public void sendCommitStatus(Job job, JobStatus jobStatus) {
         Workspace workspace = job.getWorkspace();
         GithubCommitStatus commitStatus = GithubCommitStatus.pending;
@@ -104,7 +104,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
         switch (jobStatus) {
             case completed:
                 commitStatus = GithubCommitStatus.success;
-                commitStatusDescription = "Your task has been completed successfully."; 
+                commitStatusDescription = "Your task has been completed successfully.";
                 break;
             case failed:
             case rejected:
@@ -132,7 +132,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
 
         log.info(String.format("Sending job status %s to GitHub for commit %s", job.getStatus(), job.getCommitId()));
         // Create the body
-        String body = "{\"state\":\""+ commitStatus.name() 
+        String body = "{\"state\":\"" + commitStatus.name()
                 + "\",\"description\":\"" + commitStatusDescription + "\",\"target_url\":\""
                 + jobUrl + "\",\"context\":\"" + commitStatusContext + "\"}";
 
@@ -145,17 +145,11 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     public String createWebhook(Workspace workspace, String webhookId) {
-        String url = "";
+        String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
         String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
-
-        // Create the headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", "application/vnd.github+json");
-        headers.set("Authorization", "Bearer " + workspace.getVcs().getAccessToken());
-        headers.set("X-GitHub-Api-Version", "2022-11-28");
 
         // Create the body, in this version we only support push event but in future we
         // can make this more dynamic
@@ -163,22 +157,50 @@ public class GitHubWebhookService extends WebhookServiceBase {
                 + "\",\"secret\":\"" + secret + "\",\"content_type\":\"json\",\"insecure_ssl\":\"1\"}}";
         String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + ownerAndRepo + "/hooks";
 
-        ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
+        ResponseEntity<String> response = callGitHubApi(workspace.getVcs().getAccessToken(), body, apiUrl,
+                HttpMethod.POST);
         // Extract the id from the response
         if (response.getStatusCode().value() == 201) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
-                url = rootNode.path("url").asText();
+                id = rootNode.path("id").asText();
             } catch (Exception e) {
                 log.error("Error parsing JSON response", e);
             }
 
-            log.info("Hook created successfully {}" + url);
+            log.info("GitHub Hook created successfully for workspace {}/{} with id {}",
+                    workspace.getOrganization().getName(), workspace.getName(), id);
         }
 
-        return url;
+        return id;
 
+    }
+
+    public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
+        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+
+        ResponseEntity<String> response = callGitHubApi(workspace.getVcs().getAccessToken(), "", apiUrl,
+                HttpMethod.DELETE);
+        if (response.getStatusCode().value() == 204) {
+            log.info("Webhook with remote hook id {} on repository {} deleted successfully", webhookRemoteId,
+                    ownerAndRepo);
+        } else {
+            log.warn("Failed to delete webhook with remote hook id {} on repository {}, message {}", webhookRemoteId,
+                    ownerAndRepo, response.getBody());
+        }
+    }
+
+    private ResponseEntity<String> callGitHubApi(String token, String body, String apiUrl, HttpMethod httpMethod) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/vnd.github+json");
+        headers.set("Authorization", "Bearer " + token);
+        headers.set("X-GitHub-Api-Version", "2022-11-28");
+
+        ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl, httpMethod);
+
+        return response;
     }
 
 }

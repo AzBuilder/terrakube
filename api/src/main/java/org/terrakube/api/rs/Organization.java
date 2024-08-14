@@ -1,10 +1,11 @@
 package org.terrakube.api.rs;
 
-import com.yahoo.elide.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.sql.Types;
+import java.util.List;
+import java.util.UUID;
+
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 import org.terrakube.api.rs.agent.Agent;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.hooks.organization.OrganizationManageHook;
@@ -12,18 +13,28 @@ import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.module.Module;
 import org.terrakube.api.rs.provider.Provider;
 import org.terrakube.api.rs.ssh.Ssh;
-import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.tag.Tag;
+import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.Workspace;
-import org.hibernate.annotations.Type;
 
-import jakarta.persistence.*;
+import com.yahoo.elide.annotation.CreatePermission;
+import com.yahoo.elide.annotation.DeletePermission;
+import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.LifeCycleHookBinding;
+import com.yahoo.elide.annotation.ReadPermission;
+import com.yahoo.elide.annotation.UpdatePermission;
 
-import java.sql.Types;
-import java.util.List;
-import java.util.UUID;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
 
 @ReadPermission(expression = "user belongs organization")
 @CreatePermission(expression = "user is a superuser")
@@ -35,7 +46,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity(name = "organization")
-@Where(clause = "disabled = false")
+@SQLRestriction(value = "disabled = false")
 public class Organization {
 
     @Id

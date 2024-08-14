@@ -1,67 +1,68 @@
-import { React, useEffect, useState } from "react";
-import axiosInstance from "../../config/axiosConfig";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import {
-  ORGANIZATION_ARCHIVE,
-  WORKSPACE_ARCHIVE,
-  ORGANIZATION_NAME,
-} from "../../config/actionTypes";
-import {
-  Button,
-  Layout,
-  Breadcrumb,
-  Tabs,
-  List,
-  Space,
-  Avatar,
-  Tag,
-  Form,
-  Input,
-  Select,
-  message,
-  Spin,
-  Switch,
-  Typography,
-  Popconfirm,
-  Row,
-  Col,
-  Divider,
-  Table,
-} from "antd";
-import { compareVersions } from "./Workspaces";
-import { CreateJob } from "../Jobs/Create";
-import { DetailsJob } from "../Jobs/Details";
-import { Variables } from "../Workspaces/Variables";
-import { States } from "../Workspaces/States";
-import { Schedules } from "../Workspaces/Schedules";
-import { CLIDriven } from "../Workspaces/CLIDriven";
-import { Tags } from "../Workspaces/Tags";
-import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
-import ActionLoader from "../../ActionLoader.jsx";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
-  SyncOutlined,
-  ExclamationCircleOutlined,
-  StopOutlined,
-  InfoCircleOutlined,
   DeleteOutlined,
-  UserOutlined,
-  ThunderboltOutlined,
-  PlayCircleOutlined,
-  LockOutlined,
-  ProfileOutlined,
-  UnlockOutlined,
-  GitlabOutlined,
+  ExclamationCircleOutlined,
   GithubOutlined,
+  GitlabOutlined,
+  InfoCircleOutlined,
+  LockOutlined,
+  PlayCircleOutlined,
+  ProfileOutlined,
+  StopOutlined,
+  SyncOutlined,
+  ThunderboltOutlined,
+  UnlockOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
-import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import {
+  Avatar,
+  Breadcrumb,
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Layout,
+  List,
+  message,
+  Popconfirm,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Switch,
+  Table,
+  Tabs,
+  Tag,
+  Typography
+} from "antd";
+import { React, useEffect, useState } from "react";
 import { IconContext } from "react-icons";
-import { FiGitCommit } from "react-icons/fi";
 import { BiTerminal } from "react-icons/bi";
-import "./Workspaces.css";
+import { FiGitCommit } from "react-icons/fi";
+import { HiOutlineExternalLink } from "react-icons/hi";
+import { SiAzuredevops, SiBitbucket, SiTerraform } from "react-icons/si";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { v7 as uuid } from "uuid";
+import ActionLoader from "../../ActionLoader.jsx";
+import {
+  ORGANIZATION_ARCHIVE,
+  ORGANIZATION_NAME,
+  WORKSPACE_ARCHIVE,
+} from "../../config/actionTypes";
+import axiosInstance from "../../config/axiosConfig";
+import { CreateJob } from "../Jobs/Create";
+import { DetailsJob } from "../Jobs/Details";
+import { CLIDriven } from "../Workspaces/CLIDriven";
+import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
+import { Schedules } from "../Workspaces/Schedules";
+import { States } from "../Workspaces/States";
+import { Tags } from "../Workspaces/Tags";
+import { Variables } from "../Workspaces/Variables";
 import { getServiceIcon } from "./Icons.js";
+import { compareVersions } from "./Workspaces";
+import "./Workspaces.css";
 const { Option } = Select;
 const { Paragraph } = Typography;
 const include = {
@@ -71,6 +72,7 @@ const include = {
   SCHEDULE: "schedule",
   VCS: "vcs",
   AGENT: "agent",
+  WEBHOOK: "webhook",
 };
 const { DateTime } = require("luxon");
 const { Content } = Layout;
@@ -134,7 +136,13 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [currentStateId, setCurrentStateId] = useState(0);
   const [selectedIac, setSelectedIac] = useState("");
   const [actions, setActions] = useState([]);
+  const [webhook, setWebhook] = useState({});
+  const [pushWebhookEnabled, setPushWebhookEnabled] = useState(true);
+  const [defaultBranch, setDefaultBranch] = useState("");
+  const [defaultPath, setDefaultPath] = useState("");
+  const [defaultTemplate, setDefaultTemplate] = useState("");
   const [contextState, setContextState] = useState({});
+  const pushWebhookName = "PUSH";
   const handleClick = (jobid) => {
     changeJob(jobid);
     navigate(
@@ -331,13 +339,13 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
 
   useEffect(() => {
     setLoading(true);
-    loadWorkspace(true);
+    loadWorkspace(true, true);
     setLoading(false);
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
-      loadWorkspace(false);
+      loadWorkspace(false, false);
     }, 10000);
     return () => clearInterval(interval);
   }, [id]);
@@ -350,9 +358,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   };
 
   const loadVersions = (iacType) => {
-    const versionsApi = `${
-      new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-    }/${iacType}/index.json`;
+    const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+      }/${iacType}/index.json`;
     axiosInstance.get(versionsApi).then((resp) => {
       console.log(resp);
       const tfVersions = [];
@@ -371,14 +378,16 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     });
   };
 
-  const loadWorkspace = (_loadVersions) => {
+  const loadWorkspace = (_loadVersions, _loadWebhook) => {
+    var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization`;
+    if (_loadWebhook) url += ",webhook";
     axiosInstance
       .get(`organization/${organizationId}/template`)
       .then((template) => {
         setTemplates(template.data.data);
         axiosInstance
           .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization`
+            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook`
           )
           .then((response) => {
             if (_loadVersions)
@@ -402,6 +411,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 setResources,
                 setOutputs,
                 setAgent,
+                _loadWebhook,
+                setWebhook,
+                setPushWebhookEnabled,
                 setContextState
               );
             }
@@ -423,6 +435,25 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
           });
       });
   };
+
+  const handlePushWebhookClick = () => {
+    setPushWebhookEnabled(!pushWebhookEnabled);
+  }
+
+  const handleBranchChange = (e) => {
+    setDefaultBranch(e.target.value);
+  }
+  const handlePathChange = (e) => {
+    setDefaultPath(e.target.value);
+  }
+  const handleTemplateChange = (e) => {
+    orgTemplates.forEach((template) => {
+      if (template.id === e) {
+        setDefaultTemplate(template.attributes.name);
+        return;
+      }
+    });
+  }
 
   const handleClickSettings = () => {
     switchKey("6");
@@ -452,48 +483,103 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
           message.success("Workspace " + newstatus + " successfully");
         } else {
           var newstatus = locked ? "unlock" : "lock";
-          message.error("Workspace " + newstatus + " failed");
+          message.errr("Workspace " + newstatus + " failed");
         }
       });
   };
 
   const onFinish = (values) => {
     setWaiting(true);
+    const pushWebhookId = webhook[pushWebhookName]?.id;
+    const pushWebhookExists = pushWebhookId && pushWebhookId != "";
     const body = {
-      data: {
-        type: "workspace",
-        id: id,
-        attributes: {
-          name: values.name,
-          description: values.description,
-          folder: values.folder,
-          locked: values.locked,
-          executionMode: values.executionMode,
-          moduleSshKey: values.moduleSshKey,
-          terraformVersion: values.terraformVersion,
-          iacType: values.iacType,
-          branch: values.branch,
-          defaultTemplate: values.defaultTemplate,
+      "atomic:operations": [{
+        op: "update",
+        href: `/organization/${organizationId}/workspace/${id}`,
+        data: {
+          type: "workspace",
+          id: id,
+          attributes: {
+            name: values.name,
+            description: values.description,
+            folder: values.folder,
+            locked: values.locked,
+            executionMode: values.executionMode,
+            moduleSshKey: values.moduleSshKey,
+            terraformVersion: values.terraformVersion,
+            iacType: values.iacType,
+            branch: values.branch,
+            defaultTemplate: values.defaultTemplate,
+          },
         },
-      },
-    };
+      }]
+    }
+    if (pushWebhookEnabled) {
+      const newPushWebhookId = pushWebhookExists ? "" : uuid();
+      body["atomic:operations"].push({
+        op: pushWebhookExists ? "update" : "add",
+        href: pushWebhookExists ? `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}` : `/organization/${organizationId}/workspace/${id}/webhook`,
+        data: {
+          type: "webhook",
+          id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
+          attributes: {
+            id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
+            branch: values.pushWebhookBranch,
+            path: values.pushWebhookPath,
+            event: pushWebhookName,
+            templateId: values.pushWebhookTemplate,
+          },
+        }
+      })
+    }
+    if (!pushWebhookEnabled && pushWebhookExists) {
+      body["atomic:operations"].push({
+        op: "remove",
+        href: `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}`,
+      });
+    }
+
     console.log(body);
 
-    axiosInstance
-      .patch(`organization/${organizationId}/workspace/${id}`, body, {
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        if (response.status === 204) {
-          message.success("Workspace updated successfully");
-        } else {
-          message.error("Workspace update failed");
+    try {
+      axiosInstance
+        .post("/operations",
+          body, atomicHeader
+        )
+        .then((response) => {
+          console.log(response);
+          if (response.status === 200) {
+            const pushWebhookData = response.data["atomic:results"][1]?.data;
+            if (pushWebhookEnabled && pushWebhookData) {
+              var updatedWebhook = {};
+              updatedWebhook[pushWebhookData.attributes.event] = {
+                id: pushWebhookData.id,
+                type: pushWebhookData.type,
+                ...pushWebhookData.attributes,
+              };
+              setWebhook(updatedWebhook);
+            }
+            if (!pushWebhookEnabled && pushWebhookExists) {
+              var updatedWebhook = webhook;
+              updatedWebhook[pushWebhookName] = null;
+              setWebhook(updatedWebhook);
+            }
+            message.success("workspace updated successfully");
+          } else {
+            message.error("workspace update failed");
+          }
+          setWaiting(false);
+        });
+    } catch (error) {
+      console.error("error updating workspace:", error);
+      message.error("workspace update failed");
+      if (error.response) {
+        if (error.response.status === 424) {
+          message.error("failed to create push webhook, please check if the set vcs connection has the correct permissions on the linked repository.");
         }
         setWaiting(false);
-      });
+      }
+    }
 
     var bodyAgent;
     console.log(`Using Agent: ${values.executorAgent}`);
@@ -513,13 +599,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     axiosInstance
       .patch(
         `/organization/${organizationId}/workspace/${id}/relationships/agent`,
-        bodyAgent,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      )
+        bodyAgent, genericHeader)
       .then((response) => {
         console.log("Update Workspace agent successfully");
         console.log(response);
@@ -530,6 +610,53 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
         }
       });
   };
+
+  const genericHeader = {
+    headers: {
+      "Content-Type": "application/vnd.api+json",
+    },
+  };
+  const atomicHeader = {
+    headers: {
+      "content-type": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
+      "accept": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
+    },
+  };
+
+  const deleteWebhook = () => {
+    const webhooks = Object.entries(webhook);
+    if (webhooks.length == 0) return;
+    var body = {
+      "atomic:operations": []
+    };
+    webhooks.map(([_, hook]) => {
+      body["atomic:operations"].push({
+        op: "remove",
+        href: `/organization/${organizationId}/workspace/${id}/webhook/${hook.id}`,
+      });
+    });
+    try {
+      axiosInstance.post(
+        "/operations",
+        body, atomicHeader
+      )
+        .then((response) => {
+          if (response.status == 200) {
+            message.success("Webhook deleted successfully");
+          } else {
+            message.error("Webhook deletion failed");
+          }
+        });
+    } catch (error) {
+      console.error("Error deleting webhook:", error);
+      message.error("Webhook deletion failed");
+      if (error.response) {
+        if (error.response.status === 424) {
+          message.error("Failed to delete webhook, please check if the set VCS connection has the correct permissions on the linked repository.");
+        }
+      }
+    }
+  }
 
   const renderVCSLogo = (vcs) => {
     switch (vcs) {
@@ -572,11 +699,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       },
     };
     axiosInstance
-      .patch(`organization/${organizationId}/workspace/${id}`, body, {
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-        },
-      })
+      .patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader)
       .then((response) => {
         console.log(response);
         if (response.status === 204) {
@@ -587,6 +710,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
           message.error("Workspace deletion failed");
         }
       });
+    deleteWebhook();
   };
 
   return (
@@ -778,8 +902,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   <Row>
                     <Col span={19} style={{ paddingRight: "20px" }}>
                       {workspace.data.attributes.source === "empty" &&
-                      workspace.data.attributes.branch === "remote-content" &&
-                      workspace.data.relationships.history.data.length < 1 ? (
+                        workspace.data.attributes.branch === "remote-content" &&
+                        workspace.data.relationships.history.data.length < 1 ? (
                         <CLIDriven
                           organizationName={organizationNameLocal}
                           workspaceName={workspaceName}
@@ -799,9 +923,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                               dataSource={
                                 jobs.length > 0
                                   ? jobs
-                                      .sort((a, b) => a.id - b.id)
-                                      .reverse()
-                                      .slice(0, 1)
+                                    .sort((a, b) => a.id - b.id)
+                                    .reverse()
+                                    .slice(0, 1)
                                   : []
                               }
                               renderItem={(item) => (
@@ -845,7 +969,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                                 <Tag
                                                   icon={
                                                     item.status ==
-                                                    "completed" ? (
+                                                      "completed" ? (
                                                       <CheckCircleOutlined />
                                                     ) : item.status ==
                                                       "running" ? (
@@ -938,7 +1062,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         <br />
                         <span className="App-text">
                           {workspace.data.attributes.branch !==
-                          "remote-content" ? (
+                            "remote-content" ? (
                             <>
                               {" "}
                               {renderVCSLogo(vcsProvider)}{" "}
@@ -1105,6 +1229,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             workspace.data.relationships.agent.data?.id == null
                               ? "default"
                               : workspace.data.relationships.agent.data?.id,
+                          pushWebhookBranch: webhook[pushWebhookName]?.branch,
+                          pushWebhookPath: webhook[pushWebhookName]?.path,
+                          pushWebhookTemplate: webhook[pushWebhookName]?.templateId,
                         }}
                         layout="vertical"
                         name="form-settings"
@@ -1176,13 +1303,16 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             ) +
                             " will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
                           }
+                          onChange={handlePathChange}
                         >
                           <Input />
                         </Form.Item>
                         <Form.Item
                           name="branch"
-                          label="Branch list separated by comma used in VCS worklfow. The first is used as the default branch for runs kicked off from UI."
-                          extra="Don't update the value when using CLI Driven workflows. In the VCS driven workflow, the first branch is used for any runs from UI. All values in the list are compared as prefixes for runs kicked off from VCS webhooks."
+                          label="Default Branch"
+                          tooltip="The branch from which the runs are kicked off, this is used for runs issued from the UI."
+                          extra="Don't update the value when using CLI Driven workflows. This is only used in VCS driven workflow."
+                          onChange={handleBranchChange}
                         >
                           <Input />
                         </Form.Item>
@@ -1244,6 +1374,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           extra="Default template when doing a git push to the repository"
                         >
                           <Select
+                            onChange={handleTemplateChange}
                             defaultValue={
                               workspace.data.attributes.defaultTemplate
                             }
@@ -1302,6 +1433,54 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             <Option key="default">default</Option>
                           </Select>
                         </Form.Item>
+                        <Form.Item
+                          label="Enable Push Webhook?"
+                          hidden={vcsProvider == ""}
+                          tooltip={{
+                            title: "Whether to enable push webhook",
+                            icon: <InfoCircleOutlined />,
+                          }}
+                        >
+                          <Switch onChange={handlePushWebhookClick} defaultValue={pushWebhookEnabled} />
+                        </Form.Item>
+                        <Form.Item
+                          hidden={!pushWebhookEnabled}
+                          name="pushWebhookBranch"
+                          label="Webhook Branch"
+                          tooltip="A list of branch prefixes that will trigger a run."
+                          extra="A list of brach prefixes besides the default VCS branch that will trigger a run, for example 'feat,fix'. Values are separated by comma."
+                          rules={[{ required: false }]}
+                        >
+                          <Input placeholder={defaultBranch} />
+                        </Form.Item>
+                        <Form.Item
+                          hidden={!pushWebhookEnabled}
+                          name="pushWebhookPath"
+                          label="Webhook Path"
+                          tooltip="A list of regex to match against the paths in the source that will trigger a run."
+                          extra="A list of regex to match against the paths besides the 'Terraform Working Directory' that will trigger a run, for example 'modules/.*.tf'. Values are separated by comma."
+                          rules={[{ required: false }]}
+                        >
+                          <Input placeholder={defaultPath} />
+                        </Form.Item>
+                        <Form.Item
+                          hidden={!pushWebhookEnabled}
+                          name="pushWebhookTemplate"
+                          label="Webhook Template"
+                          tooltip="The template that will be executed when a push event is received from the selected VCS provider."
+                          extra="The template that will be executed when a push event is received from the selected VCS provider."
+                          rules={[{ required: false }]}
+                        >
+                          <Select placeholder={defaultTemplate} style={{ width: 250 }}>
+                            {orgTemplates.map(function (template, index) {
+                              return (
+                                <Option key={template?.id}>
+                                  {template?.attributes?.name}
+                                </Option>
+                              );
+                            })}
+                          </Select>
+                        </Form.Item>
                         <Form.Item>
                           <Button type="primary" htmlType="submit">
                             Save settings
@@ -1311,7 +1490,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     </Spin>
                     <h1>Delete Workspace</h1>
                     <div className="App-Text">
-                      Deleting the workspace will permanently delete the
+                      Deleting thill permanently delete the
                       information. Please be certain that you understand this.
                       This action cannot be undone.
                     </div>
@@ -1379,10 +1558,14 @@ function setupWorkspaceIncludes(
   setResources,
   setOutputs,
   setAgent,
+  _loadWebhook,
+  setWebhook,
+  setPushWebhookEnabled,
   setContextState
 ) {
   let variables = [];
   let jobs = [];
+  let webhooks = {};
   let envVariables = [];
   let history = [];
   let schedule = [];
@@ -1475,6 +1658,13 @@ function setupWorkspaceIncludes(
           });
         }
         break;
+      case include.WEBHOOK:
+        webhooks[element.attributes.event] = {
+          id: element.id,
+          type: element.type,
+          ...element.attributes,
+        };
+        break;
     }
   });
 
@@ -1483,6 +1673,10 @@ function setupWorkspaceIncludes(
   setJobs(jobs);
   setHistory(history);
   setSchedule(schedule);
+  if (_loadWebhook) {
+    setWebhook(webhooks);
+    setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
+  }
 
   console.log(
     `Parsing state for workspace ${localStorage.getItem(WORKSPACE_ARCHIVE)} `
@@ -1527,8 +1721,7 @@ function loadState(
     if (result.outputs.length < 1 && result.resources.length < 1) {
       axiosInstance
         .get(
-          `${
-            new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+          `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
           }/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`
         )
         .then((currentStateData) => {

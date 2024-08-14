@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.vcs.WebhookResult;
+import org.terrakube.api.plugin.vcs.WebhookServiceBase;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Service
 @Slf4j
-public class GitLabWebhookService {
+public class GitLabWebhookService extends WebhookServiceBase {
 
     private final ObjectMapper objectMapper;
 
@@ -133,7 +134,7 @@ public class GitLabWebhookService {
                gitlabUri, HttpMethod.POST, entity, String.class);
 
         // Extract the id from the response
-        if (response.getStatusCodeValue() == 201) {
+        if (response.getStatusCode().value() == 201) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
@@ -142,21 +143,33 @@ public class GitLabWebhookService {
                 log.error("Error parsing JSON response", e);
             }
 
-            log.info("Hook created successfully {}" + id);
+            log.info("GitHub Hook created successfully for workspace {}/{} with id {}",
+                    workspace.getOrganization().getName(), workspace.getName(), id);
         }
 
         return id;
     }
-
-    private String extractOwnerAndRepo(String repoUrl) {
-        try {
-            URL url = new URL(repoUrl);
-            String[] parts = url.getPath().split("/");
-            String ownerAndRepo = String.join("/", Arrays.copyOfRange(parts, 1, parts.length)).replace(".git", "");
-            return URLEncoder.encode(ownerAndRepo, "UTF-8");
-        } catch (Exception e) {
-           log.error("Error extracting owner and repo from URL", e);
+    
+    public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
+        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String apiUrl = workspace.getVcs().getApiUrl() + "/projects/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+        
+        ResponseEntity<String> response = callGitlabApi(workspace.getVcs().getAccessToken(), "", apiUrl, HttpMethod.DELETE);
+        if (response.getStatusCode().value() == 204) {
+            log.info("Webhook with remote hook id {} on repository {} deleted successfully", webhookRemoteId, ownerAndRepo);
+        } else {
+            log.warn("Failed to delete webhook with remote hook id {} on repository {}, message {}", webhookRemoteId, ownerAndRepo, response.getBody());
         }
-        return "";
+    }
+
+    private ResponseEntity<String> callGitlabApi(String token, String body, String apiUrl, HttpMethod httpMethod) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        headers.set("Authorization", "Bearer " + token);
+        headers.set("Content-Type", "application/json");
+        
+        ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl, httpMethod);
+        
+        return response;
     }
 }
