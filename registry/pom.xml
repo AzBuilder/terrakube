@@ -22,7 +22,7 @@
 		<commons-io.version>2.16.1</commons-io.version>
 		<mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
 		<rest-assured.version>5.5.0</rest-assured.version>
-		<junit-jupiter-api.version>5.10.3</junit-jupiter-api.version>
+		<junit-jupiter-api.version>5.11.0</junit-jupiter-api.version>
 		<!--groovy.version>3.0.8</groovy.version-->
 		<aws-sdk.version>1.12.767</aws-sdk.version>
 		<zt-zip.version>1.17</zt-zip.version>
