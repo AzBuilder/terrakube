@@ -28,7 +28,7 @@ public class EphemeralExecutorService {
     public boolean sendToEphemeralExecutor(Job job, ExecutorContext executorContext) {
         final String jobName = "job-" + job.getId();
         deleteEphemeralJob(job);
-        log.info("Ephemeral Executor Image {}, Job: {}, Namespace: {}", ephemeralConfiguration.getImage(), jobName, ephemeralConfiguration.getNamespace());
+        log.info("Ephemeral Executor Image {}, Job: {}, Namespace: {}, NodeSelector: {}", ephemeralConfiguration.getImage(), jobName, ephemeralConfiguration.getNamespace(), ephemeralConfiguration.getNodeSelector());
         SecretEnvSource secretEnvSource = new SecretEnvSource();
         secretEnvSource.setName(ephemeralConfiguration.getSecret());
         EnvFromSource envFromSource = new EnvFromSource();
@@ -51,7 +51,6 @@ public class EphemeralExecutorService {
 
         final List<EnvVar> executorEnvVarFlags = Arrays.asList(executorFlagBatch, executorFlagBatchJsonContent);
 
-
         io.fabric8.kubernetes.api.model.batch.v1.Job k8sJob = new JobBuilder()
                 .withApiVersion("batch/v1")
                 .withNewMetadata()
@@ -64,6 +63,7 @@ public class EphemeralExecutorService {
                 .withNewSpec()
                 .withNewTemplate()
                 .withNewSpec()
+                .withNodeSelector(ephemeralConfiguration.getNodeSelector())
                 .addNewContainer()
                 .withName(jobName)
                 .withEnvFrom(executorEnvVarFromSecret)

@@ -14,7 +14,7 @@
 	<name>Terrakube Terraform Registry</name>
 	<description>Open Source Terraform Registry for Terrakube</description>
 	<properties>
-		<azure.version>5.12.0</azure.version>
+		<azure.version>5.15.0</azure.version>
 		<java.version>17</java.version>
 		<lombok.version>1.18.34</lombok.version>
 		<terrakube-client-starter.version>0.16.0-beta.1</terrakube-client-starter.version>
@@ -22,11 +22,11 @@
 		<commons-io.version>2.16.1</commons-io.version>
 		<mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
 		<rest-assured.version>5.5.0</rest-assured.version>
-		<junit-jupiter-api.version>5.7.2</junit-jupiter-api.version>
+		<junit-jupiter-api.version>5.10.3</junit-jupiter-api.version>
 		<!--groovy.version>3.0.8</groovy.version-->
-		<aws-sdk.version>1.12.762</aws-sdk.version>
+		<aws-sdk.version>1.12.769</aws-sdk.version>
 		<zt-zip.version>1.17</zt-zip.version>
-		<gcp-libraries-bom.version>26.40.0</gcp-libraries-bom.version>
+		<gcp-libraries-bom.version>26.44.0</gcp-libraries-bom.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 		<!--BUILDPACK DATA-->
 		<buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.292</buildpack.builder>

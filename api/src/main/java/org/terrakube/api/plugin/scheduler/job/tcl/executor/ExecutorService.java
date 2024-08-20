@@ -154,7 +154,7 @@ public class ExecutorService {
         }
         executorContext.setTofu(iacType(job));
         executorContext.setCommitId(job.getCommitId());
-        executorContext.setFolder(job.getWorkspace().getFolder());
+        executorContext.setFolder(job.getWorkspace().getFolder().split(",")[0]);
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
         executorContext.setAgentUrl(getExecutorUrl(job));

@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @AllArgsConstructor
 @Slf4j
@@ -145,17 +144,21 @@ public class WebhookService {
     }
 
     private boolean checkFileChanges(List<String> files, String workspaceFolder){
-        if(files != null){
-            AtomicBoolean fileChanged = new AtomicBoolean(false);
-            files.forEach(file-> {
-                log.info("File: {} in {}: {}", file, workspaceFolder.substring(1), file.startsWith(workspaceFolder.substring(1)));
-                if(file.startsWith(workspaceFolder.substring(1)) && !fileChanged.get()){
-                    fileChanged.set(true);
+        String[] triggeredPath = workspaceFolder.split(",");
+        for (String file: files){
+            if(file.startsWith(triggeredPath[0].substring(1))){
+                log.info("Changed file {} in set workspace path {}", file, triggeredPath[0]);
+                return true;
+            }
+            for (int i = 1; i< triggeredPath.length; i++){  
+                if(file.matches(triggeredPath[i])){
+                    log.info("Changed file {} matches set trigger pattern {}", file, triggeredPath[i]);
+                    return true;
                 }
-            });
-            return fileChanged.get();
-        } else
-            return true;
+            }
+        }
+        log.info("Changed files {} doesn't match any of the trigger path pattern {}", files, triggeredPath);
+        return false;
     }
 
 

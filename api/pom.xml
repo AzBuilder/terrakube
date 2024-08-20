@@ -16,31 +16,31 @@
     <properties>
         <java.version>17</java.version>
         <elide.version>7.1.0</elide.version>
-        <liquibase-core.version>4.28.0</liquibase-core.version>
-        <azure.version>5.12.0</azure.version>
-        <mssql-jdbc.version>12.6.3.jre11</mssql-jdbc.version>
-        <msal4j.version>1.15.1</msal4j.version>
+        <liquibase-core.version>4.29.1</liquibase-core.version>
+        <azure.version>5.15.0</azure.version>
+        <mssql-jdbc.version>12.8.0.jre11</mssql-jdbc.version>
+        <msal4j.version>1.16.2</msal4j.version>
         <lombok.version>1.18.34</lombok.version>
         <jgit.version>6.10.0.202406032230-r</jgit.version>
         <rest-assured.version>5.5.0</rest-assured.version>
-        <junit-jupiter-api.version>5.9.0</junit-jupiter-api.version>
+        <junit-jupiter-api.version>5.10.3</junit-jupiter-api.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.3</postgresql.version>
         <mysql.version>8.0.30</mysql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <quartz.version>2.5.0-rc1</quartz.version>
-        <aws-sdk.version>1.12.761</aws-sdk.version>
-        <gcp-libraries-bom.version>26.3.0</gcp-libraries-bom.version>
+        <aws-sdk.version>1.12.769</aws-sdk.version>
+        <gcp-libraries-bom.version>26.44.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
         <jedis.version>4.4.8</jedis.version>
         <commons-text.version>1.12.0</commons-text.version>
-        <commons-lang3.version>3.15.0</commons-lang3.version>
+        <commons-lang3.version>3.16.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
-        <maven-artifact.version>3.8.8</maven-artifact.version>
+        <maven-artifact.version>3.9.9</maven-artifact.version>
         <commons-io.version>2.16.1</commons-io.version>
-        <kubernetes-client.version>6.13.1</kubernetes-client.version>
+        <kubernetes-client.version>6.13.3</kubernetes-client.version>
         <!--BUILDPACK DATA-->
         <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.292</buildpack.builder>
         <buildpack.java>gcr.io/paketo-buildpacks/java:13.0.1</buildpack.java>
@@ -308,13 +308,13 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>9.38-rc3</version>
+            <version>9.40</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>9.37.3</version>
+            <version>9.40</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

@@ -276,8 +276,8 @@ public class RemoteTfeService {
             attributes.put("execution-mode", workspace.get().getExecutionMode());
             attributes.put("global-remote-state", true);
 
-            if (workspace.get().getFolder() != null && (workspace.get().getVcs() != null || workspace.get().getSsh() != null) && !workspace.get().getFolder().equals("/")){
-                attributes.put("working-directory", workspace.get().getFolder());
+            if (workspace.get().getFolder() != null && (workspace.get().getVcs() != null || workspace.get().getSsh() != null) && !workspace.get().getFolder().split(",")[0].equals("/")){
+                attributes.put("working-directory", workspace.get().getFolder().split(",")[0]);
             }
 
             boolean isManageWorkspace = validateUserManageWorkspace(workspace.get().getOrganization(), currentUser);

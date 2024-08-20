@@ -125,8 +125,8 @@ public class TclService {
                 log.info("Checking import commands in YAML");
                 ImportComands importComands = finalFlow.getImportComands();
                 if (importComands != null) {
-                    log.info("Import commands from {} branch {} folder {}", importComands.getRepository(), importComands.getBranch(), importComands.getFolder());
-                    finalFlow.setCommands(importCommands(importComands.getRepository(), importComands.getBranch(), importComands.getFolder()));
+                    log.info("Import commands from {} branch {} folder {}", importComands.getRepository(), importComands.getBranch(), importComands.getFolder().split(",")[0]);
+                    finalFlow.setCommands(importCommands(importComands.getRepository(), importComands.getBranch(), importComands.getFolder().split(",")[0]));
                 }
 
                 return finalFlow;
