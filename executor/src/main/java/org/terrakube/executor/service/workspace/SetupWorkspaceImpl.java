@@ -323,7 +323,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return sshFile.getParentFile();
     }
 
-    private CredentialsProvider setupCredentials(String vcsType, String accessToken) {
+    @Override
+    public CredentialsProvider setupCredentials(String vcsType, String accessToken) {
         CredentialsProvider credentialsProvider = null;
         log.info("vcsType: {}", vcsType);
         switch (vcsType) {

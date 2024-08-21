@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.workspace.SetupWorkspace;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,13 +36,15 @@ public class ScriptEngineService {
     private BashEngine bashEngine;
     private String toolsRepository;
     private String toolsBranch;
+    private SetupWorkspace setupWorkspace;
 
     @Autowired
-    public ScriptEngineService(GroovyEngine groovyEngine, BashEngine bashEngine, @Value("${org.terrakube.tools.repository}") String toolsRepository, @Value("${org.terrakube.tools.branch}") String toolsBranch) {
+    public ScriptEngineService(GroovyEngine groovyEngine, BashEngine bashEngine, @Value("${org.terrakube.tools.repository}") String toolsRepository, @Value("${org.terrakube.tools.branch}") String toolsBranch, SetupWorkspace setupWorkspace) {
         this.groovyEngine = groovyEngine;
         this.bashEngine = bashEngine;
         this.toolsRepository = toolsRepository;
         this.toolsBranch = toolsBranch;
+        this.setupWorkspace = setupWorkspace;
     }
 
     public boolean execute(TerraformJob terraformJob, List<Command> commands, File terraformWorkingDir, Consumer<String> output) {
@@ -53,7 +56,7 @@ public class ScriptEngineService {
             });
 
             try {
-                createToolsDirectory(terraformWorkingDir);
+                createToolsDirectory(terraformWorkingDir, terraformJob);
 
                 commandOrder.forEach((priority, command) -> {
                     if (executeSuccess.get()) {
@@ -99,15 +102,22 @@ public class ScriptEngineService {
         output.accept(colorize("\n\n", colorMessage));
     }
 
-    private void createToolsDirectory(File terraformWorkingDir) throws IOException {
+    private void createToolsDirectory(File terraformWorkingDir, TerraformJob terraformJob) throws IOException {
         FileUtils.deleteDirectory(getToolsRepository(terraformWorkingDir));
         FileUtils.forceMkdir(getToolsRepository(terraformWorkingDir));
-
+        String privateRepositoryType = terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE");
+        String privateRepositoryToken = terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN");
         try {
             Git.cloneRepository()
                     .setURI(this.toolsRepository)
                     .setDirectory(getToolsRepository(terraformWorkingDir))
                     .setBranch(this.toolsBranch)
+                    .setCredentialsProvider(
+                            setupWorkspace.setupCredentials(
+                                    privateRepositoryType != null ? privateRepositoryType : "PUBLIC",
+                                    privateRepositoryToken
+                            )
+                    )
                     .call();
         } catch (GitAPIException e) {
             log.error(e.getMessage());

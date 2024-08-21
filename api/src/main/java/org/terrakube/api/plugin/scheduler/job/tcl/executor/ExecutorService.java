@@ -8,6 +8,7 @@ import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
 import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.SshRepository;
+import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
@@ -43,6 +44,9 @@ public class ExecutorService {
 
     @Autowired
     SshRepository sshRepository;
+
+    @Autowired
+    VcsRepository vcsRepository;
 
     @Autowired
     DynamicCredentialsService dynamicCredentialsService;
@@ -203,6 +207,19 @@ public class ExecutorService {
         if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_GCP")) {
             workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsGcp(job, workspaceEnvVariables);
         }
+
+        if (workspaceEnvVariables.containsKey("TERRAKUBE_PRIVATE_EXTENSION_VCS_ID_AUTH")){
+            log.warn("Found TERRAKUBE_PRIVATE_EXTENSION_VCS_ID_AUTH, adding authentication information for private extension repository");
+
+            Optional<Vcs> vcs = vcsRepository.findById(UUID.fromString(workspaceEnvVariables.get("TERRAKUBE_PRIVATE_EXTENSION_VCS_ID_AUTH")));
+            if(vcs.isPresent()) {
+                workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE",vcs.get().getVcsType().toString());
+                workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN",vcs.get().getAccessToken());
+            } else {
+                log.error("VCS for private extension repository not found");
+            }
+        }
+
         return workspaceEnvVariables;
     }
 
