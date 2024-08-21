@@ -8,5 +8,4 @@ import java.io.File;
 public interface SetupWorkspace {
 
     File prepareWorkspace(TerraformJob terraformJob);
-    CredentialsProvider setupCredentials(String vcsType, String accessToken);
 }
