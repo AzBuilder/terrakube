@@ -3,6 +3,8 @@ package org.terrakube.executor.service.scripts;
 import com.diogonunes.jcolor.AnsiFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.terrakube.executor.service.mode.Command;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.scripts.bash.BashEngine;
@@ -13,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.workspace.SetupWorkspace;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +56,7 @@ public class ScriptEngineService {
             });
 
             try {
-                createToolsDirectory(terraformWorkingDir);
+                createToolsDirectory(terraformWorkingDir, terraformJob);
 
                 commandOrder.forEach((priority, command) -> {
                     if (executeSuccess.get()) {
@@ -99,15 +102,38 @@ public class ScriptEngineService {
         output.accept(colorize("\n\n", colorMessage));
     }
 
-    private void createToolsDirectory(File terraformWorkingDir) throws IOException {
+    private void createToolsDirectory(File terraformWorkingDir, TerraformJob terraformJob) throws IOException {
         FileUtils.deleteDirectory(getToolsRepository(terraformWorkingDir));
         FileUtils.forceMkdir(getToolsRepository(terraformWorkingDir));
-
+        String privateRepositoryType = "PUBLIC";
+        privateRepositoryType = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") : privateRepositoryType;
+        String privateRepositoryToken = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") : null;
         try {
+            CredentialsProvider credentialsProvider;
+            log.info("Private Extension vcsType: {}", privateRepositoryType);
+            switch (privateRepositoryType) {
+                case "GITLAB":
+                    credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", privateRepositoryToken);
+                    break;
+                case "BITBUCKET":
+                    credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", privateRepositoryToken);
+                    break;
+                case "AZURE_DEVOPS":
+                    credentialsProvider = new UsernamePasswordCredentialsProvider("dummy", privateRepositoryToken);
+                    break;
+                case "GITHUB":
+                    credentialsProvider = new UsernamePasswordCredentialsProvider(privateRepositoryToken, "");
+                    break;
+                default:
+                    credentialsProvider = null;
+                    break;
+            }
+
             Git.cloneRepository()
                     .setURI(this.toolsRepository)
                     .setDirectory(getToolsRepository(terraformWorkingDir))
                     .setBranch(this.toolsBranch)
+                    .setCredentialsProvider(credentialsProvider)
                     .call();
         } catch (GitAPIException e) {
             log.error(e.getMessage());
