@@ -9,5 +9,9 @@
                 columnName="variable_key"
                 newDataType="varchar(1024)"
                 tableName="globalvar"/>
+        <modifyDataType
+                columnName="variable_key"
+                newDataType="varchar(1024)"
+                tableName="variable"/>
     </changeSet>
 </databaseChangeLog>
