@@ -208,10 +208,10 @@ public class ExecutorService {
             workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsGcp(job, workspaceEnvVariables);
         }
 
-        if (workspaceEnvVariables.containsKey("TERRAKUBE_PRIVATE_EXTENSION_VCS_ID_AUTH")){
-            log.warn("Found TERRAKUBE_PRIVATE_EXTENSION_VCS_ID_AUTH, adding authentication information for private extension repository");
+        if (workspaceEnvVariables.containsKey("PRIVATE_EXTENSION_VCS_ID_AUTH")){
+            log.warn("Found PRIVATE_EXTENSION_VCS_ID_AUTH, adding authentication information for private extension repository");
 
-            Optional<Vcs> vcs = vcsRepository.findById(UUID.fromString(workspaceEnvVariables.get("TERRAKUBE_PRIVATE_EXTENSION_VCS_ID_AUTH")));
+            Optional<Vcs> vcs = vcsRepository.findById(UUID.fromString(workspaceEnvVariables.get("PRIVATE_EXTENSION_VCS_ID_AUTH")));
             if(vcs.isPresent()) {
                 workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE",vcs.get().getVcsType().toString());
                 workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN",vcs.get().getAccessToken());
