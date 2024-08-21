@@ -105,8 +105,9 @@ public class ScriptEngineService {
     private void createToolsDirectory(File terraformWorkingDir, TerraformJob terraformJob) throws IOException {
         FileUtils.deleteDirectory(getToolsRepository(terraformWorkingDir));
         FileUtils.forceMkdir(getToolsRepository(terraformWorkingDir));
-        String privateRepositoryType = terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE");
-        String privateRepositoryToken = terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN");
+        String privateRepositoryType = "PUBLIC";
+        privateRepositoryType = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") : privateRepositoryType;
+        String privateRepositoryToken = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") : null;
         try {
             CredentialsProvider credentialsProvider;
             log.info("Private Extension vcsType: {}", privateRepositoryType);
