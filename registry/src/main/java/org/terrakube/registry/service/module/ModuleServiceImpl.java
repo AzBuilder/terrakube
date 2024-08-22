@@ -1,7 +1,10 @@
 package org.terrakube.registry.service.module;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
 import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.module.Module;
 import org.terrakube.client.model.organization.module.ModuleAttributes;
@@ -9,13 +12,10 @@ import org.terrakube.client.model.organization.module.ModuleRequest;
 import org.terrakube.client.model.organization.ssh.Ssh;
 import org.terrakube.client.model.organization.vcs.Vcs;
 import org.terrakube.client.model.organization.vcs.github_app_token.GitHubAppToken;
-import org.terrakube.client.model.response.Response;
 import org.terrakube.registry.plugin.storage.StorageService;
-import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
@@ -89,6 +89,7 @@ public class ModuleServiceImpl implements ModuleService {
 
     private String getAccessToken(String organizationId, String vcsId, String repository_source) {
         Vcs vcs = getVcsInformation(organizationId, vcsId);
+        if (vcs == null) return null;
         String token = vcs.getAttributes().getAccessToken();
         if(token == null && vcs.getAttributes().getConnectionType().equals("STANDALONE")) {
             log.info("The VCS connection is on a standalone app, getting the GitHub App token");

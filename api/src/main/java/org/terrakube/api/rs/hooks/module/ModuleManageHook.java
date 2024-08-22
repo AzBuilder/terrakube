@@ -94,7 +94,7 @@ public class ModuleManageHook implements LifeCycleHook<Module> {
     }
 
     private void checkAndCreateGitHubAppToken(Module module) {
-        if (module.getVcs().getConnectionType() == VcsConnectionType.OAUTH
+        if (module.getVcs() == null || module.getVcs().getConnectionType() == VcsConnectionType.OAUTH
                 || module.getVcs().getVcsType() != VcsType.GITHUB)
             return;
         String[] ownerAndRepo;
@@ -103,9 +103,11 @@ public class ModuleManageHook implements LifeCycleHook<Module> {
             ownerAndRepo = Arrays
                     .copyOfRange(new URI(module.getSource()).getPath().replaceAll("\\.git$", "").split("/"), 1, 3);
             gitHubAppToken = gitHubTokenService.getGitHubAppToken(module.getVcs(), ownerAndRepo);
-            log.debug("Successfully fetched GitHub App Token for module {}/{}/{}", module.getOrganization().getName(), module.getName(), module.getProvider());
+            log.debug("Successfully fetched GitHub App Token for module {}/{}/{}", module.getOrganization().getName(),
+                    module.getName(), module.getProvider());
         } catch (URISyntaxException | JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error("Failed to fetch GitHub App Token for module {}/{}/{}, error {}", module.getOrganization().getName(), module.getName(), module.getProvider(), e);
+            log.error("Failed to fetch GitHub App Token for module {}/{}/{}, error {}",
+                    module.getOrganization().getName(), module.getName(), module.getProvider(), e);
         }
         module.setGitHubAppToken(gitHubAppToken);
     }
