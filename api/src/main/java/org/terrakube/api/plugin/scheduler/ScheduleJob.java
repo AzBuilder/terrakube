@@ -88,6 +88,12 @@ public class ScheduleJob implements org.quartz.Job {
             return;
         }
 
+        if(job.getWorkspace() == null ){
+            log.warn("Workspace does not exist anymore, deleting job context for {}", jobId);
+            removeJobContext(job, jobExecutionContext);
+            return;
+        }
+
         if (job.getWorkspace().isLocked()) {
             log.warn("Job {}, Workspace is locked. It must be unlocked before Terrakube can execute it.", jobId);
             return;

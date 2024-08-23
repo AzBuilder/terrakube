@@ -223,21 +223,26 @@ public class RemoteTfeController {
 
     @Transactional
     @GetMapping(produces = "application/vnd.api+json", path = "/runs/{runId}")
-    public ResponseEntity<RunsData> getRun(@PathVariable("runId") int runId, @RequestParam(name = "include", required = false) String include) {
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getRun(runId, include)));
+    public ResponseEntity<RunsData> getRun(@PathVariable("runId") String runId, @RequestParam(name = "include", required = false) String include) {
+        log.info("Get run {}", runId.replace("run-",""));
+        int runIdFixed = Integer.parseInt(runId.replace("run-",""));
+        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.getRun(runIdFixed, include)));
     }
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/runs/{runId}/actions/apply")
-    public ResponseEntity<RunsData> runApply(@PathVariable("runId") int runId) {
-        return ResponseEntity.ok(remoteTfeService.runApply(runId));
+    public ResponseEntity<RunsData> runApply(@PathVariable("runId") String runId) {
+        log.info("Applying run {}", runId.replace("run-",""));
+        int runIdFixed = Integer.parseInt(runId.replace("run-",""));
+        return ResponseEntity.ok(remoteTfeService.runApply(runIdFixed));
     }
 
     @Transactional
     @PostMapping(produces = "application/vnd.api+json", path = "/runs/{runId}/actions/discard")
-    public ResponseEntity<RunsData> runDiscard(@PathVariable("runId") int runId) {
-        log.info("Running discard: {}", runId);
-        return ResponseEntity.ok(remoteTfeService.runDiscard(runId));
+    public ResponseEntity<RunsData> runDiscard(@PathVariable("runId") String runId) {
+        log.info("Running discard: {}", runId.replace("run-",""));
+        int runIdFixed = Integer.parseInt(runId.replace("run-",""));
+        return ResponseEntity.ok(remoteTfeService.runDiscard(runIdFixed));
     }
 
 

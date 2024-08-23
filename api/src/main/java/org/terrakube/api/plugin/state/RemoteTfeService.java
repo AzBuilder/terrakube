@@ -800,7 +800,7 @@ public class RemoteTfeService {
         if(job.getWorkspace() != null) {
             RunsData runsData = new RunsData();
             RunsModel runsModel = new RunsModel();
-            runsModel.setId(String.valueOf(runId));
+            runsModel.setId("run-" + runId);
             runsModel.setType("runs");
             runsModel.setAttributes(new HashMap<>());
 
