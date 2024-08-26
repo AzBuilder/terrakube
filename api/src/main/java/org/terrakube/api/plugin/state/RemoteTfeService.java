@@ -976,8 +976,40 @@ public class RemoteTfeService {
     }
 
     RunsData runApply(int runId) {
+
         Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
         if (job.getStep() != null && !job.getStep().isEmpty()) {
+
+            //We need to check if the run was only a plan
+            //If the job status is completed and only a plan was executed
+            //we need to add the apply so the job execution can continue
+            List<Step> steps = job.getStep();
+            if(job.getStatus().equals(JobStatus.completed) && steps.size() == 1 && steps.get(0).getStepNumber() == 100) {
+                log.warn("Only a plan was executed, adding apply steps to job execution");
+                Step approvalStep = new Step();
+                approvalStep.setStatus(JobStatus.pending);
+                approvalStep.setStepNumber(150);
+                approvalStep.setName("Approve Plan from Terraform CLI");
+                approvalStep.setJob(job);
+                approvalStep = stepRepository.save(approvalStep);
+                log.warn("Approval Step {} added for job {}", approvalStep.getId(), job.getId());
+
+                Step applyStep = new Step();
+                applyStep.setStatus(JobStatus.pending);
+                applyStep.setStepNumber(200);
+                applyStep.setName("Terraform Apply from Terraform CLI");
+                applyStep.setJob(job);
+                applyStep = stepRepository.save(applyStep);
+                log.warn("Apply Step {} added for job {}", applyStep.getId(), job.getId());
+
+                Template cliTemplate = templateRepository.getByOrganizationNameAndName(job.getOrganization().getName(),"Terraform-Plan/Apply-Cli");
+                job.setTcl(cliTemplate.getTcl());
+                job.setStatus(JobStatus.pending);
+                job = jobRepository.save(job);
+                log.warn("Update job {} to status PENDING to continue execution", job.getId());
+            }
+
+
             for (Step step : job.getStep()) {
                 if (step.getStepNumber() == 150) {
                     step.setStatus(JobStatus.completed);
