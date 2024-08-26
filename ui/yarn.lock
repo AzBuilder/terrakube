@@ -6012,10 +6012,10 @@ html-minifier-terser@^6.0.2:
     relateurl "^0.2.7"
     terser "^5.10.0"
 
-html-react-parser@^5.1.12:
-  version "5.1.12"
-  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-5.1.12.tgz#6c537b5371be8ba4b81b8d0ede17d1bc3924efd8"
-  integrity sha512-OPv8fsIvxxv/+pLj9mYvyNu8PE5dPMowTRdd5VHpcoZpXlstp8eYCxQ5rzqAE5Tb75rhdiWUXnPltfb62zCVjg==
+html-react-parser@^5.1.13:
+  version "5.1.13"
+  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-5.1.13.tgz#3e5804a2873cd4ba9b848a7de52b4945c44ce690"
+  integrity sha512-XTG2lbn9JDHc3DqGLpHkoArvptXMPl+Ckk5/cqRhdUmrhcPNZ5MPDrwd2PU3BePl2QmkLOb3WsWdjAotznMdUw==
   dependencies:
     domhandler "5.0.3"
     html-dom-parser "5.0.9"
