@@ -305,6 +305,7 @@ export const CreateWorkspace = () => {
               terraformVersion: values.terraformVersion,
               branch: values.branch,
               iacType: iacType.id,
+              defaultTemplate: values.defaultTemplate,
             },
             relationships: {}
           },
