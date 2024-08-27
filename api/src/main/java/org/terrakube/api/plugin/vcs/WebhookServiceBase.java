@@ -82,9 +82,13 @@ public class WebhookServiceBase {
     }
 
     protected ResponseEntity<String> makeApiRequest(HttpHeaders headers, String body, String apiUrl) {
+        return makeApiRequest(headers, body, apiUrl, HttpMethod.POST);
+    }
+
+    protected ResponseEntity<String> makeApiRequest(HttpHeaders headers, String body, String apiUrl, HttpMethod method) {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        return restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+        return restTemplate.exchange(apiUrl, method, entity, String.class);
     }
 
     protected WebhookResult handleWebhook(String jsonPayload, Map<String, String> headers, String token,

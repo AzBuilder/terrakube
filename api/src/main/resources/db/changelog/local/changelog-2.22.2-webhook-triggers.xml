@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="2-22-2-1" author="Stanley Zhang (stanley.zhang@ityin.net)">
+        <addColumn tableName="webhook">
+            <column name="branch" type="varchar(512)" />
+            <column name="path" type="varchar(512)" />
+            <column name="event" type="varchar(72)" />
+            <column name="template_id" type="varchar(36)" />
+            <column name="created_date" type="datetime" />
+            <column name="updated_date" type="datetime" />
+            <column name="created_by" type="varchar(128)"/> 
+            <column name="updated_by" type="varchar(128)"/> 
+        </addColumn>
+        <dropColumn tableName="webhook">
+            <column name="template_mapping" />
+            <column name="type" />
+        </dropColumn>
+
+        <renameColumn tableName="webhook" oldColumnName="reference_id" newColumnName="workspace_id"
+            columnDataType="varchar(36)" />
+
+        <addForeignKeyConstraint baseTableName="webhook" baseColumnNames="template_id"
+            constraintName="fk_webhook_template_id" referencedTableName="template"
+            referencedColumnNames="id" onDelete="SET NULL" />
+        <addForeignKeyConstraint baseTableName="webhook" baseColumnNames="workspace_id"
+            constraintName="fk_webhook_workspace_id" referencedTableName="workspace"
+            referencedColumnNames="id" onDelete="CASCADE" />
+    </changeSet>
+</databaseChangeLog>
