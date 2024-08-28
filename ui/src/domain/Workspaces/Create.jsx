@@ -1,34 +1,37 @@
-import { React, useState, useEffect } from "react";
 import {
+  DownOutlined,
+  InfoCircleOutlined,
+  GithubOutlined,
+  GitlabOutlined,
+} from "@ant-design/icons";
+import {
+  Breadcrumb,
+  Button,
+  Card,
+  Checkbox,
+  Dropdown,
   Form,
   Input,
-  Button,
-  Breadcrumb,
   Layout,
-  Steps,
-  Card,
-  Space,
-  Select,
-  message,
-  Dropdown,
   List,
+  Select,
+  Space,
+  Switch,
+  Steps,
+  message,
 } from "antd";
+import { React, useEffect, useState, version } from "react";
+import { IconContext } from "react-icons";
+import { BiBookBookmark, BiTerminal, BiUpload } from "react-icons/bi";
+import { SiAzuredevops, SiBitbucket, SiGit } from "react-icons/si";
+import { Link, useNavigate } from "react-router-dom";
+import { v7 as uuid } from "uuid";
 import {
   ORGANIZATION_ARCHIVE,
   ORGANIZATION_NAME,
 } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
-import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
 import { compareVersions } from "./Workspaces";
-import { IconContext } from "react-icons";
-import {
-  GithubOutlined,
-  GitlabOutlined,
-  DownOutlined,
-} from "@ant-design/icons";
-import { SiBitbucket, SiAzuredevops } from "react-icons/si";
-import { SiGit } from "react-icons/si";
-import { useNavigate, Link } from "react-router-dom";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -50,6 +53,10 @@ export const CreateWorkspace = () => {
   const [vcsId, setVcsId] = useState("");
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep4Hidden] = useState(true);
+  const [isWebhooKEnabled, setWebhookEnabled] = useState(true);
+  const [defaultBranch, setDefaultBranch] = useState("");
+  const [defaultPath, setDefaultPath] = useState("");
+  const [defaultTemplate, setDefaultTemplate] = useState("");
   const [step2Hidden, setStep3Hidden] = useState(true);
   const [sshKeysVisible, setSSHKeysVisible] = useState(false);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
@@ -166,6 +173,25 @@ export const CreateWorkspace = () => {
     setVCSButtonsVisible(true);
   };
 
+  const handleWebhookClick = (e) => {
+    setWebhookEnabled(!isWebhooKEnabled);
+  }
+
+  const handleBranchChange = (e) => {
+    setDefaultBranch(e.target.value);
+  }
+  const handlePathChange = (e) => {
+    setDefaultPath(e.target.value);
+  }
+  const handleTemplateChange = (e) => {
+    orgTemplates.forEach((template) => {
+      if (template.id === e) {
+        setDefaultTemplate(template.attributes.name);
+        return;
+      }
+    });
+  }
+
   const renderVCSLogo = (vcs) => {
     switch (vcs) {
       case "GITLAB":
@@ -242,9 +268,8 @@ export const CreateWorkspace = () => {
   };
 
   const loadVersions = (iacType) => {
-    const versionsApi = `${
-      new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-    }/${iacType.id}/index.json`;
+    const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+      }/${iacType.id}/index.json`;
     axiosInstance.get(versionsApi).then((resp) => {
       console.log(resp);
       const tfVersions = [];
@@ -264,84 +289,95 @@ export const CreateWorkspace = () => {
   };
 
   const onFinish = (values) => {
+    const workspace_lid = uuid();
     let body = {
-      data: {
-        type: "workspace",
-        attributes: {
-          source: values.source,
-          folder: values.folder,
-          name: values.name,
-          terraformVersion: values.terraformVersion,
-          branch: values.branch,
-          iacType: iacType.id,
-        },
-      },
+      "atomic:operations": [
+        {
+          op: "add",
+          href: `/organization/${organizationId}/workspace`,
+          data: {
+            type: "workspace",
+            lid: workspace_lid,
+            attributes: {
+              source: values.source,
+              folder: values.folder,
+              name: values.name,
+              terraformVersion: values.terraformVersion,
+              branch: values.branch,
+              iacType: iacType.id,
+              defaultTemplate: values.defaultTemplate,
+            },
+            relationships: {}
+          },
+        }],
     };
 
     if (vcsId !== "") {
-      body = {
+      body["atomic:operations"][0].data.relationships["vcs"] = {
         data: {
-          type: "workspace",
-          attributes: {
-            source: values.source,
-            folder: values.folder,
-            name: values.name,
-            terraformVersion: values.terraformVersion,
-            branch: values.branch,
-            iacType: iacType.id,
-            defaultTemplate: values.defaultTemplate,
-          },
-          relationships: {
-            vcs: {
-              data: {
-                type: "vcs",
-                id: vcsId,
-              },
-            },
-          },
-        },
-      };
-    }
-    if (values.sshKey) {
-      body = {
-        data: {
-          type: "workspace",
-          attributes: {
-            source: values.source,
-            folder: values.folder,
-            name: values.name,
-            terraformVersion: values.terraformVersion,
-            branch: values.branch,
-            iacType: iacType.id,
-          },
-          relationships: {
-            ssh: {
-              data: {
-                type: "ssh",
-                id: values.sshKey,
-              },
-            },
-          },
+          type: "vcs",
+          id: vcsId,
         },
       };
     }
 
+    if (values.sshKey) {
+      body["atomic:operations"][0].data.relationships["ssh"] = {
+        data: {
+          type: "ssh",
+          id: values.sshKey,
+        },
+      }
+    }
+
+    if (isWebhooKEnabled) {
+      const webhook_lid = uuid();
+      body["atomic:operations"].push({
+        op: "add",
+        href: `/organization/${organizationId}/workspace/${workspace_lid}/webhook`,
+        data: {
+          type: "webhook",
+          lid: webhook_lid,
+          attributes: {
+            branch: values.webhookBranch,
+            path: values.webhookPath,
+            templateId: values.webhookTemplate,
+          },
+          relationships: {
+            workspace: {
+              data: {
+                type: "workspace",
+                id: workspace_lid,
+              }
+            }
+          }
+        }
+      })
+    }
+
     axiosInstance
-      .post(`organization/${organizationId}/workspace`, body, {
+      .post(`/operations`, body, {
         headers: {
-          "Content-Type": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
+          "Accept": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
         },
       })
       .then((response) => {
         console.log(response.status);
-        if (response.status === 201) {
-          console.log("/workspaces/" + response.data.data.id);
-          navigate("/workspaces/" + response.data.data.id);
+        if (response.status === 200) {
+          console.log(`/organizations/${organizationId}/workspaces/${response.data["atomic:results"][0].data.id}`);
+          navigate(`/organizations/${organizationId}/workspaces/${response.data["atomic:results"][0].data.id}`);
         }
       })
       .catch((error) => {
         if (error.response) {
-          if (error.response.status === 403) {
+          if (error.response.status === 424) {
+            message.error(
+              <span>
+                An error occurred while creating the webhook, please check whether your VCS connection has the right permission.
+              </span>
+            );
+          } else if (error.response.status === 403) {
             message.error(
               <span>
                 You are not authorized to create workspaces. <br /> Please
@@ -676,13 +712,13 @@ export const CreateWorkspace = () => {
 
               <Form.Item
                 name="branch"
-                label="VCS branches"
+                label="VCS branch"
                 placeholder="(default branch)"
-                extra=" The branches from which the runs are allowed to kick off, separated by comma. The first one is used as the default for runs kicked off from UI. All braches are compared as prefixes against the branch name in a git push."
+                extra="The branch from which the runs are kicked off, this is used for runs issued from the UI."
                 rules={[{ required: true }]}
                 hidden={!versionControlFlow}
               >
-                <Input />
+                <Input onChange={handleBranchChange} />
               </Form.Item>
               <Form.Item
                 name="folder"
@@ -692,7 +728,24 @@ export const CreateWorkspace = () => {
                 rules={[{ required: true }]}
                 hidden={!versionControlFlow}
               >
-                <Input />
+                <Input onChange={handlePathChange} />
+              </Form.Item>
+              <Form.Item
+                name="defaultTemplate"
+                label="Default template (VCS Push)"
+                tooltip="Template that will be executed by default when doing a git push to the repository."
+                rules={[{ required: true }]}
+                hidden={!versionControlFlow}
+              >
+                <Select onChange={handleTemplateChange} placeholder="Select Template" style={{ width: 250 }}>
+                  {orgTemplates.map(function (template, index) {
+                    return (
+                      <Option key={template?.id}>
+                        {template?.attributes?.name}
+                      </Option>
+                    );
+                  })}
+                </Select>
               </Form.Item>
               <Form.Item
                 name="terraformVersion"
@@ -711,23 +764,6 @@ export const CreateWorkspace = () => {
                 </Select>
               </Form.Item>
               <Form.Item
-                name="defaultTemplate"
-                label="Default template (VCS Push)"
-                tooltip="Template that will be executed by default when doing a git push to the repository."
-                rules={[{ required: false }]}
-                hidden={!versionControlFlow}
-              >
-                <Select placeholder="Select Template" style={{ width: 250 }}>
-                  {orgTemplates.map(function (template, index) {
-                    return (
-                      <Option key={template?.id}>
-                        {template?.attributes?.name}
-                      </Option>
-                    );
-                  })}
-                </Select>
-              </Form.Item>
-              <Form.Item
                 hidden={!sshKeysVisible}
                 name="sshKey"
                 label="SSH Key"
@@ -740,6 +776,54 @@ export const CreateWorkspace = () => {
                     return (
                       <Option key={sshKey?.id}>
                         {sshKey?.attributes?.name}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                hidden={!versionControlFlow}
+                label="Enable Push Webhook?"
+                tooltip={{
+                  title: "Whether to trigger a run when a push event is received from the selected VCS provider.",
+                  icon: <InfoCircleOutlined />,
+                }}
+              >
+                <Switch onChange={handleWebhookClick} defaultChecked={true} />
+              </Form.Item>
+              <Form.Item
+                hidden={!isWebhooKEnabled || !versionControlFlow}
+                name="webhookBranch"
+                label="Webhook Branch"
+                tooltip="A list of branch prefixes that will trigger a run."
+                extra="A list of brach prefixes besides the default VCS branch that will trigger a run, for example 'feat,fix'. Values are separated by comma."
+                rules={[{ required: false }]}
+              >
+                <Input placeholder={defaultBranch} />
+              </Form.Item>
+              <Form.Item
+                hidden={!isWebhooKEnabled || !versionControlFlow}
+                name="webhookPath"
+                label="Webhook Path"
+                tooltip="A list of regex to match against the paths in the source that will trigger a run."
+                extra="A list of regex to match against the paths besides the 'Terraform Working Directory' that will trigger a run, for example 'modules/.*.tf'. Values are separated by comma."
+                rules={[{ required: false }]}
+              >
+                <Input placeholder={defaultPath} />
+              </Form.Item>
+              <Form.Item
+                hidden={!isWebhooKEnabled || !versionControlFlow}
+                name="webhookTemplate"
+                label="Webhook Template"
+                tooltip="The template that will be executed when a push event is received from the selected VCS provider."
+                extra="The template that will be executed when a push event is received from the selected VCS provider."
+                rules={[{ required: false }]}
+              >
+                <Select placeholder={defaultTemplate} style={{ width: 250 }}>
+                  {orgTemplates.map(function (template, index) {
+                    return (
+                      <Option key={template?.id}>
+                        {template?.attributes?.name}
                       </Option>
                     );
                   })}

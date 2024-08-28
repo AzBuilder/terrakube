@@ -2,6 +2,7 @@ package org.terrakube.api.plugin.vcs.provider.bitbucket;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 
-
 @Service
 @Slf4j
 public class BitBucketWebhookService extends WebhookServiceBase {
@@ -36,14 +36,14 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
     public BitBucketWebhookService(WorkspaceRepository workspaceRepository, ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.workspaceRepository =workspaceRepository;
+        this.workspaceRepository = workspaceRepository;
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
         return handleWebhook(jsonPayload, headers, token, "x-hub-signature", "Bitbucket", this::handleEvent);
     }
 
-    private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers){
+    private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers) {
         // Extract event
         String event = headers.get("x-event-key");
         if (event != null) {
@@ -68,12 +68,18 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                 String author = authorNode.asText();
                 result.setCreatedBy(author);
 
-                BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload, BitbucketTokenModel.class);
-                if(bitbucketTokenModel.getPush().getChanges().size() == 1) {
-                    log.info("Bitbucket commit: {}", bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
-                    log.info("Bitbucket diff file: {}", bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
-                    result.setCommit(bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
-                    result.setFileChanges(getFileChanges(bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(), result.getWorkspaceId()));
+                BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload,
+                        BitbucketTokenModel.class);
+                if (bitbucketTokenModel.getPush().getChanges().size() == 1) {
+                    log.info("Bitbucket commit: {}",
+                            bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
+                    log.info("Bitbucket diff file: {}",
+                            bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
+                    result.setCommit(
+                            bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
+                    result.setFileChanges(getFileChanges(
+                            bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(),
+                            result.getWorkspaceId()));
                 } else {
                     log.error("Bitbucket webhook with more than 1 changes is not supported");
                 }
@@ -90,9 +96,11 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         List<String> fileChanges = new ArrayList<>();
 
         try {
-            String accessToken = "Bearer " + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
+            String accessToken = "Bearer "
+                    + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
             URL urlBitbucketApi = new URL(diffFile);
-            log.info("Base URL: {}", String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()));
+            log.info("Base URL: {}",
+                    String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()));
             log.info("URI: {}", urlBitbucketApi.getPath());
             WebClient webClient = WebClient.builder()
                     .baseUrl(String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()))
@@ -106,8 +114,8 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                     .timeout(Duration.ofSeconds(10))
                     .block();
 
-            new BufferedReader(new StringReader(diffContent)).lines().forEach(line ->{
-                if(line.startsWith("diff --git ")){
+            new BufferedReader(new StringReader(diffContent)).lines().forEach(line -> {
+                if (line.startsWith("diff --git ")) {
                     log.warn("Checking change: {}", line);
                     // Example
                     // diff --git a/work1/main.tf b/work1/main.tf
@@ -124,16 +132,11 @@ public class BitBucketWebhookService extends WebhookServiceBase {
     }
 
     public String createWebhook(Workspace workspace, String webhookId) {
-        String url = "";
+        String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
         String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
-
-        // Create the headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", "application/json");
-        headers.set("Authorization", "Bearer " + workspace.getVcs().getAccessToken());
 
         // Create the body, in this version we only support push event but in future we
         // can make this more dynamic
@@ -142,23 +145,48 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
         String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + String.join("/", ownerAndRepo) + "/hooks";
 
-        ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
+        ResponseEntity<String> response = callBitBucketApi(workspace.getVcs().getAccessToken(), body, apiUrl,
+                HttpMethod.POST);
 
         // Extract the id from the response
         if (response.getStatusCode().value() == 201) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
-                url = rootNode.path("links").path("self").path("href").asText();
+                id = rootNode.path("uuid").asText();
             } catch (Exception e) {
                 log.error("Error parsing JSON response", e);
             }
 
-            log.info("Hook created successfully {}" + url);
+            log.info("GitHub Hook created successfully for workspace {}/{} with id {}",
+                    workspace.getOrganization().getName(), workspace.getName(), id);
         } else {
             log.error("Error creating the webhook" + response.getBody());
         }
 
-        return url;
+        return id;
+    }
+
+    public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
+        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+
+        ResponseEntity<String> response = callBitBucketApi(workspace.getVcs().getAccessToken(), "", apiUrl,
+                HttpMethod.DELETE);
+        if (response.getStatusCode().value() == 204) {
+            log.info("Webhook with remote hook id {} on repository {} deleted successfully", webhookRemoteId,
+                    ownerAndRepo);
+        } else {
+            log.warn("Failed to delete webhook with remote hook id {} on repository {}, message {}", webhookRemoteId,
+                    ownerAndRepo, response.getBody());
+        }
+    }
+
+    private ResponseEntity<String> callBitBucketApi(String token, String body, String apiUrl, HttpMethod httpMethod) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        headers.set("Authorization", "Bearer " + token);
+
+        return makeApiRequest(headers, body, apiUrl, httpMethod);
     }
 }

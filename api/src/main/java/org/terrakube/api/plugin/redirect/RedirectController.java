@@ -22,10 +22,11 @@ public class RedirectController {
     }
 
     @GetMapping(path = "/{organizationName}/{workspaceName}/runs/{jobId}")
-    ResponseEntity<Void> jobIdRedirect(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName, @PathVariable("jobId") int jobId) {
+    ResponseEntity<Void> jobIdRedirect(@PathVariable("organizationName") String organizationName, @PathVariable("workspaceName") String workspaceName, @PathVariable("jobId") String jobId) {
         log.info("Redirect for: {}/{}/{}", organizationName, workspaceName, jobId);
+        int jobIdFixed = Integer.parseInt(jobId.replace("run-",""));
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(String.format("%s/organizations/%s/workspaces/%s/runs/%s", uiURL,jobRepository.findById(jobId).get().getOrganization().getId(), jobRepository.findById(jobId).get().getWorkspace().getId(), jobId)))
+                .location(URI.create(String.format("%s/organizations/%s/workspaces/%s/runs/%s", uiURL,jobRepository.findById(jobIdFixed).get().getOrganization().getId(), jobRepository.findById(jobIdFixed).get().getWorkspace().getId(), jobId)))
                 .build();
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 import org.terrakube.api.rs.agent.Agent;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.hooks.organization.OrganizationManageHook;
@@ -46,7 +46,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity(name = "organization")
-@Where(clause = "disabled = false")
+@SQLRestriction(value = "disabled = false")
 public class Organization {
 
     @Id
