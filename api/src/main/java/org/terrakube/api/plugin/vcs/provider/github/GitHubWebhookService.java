@@ -19,6 +19,7 @@ import org.terrakube.api.plugin.vcs.WebhookServiceBase;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.JobVia;
+import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -71,7 +72,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
                 result.setBranch("");
             }
 
-            result.setFileChanges(new ArrayList());
+            result.setFileChanges(new ArrayList<String>());
             try {
                 GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload,
                         GitHubWebhookModel.class);
@@ -106,16 +107,9 @@ public class GitHubWebhookService extends WebhookServiceBase {
                 workspace.getOrganization().getId(), workspace.getId(), job.getId());
         String[] ownerAndRepos = extractOwnerAndRepo(workspace.getSource());
 
-        String token = "";
-        try {
-            token = tokenService.getAccessToken(ownerAndRepos, workspace.getVcs());
-        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error("Error retrieving tokens for access to owner/organization {}, error {}", ownerAndRepos[0], e);
-            return;
-        }
-
         GithubCommitStatus commitStatus = GithubCommitStatus.pending;
-        String commitStatusContext = "Terrakube - " + workspace.getOrganization().getName() + " - " + workspace.getName();
+        String commitStatusContext = "Terrakube - " + workspace.getOrganization().getName() + " - "
+                + workspace.getName();
         String commitStatusDescription = "Your task is in Terrakube queue.";
         switch (jobStatus) {
             case completed:
@@ -139,19 +133,19 @@ public class GitHubWebhookService extends WebhookServiceBase {
         String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepos) + "/statuses/"
                 + job.getCommitId();
 
-        // Create the headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", "application/vnd.github+json");
-        headers.set("Authorization", "Bearer " + token);
-        headers.set("X-GitHub-Api-Version", "2022-11-28");
-
         log.info(String.format("Sending job status %s to GitHub for commit %s", job.getStatus(), job.getCommitId()));
         // Create the body
         String body = "{\"state\":\"" + commitStatus.name()
                 + "\",\"description\":\"" + commitStatusDescription + "\",\"target_url\":\""
                 + jobUrl + "\",\"context\":\"" + commitStatusContext + "\"}";
 
-        ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl);
+        ResponseEntity<String> response = callGitHubApi(workspace.getVcs(), ownerAndRepos, body, apiUrl,
+                HttpMethod.POST);
+        if (response == null) {
+            log.error("Failed to send job status on workspace {} in organization {} to GitHub", workspace.getName(),
+                    workspace.getOrganization().getName());
+            return;
+        }
         if (response.getStatusCode().value() == 201) {
             log.info("Job status sent successfully to GitHub");
         } else {
@@ -160,21 +154,11 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     public String createWebhook(Workspace workspace, String webhookId) {
-        String token = "";
-        String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
-        try {
-            token = tokenService.getAccessToken(ownerAndRepo, workspace.getVcs());
-        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error("Error retrieving tokens for access to owner/organization {}, error {}", ownerAndRepo[0], e);
-            return "";
-        }
-
-        String url = "";
         String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
-
+        String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
 
         // Create the body, in this version we only support push event but in future we
         // can make this more dynamic
@@ -182,10 +166,10 @@ public class GitHubWebhookService extends WebhookServiceBase {
                 + "\",\"secret\":\"" + secret + "\",\"content_type\":\"json\",\"insecure_ssl\":\"1\"}}";
         String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepo) + "/hooks";
 
-        ResponseEntity<String> response = callGitHubApi(workspace.getVcs().getAccessToken(), body, apiUrl,
+        ResponseEntity<String> response = callGitHubApi(workspace.getVcs(), ownerAndRepo, body, apiUrl,
                 HttpMethod.POST);
         // Extract the id from the response
-        if (response.getStatusCode().value() == 201) {
+        if (response != null && response.getStatusCode().value() == 201) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
@@ -203,21 +187,43 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
-        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
-        String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+        String apiUrl = webhookRemoteId;
+        String ownerAndRepo[] = extractOwnerAndRepo(workspace.getSource());
 
-        ResponseEntity<String> response = callGitHubApi(workspace.getVcs().getAccessToken(), "", apiUrl,
+        // Previously the remote_hook_id is the whole URL of the webhook, hence the
+        // below check. This can be removed in a major version upgrade.
+        if (!webhookRemoteId.substring(0, 4).equals("http")) {
+            apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepo) + "/hooks/"
+                    + webhookRemoteId;
+        }
+
+        ResponseEntity<String> response = callGitHubApi(workspace.getVcs(), ownerAndRepo, "", apiUrl,
                 HttpMethod.DELETE);
+        if (response == null) {
+            log.error("Failed to delete webhook with remote hook id {} on repository {}/{}", webhookRemoteId,
+                    ownerAndRepo[0], ownerAndRepo[1]);
+            return;
+        }
+
         if (response.getStatusCode().value() == 204) {
             log.info("Webhook with remote hook id {} on repository {} deleted successfully", webhookRemoteId,
-                    ownerAndRepo);
+                    workspace.getSource());
         } else {
             log.warn("Failed to delete webhook with remote hook id {} on repository {}, message {}", webhookRemoteId,
-                    ownerAndRepo, response.getBody());
+                    workspace.getSource(), response.getBody());
         }
     }
 
-    private ResponseEntity<String> callGitHubApi(String token, String body, String apiUrl, HttpMethod httpMethod) {
+    private ResponseEntity<String> callGitHubApi(Vcs vcs, String[] ownerAndRepo, String body, String apiUrl,
+            HttpMethod httpMethod) {
+        String token = "";
+        try {
+            token = tokenService.getAccessToken(ownerAndRepo, vcs);
+        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            log.error("Error retrieving tokens for access to owner/organization {}, error {}", ownerAndRepo[0], e);
+            return null;
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/vnd.github+json");
         headers.set("Authorization", "Bearer " + token);

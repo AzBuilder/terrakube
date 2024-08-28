@@ -92,7 +92,8 @@ public abstract class ScheduleServiceBase {
                 .withIdentity(getJobPrefix() + id)
                 .withDescription(id)
                 .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(frequencyInSeconds)
-                        .withMisfireHandlingInstructionFireNow())
+                        .withMisfireHandlingInstructionFireNow()
+                        .withRepeatCount(frequencyInSeconds))
                 .build();
 
         log.info("Create {} Trigger {}", getJobType(), jobDetail.getKey());

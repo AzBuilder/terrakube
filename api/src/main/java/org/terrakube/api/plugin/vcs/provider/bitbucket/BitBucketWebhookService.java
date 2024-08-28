@@ -168,8 +168,12 @@ public class BitBucketWebhookService extends WebhookServiceBase {
     }
 
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
-        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
-        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+        String apiUrl = webhookRemoteId;
+        String ownerAndRepo = String.join("/", extractOwnerAndRepo(workspace.getSource()));
+
+        if (!webhookRemoteId.substring(0, 4).equals("http")) {
+            apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+        }
 
         ResponseEntity<String> response = callBitBucketApi(workspace.getVcs().getAccessToken(), "", apiUrl,
                 HttpMethod.DELETE);

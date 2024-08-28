@@ -24,6 +24,7 @@ public class TerraformJob {
     private String folder;
     private String vcsType;
     private String accessToken;
+    private String connectionType;
     private String terraformOutput;
     private String rawState;
     private boolean showHeader;

@@ -45,7 +45,9 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     boolean enableRegistrySecurity;
     TerraformExecutor terraformExecutor;
 
-    public SetupWorkspaceImpl(WorkspaceSecurity workspaceSecurity, @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity, TerraformExecutor terraformExecutor) {
+    public SetupWorkspaceImpl(WorkspaceSecurity workspaceSecurity,
+            @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity,
+            TerraformExecutor terraformExecutor) {
         this.workspaceSecurity = workspaceSecurity;
         this.enableRegistrySecurity = enableRegistrySecurity;
         this.terraformExecutor = terraformExecutor;
@@ -55,14 +57,16 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     public File prepareWorkspace(TerraformJob terraformJob) {
         File workspaceCloneFolder = null;
         try {
-            workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
+            workspaceCloneFolder = setupWorkspaceDirectory(terraformJob.getOrganizationId(),
+                    terraformJob.getWorkspaceId());
             if (!terraformJob.getBranch().equals("remote-content")) {
                 downloadWorkspace(workspaceCloneFolder, terraformJob);
             } else {
                 downloadWorkspaceTarGz(workspaceCloneFolder, terraformJob.getSource());
             }
             if (terraformJob.getModuleSshKey() != null && terraformJob.getModuleSshKey().length() > 0) {
-                generateModuleSshFolder(terraformJob.getModuleSshKey(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), terraformJob.getJobId());
+                generateModuleSshFolder(terraformJob.getModuleSshKey(), terraformJob.getOrganizationId(),
+                        terraformJob.getWorkspaceId(), terraformJob.getJobId());
             }
 
             if (enableRegistrySecurity)
@@ -73,15 +77,13 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 setupGcpDynamicCredentials(
                         workspaceCloneFolder,
                         terraformJob.getEnvironmentVariables().get("TERRAKUBE_GCP_CREDENTIALS_FILE"),
-                        terraformJob.getEnvironmentVariables().get("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE")
-                );
+                        terraformJob.getEnvironmentVariables().get("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE"));
             }
 
             if (terraformJob.getEnvironmentVariables().containsKey("ENABLE_DYNAMIC_CREDENTIALS_AWS")) {
                 setupAwsDynamicCredentials(
                         workspaceCloneFolder,
-                        terraformJob.getEnvironmentVariables().get("TERRAKUBE_AWS_CREDENTIALS_FILE")
-                );
+                        terraformJob.getEnvironmentVariables().get("TERRAKUBE_AWS_CREDENTIALS_FILE"));
             }
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -89,25 +91,35 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return workspaceCloneFolder != null ? workspaceCloneFolder : new File("/tmp/" + UUID.randomUUID());
     }
 
-    private void setupAwsDynamicCredentials(File workspaceCloneFolder, String awsCredentialsFileContent ) {
+    private void setupAwsDynamicCredentials(File workspaceCloneFolder, String awsCredentialsFileContent) {
         try {
             log.info("Generating AWS dynamic credentials files inside the workspace execution");
-            log.info("Writing AWS credentials to {}/terrakube_config_dynamic_credentials_aws.txt", workspaceCloneFolder.getAbsolutePath());
-            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials_aws.txt"), awsCredentialsFileContent, Charset.defaultCharset());
-            } catch (Exception ex) {
+            log.info("Writing AWS credentials to {}/terrakube_config_dynamic_credentials_aws.txt",
+                    workspaceCloneFolder.getAbsolutePath());
+            FileUtils.writeStringToFile(
+                    new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials_aws.txt"),
+                    awsCredentialsFileContent, Charset.defaultCharset());
+        } catch (Exception ex) {
             log.error(ex.getMessage());
         }
     }
 
-    private void setupGcpDynamicCredentials(File workspaceCloneFolder, String gcpCredentialsFileContent, String gcpCredentialConfigFileContent) {
+    private void setupGcpDynamicCredentials(File workspaceCloneFolder, String gcpCredentialsFileContent,
+            String gcpCredentialConfigFileContent) {
         try {
             log.info("Generating GCP dynamic credentials files inside the workspace execution");
 
-            log.info("Writing GCP credentials to {}/terrakube_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
-            log.info("Writing GCP credentials Configuration File to {}/terrakube_config_dynamic_credentials.json", workspaceCloneFolder.getAbsolutePath());
+            log.info("Writing GCP credentials to {}/terrakube_dynamic_credentials.json",
+                    workspaceCloneFolder.getAbsolutePath());
+            log.info("Writing GCP credentials Configuration File to {}/terrakube_config_dynamic_credentials.json",
+                    workspaceCloneFolder.getAbsolutePath());
 
-            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_dynamic_credentials.json"), gcpCredentialsFileContent, Charset.defaultCharset());
-            FileUtils.writeStringToFile(new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials.json"), gcpCredentialConfigFileContent, Charset.defaultCharset());
+            FileUtils.writeStringToFile(
+                    new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_dynamic_credentials.json"),
+                    gcpCredentialsFileContent, Charset.defaultCharset());
+            FileUtils.writeStringToFile(
+                    new File(workspaceCloneFolder.getAbsolutePath() + "/terrakube_config_dynamic_credentials.json"),
+                    gcpCredentialConfigFileContent, Charset.defaultCharset());
         } catch (Exception ex) {
             log.error(ex.getMessage());
         }
@@ -133,7 +145,9 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                         .setDirectory(gitCloneFolder)
                         .setBranch(terraformJob.getBranch())
                         .setTransportConfigCallback(transport -> {
-                            ((SshTransport) transport).setSshSessionFactory(getSshdSessionFactory(terraformJob.getVcsType(), terraformJob.getAccessToken(), terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()));
+                            ((SshTransport) transport).setSshSessionFactory(
+                                    getSshdSessionFactory(terraformJob.getVcsType(), terraformJob.getAccessToken(),
+                                            terraformJob.getOrganizationId(), terraformJob.getWorkspaceId()));
                         })
                         .setCloneSubmodules(true)
                         .call();
@@ -141,7 +155,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 Git.cloneRepository()
                         .setURI(terraformJob.getSource())
                         .setDirectory(gitCloneFolder)
-                        .setCredentialsProvider(setupCredentials(terraformJob.getVcsType(), terraformJob.getAccessToken()))
+                        .setCredentialsProvider(setupCredentials(terraformJob.getVcsType(),
+                                terraformJob.getConnectionType(), terraformJob.getAccessToken()))
                         .setBranch(terraformJob.getBranch())
                         .setCloneSubmodules(true)
                         .call();
@@ -155,7 +170,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
                 }
             }
 
-            log.info("Git clone: {} Branch: {} Folder {}", terraformJob.getSource(), terraformJob.getBranch(), gitCloneFolder.getPath());
+            log.info("Git clone: {} Branch: {} Folder {}", terraformJob.getSource(), terraformJob.getBranch(),
+                    gitCloneFolder.getPath());
 
         } catch (GitAPIException ex) {
             log.error(ex.getMessage());
@@ -197,7 +213,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
                     boolean created = f.mkdir();
                     if (!created) {
-                        log.info("Unable to create directory '{}', during extraction of archive contents.\n", f.getAbsolutePath());
+                        log.info("Unable to create directory '{}', during extraction of archive contents.\n",
+                                f.getAbsolutePath());
                     }
                 } else {
                     int count;
@@ -232,12 +249,8 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         RevCommit latestCommit = null;
         try {
             if (commitId == null) {
-                latestCommit = Git.init().setDirectory(gitCloneFolder).call().
-                        log().
-                        setMaxCount(1).
-                        call().
-                        iterator().
-                        next();
+                latestCommit = Git.init().setDirectory(gitCloneFolder).call().log().setMaxCount(1).call().iterator()
+                        .next();
                 String latestCommitHash = latestCommit.getName();
                 log.info("Commit Id: {}", latestCommitHash);
                 String commitInfoFile = String.format("%s/commitHash.info", gitCloneFolder.getCanonicalPath());
@@ -253,23 +266,24 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         }
     }
 
-    public SshdSessionFactory getSshdSessionFactory(String vcsType, String accessToken, String organizationId, String workspaceId) {
+    public SshdSessionFactory getSshdSessionFactory(String vcsType, String accessToken, String organizationId,
+            String workspaceId) {
         File sshDir = generateWorkspaceSshFolder(vcsType, accessToken, organizationId, workspaceId);
         SshdSessionFactory sshdSessionFactory = new SshdSessionFactoryBuilder()
                 .setServerKeyDatabase((h, s) -> new ServerKeyDatabase() {
 
                     @Override
                     public List<PublicKey> lookup(String connectAddress,
-                                                  InetSocketAddress remoteAddress,
-                                                  Configuration config) {
+                            InetSocketAddress remoteAddress,
+                            Configuration config) {
                         return Collections.emptyList();
                     }
 
                     @Override
                     public boolean accept(String connectAddress,
-                                          InetSocketAddress remoteAddress,
-                                          PublicKey serverKey, Configuration config,
-                                          CredentialsProvider provider) {
+                            InetSocketAddress remoteAddress,
+                            PublicKey serverKey, Configuration config,
+                            CredentialsProvider provider) {
                         return true;
                     }
 
@@ -282,9 +296,11 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return sshdSessionFactory;
     }
 
-    private File generateWorkspaceSshFolder(String vcsType, String privateKey, String organizationId, String workspaceId) {
+    private File generateWorkspaceSshFolder(String vcsType, String privateKey, String organizationId,
+            String workspaceId) {
         String sshFileName = vcsType.split("~")[1];
-        String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), organizationId, workspaceId, sshFileName);
+        String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), organizationId, workspaceId,
+                sshFileName);
         File sshFile = new File(sshFilePath);
         try {
             log.info("Creating new SSH folder for organization {} wordkspace {}", organizationId, workspaceId);
@@ -304,12 +320,14 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
 
     private File generateModuleSshFolder(String privateKey, String organizationId, String workspaceId, String jobId) {
         log.warn("Generate new file SSH Key for modules...");
-        String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), organizationId, workspaceId, jobId);
+        String sshFilePath = String.format(SSH_DIRECTORY, FileUtils.getUserDirectoryPath(), organizationId, workspaceId,
+                jobId);
         File sshFile = new File(sshFilePath);
         try {
 
             FileUtils.forceMkdirParent(sshFile);
-            log.info("Creating new module SSH folder for organization {} workspace {} with jobId {}", organizationId, workspaceId, jobId);
+            log.info("Creating new module SSH folder for organization {} workspace {} with jobId {}", organizationId,
+                    workspaceId, jobId);
             FileUtils.writeStringToFile(sshFile, privateKey + "\n", Charset.defaultCharset());
 
             Set<PosixFilePermission> perms = new HashSet<>();
@@ -323,12 +341,16 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
         return sshFile.getParentFile();
     }
 
-    public CredentialsProvider setupCredentials(String vcsType, String accessToken) {
+    public CredentialsProvider setupCredentials(String vcsType, String connectionType, String accessToken) {
         CredentialsProvider credentialsProvider = null;
-        log.info("vcsType: {}", vcsType);
+        log.info("VCS type: {}, VCS connection type {}", vcsType, connectionType);
         switch (vcsType) {
             case "GITHUB":
-                credentialsProvider = new UsernamePasswordCredentialsProvider(accessToken, "");
+                if (connectionType.equals("OAUTH")) {
+                    credentialsProvider = new UsernamePasswordCredentialsProvider(accessToken, "");
+                } else {
+                    credentialsProvider = new UsernamePasswordCredentialsProvider("x-access-token", accessToken);
+                }
                 break;
             case "BITBUCKET":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", accessToken);

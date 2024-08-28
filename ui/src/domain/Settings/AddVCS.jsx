@@ -23,6 +23,7 @@ import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
 import { v1 as uuidv1 } from "uuid";
+import TextArea from "antd/es/input/TextArea";
 
 const { Paragraph } = Typography;
 const { Step } = Steps;
@@ -33,19 +34,20 @@ export const AddVCS = ({ setMode, loadVCS }) => {
   const { orgid, vcsName } = useParams();
   const [current, setCurrent] = useState(vcsName ? 1 : 0);
   const [vcsType, setVcsType] = useState(vcsName ? vcsName : "GITHUB");
+  const [connectionType, setConnectionType] = useState("OAUTH");
   const [uuid, setUUID] = useState(uuidv1());
   const handleChange = (currentVal) => {
     setCurrent(currentVal);
   };
-  const handleVCSClick = (vcs) => {
+  const handleVCSClick = (vcs, connectionType = "OAUTH") => {
     setCurrent(1);
     setVcsType(vcs);
+    setConnectionType(connectionType);
   };
 
   const getCallBackUrl = () => {
-    return `${
-      new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-    }/callback/v1/vcs/${uuid}`;
+    return `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+      }/callback/v1/vcs/${uuid}`;
   };
 
   const renderVCSType = (vcs) => {
@@ -96,15 +98,29 @@ export const AddVCS = ({ setMode, loadVCS }) => {
 
   const githubItems = [
     {
-      label: "Github.com",
+      label: "Github.com (GitHub App)",
       key: "1",
+      onClick: () => {
+        handleVCSClick("GITHUB", "STANDALONE");
+      },
+    },
+    {
+      label: "Github.com (oAuth App)",
+      key: "2",
       onClick: () => {
         handleVCSClick("GITHUB");
       },
     },
     {
-      label: "Github Enterprise",
-      key: "2",
+      label: "GitHub Enterprise (GitHub App)",
+      key: "3",
+      onClick: () => {
+        handleVCSClick("GITHUB_ENTERPRISE", "STANDALONE");
+      },
+    },
+    {
+      label: "GitHub Enterprise (oAuth App)",
+      key: "4",
       onClick: () => {
         handleVCSClick("GITHUB_ENTERPRISE");
       },
@@ -135,7 +151,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       case "GITLAB":
         return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab.com";
       case "GITLAB_ENTERPRISE":
-      case "GITLAB_COMMUNITY":  
+      case "GITLAB_COMMUNITY":
         return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab-ee-and-ce";
       case "BITBUCKET":
         return "https://docs.terrakube.io/user-guide/vcs-providers/bitbucket.com";
@@ -165,7 +181,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       case "AZURE_DEVOPS_SERVER":
         return "App ID";
       default:
-        return "Client ID";
+        return connectionType === "OAUTH" ? "Client ID" : "App ID";
     }
   };
 
@@ -270,7 +286,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       case "AZURE_DEVOPS_SERVER":
         return "Client Secret";
       default:
-        return "Client Secret";
+        return connectionType === "OAUTH" ? "Client Secret" : "Private Key in PKCS#8 format";
     }
   };
 
@@ -477,26 +493,37 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       default:
         return (
           <div>
-            <p className="paragraph">
+            <div className="paragraph">
               1. On {renderVCSType(vcsType)},{" "}
               {vcsType === "GITHUB" ? (
                 <Button
                   className="link"
                   target="_blank"
-                  href="https://github.com/settings/applications/new"
+                  href={connectionType === "OAUTH" ? "https://github.com/settings/applications/new" : "https://github.com/settings/apps/new"}
                   type="link"
                 >
-                  register a new OAuth Application&nbsp;{" "}
+                  register a new {connectionType == "OAUTH" ? "OAuth" : "GitHub"} Application&nbsp;{" "}
                   <HiOutlineExternalLink />
                 </Button>
               ) : (
                 <span>
-                  register a new OAuth Application using the link https://
-                  <i>yourdomain.com</i>/settings/applications/new
+                  register a new {connectionType == "OAUTH" ? "OAuth" : "GitHub"} Application using the link https://
+                  <i>yourdomain.com</i>/settings/{connectionType == "OAUTH" ? "applications" : "apps"}/new
                 </span>
               )}
-              . Enter the following information:
-            </p>
+              with the below information{connectionType === "OAUTH" ? (<span>:</span>) : (<span>, install it to your organization or account, and grant necessary permissions. Please check
+                <Button
+                  className="link"
+                  target="_blank"
+                  href="https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps"
+                  type="link"
+                >
+                &nbsp;here to learn more.<HiOutlineExternalLink />
+                </Button>
+                </span>
+                )
+              }
+            </div>
             <div className="paragraph">
               <p></p>
               <Row>
@@ -519,19 +546,36 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   </Paragraph>
                 </Col>
               </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Application description:</b>{" "}
-                </Col>
-                <Col span={18}>Any description of your choice</Col>
-              </Row>
-              <Row>
+              <Row hidden={connectionType != "OAUTH"}>
                 <Col span={6}>
                   <b>Authorization callback URL:</b>{" "}
                 </Col>
                 <Col span={18}>
                   {" "}
                   <Paragraph copyable>{getCallBackUrl()}</Paragraph>
+                </Col>
+              </Row>
+              <Row hidden={connectionType === "OAUTH"}>
+                <Col span={6}>
+                  <b>Webhook:</b>{" "}
+                </Col>
+                <Col span={18}>
+                  <Paragraph><b>untick</b> Active</Paragraph>
+                </Col>
+              </Row>
+              <Row hidden={connectionType === "OAUTH"}>
+                <Col span={6}>
+                  <b>Repository permissions:</b>{" "}
+                </Col>
+                <Col span={18}>
+                  <Paragraph>
+                    <ul className="disc-list">
+                      <li>Commit statuses: Read and write (Only if webhook to be used on VCS workflow workspaces)</li>
+                      <li>Content: Read-only</li>
+                      <li>Metadata: Read-only</li>
+                      <li>Webhooks: Read and write (Only if webhook to be used on VCS workflow workspaces)</li>
+                    </ul>
+                  </Paragraph>
                 </Col>
               </Row>
               <p></p>
@@ -594,7 +638,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return (
           <div>
             <p className="paragraph">
-              3. Next, generate a new client secret and enter the value below:
+              3. Next, generate a {connectionType === "OAUTH" ? "client secret and" : "private key and convert it to PKCS#8 format then"} enter the value below:
             </p>
             <br />
           </div>
@@ -653,13 +697,16 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         attributes: {
           name: values.name,
           description: values.name,
+          connectionType: connectionType,
           vcsType: getVcsType(vcsType),
           clientId: values.clientId,
           clientSecret: values.clientSecret,
+          privateKey: values.privateKey,
           callback: uuid,
           endpoint: values.endpoint,
           apiUrl: values.apiUrl,
           redirectUrl: `${window._env_.REACT_APP_REDIRECT_URI}/organizations/${orgid}/settings/vcs`,
+          status: connectionType === "OAUTH" ? "PENDING" : "COMPLETED",
         },
       },
     };
@@ -675,14 +722,16 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         console.log("created");
         console.log(response);
         if (response.status == "201") {
-          window.location.replace(
-            getConnectUrl(
-              vcsType,
-              response.data.data.attributes.clientId,
-              getCallBackUrl(),
-              response.data.data.attributes.endpoint
-            )
-          );
+          if (connectionType === "OAUTH") {
+            window.location.replace(
+              getConnectUrl(
+                vcsType,
+                response.data.data.attributes.clientId,
+                getCallBackUrl(),
+                response.data.data.attributes.endpoint
+              )
+            );
+          }
           loadVCS();
           setMode("list");
         }
@@ -820,15 +869,24 @@ export const AddVCS = ({ setMode, loadVCS }) => {
               label={getClientIdName(vcsType)}
               rules={[{ required: true }]}
             >
-              <Input placeholder="ex. 824ff023a7136981f322" />
+              <Input placeholder={connectionType === "OAUTH" ? "ex. 824ff023a7136981f322" : "970081"} />
             </Form.Item>
             {renderStep3(vcsType)}
             <Form.Item
               name="clientSecret"
               label={getSecretIdName(vcsType)}
-              rules={[{ required: true }]}
+              rules={[{ required: connectionType === "OAUTH" ? true : false }]}
+              hidden={connectionType != "OAUTH"}
             >
               <Input placeholder="ex. db55545bd64e851dc298ba900dd197a02b42bb3s" />
+            </Form.Item>
+            <Form.Item
+              name="privateKey"
+              label={getSecretIdName(vcsType)}
+              rules={[{ required: connectionType != "OAUTH" ? true : false }]}
+              hidden={connectionType === "OAUTH"}
+            >
+              <TextArea placeholder="-----BEGIN PRIVATE KEY-----" style={{ minHeight: "200px" }} />
             </Form.Item>
             <Button type="primary" htmlType="submit">
               Connect and Continue

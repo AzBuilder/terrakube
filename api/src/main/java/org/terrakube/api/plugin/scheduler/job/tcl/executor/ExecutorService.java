@@ -89,6 +89,7 @@ public class ExecutorService {
         if (job.getWorkspace().getVcs() != null) {
             Vcs vcs = job.getWorkspace().getVcs();
             executorContext.setVcsType(vcs.getVcsType().toString());
+            executorContext.setConnectionType(vcs.getConnectionType().toString());
             try {
                 executorContext.setAccessToken(tokenService.getAccessToken(job.getWorkspace().getSource(), vcs));
             } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeySpecException
@@ -158,7 +159,8 @@ public class ExecutorService {
         }
         executorContext.setTofu(iacType(job));
         executorContext.setCommitId(job.getCommitId());
-        executorContext.setFolder(job.getWorkspace().getFolder() != null ? job.getWorkspace().getFolder().split(",")[0] : "/");
+        executorContext
+                .setFolder(job.getWorkspace().getFolder() != null ? job.getWorkspace().getFolder().split(",")[0] : "/");
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
         executorContext.setAgentUrl(getExecutorUrl(job));
@@ -239,13 +241,17 @@ public class ExecutorService {
             workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsGcp(job, workspaceEnvVariables);
         }
 
-        if (workspaceEnvVariables.containsKey("PRIVATE_EXTENSION_VCS_ID_AUTH")){
-            log.warn("Found PRIVATE_EXTENSION_VCS_ID_AUTH, adding authentication information for private extension repository");
+        if (workspaceEnvVariables.containsKey("PRIVATE_EXTENSION_VCS_ID_AUTH")) {
+            log.warn(
+                    "Found PRIVATE_EXTENSION_VCS_ID_AUTH, adding authentication information for private extension repository");
 
-            Optional<Vcs> vcs = vcsRepository.findById(UUID.fromString(workspaceEnvVariables.get("PRIVATE_EXTENSION_VCS_ID_AUTH")));
-            if(vcs.isPresent()) {
-                workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE",vcs.get().getVcsType().toString());
-                workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN",vcs.get().getAccessToken());
+            Optional<Vcs> vcs = vcsRepository
+                    .findById(UUID.fromString(workspaceEnvVariables.get("PRIVATE_EXTENSION_VCS_ID_AUTH")));
+            if (vcs.isPresent()) {
+                workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE", vcs.get().getVcsType().toString());
+                workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN", vcs.get().getAccessToken());
+                workspaceEnvVariables.put("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN_TYPE",
+                        vcs.get().getConnectionType().toString());
             } else {
                 log.error("VCS for private extension repository not found");
             }

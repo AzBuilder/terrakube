@@ -108,6 +108,7 @@ public class ScriptEngineService {
         String privateRepositoryType = "PUBLIC";
         privateRepositoryType = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") : privateRepositoryType;
         String privateRepositoryToken = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") : null;
+        String privateRepositoryTokenType = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN_TYPE") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN_TYPE") : null;
         try {
             CredentialsProvider credentialsProvider;
             log.info("Private Extension vcsType: {}", privateRepositoryType);
@@ -122,7 +123,11 @@ public class ScriptEngineService {
                     credentialsProvider = new UsernamePasswordCredentialsProvider("dummy", privateRepositoryToken);
                     break;
                 case "GITHUB":
-                    credentialsProvider = new UsernamePasswordCredentialsProvider(privateRepositoryToken, "");
+                    if (privateRepositoryTokenType != null && privateRepositoryTokenType.equals("OAUTH")) {
+                        credentialsProvider = new UsernamePasswordCredentialsProvider(privateRepositoryToken, "");
+                    } else {
+                        credentialsProvider = new UsernamePasswordCredentialsProvider("x-access-token", privateRepositoryToken);
+                    }
                     break;
                 default:
                     credentialsProvider = null;
