@@ -17,7 +17,8 @@ import {
   ClockCircleOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import { SiMicrosoftazure, SiAmazonaws } from "react-icons/si";
+import { SiMicrosoftazure } from "react-icons/si";
+import { FaAws } from "react-icons/fa";
 import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from "react-icons/md";
@@ -119,7 +120,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
       case "aws":
         return (
           <IconContext.Provider value={{ color: "#232F3E", size: "1.5em" }}>
-            <SiAmazonaws />
+            <FaAws />
           </IconContext.Provider>
         );
       default:
