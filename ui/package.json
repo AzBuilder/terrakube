@@ -8,7 +8,7 @@
     "@babel/preset-env": "^7.25.3",
     "@babel/standalone": "^7.25.5",
     "@monaco-editor/react": "^4.6.0",
-    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "ansi-to-react": "^6.1.6",
