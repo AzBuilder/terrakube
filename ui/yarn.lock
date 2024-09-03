@@ -6033,10 +6033,10 @@ hpack.js@^2.1.6:
     readable-stream "^2.0.1"
     wbuf "^1.1.0"
 
-html-dom-parser@5.0.9:
-  version "5.0.9"
-  resolved "https://registry.yarnpkg.com/html-dom-parser/-/html-dom-parser-5.0.9.tgz#8c600e3407340c9a148cc8b3bf9bc390948cd9c1"
-  integrity sha512-QGeoFYwgQ582EDvrBx0+ejIz76/LuQcwwkmSR4ueKncjl2yWbciA45Kfz/LrHvWR3CgtKnxKFkr4Mpq2Sh1QNg==
+html-dom-parser@5.0.10:
+  version "5.0.10"
+  resolved "https://registry.yarnpkg.com/html-dom-parser/-/html-dom-parser-5.0.10.tgz#bf46b05c50f35c2fcadfc8e91566c54d3caf9bd7"
+  integrity sha512-GwArYL3V3V8yU/mLKoFF7HlLBv80BZ2Ey1BzfVNRpAci0cEKhFHI/Qh8o8oyt3qlAMLlK250wsxLdYX4viedvg==
   dependencies:
     domhandler "5.0.3"
     htmlparser2 "9.1.0"
@@ -6071,15 +6071,15 @@ html-minifier-terser@^6.0.2:
     relateurl "^0.2.7"
     terser "^5.10.0"
 
-html-react-parser@^5.1.13:
-  version "5.1.13"
-  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-5.1.13.tgz#3e5804a2873cd4ba9b848a7de52b4945c44ce690"
-  integrity sha512-XTG2lbn9JDHc3DqGLpHkoArvptXMPl+Ckk5/cqRhdUmrhcPNZ5MPDrwd2PU3BePl2QmkLOb3WsWdjAotznMdUw==
+html-react-parser@^5.1.15:
+  version "5.1.15"
+  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-5.1.15.tgz#f3121f31434ba5a84d06c8849e2e6fe0f64eed20"
+  integrity sha512-LRwSTseAZtdtzYbBaN0a+pJ48x4qmwPzQC5tvwAp9IvuNf7afxtTHLpCPYCsVjRKRUqhXvfjTaKJJrhctxkHJA==
   dependencies:
     domhandler "5.0.3"
-    html-dom-parser "5.0.9"
+    html-dom-parser "5.0.10"
     react-property "2.0.2"
-    style-to-js "1.1.12"
+    style-to-js "1.1.13"
 
 html-to-image@^1.11.11:
   version "1.11.11"
@@ -10616,10 +10616,10 @@ style-loader@^3.3.1:
   resolved "https://registry.npmjs.org/style-loader/-/style-loader-3.3.1.tgz"
   integrity sha512-GPcQ+LDJbrcxHORTRes6Jy2sfvK2kS6hpSfI/fXhPt+spVzxF6LJ1dHLN9zIGmVaaP044YKaIatFaufENRiDoQ==
 
-style-to-js@1.1.12:
-  version "1.1.12"
-  resolved "https://registry.yarnpkg.com/style-to-js/-/style-to-js-1.1.12.tgz#112dd054231e71643514013a4475d4649bb2b581"
-  integrity sha512-tv+/FkgNYHI2fvCoBMsqPHh5xovwiw+C3X0Gfnss/Syau0Nr3IqGOJ9XiOYXoPnToHVbllKFf5qCNFJGwFg5mg==
+style-to-js@1.1.13:
+  version "1.1.13"
+  resolved "https://registry.yarnpkg.com/style-to-js/-/style-to-js-1.1.13.tgz#8d17f2560a9cc9515b94834aaeb2305887d7ced5"
+  integrity sha512-+43kvxwjrW9n5gFR40Rv98A0/Mcjew7Lt+p5Nnw1KGR9SZf/ZaKqmMwl9Enj9EnYNcJ5VzuCjejC5KZzvH2lOA==
   dependencies:
     style-to-object "1.0.6"
 
