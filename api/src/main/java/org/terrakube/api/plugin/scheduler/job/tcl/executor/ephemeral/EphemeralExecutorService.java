@@ -53,41 +53,26 @@ public class EphemeralExecutorService {
         final List<EnvVar> executorEnvVarFlags = Arrays.asList(executorFlagBatch, executorFlagBatchJsonContent);
 
         Optional<String> nodeSelector = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(NODE_SELECTOR) ? executorContext.getEnvironmentVariables().get(NODE_SELECTOR) : null);
-<<<<<<< HEAD
         Map<String, String> nodeSelectorInfo = new HashMap();
         log.info("Custom Node selector: {} {}", nodeSelector.isPresent(), nodeSelector.isEmpty());
         if(nodeSelector.isPresent()) {
             log.info("Using custom node selector information");
-=======
-        Map<String, String> nodeSelectorInfo = new HashMap();;
-        if(nodeSelector.isPresent()) {
->>>>>>> main
             for (String nodeSelectorData : nodeSelector.get().split(";")) {
                 String[] info = nodeSelectorData.split("=");
                 nodeSelectorInfo.put(info[0], info[1]);
             }
         } else {
-<<<<<<< HEAD
             log.info("Using default node selector information");
-=======
->>>>>>> main
             nodeSelectorInfo = ephemeralConfiguration.getNodeSelector();
         }
 
         Optional<String> annotationsInfo = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(ANNOTATIONS) ? executorContext.getEnvironmentVariables().get(ANNOTATIONS) : null);
         Map<String, String> annotations = new HashMap();
-<<<<<<< HEAD
         log.info("Custom Annotations: {}", annotationsInfo.isPresent());
         if(annotationsInfo.isPresent()) {
             for (String annotationData : annotationsInfo.get().split(";")) {
                 String[] info = annotationData.split("=");
                 annotations.put(info[0], info[1]);
-=======
-        if(annotationsInfo.isPresent()) {
-            for (String nodeSelectorData : nodeSelector.get().split(";")) {
-                String[] info = nodeSelectorData.split("=");
-                nodeSelectorInfo.put(info[0], info[1]);
->>>>>>> main
             }
         }
 
