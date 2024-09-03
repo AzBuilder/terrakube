@@ -12,15 +12,16 @@ import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorContext;
 import org.terrakube.api.rs.job.Job;
 
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class EphemeralExecutorService {
+
+    private static final String NODE_SELECTOR = "EPHEMERAL_CONFIG_NODE_SELECTOR_TAGS";
+    private static final String SERVICE_ACCOUNT = "EPHEMERAL_CONFIG_SERVICE_ACCOUNT";
+    private static final String ANNOTATIONS = "EPHEMERAL_CONFIG_ANNOTATIONS";
 
     KubernetesClient kubernetesClient;
     EphemeralConfiguration ephemeralConfiguration;
@@ -51,6 +52,30 @@ public class EphemeralExecutorService {
 
         final List<EnvVar> executorEnvVarFlags = Arrays.asList(executorFlagBatch, executorFlagBatchJsonContent);
 
+        Optional<String> nodeSelector = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(NODE_SELECTOR) ? executorContext.getEnvironmentVariables().get(NODE_SELECTOR) : null);
+        Map<String, String> nodeSelectorInfo = new HashMap();;
+        if(nodeSelector.isPresent()) {
+            for (String nodeSelectorData : nodeSelector.get().split(";")) {
+                String[] info = nodeSelectorData.split("=");
+                nodeSelectorInfo.put(info[0], info[1]);
+            }
+        } else {
+            nodeSelectorInfo = ephemeralConfiguration.getNodeSelector();
+        }
+
+        Optional<String> annotationsInfo = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(ANNOTATIONS) ? executorContext.getEnvironmentVariables().get(ANNOTATIONS) : null);
+        Map<String, String> annotations = new HashMap();
+        if(annotationsInfo.isPresent()) {
+            for (String nodeSelectorData : nodeSelector.get().split(";")) {
+                String[] info = nodeSelectorData.split("=");
+                nodeSelectorInfo.put(info[0], info[1]);
+            }
+        }
+
+        Optional<String> serviceAccountInfo = Optional.ofNullable(
+                executorContext.getEnvironmentVariables().containsKey(SERVICE_ACCOUNT) ? executorContext.getEnvironmentVariables().get(SERVICE_ACCOUNT) : null);
+        String serviceAccount = serviceAccountInfo.isPresent() ? serviceAccountInfo.get() : null;
+
         io.fabric8.kubernetes.api.model.batch.v1.Job k8sJob = new JobBuilder()
                 .withApiVersion("batch/v1")
                 .withNewMetadata()
@@ -59,11 +84,13 @@ public class EphemeralExecutorService {
                 .withLabels(Collections.singletonMap("jobId", executorContext.getJobId()))
                 .withLabels(Collections.singletonMap("organizationId", executorContext.getOrganizationId()))
                 .withLabels(Collections.singletonMap("workspaceId", executorContext.getWorkspaceId()))
+                .withAnnotations(annotations)
                 .endMetadata()
                 .withNewSpec()
                 .withNewTemplate()
                 .withNewSpec()
-                .withNodeSelector(ephemeralConfiguration.getNodeSelector())
+                .withNodeSelector(nodeSelectorInfo)
+                .withServiceAccountName(serviceAccount)
                 .addNewContainer()
                 .withName(jobName)
                 .withEnvFrom(executorEnvVarFromSecret)
