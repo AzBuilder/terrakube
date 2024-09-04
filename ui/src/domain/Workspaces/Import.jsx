@@ -99,7 +99,7 @@ export const ImportWorkspace = () => {
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep4Hidden] = useState(true);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [platforms, setPlatforms] = useState([]);
   const [platform, setPlatform] = useState({
     id: "tfcloud",
@@ -167,7 +167,7 @@ export const ImportWorkspace = () => {
   ];
   const navigate = useNavigate();
   useEffect(() => {
-    setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+    setOrganizationName(sessionStorage.getItem(ORGANIZATION_NAME));
     setLoading(true);
     loadVCS();
     getPlatforms();

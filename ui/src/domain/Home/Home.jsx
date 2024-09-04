@@ -11,7 +11,7 @@ const { Content } = Layout;
 export const Home = () => {
   const [organizations, setOrganizations] = useState([]);
   const navigate = useNavigate();
-  const orgId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const orgId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
 
   useEffect(() => {
     if (orgId === "" || orgId === null) {

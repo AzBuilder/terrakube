@@ -33,7 +33,7 @@ export const CreateModule = () => {
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep3Hidden] = useState(true);
   const [step2Hidden, setStep2Hidden] = useState(true);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [vcs, setVCS] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -247,7 +247,7 @@ export const CreateModule = () => {
         style={{ margin: "16px 0" }}
         items={[
           {
-            title: localStorage.getItem(ORGANIZATION_NAME),
+            title: sessionStorage.getItem(ORGANIZATION_NAME),
           },
           {
             title: (
@@ -267,7 +267,7 @@ export const CreateModule = () => {
           <h2>Add Module</h2>
           <div className="App-text">
             This module will be created under the current organization,{" "}
-            {localStorage.getItem(ORGANIZATION_NAME)}.
+            {sessionStorage.getItem(ORGANIZATION_NAME)}.
           </div>
           <Steps
             direction="horizontal"

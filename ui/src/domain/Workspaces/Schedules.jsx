@@ -106,8 +106,8 @@ const validateMessages = {
 };
 
 export const Schedules = ({ schedules }) => {
-  const workspaceId = localStorage.getItem(WORKSPACE_ARCHIVE);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);

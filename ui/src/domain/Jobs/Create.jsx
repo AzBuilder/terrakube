@@ -14,8 +14,8 @@ import {
 const validateMessages = { required: "${label} is required!" };
 
 export const CreateJob = ({ changeJob }) => {
-  const workspaceId = localStorage.getItem(WORKSPACE_ARCHIVE);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const [templates, setTemplates] = useState([]);

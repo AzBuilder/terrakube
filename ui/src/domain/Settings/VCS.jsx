@@ -244,7 +244,7 @@ export const VCSSettings = ({ vcsMode }) => {
                               {renderVCSType(item.attributes.vcsType)} API
                               interactions by any Terrakube user anywhere within
                               the scope of{" "}
-                              <b>{localStorage.getItem(ORGANIZATION_NAME)}</b>.
+                              <b>{sessionStorage.getItem(ORGANIZATION_NAME)}</b>.
                             </span>
                           ) : (
                             <span>
@@ -255,7 +255,7 @@ export const VCSSettings = ({ vcsMode }) => {
                               <b>{item.attributes.createdBy}</b>, which assigned
                               an OAuth token for use by all Terrakube users in
                               the{" "}
-                              <b>{localStorage.getItem(ORGANIZATION_NAME)}</b>{" "}
+                              <b>{sessionStorage.getItem(ORGANIZATION_NAME)}</b>{" "}
                               organization.
                             </span>
                           )}

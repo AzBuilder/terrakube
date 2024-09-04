@@ -34,8 +34,8 @@ export const CreateOrganization = ({ setOrganizationName }) => {
       .then((response) => {
         console.log(response);
         if (response.status === 201) {
-          localStorage.setItem(ORGANIZATION_ARCHIVE, response.data.data.id);
-          localStorage.setItem(
+          sessionStorage.setItem(ORGANIZATION_ARCHIVE, response.data.data.id);
+          sessionStorage.setItem(
             ORGANIZATION_NAME,
             response.data.data.attributes.name
           );

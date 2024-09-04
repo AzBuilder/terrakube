@@ -26,8 +26,8 @@ export const ProfilePicture = (props) => {
 
   const signOutClickHandler = () => {
     auth.removeUser();
-    localStorage.removeItem(ORGANIZATION_NAME);
-    localStorage.removeItem(ORGANIZATION_ARCHIVE);
+    sessionStorage.removeItem(ORGANIZATION_NAME);
+    sessionStorage.removeItem(ORGANIZATION_ARCHIVE);
   };
 
   useEffect(() => {
