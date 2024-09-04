@@ -212,7 +212,7 @@ export const OrganizationDetails = ({
 
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(ORGANIZATION_ARCHIVE, id);
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, id);
     // reload values
     const _searchValue = sessionStorage.getItem("searchValue") || "";
     const _filterValue = sessionStorage.getItem("filterValue") || "";
@@ -288,7 +288,7 @@ export const OrganizationDetails = ({
           setLoading(false);
         });
 
-        localStorage.setItem(ORGANIZATION_NAME, organizationName);
+        sessionStorage.setItem(ORGANIZATION_NAME, organizationName);
         setOrganizationName(organizationName);
       });
   }, [id]);

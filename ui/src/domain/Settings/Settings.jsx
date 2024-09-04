@@ -23,7 +23,7 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
         style={{ margin: "16px 0" }}
         items={[
           {
-            title: localStorage.getItem(ORGANIZATION_NAME),
+            title: sessionStorage.getItem(ORGANIZATION_NAME),
           },
           {
             title: "Settings",

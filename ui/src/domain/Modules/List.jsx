@@ -80,7 +80,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
 
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
     axiosInstance
       .get(`organization/${orgid}?include=module`)
       .then((response) => {
@@ -96,7 +96,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
         }
 
         setLoading(false);
-        localStorage.setItem(
+        sessionStorage.setItem(
           ORGANIZATION_NAME,
           response.data.data.attributes.name
         );

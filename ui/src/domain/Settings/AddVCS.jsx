@@ -309,7 +309,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   <b>Name:</b>{" "}
                 </Col>
                 <Col span={18}>
-                  Terrakube ({localStorage.getItem(ORGANIZATION_NAME)})
+                  Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
                 </Col>
               </Row>
               <Row>
@@ -352,7 +352,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   <b>Name:</b>{" "}
                 </Col>
                 <Col span={18}>
-                  Terrakube ({localStorage.getItem(ORGANIZATION_NAME)})
+                  Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
                 </Col>
               </Row>
               <Row>
@@ -436,7 +436,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   <b>Application name:</b>{" "}
                 </Col>
                 <Col span={18}>
-                  Terrakube ({localStorage.getItem(ORGANIZATION_NAME)})
+                  Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
                 </Col>
               </Row>
               <Row>
@@ -505,7 +505,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 </Col>
                 <Col span={18}>
                   <Paragraph copyable>
-                    Terrakube ({localStorage.getItem(ORGANIZATION_NAME)})
+                    Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
                   </Paragraph>
                 </Col>
               </Row>

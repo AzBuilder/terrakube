@@ -208,7 +208,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
     axiosInstance
       .get(`organization/${orgid}/module/${id}?include=vcs`)
       .then((response) => {

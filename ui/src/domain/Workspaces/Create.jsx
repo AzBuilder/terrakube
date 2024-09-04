@@ -60,7 +60,7 @@ export const CreateWorkspace = () => {
   const [step2Hidden, setStep3Hidden] = useState(true);
   const [sshKeysVisible, setSSHKeysVisible] = useState(false);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [iacTypes, setIacTypes] = useState([]);
   const [iacType, setIacType] = useState({
     id: "terraform",
@@ -128,7 +128,7 @@ export const CreateWorkspace = () => {
   ];
   const navigate = useNavigate();
   useEffect(() => {
-    setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+    setOrganizationName(sessionStorage.getItem(ORGANIZATION_NAME));
     setLoading(true);
     loadVersions(iacType);
     loadSSHKeys();

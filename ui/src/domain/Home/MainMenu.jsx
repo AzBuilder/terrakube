@@ -22,13 +22,13 @@ export const RegistryMenu = (props) => {
   const { organizationName, setOrganizationName } = props;
   const location = useLocation();
   const navigate = useNavigate();
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
 
   useEffect(() => {
     axiosInstance.get("organization").then((response) => {
       setOrgs(prepareOrgs(response.data));
       setOrganizationName(
-        localStorage.getItem(ORGANIZATION_NAME) || "select organization"
+        sessionStorage.getItem(ORGANIZATION_NAME) || "select organization"
       );
     });
 

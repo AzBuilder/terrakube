@@ -100,10 +100,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const navigate = useNavigate();
   const { id, runid, orgid } = useParams();
   if (orgid !== null && orgid !== undefined && orgid !== "") {
-    localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
   }
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
-  localStorage.setItem(WORKSPACE_ARCHIVE, id);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+  sessionStorage.setItem(WORKSPACE_ARCHIVE, id);
   const [workspace, setWorkspace] = useState({});
   const [variables, setVariables] = useState([]);
   const [history, setHistory] = useState([]);
@@ -424,10 +424,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             if (organization) {
               const organizationName = organization.attributes.name;
               setOrganizationName(organizationName);
-              localStorage.setItem(ORGANIZATION_NAME, organizationName);
+              sessionStorage.setItem(ORGANIZATION_NAME, organizationName);
               console.log(organizationName);
             }
-            setOrganizationNameLocal(localStorage.getItem(ORGANIZATION_NAME));
+            setOrganizationNameLocal(sessionStorage.getItem(ORGANIZATION_NAME));
             setWorkspaceName(response.data.data.attributes.name);
             setExecutionMode(response.data.data.attributes.executionMode);
             if (runid && _loadVersions) changeJob(runid); // if runid is provided, show the job details
@@ -1679,7 +1679,7 @@ function setupWorkspaceIncludes(
   }
 
   console.log(
-    `Parsing state for workspace ${localStorage.getItem(WORKSPACE_ARCHIVE)} `
+    `Parsing state for workspace ${sessionStorage.getItem(WORKSPACE_ARCHIVE)} `
   );
   // set state data
   var lastState = history
@@ -1693,7 +1693,7 @@ function setupWorkspaceIncludes(
       axiosInstance,
       setOutputs,
       setResources,
-      localStorage.getItem(WORKSPACE_ARCHIVE),
+      sessionStorage.getItem(WORKSPACE_ARCHIVE),
       setContextState
     );
   }
@@ -1713,7 +1713,7 @@ function loadState(
   }
 
   var currentState;
-  var organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  var organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
 
   axiosInstance.get(state.output).then((resp) => {
     var result = parseState(resp.data);
