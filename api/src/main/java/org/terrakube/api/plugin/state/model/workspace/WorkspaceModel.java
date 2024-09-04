@@ -1,5 +1,6 @@
 package org.terrakube.api.plugin.state.model.workspace;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,6 +8,7 @@ import lombok.ToString;
 import org.terrakube.api.plugin.state.model.generic.Resource;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @ToString

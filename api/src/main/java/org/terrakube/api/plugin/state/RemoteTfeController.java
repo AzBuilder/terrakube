@@ -22,6 +22,7 @@ import org.terrakube.api.plugin.state.model.runs.RunsData;
 import org.terrakube.api.plugin.state.model.runs.RunsDataList;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
+import org.terrakube.api.plugin.state.model.workspace.WorkspaceError;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.state.consumers.StateConsumerList;
 import org.terrakube.api.plugin.state.model.workspace.tags.TagDataList;
@@ -33,6 +34,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.Principal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -137,7 +139,18 @@ public class RemoteTfeController {
     @PostMapping(produces = "application/vnd.api+json", path = "/workspaces/{workspaceId}/actions/lock")
     public ResponseEntity<WorkspaceData> lockWorkspace(@PathVariable("workspaceId") String workspaceId, Principal principal) {
         log.info("Lock {}", workspaceId);
-        return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, true, (JwtAuthenticationToken) principal)));
+        if(remoteTfeService.isWorkspaceLocked(workspaceId)){
+            WorkspaceData workspaceData = new WorkspaceData();
+            workspaceData.setErrors(new ArrayList());
+            WorkspaceError workspaceError = new WorkspaceError();
+            workspaceError.setStatus("409");
+            workspaceError.setTitle("conflict");
+            workspaceError.setDetail("Unable to lock workspace. The workspace is already locked.");
+            workspaceData.getErrors().add(workspaceError);
+            return ResponseEntity.status(409).body(workspaceData);
+        } else {
+            return ResponseEntity.of(Optional.ofNullable(remoteTfeService.updateWorkspaceLock(workspaceId, true, (JwtAuthenticationToken) principal)));
+        }
     }
 
     // Only used for local runs

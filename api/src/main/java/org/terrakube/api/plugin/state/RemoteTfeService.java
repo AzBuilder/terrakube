@@ -484,6 +484,12 @@ public class RemoteTfeService {
         return getWorkspace(organizationName, workspace.getName(), otherAttributes, currentUser);
     }
 
+    public boolean isWorkspaceLocked(String workspaceId) {
+        Optional<Workspace> workspace = workspaceRepository.findById(UUID.fromString(workspaceId));
+        log.info("Checking Lock for Workspace: {} is locked {}", workspaceId, workspace.get().isLocked());
+        return workspace.get().isLocked();
+    }
+
     StateData createWorkspaceState(String workspaceId, StateData stateData) {
         log.info("Creating new workspace state for {}", workspaceId);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
