@@ -218,6 +218,16 @@ class TfcApiTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .post("/remote/tfe/v2/workspaces/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/actions/lock")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.CONFLICT.value());
     }
 
     @Test
