@@ -1,7 +1,20 @@
 package org.terrakube.api.plugin.vcs;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.quartz.SchedulerException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.plugin.scheduler.ScheduleVcsService;
 import org.terrakube.api.plugin.vcs.provider.azdevops.AzDevOpsToken;
 import org.terrakube.api.plugin.vcs.provider.azdevops.AzDevOpsTokenService;
@@ -16,12 +29,12 @@ import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.vcs.VcsStatus;
 import org.terrakube.api.rs.vcs.VcsType;
-import org.quartz.SchedulerException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.util.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
@@ -151,5 +164,29 @@ public class TokenService {
         }
         return tokenInformation;
     }
+    
+    // Get the access token for access to the supplied repository, ownerAndRepo is
+    // an array of the owner and the repository name
+    public String getAccessToken(String[] ownerAndRepo, Vcs vcs)
+            throws JsonMappingException, JsonProcessingException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String token = vcs.getAccessToken();
+        // If the token is already set, return it, normally this is oAuth token
+        if (token!=null && !token.isEmpty()) return token;
+        
+        // Otherwise, get the token from other table, currently only Github is supported.
+        return  gitHubTokenService.getAccessToken(vcs, ownerAndRepo);
+    }
 
+    // Get the access token for access to the supplied repository in full URL
+    public String getAccessToken(String gitPath, Vcs vcs) throws URISyntaxException, JsonMappingException,
+            JsonProcessingException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String token = vcs.getAccessToken();
+        // If the token is already set, return it, normally this is oAuth token
+        if (token!=null && !token.isEmpty()) return token;
+
+        URI uri = new URI(gitPath);
+        String[] ownerAndRepo = Arrays.copyOfRange(uri.getPath().replaceAll("\\.git$", "").split("/"), 1, 3);
+        // Otherwise, get the token from other table, currently only Github is supported.
+        return  gitHubTokenService.getAccessToken(vcs, ownerAndRepo);
+    }
 }

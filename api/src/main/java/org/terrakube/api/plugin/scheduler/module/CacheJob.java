@@ -24,7 +24,7 @@ public class CacheJob implements Job {
         organizationRepository.findAll().forEach(organization -> {
             organization.getModule().forEach(module -> {
                 try {
-                    gitTagsCache.setVersions(module.getRegistryPath(null), gitTagsCache.getVersionFromRepository(module.getSource(), module.getTagPrefix(), module.getVcs(), module.getSsh()));
+                    gitTagsCache.setVersions(module.getRegistryPath(null), gitTagsCache.getVersionFromRepository(module.getSource(), module.getTagPrefix(), module.getVcs(), module.getSsh(), module.getGitHubAppToken()));
                 } catch (Exception ex) {
                     log.error("Updating module index for {}", module.getRegistryPath(null));
                     log.error(ex.getMessage());

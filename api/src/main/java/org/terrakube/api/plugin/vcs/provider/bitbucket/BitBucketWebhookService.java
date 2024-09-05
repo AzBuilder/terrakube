@@ -135,7 +135,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
 
         // Create the body, in this version we only support push event but in future we
@@ -143,7 +143,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         String body = "{\"description\":\"Terrakube\",\"url\":\"" + webhookUrl
                 + "\",\"active\":true,\"events\":[\"repo:push\"],\"secret\":\"" + secret + "\"}";
 
-        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks";
+        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + String.join("/", ownerAndRepo) + "/hooks";
 
         ResponseEntity<String> response = callBitBucketApi(workspace.getVcs().getAccessToken(), body, apiUrl,
                 HttpMethod.POST);
@@ -168,8 +168,12 @@ public class BitBucketWebhookService extends WebhookServiceBase {
     }
 
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
-        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
-        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+        String apiUrl = webhookRemoteId;
+        String ownerAndRepo = String.join("/", extractOwnerAndRepo(workspace.getSource()));
+
+        if (!webhookRemoteId.substring(0, 4).equals("http")) {
+            apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+        }
 
         ResponseEntity<String> response = callBitBucketApi(workspace.getVcs().getAccessToken(), "", apiUrl,
                 HttpMethod.DELETE);

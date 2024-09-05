@@ -188,7 +188,7 @@ export const VCSSettings = ({ vcsMode }) => {
                       </div>,
                     ]}
                   >
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>Callback URL</Col>
                         <Col span={18}>
@@ -200,25 +200,25 @@ export const VCSSettings = ({ vcsMode }) => {
                           </Paragraph>
                         </Col>
                       </Row>
-                    </p>
+                    </div>
                     <Divider />
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>API URL</Col>
                         <Col span={18}>
                           {item.attributes?.apiUrl}
                         </Col>
                       </Row>
-                    </p>
+                    </div>
                     <Divider />
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>Created</Col>
                         <Col span={18}>{item.attributes.createdDate}</Col>
                       </Row>
-                    </p>
+                    </div>
                     <Divider />
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>
                           {item.attributes.status !== "COMPLETED" ? (
@@ -283,7 +283,7 @@ export const VCSSettings = ({ vcsMode }) => {
                           )}
                         </Col>
                       </Row>
-                    </p>
+                    </div>
                   </Card>
                 </List.Item>
               )}

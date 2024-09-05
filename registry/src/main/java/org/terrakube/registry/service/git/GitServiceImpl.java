@@ -32,36 +32,35 @@ public class GitServiceImpl implements GitService {
     private static final String SSH_REGISTRY_DIRECTORY = "%s/.terraform-spring-boot/ssh/registry/%s/id_%s";
 
     @Override
-    public File getCloneRepositoryByTag(String repository, String tag, String vcsType, String accessToken, String tagPrefix, String folder) {
+    public File getCloneRepositoryByTag(String repository, String tag, String vcsType, String vcsConnectionType,
+            String accessToken, String tagPrefix, String folder) {
         File gitCloneRepository = null;
         try {
             String userHomeDirectory = FileUtils.getUserDirectoryPath();
             String tempFolder = UUID.randomUUID().toString();
             String gitRepositoryPath = userHomeDirectory.concat(
                     FilenameUtils.separatorsToSystem(
-                            GIT_DIRECTORY + "/" + tempFolder
-                    ));
+                            GIT_DIRECTORY + "/" + tempFolder));
 
             gitCloneRepository = new File(gitRepositoryPath);
             FileUtils.forceMkdir(gitCloneRepository);
             FileUtils.cleanDirectory(gitCloneRepository);
 
-            String correctTag = validateCorrectTag(tag, repository, vcsType, accessToken, tempFolder, tagPrefix);
+            String correctTag = validateCorrectTag(tag, repository, vcsType, vcsConnectionType, accessToken, tempFolder, tagPrefix);
 
             log.info("Cloning {} using {}", repository, correctTag);
             Git.cloneRepository()
                     .setURI(repository)
                     .setDirectory(gitCloneRepository)
                     .setBranch("refs/tags/" + correctTag)
-                    .setCredentialsProvider(setupCredentials(vcsType, accessToken))
+                    .setCredentialsProvider(setupCredentials(vcsType, vcsConnectionType, accessToken))
                     .setTransportConfigCallback(setupTransportConfigCallback(vcsType, accessToken, tempFolder))
                     .call();
 
-            if (folder != null && !folder.isEmpty()){
+            if (folder != null && !folder.isEmpty()) {
                 gitRepositoryPath = userHomeDirectory.concat(
                         FilenameUtils.separatorsToSystem(
-                                GIT_DIRECTORY + "/" + tempFolder + folder
-                        ));
+                                GIT_DIRECTORY + "/" + tempFolder + folder));
                 gitCloneRepository = new File(gitRepositoryPath);
             }
 
@@ -71,11 +70,14 @@ public class GitServiceImpl implements GitService {
         return gitCloneRepository;
     }
 
-    private CredentialsProvider setupCredentials(String vcsType, String accessToken) {
+    private CredentialsProvider setupCredentials(String vcsType, String vcsConnectionType, String accessToken) {
         CredentialsProvider credentialsProvider = null;
         switch (vcsType) {
             case "GITHUB":
-                credentialsProvider = new UsernamePasswordCredentialsProvider(accessToken, "");
+                if (vcsConnectionType != null && vcsConnectionType.equals("OAUTH"))
+                    credentialsProvider = new UsernamePasswordCredentialsProvider(accessToken, "");
+                else
+                    credentialsProvider = new UsernamePasswordCredentialsProvider("x-access-token", accessToken);
                 break;
             case "BITBUCKET":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", accessToken);
@@ -93,15 +95,16 @@ public class GitServiceImpl implements GitService {
         return credentialsProvider;
     }
 
-    private String validateCorrectTag(String originalTag, String repository, String vcsType, String accessToken, String folderName, String tagPrefix) {
+    private String validateCorrectTag(String originalTag, String repository, String vcsType, String vcsConnectionType, String accessToken,
+            String folderName, String tagPrefix) {
         List<String> versionList = new ArrayList<>();
-        String finalTag = (tagPrefix == null ? "": tagPrefix) + originalTag;
+        String finalTag = (tagPrefix == null ? "" : tagPrefix) + originalTag;
         Map<String, Ref> tags = null;
         try {
             tags = Git.lsRemoteRepository()
                     .setTags(true)
                     .setRemote(repository)
-                    .setCredentialsProvider(setupCredentials(vcsType, accessToken))
+                    .setCredentialsProvider(setupCredentials(vcsType, vcsConnectionType, accessToken))
                     .setTransportConfigCallback(setupTransportConfigCallback(vcsType, accessToken, folderName))
                     .callAsMap();
         } catch (GitAPIException e) {
@@ -111,28 +114,28 @@ public class GitServiceImpl implements GitService {
             versionList.add(key.replace("refs/tags/", ""));
         });
 
-        if (versionList.contains((tagPrefix == null ? "": tagPrefix) + "v" + originalTag))
-            finalTag = (tagPrefix == null ? "": tagPrefix) + "v" + originalTag;
+        if (versionList.contains((tagPrefix == null ? "" : tagPrefix) + "v" + originalTag))
+            finalTag = (tagPrefix == null ? "" : tagPrefix) + "v" + originalTag;
 
         return finalTag;
     }
 
-    private TransportConfigCallback setupTransportConfigCallback(String vcsType, String privateKey, String folderName){
-        if(vcsType.startsWith("SSH")){
+    private TransportConfigCallback setupTransportConfigCallback(String vcsType, String privateKey, String folderName) {
+        if (vcsType.startsWith("SSH")) {
             SshdSessionFactory registrySshFactory = new SshdSessionFactoryBuilder()
                     .setServerKeyDatabase((h, s) -> new ServerKeyDatabase() {
                         @Override
                         public List<PublicKey> lookup(String connectAddress,
-                                                      InetSocketAddress remoteAddress,
-                                                      Configuration config) {
+                                InetSocketAddress remoteAddress,
+                                Configuration config) {
                             return Collections.emptyList();
                         }
 
                         @Override
                         public boolean accept(String connectAddress,
-                                              InetSocketAddress remoteAddress,
-                                              PublicKey serverKey, Configuration config,
-                                              CredentialsProvider provider) {
+                                InetSocketAddress remoteAddress,
+                                PublicKey serverKey, Configuration config,
+                                CredentialsProvider provider) {
                             return true;
                         }
 
@@ -151,7 +154,8 @@ public class GitServiceImpl implements GitService {
 
     private File generateRegistrySshFolder(String vcsType, String privateKey, String folderName) {
         String sshFileName = vcsType.split("~")[1];
-        String sshFilePath = String.format(SSH_REGISTRY_DIRECTORY, FileUtils.getUserDirectoryPath(), folderName, sshFileName);
+        String sshFilePath = String.format(SSH_REGISTRY_DIRECTORY, FileUtils.getUserDirectoryPath(), folderName,
+                sshFileName);
         File sshFile = new File(sshFilePath);
         log.info("Creating new SSH folder for registry {}", sshFilePath);
         try {
@@ -162,6 +166,5 @@ public class GitServiceImpl implements GitService {
         }
         return sshFile.getParentFile();
     }
-
 
 }

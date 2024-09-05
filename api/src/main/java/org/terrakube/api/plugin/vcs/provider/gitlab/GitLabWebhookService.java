@@ -1,32 +1,29 @@
 package org.terrakube.api.plugin.vcs.provider.gitlab;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.stereotype.Service;
-import org.terrakube.api.plugin.vcs.WebhookResult;
-import org.terrakube.api.plugin.vcs.WebhookServiceBase;
-import org.terrakube.api.rs.workspace.Workspace;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
-
 import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.terrakube.api.plugin.vcs.WebhookResult;
+import org.terrakube.api.plugin.vcs.WebhookServiceBase;
+import org.terrakube.api.rs.workspace.Workspace;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -110,7 +107,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
         String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String ownerAndRepo = String.join("/", extractOwnerAndRepo(workspace.getSource()));
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
         RestTemplate restTemplate = new RestTemplate();
 
@@ -151,7 +148,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
     }
     
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
-        String ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String ownerAndRepo = String.join("/", extractOwnerAndRepo(workspace.getSource()));
         String apiUrl = workspace.getVcs().getApiUrl() + "/projects/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
         
         ResponseEntity<String> response = callGitlabApi(workspace.getVcs().getAccessToken(), "", apiUrl, HttpMethod.DELETE);

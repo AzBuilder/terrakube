@@ -43,3 +43,7 @@
 .editor{
   border: 1px solid #eee;
 }
+
+ul.disc-list {
+  list-style-type: disc
+}

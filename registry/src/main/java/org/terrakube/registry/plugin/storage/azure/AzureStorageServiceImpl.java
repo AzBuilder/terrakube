@@ -21,7 +21,6 @@ public class AzureStorageServiceImpl implements StorageService {
     private static final String CONTAINER_NAME = "registry";
     private static String BUCKET_DOWNLOAD_MODULE_LOCATION = "%s/terraform/modules/v1/download/%s/%s/%s/%s/module.zip";
 
-
     @NonNull
     BlobServiceClient blobServiceClient;
 
@@ -32,7 +31,9 @@ public class AzureStorageServiceImpl implements StorageService {
     String registryHostname;
 
     @Override
-    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken, String tagPrefix, String folder) {
+    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion,
+            String source, String vcsType, String vcsConnectionType, String accessToken, String tagPrefix,
+            String folder) {
 
         BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
 
@@ -40,31 +41,40 @@ public class AzureStorageServiceImpl implements StorageService {
         if (!blobContainerClient.exists()) {
             blobContainerClient.create();
         }
-        String blobName = String.format("%s/%s/%s/%s/module.zip", organizationName, moduleName, providerName, moduleVersion);
+        String blobName = String.format("%s/%s/%s/%s/module.zip", organizationName, moduleName, providerName,
+                moduleVersion);
         log.info("blobName: {}", blobName);
         BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
 
         if (!blobClient.exists()) {
-            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken, tagPrefix, folder);
+            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType,
+                    vcsConnectionType, accessToken,
+                    tagPrefix, folder);
             File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
             ZipUtil.pack(gitCloneDirectory, moduleZip);
             blobClient.uploadFromFile(moduleZip.getAbsolutePath());
 
             try {
                 FileUtils.cleanDirectory(gitCloneDirectory);
-                if (FileUtils.deleteQuietly(moduleZip)) log.info("Successfully delete folder");
+                if (FileUtils.deleteQuietly(moduleZip))
+                    log.info("Successfully delete folder");
             } catch (IOException e) {
                 log.error(e.getMessage());
             }
         }
 
-        return String.format(BUCKET_DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName, providerName, moduleVersion);
+        return String.format(BUCKET_DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName,
+                providerName, moduleVersion);
     }
 
     @Override
-    public byte[] downloadModule(String organizationName, String moduleName, String providerName, String moduleVersion) {
+    public byte[] downloadModule(String organizationName, String moduleName, String providerName,
+            String moduleVersion) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
-        log.info("Searching: /registry/{}/{}/{}/{}/module.zip", organizationName, moduleName, providerName, moduleVersion);
-        return containerClient.getBlobClient(String.format("%s/%s/%s/%s/module.zip", organizationName, moduleName, providerName, moduleVersion)).downloadContent().toBytes();
+        log.info("Searching: /registry/{}/{}/{}/{}/module.zip", organizationName, moduleName, providerName,
+                moduleVersion);
+        return containerClient.getBlobClient(
+                String.format("%s/%s/%s/%s/module.zip", organizationName, moduleName, providerName, moduleVersion))
+                .downloadContent().toBytes();
     }
 }

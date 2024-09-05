@@ -215,6 +215,9 @@ public class WebhookService {
     private boolean checkFileChanges(List<String> files, Webhook webhook) {
         String[] triggeredPath = webhook.getPath().split(",");
         String workspaceFolder = webhook.getWorkspace().getFolder();
+        if(workspaceFolder.substring(0, 1).equals("/")) {
+            workspaceFolder = workspaceFolder.substring(1);
+        }
         for (String file : files) {
             if (file.startsWith(workspaceFolder)) {
                 log.info("Changed file {} in set workspace path {}", file, workspaceFolder);

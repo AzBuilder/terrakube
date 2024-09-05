@@ -1,22 +1,24 @@
 package org.terrakube.api.plugin.scheduler;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.terrakube.api.plugin.vcs.TokenService;
-import org.terrakube.api.repository.VcsRepository;
-import org.terrakube.api.rs.vcs.Vcs;
-import org.terrakube.api.rs.vcs.VcsStatus;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.plugin.vcs.TokenService;
+import org.terrakube.api.repository.GitHubAppTokenRepository;
+import org.terrakube.api.repository.VcsRepository;
+import org.terrakube.api.rs.vcs.Vcs;
+import org.terrakube.api.rs.vcs.VcsStatus;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Component
@@ -29,6 +31,8 @@ public class ScheduleVcs implements org.quartz.Job {
 
     TokenService tokenService;
     VcsRepository vcsRepository;
+    GitHubAppTokenRepository gitHubAppTokenRepository;
+    ScheduleGitHubAppTokenService scheduleGitHubAppTokenService;
 
     @Transactional
     @Override
@@ -42,13 +46,15 @@ public class ScheduleVcs implements org.quartz.Job {
         } else {
             vcs = vcsRepository.findByCallback(vcsId);
             if (vcs == null) {
-                log.warn("VCS Job Id {} is still active but no longer needed it, vcs connection cannot be found in the database", vcsId);
+                log.warn(
+                        "VCS Job Id {} is still active but no longer needed it, vcs connection cannot be found in the database",
+                        vcsId);
                 return;
             }
             log.info("VCS found with custom callback");
         }
-
         if (vcs.getStatus().equals(VcsStatus.COMPLETED)) {
+            @SuppressWarnings("unchecked")
             Map<String, Object> newTokenInformation = tokenService.refreshAccessToken(
                     vcs.getId().toString(),
                     vcs.getVcsType(),
@@ -57,8 +63,7 @@ public class ScheduleVcs implements org.quartz.Job {
                     vcs.getClientSecret(),
                     vcs.getRefreshToken(),
                     vcs.getCallback(),
-                    vcs.getEndpoint()
-            );
+                    vcs.getEndpoint());
 
             if (!newTokenInformation.isEmpty()) {
                 Vcs tempVcs = vcsRepository.getReferenceById(vcs.getId());
@@ -68,6 +73,5 @@ public class ScheduleVcs implements org.quartz.Job {
                 vcsRepository.save(tempVcs);
             }
         }
-
     }
 }

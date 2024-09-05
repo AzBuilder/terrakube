@@ -58,5 +58,8 @@
     <include file="/db/changelog/local/changelog-2.21.0-has-changes.xml"/>
     <include file="/db/changelog/local/changelog-2.22.0-global-vars-size.xml"/>
     <include file="/db/changelog/local/changelog-2.22.0-global-var-key-size.xml"/>
+    <include file="/db/changelog/local/changelog-2.22.1-github-token.xml"/>
+    <include file="/db/changelog/local/changelog-2.22.1-vcs-key-connection-type.xml"/>
+    <include file="/db/changelog/local/changelog-2.22.1-module-github-token-id.xml"/>
     <include file="/db/changelog/local/changelog-2.22.2-webhook-triggers.xml"/>
 </databaseChangeLog>
