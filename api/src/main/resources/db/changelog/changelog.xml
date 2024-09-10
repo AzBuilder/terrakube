@@ -62,4 +62,5 @@
     <include file="/db/changelog/local/changelog-2.22.1-vcs-key-connection-type.xml"/>
     <include file="/db/changelog/local/changelog-2.22.1-module-github-token-id.xml"/>
     <include file="/db/changelog/local/changelog-2.22.2-webhook-triggers.xml"/>
+    <include file="/db/changelog/local/changelog-2.23.0-job-reference-size.xml"/>
 </databaseChangeLog>
