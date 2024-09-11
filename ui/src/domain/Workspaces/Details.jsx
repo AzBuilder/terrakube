@@ -1195,6 +1195,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     workspace={workspace.data}
                     organizationId={organizationId}
                     organizationName={organizationNameLocal}
+                    onRollback={loadWorkspace}
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
