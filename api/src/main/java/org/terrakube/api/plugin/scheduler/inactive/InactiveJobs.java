@@ -75,7 +75,6 @@ public class InactiveJobs implements org.quartz.Job {
                     log.error(e.getMessage());
                 }
                 log.warn("Closing Job");
-                return;
             }
         }
     }
