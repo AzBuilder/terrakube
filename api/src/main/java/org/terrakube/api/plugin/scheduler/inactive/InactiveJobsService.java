@@ -28,11 +28,11 @@ public class InactiveJobsService {
             JobDetail jobDetail = scheduler.getJobDetail(new JobKey(PREFIX_INACTIVE_JOBS));
             log.info("jobDetail is null {}", jobDetail == null);
             if(jobDetail == null){
-                setupInactiveJob("0 * * ? * *");
+                setupInactiveJob("0 */5 * ? * *");
             } else {
                 log.info("Delete Old Quartz Job for inactive jobs");
                 scheduler.deleteJob(new JobKey(PREFIX_INACTIVE_JOBS));
-                setupInactiveJob("0 * * ? * *");
+                setupInactiveJob("0 */5 * ? * *");
             }
         } catch (Exception ex) {
             log.error(ex.getMessage());

@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.terrakube.api.plugin.scheduler.ScheduleJobService.PREFIX_JOB_CONTEXT;
-import static org.terrakube.api.rs.vcs.VcsType.GITHUB;
 
 @Service
 @Slf4j
