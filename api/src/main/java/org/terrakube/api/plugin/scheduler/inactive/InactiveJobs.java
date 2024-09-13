@@ -46,8 +46,7 @@ public class InactiveJobs implements org.quartz.Job {
             log.info("Inactive Job {} should be completed before {}, current time {}", job.getId(), jobExpirationDate, currentTime);
             if (currentTime.after(jobExpirationDate)) {
                 try {
-                    log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
-                    log.error("Job has been running for more than 6 hours, cancelling running job");
+                    log.error("Job has been running for more than 6 hours, cancelling running job {}", job.getId());
                     job.setStatus(JobStatus.failed);
                     jobRepository.save(job);
                     redisTemplate.delete(String.valueOf(job.getId()));
