@@ -333,7 +333,7 @@ public class RemoteTfeService {
             workspaceData.setData(workspaceModel);
 
             Optional<Job> currentJob = jobRepository.findFirstByWorkspaceAndStatusInOrderByIdAsc(workspace.get(),
-                    Arrays.asList(JobStatus.pending, JobStatus.running, JobStatus.queue));
+                    Arrays.asList(JobStatus.pending, JobStatus.running, JobStatus.queue, JobStatus.waitingApproval));
             if (currentJob.isPresent()) {
                 log.info("Found Current Job Id: {}", currentJob.get().getId());
                 workspaceModel.setRelationships(new org.terrakube.api.plugin.state.model.workspace.Relationships());
@@ -956,7 +956,8 @@ public class RemoteTfeService {
                 Arrays.asList(
                         JobStatus.pending,
                         JobStatus.running,
-                        JobStatus.queue));
+                        JobStatus.queue,
+                        JobStatus.waitingApproval));
 
         int runQueue = 1;
         for (Job job : jobList) {
