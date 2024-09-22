@@ -105,6 +105,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   sessionStorage.setItem(WORKSPACE_ARCHIVE, id);
   const [workspace, setWorkspace] = useState({});
+  const [manageWorkspace, setManageWorkspace] = useState(false);
+  const [manageState, setManageState] = useState(false);
   const [variables, setVariables] = useState([]);
   const [history, setHistory] = useState([]);
   const [schedule, setSchedule] = useState([]);
@@ -340,12 +342,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   useEffect(() => {
     setLoading(true);
     loadWorkspace(true, true);
+    loadPermissionSet();
     setLoading(false);
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false, false);
+      loadPermissionSet();
     }, 10000);
     return () => clearInterval(interval);
   }, [id]);
@@ -376,6 +380,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       setTerraformVersions(tfVersions.sort(compareVersions).reverse());
       console.log(tfVersions);
     });
+  };
+  
+  const loadPermissionSet = () => {
+    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
+    axiosInstance.get(url).then((response) => {
+      setManageState(response.data.manageState);
+      setManageWorkspace(response.data.manageWorkspace);
+    })
   };
 
   const loadWorkspace = (_loadVersions, _loadWebhook) => {
@@ -414,7 +426,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 _loadWebhook,
                 setWebhook,
                 setPushWebhookEnabled,
-                setContextState
+                setContextState,
+                manageState,
               );
             }
 
@@ -889,6 +902,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             <LockOutlined />
                           )
                         }
+                        disabled={!manageWorkspace}
                       >
                         {workspace.data.attributes.locked ? "Unlock" : "Lock"}
                       </Button>
@@ -1100,6 +1114,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         <Tags
                           organizationId={organizationId}
                           workspaceId={id}
+                          manageWorkspace={manageWorkspace}
                         />
                       </Space>
                     </Col>
@@ -1187,7 +1202,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     </div>
                   )}
                 </TabPane>
-                <TabPane tab="States" key="3">
+                <TabPane tab="States" key="3" disabled={!manageState}>
                   <States
                     history={history}
                     setStateDetailsVisible={setStateDetailsVisible}
@@ -1196,14 +1211,15 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     organizationId={organizationId}
                     organizationName={organizationNameLocal}
                     onRollback={loadWorkspace}
+                    manageState={manageState}
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-                  <Variables vars={variables} env={envVariables} />
+                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace}/>
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
                   {templates ? (
-                    <Schedules schedules={schedule} />
+                    <Schedules schedules={schedule} manageWorkspace={manageWorkspace}/>
                   ) : (
                     <p>Loading...</p>
                   )}
@@ -1254,7 +1270,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           ]}
                           label="Name"
                         >
-                          <Input />
+                          <Input disabled={!manageWorkspace}/>
                         </Form.Item>
 
                         <Form.Item
@@ -1262,7 +1278,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           name="description"
                           label="Description"
                         >
-                          <Input.TextArea placeholder="Workspace description" />
+                          <Input.TextArea placeholder="Workspace description" disabled={!manageWorkspace}/>
                         </Form.Item>
                         <Form.Item
                           name="terraformVersion"
@@ -1284,6 +1300,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                               workspace.data.attributes.terraformVersion
                             }
                             style={{ width: 250 }}
+                            disabled={!manageWorkspace}
                           >
                             {terraformVersions.map(function (name, index) {
                               return <Option key={name}>{name}</Option>;
@@ -1306,7 +1323,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           }
                           onChange={handlePathChange}
                         >
-                          <Input />
+                          <Input disabled={!manageWorkspace}/>
                         </Form.Item>
                         <Form.Item
                           name="branch"
@@ -1315,7 +1332,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           extra="Don't update the value when using CLI Driven workflows. This is only used in VCS driven workflow."
                           onChange={handleBranchChange}
                         >
-                          <Input />
+                          <Input disabled={!manageWorkspace}/>
                         </Form.Item>
                         <Form.Item
                           name="locked"
@@ -1326,7 +1343,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             icon: <InfoCircleOutlined />,
                           }}
                         >
-                          <Switch />
+                          <Switch disabled={!manageWorkspace}/>
                         </Form.Item>
 
                         <Form.Item
@@ -1338,6 +1355,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             defaultValue={workspace.data.attributes?.iacType}
                             style={{ width: 250 }}
                             onChange={handleIacChange}
+                            disabled={!manageWorkspace}
                           >
                             {iacTypes.map(function (iacType, index) {
                               return (
@@ -1364,6 +1382,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                               workspace.data.attributes.executionMode
                             }
                             style={{ width: 250 }}
+                            disabled={!manageWorkspace}
                           >
                             <Option key="remote">remote</Option>
                             <Option key="local">local</Option>
@@ -1381,6 +1400,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             }
                             placeholder="select default template"
                             style={{ width: 250 }}
+                            disabled={!manageWorkspace}
                           >
                             {orgTemplates.map(function (template, index) {
                               return (
@@ -1402,6 +1422,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             }
                             placeholder="select SSH Key"
                             style={{ width: 250 }}
+                            disabled={!manageWorkspace}
                           >
                             {sshKeys.map(function (sshKey, index) {
                               return (
@@ -1423,6 +1444,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             }
                             placeholder="select Job Agent"
                             style={{ width: 250 }}
+                            disabled={!manageWorkspace}
                           >
                             {agentList.map(function (agentKey, index) {
                               return (
@@ -1442,7 +1464,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                             icon: <InfoCircleOutlined />,
                           }}
                         >
-                          <Switch onChange={handlePushWebhookClick} defaultValue={pushWebhookEnabled} />
+                          <Switch onChange={handlePushWebhookClick} defaultValue={pushWebhookEnabled} disabled={!manageWorkspace}/>
                         </Form.Item>
                         <Form.Item
                           hidden={!pushWebhookEnabled}
@@ -1452,7 +1474,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           extra="A list of brach prefixes besides the default VCS branch that will trigger a run, for example 'feat,fix'. Values are separated by comma."
                           rules={[{ required: false }]}
                         >
-                          <Input placeholder={defaultBranch} />
+                          <Input placeholder={defaultBranch} disabled={!manageWorkspace}/>
                         </Form.Item>
                         <Form.Item
                           hidden={!pushWebhookEnabled}
@@ -1462,7 +1484,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           extra="A list of regex to match against the paths besides the 'Terraform Working Directory' that will trigger a run, for example 'modules/.*.tf'. Values are separated by comma."
                           rules={[{ required: false }]}
                         >
-                          <Input placeholder={defaultPath} />
+                          <Input placeholder={defaultPath} disabled={!manageWorkspace}/>
                         </Form.Item>
                         <Form.Item
                           hidden={!pushWebhookEnabled}
@@ -1472,7 +1494,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           extra="The template that will be executed when a push event is received from the selected VCS provider."
                           rules={[{ required: false }]}
                         >
-                          <Select placeholder={defaultTemplate} style={{ width: 250 }}>
+                          <Select placeholder={defaultTemplate} style={{ width: 250 }} disabled={!manageWorkspace}>
                             {orgTemplates.map(function (template, index) {
                               return (
                                 <Option key={template?.id}>
@@ -1483,7 +1505,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           </Select>
                         </Form.Item>
                         <Form.Item>
-                          <Button type="primary" htmlType="submit">
+                          <Button type="primary" htmlType="submit" disabled={!manageWorkspace}>
                             Save settings
                           </Button>
                         </Form.Item>
@@ -1512,7 +1534,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                       cancelText="No"
                       placement="bottom"
                     >
-                      <Button type="default" danger style={{ width: "100%" }}>
+                      <Button type="default" danger style={{ width: "100%" }} disabled={!manageWorkspace}>
                         <Space>
                           <DeleteOutlined />
                           Delete from Terrakube
@@ -1562,7 +1584,8 @@ function setupWorkspaceIncludes(
   _loadWebhook,
   setWebhook,
   setPushWebhookEnabled,
-  setContextState
+  setContextState,
+  manageState
 ) {
   let variables = [];
   let jobs = [];
@@ -1695,7 +1718,8 @@ function setupWorkspaceIncludes(
       setOutputs,
       setResources,
       sessionStorage.getItem(WORKSPACE_ARCHIVE),
-      setContextState
+      setContextState,
+      manageState
     );
   }
   setCurrentStateId(lastState?.id);
@@ -1707,9 +1731,10 @@ function loadState(
   setOutputs,
   setResources,
   workspaceId,
-  setContextState
+  setContextState,
+  manageState
 ) {
-  if (!state) {
+  if (!state || !manageState) {
     return;
   }
 

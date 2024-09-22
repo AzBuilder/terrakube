@@ -1,20 +1,28 @@
 package org.terrakube.api.plugin.token.team;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.terrakube.api.repository.TeamRepository;
+import org.terrakube.api.rs.token.group.Group;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import org.terrakube.api.rs.token.group.Group;
-
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -23,9 +31,11 @@ import java.util.List;
 public class TeamTokenController {
 
     TeamTokenService teamTokenService;
+    TeamRepository teamRepository;
 
     @PostMapping
-    public ResponseEntity<TeamToken> createToken(@RequestBody GroupTokenRequest groupTokenRequest,  Principal principal) {
+    public ResponseEntity<TeamToken> createToken(@RequestBody GroupTokenRequest groupTokenRequest,
+            Principal principal) {
         TeamToken teamToken = new TeamToken();
         teamToken.setToken(teamTokenService.createTeamToken(
                 groupTokenRequest.getGroup(),
@@ -37,25 +47,46 @@ public class TeamTokenController {
     }
 
     @GetMapping("/current-teams")
-    public ResponseEntity<CurrentGroupsResponse> SearchTeams(Principal principal){
+    public ResponseEntity<CurrentGroupsResponse> SearchTeams(Principal principal) {
         JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
         CurrentGroupsResponse groupList = new CurrentGroupsResponse();
-        groupList.setGroups(new ArrayList());
-        teamTokenService.getCurrentGroups(principalJwt).forEach(group->{
+        groupList.setGroups(new ArrayList<String>());
+        teamTokenService.getCurrentGroups(principalJwt).forEach(group -> {
             groupList.getGroups().add(group);
         });
         return new ResponseEntity<>(groupList, HttpStatus.ACCEPTED);
     }
 
+    @GetMapping(path = "/permissions/organization/{organizationId}")
+    public ResponseEntity<PermissionSet> getPermissions(Principal principal,
+            @PathVariable("organizationId") String organizationId) {
+        JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
+        PermissionSet permissions = new PermissionSet();
+        List<String> groups = teamTokenService.getCurrentGroups(principalJwt);
+        teamRepository.findAllByOrganizationIdAndNameIn(UUID.fromString(organizationId), groups).forEach(group -> {
+            permissions.setManageState(permissions.manageState || group.isManageState());
+            permissions.setManageWorkspace(permissions.manageWorkspace || group.isManageWorkspace());
+            permissions.setManageModule(permissions.manageModule || group.isManageModule());
+            permissions.setManageProvider(permissions.manageProvider || group.isManageProvider());
+            permissions.setManageTemplate(permissions.manageTemplate || group.isManageTemplate());
+            permissions.setManageVcs(permissions.manageVcs || group.isManageVcs());
+        });
+        return new ResponseEntity<>(permissions, HttpStatus.ACCEPTED);
+    }
+
     @Transactional
     @DeleteMapping(path = "/{groupTokenId}")
-    public ResponseEntity<String> deleteToken(@PathVariable("groupTokenId") String groupTokenId){
-        if (teamTokenService.deleteToken(groupTokenId)) return ResponseEntity.accepted().build(); else return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> deleteToken(@PathVariable("groupTokenId") String groupTokenId) {
+        if (teamTokenService.deleteToken(groupTokenId))
+            return ResponseEntity.accepted().build();
+        else
+            return ResponseEntity.badRequest().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Group>> searchToken(Principal principal){
-        return new ResponseEntity<>(teamTokenService.searchToken(((JwtAuthenticationToken) principal)), HttpStatus.ACCEPTED);
+    public ResponseEntity<List<Group>> searchToken(Principal principal) {
+        return new ResponseEntity<>(teamTokenService.searchToken(((JwtAuthenticationToken) principal)),
+                HttpStatus.ACCEPTED);
     }
 
     @Getter
@@ -72,7 +103,7 @@ public class TeamTokenController {
 
     @Getter
     @Setter
-    private static class GroupTokenRequest{
+    private static class GroupTokenRequest {
         private String group;
         private String description;
         private int days = 0;
@@ -80,4 +111,14 @@ public class TeamTokenController {
         private int hours = 0;
     }
 
+    @Getter
+    @Setter
+    private class PermissionSet {
+        private boolean manageState;
+        private boolean manageWorkspace;
+        private boolean manageModule;
+        private boolean manageProvider;
+        private boolean manageVcs;
+        private boolean manageTemplate;
+    }
 }

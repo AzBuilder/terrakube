@@ -312,12 +312,12 @@ public class RemoteTfeService {
             defaultAttributes.put("can-lock", isManageWorkspace);
             defaultAttributes.put("can-manage-run-tasks", isManageWorkspace);
             defaultAttributes.put("can-manage-tags", isManageWorkspace);
-            defaultAttributes.put("can-queue-apply", isManageWorkspace);
+            defaultAttributes.put("can-queue-apply", true);
             defaultAttributes.put("can-queue-destroy", isManageWorkspace);
-            defaultAttributes.put("can-queue-run", isManageWorkspace);
-            defaultAttributes.put("can-read-settings", isManageWorkspace);
+            defaultAttributes.put("can-queue-run", true);
+            defaultAttributes.put("can-read-settings", true);
             defaultAttributes.put("can-read-state-versions", isManageWorkspace);
-            defaultAttributes.put("can-read-variable", isManageWorkspace);
+            defaultAttributes.put("can-read-variable", true);
             defaultAttributes.put("can-unlock", isManageWorkspace);
             defaultAttributes.put("can-update", isManageWorkspace);
             defaultAttributes.put("can-update-variable", isManageWorkspace);

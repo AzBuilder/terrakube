@@ -1,17 +1,26 @@
 package org.terrakube.api.rs.team;
 
-import com.yahoo.elide.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.sql.Types;
+import java.util.UUID;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
-import org.hibernate.annotations.Type;
 
-import jakarta.persistence.*;
+import com.yahoo.elide.annotation.CreatePermission;
+import com.yahoo.elide.annotation.DeletePermission;
+import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.UpdatePermission;
 
-import java.sql.Types;
-import java.util.UUID;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.Setter;
 
 @CreatePermission(expression = "user is a superuser")
 @UpdatePermission(expression = "user is a superuser")
@@ -30,6 +39,9 @@ public class Team {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "manage_state")
+    private boolean manageState;
 
     @Column(name = "manage_workspace")
     private boolean manageWorkspace;
