@@ -11,8 +11,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -186,8 +185,10 @@ public class ExecutorService {
         RestTemplate restTemplate = new RestTemplate();
         boolean executed = false;
         try {
-            ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(getExecutorUrl(job), executorContext,
-                    ExecutorContext.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<ExecutorContext> entity = new HttpEntity<>(executorContext, headers);
+            ResponseEntity<ExecutorContext> response = restTemplate.postForEntity(getExecutorUrl(job), entity, ExecutorContext.class);
             executorContext.setAccessToken("****");
             executorContext.setModuleSshKey("****");
             log.debug("Sending Job: /n {}", executorContext);
