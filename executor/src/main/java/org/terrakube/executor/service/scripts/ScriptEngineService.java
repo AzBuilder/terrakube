@@ -1,21 +1,9 @@
 package org.terrakube.executor.service.scripts;
 
-import com.diogonunes.jcolor.AnsiFormat;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.terrakube.executor.service.mode.Command;
-import org.terrakube.executor.service.mode.TerraformJob;
-import org.terrakube.executor.service.scripts.bash.BashEngine;
-import org.terrakube.executor.service.scripts.groovy.GroovyEngine;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.terrakube.executor.service.workspace.SetupWorkspace;
+import static com.diogonunes.jcolor.Ansi.colorize;
+import static com.diogonunes.jcolor.Attribute.BLACK_BACK;
+import static com.diogonunes.jcolor.Attribute.BOLD;
+import static com.diogonunes.jcolor.Attribute.GREEN_TEXT;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +12,23 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import static com.diogonunes.jcolor.Ansi.colorize;
-import static com.diogonunes.jcolor.Attribute.*;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.terrakube.executor.service.mode.Command;
+import org.terrakube.executor.service.mode.TerraformJob;
+import org.terrakube.executor.service.scripts.bash.BashEngine;
+import org.terrakube.executor.service.scripts.groovy.GroovyEngine;
+
+import com.diogonunes.jcolor.AnsiFormat;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -40,14 +43,17 @@ public class ScriptEngineService {
     private String toolsBranch;
 
     @Autowired
-    public ScriptEngineService(GroovyEngine groovyEngine, BashEngine bashEngine, @Value("${org.terrakube.tools.repository}") String toolsRepository, @Value("${org.terrakube.tools.branch}") String toolsBranch) {
+    public ScriptEngineService(GroovyEngine groovyEngine, BashEngine bashEngine,
+            @Value("${org.terrakube.tools.repository}") String toolsRepository,
+            @Value("${org.terrakube.tools.branch}") String toolsBranch) {
         this.groovyEngine = groovyEngine;
         this.bashEngine = bashEngine;
         this.toolsRepository = toolsRepository;
         this.toolsBranch = toolsBranch;
     }
 
-    public boolean execute(TerraformJob terraformJob, List<Command> commands, File terraformWorkingDir, Consumer<String> output) {
+    public boolean execute(TerraformJob terraformJob, List<Command> commands, File terraformWorkingDir,
+            Consumer<String> output) {
         AtomicBoolean executeSuccess = new AtomicBoolean(true);
         TreeMap<Integer, Command> commandOrder = new TreeMap<>();
         if (commands != null) {
@@ -60,18 +66,25 @@ public class ScriptEngineService {
 
                 commandOrder.forEach((priority, command) -> {
                     if (executeSuccess.get()) {
-                        printBannerInit(command, output);
+                        if (command.isVerbose()) {
+                            printBannerInit(command, output);
+
+                        }
                         switch (command.getRuntime()) {
                             case GROOVY:
-                                executeSuccess.set(groovyEngine.execute(terraformJob, command.getScript(), terraformWorkingDir, output));
+                                executeSuccess.set(groovyEngine.execute(terraformJob, command.getScript(),
+                                        terraformWorkingDir, output));
                                 break;
                             case BASH:
-                                executeSuccess.set(bashEngine.execute(terraformJob, command.getScript(), terraformWorkingDir, output));
+                                executeSuccess.set(bashEngine.execute(terraformJob, command.getScript(),
+                                        terraformWorkingDir, output));
                                 break;
                             default:
                                 break;
                         }
-                        printBannerEnd(output);
+                        if (command.isVerbose()) {
+                            printBannerEnd(output);
+                        }
                     }
                 });
 
@@ -106,9 +119,18 @@ public class ScriptEngineService {
         FileUtils.deleteDirectory(getToolsRepository(terraformWorkingDir));
         FileUtils.forceMkdir(getToolsRepository(terraformWorkingDir));
         String privateRepositoryType = "PUBLIC";
-        privateRepositoryType = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE") : privateRepositoryType;
-        String privateRepositoryToken = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN") : null;
-        String privateRepositoryTokenType = terraformJob.getEnvironmentVariables().containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN_TYPE") ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN_TYPE") : null;
+        privateRepositoryType = terraformJob.getEnvironmentVariables()
+                .containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE")
+                        ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TYPE")
+                        : privateRepositoryType;
+        String privateRepositoryToken = terraformJob.getEnvironmentVariables()
+                .containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN")
+                        ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN")
+                        : null;
+        String privateRepositoryTokenType = terraformJob.getEnvironmentVariables()
+                .containsKey("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN_TYPE")
+                        ? terraformJob.getEnvironmentVariables().get("TERRAKUBE_PRIVATE_EXTENSION_REPO_TOKEN_TYPE")
+                        : null;
         try {
             CredentialsProvider credentialsProvider;
             log.info("Private Extension vcsType: {}", privateRepositoryType);
@@ -117,7 +139,8 @@ public class ScriptEngineService {
                     credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", privateRepositoryToken);
                     break;
                 case "BITBUCKET":
-                    credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth", privateRepositoryToken);
+                    credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth",
+                            privateRepositoryToken);
                     break;
                 case "AZURE_DEVOPS":
                     credentialsProvider = new UsernamePasswordCredentialsProvider("dummy", privateRepositoryToken);
@@ -126,7 +149,8 @@ public class ScriptEngineService {
                     if (privateRepositoryTokenType != null && privateRepositoryTokenType.equals("OAUTH")) {
                         credentialsProvider = new UsernamePasswordCredentialsProvider(privateRepositoryToken, "");
                     } else {
-                        credentialsProvider = new UsernamePasswordCredentialsProvider("x-access-token", privateRepositoryToken);
+                        credentialsProvider = new UsernamePasswordCredentialsProvider("x-access-token",
+                                privateRepositoryToken);
                     }
                     break;
                 default:
