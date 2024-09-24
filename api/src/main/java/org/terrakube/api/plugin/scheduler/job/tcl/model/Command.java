@@ -13,4 +13,5 @@ public class Command {
     private int priority;
     private boolean before;
     private boolean after;
+    private boolean verbose;
 }
