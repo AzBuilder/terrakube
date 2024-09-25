@@ -37,6 +37,7 @@ export const States = ({
   organizationId,
   organizationName,
   onRollback,
+  manageState,
 }) => {
   const [currentState, setCurrentState] = useState({});
   const [stateContent, setStateContent] = useState("");
@@ -198,30 +199,34 @@ export const States = ({
               setRawStateContent(JSON.stringify(response.data, null, "\t"));
             })
             .catch((err) => {
-              setStateContent(`{"error":"Failed to load raw state${err}"}`);
+              setRawStateContent(`{"error":"Failed to load raw state${err}"}`);
             });
         })
-        .catch((err) =>
-          setStateContent(`{"error":"Failed to load state ${err}"}`)
-        );
+        .catch((err) => {
+          setStateContent(`{"error":"Failed to load state ${err}"}`);
+          setRawStateContent(`{"error":"Failed to load state ${err}"}`);
+        });
     else
       axiosClient
         .get(state.output)
         .then((resp) => {
           loadData(resp);
         })
-        .catch((err) =>
-          setStateContent(`{"error":"Failed to load state ${err}"}`)
-        );
+        .catch((err) => {
+          setStateContent(`{"error":"Failed to load state ${err}"}`);
+          setRawStateContent(`{"error":"Failed to load state ${err}"}`);
+        });
   };
 
   const tabs = [
     {
       key: "diagram",
       tab: "diagram",
+      disabled: !manageState,
     },
     {
       key: "raw",
+      disabled: !manageState,
       tab: (
         <span>
           code&nbsp;
@@ -233,6 +238,7 @@ export const States = ({
     },
     {
       key: "json",
+      disabled: !manageState,
       tab: (
         <span>
           json&nbsp;
@@ -246,9 +252,9 @@ export const States = ({
 
   const onTabChange = (key) => {
     setactivetab(key);
-    if (key === "json") {
+    if (key === "json" && jsonEditorRef.current) {
       jsonEditorRef.current.layout();
-    } else {
+    } else if(key === "raw" && editorRef.current) {
       editorRef.current.layout();
     }
   };
@@ -278,8 +284,12 @@ export const States = ({
       })
       .catch((error) => {
         // Extract error message from the API response
-        const errorMessage =
-          error.response?.data || "An unexpected error occurred.";
+        var errorMessage = "An unexpected error occurred.";
+        if(error.response?.status === 403) {
+          errorMessage = "You do not have permission to perform this action.";
+        }
+
+        errorMessage = error.response?.data || errorMessage          
 
         // Show the error message
         message.error(`Failed to roll back the state: ${errorMessage}`);
@@ -369,12 +379,12 @@ export const States = ({
                   cancelText="No"
                 >
                   <Tooltip title="Rollback to this State Version">
-                    <Button icon={<RollbackOutlined />} danger type="default">
+                    <Button icon={<RollbackOutlined />} danger type="default" disabled={!manageState}>
                       Rollback
                     </Button>
                   </Tooltip>
                 </Popconfirm>
-                <DownloadState stateUrl={currentState.output} />
+                <DownloadState stateUrl={currentState.output} manageState={manageState} />
               </Space>
             </Col>
           </Row>
@@ -419,7 +429,7 @@ export const States = ({
                     options={{ readOnly: "true" }}
                     onMount={handleEditorDidMount}
                     defaultLanguage="json"
-                    defaultValue={rawStateContent}
+                    defaultValue={manageState ? rawStateContent : "No access to raw state"}
                   />
                 ) : (
                   <Editor
@@ -428,7 +438,7 @@ export const States = ({
                     options={{ readOnly: "true" }}
                     onMount={handleJSONEditorDidMount}
                     defaultLanguage="json"
-                    defaultValue={stateContent}
+                    defaultValue={manageState ? stateContent : "No access to state"}
                   />
                 )}
               </Card>

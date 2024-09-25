@@ -1,12 +1,24 @@
 package org.terrakube.api.plugin.storage.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.ResponseEntity;
-import org.terrakube.api.plugin.storage.StorageTypeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.terrakube.api.plugin.security.state.StateService;
+import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.repository.ArchiveRepository;
 import org.terrakube.api.repository.HistoryRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
@@ -14,10 +26,7 @@ import org.terrakube.api.rs.workspace.history.History;
 import org.terrakube.api.rs.workspace.history.archive.Archive;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
@@ -28,6 +37,9 @@ public class TerraformStateController {
     private final ArchiveRepository archiveRepository;
     private final WorkspaceRepository workspaceRepository;
     private final HistoryRepository historyRepository;
+    @SuppressWarnings("unused")
+    @Autowired
+    private StateService stateService;
     private final String hostname; 
 
     public TerraformStateController(StorageTypeService storageTypeService, 
@@ -49,12 +61,14 @@ public class TerraformStateController {
     }
 
     @GetMapping(value = "/organization/{organizationId}/workspace/{workspaceId}/state/{stateFilename}.json", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("@stateService.hasManageStatePermission(authentication, #organizationId)")
     public @ResponseBody byte[] getTerraformStateJson(@PathVariable("organizationId") String organizationId,
             @PathVariable("workspaceId") String workspaceId, @PathVariable("stateFilename") String stateFilename) {
         return storageTypeService.getTerraformStateJson(organizationId, workspaceId, stateFilename);
     }
 
     @GetMapping(value = "/organization/{organizationId}/workspace/{workspaceId}/state/terraform.tfstate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("@stateService.hasManageStatePermission(authentication, #organizationId)")
     public @ResponseBody byte[] getCurrentTerraformState(@PathVariable("organizationId") String organizationId,
             @PathVariable("workspaceId") String workspaceId) {
         return storageTypeService.getCurrentTerraformState(organizationId, workspaceId);
@@ -105,6 +119,7 @@ public class TerraformStateController {
     }
 
     @PutMapping(value = "/organization/{organizationId}/workspace/{workspaceId}/rollback/{stateFilename}.json", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("@stateService.hasManageStatePermission(authentication, #organizationId)")
     public ResponseEntity<String> rollbackToState(
             @PathVariable("organizationId") String organizationId,
             @PathVariable("workspaceId") String workspaceId,

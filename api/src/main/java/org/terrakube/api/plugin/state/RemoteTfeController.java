@@ -67,7 +67,7 @@ public class RemoteTfeController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("TFP-API-Version", "2.5");
         responseHeaders.set("TFP-AppName", "Terrakube");
-        ResponseEntity response = new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
+        ResponseEntity<String> response = new ResponseEntity<>(responseHeaders, HttpStatus.NOT_FOUND);
         return response;
     }
 
@@ -159,7 +159,7 @@ public class RemoteTfeController {
         log.info("Lock {}", workspaceId);
         if (remoteTfeService.isWorkspaceLocked(workspaceId)) {
             WorkspaceData workspaceData = new WorkspaceData();
-            workspaceData.setErrors(new ArrayList());
+            workspaceData.setErrors(new ArrayList<WorkspaceError>());
             WorkspaceError workspaceError = new WorkspaceError();
             workspaceError.setStatus("409");
             workspaceError.setTitle("conflict");
