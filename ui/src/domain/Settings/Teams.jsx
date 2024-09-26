@@ -130,6 +130,9 @@ export const TeamSettings = ({key}) => {
                           {item.attributes.manageWorkspace ? (
                             <span>Workspaces</span>
                           ) : null}
+                          {item.attributes.manageState ? (
+                              <span>State</span>
+                          ) : null}
                           {item.attributes.manageModule ? (
                             <span>Modules</span>
                           ) : null}
