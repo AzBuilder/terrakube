@@ -60,6 +60,7 @@ export const CreateWorkspace = () => {
   const [step2Hidden, setStep3Hidden] = useState(true);
   const [sshKeysVisible, setSSHKeysVisible] = useState(false);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
+  const [requiredVcsPush, setRequiredVcsPush] = useState(true);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [iacTypes, setIacTypes] = useState([]);
   const [iacType, setIacType] = useState({
@@ -156,6 +157,7 @@ export const CreateWorkspace = () => {
       setVcsId(id);
     }
     setCurrent(3);
+    setRequiredVcsPush(true)
     setStep3Hidden(false);
   };
 
@@ -259,6 +261,7 @@ export const CreateWorkspace = () => {
     setCurrent(2);
     setStep4Hidden(false);
     setSSHKeysVisible(false);
+    setRequiredVcsPush(false);
     form.setFieldsValue({ source: "empty", branch: "remote-content"});
   };
 
@@ -734,7 +737,7 @@ export const CreateWorkspace = () => {
                 name="defaultTemplate"
                 label="Default template (VCS Push)"
                 tooltip="Template that will be executed by default when doing a git push to the repository."
-                rules={[{ required: versionControlFlow }]}
+                rules={[{ required: requiredVcsPush }]}
                 hidden={!versionControlFlow}
               >
                 <Select onChange={handleTemplateChange} placeholder="Select Template" style={{ width: 250 }}>
