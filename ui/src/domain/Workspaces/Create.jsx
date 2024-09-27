@@ -259,7 +259,7 @@ export const CreateWorkspace = () => {
     setCurrent(2);
     setStep4Hidden(false);
     setSSHKeysVisible(false);
-    form.setFieldsValue({ source: "empty", branch: "remote-content" });
+    form.setFieldsValue({ source: "empty", branch: "remote-content"});
   };
 
   const onFinishFailed = (values, errorFields) => {
@@ -734,7 +734,7 @@ export const CreateWorkspace = () => {
                 name="defaultTemplate"
                 label="Default template (VCS Push)"
                 tooltip="Template that will be executed by default when doing a git push to the repository."
-                rules={[{ required: true }]}
+                rules={[{ required: versionControlFlow }]}
                 hidden={!versionControlFlow}
               >
                 <Select onChange={handleTemplateChange} placeholder="Select Template" style={{ width: 250 }}>
