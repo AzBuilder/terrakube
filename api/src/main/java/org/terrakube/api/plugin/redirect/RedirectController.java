@@ -26,7 +26,7 @@ public class RedirectController {
         log.info("Redirect for: {}/{}/{}", organizationName, workspaceName, jobId);
         int jobIdFixed = Integer.parseInt(jobId.replace("run-",""));
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(String.format("%s/organizations/%s/workspaces/%s/runs/%s", uiURL,jobRepository.findById(jobIdFixed).get().getOrganization().getId(), jobRepository.findById(jobIdFixed).get().getWorkspace().getId(), jobId)))
+                .location(URI.create(String.format("%s/organizations/%s/workspaces/%s/runs/%s", uiURL,jobRepository.findById(jobIdFixed).get().getOrganization().getId(), jobRepository.findById(jobIdFixed).get().getWorkspace().getId(), jobIdFixed)))
                 .build();
     }
 }
