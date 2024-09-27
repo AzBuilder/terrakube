@@ -330,7 +330,7 @@ export const CreateWorkspace = () => {
       }
     }
 
-    if (isWebhooKEnabled) {
+    if (isWebhooKEnabled && versionControlFlow) {
       const webhook_lid = uuid();
       body["atomic:operations"].push({
         op: "add",
