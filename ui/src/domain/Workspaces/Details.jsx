@@ -341,14 +341,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
 
   useEffect(() => {
     setLoading(true);
-    loadWorkspace(true, true);
+    loadWorkspace(true, true, true);
     loadPermissionSet();
     setLoading(false);
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
-      loadWorkspace(false, false);
+      loadWorkspace(false, false, false);
       loadPermissionSet();
     }, 10000);
     return () => clearInterval(interval);
@@ -383,14 +383,16 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   };
   
   const loadPermissionSet = () => {
+    console.log("Loading Permission Values")
     const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
     axiosInstance.get(url).then((response) => {
+      console.log(response.data)
       setManageState(response.data.manageState);
       setManageWorkspace(response.data.manageWorkspace);
     })
   };
 
-  const loadWorkspace = (_loadVersions, _loadWebhook) => {
+  const loadWorkspace = (_loadVersions, _loadWebhook, _loadPermissionSet) => {
     var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization`;
     if (_loadWebhook) url += ",webhook";
     axiosInstance
@@ -404,6 +406,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
           .then((response) => {
             if (_loadVersions)
               loadVersions(response.data.data.attributes.iacType);
+
+            if (_loadPermissionSet)
+              loadPermissionSet()
+
             setWorkspace(response.data);
             console.log(response.data);
             if (response.data.included) {
@@ -426,8 +432,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 _loadWebhook,
                 setWebhook,
                 setPushWebhookEnabled,
-                setContextState,
-                manageState,
+                setContextState
               );
             }
 
@@ -1584,8 +1589,7 @@ function setupWorkspaceIncludes(
   _loadWebhook,
   setWebhook,
   setPushWebhookEnabled,
-  setContextState,
-  manageState
+  setContextState
 ) {
   let variables = [];
   let jobs = [];
@@ -1712,15 +1716,22 @@ function setupWorkspaceIncludes(
   // reload state only if there is a new version
   console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
-    loadState(
-      lastState,
-      axiosInstance,
-      setOutputs,
-      setResources,
-      sessionStorage.getItem(WORKSPACE_ARCHIVE),
-      setContextState,
-      manageState
-    );
+    var organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
+    axiosInstance.get(url).then((response) => {
+      console.log(`Manage Permission Set: ${response.data}`)
+      console.log(response.data)
+      loadState(
+        lastState,
+        axiosInstance,
+        setOutputs,
+        setResources,
+        sessionStorage.getItem(WORKSPACE_ARCHIVE),
+        setContextState,
+        response.data.manageState
+      );
+    })
+    
   }
   setCurrentStateId(lastState?.id);
 }
@@ -1734,6 +1745,7 @@ function loadState(
   setContextState,
   manageState
 ) {
+  console.log(`Loading State ${manageState} `)
   if (!state || !manageState) {
     return;
   }
