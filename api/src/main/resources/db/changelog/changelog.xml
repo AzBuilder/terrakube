@@ -64,4 +64,5 @@
     <include file="/db/changelog/local/changelog-2.22.2-webhook-triggers.xml"/>
     <include file="/db/changelog/local/changelog-2.23.0-job-reference-size.xml"/>
     <include file="/db/changelog/local/changelog-2.23.0-team-manage-state.xml"/>
+    <include file="/db/changelog/local/changelog-2.23.1-team-manage-state-hotfix.xml"/>
 </databaseChangeLog>
