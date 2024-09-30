@@ -341,14 +341,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
 
   useEffect(() => {
     setLoading(true);
-    loadWorkspace(true, true);
+    loadWorkspace(true, true, true);
     loadPermissionSet();
     setLoading(false);
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
-      loadWorkspace(false, false);
+      loadWorkspace(false, false, false);
       loadPermissionSet();
     }, 10000);
     return () => clearInterval(interval);
@@ -387,10 +387,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     axiosInstance.get(url).then((response) => {
       setManageState(response.data.manageState);
       setManageWorkspace(response.data.manageWorkspace);
+      console.log(`Manage Permission Set: ${manageState} ${manageWorkspace}`)
     })
   };
 
-  const loadWorkspace = (_loadVersions, _loadWebhook) => {
+  const loadWorkspace = (_loadVersions, _loadWebhook, _loadPermissionSet) => {
     var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization`;
     if (_loadWebhook) url += ",webhook";
     axiosInstance
@@ -404,6 +405,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
           .then((response) => {
             if (_loadVersions)
               loadVersions(response.data.data.attributes.iacType);
+
+            if (_loadPermissionSet)
+              loadPermissionSet()
             setWorkspace(response.data);
             console.log(response.data);
             if (response.data.included) {
@@ -1737,7 +1741,7 @@ function loadState(
   if (!state || !manageState) {
     return;
   }
-
+  console.log(`Loading State ${manageState} `)
   var currentState;
   var organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
 
