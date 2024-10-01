@@ -770,9 +770,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 >
                   <span className="workspace-details"> ID: {id} </span>
                 </Paragraph>
-                {workspace.data.attributes.description === "" ? (
-                  workspace.data.attributes.description
-                ) : (
+                {(workspace.data.attributes?.description === "") ? (
                   <a
                     className="workspace-button"
                     onClick={handleClickSettings}
@@ -780,6 +778,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   >
                     Add workspace description
                   </a>
+                )
+                :
+                (
+                  workspace.data.attributes.description
                 )}
                 <Space
                   size={40}
