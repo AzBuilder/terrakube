@@ -16,18 +16,21 @@ public class StateService {
    private TeamRepository teamRepository;
 
    public boolean hasManageStatePermission(Authentication authentication, String orgnizationId) {
-      Object groupNames = ((JwtAuthenticationToken) authentication).getTokenAttributes().get("groups");
-      if (groupNames == null) {
+      if (((JwtAuthenticationToken) authentication).getTokenAttributes().get("iss").equals("TerrakubeInternal")) {
+         return true;
+      } else {
+         Object groupNames = ((JwtAuthenticationToken) authentication).getTokenAttributes().get("groups");
+         if (groupNames == null) {
+            return false;
+         }
+         @SuppressWarnings("unchecked")
+         List<Team> teams = teamRepository.findAllByOrganizationIdAndNameIn(UUID.fromString(orgnizationId), (List<String>) groupNames);
+         for (Team team : teams) {
+            if (team.isManageState()) {
+               return true;
+            }
+         }
          return false;
       }
-      @SuppressWarnings("unchecked")
-      List<Team> teams = teamRepository.findAllByOrganizationIdAndNameIn(UUID.fromString(orgnizationId), (List<String>) groupNames);
-      for (Team team : teams) {
-         if (team.isManageState()) {
-            return true;
-         }
-      }
-      
-      return false;
-   } 
+   }
 }
