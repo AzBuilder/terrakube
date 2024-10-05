@@ -161,7 +161,6 @@ export const OrganizationDetails = ({
     console.log(searchValue || "serach empty");
     console.log(filterValue || "filter empty");
     console.log(selectedTags || "tags empty");
-
     var filteredWorkspaces = filterWorkspaces(
       workspaces,
       searchValue,
@@ -217,7 +216,6 @@ export const OrganizationDetails = ({
     const _searchValue = sessionStorage.getItem("searchValue") || "";
     const _filterValue = sessionStorage.getItem("filterValue") || "";
     const _selectedTags = sessionStorage.getItem("selectedTags") || [];
-
     setSearchValue(_searchValue);
     setFilterValue(_filterValue);
     setFilterTags(_selectedTags);
@@ -390,6 +388,7 @@ export const OrganizationDetails = ({
                     style={{ width: "100%" }}
                     placeholder="Search by tag"
                     onChange={handleChange}
+                    value={filterTags}
                     filterSort={(optionA, optionB) =>
                       (optionA?.label ?? "")
                         .toLowerCase()
@@ -407,6 +406,7 @@ export const OrganizationDetails = ({
                   <Search
                     placeholder="Search by name, description"
                     onSearch={onSearch}
+                    value={searchValue}
                     defaultValue={searchValue}
                     allowClear
                   />
