@@ -137,10 +137,11 @@ export const OrganizationDetails = ({
   };
 
   const onSearch = (value) => {
-    setSearchValue(value);
     applyFilters(value, filterValue, filterTags);
   };
-
+  const updateSearchValue=(e)=>{
+    setSearchValue(e.target.value);
+  }
   const getTagName = (tagId) => {
     return tags.data.find((tag) => tag.id === tagId)?.attributes?.name;
   };
@@ -390,6 +391,7 @@ export const OrganizationDetails = ({
                     style={{ width: "100%" }}
                     placeholder="Search by tag"
                     onChange={handleChange}
+                    value={filterTags}
                     filterSort={(optionA, optionB) =>
                       (optionA?.label ?? "")
                         .toLowerCase()
@@ -407,7 +409,9 @@ export const OrganizationDetails = ({
                   <Search
                     placeholder="Search by name, description"
                     onSearch={onSearch}
-                    defaultValue={searchValue}
+                    onChange={updateSearchValue}
+                    value={searchValue}
+                    // defaultValue={searchValue}
                     allowClear
                   />
                 </Col>
