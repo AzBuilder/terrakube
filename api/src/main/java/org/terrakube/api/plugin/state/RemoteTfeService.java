@@ -1164,7 +1164,6 @@ public class RemoteTfeService {
 
                         for (MapRecord<String, String, String> mapRecord : messagesPlan) {
                             Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
-                            log.info("Data length {}", streamData.get("output").length());
                             logsOutput.appendln(streamData.get("output"));
                         }
 
@@ -1173,6 +1172,7 @@ public class RemoteTfeService {
                         int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
                                 : logsOutputString.length();
                         logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
+                        log.debug("{}", logs);
                     } catch (Exception ex) {
                         log.debug(ex.getMessage());
                     }
@@ -1199,7 +1199,6 @@ public class RemoteTfeService {
                         for (MapRecord<String, String, String> mapRecord : messagesApply) {
                             Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
                             logsOutputApply.appendln(streamData.get("output"));
-                            log.info("{}", streamData.get("output"));
                         }
 
                         String logsOutputString = logsOutputApply.toString();
@@ -1207,6 +1206,7 @@ public class RemoteTfeService {
                         int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
                                 : logsOutputString.length();
                         logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
+                        log.debug("{}", logs);
                     } catch (Exception ex) {
                         log.debug(ex.getMessage());
                     }
