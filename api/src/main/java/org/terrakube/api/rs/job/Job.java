@@ -1,22 +1,36 @@
 package org.terrakube.api.rs.job;
 
-import com.yahoo.elide.annotation.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.List;
+
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.job.JobManageHook;
 import org.terrakube.api.rs.job.step.Step;
 import org.terrakube.api.rs.workspace.Workspace;
 
-import jakarta.persistence.*;
+import com.yahoo.elide.annotation.CreatePermission;
+import com.yahoo.elide.annotation.Exclude;
+import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.LifeCycleHookBinding;
+import com.yahoo.elide.annotation.ReadPermission;
+import com.yahoo.elide.annotation.UpdatePermission;
 
-import java.util.List;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
 
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)
 @ReadPermission(expression = "team view job")
-@CreatePermission(expression = "team manage job")
+@CreatePermission(expression = "team view job")
 @UpdatePermission(expression = "team manage job OR user is a super service")
 @Include(rootLevel = false)
 @Getter
