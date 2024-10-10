@@ -45,7 +45,7 @@ public class WebhookService {
         String result = "";
         Webhook webhook = webhookRepository.getReferenceById(UUID.fromString(webhookId));
         if (webhook == null) {
-            log.error("Webhook with ID {} for workspace {} not found", webhookId, webhook.getWorkspace().getName());
+            log.error("Webhook {} not found", webhookId);
             return result;
         }
         Workspace workspace = webhook.getWorkspace();
@@ -91,29 +91,31 @@ public class WebhookService {
         }
 
         try {
-            // The template id is stored in the webhook template mapping, basicall its a map
-            log.info("webhook event {}", webhookResult.getEvent());
-            if (webhook.getTemplateId() == null || webhook.getTemplateId().isEmpty()) {
-                String workspaceTemplate = workspace.getDefaultTemplate();
-                if (workspaceTemplate == null || workspaceTemplate.isEmpty()) {
-                    log.error(
-                            "No template found for the configured webhook event {}, nor default template configured for workspace {}",
-                            webhookResult.getEvent(), workspace.getName());
-                    return result;
-                }
-                webhook.setTemplateId(workspaceTemplate);
-                webhook = webhookRepository.save(webhook);
-                log.warn("Template not found for event {}, using workspace default template with id {}",
-                        webhookResult.getEvent(), workspaceTemplate);
+            String templateId = webhook.getTemplateId();
+
+            // If the webhook branch is the same as the default workspace branch, or the
+            // webhook template is not valid, use the default template of the workspace.
+            if (webhookResult.getBranch().equals(workspace.getBranch()) || templateId == null || templateId.isEmpty()) {
+                templateId = workspace.getDefaultTemplate();
             }
+            // If the template is still not valid, log an error and return
+            if (templateId == null || templateId.isEmpty()) {
+                log.error(
+                        "No valid template found for the configured webhook event {}, nor default template configured for workspace {}",
+                        webhook.getEvent(), workspace.getName());
+                return result;
+
+            }
+            log.info("webhook event {} for workspace {}, using template with id {}", webhookResult.getEvent(),
+                    webhook.getWorkspace().getName(), templateId);
             Job job = new Job();
+            job.setTemplateReference(templateId);
             job.setRefresh(true);
             job.setPlanChanges(true);
             job.setRefreshOnly(false);
             job.setOverrideBranch(webhookBranch);
             job.setOrganization(workspace.getOrganization());
             job.setWorkspace(workspace);
-            job.setTemplateReference(webhook.getTemplateId());
             job.setCreatedBy(webhookResult.getCreatedBy());
             job.setUpdatedBy(webhookResult.getCreatedBy());
             Date triggerDate = new Date(System.currentTimeMillis());
@@ -215,7 +217,7 @@ public class WebhookService {
     private boolean checkFileChanges(List<String> files, Webhook webhook) {
         String[] triggeredPath = webhook.getPath().split(",");
         String workspaceFolder = webhook.getWorkspace().getFolder();
-        if(workspaceFolder.substring(0, 1).equals("/")) {
+        if (workspaceFolder.substring(0, 1).equals("/")) {
             workspaceFolder = workspaceFolder.substring(1);
         }
         for (String file : files) {
