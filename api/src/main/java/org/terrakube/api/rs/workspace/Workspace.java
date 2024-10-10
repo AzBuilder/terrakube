@@ -111,6 +111,7 @@ public class Workspace extends GenericAuditFields {
     private List<Schedule> schedule;
 
     @OneToMany(mappedBy = "workspace")
+    @UpdatePermission(expression = "team view workspace")
     private List<Job> job;
 
     @Exclude
