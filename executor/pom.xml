@@ -21,7 +21,7 @@
 		<commons-io.version>2.17.0</commons-io.version>
 		<commons-codec>1.17.1</commons-codec>
 		<okhttp.version>4.12.0</okhttp.version>
-		<azure-storage-blob.version>12.28.0</azure-storage-blob.version>
+		<azure-storage-blob.version>12.28.1</azure-storage-blob.version>
 		<jgit.version>7.0.0.202409031743-r</jgit.version>
 		<lombok.version>1.18.34</lombok.version>
 		<groovy.version>4.0.23</groovy.version>
