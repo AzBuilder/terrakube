@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.not;
 
 public class SshTests extends ServerApplicationTests {
 
@@ -81,5 +83,68 @@ public class SshTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void readSshPrivateKey() {
+        //Able to create the ssh connection
+        String sshId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"ssh\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"SSH RANDOM DATA\",\n" +
+                        "      \"description\": \"SSH KEY DESCRIPTION\",\n" +
+                        "      \"privateKey\": \"12345\", \n" +
+                        "      \"sshType\": \"rsa\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/ssh")
+                .then()
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("SSH RANDOM DATA"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        //Read the vcs connection as TERRAKUBE_DEVELOPERS does not include the access token
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/ssh/"+sshId)
+                .then()
+                .assertThat()
+                .body("data.attributes", not(hasKey("privateKey")))
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+
+        //Read the vcs connection as TERRAKUBE_ADMIN does not include the access token
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/ssh/"+sshId)
+                .then()
+                .assertThat()
+                .body("data.attributes", not(hasKey("privateKey")))
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+
+        //Read the vcs connection as the registry include the access token
+        given()
+                .headers("Authorization", "Bearer " + generateSystemToken())
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/ssh/"+sshId)
+                .then()
+                .assertThat()
+                .body("data.attributes", hasKey("privateKey"))
+                .body("data.attributes.privateKey", IsEqual.equalTo("12345"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
     }
 }

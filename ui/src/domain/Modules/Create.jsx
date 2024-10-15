@@ -19,7 +19,7 @@ import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
 import { IconContext } from "react-icons";
 import { SiGit } from "react-icons/si";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -33,10 +33,10 @@ export const CreateModule = () => {
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep3Hidden] = useState(true);
   const [step2Hidden, setStep2Hidden] = useState(true);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [vcs, setVCS] = useState([]);
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const [vcsId, setVcsId] = useState("");
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
   const [sshKeys, setSSHKeys] = useState([]);
@@ -77,9 +77,7 @@ export const CreateModule = () => {
   };
 
   const handleVCSClick = (vcsType) => {
-    history.push(
-      `/organizations/${organizationId}/settings/vcs/new/${vcsType}`
-    );
+    navigate(`/organizations/${organizationId}/settings/vcs/new/${vcsType}`);
   };
 
   const handleDifferent = () => {
@@ -201,7 +199,7 @@ export const CreateModule = () => {
       .then((response) => {
         console.log(response);
         if (response.status === 201) {
-          history.push(
+          navigate(
             `/organizations/${organizationId}/registry/${response.data.data.id}`
           );
         }
@@ -227,6 +225,7 @@ export const CreateModule = () => {
         }
       });
   };
+
   const [form] = Form.useForm();
 
   const handleChange = (currentVal) => {
@@ -248,7 +247,7 @@ export const CreateModule = () => {
         style={{ margin: "16px 0" }}
         items={[
           {
-            title: localStorage.getItem(ORGANIZATION_NAME),
+            title: sessionStorage.getItem(ORGANIZATION_NAME),
           },
           {
             title: (
@@ -268,7 +267,7 @@ export const CreateModule = () => {
           <h2>Add Module</h2>
           <div className="App-text">
             This module will be created under the current organization,{" "}
-            {localStorage.getItem(ORGANIZATION_NAME)}.
+            {sessionStorage.getItem(ORGANIZATION_NAME)}.
           </div>
           <Steps
             direction="horizontal"
@@ -311,6 +310,7 @@ export const CreateModule = () => {
                               handleGitClick(item.id);
                             }}
                             size="large"
+                            key={item.id}
                           >
                             &nbsp;{item.attributes.name}
                           </Button>
@@ -425,17 +425,16 @@ export const CreateModule = () => {
               <Form.Item
                 name="name"
                 label="Module Name"
-                rules={[{ required: true },       {
-                  max: 32,
-                  message: "Value should be less than 32 character",
-                },]}
+                rules={[
+                  { required: true },
+                  {
+                    max: 32,
+                    message: "Value should be less than 32 character",
+                  },
+                ]}
                 extra="The name of your module generally names the abstraction that the module is intending to create."
               >
-                <Input
-                    onChange={(value) => {
-                      this.props.setValue(value);
-                    }}
-                />
+                <Input />
               </Form.Item>
 
               <Form.Item

@@ -2,7 +2,7 @@ import { React, useEffect, useState } from "react";
 import { Select } from "antd";
 import axiosInstance from "../../config/axiosConfig";
 
-export const Tags = ({ organizationId, workspaceId }) => {
+export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
   const [tags, setTags] = useState([]);
   const [newTags, setNewTags] = useState([]);
   const [currentTags, setCurrentTags] = useState([]);
@@ -139,6 +139,7 @@ export const Tags = ({ organizationId, workspaceId }) => {
         return { label: tag.attributes.name, value: tag.id };
       })}
       placeholder="Add a tag"
+      disabled={!manageWorkspace}
     />
   );
 };

@@ -18,7 +18,7 @@ import axiosInstance from "../../config/axiosConfig";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
-const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit) => [
+const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit, manageWorkspace) => [
   {
     title: "Key",
     dataIndex: "key",
@@ -28,8 +28,8 @@ const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit) => [
       return (
         <div>
           {record.key} &nbsp;&nbsp;&nbsp;&nbsp;{" "}
-          <Tag visible={record.hcl}>HCL</Tag>{" "}
-          <Tag visible={record.sensitive}>Sensitive</Tag>
+          {record.hcl && <Tag>HCL</Tag>}{" "}
+          {record.sensitive && <Tag>Sensitive</Tag>}
         </div>
       );
     },
@@ -57,6 +57,7 @@ const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit) => [
             type="link"
             icon={<EditOutlined />}
             onClick={() => onEdit(record)}
+            disabled={!manageWorkspace}
           >
             Edit
           </Button>
@@ -75,7 +76,7 @@ const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit) => [
             cancelText="No"
           >
             {" "}
-            <Button danger type="link" icon={<DeleteOutlined />}>
+            <Button danger type="link" icon={<DeleteOutlined />} disabled={!manageWorkspace}>
               Delete
             </Button>
           </Popconfirm>
@@ -89,9 +90,9 @@ const validateMessages = {
   required: "${label} is required!",
 };
 
-export const Variables = ({ vars, env }) => {
-  const workspaceId = localStorage.getItem(WORKSPACE_ARCHIVE);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+export const Variables = ({ vars, env, manageWorkspace }) => {
+  const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [variableName, setVariableName] = useState("");
@@ -207,7 +208,7 @@ export const Variables = ({ vars, env }) => {
       </div>
       <Table
         dataSource={vars}
-        columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit)}
+        columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit, manageWorkspace)}
         rowKey="key"
       />
       <Button
@@ -219,6 +220,7 @@ export const Variables = ({ vars, env }) => {
           form.resetFields();
           setVisible(true);
         }}
+        disabled={!manageWorkspace}
       >
         Add variable
       </Button>
@@ -229,7 +231,7 @@ export const Variables = ({ vars, env }) => {
         </div>
         <Table
           dataSource={env}
-          columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit)}
+          columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit, manageWorkspace)}
           rowKey="key"
         />
         <Button
@@ -241,6 +243,7 @@ export const Variables = ({ vars, env }) => {
             form.resetFields();
             setVisible(true);
           }}
+          disabled={!manageWorkspace}
         >
           Add variable
         </Button>

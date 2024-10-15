@@ -7,7 +7,7 @@ resource "random_string" "random" {
 }
 
 resource "azuread_application_registration" "terrakube_application" {
-  display_name     = "terrakube-dynamic-creds-${random_string.random.result}"
+  display_name = "terrakube-dynamic-creds-${random_string.random.result}"
 }
 
 resource "azuread_service_principal" "terrakube_service_principal" {

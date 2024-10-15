@@ -13,5 +13,5 @@ provider "google" {
 
 provider "terrakube" {
   endpoint = "https://${var.terrakube_hostname}"
-  token = var.terrakube_token
+  token    = var.terrakube_token
 }

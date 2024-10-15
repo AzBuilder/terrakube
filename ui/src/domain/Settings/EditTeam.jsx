@@ -58,6 +58,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     axiosInstance.get(`organization/${orgid}/team/${id}`).then((response) => {
       setTeamName(response.data.data.attributes.name);
       form.setFieldsValue({
+        manageState: response.data.data.attributes.manageState,
         manageProvider: response.data.data.attributes.manageProvider,
         manageModule: response.data.data.attributes.manageModule,
         manageWorkspace: response.data.data.attributes.manageWorkspace,
@@ -76,6 +77,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
         type: "team",
         attributes: {
           name: values.name,
+          manageState: values.manageState,
           manageWorkspace: values.manageWorkspace,
           manageModule: values.manageModule,
           manageProvider: values.manageProvider,
@@ -112,6 +114,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
         type: "team",
         id: teamId,
         attributes: {
+          manageState: values.manageState,
           manageWorkspace: values.manageWorkspace,
           manageModule: values.manageModule,
           manageProvider: values.manageProvider,
@@ -255,6 +258,18 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
             <FormItem>
               <h2 style={{ marginTop: "10px" }}>Organization Access</h2>
             </FormItem>
+            <Form.Item
+              name="manageState"
+              valuePropName="checked"
+              label="Manage State"
+              tooltip={{
+                title:
+                  "Allow members to manage Terraform/OpenTofu state, include downloading, uploading and view state content of a workspace.",
+                icon: <InfoCircleOutlined />,
+              }}
+            >
+              <Switch />
+            </Form.Item>
             <Form.Item
               name="manageWorkspace"
               valuePropName="checked"

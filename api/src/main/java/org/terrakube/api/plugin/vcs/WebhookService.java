@@ -1,31 +1,31 @@
 package org.terrakube.api.plugin.vcs;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import org.terrakube.api.repository.JobRepository;
-import org.terrakube.api.repository.WebhookRepository;
-import org.terrakube.api.repository.WorkspaceRepository;
-import org.terrakube.api.rs.job.Job;
-import org.terrakube.api.rs.template.Template;
-import org.terrakube.api.rs.vcs.Vcs;
-import org.terrakube.api.rs.webhook.Webhook;
-import org.terrakube.api.rs.webhook.WebhookType;
-import org.terrakube.api.rs.workspace.Workspace;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
 import org.terrakube.api.plugin.vcs.provider.bitbucket.BitBucketWebhookService;
 import org.terrakube.api.plugin.vcs.provider.github.GitHubWebhookService;
 import org.terrakube.api.plugin.vcs.provider.gitlab.GitLabWebhookService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.repository.JobRepository;
+import org.terrakube.api.repository.WebhookRepository;
+import org.terrakube.api.rs.job.Job;
+import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.vcs.Vcs;
+import org.terrakube.api.rs.webhook.Webhook;
+import org.terrakube.api.rs.webhook.WebhookEvent;
+import org.terrakube.api.rs.workspace.Workspace;
 
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
@@ -33,179 +33,216 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class WebhookService {
 
     WebhookRepository webhookRepository;
-    WorkspaceRepository workspaceRepository;
     GitHubWebhookService gitHubWebhookService;
     GitLabWebhookService gitLabWebhookService;
-    BitBucketWebhookService BitBucketWebhookService;
+    BitBucketWebhookService bitBucketWebhookService;
     JobRepository jobRepository;
     ScheduleJobService scheduleJobService;
-
+    ObjectMapper objectMapper;
 
     @Transactional
-    public String processWebhook(String webhookId, String jsonPayload,Map<String, String> headers) {
+    public String processWebhook(String webhookId, String jsonPayload, Map<String, String> headers) {
         String result = "";
         Webhook webhook = webhookRepository.getReferenceById(UUID.fromString(webhookId));
-        if(webhook == null){
-            log.error("Webhook not found {}", webhookId);
+        if (webhook == null) {
+            log.error("Webhook {} not found", webhookId);
             return result;
         }
-        webhook.setType(WebhookType.WORKSPACE);
-        switch (webhook.getType()) {
-            case WORKSPACE:
-                // The webhook instance has a reference to the workspace
-                Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(webhook.getReferenceId()));
-                Vcs vcs = workspace.getVcs();
+        Workspace workspace = webhook.getWorkspace();
+        Vcs vcs = workspace.getVcs();
 
-                // if the VCS is empty we cannot process the webhook
-                if(vcs == null) {
-                    log.error("VCS not found for workspace {}", workspace.getId());
-                    return result;
-                }
-                else{
-                    WebhookResult webhookResult = new WebhookResult();
-                    String base64WorkspaceId = Base64.getEncoder().encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-                    switch (vcs.getVcsType()) {
-                        case GITHUB:
-                             webhookResult = gitHubWebhookService.processWebhook(jsonPayload, headers,base64WorkspaceId);
-                            break;
-                        case GITLAB:
-                             webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,base64WorkspaceId);
-                            break;
-                        case BITBUCKET:
-                            webhookResult = BitBucketWebhookService.processWebhook(jsonPayload, headers,base64WorkspaceId);
-                            break;
-                        default:
-                            break;
-                    }
+        // if the VCS is empty we cannot process the webhook
+        if (vcs == null) {
+            log.error("VCS not found for workspace {} with id {}", workspace.getName(), workspace.getId());
+            return result;
+        }
 
-                    log.info("webhook result {}", webhookResult);
-
-                    // if the webhook is a valid request we can create a new job
-                    if(webhookResult.isValid()){
-                        // only execute the job if the branch is the same
-                        if(webhookResult.getBranch().equals(workspace.getBranch()) && checkFileChanges(webhookResult.getFileChanges(), workspace.getFolder()))
-                        {
-                           ObjectMapper objectMapper = new ObjectMapper();
-                            try {
-                                // The template id is stored in the webhook template mapping, basicall its a map with event and templateId
-                                JsonNode rootNode = objectMapper.readTree(webhook.getTemplateMapping());
-                                log.info("webhook event {}", webhookResult.getEvent());
-                                log.info(rootNode.toString());
-                                String templateId = rootNode.path(webhookResult.getEvent()).asText();
-                                log.info("Template ID is: " + templateId);
-                                if(templateId.isEmpty()){
-                                    log.error("Template not found for event {}", webhookResult.getEvent());
-                                    return result;
-                                }
-                                Job job = new Job();
-                                job.setRefresh(true);
-                                job.setPlanChanges(true);
-                                job.setRefreshOnly(false);
-                                job.setOrganization(workspace.getOrganization());
-                                job.setWorkspace(workspace);
-                                job.setTemplateReference(templateId);
-                                job.setCreatedBy(webhookResult.getCreatedBy());
-                                job.setUpdatedBy(webhookResult.getCreatedBy());
-                                Date triggerDate = new Date(System.currentTimeMillis());
-                                job.setCreatedDate(triggerDate);
-                                job.setUpdatedDate(triggerDate);
-                                job.setVia(webhookResult.getVia());
-                                job.setCommitId(webhookResult.getCommit());
-                                Job savedJob = jobRepository.save(job);
-                                scheduleJobService.createJobContext(savedJob);
-                            } catch (Exception e) {
-                                log.error("Error creating the job", e);
-                            }
-
-                        }
-                    }
-                }
+        WebhookResult webhookResult = new WebhookResult();
+        String base64WorkspaceId = Base64.getEncoder()
+                .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
+        switch (vcs.getVcsType()) {
+            case GITHUB:
+                webhookResult = gitHubWebhookService.processWebhook(jsonPayload, headers,
+                        base64WorkspaceId);
                 break;
-            case MODULE:
-            // In future we can use this to validate the module for a new version or update the code asynchronously
+            case GITLAB:
+                webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,
+                        base64WorkspaceId);
+                break;
+            case BITBUCKET:
+                webhookResult = bitBucketWebhookService.processWebhook(jsonPayload, headers,
+                        base64WorkspaceId);
                 break;
             default:
                 break;
         }
+
+        log.info("webhook result {}", webhookResult);
+
+        if (!webhookResult.isValid())
+            return result;
+
+        String webhookBranch = webhookResult.getBranch();
+
+        // Return if branch in the event doesn't match any set branches or if the file
+        // changes doesn't match the set path
+        if (!checkBranch(webhookBranch, webhook) || !checkFileChanges(webhookResult.getFileChanges(), webhook)) {
+            return result;
+        }
+
+        try {
+            String templateId = webhook.getTemplateId();
+
+            // If the webhook branch is the same as the default workspace branch, or the
+            // webhook template is not valid, use the default template of the workspace.
+            if (webhookResult.getBranch().equals(workspace.getBranch()) || templateId == null || templateId.isEmpty()) {
+                templateId = workspace.getDefaultTemplate();
+            }
+            // If the template is still not valid, log an error and return
+            if (templateId == null || templateId.isEmpty()) {
+                log.error(
+                        "No valid template found for the configured webhook event {}, nor default template configured for workspace {}",
+                        webhook.getEvent(), workspace.getName());
+                return result;
+
+            }
+            log.info("webhook event {} for workspace {}, using template with id {}", webhookResult.getEvent(),
+                    webhook.getWorkspace().getName(), templateId);
+            Job job = new Job();
+            job.setTemplateReference(templateId);
+            job.setRefresh(true);
+            job.setPlanChanges(true);
+            job.setRefreshOnly(false);
+            job.setOverrideBranch(webhookBranch);
+            job.setOrganization(workspace.getOrganization());
+            job.setWorkspace(workspace);
+            job.setCreatedBy(webhookResult.getCreatedBy());
+            job.setUpdatedBy(webhookResult.getCreatedBy());
+            Date triggerDate = new Date(System.currentTimeMillis());
+            job.setCreatedDate(triggerDate);
+            job.setUpdatedDate(triggerDate);
+            job.setVia(webhookResult.getVia());
+            job.setCommitId(webhookResult.getCommit());
+            Job savedJob = jobRepository.save(job);
+            sendCommitStatus(savedJob);
+            scheduleJobService.createJobContext(savedJob);
+        } catch (Exception e) {
+            log.error("Error creating the job", e);
+        }
         return result;
     }
 
-    private boolean checkFileChanges(List<String> files, String workspaceFolder){
-        if(files != null){
-            AtomicBoolean fileChanged = new AtomicBoolean(false);
-            files.forEach(file-> {
-                log.info("File: {} in {}: {}", file, workspaceFolder.substring(1), file.startsWith(workspaceFolder.substring(1)));
-                if(file.startsWith(workspaceFolder.substring(1)) && !fileChanged.get()){
-                    fileChanged.set(true);
-                }
-            });
-            return fileChanged.get();
-        } else
-            return true;
+    @Transactional
+    public void createWorkspaceWebhook(Webhook webhook) {
+        Workspace workspace = webhook.getWorkspace();
+        if (workspace.getVcs() == null) {
+            log.warn("There is no VCS defined for workspace {}, skipping webhook creation", workspace.getName());
+            throw new IllegalArgumentException("No VCS defined for workspace");
+        }
+
+        if (webhook.getEvent() == null || webhook.getEvent().toString().isEmpty())
+            webhook.setEvent(WebhookEvent.PUSH);
+
+        String webhookRemoteId = "";
+        if (webhook.getTemplateId() == null)
+            webhook.setTemplateId(workspace.getDefaultTemplate());
+
+        Vcs vcs = workspace.getVcs();
+        switch (vcs.getVcsType()) {
+            case GITHUB:
+                webhookRemoteId = gitHubWebhookService.createWebhook(workspace, webhook.getId().toString());
+                break;
+            case GITLAB:
+                webhookRemoteId = gitLabWebhookService.createWebhook(workspace, webhook.getId().toString());
+                break;
+            case BITBUCKET:
+                webhookRemoteId = bitBucketWebhookService.createWebhook(workspace, webhook.getId().toString());
+                break;
+            default:
+                break;
+        }
+
+        if (webhookRemoteId.isEmpty()) {
+            log.error("Error creating the webhook");
+            throw new IllegalArgumentException("Error creating the webhook");
+        }
+
+        webhook.setRemoteHookId(webhookRemoteId);
     }
 
+    @Transactional
+    public void deleteWorkspaceWebhook(Webhook webhook) {
+        Workspace workspace = webhook.getWorkspace();
+        if (workspace.getVcs() == null) {
+            log.warn("There is no VCS defined for workspace {}, skipping webhook creation", workspace.getName());
+            return;
+        }
+        if (webhook.getRemoteHookId() == null || webhook.getRemoteHookId().isEmpty()) {
+            log.warn("No remote hook id found for webhook {} on workspace {}, skipping webhook deletion",
+                    webhook.getId(), workspace.getName());
+            return;
+        }
 
- @Transactional
- public void createWorkspaceWebhook(Workspace workspace) {
-    String webhookRemoteId = "";
-
-  if(workspace.getVcs() != null){
-   // Get template id
-    List<Template> templates = workspace.getOrganization().getTemplate();
-    String templateId = "";
-    if(workspace.getDefaultTemplate() != null && workspace.getDefaultTemplate().length() > 0){
-        templateId = workspace.getDefaultTemplate();
-    } else {
-        for (Template template : templates) {
-            // search for the template "Plan and apply"
-            if ("Plan and apply".equals(template.getName())) {
-                templateId = template.getId().toString();
+        Vcs vcs = workspace.getVcs();
+        switch (vcs.getVcsType()) {
+            case GITHUB:
+                gitHubWebhookService.deleteWebhook(workspace, webhook.getRemoteHookId());
                 break;
+            case GITLAB:
+                gitLabWebhookService.deleteWebhook(workspace, webhook.getRemoteHookId());
+                break;
+            case BITBUCKET:
+                bitBucketWebhookService.deleteWebhook(workspace, webhook.getRemoteHookId());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private boolean checkBranch(String webhookBranch, Webhook webhook) {
+        // Check if the webhook branch is the default workspace branch
+        if (webhookBranch.equals(webhook.getWorkspace().getBranch())) {
+            return true;
+        }
+        String[] branchList = webhook.getBranch().split(",");
+        for (String branch : branchList) {
+            if (webhookBranch.startsWith(branch)) {
+                return true;
             }
         }
 
-        if (templateId.isEmpty()) {
-            log.warn("Template 'Plan and apply' not found , getting first template");
-            templateId = templates.get(0).getId().toString();
+        return false;
+    }
+
+    private boolean checkFileChanges(List<String> files, Webhook webhook) {
+        String[] triggeredPath = webhook.getPath().split(",");
+        String workspaceFolder = webhook.getWorkspace().getFolder();
+        if (workspaceFolder.substring(0, 1).equals("/")) {
+            workspaceFolder = workspaceFolder.substring(1);
+        }
+        for (String file : files) {
+            if (file.startsWith(workspaceFolder)) {
+                log.info("Changed file {} in set workspace path {}", file, workspaceFolder);
+                return true;
+            }
+            for (int i = 0; i < triggeredPath.length; i++) {
+                if (file.matches(triggeredPath[i])) {
+                    log.info("Changed file {} matches set trigger pattern {}", file, triggeredPath[i]);
+                    return true;
+                }
+            }
+        }
+        log.info("Changed files {} doesn't match any of the trigger path pattern {}", files, triggeredPath);
+        return false;
+    }
+
+    private void sendCommitStatus(Job job) {
+        switch (job.getWorkspace().getVcs().getVcsType()) {
+            case GITHUB:
+                gitHubWebhookService.sendCommitStatus(job, JobStatus.pending);
+                break;
+            default:
+                break;
         }
     }
-
-    // Template id is a json with the mapping of the event and the template id. 
-    // In a future release we can trigger a different template for each event
-    String templateMapping ="{\"push\":\"" + templateId +"\"}";
-    log.info("templateMapping {}", templateMapping);
-    // save the webhook
-    Webhook webhook = new Webhook();
-    webhook.setType(WebhookType.WORKSPACE);
-    webhook.setReferenceId(workspace.getId().toString());
-    webhook.setTemplateMapping(templateMapping);
-    Webhook savedWebhook = webhookRepository.save(webhook);
-
-    //
-    Vcs vcs = workspace.getVcs();
-    switch (vcs.getVcsType()) {
-        case GITHUB:
-            webhookRemoteId = gitHubWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
-            break;
-        case GITLAB:
-            webhookRemoteId = gitLabWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
-            break;
-        case BITBUCKET:
-            webhookRemoteId = BitBucketWebhookService.createWebhook(workspace,savedWebhook.getId().toString());
-            break;
-        default:
-            break;
-    }
-
-    if(webhookRemoteId.isEmpty()){
-        log.error("Error creating the webhook");
-        return;
-    }
-
-    savedWebhook.setRemoteHookId(webhookRemoteId);
-    // Save the updated webhook
-    webhookRepository.save(savedWebhook);
-  }
- }
-
 }

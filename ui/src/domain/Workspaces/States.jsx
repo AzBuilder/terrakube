@@ -1,5 +1,16 @@
 import { React, useState, useRef, useCallback, useMemo } from "react";
-import { List, Space, Card, Row, Col, Avatar, Tooltip } from "antd";
+import {
+  List,
+  Space,
+  Card,
+  Row,
+  Col,
+  Avatar,
+  Tooltip,
+  Button,
+  Popconfirm,
+  message,
+} from "antd";
 import Editor from "@monaco-editor/react";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import ReactFlow, {
@@ -10,7 +21,11 @@ import ReactFlow, {
 } from "reactflow";
 import NodeResource from "./NodeResource";
 import { DownloadState } from "./DownloadState";
-import { InfoCircleOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  InfoCircleOutlined,
+  UserOutlined,
+  RollbackOutlined,
+} from "@ant-design/icons";
 import "reactflow/dist/style.css";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
 
@@ -20,7 +35,9 @@ export const States = ({
   stateDetailsVisible,
   workspace,
   organizationId,
-  organizationName
+  organizationName,
+  onRollback,
+  manageState,
 }) => {
   const [currentState, setCurrentState] = useState({});
   const [stateContent, setStateContent] = useState("");
@@ -182,30 +199,34 @@ export const States = ({
               setRawStateContent(JSON.stringify(response.data, null, "\t"));
             })
             .catch((err) => {
-              setStateContent(`{"error":"Failed to load raw state${err}"}`);
+              setRawStateContent(`{"error":"Failed to load raw state${err}"}`);
             });
         })
-        .catch((err) =>
-          setStateContent(`{"error":"Failed to load state ${err}"}`)
-        );
+        .catch((err) => {
+          setStateContent(`{"error":"Failed to load state ${err}"}`);
+          setRawStateContent(`{"error":"Failed to load state ${err}"}`);
+        });
     else
       axiosClient
         .get(state.output)
         .then((resp) => {
           loadData(resp);
         })
-        .catch((err) =>
-          setStateContent(`{"error":"Failed to load state ${err}"}`)
-        );
+        .catch((err) => {
+          setStateContent(`{"error":"Failed to load state ${err}"}`);
+          setRawStateContent(`{"error":"Failed to load state ${err}"}`);
+        });
   };
 
   const tabs = [
     {
       key: "diagram",
       tab: "diagram",
+      disabled: !manageState,
     },
     {
       key: "raw",
+      disabled: !manageState,
       tab: (
         <span>
           code&nbsp;
@@ -217,6 +238,7 @@ export const States = ({
     },
     {
       key: "json",
+      disabled: !manageState,
       tab: (
         <span>
           json&nbsp;
@@ -230,9 +252,9 @@ export const States = ({
 
   const onTabChange = (key) => {
     setactivetab(key);
-    if (key === "json") {
+    if (key === "json" && jsonEditorRef.current) {
       jsonEditorRef.current.layout();
-    } else {
+    } else if(key === "raw" && editorRef.current) {
       editorRef.current.layout();
     }
   };
@@ -244,15 +266,48 @@ export const States = ({
     []
   );
 
+  const handleRollback = () => {
+    const outputUrl = currentState.output;
+    const rollbackUrl = outputUrl.replace("/state/", "/rollback/"); // Replace /state/ with /rollback/
+
+    axiosInstance
+      .put(rollbackUrl)
+      .then((response) => {
+        // Show success message on successful rollback
+        message.success(
+          "The state was successfully rolled back. Please verify that the workspace version is compatible with this state."
+        );
+
+        console.log("Rollback successful:", response.data);
+        onRollback(false, false);
+        setStateDetailsVisible(false);
+      })
+      .catch((error) => {
+        // Extract error message from the API response
+        var errorMessage = "An unexpected error occurred.";
+        if(error.response?.status === 403) {
+          errorMessage = "You do not have permission to perform this action.";
+        }
+
+        errorMessage = error.response?.data || errorMessage          
+
+        // Show the error message
+        message.error(`Failed to roll back the state: ${errorMessage}`);
+
+        // Log the error for debugging purposes
+        console.error("Error during rollback:", error);
+      });
+  };
+
   return (
     <div>
       {!stateDetailsVisible ? (
         <List
           split=""
           className="moduleList"
-          dataSource={history
-            .sort((a, b) => a.jobReference - b.jobReference)
-            .reverse()}
+          dataSource={history.sort(
+            (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+          )}
           renderItem={(item) => (
             <List.Item>
               <Card
@@ -267,7 +322,13 @@ export const States = ({
                     {item.relativeDate}
                   </span>
                   <span>
-                    <a>job #{item.jobReference}</a>
+                    <a>
+                      {/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+                        item.jobReference
+                      )
+                        ? `rollback to #${item.jobReference}`
+                        : `job #${item.jobReference}`}
+                    </a>
                   </span>
                 </Space>
               </Card>
@@ -280,22 +341,51 @@ export const States = ({
             <Col span={1}>
               <Avatar shape="square" icon={<UserOutlined />} />
             </Col>
-            <Col span={21}>
+            <Col span={19}>
               <h3>{currentState.title}</h3>
               <Space className="stateDetails" size={40} split="|">
                 <span>#{currentState.id}</span>
                 <span>
-                  <b>{currentState.createdBy}</b> triggered from Terraform
+                  <b>{currentState.createdBy}</b> triggered from Terraform{" "}
+                  <span className="stateDetails">
+                    {currentState.relativeDate}
+                  </span>
                 </span>
                 <span>
-                  <a>job #{currentState.jobReference}</a>
+                  <a>
+                    {/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+                      currentState.jobReference
+                    )
+                      ? `rollback to #${currentState.jobReference}`
+                      : `job #${currentState.jobReference}`}
+                  </a>
                 </span>
               </Space>
             </Col>
-            <Col span={2}>
-              <DownloadState stateUrl={currentState.output} />
-              <br />
-              <span className="stateDetails">{currentState.relativeDate}</span>
+            <Col span={3}>
+              <Space style={{ marginTop: "30px" }} direction="horizontal">
+                <Popconfirm
+                  title="Are you sure?"
+                  description={
+                    <span>
+                      Restoring this workspace to its previous state may lead to
+                      loss of data. <br /> Any resources that have been added or
+                      modified since this state was saved <br /> will no longer
+                      be tracked by Terrakube.
+                    </span>
+                  }
+                  onConfirm={handleRollback}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Tooltip title="Rollback to this State Version">
+                    <Button icon={<RollbackOutlined />} danger type="default" disabled={!manageState}>
+                      Rollback
+                    </Button>
+                  </Tooltip>
+                </Popconfirm>
+                <DownloadState stateUrl={currentState.output} manageState={manageState} />
+              </Space>
             </Col>
           </Row>
           <Row style={{ paddingTop: "30px" }}>
@@ -339,7 +429,7 @@ export const States = ({
                     options={{ readOnly: "true" }}
                     onMount={handleEditorDidMount}
                     defaultLanguage="json"
-                    defaultValue={rawStateContent}
+                    defaultValue={manageState ? rawStateContent : "No access to raw state"}
                   />
                 ) : (
                   <Editor
@@ -348,7 +438,7 @@ export const States = ({
                     options={{ readOnly: "true" }}
                     onMount={handleJSONEditorDidMount}
                     defaultLanguage="json"
-                    defaultValue={stateContent}
+                    defaultValue={manageState ? stateContent : "No access to state"}
                   />
                 )}
               </Card>

@@ -6,7 +6,7 @@ import {
   ORGANIZATION_NAME,
 } from "../../config/actionTypes";
 import "./Organizations.css";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const { Content } = Layout;
 
 const validateMessages = {
@@ -14,7 +14,8 @@ const validateMessages = {
 };
 
 export const CreateOrganization = ({ setOrganizationName }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
+
   const onFinish = (values) => {
     const body = {
       data: {
@@ -32,16 +33,14 @@ export const CreateOrganization = ({ setOrganizationName }) => {
       })
       .then((response) => {
         console.log(response);
-        if (response.status == "201") {
-          localStorage.setItem(ORGANIZATION_ARCHIVE, response.data.data.id);
-          localStorage.setItem(
+        if (response.status === 201) {
+          sessionStorage.setItem(ORGANIZATION_ARCHIVE, response.data.data.id);
+          sessionStorage.setItem(
             ORGANIZATION_NAME,
             response.data.data.attributes.name
           );
           setOrganizationName(response.data.data.attributes.name);
-          history.push(
-            `/organizations/${response.data.data.id}/settings/teams`
-          );
+          navigate(`/organizations/${response.data.data.id}/settings/teams`);
         }
       })
       .catch((error) => {
@@ -55,6 +54,7 @@ export const CreateOrganization = ({ setOrganizationName }) => {
                 visit the{" "}
                 <a
                   target="_blank"
+                  rel="noopener noreferrer"
                   href="https://docs.terrakube.io/getting-started/security#administrator-group"
                 >
                   Terrakube documentation
@@ -98,7 +98,7 @@ export const CreateOrganization = ({ setOrganizationName }) => {
               label="Organization name"
               tooltip="e.g. company-name"
               extra=" Organization names must be unique and will be part of your resource names used in various tools, for example terrakube/www-prod."
-              required
+              rules={[{ required: true }]}
             >
               <Input />
             </Form.Item>

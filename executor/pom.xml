@@ -18,27 +18,27 @@
 		<commons-text.version>1.12.0</commons-text.version>
 		<terraform-spring-boot-starter.version>0.15.0</terraform-spring-boot-starter.version>
 		<terrakube-client-starter.version>0.15.1</terrakube-client-starter.version>
-		<commons-io.version>2.16.1</commons-io.version>
-		<commons-codec>1.17.0</commons-codec>
+		<commons-io.version>2.17.0</commons-io.version>
+		<commons-codec>1.17.1</commons-codec>
 		<okhttp.version>4.12.0</okhttp.version>
-		<azure-storage-blob.version>12.26.0</azure-storage-blob.version>
-		<jgit.version>6.9.0.202403050737-r</jgit.version>
-		<lombok.version>1.18.32</lombok.version>
-		<groovy.version>4.0.21</groovy.version>
+		<azure-storage-blob.version>12.28.1</azure-storage-blob.version>
+		<jgit.version>7.0.0.202409031743-r</jgit.version>
+		<lombok.version>1.18.34</lombok.version>
+		<groovy.version>4.0.23</groovy.version>
 		<ivy.version>2.5.2</ivy.version>
 		<jcolor.version>5.5.1</jcolor.version>
-		<aws-sdk.version>1.12.734</aws-sdk.version>
+		<aws-sdk.version>1.12.773</aws-sdk.version>
 		<google-storage.version>1.17.0</google-storage.version>
-		<slf4j.version>2.0.13</slf4j.version>
-		<gcp-libraries-bom.version>26.40.0</gcp-libraries-bom.version>
-		<commons-compress.version>1.26.2</commons-compress.version>
-		<jedis.version>4.4.7</jedis.version>
+		<slf4j.version>2.0.16</slf4j.version>
+		<gcp-libraries-bom.version>26.48.0</gcp-libraries-bom.version>
+		<commons-compress.version>1.27.1</commons-compress.version>
+		<jedis.version>4.4.8</jedis.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
 		</sonar.coverage.jacoco.xmlReportPaths>
 		<!--BUILDPACK DATA-->
 		<buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.292</buildpack.builder>
 		<buildpack.java>gcr.io/paketo-buildpacks/java:13.0.1</buildpack.java>
-		<buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:1.7.1</buildpack.telemetry>
+		<buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:1.9.0</buildpack.telemetry>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -214,6 +214,7 @@
                     	</bindings>
                     <env>
                         <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
+						<BP_JVM_VERSION>17</BP_JVM_VERSION>
                     </env>
                 	</image>
 				</configuration>

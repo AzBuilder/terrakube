@@ -1,5 +1,4 @@
 import { React, useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
 import {
   Menu,
   Layout,
@@ -17,7 +16,7 @@ import {
   message,
   Spin,
 } from "antd";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
 import {
   DownOutlined,
@@ -32,13 +31,13 @@ import {
   SiBitbucket,
   SiAzuredevops,
   SiMicrosoftazure,
-  SiAmazonaws,
 } from "react-icons/si";
+import { FaAws } from "react-icons/fa";
 import { BiBookBookmark } from "react-icons/bi";
 import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from "react-icons/md";
-import ReactMarkdown from "react-markdown";
+import Markdown from "react-markdown";
 import { compareVersions } from "../Workspaces/Workspaces";
 import { unzip } from "unzipit";
 import "./Module.css";
@@ -68,7 +67,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const [submodules, setSubmodules] = useState([]);
   const [submodule, setSubmodule] = useState("");
   const [submodulePath, setSubmodulePath] = useState("");
-  const history = useHistory();
+  const navigate = useNavigate();
+
   const renderLogo = (provider) => {
     switch (provider) {
       case "azurerm":
@@ -80,13 +80,14 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       case "aws":
         return (
           <IconContext.Provider value={{ color: "#232F3E", size: "1.5em" }}>
-            <SiAmazonaws />
+            <FaAws />
           </IconContext.Provider>
         );
       default:
         return <CloudOutlined />;
     }
   };
+
   const handleClick = (e) => {
     setMarkdown("loading...");
     setVersion(e.key);
@@ -99,12 +100,12 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     var hclString = "";
     var modules = [];
     for (const [name, entry] of Object.entries(entries)) {
-      if (submodule == "") {
+      if (submodule === "") {
         // if submodule is empty then load the submodules dropdown list
         if (name.includes("modules/")) {
           var moduleName = name.split("/")[1];
 
-          if (!modules.includes(moduleName) && moduleName != "") {
+          if (!modules.includes(moduleName) && moduleName !== "") {
             console.log(moduleName);
             modules.push(moduleName);
           }
@@ -116,9 +117,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
           hclString += "\n" + contentText;
         }
         setSubmodules(modules.sort());
-      }
-      //  if submodule is not empty then load the specific submodule tf files
-      else {
+      } else {
+        //  if submodule is not empty then load the specific submodule tf files
         if (
           name.includes(".tf") &&
           name.includes("modules/" + submodule + "/")
@@ -166,7 +166,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     setSubmodule(e.key);
     setSubmodulePath("//modules/" + e.key);
     loadModuleDetails(module.data.attributes.registryPath, version, e.key);
-    if (markdown == "loading...") {
+    if (markdown === "loading...") {
       setMarkdown("");
     }
   };
@@ -185,7 +185,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       .then((response) => {
         console.log(response);
         message.success("Module deleted successfully");
-        history.push(`/organizations/${orgid}/registry`);
+        navigate(`/organizations/${orgid}/registry`);
       })
       .catch((error) => {
         console.log(error);
@@ -196,6 +196,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const onChange = (key) => {
     console.log(key);
   };
+
   async function loadReadmeFile(text) {
     if (text != null) {
       const textReadme = Buffer.from(text, "base64").toString();
@@ -207,7 +208,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
     axiosInstance
       .get(`organization/${orgid}/module/${id}?include=vcs`)
       .then((response) => {
@@ -299,8 +300,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
       <div className="site-layout-content">
         {loading || !module.data ? (
-          <Spin spinning={loading}  tip="Loading Module...">
-          <p style={{marginTop: "50px"}}></p>
+          <Spin spinning={loading} tip="Loading Module...">
+            <p style={{ marginTop: "50px" }}></p>
           </Spin>
         ) : (
           <div>
@@ -392,6 +393,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                               <a
                                 href={fixSshURL(module.data.attributes.source)}
                                 target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 {new URL(
                                   fixSshURL(module.data.attributes.source)
@@ -409,7 +411,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                             <Menu onClick={onClickSubmodule}>
                               {" "}
                               {submodules.map(function (name, index) {
-                                return <Menu.Item key={name}>{name}</Menu.Item>;
+                                return (
+                                  <Menu.Item key={name}>{name}</Menu.Item>
+                                );
                               })}
                             </Menu>
                           }
@@ -471,9 +475,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         label: "Readme",
                         key: "1",
                         children: (
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          <Markdown remarkPlugins={[remarkGfm]}>
                             {markdown}
-                          </ReactMarkdown>
+                          </Markdown>
                         ),
                         className: "markdown-body",
                       },

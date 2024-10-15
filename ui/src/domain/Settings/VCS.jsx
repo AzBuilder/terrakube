@@ -188,7 +188,7 @@ export const VCSSettings = ({ vcsMode }) => {
                       </div>,
                     ]}
                   >
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>Callback URL</Col>
                         <Col span={18}>
@@ -200,25 +200,25 @@ export const VCSSettings = ({ vcsMode }) => {
                           </Paragraph>
                         </Col>
                       </Row>
-                    </p>
+                    </div>
                     <Divider />
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>API URL</Col>
                         <Col span={18}>
                           {item.attributes?.apiUrl}
                         </Col>
                       </Row>
-                    </p>
+                    </div>
                     <Divider />
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>Created</Col>
                         <Col span={18}>{item.attributes.createdDate}</Col>
                       </Row>
-                    </p>
+                    </div>
                     <Divider />
-                    <p className="paragraph">
+                    <div className="paragraph">
                       <Row>
                         <Col span={6}>
                           {item.attributes.status !== "COMPLETED" ? (
@@ -244,7 +244,7 @@ export const VCSSettings = ({ vcsMode }) => {
                               {renderVCSType(item.attributes.vcsType)} API
                               interactions by any Terrakube user anywhere within
                               the scope of{" "}
-                              <b>{localStorage.getItem(ORGANIZATION_NAME)}</b>.
+                              <b>{sessionStorage.getItem(ORGANIZATION_NAME)}</b>.
                             </span>
                           ) : (
                             <span>
@@ -255,7 +255,7 @@ export const VCSSettings = ({ vcsMode }) => {
                               <b>{item.attributes.createdBy}</b>, which assigned
                               an OAuth token for use by all Terrakube users in
                               the{" "}
-                              <b>{localStorage.getItem(ORGANIZATION_NAME)}</b>{" "}
+                              <b>{sessionStorage.getItem(ORGANIZATION_NAME)}</b>{" "}
                               organization.
                             </span>
                           )}
@@ -283,7 +283,7 @@ export const VCSSettings = ({ vcsMode }) => {
                           )}
                         </Col>
                       </Row>
-                    </p>
+                    </div>
                   </Card>
                 </List.Item>
               )}

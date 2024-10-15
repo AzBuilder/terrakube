@@ -1,6 +1,20 @@
 package org.terrakube.api.rs.module;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -11,22 +25,14 @@ import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.terrakube.api.plugin.ssh.TerrakubeSshdSessionFactory;
 import org.terrakube.api.rs.ssh.Ssh;
+import org.terrakube.api.rs.vcs.GitHubAppToken;
 import org.terrakube.api.rs.vcs.Vcs;
+import org.terrakube.api.rs.vcs.VcsConnectionType;
+
+import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-
-import java.util.*;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.SecureRandom;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
 @Slf4j
 public class GitTagsCache {
@@ -66,7 +72,8 @@ public class GitTagsCache {
 
         String truststorePath = System.getenv("TerrakubeRedisTruststorePath");
         String truststorePassword = System.getenv("TerrakubeRedisTruststorePassword");
-        Boolean useSSL = Boolean.parseBoolean(getFromEnvOrDefault("TerrakubeRedisSSL", "false").trim()) && truststorePath != null
+        Boolean useSSL = Boolean.parseBoolean(getFromEnvOrDefault("TerrakubeRedisSSL", "false").trim())
+                && truststorePath != null
                 && truststorePassword != null;
 
         String hostname = System.getenv("TerrakubeRedisHostname");
@@ -100,13 +107,20 @@ public class GitTagsCache {
                             jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                     Integer.valueOf(timeout), Integer.valueOf(timeout), username, password, 0, null,
                                     true, sslSocketFactory, null, null);
+                        } else if (useSSL && username == null) {
+                            log.warn("Connecting Redis using hostname, port, password and sslSocketFactory");
+                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
+                                    Integer.valueOf(timeout), Integer.valueOf(timeout), password, 0, null,
+                                    true, sslSocketFactory, null, null);
                         } else if (username != null) {
-                            log.warn("Connecting Redis using hostname, port, username, password with SSL enabled", username);
+                            log.warn("Connecting Redis using hostname, port, username, password with SSL enabled",
+                                    username);
                             jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
                                     Integer.valueOf(timeout), username, password, true);
                         } else {
                             log.warn("Connecting Default Redis using hostname, port and password");
-                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port), Integer.valueOf(timeout), password);
+                            jedisPool = new JedisPool(jedisPoolConfig, hostname, Integer.valueOf(port),
+                                    Integer.valueOf(timeout), password);
                         }
                     }
                     log.info("Redis connection completed...");
@@ -123,7 +137,8 @@ public class GitTagsCache {
         return jedisPool.getResource();
     }
 
-    public List<String> getVersions(String modulePath, String tagPrefix, String source, Vcs vcs, Ssh ssh) {
+    public List<String> getVersions(String modulePath, String tagPrefix, String source, Vcs vcs, Ssh ssh,
+            GitHubAppToken gitHubAppToken) {
         Jedis connection;
         String cacheFromRedis = null;
         if (jedisPool != null) {
@@ -137,7 +152,7 @@ public class GitTagsCache {
             return Arrays.asList(StringUtils.split(currentList.get().toString(), "|"));
         } else {
             log.info("Module {} is not in cache, adding to cache (this should not happen...)", modulePath);
-            List<String> fromRepository = getVersionFromRepository(source, tagPrefix, vcs, ssh);
+            List<String> fromRepository = getVersionFromRepository(source, tagPrefix, vcs, ssh, gitHubAppToken);
             if (jedisPool != null) {
                 connection = getJedisConnection();
                 connection.set(modulePath, StringUtils.join(fromRepository, "|"));
@@ -148,7 +163,8 @@ public class GitTagsCache {
         }
     }
 
-    public List<String> getVersionFromRepository(String source, String tagPrefix, Vcs vcs, Ssh ssh) {
+    public List<String> getVersionFromRepository(String source, String tagPrefix, Vcs vcs, Ssh ssh,
+            GitHubAppToken gitHubAppToken) {
         List<String> versionList = new ArrayList<>();
         try {
             CredentialsProvider credentialsProvider = null;
@@ -158,7 +174,12 @@ public class GitTagsCache {
                 log.info("vcs using {}", vcs.getVcsType().toString());
                 switch (vcs.getVcsType()) {
                     case GITHUB:
-                        credentialsProvider = new UsernamePasswordCredentialsProvider(vcs.getAccessToken(), "");
+                        if (vcs.getConnectionType() == VcsConnectionType.OAUTH) {
+                            credentialsProvider = new UsernamePasswordCredentialsProvider(vcs.getAccessToken(), "");
+                        } else {
+                            credentialsProvider = new UsernamePasswordCredentialsProvider("x-access-token",
+                                    gitHubAppToken.getToken());
+                        }
                         break;
                     case BITBUCKET:
                         credentialsProvider = new UsernamePasswordCredentialsProvider("x-token-auth",
@@ -216,7 +237,7 @@ public class GitTagsCache {
 
             tags.forEach((key, value) -> {
                 String originalTag = key.replace("refs/tags/", "");
-                if(tagPrefix == null) {
+                if (tagPrefix == null) {
                     versionList.add(originalTag);
                 } else if (originalTag.startsWith(tagPrefix)) {
                     versionList.add(originalTag.replace(tagPrefix, ""));

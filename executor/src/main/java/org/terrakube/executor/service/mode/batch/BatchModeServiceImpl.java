@@ -10,8 +10,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -25,12 +26,14 @@ public class BatchModeServiceImpl implements ApplicationListener<ContextRefreshe
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        if (executorFlagsProperties.isBatch())
+        log.info("Ephemeral mode is enable: {}", executorFlagsProperties.isEphemeral());
+        if (executorFlagsProperties.isEphemeral())
             try {
-                File terraformJobFile = new File(executorFlagsProperties.getBatchJobFilePath());
-                TerraformJob terraformJob = new ObjectMapper().readValue(terraformJobFile, TerraformJob.class);
+                log.info("Running in ephemeral mode....");
+                String batchJob = new String(Base64.getDecoder().decode(executorFlagsProperties.getEphemeralJobData()), StandardCharsets.UTF_8);
+                TerraformJob terraformJob = new ObjectMapper().readValue(batchJob, TerraformJob.class);
+                log.info("Creating ephemeral job....");
                 executorJob.createJob(terraformJob);
-                if (!terraformJobFile.delete()) log.error("Error deleting folder");
             } catch (IOException exception) {
                 log.error(exception.getMessage());
             }

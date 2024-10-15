@@ -31,7 +31,7 @@ import parse from "html-react-parser";
 const { DateTime } = require("luxon");
 
 export const DetailsJob = ({ jobId }) => {
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [loading, setLoading] = useState(false);
   const [job, setJob] = useState([]);
   const [steps, setSteps] = useState([]);

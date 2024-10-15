@@ -11,6 +11,7 @@ import {
   Popconfirm,
 } from "antd";
 import { Cron } from "react-js-cron";
+import "react-js-cron/dist/styles.css"
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,
@@ -65,13 +66,14 @@ const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit) => [
   {
     title: "Actions",
     key: "action",
-    render: (_, record) => {
+    render: (_, record, manageWorkspace) => {
       return (
         <div>
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => onEdit(record)}
+            disabled={!manageWorkspace}
           >
             Edit
           </Button>
@@ -89,7 +91,7 @@ const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit) => [
             cancelText="No"
           >
             {" "}
-            <Button danger type="link" icon={<DeleteOutlined />}>
+            <Button danger type="link" icon={<DeleteOutlined />} manageWorkspace={!manageWorkspace}>
               Delete
             </Button>
           </Popconfirm>
@@ -104,9 +106,9 @@ const validateMessages = {
   pattern: "${label} is not valid cron expression!",
 };
 
-export const Schedules = ({ schedules }) => {
-  const workspaceId = localStorage.getItem(WORKSPACE_ARCHIVE);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+export const Schedules = ({ schedules, manageWorkspace }) => {
+  const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -231,6 +233,7 @@ export const Schedules = ({ schedules }) => {
           form.resetFields();
           setVisible(true);
         }}
+        disabled={!manageWorkspace}
       >
         Add schedule
       </Button>
@@ -275,7 +278,7 @@ export const Schedules = ({ schedules }) => {
               ) : (
                 <Select>
                   {templates.map((item) => (
-                    <Select.Option value={item.id}>
+                    <Select.Option value={item.id} key={item.id}>
                       {item.attributes.name}
                     </Select.Option>
                   ))}

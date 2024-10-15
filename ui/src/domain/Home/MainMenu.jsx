@@ -2,7 +2,7 @@ import { React, useEffect, useState } from "react";
 import "antd/dist/reset.css";
 import axiosInstance from "../../config/axiosConfig";
 import "./Home.css";
-import { withRouter, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "antd";
 import {
   ORGANIZATION_ARCHIVE,
@@ -19,15 +19,16 @@ import {
 export const RegistryMenu = (props) => {
   const [orgs, setOrgs] = useState([]);
   const [defaultSelected, setDefaultSelected] = useState(["registry"]);
-  const { organizationName, setOrganizationName, history } = props;
+  const { organizationName, setOrganizationName } = props;
   const location = useLocation();
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const navigate = useNavigate();
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
 
   useEffect(() => {
     axiosInstance.get("organization").then((response) => {
       setOrgs(prepareOrgs(response.data));
       setOrganizationName(
-        localStorage.getItem(ORGANIZATION_NAME) || "select organization"
+        sessionStorage.getItem(ORGANIZATION_NAME) || "select organization"
       );
     });
 
@@ -38,14 +39,14 @@ export const RegistryMenu = (props) => {
     } else {
       setDefaultSelected(["workspaces"]);
     }
-  }, [organizationId]);
+  }, [organizationId, location.pathname, setOrganizationName]);
 
   const handleClick = (e) => {
-    if (e.key === "new") history.push("/organizations/create");
+    if (e.key === "new") navigate("/organizations/create");
     else {
-      history.push(`/organizations/${e.key}/workspaces`);
+      navigate(`/organizations/${e.key}/workspaces`);
       setDefaultSelected(["workspaces"]);
-      history.go(0);
+      navigate(0);
     }
   };
 
@@ -80,7 +81,7 @@ export const RegistryMenu = (props) => {
       key: "workspaces",
       icon: <AppstoreOutlined />,
       onClick: () => {
-        history.push(`/organizations/${organizationId}/workspaces`);
+        navigate(`/organizations/${organizationId}/workspaces`);
         setDefaultSelected(["workspaces"]);
       },
     },
@@ -89,7 +90,7 @@ export const RegistryMenu = (props) => {
       key: "registry",
       icon: <CloudOutlined />,
       onClick: () => {
-        history.push(`/organizations/${organizationId}/registry`);
+        navigate(`/organizations/${organizationId}/registry`);
         setDefaultSelected(["registry"]);
       },
     },
@@ -98,7 +99,7 @@ export const RegistryMenu = (props) => {
       key: "settings",
       icon: <SettingOutlined />,
       onClick: () => {
-        history.push(`/organizations/${organizationId}/settings`);
+        navigate(`/organizations/${organizationId}/settings`);
         setDefaultSelected(["settings"]);
       },
     },
@@ -124,4 +125,4 @@ function prepareOrgs(organizations) {
   }));
 }
 
-export default withRouter(RegistryMenu);
+export default RegistryMenu;

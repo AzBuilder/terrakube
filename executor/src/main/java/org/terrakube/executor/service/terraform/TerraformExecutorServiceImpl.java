@@ -17,6 +17,7 @@ import org.terrakube.executor.service.logs.*;
 import org.terrakube.terraform.TerraformProcessData;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,8 +61,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     public File getTerraformWorkingDir(TerraformJob terraformJob, File workingDirectory) throws IOException {
         File terraformWorkingDir = workingDirectory;
         try {
-            if (!terraformJob.getBranch().equals("remote-content") || (terraformJob.getFolder() != null && !terraformJob.getFolder().equals("/"))) {
-                terraformWorkingDir = new File(workingDirectory.getCanonicalPath() + terraformJob.getFolder());
+            if (!terraformJob.getBranch().equals("remote-content") || (terraformJob.getFolder() != null && !terraformJob.getFolder().split(",")[0].equals("/"))) {
+                terraformWorkingDir = new File (Path.of(workingDirectory.getCanonicalPath(), terraformJob.getFolder().split(",")[0]).toString());
+                if (!terraformWorkingDir.isDirectory()){
+                    throw new IOException(String.format("Terraform Working Directory not exist: {}", terraformWorkingDir.getCanonicalPath()));
+                }
             }
         } catch (IOException e) {
             log.error(e.getMessage());

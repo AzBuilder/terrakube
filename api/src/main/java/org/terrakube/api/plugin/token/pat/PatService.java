@@ -29,34 +29,35 @@ public class PatService {
     private PatRepository patRepository;
 
     public String createToken(int days, String description, Object name, Object email, Object groups) {
-
+        String jws = "";
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.base64Key));
-        UUID keyId = UUID.randomUUID();
-
-        log.info("Generated Pat {}", keyId);
-
-        String jws = Jwts.builder()
-                .setIssuer(ISSUER)
-                .setSubject(String.format("%s (Token)", name))
-                .setAudience(ISSUER)
-                .setId(keyId.toString())
-                .claim("email", email)
-                .claim("email_verified", true)
-                .claim("name", String.format("%s (Token)", name))
-                .claim("groups", groups)
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
-                .signWith(key)
-                .compact();
 
         Pat pat = new Pat();
-        pat.setId(keyId);
         pat.setDays(days);
         pat.setDeleted(false);
         pat.setDescription(description);
+        pat = patRepository.save(pat);
 
-        patRepository.save(pat);
+        try {
+            log.info("Generated Pat {}", pat.getId());
 
+            jws = Jwts.builder()
+                    .setIssuer(ISSUER)
+                    .setSubject(String.format("%s (Token)", name))
+                    .setAudience(ISSUER)
+                    .setId(pat.getId().toString())
+                    .claim("email", email)
+                    .claim("email_verified", true)
+                    .claim("name", String.format("%s (Token)", name))
+                    .claim("groups", groups)
+                    .setIssuedAt(Date.from(Instant.now()))
+                    .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
+                    .signWith(key)
+                    .compact();
+        } catch (Exception e) {
+            log.error("Error generating token", e);
+            patRepository.delete(pat);
+        }
         return jws;
     }
 
