@@ -52,22 +52,22 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                <image>
-                    <builder>${buildpack.builder}</builder>
-                    <buildpacks>
-                        <buildpack>${buildpack.java}</buildpack>
-                        <buildpack>${buildpack.telemetry}</buildpack>
-                    </buildpacks>
-                    <bindings>
-                        <binding>${basedir}/../bindings/ca-certificates:/platform/bindings/ca-certificates</binding>
-                    </bindings>
-                    <env>
-                        <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
-                        <BP_JVM_VERSION>17</BP_JVM_VERSION>
-                    </env>
-                </image>
-            </configuration>
-            <executions>
+                    <image>
+                        <builder>${buildpack.builder}</builder>
+                        <buildpacks>
+                            <buildpack>${buildpack.java}</buildpack>
+                            <buildpack>${buildpack.telemetry}</buildpack>
+                        </buildpacks>
+                        <bindings>
+                            <binding>${basedir}/../bindings/ca-certificates:/platform/bindings/ca-certificates</binding>
+                        </bindings>
+                        <env>
+                            <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
+                            <BP_JVM_VERSION>17</BP_JVM_VERSION>
+                        </env>
+                    </image>
+                </configuration>
+                <executions>
                     <execution>
                         <goals>
                             <goal>build-image</goal>
@@ -254,8 +254,8 @@
             <version>${postgresql.version}</version>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.version}</version>
         </dependency>
         <dependency>
