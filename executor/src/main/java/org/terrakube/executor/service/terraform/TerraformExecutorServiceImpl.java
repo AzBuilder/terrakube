@@ -96,19 +96,12 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .lineNumber(new AtomicInteger(0))
                     .build();
 
-            Consumer<String> planOutputError = LogsConsumer.builder()
-                    .jobId(Integer.valueOf(terraformJob.getJobId()))
-                    .terraformOutput(jobErrorOutput)
-                    .stepId(terraformJob.getStepId())
-                    .lineNumber(new AtomicInteger(0))
-                    .processLogs(logsService)
-                    .build();
-
+            terraformClient.setRedirectErrorStream(true);
             executeTerraformInit(
                     terraformJob,
                     terraformWorkingDir,
                     planOutput,
-                    planOutputError);
+                    null);
 
             scriptBeforeSuccessPlan = executePreOperationScripts(terraformJob, terraformWorkingDir, planOutput);
 
@@ -120,12 +113,12 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     exitCode = terraformClient.planDestroyDetailExitCode(
                             getTerraformProcessData(terraformJob, terraformWorkingDir),
                             planOutput,
-                            planOutputError).get();
+                            null).get();
                 } else {
                     exitCode = terraformClient.planDetailExitCode(
                             getTerraformProcessData(terraformJob, terraformWorkingDir),
                             planOutput,
-                            planOutputError).get();
+                            null).get();
                 }
 
             if(exitCode != 1) {
@@ -169,25 +162,18 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .processLogs(logsService)
                     .build();
 
-            Consumer<String> applyErrorOutput = LogsConsumer.builder()
-                    .jobId(Integer.valueOf(terraformJob.getJobId()))
-                    .terraformOutput(terraformErrorOutput)
-                    .stepId(terraformJob.getStepId())
-                    .processLogs(logsService)
-                    .lineNumber(new AtomicInteger(0))
-                    .build();
-
             HashMap<String, String> terraformParameters = getWorkspaceParameters(terraformJob.getVariables());
 
             boolean execution = false;
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess;
 
+            terraformClient.setRedirectErrorStream(true);
             executeTerraformInit(
                     terraformJob,
                     terraformWorkingDir,
                     applyOutput,
-                    applyErrorOutput);
+                    null);
 
             scriptBeforeSuccess = executePreOperationScripts(terraformJob, terraformWorkingDir, applyOutput);
 
@@ -201,7 +187,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 execution = terraformClient.apply(
                         terraformProcessData,
                         applyOutput,
-                        applyErrorOutput).get();
+                        null).get();
 
                 handleTerraformStateChange(terraformJob, terraformWorkingDir);
 
@@ -236,14 +222,6 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     .lineNumber(new AtomicInteger(0))
                     .build();
 
-            Consumer<String> errorOutputDestroy = LogsConsumer.builder()
-                    .lineNumber(new AtomicInteger(0))
-                    .jobId(Integer.valueOf(terraformJob.getJobId()))
-                    .terraformOutput(jobErrorOutput)
-                    .stepId(terraformJob.getStepId())
-                    .processLogs(logsService)
-                    .build();
-
             boolean execution = false;
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess;
@@ -252,7 +230,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                     terraformJob,
                     terraformWorkingDir,
                     outputDestroy,
-                    errorOutputDestroy);
+                    null);
 
             scriptBeforeSuccess = executePreOperationScripts(terraformJob, terraformWorkingDir, outputDestroy);
 
@@ -262,7 +240,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                 execution = terraformClient.destroy(
                         getTerraformProcessData(terraformJob, terraformWorkingDir),
                         outputDestroy,
-                        errorOutputDestroy).get();
+                        null).get();
 
                 handleTerraformStateChange(terraformJob, terraformWorkingDir);
             }
