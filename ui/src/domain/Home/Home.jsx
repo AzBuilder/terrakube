@@ -3,32 +3,32 @@ import "antd/dist/reset.css";
 import "./Home.css";
 import axiosInstance from "../../config/axiosConfig";
 import { Layout, Breadcrumb, List, Card } from "antd";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
+
 const { Content } = Layout;
+
 export const Home = () => {
   const [organizations, setOrganizations] = useState([]);
-  const history = useHistory();
-  const orgId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const navigate = useNavigate();
+  const orgId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+
   useEffect(() => {
     if (orgId === "" || orgId === null) {
       axiosInstance.get("organization").then((response) => {
         var orgs = response.data?.data;
         setOrganizations(orgs);
         if (orgs?.length === 1) {
-          history.push(`/organizations/${orgs[0].id}/workspaces`);
-          history.go(0);
+          navigate(`/organizations/${orgs[0].id}/workspaces`, { replace: true });
         }
       });
     } else {
-      history.push(`/organizations/${orgId}/workspaces`);
-      history.go(0);
+      navigate(`/organizations/${orgId}/workspaces`, { replace: true });
     }
-  });
+  }, [orgId, navigate]);
 
   const handleClick = (id) => {
-    history.push(`/organizations/${id}/workspaces`);
-    history.go(0);
+    navigate(`/organizations/${id}/workspaces`, { replace: true });
   };
 
   return (

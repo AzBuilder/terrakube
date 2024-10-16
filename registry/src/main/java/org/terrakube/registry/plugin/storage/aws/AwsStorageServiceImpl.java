@@ -34,12 +34,16 @@ public class AwsStorageServiceImpl implements StorageService {
     String registryHostname;
 
     @Override
-    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken, String tagPrefix, String folder) {
-        String blobKey = String.format(BUCKET_ZIP_MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion);
+    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion,
+            String source, String vcsType, String vcsConnectionType, String accessToken, String tagPrefix,
+            String folder) {
+        String blobKey = String.format(BUCKET_ZIP_MODULE_LOCATION, organizationName, moduleName, providerName,
+                moduleVersion);
         log.info("Checking Aws S3 Object exist {}", blobKey);
 
         if (!s3client.doesObjectExist(bucketName, blobKey)) {
-            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken, tagPrefix, folder);
+            File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType,
+                    vcsConnectionType, accessToken, tagPrefix, folder);
             File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
             ZipUtil.pack(gitCloneDirectory, moduleZip);
 
@@ -50,25 +54,30 @@ public class AwsStorageServiceImpl implements StorageService {
             log.info("Upload Aws S3 Object completed", blobKey);
             try {
                 FileUtils.cleanDirectory(gitCloneDirectory);
-                if (FileUtils.deleteQuietly(moduleZip)) log.info("Successfully delete folder");
+                if (FileUtils.deleteQuietly(moduleZip))
+                    log.info("Successfully delete folder");
             } catch (IOException e) {
                 log.error(e.getMessage());
             }
         }
 
-        return String.format(BUCKET_DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName, providerName, moduleVersion);
+        return String.format(BUCKET_DOWNLOAD_MODULE_LOCATION, registryHostname, organizationName, moduleName,
+                providerName, moduleVersion);
     }
 
     @Override
-    public byte[] downloadModule(String organizationName, String moduleName, String providerName, String moduleVersion) {
+    public byte[] downloadModule(String organizationName, String moduleName, String providerName,
+            String moduleVersion) {
         byte[] data;
         try {
-            log.info("Searching: /registry/{}/{}/{}/{}/module.zip", organizationName, moduleName, providerName, moduleVersion);
-            S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_ZIP_MODULE_LOCATION, organizationName, moduleName, providerName, moduleVersion));
+            log.info("Searching: /registry/{}/{}/{}/{}/module.zip", organizationName, moduleName, providerName,
+                    moduleVersion);
+            S3Object s3object = s3client.getObject(bucketName, String.format(BUCKET_ZIP_MODULE_LOCATION,
+                    organizationName, moduleName, providerName, moduleVersion));
             S3ObjectInputStream inputStream = s3object.getObjectContent();
             data = inputStream.getDelegateStream().readAllBytes();
         } catch (IOException e) {
-            log.error(S3_ERROR_LOG,e.getMessage());
+            log.error(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
         return data;

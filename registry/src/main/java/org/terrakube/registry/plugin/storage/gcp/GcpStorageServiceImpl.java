@@ -32,17 +32,19 @@ public class GcpStorageServiceImpl implements StorageService {
     private GitService gitService;
 
     @Override
-    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion, String source, String vcsType, String accessToken, String tagPrefix, String folder) {
+    public String searchModule(String organizationName, String moduleName, String providerName, String moduleVersion,
+            String source, String vcsType, String vcsConnectionType, String accessToken, String tagPrefix,
+            String folder) {
         String blobKey = String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion);
         log.info("Searching module: {}", blobKey);
         BlobId blobId = BlobId.of(
                 bucketName,
-                String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion)
-        );
+                String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion));
         log.info("Checking GCP Object exist {}", blobKey);
         if (storage.get(blobId) == null) {
             try {
-                File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType, accessToken, tagPrefix, folder);
+                File gitCloneDirectory = gitService.getCloneRepositoryByTag(source, moduleVersion, vcsType,
+                        vcsConnectionType, accessToken, tagPrefix, folder);
                 File moduleZip = new File(gitCloneDirectory.getAbsolutePath() + ".zip");
                 ZipUtil.pack(gitCloneDirectory, moduleZip);
 
@@ -52,23 +54,27 @@ public class GcpStorageServiceImpl implements StorageService {
                 log.info("File uploaded to bucket {} as {}", bucketName, blobKey);
 
                 FileUtils.cleanDirectory(gitCloneDirectory);
-                if (FileUtils.deleteQuietly(moduleZip)) log.info("Successfully delete folder for gcp module");
+                if (FileUtils.deleteQuietly(moduleZip))
+                    log.info("Successfully delete folder for gcp module");
             } catch (IOException e) {
                 log.error(e.getMessage());
             }
         }
 
-        return String.format(gcpDownloadModuleLocation, registryHostname, organizationName, moduleName, providerName, moduleVersion);
+        return String.format(gcpDownloadModuleLocation, registryHostname, organizationName, moduleName, providerName,
+                moduleVersion);
     }
 
     @Override
-    public byte[] downloadModule(String organizationName, String moduleName, String providerName, String moduleVersion) {
+    public byte[] downloadModule(String organizationName, String moduleName, String providerName,
+            String moduleVersion) {
         byte[] data;
-        log.info("Searching: /registry/{}/{}/{}/{}/module.zip", organizationName, moduleName, providerName, moduleVersion);
+        log.info("Searching: /registry/{}/{}/{}/{}/module.zip", organizationName, moduleName, providerName,
+                moduleVersion);
         data = storage.get(
-                        BlobId.of(
-                                bucketName,
-                                String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion)))
+                BlobId.of(
+                        bucketName,
+                        String.format(gcpZipModuleLocation, organizationName, moduleName, providerName, moduleVersion)))
                 .getContent();
         return data;
     }

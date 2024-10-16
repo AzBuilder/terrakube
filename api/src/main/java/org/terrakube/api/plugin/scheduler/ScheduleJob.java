@@ -8,13 +8,16 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
+import org.terrakube.api.plugin.scheduler.job.tcl.executor.ephemeral.EphemeralExecutorService;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.FlowType;
 import org.terrakube.api.plugin.scheduler.job.tcl.model.ScheduleTemplate;
 import org.terrakube.api.plugin.softdelete.SoftDeleteService;
+import org.terrakube.api.plugin.vcs.provider.github.GitHubWebhookService;
 import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.JobVia;
 import org.terrakube.api.rs.job.step.Step;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -41,6 +44,7 @@ public class ScheduleJob implements org.quartz.Job {
     private final TemplateRepository templateRepository;
 
     public static final String JOB_ID = "jobId";
+    private final EphemeralExecutorService ephemeralExecutorService;
 
     JobRepository jobRepository;
 
@@ -55,6 +59,8 @@ public class ScheduleJob implements org.quartz.Job {
     ScheduleJobService scheduleJobService;
 
     RedisTemplate redisTemplate;
+    
+    GitHubWebhookService gitHubWebhookService;
 
     @Transactional
     @Override
@@ -73,15 +79,23 @@ public class ScheduleJob implements org.quartz.Job {
                 redisTemplate.delete(String.valueOf(job.getId()));
                 log.warn("Deleting Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
                 updateJobStepsWithStatus(job.getId(), JobStatus.failed);
-                jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
-                if (job.getWorkspace().isLocked()) {
-                    log.warn("Release Workspace {} Lock for job id {}", job.getWorkspace().getId(), job.getId());
-                    unlockWorkspace(job);
-                }
+                updateJobStatusOnVcs(job, JobStatus.unknown);
+                removeJobContext(job, jobExecutionContext);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
             log.warn("Closing Job");
+            return;
+        }
+
+        if(job.getWorkspace() == null ){
+            log.warn("Workspace does not exist anymore, deleting job context for {}", jobId);
+            removeJobContext(job, jobExecutionContext);
+            return;
+        }
+
+        if (job.getWorkspace().isLocked()) {
+            log.warn("Job {}, Workspace is locked. It must be unlocked before Terrakube can execute it.", jobId);
             return;
         }
 
@@ -91,7 +105,7 @@ public class ScheduleJob implements org.quartz.Job {
                 Arrays.asList(JobStatus.failed, JobStatus.completed, JobStatus.rejected, JobStatus.cancelled, JobStatus.waitingApproval, JobStatus.approved, JobStatus.noChanges),
                 job.getId()
         );
-        if (previousJobs.isPresent() && previousJobs.get().size() > 0) {
+        if (previousJobs.isPresent() && !previousJobs.get().isEmpty()) {
             log.warn("Job {} is waiting for previous jobs to be completed...", jobId);
         } else {
 
@@ -101,13 +115,13 @@ public class ScheduleJob implements org.quartz.Job {
                     if(job.isPlanChanges()) {
                         redisTemplate.delete(String.valueOf(job.getId()));
                         executePendingJob(job, jobExecutionContext);
+                        removeJobContext(job, jobExecutionContext);
                     } else {
                         log.warn("Job {} completed with no changes...", jobId);
                         completeJob(job);
                         redisTemplate.delete(String.valueOf(job.getId()));
                         updateJobStepsWithStatus(job.getId(), JobStatus.notExecuted);
-                        removeJobContext(job, jobExecutionContext);
-                        unlockWorkspace(job);
+                        updateJobStatusOnVcs(job, JobStatus.completed);
                     }
                     break;
                 case approved:
@@ -119,20 +133,18 @@ public class ScheduleJob implements org.quartz.Job {
                 case completed:
                     redisTemplate.delete(String.valueOf(job.getId()));
                     removeJobContext(job, jobExecutionContext);
-                    unlockWorkspace(job);
+                    ephemeralExecutorService.deleteEphemeralJob(job);
+                    updateJobStatusOnVcs(job, JobStatus.completed);
                     break;
                 case cancelled:
                 case failed:
                 case rejected:
                     redisTemplate.delete(String.valueOf(job.getId()));
-                    try {
-                        log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
-                        updateJobStepsWithStatus(job.getId(), JobStatus.failed);
-                        jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
-                    } catch (SchedulerException e) {
-                        log.error(e.getMessage());
-                    }
-                    unlockWorkspace(job);
+                    log.info("Deleting Failed/Cancelled/Rejected Job Context {} from Quartz", PREFIX_JOB_CONTEXT + job.getId());
+                    updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                    updateJobStatusOnVcs(job, JobStatus.failed);
+                    removeJobContext(job, jobExecutionContext);
+                    ephemeralExecutorService.deleteEphemeralJob(job);
                     break;
                 default:
                     log.info("Job {} Status {}", job.getId(), job.getStatus());
@@ -185,8 +197,6 @@ public class ScheduleJob implements org.quartz.Job {
                     softDeleteService.disableWorkspaceSchedules(job.getWorkspace());
                     log.warn("Remove current job context");
                     removeJobContext(job, jobExecutionContext);
-                    log.warn("Unlock workspace");
-                    unlockWorkspace(job);
                     log.warn("Update workspace deleted to true");
                     Workspace workspace = job.getWorkspace();
                     workspace.setDeleted(true);
@@ -216,6 +226,7 @@ public class ScheduleJob implements org.quartz.Job {
                     job.setStatus(JobStatus.failed);
                     jobRepository.save(job);
                     updateJobStepsWithStatus(job.getId(), JobStatus.failed);
+                    updateJobStatusOnVcs(job, JobStatus.unknown);
                     break;
                 default:
                     log.error("FlowType not supported");
@@ -224,7 +235,6 @@ public class ScheduleJob implements org.quartz.Job {
         } else {
             completeJob(job);
             removeJobContext(job, jobExecutionContext);
-            unlockWorkspace(job);
         }
     }
 
@@ -266,13 +276,21 @@ public class ScheduleJob implements org.quartz.Job {
     private void completeJob(Job job) {
         job.setStatus(JobStatus.completed);
         jobRepository.save(job);
+        ephemeralExecutorService.deleteEphemeralJob(job);
+        updateJobStatusOnVcs(job, JobStatus.completed);
         log.info("Update Job {} to completed", job.getId());
     }
 
     private void removeJobContext(Job job, JobExecutionContext jobExecutionContext) {
         try {
-            log.info("Deleting Job Context {}", PREFIX_JOB_CONTEXT + job.getId());
-            jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+            Boolean triggerByStatusChange = jobExecutionContext.getJobDetail().getJobDataMap().getBooleanFromString("isTriggerFromStatusChange");
+            if(!triggerByStatusChange.booleanValue()) {
+                log.info("Deleting Schedule Job Context {}, InstanceId {}", PREFIX_JOB_CONTEXT + job.getId(), jobExecutionContext.getFireInstanceId());
+                jobExecutionContext.getScheduler().deleteJob(new JobKey(PREFIX_JOB_CONTEXT + job.getId()));
+            } else {
+                String jobIdentity = jobExecutionContext.getJobDetail().getJobDataMap().getString("identity");
+                jobExecutionContext.getScheduler().deleteJob(new JobKey(jobIdentity));
+            }
         } catch (SchedulerException e) {
             log.error(e.getMessage());
         }
@@ -290,7 +308,7 @@ public class ScheduleJob implements org.quartz.Job {
                 log.info("Executing Job {} Step Id {}", job.getId(), stepId);
         }
     }
-
+    
     private void updateJobStepsWithStatus(int jobId, JobStatus jobStatus) {
         log.warn("Cancelling pending steps");
         for (Step step : stepRepository.findByJobId(jobId)) {
@@ -301,10 +319,17 @@ public class ScheduleJob implements org.quartz.Job {
         }
     }
 
-    private void unlockWorkspace(Job job) {
-        Workspace workspace = job.getWorkspace();
-        workspace.setLocked(false);
-        log.info("Unlock workspace {} in job {}", workspace.getId(), job.getId());
-        workspaceRepository.save(workspace);
+    private void updateJobStatusOnVcs(Job job, JobStatus jobStatus) {
+        if (job.getVia().equals(JobVia.UI.name()) || job.getVia().equals(JobVia.CLI.name())) {
+            return; 
+        }
+        
+        switch (job.getWorkspace().getVcs().getVcsType()) {
+            case GITHUB:
+                gitHubWebhookService.sendCommitStatus(job, jobStatus);
+                break;
+            default:
+                break;
+        }
     }
 }

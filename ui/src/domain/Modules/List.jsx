@@ -10,14 +10,15 @@ import {
   Tag,
 } from "antd";
 import axiosInstance from "../../config/axiosConfig";
-import { useParams, useHistory, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   CloudUploadOutlined,
   CloudOutlined,
   ClockCircleOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import { SiMicrosoftazure, SiAmazonaws } from "react-icons/si";
+import { SiMicrosoftazure } from "react-icons/si";
+import { FaAws } from "react-icons/fa";
 import { RiFolderHistoryLine } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { MdBusiness } from "react-icons/md";
@@ -79,7 +80,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
 
   useEffect(() => {
     setLoading(true);
-    localStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
     axiosInstance
       .get(`organization/${orgid}?include=module`)
       .then((response) => {
@@ -95,17 +96,17 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
         }
 
         setLoading(false);
-        localStorage.setItem(
+        sessionStorage.setItem(
           ORGANIZATION_NAME,
           response.data.data.attributes.name
         );
         setOrganizationName(response.data.data.attributes.name);
       });
   }, [orgid]);
-  const history = useHistory();
+  const navigate = useNavigate();
   const handleClick = (id) => {
     console.log(id);
-    history.push("/organizations/" + orgid + "/registry/" + id);
+    navigate("/organizations/" + orgid + "/registry/" + id);
   };
 
   const renderLogo = (provider) => {
@@ -119,7 +120,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
       case "aws":
         return (
           <IconContext.Provider value={{ color: "#232F3E", size: "1.5em" }}>
-            <SiAmazonaws />
+            <FaAws />
           </IconContext.Provider>
         );
       default:
@@ -128,7 +129,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }) => {
   };
 
   const handlePublish = () => {
-    history.push("/organizations/" + orgid + "/registry/create");
+    navigate("/organizations/" + orgid + "/registry/create");
   };
 
   return (

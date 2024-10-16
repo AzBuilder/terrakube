@@ -1,12 +1,25 @@
 package org.terrakube.api;
 
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.terrakube.api.repository.TeamRepository;
+import org.terrakube.api.rs.team.Team;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Optional;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 
 class WorkspaceTests extends ServerApplicationTests {
+
+    @Autowired
+    TeamRepository teamRepository;
 
     @Test
     void searchWorkspaceAsOrgMember() {
@@ -17,6 +30,84 @@ class WorkspaceTests extends ServerApplicationTests {
                 .then()
                 .assertThat()
                 .body("data.attributes.name", IsEqual.equalTo("sample_simple"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void searchWorkspaceManageSateOrgMember() throws IOException {
+
+        FileUtils.writeStringToFile(
+                new File(
+                        String.format("%s/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate", FileUtils.getUserDirectoryPath(), "d9b58bd3-f3fc-4056-a026-1163297e80a8", "5ed411ca-7ab8-4d2f-b591-02d0d5788afc")),
+                "SAMPLE",
+                Charset.defaultCharset().toString()
+        );
+
+        Optional<Team> teamOptional = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7"));
+        Team team = teamOptional.get();
+        team.setManageState(true);
+        teamRepository.save(team);
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/tfstate/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/state/terraform.tfstate")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void searchWorkspaceManageSateNoOrgMember() throws IOException {
+
+        FileUtils.writeStringToFile(
+                new File(
+                        String.format("%s/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate", FileUtils.getUserDirectoryPath(), "d9b58bd3-f3fc-4056-a026-1163297e80a8", "5ed411ca-7ab8-4d2f-b591-02d0d5788afc")),
+                "SAMPLE",
+                Charset.defaultCharset().toString()
+        );
+
+        Optional<Team> teamOptional = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7"));
+        Team team = teamOptional.get();
+        team.setManageState(true);
+        teamRepository.save(team);
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("FAKE_GROUP"))
+                .when()
+                .get("/tfstate/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/state/terraform.tfstate")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void searchWorkspaceStateAsExecutor() throws IOException {
+
+        FileUtils.writeStringToFile(
+                new File(
+                        String.format("%s/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate", FileUtils.getUserDirectoryPath(), "d9b58bd3-f3fc-4056-a026-1163297e80a8", "5ed411ca-7ab8-4d2f-b591-02d0d5788afc")),
+                "SAMPLE",
+                Charset.defaultCharset().toString()
+        );
+
+        Optional<Team> teamOptional = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7"));
+        Team team = teamOptional.get();
+        team.setManageState(true);
+        teamRepository.save(team);
+
+        given()
+                .headers("Authorization", "Bearer " + generateSystemToken())
+                .when()
+                .get("/tfstate/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/state/terraform.tfstate")
+                .then()
+                .assertThat()
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
@@ -261,4 +352,5 @@ class WorkspaceTests extends ServerApplicationTests {
                 .all()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
+
 }

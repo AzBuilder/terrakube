@@ -27,7 +27,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import { SiBitbucket, SiAzuredevops } from "react-icons/si";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import parse from "html-react-parser";
 const { Content } = Layout;
 const { Step } = Steps;
@@ -99,7 +99,7 @@ export const ImportWorkspace = () => {
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep4Hidden] = useState(true);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [platforms, setPlatforms] = useState([]);
   const [platform, setPlatform] = useState({
     id: "tfcloud",
@@ -165,9 +165,9 @@ export const ImportWorkspace = () => {
       },
     },
   ];
-  const history = useHistory();
+  const navigate = useNavigate();
   useEffect(() => {
-    setOrganizationName(localStorage.getItem(ORGANIZATION_NAME));
+    setOrganizationName(sessionStorage.getItem(ORGANIZATION_NAME));
     setLoading(true);
     loadVCS();
     getPlatforms();
@@ -196,9 +196,7 @@ export const ImportWorkspace = () => {
   };
 
   const handleVCSClick = (vcsType) => {
-    history.push(
-      `/organizations/${organizationId}/settings/vcs/new/${vcsType}`
-    );
+    navigate(`/organizations/${organizationId}/settings/vcs/new/${vcsType}`);
   };
 
   const handleConnectDifferent = () => {

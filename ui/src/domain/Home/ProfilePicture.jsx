@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from "react";
 import "antd/dist/reset.css";
 import "./Home.css";
-import { Avatar, Dropdown, Menu, message } from "antd";
+import { Avatar, Dropdown, message } from "antd";
 import {
   UserOutlined,
   PoweroffOutlined,
@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import getUserFromStorage from "../../config/authUser";
 import { useAuth } from "../../config/authConfig";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   ORGANIZATION_ARCHIVE,
   ORGANIZATION_NAME,
@@ -18,16 +18,16 @@ import {
 export const ProfilePicture = (props) => {
   const [username, setUsername] = useState(null);
   const auth = useAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleUserSettings = () => {
-    history.push(`/settings/tokens`);
+    navigate(`/settings/tokens`);
   };
 
   const signOutClickHandler = () => {
     auth.removeUser();
-    localStorage.removeItem(ORGANIZATION_NAME);
-    localStorage.removeItem(ORGANIZATION_ARCHIVE);
+    sessionStorage.removeItem(ORGANIZATION_NAME);
+    sessionStorage.removeItem(ORGANIZATION_ARCHIVE);
   };
 
   useEffect(() => {

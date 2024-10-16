@@ -1,42 +1,39 @@
 package org.terrakube.api.plugin.vcs;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.function.TriFunction;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.lang3.function.TriFunction;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @AllArgsConstructor
 @Slf4j
 @Service
 public class WebhookServiceBase {
 
-    protected String extractOwnerAndRepo(String repoUrl) {
+    protected String[] extractOwnerAndRepo(String repoUrl) {
         try {
-            URL url = new URL(repoUrl);
-            String[] parts = url.getPath().split("/");
-            String owner = parts[1];
-            String repo = parts[2].replace(".git", "");
-            return owner + "/" + repo;
+            URI uri = new URI(repoUrl);
+            return Arrays.copyOfRange(uri.getPath().replaceAll("\\.git$", "").split("/"), 1, 3);
         } catch (Exception e) {
             log.error("error extracing the repo", e);
-            return "";
+            return null;
         }
     }
 
@@ -82,13 +79,18 @@ public class WebhookServiceBase {
     }
 
     protected ResponseEntity<String> makeApiRequest(HttpHeaders headers, String body, String apiUrl) {
+        return makeApiRequest(headers, body, apiUrl, HttpMethod.POST);
+    }
+
+    protected ResponseEntity<String> makeApiRequest(HttpHeaders headers, String body, String apiUrl, HttpMethod method) {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        return restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+        return restTemplate.exchange(apiUrl, method, entity, String.class);
     }
 
     protected WebhookResult handleWebhook(String jsonPayload, Map<String, String> headers, String token,
-            String signatureHeader, String via, TriFunction<String, WebhookResult, Map<String, String>, WebhookResult > handleEvent) {
+            String signatureHeader, String via,
+            TriFunction<String, WebhookResult, Map<String, String>, WebhookResult> handleEvent) {
         WebhookResult result = new WebhookResult();
         result.setBranch("");
         result.setVia(via);
@@ -107,7 +109,7 @@ public class WebhookServiceBase {
         log.info("Parsing " + via + " webhook payload");
 
         try {
-            result = handleEvent.apply(jsonPayload, result,headers);
+            result = handleEvent.apply(jsonPayload, result, headers);
         } catch (Exception e) {
             log.info("Error processing the webhook", e);
         }

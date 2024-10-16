@@ -14,8 +14,8 @@ import {
 const validateMessages = { required: "${label} is required!" };
 
 export const CreateJob = ({ changeJob }) => {
-  const workspaceId = localStorage.getItem(WORKSPACE_ARCHIVE);
-  const organizationId = localStorage.getItem(ORGANIZATION_ARCHIVE);
+  const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const [templates, setTemplates] = useState([]);
@@ -44,6 +44,7 @@ export const CreateJob = ({ changeJob }) => {
         setLoading(false);
       });
   };
+
   const onCreate = (values) => {
     const body = {
       data: {
@@ -129,7 +130,7 @@ export const CreateJob = ({ changeJob }) => {
               ) : (
                 <Select>
                   {templates.map((item) => (
-                    <Select.Option value={item.id}>
+                    <Select.Option key={item.id} value={item.id}>
                       <span
                         style={
                           item.attributes.name.includes("Destroy")

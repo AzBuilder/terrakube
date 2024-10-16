@@ -1,18 +1,21 @@
 package org.terrakube.registry.service.module;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
 import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.module.Module;
 import org.terrakube.client.model.organization.module.ModuleAttributes;
 import org.terrakube.client.model.organization.module.ModuleRequest;
 import org.terrakube.client.model.organization.ssh.Ssh;
 import org.terrakube.client.model.organization.vcs.Vcs;
+import org.terrakube.client.model.organization.vcs.github_app_token.GitHubAppToken;
 import org.terrakube.registry.plugin.storage.StorageService;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
@@ -47,13 +50,15 @@ public class ModuleServiceImpl implements ModuleService {
         String moduleSource = module.getAttributes().getSource();
         String vcsType = "PUBLIC";
         String accessToken = null;
+        String vcsConnectionType = null;
         String folder = module.getAttributes().getFolder();
         String tagPrefix = module.getAttributes().getTagPrefix();
 
         if (module.getRelationships().getVcs().getData() != null) {
             Vcs vcsInformation = getVcsInformation(organizationId, module.getRelationships().getVcs().getData().getId());
             vcsType = vcsInformation.getAttributes().getVcsType();
-            accessToken = vcsInformation.getAttributes().getAccessToken();
+            vcsConnectionType = vcsInformation.getAttributes().getConnectionType();
+            accessToken = getAccessToken(organizationId, vcsInformation.getId(), moduleSource);
         }
 
         if (module.getRelationships().getSsh().getData() != null) {
@@ -63,7 +68,7 @@ public class ModuleServiceImpl implements ModuleService {
         }
 
         moduleVersionPath = storageService.searchModule(
-                organizationName, moduleName, providerName, version, moduleSource, vcsType, accessToken, tagPrefix, folder
+                organizationName, moduleName, providerName, version, moduleSource, vcsType, vcsConnectionType, accessToken, tagPrefix, folder
         );
 
         if (countDownload)
@@ -84,6 +89,17 @@ public class ModuleServiceImpl implements ModuleService {
         terrakubeClient.updateModule(moduleRequest, organizationId, module.getId());
     }
 
+    private String getAccessToken(String organizationId, String vcsId, String repository_source) {
+        Vcs vcs = getVcsInformation(organizationId, vcsId);
+        if (vcs == null) return null;
+        String token = vcs.getAttributes().getAccessToken();
+        if(token == null && vcs.getAttributes().getConnectionType().equals("STANDALONE")) {
+            log.info("The VCS connection is on a standalone app, getting the GitHub App token");
+            GitHubAppToken gitHubAppToken = getGitHubAppTokenInformation(vcs.getRelationships().getOrganization().getData().getId(), vcs.getId(), repository_source);
+            token = gitHubAppToken.getAttributes().getToken();
+        }
+        return token;
+    }
     private Vcs getVcsInformation(String organizationId, String vcsId) {
         return terrakubeClient.getVcsById(organizationId, vcsId).getData();
     }
@@ -91,4 +107,12 @@ public class ModuleServiceImpl implements ModuleService {
     private Ssh getSshInformation(String organizationId, String sshId) {
         return terrakubeClient.getSshById(organizationId, sshId).getData();
     }
+    
+    private GitHubAppToken getGitHubAppTokenInformation(String organizationId, String vcsId, String repository_source) {
+        URI uri = URI.create(repository_source);
+        String owner = uri.getPath().split("/")[1];
+        List<GitHubAppToken> gitHubAppTokens = terrakubeClient.getGitHubAppTokenByVcsIdAndOwner(organizationId, vcsId, owner).getData();
+        if (gitHubAppTokens.size() == 0)  return null;
+        return gitHubAppTokens.get(0);
+    } 
 }

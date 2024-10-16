@@ -52,7 +52,7 @@ public class DynamicCredentialsService {
                 job.getId()
         );
 
-        log.info("ARM_OIDC_TOKEN: {}", jwtToken);
+        log.debug("ARM_OIDC_TOKEN: {}", jwtToken);
         workspaceEnvVariables.put("ARM_OIDC_TOKEN", jwtToken);
 
         return workspaceEnvVariables;
@@ -98,7 +98,7 @@ public class DynamicCredentialsService {
                 job.getId()
         );
 
-        log.info("TERRAKUBE_AWS_CREDENTIALS_FILE: {}", awsWebIdentityToken);
+        log.debug("TERRAKUBE_AWS_CREDENTIALS_FILE: {}", awsWebIdentityToken);
 
         workspaceEnvVariables.put("TERRAKUBE_AWS_CREDENTIALS_FILE", awsWebIdentityToken);
         workspaceEnvVariables.put("AWS_ROLE_ARN", workspaceEnvVariables.get("WORKLOAD_IDENTITY_ROLE_AWS"));
@@ -146,8 +146,8 @@ public class DynamicCredentialsService {
 
         googleCredentialConfigFile = String.format(googleCredentialConfigFile, audience, serviceAccountEmail, executorDirectory);
 
-        log.info("TERRAKUBE_GCP_CREDENTIALS_FILE: {}", googleCredentialsFile);
-        log.info("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE: {}", googleCredentialConfigFile);
+        log.debug("TERRAKUBE_GCP_CREDENTIALS_FILE: {}", googleCredentialsFile);
+        log.debug("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE: {}", googleCredentialConfigFile);
 
         workspaceEnvVariables.put("TERRAKUBE_GCP_CREDENTIALS_FILE", googleCredentialsFile);
         workspaceEnvVariables.put("TERRAKUBE_GCP_CREDENTIALS_CONFIG_FILE", googleCredentialConfigFile);

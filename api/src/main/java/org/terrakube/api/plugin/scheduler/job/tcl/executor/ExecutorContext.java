@@ -23,6 +23,7 @@ public class ExecutorContext {
     private String branch;
     private String folder;
     private String vcsType;
+    private String connectionType;
     private boolean refresh;
     private boolean refreshOnly;
     private boolean showHeader;

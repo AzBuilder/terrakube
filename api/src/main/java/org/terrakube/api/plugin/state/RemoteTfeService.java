@@ -1,12 +1,24 @@
 package org.terrakube.api.plugin.state;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.text.TextStringBuilder;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -20,14 +32,23 @@ import org.terrakube.api.plugin.state.model.entitlement.EntitlementModel;
 import org.terrakube.api.plugin.state.model.generic.Resource;
 import org.terrakube.api.plugin.state.model.organization.OrganizationData;
 import org.terrakube.api.plugin.state.model.organization.OrganizationModel;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityAttributes;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityData;
+import org.terrakube.api.plugin.state.model.organization.capacity.OrgCapacityModel;
 import org.terrakube.api.plugin.state.model.outputs.OutputData;
 import org.terrakube.api.plugin.state.model.outputs.StateOutputs;
 import org.terrakube.api.plugin.state.model.plan.PlanRunData;
 import org.terrakube.api.plugin.state.model.plan.PlanRunModel;
-import org.terrakube.api.plugin.state.model.runs.*;
+import org.terrakube.api.plugin.state.model.runs.ApplyModel;
+import org.terrakube.api.plugin.state.model.runs.Relationships;
+import org.terrakube.api.plugin.state.model.runs.RunEventsModel;
+import org.terrakube.api.plugin.state.model.runs.RunsData;
+import org.terrakube.api.plugin.state.model.runs.RunsDataList;
+import org.terrakube.api.plugin.state.model.runs.RunsModel;
 import org.terrakube.api.plugin.state.model.state.StateData;
 import org.terrakube.api.plugin.state.model.state.StateModel;
 import org.terrakube.api.plugin.state.model.terraform.TerraformState;
+import org.terrakube.api.plugin.state.model.workspace.CurrentRunModel;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceData;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
@@ -35,7 +56,16 @@ import org.terrakube.api.plugin.state.model.workspace.state.consumers.StateConsu
 import org.terrakube.api.plugin.state.model.workspace.tags.TagDataList;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.plugin.token.team.TeamTokenService;
-import org.terrakube.api.repository.*;
+import org.terrakube.api.repository.ArchiveRepository;
+import org.terrakube.api.repository.ContentRepository;
+import org.terrakube.api.repository.HistoryRepository;
+import org.terrakube.api.repository.JobRepository;
+import org.terrakube.api.repository.OrganizationRepository;
+import org.terrakube.api.repository.StepRepository;
+import org.terrakube.api.repository.TagRepository;
+import org.terrakube.api.repository.TemplateRepository;
+import org.terrakube.api.repository.WorkspaceRepository;
+import org.terrakube.api.repository.WorkspaceTagRepository;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
@@ -49,17 +79,15 @@ import org.terrakube.api.rs.workspace.history.archive.Archive;
 import org.terrakube.api.rs.workspace.history.archive.ArchiveType;
 import org.terrakube.api.rs.workspace.tag.WorkspaceTag;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class RemoteTfeService {
 
-    private static final String GENERIC_STATE_PATH = "%s/tfstate/v1/organization/%s/workspace/%s/jobId/%s/step/%s/terraform.tfstate";
     private JobRepository jobRepository;
     private ContentRepository contentRepository;
     private OrganizationRepository organizationRepository;
@@ -70,7 +98,9 @@ public class RemoteTfeService {
     private String hostname;
     private StorageTypeService storageTypeService;
     private StepRepository stepRepository;
+    @SuppressWarnings("rawtypes")
     private RedisTemplate redisTemplate;
+    private int executorCount;
 
     private TagRepository tagRepository;
 
@@ -81,20 +111,21 @@ public class RemoteTfeService {
     private ArchiveRepository archiveRepository;
 
     public RemoteTfeService(JobRepository jobRepository,
-                            ContentRepository contentRepository,
-                            OrganizationRepository organizationRepository,
-                            WorkspaceRepository workspaceRepository,
-                            HistoryRepository historyRepository,
-                            TemplateRepository templateRepository,
-                            ScheduleJobService scheduleJobService,
-                            @Value("${org.terrakube.hostname}") String hostname,
-                            StorageTypeService storageTypeService,
-                            StepRepository stepRepository,
-                            RedisTemplate redisTemplate,
-                            TagRepository tagRepository,
-                            WorkspaceTagRepository workspaceTagRepository,
-                            TeamTokenService teamTokenService,
-                            ArchiveRepository archiveRepository) {
+            ContentRepository contentRepository,
+            OrganizationRepository organizationRepository,
+            WorkspaceRepository workspaceRepository,
+            HistoryRepository historyRepository,
+            TemplateRepository templateRepository,
+            ScheduleJobService scheduleJobService,
+            @Value("${org.terrakube.hostname}") String hostname,
+            StorageTypeService storageTypeService,
+            StepRepository stepRepository,
+            @SuppressWarnings("rawtypes") RedisTemplate redisTemplate,
+            @Value("${org.terrakube.executor.replicas}") int executorCount,
+            TagRepository tagRepository,
+            WorkspaceTagRepository workspaceTagRepository,
+            TeamTokenService teamTokenService,
+            ArchiveRepository archiveRepository) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -106,6 +137,7 @@ public class RemoteTfeService {
         this.storageTypeService = storageTypeService;
         this.stepRepository = stepRepository;
         this.redisTemplate = redisTemplate;
+        this.executorCount = executorCount;
         this.tagRepository = tagRepository;
         this.workspaceTagRepository = workspaceTagRepository;
         this.teamTokenService = teamTokenService;
@@ -179,6 +211,25 @@ public class RemoteTfeService {
 
     }
 
+    OrgCapacityData getOrgCapacity(String organizationName, JwtAuthenticationToken currentUser) {
+        Organization organization = organizationRepository.getOrganizationByName(organizationName);
+
+        if (organization != null && validateUserIsMemberOrg(organization, currentUser)) {
+            OrgCapacityData orgCapacityData = new OrgCapacityData();
+            orgCapacityData.setData(new OrgCapacityModel());
+            orgCapacityData.getData().setAttributes(new OrgCapacityAttributes());
+            orgCapacityData.getData().getAttributes().setPending(0);
+
+            orgCapacityData.getData().setType("organization-capacity");
+            orgCapacityData.getData().getAttributes().setRunning(executorCount);
+            log.info("orgCapacityData: {}", orgCapacityData);
+            return orgCapacityData;
+        } else {
+            return null;
+        }
+
+    }
+
     OrganizationData getOrgInformation(String organizationName, JwtAuthenticationToken currentUser) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
         if (organization != null && validateUserIsMemberOrg(organization, currentUser)) {
@@ -225,7 +276,8 @@ public class RemoteTfeService {
         }
     }
 
-    WorkspaceData getWorkspace(String organizationName, String workspaceName, Map<String, Object> otherAttributes, JwtAuthenticationToken currentUser) {
+    WorkspaceData getWorkspace(String organizationName, String workspaceName, Map<String, Object> otherAttributes,
+            JwtAuthenticationToken currentUser) {
         Optional<Workspace> workspace = Optional
                 .ofNullable(workspaceRepository.getByOrganizationNameAndName(organizationName, workspaceName));
 
@@ -245,8 +297,10 @@ public class RemoteTfeService {
             attributes.put("execution-mode", workspace.get().getExecutionMode());
             attributes.put("global-remote-state", true);
 
-            if (workspace.get().getFolder() != null && workspace.get().getVcs() != null && !workspace.get().getFolder().equals("/")){
-                attributes.put("working-directory", workspace.get().getFolder());
+            if (workspace.get().getFolder() != null
+                    && (workspace.get().getVcs() != null || workspace.get().getSsh() != null)
+                    && !workspace.get().getFolder().split(",")[0].equals("/")) {
+                attributes.put("working-directory", workspace.get().getFolder().split(",")[0]);
             }
 
             boolean isManageWorkspace = validateUserManageWorkspace(workspace.get().getOrganization(), currentUser);
@@ -258,18 +312,18 @@ public class RemoteTfeService {
             defaultAttributes.put("can-lock", isManageWorkspace);
             defaultAttributes.put("can-manage-run-tasks", isManageWorkspace);
             defaultAttributes.put("can-manage-tags", isManageWorkspace);
-            defaultAttributes.put("can-queue-apply", isManageWorkspace);
+            defaultAttributes.put("can-queue-apply", true);
             defaultAttributes.put("can-queue-destroy", isManageWorkspace);
-            defaultAttributes.put("can-queue-run", isManageWorkspace);
-            defaultAttributes.put("can-read-settings", isManageWorkspace);
+            defaultAttributes.put("can-queue-run", true);
+            defaultAttributes.put("can-read-settings", true);
             defaultAttributes.put("can-read-state-versions", isManageWorkspace);
-            defaultAttributes.put("can-read-variable", isManageWorkspace);
+            defaultAttributes.put("can-read-variable", true);
             defaultAttributes.put("can-unlock", isManageWorkspace);
             defaultAttributes.put("can-update", isManageWorkspace);
             defaultAttributes.put("can-update-variable", isManageWorkspace);
             defaultAttributes.put("can-read-assessment-result", isManageWorkspace);
             defaultAttributes.put("can-force-delete", isManageWorkspace);
-            //defaultAttributes.put("structured-run-output-enabled", true);
+            // defaultAttributes.put("structured-run-output-enabled", true);
 
             attributes.put("permissions", defaultAttributes);
 
@@ -277,6 +331,18 @@ public class RemoteTfeService {
 
             workspaceModel.setAttributes(attributes);
             workspaceData.setData(workspaceModel);
+
+            Optional<Job> currentJob = jobRepository.findFirstByWorkspaceAndStatusInOrderByIdAsc(workspace.get(),
+                    Arrays.asList(JobStatus.pending, JobStatus.running, JobStatus.queue, JobStatus.waitingApproval));
+            if (currentJob.isPresent()) {
+                log.info("Found Current Job Id: {}", currentJob.get().getId());
+                workspaceModel.setRelationships(new org.terrakube.api.plugin.state.model.workspace.Relationships());
+                CurrentRunModel currentRunModel = new CurrentRunModel();
+                currentRunModel.setData(new Resource());
+                currentRunModel.getData().setId(String.valueOf(currentJob.get().getId()));
+                currentRunModel.getData().setType("runs");
+                workspaceModel.getRelationships().setCurrentRun(currentRunModel);
+            }
 
             return workspaceData;
         } else {
@@ -297,7 +363,8 @@ public class RemoteTfeService {
             workspaceData.getOrganization().getWorkspace().forEach(workspace -> {
                 if (!workspace.getId().toString().equals(workspaceId)) {
                     log.info("Adding workspace {} as state consumers", workspace.getName());
-                    stateConsumerList.getData().add(getWorkspace(workspace.getOrganization().getName(), workspace.getName(), new HashMap(), currentUser).getData());
+                    stateConsumerList.getData().add(getWorkspace(workspace.getOrganization().getName(),
+                            workspace.getName(), new HashMap(), currentUser).getData());
                 }
             });
         });
@@ -306,7 +373,8 @@ public class RemoteTfeService {
 
     }
 
-    WorkspaceList listWorkspace(String organizationName, Optional<String> searchTags, Optional<String> searchName, JwtAuthenticationToken currentUser) {
+    WorkspaceList listWorkspace(String organizationName, Optional<String> searchTags, Optional<String> searchName,
+            JwtAuthenticationToken currentUser) {
         WorkspaceList workspaceList = new WorkspaceList();
         workspaceList.setData(new ArrayList());
 
@@ -324,9 +392,11 @@ public class RemoteTfeService {
                         matchingTags++;
                     }
                 }
-                log.info("Workspace {} Tags Count {} Searching Tag Quantity {} Matched {}", workspace.getName(), workspaceTagList.size(), listTags.size(), matchingTags);
+                log.info("Workspace {} Tags Count {} Searching Tag Quantity {} Matched {}", workspace.getName(),
+                        workspaceTagList.size(), listTags.size(), matchingTags);
                 if (matchingTags == listTags.size()) {
-                    workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
+                    workspaceList.getData().add(
+                            getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
                 }
             }
         }
@@ -334,10 +404,12 @@ public class RemoteTfeService {
         if (searchName.isPresent()) {
             String searchNameData = searchName.get();
             log.info("Searching workspaces with name prefix: {}", searchNameData);
-            Optional<List<Workspace>> workspaceListByName = workspaceRepository.findWorkspacesByOrganizationNameAndNameStartingWith(organizationName, searchNameData);
-            if(workspaceListByName.isPresent())
+            Optional<List<Workspace>> workspaceListByName = workspaceRepository
+                    .findWorkspacesByOrganizationNameAndNameStartingWith(organizationName, searchNameData);
+            if (workspaceListByName.isPresent())
                 for (Workspace workspace : workspaceListByName.get()) {
-                        workspaceList.getData().add(getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
+                    workspaceList.getData().add(
+                            getWorkspace(organizationName, workspace.getName(), new HashMap(), currentUser).getData());
                 }
         }
         return workspaceList;
@@ -349,14 +421,16 @@ public class RemoteTfeService {
             Tag tag = searchOrCreateTagOrganization(workspace, tagModel.getAttributes().get("name"));
             log.info("Updating tag {} in Workspace {}", tagModel.getAttributes().get("name"), workspace.getName());
             if (workspaceTagRepository.getByWorkspaceAndTagId(workspace, tag.getId().toString()) == null) {
-                log.info("Tag {} does not exist in workspace {}, adding new tag to workspace...", tagModel.getAttributes().get("name"), workspace.getName());
+                log.info("Tag {} does not exist in workspace {}, adding new tag to workspace...",
+                        tagModel.getAttributes().get("name"), workspace.getName());
                 WorkspaceTag newWorkspaceTag = new WorkspaceTag();
                 newWorkspaceTag.setId(UUID.randomUUID());
                 newWorkspaceTag.setTagId(tag.getId().toString());
                 newWorkspaceTag.setWorkspace(workspace);
                 workspaceTagRepository.save(newWorkspaceTag);
             } else {
-                log.info("Tag {} exist in workspace {}, there is no need to update", tagModel.getAttributes().get("name"), workspace.getName());
+                log.info("Tag {} exist in workspace {}, there is no need to update",
+                        tagModel.getAttributes().get("name"), workspace.getName());
             }
         });
 
@@ -385,19 +459,24 @@ public class RemoteTfeService {
     }
 
     WorkspaceData updateWorkspace(String workspaceId, WorkspaceData workspaceData, JwtAuthenticationToken currentUser) {
-        Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
+        Optional<Workspace> workspace = Optional
+                .ofNullable(workspaceRepository.getReferenceById(UUID.fromString(workspaceId)));
 
-        log.info("Updating existing workspace {} in {}", workspace.get().getName(), workspace.get().getOrganization().getName());
+        log.info("Updating existing workspace {} in {}", workspace.get().getName(),
+                workspace.get().getOrganization().getName());
 
         Workspace updatedWorkspace = workspace.get();
-        updatedWorkspace.setTerraformVersion(workspaceData.getData().getAttributes().get("terraform-version").toString());
+        updatedWorkspace
+                .setTerraformVersion(workspaceData.getData().getAttributes().get("terraform-version").toString());
 
         workspaceRepository.save(updatedWorkspace);
 
-        return getWorkspace(updatedWorkspace.getOrganization().getName(), updatedWorkspace.getName(), new HashMap<>(), currentUser);
+        return getWorkspace(updatedWorkspace.getOrganization().getName(), updatedWorkspace.getName(), new HashMap<>(),
+                currentUser);
     }
 
-    WorkspaceData createWorkspace(String organizationName, WorkspaceData workspaceData, JwtAuthenticationToken currentUser) {
+    WorkspaceData createWorkspace(String organizationName, WorkspaceData workspaceData,
+            JwtAuthenticationToken currentUser) {
         Optional<Workspace> workspace = Optional.ofNullable(workspaceRepository.getByOrganizationNameAndName(
                 organizationName, workspaceData.getData().getAttributes().get("name").toString()));
 
@@ -442,6 +521,12 @@ public class RemoteTfeService {
         return getWorkspace(organizationName, workspace.getName(), otherAttributes, currentUser);
     }
 
+    public boolean isWorkspaceLocked(String workspaceId) {
+        Optional<Workspace> workspace = workspaceRepository.findById(UUID.fromString(workspaceId));
+        log.info("Checking Lock for Workspace: {} is locked {}", workspaceId, workspace.get().isLocked());
+        return workspace.get().isLocked();
+    }
+
     StateData createWorkspaceState(String workspaceId, StateData stateData) {
         log.info("Creating new workspace state for {}", workspaceId);
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
@@ -453,11 +538,14 @@ public class RemoteTfeService {
             terraformState = new String(Base64.getMimeDecoder().decode(decodedBytes));
         }
 
-        //According to API docs json-state is optional so if the value is not available we will upload a default "{}"
-        byte[] decodedBytesJson = (stateData.getData().getAttributes().get("json-state") != null) ? stateData.getData().getAttributes().get("json-state").toString().getBytes() : "{}".getBytes(StandardCharsets.UTF_8);
+        // According to API docs json-state is optional so if the value is not available
+        // we will upload a default "{}"
+        byte[] decodedBytesJson = (stateData.getData().getAttributes().get("json-state") != null)
+                ? stateData.getData().getAttributes().get("json-state").toString().getBytes()
+                : "{}".getBytes(StandardCharsets.UTF_8);
         String terraformStateJson = new String(Base64.getMimeDecoder().decode(decodedBytesJson));
 
-        //create dummy job
+        // create dummy job
         Job job = new Job();
         job.setWorkspace(workspace);
         job.setOrganization(workspace.getOrganization());
@@ -467,7 +555,7 @@ public class RemoteTfeService {
         job.setRefreshOnly(false);
         job = jobRepository.save(job);
 
-        //dummy step
+        // dummy step
         Step step = new Step();
         step.setJob(job);
         step.setName("Dummy State Uploaded");
@@ -475,11 +563,15 @@ public class RemoteTfeService {
         step.setStepNumber(100);
         stepRepository.save(step);
 
-        //create dummy history
+        // create dummy history
         History history = new History();
         history.setOutput("");
-        history.setSerial(stateData.getData().getAttributes().get("serial") != null ? Integer.parseInt(stateData.getData().getAttributes().get("serial").toString()): 1);
-        history.setLineage(stateData.getData().getAttributes().get("lineage") != null ? stateData.getData().getAttributes().get("lineage").toString(): null);
+        history.setSerial(stateData.getData().getAttributes().get("serial") != null
+                ? Integer.parseInt(stateData.getData().getAttributes().get("serial").toString())
+                : 1);
+        history.setLineage(stateData.getData().getAttributes().get("lineage") != null
+                ? stateData.getData().getAttributes().get("lineage").toString()
+                : null);
         history.setJobReference(String.valueOf(job.getId()));
         history.setWorkspace(workspace);
 
@@ -495,8 +587,9 @@ public class RemoteTfeService {
         history = historyRepository.save(history);
 
         if (terraformState != null) {
-            //upload state to backend storage
-            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformState, history.getId().toString());
+            // upload state to backend storage
+            storageTypeService.uploadState(workspace.getOrganization().getId().toString(), workspace.getId().toString(),
+                    terraformState, history.getId().toString());
         } else {
             log.warn("State field is empty, workspace state should be uploaded, creating new archive ...");
             Archive archiveState = new Archive();
@@ -510,8 +603,9 @@ public class RemoteTfeService {
             archiveRepository.save(archiveJsonState).getId();
         }
 
-        //upload json state to backend storage
-        storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(), workspace.getId().toString(), terraformStateJson, history.getId().toString());
+        // upload json state to backend storage
+        storageTypeService.uploadTerraformStateJson(workspace.getOrganization().getId().toString(),
+                workspace.getId().toString(), terraformStateJson, history.getId().toString());
 
         return getWorkspaceState(history.getId().toString());
     }
@@ -542,7 +636,6 @@ public class RemoteTfeService {
                             history.getWorkspace().getId(),
                             history.getId().toString()));
 
-
             Optional<Archive> archiveRawState = archiveRepository.findByHistoryAndType(history, ArchiveType.RAW);
             Optional<Archive> archiveJsonState = archiveRepository.findByHistoryAndType(history, ArchiveType.JSON);
 
@@ -553,14 +646,13 @@ public class RemoteTfeService {
                 responseAttributes.put("status", "finalized");
             }
 
-
-            if(archiveRawState.isPresent())
+            if (archiveRawState.isPresent())
                 responseAttributes.put("hosted-state-upload-url", String
                         .format("https://%s/tfstate/v1/archive/%s/terraform.tfstate",
                                 hostname,
                                 archiveRawState.get().getId()));
 
-            if(archiveJsonState.isPresent())
+            if (archiveJsonState.isPresent())
                 responseAttributes.put("hosted-json-state-upload-url", String
                         .format("https://%s/tfstate/v1/archive/%s/terraform.json.tfstate",
                                 hostname,
@@ -593,7 +685,8 @@ public class RemoteTfeService {
         log.info("Searching for existing terraform state for {} in the storage service", workspace.getId());
         byte[] currentState;
         try {
-            currentState = storageTypeService.getCurrentTerraformState(workspace.getOrganization().getId().toString(), workspaceId);
+            currentState = storageTypeService.getCurrentTerraformState(workspace.getOrganization().getId().toString(),
+                    workspaceId);
         } catch (Exception ex) {
             log.error("Exception searching state in storage");
             log.error(ex.getMessage());
@@ -616,7 +709,7 @@ public class RemoteTfeService {
                             workspace.getId().toString()));
 
             String stateString = new String(currentState, StandardCharsets.UTF_8);
-            Map<String,Object> result = new ObjectMapper().readValue(stateString, HashMap.class);
+            Map<String, Object> result = new ObjectMapper().readValue(stateString, HashMap.class);
             responseAttributes.put("serial", Integer.valueOf(result.get("serial").toString()));
             responseAttributes.put("terraform-version", result.get("terraform_version").toString());
             responseAttributes.put("status", "finalized");
@@ -704,8 +797,9 @@ public class RemoteTfeService {
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
         String sourceTarGz = String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz",
                 hostname, configurationId);
-        // we need to update the source only if the VCS connection is null and the branch is other than "remote-content"
-        if(workspace.getVcs() == null && workspace.getBranch().equals("remote-content")) {
+        // we need to update the source only if the VCS connection is null and the
+        // branch is other than "remote-content"
+        if (workspace.getVcs() == null && workspace.getBranch().equals("remote-content")) {
             workspace.setSource(sourceTarGz);
         }
         workspace = workspaceRepository.save(workspace);
@@ -715,8 +809,12 @@ public class RemoteTfeService {
         log.info("Creating Job");
         Job job = new Job();
         job.setPlanChanges(true);
-        job.setRefresh(runsData.getData().getAttributes().get("refresh") != null ? (boolean) runsData.getData().getAttributes().get("refresh") : true);
-        job.setRefreshOnly(runsData.getData().getAttributes().get("refresh-only") != null ? (boolean) runsData.getData().getAttributes().get("refresh-only") : false);
+        job.setRefresh(runsData.getData().getAttributes().get("refresh") != null
+                ? (boolean) runsData.getData().getAttributes().get("refresh")
+                : true);
+        job.setRefreshOnly(runsData.getData().getAttributes().get("refresh-only") != null
+                ? (boolean) runsData.getData().getAttributes().get("refresh-only")
+                : false);
         job.setWorkspace(workspace);
         job.setOrganization(workspace.getOrganization());
         job.setStatus(JobStatus.pending);
@@ -724,12 +822,15 @@ public class RemoteTfeService {
         job.setComments("terraform-cli");
         job.setVia("CLI");
         job.setTemplateReference(template.getId().toString());
-        // if the vcs connection is not null, we need to override the value inside the job
-        if(workspace.getVcs() != null){
-            log.warn("Workspace is using VCS connection, overriding vcs source and branch to run job using a remote plan");
+        // if the vcs connection is not null, we need to override the value inside the
+        // job
+        if (workspace.getVcs() != null || workspace.getSsh() != null) {
+            log.warn(
+                    "Workspace is using VCS connection, overriding vcs source and branch to run job using a remote plan");
             job.setOverrideBranch("remote-content");
             job.setOverrideSource(sourceTarGz);
         }
+
         job = jobRepository.save(job);
         log.info("Job Created");
         scheduleJobService.createJobContext(job);
@@ -752,82 +853,187 @@ public class RemoteTfeService {
 
     RunsData getRun(int runId, String include) {
         log.info("Searching Run {}", runId);
-        RunsData runsData = new RunsData();
-        RunsModel runsModel = new RunsModel();
-        runsModel.setId(String.valueOf(runId));
-        runsModel.setType("runs");
-        runsModel.setAttributes(new HashMap<>());
-
-        String planStatus = "running";
         Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
 
-        switch (job.getStatus()) {
-            case completed:
-                planStatus = "finished";
-                break;
-            case running:
-            case queue:
-                planStatus = "running";
-                break;
-            case failed:
-                planStatus = "errored";
-                break;
+        if (job.getWorkspace() != null) {
+            RunsData runsData = new RunsData();
+            RunsModel runsModel = new RunsModel();
+            runsModel.setId("run-" + runId);
+            runsModel.setType("runs");
+            runsModel.setAttributes(new HashMap<>());
+
+            String planStatus = "running";
+
+            switch (job.getStatus()) {
+                case completed:
+                    planStatus = "finished";
+                    break;
+                case pending:
+                    // check if any step is in status pending else we need to return running
+                    // check if workspace is not lock return running too
+                    Optional<Step> optionalStep = stepRepository.findFirstByJobIdOrderByStepNumber(job.getId());
+                    if (optionalStep.isPresent()) {
+                        Step step = optionalStep.get();
+                        if (step.getStatus().equals(JobStatus.pending)) {
+                            planStatus = "pending";
+                        } else {
+                            planStatus = "running";
+                        }
+                    } else {
+                        planStatus = "pending";
+                    }
+                    break;
+                case running:
+                case queue:
+                    planStatus = "running";
+                    break;
+                case failed:
+                    planStatus = "errored";
+                    break;
+                default:
+                    planStatus = "unknown";
+                    break;
+            }
+
+            runsModel.getAttributes().put("status", planStatus);
+            runsModel.getAttributes().put("has-changes", job.isPlanChanges());
+            runsModel.getAttributes().put("resource-additions", 1);
+            runsModel.getAttributes().put("resource-changes", 1);
+            runsModel.getAttributes().put("resource-destructions", 0);
+
+            HashMap<String, Object> actions = new HashMap<>();
+            actions.put("is-confirmable", true);
+            actions.put("is-discardable", true);
+            runsModel.getAttributes().put("actions", actions);
+
+            HashMap<String, Object> permissions = new HashMap<>();
+            permissions.put("can-apply", true);
+            runsModel.getAttributes().put("permissions", permissions);
+
+            runsData.setData(runsModel);
+            Relationships relationships = new Relationships();
+            org.terrakube.api.plugin.state.model.runs.PlanModel planModel = new org.terrakube.api.plugin.state.model.runs.PlanModel();
+            planModel.setData(new Resource());
+            planModel.getData().setType("plans");
+            planModel.getData().setId(String.valueOf(runId));
+            relationships.setPlan(planModel);
+
+            ApplyModel applyModel = new ApplyModel();
+            applyModel.setData(new Resource());
+            applyModel.getData().setType("applies");
+            applyModel.getData().setId(String.valueOf(runId));
+            relationships.setApply(applyModel);
+
+            org.terrakube.api.plugin.state.model.runs.WorkspaceModel workspaceModel = new org.terrakube.api.plugin.state.model.runs.WorkspaceModel();
+            workspaceModel.setData(new Resource());
+            workspaceModel.getData().setId(job.getWorkspace().getId().toString());
+            workspaceModel.getData().setType("workspaces");
+            relationships.setWorkspace(workspaceModel);
+
+            RunEventsModel runEventsModel = new RunEventsModel();
+            runEventsModel.setData(new ArrayList<Resource>());
+            relationships.setRunEventsModel(runEventsModel);
+
+            log.info("Included: {}", include);
+            // if(include != null && include.equals("workspace")){
+            // runsData.setIncluded(new ArrayList());
+            // runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(),
+            // job.getWorkspace().getName(), new HashMap<>()));
+            // }
+
+            runsData.getData().setRelationships(relationships);
+
+            log.info("{}", runsData.toString());
+            return runsData;
+        } else
+            return null;
+    }
+
+    RunsDataList getRunsQueue(String organizationName) {
+        RunsDataList runsDataList = new RunsDataList();
+        runsDataList.setData(new ArrayList<RunsModel>());
+        List<Job> jobList = jobRepository.findAllByStatusInOrderByIdAsc(
+                Arrays.asList(
+                        JobStatus.pending,
+                        JobStatus.running,
+                        JobStatus.queue,
+                        JobStatus.waitingApproval));
+
+        int runQueue = 1;
+        for (Job job : jobList) {
+            log.info("Run Queue {} job {}", runQueue, job.getId());
+            Optional<RunsData> runsData = Optional.ofNullable(getRun(job.getId(), null));
+            if (runsData.isPresent()) {
+                RunsModel runsModel = runsData.get().getData();
+                runsModel.getAttributes().put("position-in-queue", runQueue);
+                runsDataList.getData().add(runsModel);
+                runQueue = runQueue + 1;
+            }
         }
+        runsDataList.setCurrentPage(1);
+        runsDataList.setTotalPages(1);
+        return runsDataList;
+    }
 
-        runsModel.getAttributes().put("status", planStatus);
-        runsModel.getAttributes().put("has-changes", job.isPlanChanges());
-        runsModel.getAttributes().put("resource-additions", 1);
-        runsModel.getAttributes().put("resource-changes", 1);
-        runsModel.getAttributes().put("resource-destructions", 0);
+    RunsDataList getWorkspaceRuns(String workspaceId) {
+        RunsDataList runsDataList = new RunsDataList();
+        runsDataList.setData(new ArrayList<RunsModel>());
+        Optional<Workspace> workspaceList = workspaceRepository.findById(UUID.fromString(workspaceId));
+        if (!workspaceList.isPresent()) {
+            return runsDataList;
+        }
+        Workspace workspace = workspaceList.get();
+        jobRepository.findAllByWorkspaceAndStatusInOrderByIdDesc(workspace, Arrays.asList(
+                JobStatus.pending,
+                JobStatus.running,
+                JobStatus.queue,
+                JobStatus.waitingApproval)).forEach(job -> {
+                    log.info("Run Workspace {} job {}", workspace.getName(), job.getId());
+                    Optional<RunsData> runsData = Optional.ofNullable(getRun(job.getId(), null));
+                    runsDataList.getData().add(runsData.get().getData());
+                });
 
-        HashMap<String, Object> actions = new HashMap<>();
-        actions.put("is-confirmable", true);
-        actions.put("is-discardable", true);
-        runsModel.getAttributes().put("actions", actions);
-
-        HashMap<String, Object> permissions = new HashMap<>();
-        permissions.put("can-apply", true);
-        runsModel.getAttributes().put("permissions", permissions);
-
-        runsData.setData(runsModel);
-        Relationships relationships = new Relationships();
-        org.terrakube.api.plugin.state.model.runs.PlanModel planModel = new org.terrakube.api.plugin.state.model.runs.PlanModel();
-        planModel.setData(new Resource());
-        planModel.getData().setType("plans");
-        planModel.getData().setId(String.valueOf(runId));
-        relationships.setPlan(planModel);
-
-        ApplyModel applyModel = new ApplyModel();
-        applyModel.setData(new Resource());
-        applyModel.getData().setType("applies");
-        applyModel.getData().setId(String.valueOf(runId));
-        relationships.setApply(applyModel);
-
-        org.terrakube.api.plugin.state.model.runs.WorkspaceModel workspaceModel = new org.terrakube.api.plugin.state.model.runs.WorkspaceModel();
-        workspaceModel.setData(new Resource());
-        workspaceModel.getData().setId(job.getWorkspace().getId().toString());
-        workspaceModel.getData().setType("workspaces");
-        relationships.setWorkspace(workspaceModel);
-
-        RunEventsModel runEventsModel = new RunEventsModel();
-        runEventsModel.setData(new ArrayList());
-        relationships.setRunEventsModel(runEventsModel);
-
-        log.info("Included: {}", include);
-        //if(include != null && include.equals("workspace")){
-        //    runsData.setIncluded(new ArrayList());
-        //    runsData.getIncluded().add(getWorkspace(job.getOrganization().getName(), job.getWorkspace().getName(), new HashMap<>()));
-        //}
-
-        runsData.getData().setRelationships(relationships);
-
-        log.info("{}", runsData.toString());
-        return runsData;
+        runsDataList.setCurrentPage(1);
+        runsDataList.setTotalPages(1);
+        return runsDataList;
     }
 
     RunsData runApply(int runId) {
+
         Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
         if (job.getStep() != null && !job.getStep().isEmpty()) {
+
+            // We need to check if the run was only a plan
+            // If the job status is completed and only a plan was executed
+            // we need to add the apply so the job execution can continue
+            List<Step> steps = job.getStep();
+            if (job.getStatus().equals(JobStatus.completed) && steps.size() == 1
+                    && steps.get(0).getStepNumber() == 100) {
+                log.warn("Only a plan was executed, adding apply steps to job execution");
+                Step approvalStep = new Step();
+                approvalStep.setStatus(JobStatus.pending);
+                approvalStep.setStepNumber(150);
+                approvalStep.setName("Approve Plan from Terraform CLI");
+                approvalStep.setJob(job);
+                approvalStep = stepRepository.save(approvalStep);
+                log.warn("Approval Step {} added for job {}", approvalStep.getId(), job.getId());
+
+                Step applyStep = new Step();
+                applyStep.setStatus(JobStatus.pending);
+                applyStep.setStepNumber(200);
+                applyStep.setName("Terraform Apply from Terraform CLI");
+                applyStep.setJob(job);
+                applyStep = stepRepository.save(applyStep);
+                log.warn("Apply Step {} added for job {}", applyStep.getId(), job.getId());
+
+                Template cliTemplate = templateRepository.getByOrganizationNameAndName(job.getOrganization().getName(),
+                        "Terraform-Plan/Apply-Cli");
+                job.setTcl(cliTemplate.getTcl());
+                job.setStatus(JobStatus.pending);
+                job = jobRepository.save(job);
+                log.warn("Update job {} to status PENDING to continue execution", job.getId());
+            }
+
             for (Step step : job.getStep()) {
                 if (step.getStepNumber() == 150) {
                     step.setStatus(JobStatus.completed);
@@ -836,6 +1042,11 @@ public class RemoteTfeService {
                     stepRepository.save(step);
                     job.setStatus(JobStatus.pending);
                     jobRepository.save(job);
+                    try {
+                        scheduleJobService.createJobContextNow(job);
+                    } catch (SchedulerException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 }
             }
@@ -849,7 +1060,6 @@ public class RemoteTfeService {
             Job job = jobRepository.getReferenceById(Integer.valueOf(runId));
             job.setStatus(JobStatus.cancelled);
             jobRepository.save(job);
-            scheduleJobService.unlockWorkpace(job.getWorkspace().getId());
             scheduleJobService.deleteJobContext(job.getId());
         } catch (ParseException | SchedulerException e) {
             log.error(e.getMessage());
@@ -937,7 +1147,7 @@ public class RemoteTfeService {
         return applyRunData;
     }
 
-    byte[] getPlanLogs(int planId) {
+    byte[] getPlanLogs(int planId, int offset, int limit) {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutput = new TextStringBuilder();
@@ -947,18 +1157,22 @@ public class RemoteTfeService {
                     log.info("Checking logs for plan: {}", step.getId());
 
                     try {
-                        List<MapRecord> messagesPlan = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
-                                StreamReadOptions.empty().noack(),
-                                StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
+                        @SuppressWarnings("unchecked")
+                        List<MapRecord<String, String, String>> messagesPlan = redisTemplate.opsForStream()
+                                .read(StreamOffset.fromStart(String.valueOf(job.getId())),
+                                        StreamOffset.latest(String.valueOf(job.getId())));
 
-                        for (MapRecord mapRecord : messagesPlan) {
+                        for (MapRecord<String, String, String> mapRecord : messagesPlan) {
                             Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
-                            log.info("Data length {}", streamData.get("output").length());
                             logsOutput.appendln(streamData.get("output"));
-                            redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
                         }
 
-                        logs = logsOutput.toString().getBytes(StandardCharsets.UTF_8);
+                        String logsOutputString = logsOutput.toString();
+                        int potentialEndIndex = limit + offset;
+                        int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
+                                : logsOutputString.length();
+                        logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
+                        log.debug("{}", logs);
                     } catch (Exception ex) {
                         log.debug(ex.getMessage());
                     }
@@ -967,7 +1181,7 @@ public class RemoteTfeService {
         return logs;
     }
 
-    byte[] getApplyLogs(int planId) {
+    byte[] getApplyLogs(int planId, int offset, int limit) {
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutputApply = new TextStringBuilder();
@@ -977,18 +1191,22 @@ public class RemoteTfeService {
                     log.info("Checking logs stepId for apply: {}", step.getId());
 
                     try {
-                        List<MapRecord> messagesApply = redisTemplate.opsForStream().read(Consumer.from("CLI", String.valueOf(planId)),
-                                StreamReadOptions.empty().noack(),
-                                StreamOffset.create(String.valueOf(job.getId()), ReadOffset.lastConsumed()));
+                        @SuppressWarnings("unchecked")
+                        List<MapRecord<String, String, String>> messagesApply = redisTemplate.opsForStream().read(
+                                StreamOffset.fromStart(String.valueOf(job.getId())),
+                                StreamOffset.latest(String.valueOf(job.getId())));
 
-                        for (MapRecord mapRecord : messagesApply) {
+                        for (MapRecord<String, String, String> mapRecord : messagesApply) {
                             Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
                             logsOutputApply.appendln(streamData.get("output"));
-                            log.info("{}", streamData.get("output"));
-                            redisTemplate.opsForStream().acknowledge("CLI", mapRecord);
                         }
 
-                        logs = logsOutputApply.toString().getBytes(StandardCharsets.UTF_8);
+                        String logsOutputString = logsOutputApply.toString();
+                        int potentialEndIndex = limit + offset;
+                        int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
+                                : logsOutputString.length();
+                        logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
+                        log.debug("{}", logs);
                     } catch (Exception ex) {
                         log.debug(ex.getMessage());
                     }
@@ -997,18 +1215,19 @@ public class RemoteTfeService {
         return logs;
     }
 
-StateOutputs getCurrentOutputs(String workspaceId) {
+    StateOutputs getCurrentOutputs(String workspaceId) {
         StateOutputs stateOutputs = new StateOutputs();
         stateOutputs.setData(new ArrayList());
         try {
             Optional<Workspace> searchWorkspace = workspaceRepository.findById(UUID.fromString(workspaceId));
             if (searchWorkspace.isPresent()) {
                 Workspace workspace = searchWorkspace.get();
-                byte[] currentState = storageTypeService.getCurrentTerraformState(workspace.getOrganization().getId().toString(), workspaceId);
+                byte[] currentState = storageTypeService
+                        .getCurrentTerraformState(workspace.getOrganization().getId().toString(), workspaceId);
                 String state = new String(currentState, StandardCharsets.UTF_8);
                 TerraformState terraformState = new ObjectMapper().readValue(state, TerraformState.class);
 
-                terraformState.getOutputs().forEach((mapKey, mapValue) ->{
+                terraformState.getOutputs().forEach((mapKey, mapValue) -> {
                     log.info("Processing Key output: {}", mapKey);
 
                     OutputData outputData = new OutputData();
@@ -1017,16 +1236,16 @@ StateOutputs getCurrentOutputs(String workspaceId) {
                     outputData.setAttributes(new HashMap());
                     outputData.getAttributes().put("name", mapKey);
 
-                    LinkedHashMap linkedHashMap = (LinkedHashMap)  mapValue;
+                    LinkedHashMap linkedHashMap = (LinkedHashMap) mapValue;
 
                     outputData.getAttributes().put("value", linkedHashMap.get("value"));
 
                     if (linkedHashMap.get("sensitive") != null)
-                       outputData.getAttributes().put("sensitive", linkedHashMap.get("sensitive") );
+                        outputData.getAttributes().put("sensitive", linkedHashMap.get("sensitive"));
                     else
-                        outputData.getAttributes().put("sensitive", false );
+                        outputData.getAttributes().put("sensitive", false);
 
-                    if (linkedHashMap.get("type") instanceof String ) {
+                    if (linkedHashMap.get("type") instanceof String) {
                         outputData.getAttributes().put("type", "string");
                         outputData.getAttributes().put("detailed-type", "string");
                     } else {

@@ -4,16 +4,16 @@ resource "google_project_service" "services" {
 }
 
 resource "random_string" "random" {
-  length           = 3
-  special          = false
-  lower = true
-  upper = false
+  length  = 3
+  special = false
+  lower   = true
+  upper   = false
   numeric = false
 }
 
 locals {
-  workload_identity_pool_id = format("terrakube-pool%s",random_string.random.result)
-  workload_identity_pool_provider_id = format("terrakube-provider-%s",random_string.random.result)
+  workload_identity_pool_id          = format("terrakube-pool%s", random_string.random.result)
+  workload_identity_pool_provider_id = format("terrakube-provider-%s", random_string.random.result)
 }
 
 resource "google_iam_workload_identity_pool" "terrakube_pool" {
@@ -35,7 +35,7 @@ resource "google_iam_workload_identity_pool_provider" "terrakube_provider" {
   }
   attribute_condition = "assertion.sub.startsWith(\"organization:${var.terrakube_organization_name}:workspace:${var.terrakube_workspace_name}\")"
 
-  depends_on = [ google_iam_workload_identity_pool.terrakube_pool ]
+  depends_on = [google_iam_workload_identity_pool.terrakube_pool]
 }
 
 resource "google_service_account" "terrakube_service_account" {
@@ -63,7 +63,7 @@ resource "terrakube_workspace_cli" "dynamic_credentials_workspace" {
   iac_type        = "terraform"
   iac_version     = "1.5.7"
 
-  depends_on = [ data.terrakube_organization.org ]
+  depends_on = [data.terrakube_organization.org]
 }
 
 

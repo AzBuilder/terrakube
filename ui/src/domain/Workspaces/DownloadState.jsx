@@ -7,7 +7,7 @@ import { toPng, toSvg, toJpeg } from "html-to-image";
 import axiosInstance from "../../config/axiosConfig";
 import{BsFiletypeSvg,BsFiletypeJson,BsFiletypePng} from "react-icons/bs";
 
-export const DownloadState = ({stateUrl}) => {
+export const DownloadState = ({stateUrl, manageState}) => {
   function downloadImage(dataUrl, fileName) {
     const a = document.createElement("a");
     a.setAttribute("download", fileName);
@@ -134,7 +134,7 @@ export const DownloadState = ({stateUrl}) => {
   };
 
   return (
-    <Dropdown.Button menu={menuProps} onClick={handleButtonClick}>
+    <Dropdown.Button menu={menuProps} onClick={handleButtonClick} disabled={!manageState}>
       Download
     </Dropdown.Button>
   );

@@ -14,6 +14,8 @@ import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 import org.terrakube.executor.service.mode.TerraformJob;
 
+import java.io.IOException;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -31,7 +33,18 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
     @Override
     public void setRunningStatus(TerraformJob terraformJob, String commitId) {
         if (!executorFlagsProperties.isDisableAcknowledge()) {
-            Job job = terrakubeClient.getJobById(terraformJob.getOrganizationId(), terraformJob.getJobId()).getData();
+            Job job = null;
+            for(int retry=0; retry<5; retry++) {
+                job = terrakubeClient.getJobById(terraformJob.getOrganizationId(), terraformJob.getJobId()).getData();
+
+                if(!job.getRelationships().getStep().getData().isEmpty()){
+                    log.info("Step list is not empty...");
+                    break;
+                } else {
+                    log.error("Step list is empty for some reason...");
+                }
+            }
+
             job.getAttributes().setStatus("running");
             job.getAttributes().setCommitId(commitId);
 
