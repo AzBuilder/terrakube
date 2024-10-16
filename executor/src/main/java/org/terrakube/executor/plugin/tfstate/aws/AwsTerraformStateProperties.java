@@ -20,4 +20,7 @@ public class AwsTerraformStateProperties {
     private String region;
     private String endpoint;
     private boolean includeBackendKeys;
+    private boolean enableRoleAuthentication;
+    private String roleArn;
+    private String roleSessionName;
 }

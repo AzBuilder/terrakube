@@ -4,10 +4,15 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
+import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.google.auth.Credentials;
@@ -63,10 +68,37 @@ public class TerraformOutputAutoConfiguration {
                             .build();
                     break;
                 case AwsTerraformOutputImpl:
-                    AWSCredentials credentials = new BasicAWSCredentials(
-                            awsTerraformOutputProperties.getAccessKey(),
-                            awsTerraformOutputProperties.getSecretKey()
-                    );
+                    AWSStaticCredentialsProvider awsStaticCredentialsProvider = null;
+
+                    if(awsTerraformOutputProperties.isEnableRoleAuthentication()) {
+                        log.warn("Using aws role authentication");
+                        AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder
+                                .standard()
+                                .withRegion(awsTerraformOutputProperties.getRegion())
+                                .build();
+
+                        AssumeRoleRequest roleRequest = new AssumeRoleRequest()
+                                .withRoleArn(awsTerraformOutputProperties.getRoleArn())
+                                .withRoleSessionName(awsTerraformOutputProperties.getRoleSessionName());
+
+                        AssumeRoleResult assumeRoleResult = stsClient.assumeRole(roleRequest);
+
+                        com.amazonaws.services.securitytoken.model.Credentials sessionCredentials = assumeRoleResult.getCredentials();
+
+                        BasicSessionCredentials basicSessionCredentials = new BasicSessionCredentials(
+                                sessionCredentials.getAccessKeyId(), sessionCredentials.getSecretAccessKey(),
+                                sessionCredentials.getSessionToken());
+
+                        awsStaticCredentialsProvider= new AWSStaticCredentialsProvider(basicSessionCredentials);
+
+                    } else {
+                        log.warn("Using aws access key and secret key for authentication");
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformOutputProperties.getAccessKey(),
+                                awsTerraformOutputProperties.getSecretKey()
+                        );
+                        awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
+                    }
 
                     AmazonS3 s3client = null;
                     if (awsTerraformOutputProperties.getEndpoint() != "") {
@@ -78,12 +110,12 @@ public class TerraformOutputAutoConfiguration {
                                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsTerraformOutputProperties.getEndpoint(), awsTerraformOutputProperties.getRegion()))
                                 .withPathStyleAccessEnabled(true)
                                 .withClientConfiguration(clientConfiguration)
-                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                                .withCredentials(awsStaticCredentialsProvider)
                                 .build();
                     } else
                         s3client = AmazonS3ClientBuilder
                                 .standard()
-                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                                .withCredentials(awsStaticCredentialsProvider)
                                 .withRegion(Regions.fromName(awsTerraformOutputProperties.getRegion()))
                                 .build();
 

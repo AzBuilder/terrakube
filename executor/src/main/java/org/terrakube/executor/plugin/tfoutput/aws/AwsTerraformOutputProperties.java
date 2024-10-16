@@ -19,4 +19,7 @@ public class AwsTerraformOutputProperties {
     private String bucketName;
     private String region;
     private String endpoint;
+    private boolean enableRoleAuthentication;
+    private String roleArn;
+    private String roleSessionName;
 }
