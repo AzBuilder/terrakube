@@ -226,6 +226,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             boolean scriptBeforeSuccess;
             boolean scriptAfterSuccess;
 
+            terraformClient.setRedirectErrorStream(true);
             executeTerraformInit(
                     terraformJob,
                     terraformWorkingDir,
