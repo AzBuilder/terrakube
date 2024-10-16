@@ -54,6 +54,8 @@ public class AwsTerraformStateImpl implements TerraformState {
 
     private String endpoint;
 
+    private boolean includeBackendKeys;
+
     @NonNull
     TerrakubeClient terrakubeClient;
 
@@ -73,8 +75,13 @@ public class AwsTerraformStateImpl implements TerraformState {
             awsBackendHcl.appendln("    bucket     = \"" + bucketName + "\"");
             awsBackendHcl.appendln("    region     = \"" + region.getName() + "\"");
             awsBackendHcl.appendln("    key        = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
-            awsBackendHcl.appendln("    access_key = \"" + accessKey + "\"");
-            awsBackendHcl.appendln("    secret_key = \"" + secretKey + "\"");
+            if(includeBackendKeys) {
+                log.info("Including backend information");
+                awsBackendHcl.appendln("    access_key = \"" + accessKey + "\"");
+                awsBackendHcl.appendln("    secret_key = \"" + secretKey + "\"");
+            } else {
+              log.warn("No including backend information");
+            }
 
             if(endpoint != null){
                 if(version.compareTo(new ComparableVersion("1.6.0")) < 0){
