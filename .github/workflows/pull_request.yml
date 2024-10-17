@@ -40,7 +40,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       - name: Build Terrakube from Fork
-        if: ${{ github.event_name != 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: mvn clean install
 
   build-alpaquita:
