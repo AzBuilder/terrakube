@@ -1,13 +1,15 @@
 package org.terrakube.executor.plugin.tfstate.configuration;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.*;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
+import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.google.auth.Credentials;
@@ -72,29 +74,44 @@ public class TerraformStateAutoConfiguration {
                             .build();
                     break;
                 case AwsTerraformStateImpl:
-                    AWSCredentials credentials = new BasicAWSCredentials(
-                            awsTerraformStateProperties.getAccessKey(),
-                            awsTerraformStateProperties.getSecretKey()
-                    );
                     AmazonS3 s3client = null;
 
                     if (awsTerraformStateProperties.getEndpoint() != "") {
                         ClientConfiguration clientConfiguration = new ClientConfiguration();
                         clientConfiguration.setSignerOverride("AWSS3V4SignerType");
 
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformStateProperties.getAccessKey(),
+                                awsTerraformStateProperties.getSecretKey()
+                        );
+                        AWSStaticCredentialsProvider awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
+
                         s3client = AmazonS3ClientBuilder
                                 .standard()
                                 .withClientConfiguration(clientConfiguration)
                                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsTerraformStateProperties.getEndpoint(), awsTerraformStateProperties.getRegion()))
-                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                                .withCredentials(awsStaticCredentialsProvider)
                                 .withPathStyleAccessEnabled(true)
                                 .build();
-                    } else
+                    } else if (awsTerraformStateProperties.isEnableRoleAuthentication()) {
+                        log.info("Using Role Authentication");
+                        s3client = AmazonS3ClientBuilder.standard()
+                                .withCredentials(new DefaultAWSCredentialsProviderChain())
+                                .withRegion(awsTerraformStateProperties.getRegion())
+                                .build();
+                    } else {
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformStateProperties.getAccessKey(),
+                                awsTerraformStateProperties.getSecretKey()
+                        );
+                        AWSStaticCredentialsProvider awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
+
                         s3client = AmazonS3ClientBuilder
                                 .standard()
-                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                                .withCredentials(awsStaticCredentialsProvider)
                                 .withRegion(Regions.fromName(awsTerraformStateProperties.getRegion()))
                                 .build();
+                    }
 
                     terraformState = AwsTerraformStateImpl.builder()
                             .s3client(s3client)

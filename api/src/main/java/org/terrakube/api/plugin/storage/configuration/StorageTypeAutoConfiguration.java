@@ -1,13 +1,15 @@
 package org.terrakube.api.plugin.storage.configuration;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.*;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
+import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.google.auth.Credentials;
@@ -61,16 +63,17 @@ public class StorageTypeAutoConfiguration {
                         .build();
                 break;
             case AWS:
-                AWSCredentials credentials = new BasicAWSCredentials(
-                        awsStorageTypeProperties.getAccessKey(),
-                        awsStorageTypeProperties.getSecretKey()
-                );
-
                 AmazonS3 s3client = null;
                 if (!awsStorageTypeProperties.getEndpoint().equals("")) {
+                    log.info("Using S3 compatible Endpoint={}", awsStorageTypeProperties.getEndpoint());
                     ClientConfiguration clientConfiguration = new ClientConfiguration();
                     clientConfiguration.setSignerOverride("AWSS3V4SignerType");
-                    
+
+                    AWSCredentials credentials = new BasicAWSCredentials(
+                            awsStorageTypeProperties.getAccessKey(),
+                            awsStorageTypeProperties.getSecretKey()
+                    );
+
                     s3client = AmazonS3ClientBuilder
                             .standard()
                             .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsStorageTypeProperties.getEndpoint(), awsStorageTypeProperties.getRegion()))
@@ -78,12 +81,25 @@ public class StorageTypeAutoConfiguration {
                             .withClientConfiguration(clientConfiguration)
                             .withPathStyleAccessEnabled(true)
                             .build();
-                }else
-                    s3client = AmazonS3ClientBuilder
-                            .standard()
-                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                            .withRegion(Regions.fromName(awsStorageTypeProperties.getRegion()))
-                            .build();
+                }else if (awsStorageTypeProperties.isEnableRoleAuthentication()) {
+                        log.info("Using Role Authentication");
+                        s3client = AmazonS3ClientBuilder.standard()
+                                .withCredentials(new DefaultAWSCredentialsProviderChain())
+                                .withRegion(awsStorageTypeProperties.getRegion())
+                                .build();
+                    } else {
+                        log.info("Using Default S3 Authentication");
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsStorageTypeProperties.getAccessKey(),
+                                awsStorageTypeProperties.getSecretKey()
+                        );
+
+                        s3client = AmazonS3ClientBuilder
+                                .standard()
+                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                                .withRegion(Regions.fromName(awsStorageTypeProperties.getRegion()))
+                                .build();
+                    }
 
                 storageTypeService = AwsStorageTypeServiceImpl.builder()
                         .s3client(s3client)

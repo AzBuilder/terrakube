@@ -1,13 +1,15 @@
 package org.terrakube.executor.plugin.tfoutput.configuration;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.*;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
+import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.google.auth.Credentials;
@@ -63,15 +65,16 @@ public class TerraformOutputAutoConfiguration {
                             .build();
                     break;
                 case AwsTerraformOutputImpl:
-                    AWSCredentials credentials = new BasicAWSCredentials(
-                            awsTerraformOutputProperties.getAccessKey(),
-                            awsTerraformOutputProperties.getSecretKey()
-                    );
-
                     AmazonS3 s3client = null;
                     if (awsTerraformOutputProperties.getEndpoint() != "") {
+                        log.info("Using S3 compatible Endpoint={}", awsTerraformOutputProperties.getEndpoint());
                         ClientConfiguration clientConfiguration = new ClientConfiguration();
                         clientConfiguration.setSignerOverride("AWSS3V4SignerType");
+
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformOutputProperties.getAccessKey(),
+                                awsTerraformOutputProperties.getSecretKey()
+                        );
 
                         s3client = AmazonS3ClientBuilder
                                 .standard()
@@ -80,12 +83,25 @@ public class TerraformOutputAutoConfiguration {
                                 .withClientConfiguration(clientConfiguration)
                                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                                 .build();
-                    } else
+                    } else if (awsTerraformOutputProperties.isEnableRoleAuthentication()) {
+                        log.info("Using Role Authentication");
+                        s3client = AmazonS3ClientBuilder.standard()
+                                .withCredentials(new DefaultAWSCredentialsProviderChain())
+                                .withRegion(awsTerraformOutputProperties.getRegion())
+                                .build();
+                    } else {
+                        log.info("Using Default S3 Authentication");
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformOutputProperties.getAccessKey(),
+                                awsTerraformOutputProperties.getSecretKey()
+                        );
+
                         s3client = AmazonS3ClientBuilder
                                 .standard()
                                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                                 .withRegion(Regions.fromName(awsTerraformOutputProperties.getRegion()))
                                 .build();
+                    }
 
                     terraformOutput = AwsTerraformOutputImpl.builder()
                             .s3client(s3client)

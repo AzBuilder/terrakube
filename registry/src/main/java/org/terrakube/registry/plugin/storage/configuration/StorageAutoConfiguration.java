@@ -1,13 +1,15 @@
 package org.terrakube.registry.plugin.storage.configuration;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.*;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
+import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.google.auth.Credentials;
@@ -66,30 +68,40 @@ public class StorageAutoConfiguration {
                         .build();
                 break;
             case AwsStorageImpl:
-
-                AWSCredentials credentials = new BasicAWSCredentials(
-                        awsStorageServiceProperties.getAccessKey(),
-                        awsStorageServiceProperties.getSecretKey()
-                );
-
                 AmazonS3 s3client;
+
                 if (awsStorageServiceProperties.getEndpoint() != "") {
+                    log.info("Using S3 compatible Endpoint={}", awsStorageServiceProperties.getEndpoint());
                     ClientConfiguration clientConfiguration = new ClientConfiguration();
                     clientConfiguration.setSignerOverride("AWSS3V4SignerType");
-                    
+
                     s3client = AmazonS3ClientBuilder
                             .standard()
                             .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsStorageServiceProperties.getEndpoint(), awsStorageServiceProperties.getRegion()))
-                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                            .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(
+                                    awsStorageServiceProperties.getAccessKey(),
+                                    awsStorageServiceProperties.getSecretKey()
+                            )))
                             .withClientConfiguration(clientConfiguration)
                             .withPathStyleAccessEnabled(true)
                             .build();
-                } else
+                } else if (awsStorageServiceProperties.isEnableRoleAuthentication()) {
+                    log.info("Using Role Authentication");
+                    s3client = AmazonS3ClientBuilder.standard()
+                            .withCredentials(new DefaultAWSCredentialsProviderChain())
+                            .withRegion(awsStorageServiceProperties.getRegion())
+                            .build();
+                } else {
+                    log.info("Using Default S3 Authentication");
                     s3client = AmazonS3ClientBuilder
                             .standard()
-                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                            .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(
+                                    awsStorageServiceProperties.getAccessKey(),
+                                    awsStorageServiceProperties.getSecretKey()
+                            )))
                             .withRegion(Regions.fromName(awsStorageServiceProperties.getRegion()))
                             .build();
+                }
 
                 storageService = AwsStorageServiceImpl.builder()
                         .s3client(s3client)
