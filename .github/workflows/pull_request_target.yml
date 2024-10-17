@@ -1,4 +1,4 @@
-name: Build Terrakube Backend
+name: Build Terrakube Backend from Forks
 
 on:
   push:
