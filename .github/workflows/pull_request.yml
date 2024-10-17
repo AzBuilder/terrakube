@@ -1,4 +1,4 @@
-name: Build Terrakube Backend from Repo
+name: Build Terrakube Backend
 
 on:
   push:
