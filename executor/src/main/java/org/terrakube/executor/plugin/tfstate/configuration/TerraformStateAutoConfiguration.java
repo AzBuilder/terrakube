@@ -1,10 +1,7 @@
 package org.terrakube.executor.plugin.tfstate.configuration;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.auth.*;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -77,42 +74,17 @@ public class TerraformStateAutoConfiguration {
                             .build();
                     break;
                 case AwsTerraformStateImpl:
-                    AWSStaticCredentialsProvider awsStaticCredentialsProvider = null;
-
-                    if(awsTerraformStateProperties.isEnableRoleAuthentication()) {
-                        log.warn("Using aws role authentication");
-                        AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder
-                                .standard()
-                                .withRegion(awsTerraformStateProperties.getRegion())
-                                .build();
-
-                        AssumeRoleRequest roleRequest = new AssumeRoleRequest()
-                                .withRoleArn(awsTerraformStateProperties.getRoleArn())
-                                .withRoleSessionName(awsTerraformStateProperties.getRoleSessionName());
-
-                        AssumeRoleResult assumeRoleResult = stsClient.assumeRole(roleRequest);
-
-                        com.amazonaws.services.securitytoken.model.Credentials sessionCredentials = assumeRoleResult.getCredentials();
-
-                        BasicSessionCredentials basicSessionCredentials = new BasicSessionCredentials(
-                                sessionCredentials.getAccessKeyId(), sessionCredentials.getSecretAccessKey(),
-                                sessionCredentials.getSessionToken());
-
-                        awsStaticCredentialsProvider= new AWSStaticCredentialsProvider(basicSessionCredentials);
-
-                    } else {
-                        log.warn("Using aws access key and secret key for authentication");
-                        AWSCredentials credentials = new BasicAWSCredentials(
-                                awsTerraformStateProperties.getAccessKey(),
-                                awsTerraformStateProperties.getSecretKey()
-                        );
-                        awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
-                    }
                     AmazonS3 s3client = null;
 
                     if (awsTerraformStateProperties.getEndpoint() != "") {
                         ClientConfiguration clientConfiguration = new ClientConfiguration();
                         clientConfiguration.setSignerOverride("AWSS3V4SignerType");
+
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformStateProperties.getAccessKey(),
+                                awsTerraformStateProperties.getSecretKey()
+                        );
+                        AWSStaticCredentialsProvider awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
 
                         s3client = AmazonS3ClientBuilder
                                 .standard()
@@ -121,12 +93,25 @@ public class TerraformStateAutoConfiguration {
                                 .withCredentials(awsStaticCredentialsProvider)
                                 .withPathStyleAccessEnabled(true)
                                 .build();
-                    } else
+                    } else if (awsTerraformStateProperties.isEnableRoleAuthentication()) {
+                        log.info("Using Role Authentication");
+                        s3client = AmazonS3ClientBuilder.standard()
+                                .withCredentials(new DefaultAWSCredentialsProviderChain())
+                                .withRegion(awsTerraformStateProperties.getRegion())
+                                .build();
+                    } else {
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformStateProperties.getAccessKey(),
+                                awsTerraformStateProperties.getSecretKey()
+                        );
+                        AWSStaticCredentialsProvider awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
+
                         s3client = AmazonS3ClientBuilder
                                 .standard()
                                 .withCredentials(awsStaticCredentialsProvider)
                                 .withRegion(Regions.fromName(awsTerraformStateProperties.getRegion()))
                                 .build();
+                    }
 
                     terraformState = AwsTerraformStateImpl.builder()
                             .s3client(s3client)

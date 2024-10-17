@@ -1,10 +1,7 @@
 package org.terrakube.executor.plugin.tfoutput.configuration;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.auth.*;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -68,56 +65,43 @@ public class TerraformOutputAutoConfiguration {
                             .build();
                     break;
                 case AwsTerraformOutputImpl:
-                    AWSStaticCredentialsProvider awsStaticCredentialsProvider = null;
+                    AmazonS3 s3client = null;
+                    if (awsTerraformOutputProperties.getEndpoint() != "") {
+                        log.info("Using S3 compatible Endpoint={}", awsTerraformOutputProperties.getEndpoint());
+                        ClientConfiguration clientConfiguration = new ClientConfiguration();
+                        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
 
-                    if(awsTerraformOutputProperties.isEnableRoleAuthentication()) {
-                        log.warn("Using aws role authentication");
-                        AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder
-                                .standard()
-                                .withRegion(awsTerraformOutputProperties.getRegion())
-                                .build();
-
-                        AssumeRoleRequest roleRequest = new AssumeRoleRequest()
-                                .withRoleArn(awsTerraformOutputProperties.getRoleArn())
-                                .withRoleSessionName(awsTerraformOutputProperties.getRoleSessionName());
-
-                        AssumeRoleResult assumeRoleResult = stsClient.assumeRole(roleRequest);
-
-                        com.amazonaws.services.securitytoken.model.Credentials sessionCredentials = assumeRoleResult.getCredentials();
-
-                        BasicSessionCredentials basicSessionCredentials = new BasicSessionCredentials(
-                                sessionCredentials.getAccessKeyId(), sessionCredentials.getSecretAccessKey(),
-                                sessionCredentials.getSessionToken());
-
-                        awsStaticCredentialsProvider= new AWSStaticCredentialsProvider(basicSessionCredentials);
-
-                    } else {
-                        log.warn("Using aws access key and secret key for authentication");
                         AWSCredentials credentials = new BasicAWSCredentials(
                                 awsTerraformOutputProperties.getAccessKey(),
                                 awsTerraformOutputProperties.getSecretKey()
                         );
-                        awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
-                    }
-
-                    AmazonS3 s3client = null;
-                    if (awsTerraformOutputProperties.getEndpoint() != "") {
-                        ClientConfiguration clientConfiguration = new ClientConfiguration();
-                        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
 
                         s3client = AmazonS3ClientBuilder
                                 .standard()
                                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsTerraformOutputProperties.getEndpoint(), awsTerraformOutputProperties.getRegion()))
                                 .withPathStyleAccessEnabled(true)
                                 .withClientConfiguration(clientConfiguration)
-                                .withCredentials(awsStaticCredentialsProvider)
+                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
                                 .build();
-                    } else
+                    } else if (awsTerraformOutputProperties.isEnableRoleAuthentication()) {
+                        log.info("Using Role Authentication");
+                        s3client = AmazonS3ClientBuilder.standard()
+                                .withCredentials(new DefaultAWSCredentialsProviderChain())
+                                .withRegion(awsTerraformOutputProperties.getRegion())
+                                .build();
+                    } else {
+                        log.info("Using Default S3 Authentication");
+                        AWSCredentials credentials = new BasicAWSCredentials(
+                                awsTerraformOutputProperties.getAccessKey(),
+                                awsTerraformOutputProperties.getSecretKey()
+                        );
+
                         s3client = AmazonS3ClientBuilder
                                 .standard()
-                                .withCredentials(awsStaticCredentialsProvider)
+                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
                                 .withRegion(Regions.fromName(awsTerraformOutputProperties.getRegion()))
                                 .build();
+                    }
 
                     terraformOutput = AwsTerraformOutputImpl.builder()
                             .s3client(s3client)

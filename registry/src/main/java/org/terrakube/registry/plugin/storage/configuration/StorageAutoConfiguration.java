@@ -1,10 +1,7 @@
 package org.terrakube.registry.plugin.storage.configuration;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.auth.*;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -71,57 +68,40 @@ public class StorageAutoConfiguration {
                         .build();
                 break;
             case AwsStorageImpl:
-
-                AWSStaticCredentialsProvider awsStaticCredentialsProvider = null;
-
-                if(awsStorageServiceProperties.isEnableRoleAuthentication()) {
-                    log.warn("Using aws role authentication");
-                    AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder
-                            .standard()
-                            .withRegion(awsStorageServiceProperties.getRegion())
-                            .build();
-
-                    AssumeRoleRequest roleRequest = new AssumeRoleRequest()
-                            .withRoleArn(awsStorageServiceProperties.getRoleArn())
-                            .withRoleSessionName(awsStorageServiceProperties.getRoleSessionName());
-
-                    AssumeRoleResult assumeRoleResult = stsClient.assumeRole(roleRequest);
-
-                    com.amazonaws.services.securitytoken.model.Credentials sessionCredentials = assumeRoleResult.getCredentials();
-
-                    BasicSessionCredentials basicSessionCredentials = new BasicSessionCredentials(
-                            sessionCredentials.getAccessKeyId(), sessionCredentials.getSecretAccessKey(),
-                            sessionCredentials.getSessionToken());
-
-                    awsStaticCredentialsProvider= new AWSStaticCredentialsProvider(basicSessionCredentials);
-
-                } else {
-                    log.warn("Using aws access key and secret key for authentication");
-                    AWSCredentials credentials = new BasicAWSCredentials(
-                            awsStorageServiceProperties.getAccessKey(),
-                            awsStorageServiceProperties.getSecretKey()
-                    );
-                    awsStaticCredentialsProvider = new AWSStaticCredentialsProvider(credentials);
-                }
-
                 AmazonS3 s3client;
+
                 if (awsStorageServiceProperties.getEndpoint() != "") {
+                    log.info("Using S3 compatible Endpoint={}", awsStorageServiceProperties.getEndpoint());
                     ClientConfiguration clientConfiguration = new ClientConfiguration();
                     clientConfiguration.setSignerOverride("AWSS3V4SignerType");
-                    
+
                     s3client = AmazonS3ClientBuilder
                             .standard()
                             .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsStorageServiceProperties.getEndpoint(), awsStorageServiceProperties.getRegion()))
-                            .withCredentials(awsStaticCredentialsProvider)
+                            .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(
+                                    awsStorageServiceProperties.getAccessKey(),
+                                    awsStorageServiceProperties.getSecretKey()
+                            )))
                             .withClientConfiguration(clientConfiguration)
                             .withPathStyleAccessEnabled(true)
                             .build();
-                } else
+                } else if (awsStorageServiceProperties.isEnableRoleAuthentication()) {
+                    log.info("Using Role Authentication");
+                    s3client = AmazonS3ClientBuilder.standard()
+                            .withCredentials(new DefaultAWSCredentialsProviderChain())
+                            .withRegion(awsStorageServiceProperties.getRegion())
+                            .build();
+                } else {
+                    log.info("Using Default S3 Authentication");
                     s3client = AmazonS3ClientBuilder
                             .standard()
-                            .withCredentials(awsStaticCredentialsProvider)
+                            .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(
+                                    awsStorageServiceProperties.getAccessKey(),
+                                    awsStorageServiceProperties.getSecretKey()
+                            )))
                             .withRegion(Regions.fromName(awsStorageServiceProperties.getRegion()))
                             .build();
+                }
 
                 storageService = AwsStorageServiceImpl.builder()
                         .s3client(s3client)
