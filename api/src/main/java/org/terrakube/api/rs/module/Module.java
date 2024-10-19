@@ -1,9 +1,9 @@
 package org.terrakube.api.rs.module;
 
-import com.yahoo.elide.annotation.*;
-import com.yahoo.elide.core.RequestScope;
-import lombok.Getter;
-import lombok.Setter;
+import java.sql.Types;
+import java.util.List;
+import java.util.UUID;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
@@ -13,10 +13,28 @@ import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.GitHubAppToken;
 import org.terrakube.api.rs.vcs.Vcs;
 
-import jakarta.persistence.*;
+import com.yahoo.elide.annotation.ComputedAttribute;
+import com.yahoo.elide.annotation.CreatePermission;
+import com.yahoo.elide.annotation.DeletePermission;
+import com.yahoo.elide.annotation.Exclude;
+import com.yahoo.elide.annotation.Include;
+import com.yahoo.elide.annotation.LifeCycleHookBinding;
+import com.yahoo.elide.annotation.ReadPermission;
+import com.yahoo.elide.annotation.UpdatePermission;
+import com.yahoo.elide.core.RequestScope;
 
-import java.sql.Types;
-import java.util.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
 
 @ReadPermission(expression = "team view module")
 @CreatePermission(expression = "team manage module")
@@ -81,7 +99,7 @@ public class Module extends GenericAuditFields {
     private Ssh ssh;
     
     // This can go if the the logic in the above GitTagsCache is moved to serivce layer
-    @OneToOne
-    @PrimaryKeyJoinColumn(name = "github_app_token_id")
+    @ManyToOne
+    @JoinColumn(name = "github_app_token_id")
     private GitHubAppToken gitHubAppToken;
 }
