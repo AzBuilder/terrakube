@@ -23,7 +23,6 @@
         <lombok.version>1.18.34</lombok.version>
         <jgit.version>7.0.0.202409031743-r</jgit.version>
         <rest-assured.version>5.5.0</rest-assured.version>
-        <junit-jupiter-api.version>5.10.3</junit-jupiter-api.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.4</postgresql.version>
         <mysql.version>8.2.0</mysql.version>
@@ -194,18 +193,6 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit-jupiter-api.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
