@@ -22,7 +22,6 @@
 		<commons-io.version>2.17.0</commons-io.version>
 		<mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
 		<rest-assured.version>5.5.0</rest-assured.version>
-		<junit-jupiter-api.version>5.10.3</junit-jupiter-api.version>
 		<!--groovy.version>3.0.8</groovy.version-->
 		<aws-sdk.version>1.12.773</aws-sdk.version>
 		<zt-zip.version>1.17</zt-zip.version>
@@ -138,18 +137,6 @@
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 			<version>${rest-assured.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${junit-jupiter-api.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit-jupiter-api.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
