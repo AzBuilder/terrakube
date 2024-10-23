@@ -72,17 +72,24 @@ public class AwsStorageServiceImpl implements StorageService {
     }
 
     public boolean doesObjectExistByListObjects(String bucketName, String key) {
-        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
-                .bucket(bucketName)
-                .build();
-        ListObjectsV2Response listObjectsV2Response = s3client.listObjectsV2(listObjectsV2Request);
+        try {
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
 
-        return listObjectsV2Response.contents()
-                .stream()
-                .filter(s3ObjectSummary -> s3ObjectSummary.getValueForField("key", String.class)
-                        .equals(key))
-                .findFirst()
-                .isPresent();
+            s3client.headObject(headObjectRequest);
+
+            log.info("Object exists: {}", key);
+            return true;
+        } catch (S3Exception e) {
+            if (e.statusCode() == 404) {
+                log.info("Object does not exist");
+                return false;
+            } else {
+                throw e;
+            }
+        }
     }
 
     @Override
