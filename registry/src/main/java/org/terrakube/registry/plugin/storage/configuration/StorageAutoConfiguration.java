@@ -26,14 +26,18 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.endpoints.Endpoint;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.endpoints.S3EndpointParams;
+import software.amazon.awssdk.services.s3.endpoints.S3EndpointProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Base64;
+import java.util.concurrent.CompletableFuture;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -71,9 +75,16 @@ public class StorageAutoConfiguration {
                 if (awsStorageServiceProperties.getEndpoint() != "") {
                     log.info("Creating AWS SDK with custom endpoint and custom credentials");
                     s3client = S3Client.builder()
-                            .region(Region.of(awsStorageServiceProperties.getRegion()))
+                            .region(Region.AWS_GLOBAL)
                             .credentialsProvider(StaticCredentialsProvider.create(getAwsBasicCredentials(awsStorageServiceProperties)))
-                            .endpointOverride(URI.create(awsStorageServiceProperties.getEndpoint()))
+                            .endpointProvider(new S3EndpointProvider() {
+                                @Override
+                                public CompletableFuture<Endpoint> resolveEndpoint(S3EndpointParams endpointParams) {
+                                    return CompletableFuture.completedFuture(Endpoint.builder()
+                                            .url(URI.create(awsStorageServiceProperties.getEndpoint() + "/" + endpointParams.bucket()))
+                                            .build());
+                                }
+                            })
                             .build();
 
                 } else {
