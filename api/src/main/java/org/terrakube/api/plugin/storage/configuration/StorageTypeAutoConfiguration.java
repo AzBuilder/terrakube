@@ -64,7 +64,7 @@ public class StorageTypeAutoConfiguration {
                 break;
             case AWS:
                 S3Client s3client;
-                if (awsStorageTypeProperties.getEndpoint() != "") {
+                if (awsStorageTypeProperties.getEndpoint() != null && !awsStorageTypeProperties.getEndpoint().isEmpty()) {
                     log.info("Creating AWS SDK with custom endpoint and custom credentials");
                     s3client = S3Client.builder()
                             .region(Region.AWS_GLOBAL)

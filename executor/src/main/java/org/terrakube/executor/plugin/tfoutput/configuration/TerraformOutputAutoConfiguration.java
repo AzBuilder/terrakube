@@ -66,7 +66,7 @@ public class TerraformOutputAutoConfiguration {
                     break;
                 case AwsTerraformOutputImpl:
                     S3Client s3client = null;
-                    if (awsTerraformOutputProperties.getEndpoint() != "") {
+                    if (awsTerraformOutputProperties.getEndpoint() != null && !awsTerraformOutputProperties.getEndpoint().isEmpty()) {
                         log.info("Creating AWS SDK with custom endpoint and custom credentials");
                         s3client = S3Client.builder()
                                 .region(Region.AWS_GLOBAL)
