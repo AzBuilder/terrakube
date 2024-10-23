@@ -12,8 +12,6 @@ import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -54,7 +52,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
                     ResponseTransformer.toBytes());
             data = objectBytes.asByteArray();
         } catch (Exception e) {
-            log.error(S3_ERROR_LOG, e.getMessage());
+            log.debug(S3_ERROR_LOG, e.getMessage());
             data = new byte[0];
         }
         return data;
