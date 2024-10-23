@@ -1,13 +1,6 @@
 package org.terrakube.registry.plugin.storage.configuration;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.google.auth.Credentials;
@@ -15,6 +8,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.terrakube.registry.configuration.OpenRegistryProperties;
 import org.terrakube.registry.plugin.storage.StorageService;
 import org.terrakube.registry.plugin.storage.aws.AwsStorageServiceImpl;
@@ -29,10 +23,21 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.endpoints.Endpoint;
+import software.amazon.awssdk.http.SdkHttpClient;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.endpoints.S3EndpointParams;
+import software.amazon.awssdk.services.s3.endpoints.S3EndpointProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Base64;
+import java.util.concurrent.CompletableFuture;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -66,30 +71,38 @@ public class StorageAutoConfiguration {
                         .build();
                 break;
             case AwsStorageImpl:
-
-                AWSCredentials credentials = new BasicAWSCredentials(
-                        awsStorageServiceProperties.getAccessKey(),
-                        awsStorageServiceProperties.getSecretKey()
-                );
-
-                AmazonS3 s3client;
+                S3Client s3client;
                 if (awsStorageServiceProperties.getEndpoint() != "") {
-                    ClientConfiguration clientConfiguration = new ClientConfiguration();
-                    clientConfiguration.setSignerOverride("AWSS3V4SignerType");
-                    
-                    s3client = AmazonS3ClientBuilder
-                            .standard()
-                            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsStorageServiceProperties.getEndpoint(), awsStorageServiceProperties.getRegion()))
-                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                            .withClientConfiguration(clientConfiguration)
-                            .withPathStyleAccessEnabled(true)
+                    log.info("Creating AWS SDK with custom endpoint and custom credentials");
+                    s3client = S3Client.builder()
+                            .region(Region.AWS_GLOBAL)
+                            .credentialsProvider(StaticCredentialsProvider.create(getAwsBasicCredentials(awsStorageServiceProperties)))
+                            .endpointProvider(new S3EndpointProvider() {
+                                @Override
+                                public CompletableFuture<Endpoint> resolveEndpoint(S3EndpointParams endpointParams) {
+                                    return CompletableFuture.completedFuture(Endpoint.builder()
+                                            .url(URI.create(awsStorageServiceProperties.getEndpoint() + "/" + endpointParams.bucket()))
+                                            .build());
+                                }
+                            })
                             .build();
-                } else
-                    s3client = AmazonS3ClientBuilder
-                            .standard()
-                            .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                            .withRegion(Regions.fromName(awsStorageServiceProperties.getRegion()))
-                            .build();
+
+                } else {
+                    if (awsStorageServiceProperties.isEnableRoleAuthentication()) {
+                        log.info("Creating AWS SDK with default credentials");
+                        s3client = S3Client.builder()
+                                .region(Region.of(awsStorageServiceProperties.getRegion()))
+                                .credentialsProvider(DefaultCredentialsProvider.create())
+                                .build();
+                    } else {
+                        log.info("Creating AWS SDK with custom credentials");
+                        s3client = S3Client.builder()
+                                .region(Region.of(awsStorageServiceProperties.getRegion()))
+                                .credentialsProvider(StaticCredentialsProvider.create(getAwsBasicCredentials(awsStorageServiceProperties)))
+                                .build();
+
+                    }
+                }
 
                 storageService = AwsStorageServiceImpl.builder()
                         .s3client(s3client)
@@ -138,5 +151,11 @@ public class StorageAutoConfiguration {
                 storageService = null;
         }
         return storageService;
+    }
+
+    private static @NotNull AwsBasicCredentials getAwsBasicCredentials(AwsStorageServiceProperties
+                                                                               awsStorageServiceProperties) {
+        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(awsStorageServiceProperties.getAccessKey(), awsStorageServiceProperties.getSecretKey());
+        return awsCreds;
     }
 }

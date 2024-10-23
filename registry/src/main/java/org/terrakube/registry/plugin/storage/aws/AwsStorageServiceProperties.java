@@ -18,4 +18,5 @@ public class AwsStorageServiceProperties {
     private String bucketName;
     private String region;
     private String endpoint;
+    private boolean enableRoleAuthentication;
 }
