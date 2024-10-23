@@ -133,7 +133,6 @@ public class AwsTerraformStateImpl implements TerraformState {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(blobKey)
-                    .contentType("application/octet-stream")
                     .build();
 
             s3client.putObject(putObjectRequest, RequestBody.fromFile(tfPlanContent));
@@ -160,7 +159,7 @@ public class AwsTerraformStateImpl implements TerraformState {
                         log.info("Downloading state from {}", stateUrl);
                         log.info("Buket location: {}", "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
 
-                        byte[] data = downloadObjectFromBucket(bucketName, new URL(stateUrl).getPath().split("/tfstate/")[1]);
+                        byte[] data = downloadObjectFromBucket(bucketName, "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
 
                         FileUtils.copyToFile(
                                 new ByteArrayInputStream(data),
