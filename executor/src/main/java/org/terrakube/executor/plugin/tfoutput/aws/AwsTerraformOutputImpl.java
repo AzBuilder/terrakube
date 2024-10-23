@@ -1,6 +1,5 @@
 package org.terrakube.executor.plugin.tfoutput.aws;
 
-import com.amazonaws.services.s3.AmazonS3;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -9,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.StringUtils;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Builder
 @Getter
@@ -17,7 +19,7 @@ import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 public class AwsTerraformOutputImpl implements TerraformOutput {
 
     @NonNull
-    private AmazonS3 s3client;
+    private S3Client s3client;
 
     @NonNull
     private String bucketName;
@@ -33,11 +35,13 @@ public class AwsTerraformOutputImpl implements TerraformOutput {
         byte[] bytes = StringUtils.getBytesUtf8(output + outputError);
         String utf8EncodedString = StringUtils.newStringUtf8(bytes);
 
-        s3client.putObject(
-                bucketName,
-                blobKey,
-                utf8EncodedString
-        );
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(blobKey)
+                .build();
+
+        s3client.putObject(putObjectRequest, RequestBody.fromString(utf8EncodedString));
+        log.info("Upload Object {} completed", blobKey);
 
         return terraformOutputPathService.getOutputPath(organizationId, jobId, stepId);
     }

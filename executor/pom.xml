@@ -27,7 +27,7 @@
 		<groovy.version>4.0.23</groovy.version>
 		<ivy.version>2.5.2</ivy.version>
 		<jcolor.version>5.5.1</jcolor.version>
-		<aws-sdk.version>1.12.776</aws-sdk.version>
+		<aws-sdk.version>2.28.27</aws-sdk.version>
 		<google-storage.version>1.17.0</google-storage.version>
 		<slf4j.version>2.0.16</slf4j.version>
 		<gcp-libraries-bom.version>26.49.0</gcp-libraries-bom.version>
@@ -142,8 +142,8 @@
 			<version>${jcolor.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-s3</artifactId>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.cloud</groupId>
@@ -174,8 +174,8 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.amazonaws</groupId>
-				<artifactId>aws-java-sdk-bom</artifactId>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>bom</artifactId>
 				<version>${aws-sdk.version}</version>
 				<type>pom</type>
 				<scope>import</scope>

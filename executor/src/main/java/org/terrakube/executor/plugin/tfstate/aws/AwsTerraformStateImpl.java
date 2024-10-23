@@ -1,9 +1,5 @@
 package org.terrakube.executor.plugin.tfstate.aws;
 
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -21,6 +17,12 @@ import org.terrakube.client.model.organization.workspace.history.HistoryRequest;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.service.mode.TerraformJob;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -41,12 +43,12 @@ public class AwsTerraformStateImpl implements TerraformState {
     private static final String BACKEND_FILE_NAME = "azure_backend_override.tf";
 
     @NonNull
-    private AmazonS3 s3client;
+    private S3Client s3client;
 
     @NonNull
     private String bucketName;
 
-    private Regions region;
+    private Region region;
 
     private String accessKey;
 
@@ -73,7 +75,7 @@ public class AwsTerraformStateImpl implements TerraformState {
             awsBackendHcl.appendln("terraform {");
             awsBackendHcl.appendln("  backend \"s3\" {");
             awsBackendHcl.appendln("    bucket     = \"" + bucketName + "\"");
-            awsBackendHcl.appendln("    region     = \"" + region.getName() + "\"");
+            awsBackendHcl.appendln("    region     = \"" + region.toString() + "\"");
             awsBackendHcl.appendln("    key        = \"tfstate/" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
             if(includeBackendKeys) {
                 log.info("Including backend information");
@@ -128,13 +130,21 @@ public class AwsTerraformStateImpl implements TerraformState {
         File tfPlanContent = new File(workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE);
         log.info("terraformStateFile Path: {} {}", workingDirectory.getAbsolutePath() + "/" + TERRAFORM_PLAN_FILE, tfPlanContent.exists());
         if (tfPlanContent.exists()) {
-            s3client.putObject(
-                    bucketName,
-                    blobKey,
-                    tfPlanContent
-            );
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(blobKey)
+                    .build();
 
-            return s3client.getUrl(bucketName, blobKey).toExternalForm();
+            s3client.putObject(putObjectRequest, RequestBody.fromFile(tfPlanContent));
+
+            GetUrlRequest getUrlRequest = GetUrlRequest.builder()
+                    .bucket(bucketName)
+                    .key(blobKey)
+                    .build();
+
+            URL url = s3client.utilities().getUrl(getUrlRequest);
+
+            return url.toExternalForm();
         } else {
             return null;
         }
@@ -147,13 +157,9 @@ public class AwsTerraformStateImpl implements TerraformState {
                 .ifPresent(stateUrl -> {
                     try {
                         log.info("Downloading state from {}", stateUrl);
-
-                        //log.info("Buket location: {}", new URL(stateUrl).getPath().replace(endpoint != null ? bucketName + "/tfstate" :"/tfstate","tfstate").substring(1));
                         log.info("Buket location: {}", "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
 
-                        S3Object s3object = s3client.getObject(bucketName, "tfstate/" + new URL(stateUrl).getPath().split("/tfstate/")[1]);
-                        S3ObjectInputStream inputStream = s3object.getObjectContent();
-                        byte[] data = inputStream.getDelegateStream().readAllBytes();
+                        byte[] data = downloadObjectFromBucket(bucketName, new URL(stateUrl).getPath().split("/tfstate/")[1]);
 
                         FileUtils.copyToFile(
                                 new ByteArrayInputStream(data),
@@ -180,17 +186,19 @@ public class AwsTerraformStateImpl implements TerraformState {
             String utf8EncodedString = StringUtils.newStringUtf8(bytes);
             String rawUtf8EncodedString = StringUtils.newStringUtf8(rawBytes);
 
-            s3client.putObject(
-                    bucketName,
-                    blobKey,
-                    utf8EncodedString
-            );
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(blobKey)
+                    .build();
 
-            s3client.putObject(
-                    bucketName,
-                    blobKeyRaw,
-                    rawUtf8EncodedString
-            );
+            s3client.putObject(putObjectRequest, RequestBody.fromString(utf8EncodedString));
+
+            putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(blobKeyRaw)
+                    .build();
+
+            s3client.putObject(putObjectRequest, RequestBody.fromString(rawUtf8EncodedString));
 
             String stateURL = terraformStatePathService.getStateJsonPath(terraformJob.getOrganizationId(), terraformJob.getWorkspaceId(), stateFilename);
 
@@ -208,6 +216,25 @@ public class AwsTerraformStateImpl implements TerraformState {
 
             terrakubeClient.createHistory(historyRequest, terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
         }
+    }
+
+    private byte[] downloadObjectFromBucket(String bucketName, String objectKey) {
+        byte[] data;
+        try {
+            log.info("Bucket: {} Searching: {}", bucketName, objectKey);
+
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                    .key(objectKey)
+                    .bucket(bucketName)
+                    .build();
+            ResponseBytes<GetObjectResponse> objectBytes = s3client.getObject(objectRequest,
+                    ResponseTransformer.toBytes());
+            data = objectBytes.asByteArray();
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+            data = new byte[0];
+        }
+        return data;
     }
 
 }
