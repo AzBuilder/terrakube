@@ -1,13 +1,5 @@
 package org.terrakube.executor.plugin.tfoutput.configuration;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.google.auth.Credentials;
@@ -28,10 +20,20 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.endpoints.Endpoint;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.endpoints.S3EndpointParams;
+import software.amazon.awssdk.services.s3.endpoints.S3EndpointProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Base64;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Configuration
@@ -63,29 +65,36 @@ public class TerraformOutputAutoConfiguration {
                             .build();
                     break;
                 case AwsTerraformOutputImpl:
-                    AWSCredentials credentials = new BasicAWSCredentials(
-                            awsTerraformOutputProperties.getAccessKey(),
-                            awsTerraformOutputProperties.getSecretKey()
-                    );
-
-                    AmazonS3 s3client = null;
+                    S3Client s3client = null;
                     if (awsTerraformOutputProperties.getEndpoint() != "") {
-                        ClientConfiguration clientConfiguration = new ClientConfiguration();
-                        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
-
-                        s3client = AmazonS3ClientBuilder
-                                .standard()
-                                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsTerraformOutputProperties.getEndpoint(), awsTerraformOutputProperties.getRegion()))
-                                .withPathStyleAccessEnabled(true)
-                                .withClientConfiguration(clientConfiguration)
-                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                        log.info("Creating AWS SDK with custom endpoint and custom credentials");
+                        s3client = S3Client.builder()
+                                .region(Region.AWS_GLOBAL)
+                                .credentialsProvider(StaticCredentialsProvider.create(getAwsBasicCredentials(awsTerraformOutputProperties)))
+                                .endpointProvider(new S3EndpointProvider() {
+                                    @Override
+                                    public CompletableFuture<Endpoint> resolveEndpoint(S3EndpointParams endpointParams) {
+                                        return CompletableFuture.completedFuture(Endpoint.builder()
+                                                .url(URI.create(awsTerraformOutputProperties.getEndpoint() + "/" + endpointParams.bucket()))
+                                                .build());
+                                    }
+                                })
                                 .build();
-                    } else
-                        s3client = AmazonS3ClientBuilder
-                                .standard()
-                                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                                .withRegion(Regions.fromName(awsTerraformOutputProperties.getRegion()))
-                                .build();
+                    } else {
+                        if (awsTerraformOutputProperties.isEnableRoleAuthentication()) {
+                            log.info("Creating AWS SDK with default credentials");
+                            s3client = S3Client.builder()
+                                    .region(Region.of(awsTerraformOutputProperties.getRegion()))
+                                    .credentialsProvider(DefaultCredentialsProvider.create())
+                                    .build();
+                        } else {
+                            log.info("Creating AWS SDK with custom credentials");
+                            s3client = S3Client.builder()
+                                    .region(Region.of(awsTerraformOutputProperties.getRegion()))
+                                    .credentialsProvider(StaticCredentialsProvider.create(getAwsBasicCredentials(awsTerraformOutputProperties)))
+                                    .build();
+                        }
+                    }
 
                     terraformOutput = AwsTerraformOutputImpl.builder()
                             .s3client(s3client)
@@ -125,5 +134,10 @@ public class TerraformOutputAutoConfiguration {
                     .terraformOutputPathService(terraformOutputPathService)
                     .build();
         return terraformOutput;
+    }
+
+    private AwsBasicCredentials getAwsBasicCredentials(AwsTerraformOutputProperties awsTerraformOutputProperties) {
+        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(awsTerraformOutputProperties.getAccessKey(), awsTerraformOutputProperties.getSecretKey());
+        return awsCreds;
     }
 }

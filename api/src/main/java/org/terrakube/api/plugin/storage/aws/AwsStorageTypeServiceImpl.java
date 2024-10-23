@@ -139,7 +139,7 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
                     .contentType("application/gzip")
                     .build();
 
-            s3client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, IoUtils.toByteArray(inputStream).length));
+            s3client.putObject(putObjectRequest, RequestBody.fromBytes(IoUtils.toByteArray(inputStream)));
         } catch (IOException e) {
             log.error(e.getMessage());
         }

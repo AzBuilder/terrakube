@@ -1188,7 +1188,7 @@ public class RemoteTfeService {
         if (job.getStep() != null && !job.getStep().isEmpty())
             for (Step step : job.getStep()) {
                 if (step.getStepNumber() == 100) {
-                    log.info("Checking logs stepId for apply: {}", step.getId());
+                    log.debug("Checking logs stepId for apply: {}", step.getId());
 
                     try {
                         @SuppressWarnings("unchecked")
