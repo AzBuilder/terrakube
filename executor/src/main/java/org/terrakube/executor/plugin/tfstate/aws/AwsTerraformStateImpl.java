@@ -133,6 +133,7 @@ public class AwsTerraformStateImpl implements TerraformState {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(blobKey)
+                    .contentType("application/octet-stream")
                     .build();
 
             s3client.putObject(putObjectRequest, RequestBody.fromFile(tfPlanContent));
