@@ -76,7 +76,7 @@ public class TerraformStateAutoConfiguration {
                 case AwsTerraformStateImpl:
                     S3Client s3client = null;
 
-                    if (awsTerraformStateProperties.getEndpoint() != "") {
+                    if (awsTerraformStateProperties.getEndpoint() != null && !awsTerraformStateProperties.getEndpoint().isEmpty()) {
                         log.info("Creating AWS with custom endpoint and custom credentials");
                         s3client = S3Client.builder()
                                 .credentialsProvider(StaticCredentialsProvider.create(getAwsBasicCredentials(awsTerraformStateProperties)))
