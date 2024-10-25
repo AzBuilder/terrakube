@@ -200,18 +200,29 @@ public class WebhookService {
     }
 
     private boolean checkBranch(String webhookBranch, Webhook webhook) {
-        // Check if the webhook branch is the default workspace branch
-        if (webhookBranch.equals(webhook.getWorkspace().getBranch())) {
-            return true;
-        }
         String[] branchList = webhook.getBranch().split(",");
+        boolean isExcluded = false;
+        boolean allowAnyBranch = false;
+
         for (String branch : branchList) {
-            if (webhookBranch.startsWith(branch)) {
+            branch = branch.trim();
+
+            if (branch.equals("*")) {
+                allowAnyBranch = true; // Only set if there are no exclusions
+            } else if (branch.startsWith("!")) {
+                // If the branch pattern starts with '!', mark it as excluded if it matches
+                String excludeBranch = branch.substring(1);
+                if (webhookBranch.equals(excludeBranch)) {
+                    isExcluded = true;
+                }
+            } else if (webhookBranch.startsWith(branch)) {
+                // Check for other prefix matches
                 return true;
             }
         }
 
-        return false;
+        // Return true if allowed by wildcard and not excluded
+        return allowAnyBranch && !isExcluded;
     }
 
     private boolean checkFileChanges(List<String> files, Webhook webhook) {
