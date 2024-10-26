@@ -201,28 +201,14 @@ public class WebhookService {
 
     private boolean checkBranch(String webhookBranch, Webhook webhook) {
         String[] branchList = webhook.getBranch().split(",");
-        boolean isExcluded = false;
-        boolean allowAnyBranch = false;
 
         for (String branch : branchList) {
             branch = branch.trim();
-
-            if (branch.equals("*")) {
-                allowAnyBranch = true; // Only set if there are no exclusions
-            } else if (branch.startsWith("!")) {
-                // If the branch pattern starts with '!', mark it as excluded if it matches
-                String excludeBranch = branch.substring(1);
-                if (webhookBranch.equals(excludeBranch)) {
-                    isExcluded = true;
-                }
-            } else if (webhookBranch.startsWith(branch)) {
-                // Check for other prefix matches
+            if (webhookBranch.matches(branch)) {
                 return true;
             }
         }
-
-        // Return true if allowed by wildcard and not excluded
-        return allowAnyBranch && !isExcluded;
+        return false;
     }
 
     private boolean checkFileChanges(List<String> files, Webhook webhook) {
@@ -232,10 +218,6 @@ public class WebhookService {
             workspaceFolder = workspaceFolder.substring(1);
         }
         for (String file : files) {
-            if (file.startsWith(workspaceFolder)) {
-                log.info("Changed file {} in set workspace path {}", file, workspaceFolder);
-                return true;
-            }
             for (int i = 0; i < triggeredPath.length; i++) {
                 if (file.matches(triggeredPath[i])) {
                     log.info("Changed file {} matches set trigger pattern {}", file, triggeredPath[i]);
