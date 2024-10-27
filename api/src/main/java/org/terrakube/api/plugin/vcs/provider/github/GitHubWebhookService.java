@@ -51,54 +51,104 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers) {
-        // Extract event
         String event = headers.get("x-github-event");
         result.setEvent(event);
 
-        if (event.equals("push")) {
-            try {
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonPayload);
+
+            // Extract repository owner and name from the payload
+            String repoOwner = rootNode.path("repository").path("owner").path("login").asText();
+            String repoName = rootNode.path("repository").path("name").asText();
+
+            // Handle push event
+            if ("push".equals(event)) {
                 // Extract branch from the ref
-                JsonNode rootNode = objectMapper.readTree(jsonPayload);
                 String[] ref = rootNode.path("ref").asText().split("/");
                 String[] extractedBranch = Arrays.copyOfRange(ref, 2, ref.length);
                 result.setBranch(String.join("/", extractedBranch));
 
                 // Extract the user who triggered the webhook
-                JsonNode pusherNode = rootNode.path("pusher");
-                String pusher = pusherNode.path("email").asText();
+                String pusher = rootNode.path("pusher").path("email").asText();
                 result.setCreatedBy(pusher);
-            } catch (Exception e) {
-                log.error("Error parsing JSON response", e);
-                result.setBranch("");
-            }
 
-            result.setFileChanges(new ArrayList<String>());
-            try {
-                GitHubWebhookModel gitHubWebhookModel = new ObjectMapper().readValue(jsonPayload,
-                        GitHubWebhookModel.class);
+                // Extract files changed in the push
+                List<String> fileChanges = new ArrayList<>();
+                GitHubWebhookModel gitHubWebhookModel = objectMapper.readValue(jsonPayload, GitHubWebhookModel.class);
                 result.setCommit(gitHubWebhookModel.getHead_commit().getId());
                 gitHubWebhookModel.getCommits().forEach(commit -> {
-                    for (String addedObject : commit.getAdded()) {
-                        log.info("New: {}", addedObject);
-                        result.getFileChanges().add(addedObject);
-                    }
-
-                    for (String removedObject : commit.getRemoved()) {
-                        log.info("Removed: {}", removedObject);
-                        result.getFileChanges().add(removedObject);
-                    }
-
-                    for (String modifedObject : commit.getModified()) {
-                        log.info("Modified: {}", modifedObject);
-                        result.getFileChanges().add(modifedObject);
-                    }
+                    fileChanges.addAll(commit.getAdded());
+                    fileChanges.addAll(commit.getRemoved());
+                    fileChanges.addAll(commit.getModified());
                 });
-            } catch (JsonProcessingException e) {
-                log.error(e.getMessage());
+                result.setFileChanges(fileChanges);
+
+            // Handle pull request event (opened, synchronize, reopened)
+            } else if ("pull_request".equals(event)) {
+                String action = rootNode.path("action").asText();
+                if ("opened".equals(action) || "synchronize".equals(action) || "reopened".equals(action)) {
+                    int prNumber = rootNode.path("number").asInt();
+                    result.setPrNumber(prNumber);
+                    result.setRepoOwner(repoOwner);
+                    result.setRepoName(repoName);
+
+                    // Fetch file changes for the PR
+                    List<String> prFileChanges = getPrFileChanges(prNumber, repoOwner, repoName, result);
+                    result.setFileChanges(prFileChanges);
+                }
             }
+        } catch (Exception e) {
+            log.error("Error parsing JSON response", e);
+            result.setBranch("");
         }
 
         return result;
+    }
+
+    // Helper method to fetch files changed in a PR using GitHub API
+    private List<String> getPrFileChanges(int prNumber, String repoOwner, String repoName, WebhookResult result) {
+        List<String> fileChanges = new ArrayList<>();
+        try {
+            // Fetch GitHub API token from TokenService
+            String token = tokenService.getAccessToken(new String[]{repoOwner, repoName}, result.getVcs());
+
+            // Construct API URL
+            String url = String.format("https://api.github.com/repos/%s/%s/pulls/%d/files", repoOwner, repoName, prNumber);
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+
+            try {
+                URL apiUrl = new URL(url);
+                connection = (HttpURLConnection) apiUrl.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Authorization", "Bearer " + token);
+                connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
+
+                if (connection.getResponseCode() == 200) {
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    // Parse response to extract file names
+                    JsonNode responseJson = objectMapper.readTree(response.toString());
+                    for (JsonNode fileNode : responseJson) {
+                        String filename = fileNode.path("filename").asText();
+                        fileChanges.add(filename);
+                    }
+                } else {
+                    log.error("Failed to fetch PR files: HTTP error code {}", connection.getResponseCode());
+                }
+            } finally {
+                if (reader != null) reader.close();
+                if (connection != null) connection.disconnect();
+            }
+        } catch (Exception e) {
+            log.error("Error fetching PR file changes", e);
+        }
+        return fileChanges;
     }
 
     public void sendCommitStatus(Job job, JobStatus jobStatus) {
