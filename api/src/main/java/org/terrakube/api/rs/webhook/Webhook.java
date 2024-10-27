@@ -47,7 +47,7 @@ public class Webhook extends GenericAuditFields{
     private String templateId;
 
     @Enumerated(EnumType.STRING)
-    private WebhookEvent event = WebhookEvent.PUSH;
+    private WebhookEvent event;
     
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Workspace workspace;
