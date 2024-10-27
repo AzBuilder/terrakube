@@ -150,7 +150,7 @@ public class WebhookService {
         Vcs vcs = workspace.getVcs();
         switch (vcs.getVcsType()) {
             case GITHUB:
-                webhookRemoteId = gitHubWebhookService.createWebhook(workspace, webhook);
+                webhookRemoteId = gitHubWebhookService.createWebhook(workspace, webhook.getId().toString());
                 break;
             case GITLAB:
                 webhookRemoteId = gitLabWebhookService.createWebhook(workspace, webhook.getId().toString());

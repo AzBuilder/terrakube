@@ -261,16 +261,16 @@ public class GitHubWebhookService extends WebhookServiceBase {
         return prNumbers;
     }
 
-    public String createWebhook(Workspace workspace, Webhook webhook) {
+    public String createWebhook(Workspace workspace, String webhookId) {
         String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-        String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhook.getId().toString());
+        String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
         String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
 
         // Create the body, in this version we only support push event but in future we
         // can make this more dynamic
-        String body = "{\"name\":\"web\",\"active\":true,\"events\":[\""+ webhook.getEvent().toString() +"\"],\"config\":{\"url\":\"" + webhookUrl
+        String body = "{\"name\":\"web\",\"active\":true,\"events\":[\"push\"],\"config\":{\"url\":\"" + webhookUrl
                 + "\",\"secret\":\"" + secret + "\",\"content_type\":\"json\",\"insecure_ssl\":\"1\"}}";
         String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepo) + "/hooks";
 
