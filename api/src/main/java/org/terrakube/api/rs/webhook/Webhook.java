@@ -47,9 +47,17 @@ public class Webhook extends GenericAuditFields{
     private String templateId;
 
     @Enumerated(EnumType.STRING)
-    private WebhookEvent event = WebhookEvent.PUSH;
+    private WebhookEvent event;
     
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Workspace workspace;
+
+    public void setEvent(String event) {
+        try {
+            this.event = WebhookEvent.valueOf(event.toUpperCase()); // Converts the string to the enum
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid value for event. Allowed values are 'PUSH' and 'PULL_REQUEST'.");
+        }
+    }
 }
 

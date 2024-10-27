@@ -63,7 +63,7 @@ public class WebhookService {
         switch (vcs.getVcsType()) {
             case GITHUB:
                 webhookResult = gitHubWebhookService.processWebhook(jsonPayload, headers,
-                        base64WorkspaceId);
+                        base64WorkspaceId, vcs);
                 break;
             case GITLAB:
                 webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,
@@ -141,7 +141,7 @@ public class WebhookService {
         }
 
         if (webhook.getEvent() == null || webhook.getEvent().toString().isEmpty())
-            webhook.setEvent(WebhookEvent.PUSH);
+            webhook.setEvent("PUSH");
 
         String webhookRemoteId = "";
         if (webhook.getTemplateId() == null)
@@ -150,7 +150,7 @@ public class WebhookService {
         Vcs vcs = workspace.getVcs();
         switch (vcs.getVcsType()) {
             case GITHUB:
-                webhookRemoteId = gitHubWebhookService.createWebhook(workspace, webhook.getId().toString());
+                webhookRemoteId = gitHubWebhookService.createWebhook(workspace, webhook);
                 break;
             case GITLAB:
                 webhookRemoteId = gitLabWebhookService.createWebhook(workspace, webhook.getId().toString());

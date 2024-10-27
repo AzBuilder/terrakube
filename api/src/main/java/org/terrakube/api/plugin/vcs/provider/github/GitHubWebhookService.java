@@ -3,10 +3,7 @@ package org.terrakube.api.plugin.vcs.provider.github;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -16,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.vcs.TokenService;
 import org.terrakube.api.plugin.vcs.WebhookResult;
 import org.terrakube.api.plugin.vcs.WebhookServiceBase;
+import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.job.JobVia;
 import org.terrakube.api.rs.vcs.Vcs;
+import org.terrakube.api.rs.webhook.Webhook;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,6 +26,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @Service
 @Slf4j
@@ -45,12 +50,12 @@ public class GitHubWebhookService extends WebhookServiceBase {
         this.tokenService = tokenService;
     }
 
-    public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
+    public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token, Vcs vcs) {
         return handleWebhook(jsonPayload, headers, token, "x-hub-signature-256", JobVia.Github.name(),
-                this::handleEvent);
+                (payload, result, headerMap) -> handleEvent(payload, result, headerMap, vcs));
     }
 
-    private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers) {
+    private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers, Vcs vcs) {
         String event = headers.get("x-github-event");
         result.setEvent(event);
 
@@ -93,7 +98,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
                     result.setRepoName(repoName);
 
                     // Fetch file changes for the PR
-                    List<String> prFileChanges = getPrFileChanges(prNumber, repoOwner, repoName, result);
+                    List<String> prFileChanges = getPrFileChanges(prNumber, repoOwner, repoName, vcs);
                     result.setFileChanges(prFileChanges);
                 }
             }
@@ -106,11 +111,11 @@ public class GitHubWebhookService extends WebhookServiceBase {
     }
 
     // Helper method to fetch files changed in a PR using GitHub API
-    private List<String> getPrFileChanges(int prNumber, String repoOwner, String repoName, WebhookResult result) {
+    private List<String> getPrFileChanges(int prNumber, String repoOwner, String repoName, Vcs vcs) {
         List<String> fileChanges = new ArrayList<>();
         try {
             // Fetch GitHub API token from TokenService
-            String token = tokenService.getAccessToken(new String[]{repoOwner, repoName}, result.getVcs());
+            String token = tokenService.getAccessToken(new String[]{repoOwner, repoName}, vcs);
 
             // Construct API URL
             String url = String.format("https://api.github.com/repos/%s/%s/pulls/%d/files", repoOwner, repoName, prNumber);
@@ -261,16 +266,16 @@ public class GitHubWebhookService extends WebhookServiceBase {
         return prNumbers;
     }
 
-    public String createWebhook(Workspace workspace, String webhookId) {
+    public String createWebhook(Workspace workspace, Webhook webhook) {
         String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-        String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
+        String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhook.getId().toString());
         String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
 
         // Create the body, in this version we only support push event but in future we
         // can make this more dynamic
-        String body = "{\"name\":\"web\",\"active\":true,\"events\":[\"push\"],\"config\":{\"url\":\"" + webhookUrl
+        String body = "{\"name\":\"web\",\"active\":true,\"events\":[\""+ webhook.getEvent().toString().toLowerCase() + "\"],\"config\":{\"url\":\"" + webhookUrl
                 + "\",\"secret\":\"" + secret + "\",\"content_type\":\"json\",\"insecure_ssl\":\"1\"}}";
         String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepo) + "/hooks";
 
