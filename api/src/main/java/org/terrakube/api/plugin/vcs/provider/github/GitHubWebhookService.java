@@ -161,6 +161,8 @@ public class GitHubWebhookService extends WebhookServiceBase {
         String commitStatusContext = "Terrakube - " + workspace.getOrganization().getName() + " - "
                 + workspace.getName();
         String commitStatusDescription = "Your task is in Terrakube queue.";
+
+        // Determine the commit status based on jobStatus
         switch (jobStatus) {
             case completed:
                 commitStatus = GithubCommitStatus.success;
@@ -180,27 +182,83 @@ public class GitHubWebhookService extends WebhookServiceBase {
                 break;
         }
 
+        // API URL for commit status
         String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepos) + "/statuses/"
                 + job.getCommitId();
 
         log.info(String.format("Sending job status %s to GitHub for commit %s", job.getStatus(), job.getCommitId()));
-        // Create the body
+
+        // Create the body for the commit status
         String body = "{\"state\":\"" + commitStatus.name()
                 + "\",\"description\":\"" + commitStatusDescription + "\",\"target_url\":\""
                 + jobUrl + "\",\"context\":\"" + commitStatusContext + "\"}";
 
         ResponseEntity<String> response = callGitHubApi(workspace.getVcs(), ownerAndRepos, body, apiUrl,
                 HttpMethod.POST);
+
+        // Handle the response
         if (response == null) {
             log.error("Failed to send job status on workspace {} in organization {} to GitHub", workspace.getName(),
                     workspace.getOrganization().getName());
             return;
         }
+
         if (response.getStatusCode().value() == 201) {
             log.info("Job status sent successfully to GitHub");
         } else {
             log.error(String.format("Failed to send job status to Github, message %s", response.getBody()));
         }
+
+        // Optional: Check if the commit is part of a PR and send status to the PR as well
+        try {
+            List<Integer> prNumbers = getPullRequestNumbersForCommit(workspace, job.getCommitId());
+            for (Integer prNumber : prNumbers) {
+                String prApiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepos)
+                        + "/pulls/" + prNumber + "/statuses";
+
+                // Send the status to the pull request
+                ResponseEntity<String> prResponse = callGitHubApi(workspace.getVcs(), ownerAndRepos, body, prApiUrl,
+                        HttpMethod.POST);
+                if (prResponse == null) {
+                    log.error("Failed to send job status on PR #{} in workspace {} to GitHub", prNumber,
+                            workspace.getName());
+                    continue;
+                }
+
+                if (prResponse.getStatusCode().value() == 201) {
+                    log.info("Job status sent successfully to PR #{} on GitHub", prNumber);
+                } else {
+                    log.error(String.format("Failed to send job status to PR #%, message %s", prNumber, prResponse.getBody()));
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while checking PRs for commit {}: {}", job.getCommitId(), e.getMessage());
+        }
+    }
+
+    private List<Integer> getPullRequestNumbersForCommit(Workspace workspace, String commitId) {
+        List<Integer> prNumbers = new ArrayList<>();
+        String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+        String apiUrl = workspace.getVcs().getApiUrl() + "/repos/" + String.join("/", ownerAndRepo)
+                + "/commits/" + commitId + "/pulls";
+
+        ResponseEntity<String> response = callGitHubApi(workspace.getVcs(), ownerAndRepo, null, apiUrl,
+                HttpMethod.GET);
+
+        if (response != null && response.getStatusCode().value() == 200) {
+            try {
+                JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
+                for (JsonNode pr : jsonNode) {
+                    prNumbers.add(pr.path("number").asInt());
+                }
+            } catch (Exception e) {
+                log.error("Failed to parse PR data for commit {}: {}", commitId, e.getMessage());
+            }
+        } else {
+            log.error("Failed to fetch PRs for commit {}: {}", commitId, response != null ? response.getBody() : "No response");
+        }
+
+        return prNumbers;
     }
 
     public String createWebhook(Workspace workspace, String webhookId) {
