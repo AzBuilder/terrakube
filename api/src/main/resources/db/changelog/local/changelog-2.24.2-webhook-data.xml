@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="2-24-2-11" author="Stanley Zhang (stanley.zhang@ityin.net)">
+        <sql dbms="postgresql, mysql">
+            insert into webhook_event (id, branch, path, event, template_id, webhook_id, created_date, updated_date, created_by, updated_by)
+            select id, branch, path, event, template_id, id, created_date, updated_date, created_by, updated_by from webhook;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -1,11 +1,9 @@
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
-  DeleteOutlined,
   ExclamationCircleOutlined,
   GithubOutlined,
   GitlabOutlined,
-  InfoCircleOutlined,
   LockOutlined,
   PlayCircleOutlined,
   ProfileOutlined,
@@ -13,7 +11,7 @@ import {
   SyncOutlined,
   ThunderboltOutlined,
   UnlockOutlined,
-  UserOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import {
   Alert,
@@ -22,17 +20,13 @@ import {
   Button,
   Col,
   Divider,
-  Form,
-  Input,
   Layout,
   List,
   message,
-  Popconfirm,
   Row,
   Select,
   Space,
   Spin,
-  Switch,
   Table,
   Tabs,
   Tag,
@@ -63,7 +57,17 @@ import { States } from "../Workspaces/States";
 import { Tags } from "../Workspaces/Tags";
 import { Variables } from "../Workspaces/Variables";
 import { getServiceIcon } from "./Icons.js";
-import { compareVersions } from "./Workspaces";
+import { WorkspaceAdvanced } from "./Settings/Advanced.jsx";
+import { WorkspaceGeneral } from "./Settings/General";
+import { WorkspaceWebhook } from "./Settings/Webhook.jsx";
+import {
+  // atomicHeader,
+  // genericHeader,
+  // loadVersions,
+  getIaCIconById,
+  getIaCNameById,
+  renderVCSLogo,
+} from "./Workspaces";
 import "./Workspaces.css";
 const { Option } = Select;
 const { Paragraph } = Typography;
@@ -81,24 +85,6 @@ const include = {
 const { DateTime } = require("luxon");
 const { Content } = Layout;
 const { TabPane } = Tabs;
-const iacTypes = [
-  {
-    id: "terraform",
-    name: "Terraform",
-    description:
-      "Create an empty template. So you can define your template from scratch.",
-    icon: (
-      <IconContext.Provider value={{ size: "1.4em" }}>
-        <SiTerraform />
-      </IconContext.Provider>
-    ),
-  },
-  {
-    id: "tofu",
-    name: "OpenTofu",
-    icon: <img width="18px" src="/providers/opentofu.png" />,
-  },
-];
 
 export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const navigate = useNavigate();
@@ -132,26 +118,24 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [activeKey, setActiveKey] = useState(
     selectedTab !== null ? selectedTab : "1"
   );
-  const [terraformVersions, setTerraformVersions] = useState([]);
   const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
   const [agent, setAgent] = useState("...");
-  const [sshKeys, setSSHKeys] = useState([]);
-  const [agentList, setAgentList] = useState([]);
+  // const [sshKeys, setSSHKeys] = useState([]);
+  // const [agentList, setAgentList] = useState([]);
   const [orgTemplates, setOrgTemplates] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
   const [currentStateId, setCurrentStateId] = useState(0);
-  const [selectedIac, setSelectedIac] = useState("");
   const [actions, setActions] = useState([]);
   const [webhook, setWebhook] = useState({});
-  const [pushWebhookEnabled, setPushWebhookEnabled] = useState(true);
-  const [defaultBranch, setDefaultBranch] = useState("");
-  const [defaultPath, setDefaultPath] = useState("");
-  const [defaultTemplate, setDefaultTemplate] = useState("");
+  // const [pushWebhookEnabled, setPushWebhookEnabled] = useState(true);
+  // const [defaultBranch, setDefaultBranch] = useState("");
+  // const [defaultPath, setDefaultPath] = useState("");
+  // const [defaultTemplate, setDefaultTemplate] = useState("");
   const [contextState, setContextState] = useState({});
   const pushWebhookName = "PUSH";
   const handleClick = (jobid) => {
@@ -159,10 +143,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     navigate(
       `/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`
     );
-  };
-  const handleIacChange = (iac) => {
-    setSelectedIac(iac);
-    loadVersions(iac);
   };
 
   const outputColumns = [
@@ -239,27 +219,21 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     switchKey(key);
   };
 
-  const getIaCIconById = (id) => {
-    const item = iacTypes.find((iacType) => iacType.id === id);
-    return item ? item.icon : null;
-  };
+  // const loadSSHKeys = () => {
+  //   axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
+  //     console.log(response.data.data);
+  //     setSSHKeys(response.data.data);
+  //   });
+  // };
 
-  const loadSSHKeys = () => {
-    axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
-      console.log(response.data.data);
-      setSSHKeys(response.data.data);
-    });
-  };
-
-  const loadAgentlist = () => {
-    axiosInstance
-      .get(`organization/${organizationId}/agent`)
-      .then((response) => {
-        console.log(response.data.data);
-        setAgentList(response.data.data);
-      });
-  };
-
+  // const loadAgentlist = () => {
+  //   axiosInstance
+  //     .get(`organization/${organizationId}/agent`)
+  //     .then((response) => {
+  //       console.log(response.data.data);
+  //       setAgentList(response.data.data);
+  //     });
+  // };
   const loadOrgTemplates = () => {
     axiosInstance
       .get(`organization/${organizationId}/template`)
@@ -353,8 +327,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     loadWorkspace(true, true, true);
     loadPermissionSet();
     setLoading(false);
-    loadSSHKeys();
-    loadAgentlist();
+    // loadSSHKeys();
+    // loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false, false, false);
@@ -370,27 +344,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     setActiveKey("2");
   };
 
-  const loadVersions = (iacType) => {
-    const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-      }/${iacType}/index.json`;
-    axiosInstance.get(versionsApi).then((resp) => {
-      console.log(resp);
-      const tfVersions = [];
-      if (iacType === "tofu") {
-        resp.data.forEach((release) => {
-          if (!release.tag_name.includes("-"))
-            tfVersions.push(release.tag_name.replace("v", ""));
-        });
-      } else {
-        for (const version in resp.data.versions) {
-          if (!version.includes("-")) tfVersions.push(version);
-        }
-      }
-      setTerraformVersions(tfVersions.sort(compareVersions).reverse());
-      console.log(tfVersions);
-    });
-  };
-  
   const loadPermissionSet = () => {
     console.log("Loading Organization Permission Values")
     const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
@@ -423,8 +376,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook,reference`
           )
           .then((response) => {
-            if (_loadVersions)
-              loadVersions(response.data.data.attributes.iacType);
+            // if (_loadVersions)
+            //   loadVersions(response.data.data.attributes.iacType);
 
             if (_loadPermissionSet)
               loadPermissionSet()
@@ -450,7 +403,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 setAgent,
                 _loadWebhook,
                 setWebhook,
-                setPushWebhookEnabled,
+                // setPushWebhookEnabled,
                 setContextState,
                 setReferences, setCollectionVariables, setCollectionEnvVariables, setGlobalVariables, setGlobalEnvVariables
               );
@@ -474,24 +427,24 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       });
   };
 
-  const handlePushWebhookClick = () => {
-    setPushWebhookEnabled(!pushWebhookEnabled);
-  }
+  // const handlePushWebhookClick = () => {
+  //   setPushWebhookEnabled(!pushWebhookEnabled);
+  // }
 
-  const handleBranchChange = (e) => {
-    setDefaultBranch(e.target.value);
-  }
-  const handlePathChange = (e) => {
-    setDefaultPath(e.target.value);
-  }
-  const handleTemplateChange = (e) => {
-    orgTemplates.forEach((template) => {
-      if (template.id === e) {
-        setDefaultTemplate(template.attributes.name);
-        return;
-      }
-    });
-  }
+  // const handleBranchChange = (e) => {
+  //   setDefaultBranch(e.target.value);
+  // }
+  // const handlePathChange = (e) => {
+  //   setDefaultPath(e.target.value);
+  // }
+  // const handleTemplateChange = (e) => {
+  //   orgTemplates.forEach((template) => {
+  //     if (template.id === e) {
+  //       setDefaultTemplate(template.attributes.name);
+  //       return;
+  //     }
+  //   });
+  // }
 
   const handleClickSettings = () => {
     switchKey("6");
@@ -526,247 +479,197 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       });
   };
 
-  const onFinish = (values) => {
-    setWaiting(true);
-    const pushWebhookId = webhook[pushWebhookName]?.id;
-    const pushWebhookExists = pushWebhookId && pushWebhookId != "";
-    const body = {
-      "atomic:operations": [{
-        op: "update",
-        href: `/organization/${organizationId}/workspace/${id}`,
-        data: {
-          type: "workspace",
-          id: id,
-          attributes: {
-            name: values.name,
-            description: values.description,
-            folder: values.folder,
-            locked: values.locked,
-            lockDescription: values.lockDescription,
-            executionMode: values.executionMode,
-            moduleSshKey: values.moduleSshKey,
-            terraformVersion: values.terraformVersion,
-            iacType: values.iacType,
-            branch: values.branch,
-            defaultTemplate: values.defaultTemplate,
-          },
-        },
-      }]
-    }
-    if (pushWebhookEnabled) {
-      const newPushWebhookId = pushWebhookExists ? "" : uuid();
-      body["atomic:operations"].push({
-        op: pushWebhookExists ? "update" : "add",
-        href: pushWebhookExists ? `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}` : `/organization/${organizationId}/workspace/${id}/webhook`,
-        data: {
-          type: "webhook",
-          id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
-          attributes: {
-            id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
-            branch: values.pushWebhookBranch,
-            path: values.pushWebhookPath,
-            event: pushWebhookName,
-            templateId: values.pushWebhookTemplate,
-          },
-        }
-      })
-    }
-    if (!pushWebhookEnabled && pushWebhookExists) {
-      body["atomic:operations"].push({
-        op: "remove",
-        href: `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}`,
-      });
-    }
+  // const onFinish = (values) => {
+  //   setWaiting(true);
+  //   const pushWebhookId = webhook[pushWebhookName]?.id;
+  //   const pushWebhookExists = pushWebhookId && pushWebhookId != "";
+  //   const body = {
+  //     "atomic:operations": [{
+  //       op: "update",
+  //       href: `/organization/${organizationId}/workspace/${id}`,
+  //       data: {
+  //         type: "workspace",
+  //         id: id,
+  //         attributes: {
+  //           name: values.name,
+  //           description: values.description,
+  //           folder: values.folder,
+  //           locked: values.locked,
+  //           executionMode: values.executionMode,
+  //           moduleSshKey: values.moduleSshKey,
+  //           terraformVersion: values.terraformVersion,
+  //           iacType: values.iacType,
+  //           branch: values.branch,
+  //           defaultTemplate: values.defaultTemplate,
+  //         },
+  //       },
+  //     }]
+  //   }
+  //   if (pushWebhookEnabled) {
+  //     const newPushWebhookId = pushWebhookExists ? "" : uuid();
+  //     body["atomic:operations"].push({
+  //       op: pushWebhookExists ? "update" : "add",
+  //       href: pushWebhookExists ? `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}` : `/organization/${organizationId}/workspace/${id}/webhook`,
+  //       data: {
+  //         type: "webhook",
+  //         id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
+  //         attributes: {
+  //           id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
+  //           branch: values.pushWebhookBranch,
+  //           path: values.pushWebhookPath,
+  //           event: pushWebhookName,
+  //           templateId: values.pushWebhookTemplate,
+  //         },
+  //       }
+  //     })
+  //   }
+  //   if (!pushWebhookEnabled && pushWebhookExists) {
+  //     body["atomic:operations"].push({
+  //       op: "remove",
+  //       href: `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}`,
+  //     });
+  //   }
 
-    console.log(body);
+  //   console.log(body);
 
-    try {
-      axiosInstance
-        .post("/operations",
-          body, atomicHeader
-        )
-        .then((response) => {
-          console.log(response);
-          if (response.status === 200) {
-            const pushWebhookData = response.data["atomic:results"][1]?.data;
-            if (pushWebhookEnabled && pushWebhookData) {
-              var updatedWebhook = {};
-              updatedWebhook[pushWebhookData.attributes.event] = {
-                id: pushWebhookData.id,
-                type: pushWebhookData.type,
-                ...pushWebhookData.attributes,
-              };
-              setWebhook(updatedWebhook);
-            }
-            if (!pushWebhookEnabled && pushWebhookExists) {
-              var updatedWebhook = webhook;
-              updatedWebhook[pushWebhookName] = null;
-              setWebhook(updatedWebhook);
-            }
-            message.success("workspace updated successfully");
-          } else {
-            message.error("workspace update failed");
-          }
-          setWaiting(false);
-        });
-    } catch (error) {
-      console.error("error updating workspace:", error);
-      message.error("workspace update failed");
-      if (error.response) {
-        if (error.response.status === 424) {
-          message.error("failed to create push webhook, please check if the set vcs connection has the correct permissions on the linked repository.");
-        }
-        setWaiting(false);
-      }
-    }
+  //   try {
+  //     axiosInstance
+  //       .post("/operations",
+  //         body, atomicHeader
+  //       )
+  //       .then((response) => {
+  //         console.log(response);
+  //         if (response.status === 200) {
+  //           const pushWebhookData = response.data["atomic:results"][1]?.data;
+  //           if (pushWebhookEnabled && pushWebhookData) {
+  //             var updatedWebhook = {};
+  //             updatedWebhook[pushWebhookData.attributes.event] = {
+  //               id: pushWebhookData.id,
+  //               type: pushWebhookData.type,
+  //               ...pushWebhookData.attributes,
+  //             };
+  //             setWebhook(updatedWebhook);
+  //           }
+  //           if (!pushWebhookEnabled && pushWebhookExists) {
+  //             var updatedWebhook = webhook;
+  //             updatedWebhook[pushWebhookName] = null;
+  //             setWebhook(updatedWebhook);
+  //           }
+  //           message.success("workspace updated successfully");
+  //         } else {
+  //           message.error("workspace update failed");
+  //         }
+  //         setWaiting(false);
+  //       });
+  //   } catch (error) {
+  //     console.error("error updating workspace:", error);
+  //     message.error("workspace update failed");
+  //     if (error.response) {
+  //       if (error.response.status === 424) {
+  //         message.error("failed to create push webhook, please check if the set vcs connection has the correct permissions on the linked repository.");
+  //       }
+  //       setWaiting(false);
+  //     }
+  //   }
 
-    var bodyAgent;
-    console.log(`Using Agent: ${values.executorAgent}`);
-    if (values.executorAgent === "default") {
-      bodyAgent = {
-        data: null,
-      };
-    } else {
-      bodyAgent = {
-        data: {
-          type: "agent",
-          id: values.executorAgent,
-        },
-      };
-    }
-    console.log(bodyAgent);
-    axiosInstance
-      .patch(
-        `/organization/${organizationId}/workspace/${id}/relationships/agent`,
-        bodyAgent, genericHeader)
-      .then((response) => {
-        console.log("Update Workspace agent successfully");
-        console.log(response);
-        if (response.status === 204) {
-          console.log("Workspace agent updated successfully");
-        } else {
-          console.log("Workspace agent update failed");
-        }
-      });
-  };
+  //   var bodyAgent;
+  //   console.log(`Using Agent: ${values.executorAgent}`);
+  //   if (values.executorAgent === "default") {
+  //     bodyAgent = {
+  //       data: null,
+  //     };
+  //   } else {
+  //     bodyAgent = {
+  //       data: {
+  //         type: "agent",
+  //         id: values.executorAgent,
+  //       },
+  //     };
+  //   }
+  //   console.log(bodyAgent);
+  //   axiosInstance
+  //     .patch(
+  //       `/organization/${organizationId}/workspace/${id}/relationships/agent`,
+  //       bodyAgent, genericHeader)
+  //     .then((response) => {
+  //       console.log("Update Workspace agent successfully");
+  //       console.log(response);
+  //       if (response.status === 204) {
+  //         console.log("Workspace agent updated successfully");
+  //       } else {
+  //         console.log("Workspace agent update failed");
+  //       }
+  //     });
+  // };
 
-  const genericHeader = {
-    headers: {
-      "Content-Type": "application/vnd.api+json",
-    },
-  };
-  const atomicHeader = {
-    headers: {
-      "content-type": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
-      "accept": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
-    },
-  };
+  // const renderVCSLogo = (vcs) => {
+  //   switch (vcs) {
+  //     case "GITLAB":
+  //       return <GitlabOutlined style={{ fontSize: "18px" }} />;
+  //     case "BITBUCKET":
+  //       return (
+  //         <IconContext.Provider value={{ size: "18px" }}>
+  //           <SiBitbucket />
+  //           &nbsp;
+  //         </IconContext.Provider>
+  //       );
+  //     case "AZURE_DEVOPS":
+  //       return (
+  //         <IconContext.Provider value={{ size: "18px" }}>
+  //           <SiAzuredevops />
+  //           &nbsp;
+  //         </IconContext.Provider>
+  //       );
+  //     default:
+  //       return <GithubOutlined style={{ fontSize: "18px" }} />;
+  //   }
+  // };
 
-  const deleteWebhook = () => {
-    const webhooks = Object.entries(webhook);
-    if (webhooks.length == 0) return;
-    var body = {
-      "atomic:operations": []
-    };
-    webhooks.map(([_, hook]) => {
-      body["atomic:operations"].push({
-        op: "remove",
-        href: `/organization/${organizationId}/workspace/${id}/webhook/${hook.id}`,
-      });
-    });
-    try {
-      axiosInstance.post(
-        "/operations",
-        body, atomicHeader
-      )
-        .then((response) => {
-          if (response.status == 200) {
-            message.success("Webhook deleted successfully");
-          } else {
-            message.error("Webhook deletion failed");
-          }
-        });
-    } catch (error) {
-      console.error("Error deleting webhook:", error);
-      message.error("Webhook deletion failed");
-      if (error.response) {
-        if (error.response.status === 424) {
-          message.error("Failed to delete webhook, please check if the set VCS connection has the correct permissions on the linked repository.");
-        }
-      }
-    }
-  }
-
-  const renderVCSLogo = (vcs) => {
-    switch (vcs) {
-      case "GITLAB":
-        return <GitlabOutlined style={{ fontSize: "18px" }} />;
-      case "BITBUCKET":
-        return (
-          <IconContext.Provider value={{ size: "18px" }}>
-            <SiBitbucket />
-            &nbsp;
-          </IconContext.Provider>
-        );
-      case "AZURE_DEVOPS":
-        return (
-          <IconContext.Provider value={{ size: "18px" }}>
-            <VscAzureDevops />
-            &nbsp;
-          </IconContext.Provider>
-        );
-      default:
-        return <GithubOutlined style={{ fontSize: "18px" }} />;
-    }
-  };
-
-  const onDelete = (workspace) => {
-    let randomLetters = generateRandomString(4);
-    let deletedName = `${workspace.data.attributes.name.substring(
-      0,
-      21
-    )}_DEL_${randomLetters}`;
-    console.log(`New deleted name; ${deletedName}`);
-    const body = {
-      data: {
-        type: "workspace",
-        id: id,
-        attributes: {
-          name: deletedName,
-          deleted: "true",
-        },
-      },
-    };
-    axiosInstance
-        .patch(
-            `/organization/${organizationId}/workspace/${id}/relationships/vcs`,
-            {
-              data: null,
-            },
-            {
-              headers: {
-                "Content-Type": "application/vnd.api+json",
-              },
-            }
-        )
-        .then((response) => {
-          console.log("Deleting VCS refernce successfully");
-          axiosInstance
-              .patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader)
-              .then((response) => {
-                console.log(response);
-                if (response.status === 204) {
-                  console.log(response);
-                  message.success("Workspace deleted successfully");
-                  navigate(`/organizations/${organizationId}/workspaces`);
-                } else {
-                  message.error("Workspace deletion failed");
-                }
-              });
-          deleteWebhook();
-        });
-
-  };
+  // const onDelete = (workspace) => {
+  //   let randomLetters = generateRandomString(4);
+  //   let deletedName = `${workspace.data.attributes.name.substring(
+  //     0,
+  //     21
+  //   )}_DEL_${randomLetters}`;
+  //   console.log(`New deleted name; ${deletedName}`);
+  //   const body = {
+  //     data: {
+  //       type: "workspace",
+  //       id: id,
+  //       attributes: {
+  //         name: deletedName,
+  //         deleted: "true",
+  //       },
+  //     },
+  //   };
+  //   axiosInstance
+  //       .patch(
+  //           `/organization/${organizationId}/workspace/${id}/relationships/vcs`,
+  //           {
+  //             data: null,
+  //           },
+  //           {
+  //             headers: {
+  //               "Content-Type": "application/vnd.api+json",
+  //             },
+  //           }
+  //       )
+  //       .then((response) => {
+  //         console.log("Deleting VCS refernce successfully");
+  //         axiosInstance
+  //             .patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader)
+  //             .then((response) => {
+  //               console.log(response);
+  //               if (response.status === 204) {
+  //                 console.log(response);
+  //                 message.success("Workspace deleted successfully");
+  //                 navigate(`/organizations/${organizationId}/workspaces`);
+  //               } else {
+  //                 message.error("Workspace deletion failed");
+  //               }
+  //             });
+  //         deleteWebhook();
+  //       });
 
   return (
     <Content style={{ padding: "0 50px" }}>
@@ -816,10 +719,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     Add workspace description
                   </a>
                 )
-                :
-                (
-                  workspace.data.attributes.description
-                )}
+                  :
+                  (
+                    workspace.data.attributes.description
+                  )}
                 <Space
                     size={40}
                     style={{marginBottom: "40px"}}
@@ -1276,16 +1179,47 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} globalVariables={globalVariables} globalEnvVariables={globalEnvVariables}/>
+                <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} globalVariables={globalVariables} globalEnvVariables={globalEnvVariables}/>
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
                   {templates ? (
-                    <Schedules schedules={schedule} manageWorkspace={manageWorkspace}/>
+                    <Schedules schedules={schedule} manageWorkspace={manageWorkspace} />
                   ) : (
                     <p>Loading...</p>
                   )}
                 </TabPane>
-                <TabPane tab="Settings" key="6">
+                <Tabs tab="Settings" key="6">
+                  <Tabs tabPosition="left"
+                    items={[
+                      {
+                        label: "General",
+                        key: "61",
+                        children: <WorkspaceGeneral 
+                          workspaceData={workspace.data}
+                          orgTemplates={orgTemplates}
+                          manageWorkspace={manageWorkspace}
+                        />
+                      },
+                      {
+                        label: "Webhook",
+                        key: "62",
+                        children: <WorkspaceWebhook
+                          workspace={workspace.data}
+                          vcsProvider={vcsProvider}
+                          orgTemplates={orgTemplates}
+                          manageWorkspace={manageWorkspace} />
+                      },
+                      {
+                        label: "Advanced",
+                        key: "63",
+                        children: <WorkspaceAdvanced
+                          workspace={workspace.data}
+                          manageWorkspace={manageWorkspace} />
+                      },
+                    ]}
+                  />
+                </Tabs>
+                {/* <TabPane tab="Settings" key="6">
                   <div className="generalSettings">
                     <h1>General Settings</h1>
                     <Spin spinning={waiting}>
@@ -1610,7 +1544,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                       </Button>
                     </Popconfirm>
                   </div>
-                </TabPane>
+                </TabPane> */}
               </Tabs>
             </div>
           )}
@@ -1619,19 +1553,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     </Content>
   );
 };
-
-const characters =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-function generateRandomString(length) {
-  let result = "";
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-
-  return result;
-}
 
 function setupWorkspaceIncludes(
   data,
@@ -1651,7 +1572,7 @@ function setupWorkspaceIncludes(
   setAgent,
   _loadWebhook,
   setWebhook,
-  setPushWebhookEnabled,
+  // setPushWebhookEnabled,
   setContextState,
   setReferences,
   setCollectionVariables,
@@ -1833,15 +1754,14 @@ function setupWorkspaceIncludes(
   setEnvVariables(envVariables);
   setJobs(jobs);
   setHistory(history);
-  setSchedule(schedule);
-  setCollectionVariables(collectionVariables)
+  setSchedule(schedule);  setCollectionVariables(collectionVariables)
   setCollectionEnvVariables(collectionEnvVariables)
   setGlobalVariables(globalVariables);
   setGlobalEnvVariables(globalEnvVariables);
-  if (_loadWebhook) {
-    setWebhook(webhooks);
-    setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
-  }
+  // if (_loadWebhook) {
+  //   setWebhook(webhooks);
+  //   setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
+  // }
 
   console.log(
     `Parsing state for workspace ${sessionStorage.getItem(WORKSPACE_ARCHIVE)} `
@@ -2094,9 +2014,4 @@ function fixSshURL(source) {
   } else {
     return source;
   }
-}
-
-function getIaCNameById(id) {
-  const item = iacTypes.find((iacType) => iacType.id === id);
-  return item ? item.name : null;
 }

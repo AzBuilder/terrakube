@@ -25,13 +25,14 @@ public class WebhookManageHook implements LifeCycleHook<Webhook> {
             Optional<ChangeSpec> changes) {
         switch (operation) {
             case CREATE:
+            case UPDATE:
                 switch (phase) {
                     case PRECOMMIT:
                         try {
-                            webhookService.createWorkspaceWebhook(elideEntity);
+                            webhookService.createOrUpdateWorkspaceWebhook(elideEntity);
                         } catch (Exception e) {
                             throw new WebhookManagementException(HttpStatus.SC_FAILED_DEPENDENCY,
-                                    "Failed to create webhook: " + e.getMessage());
+                                    "Failed to create/update webhook: " + e.getMessage());
                         }
                         break;
 
