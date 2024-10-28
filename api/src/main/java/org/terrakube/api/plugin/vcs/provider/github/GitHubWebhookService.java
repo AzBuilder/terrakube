@@ -62,10 +62,6 @@ public class GitHubWebhookService extends WebhookServiceBase {
         try {
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
 
-            // Extract repository owner and name from the payload
-            String repoOwner = rootNode.path("repository").path("owner").path("login").asText();
-            String repoName = rootNode.path("repository").path("name").asText();
-
             // Handle push event
             if ("push".equals(event)) {
                 // Extract branch from the ref
@@ -90,12 +86,23 @@ public class GitHubWebhookService extends WebhookServiceBase {
 
             // Handle pull request event (opened, synchronize, reopened)
             } else if ("pull_request".equals(event)) {
+                // Extract repository owner and name from the payload
+                String repoOwner = rootNode.path("repository").path("owner").path("login").asText();
+                String repoName = rootNode.path("repository").path("name").asText();
                 String action = rootNode.path("action").asText();
                 if ("opened".equals(action) || "synchronize".equals(action) || "reopened".equals(action)) {
                     int prNumber = rootNode.path("number").asInt();
                     result.setPrNumber(prNumber);
-                    result.setRepoOwner(repoOwner);
-                    result.setRepoName(repoName);
+
+                    String prCommitId = rootNode.path("pull_request").path("head").path("sha").asText();
+                    result.setCommit(prCommitId);
+
+                    String prBranch = rootNode.path("pull_request").path("head").path("ref").asText();
+                    result.setBranch(prBranch);
+
+                    // Set createdBy to the user who created the PR
+                    String prUser = rootNode.path("pull_request").path("user").path("login").asText();
+                    result.setCreatedBy(prUser);
 
                     // Fetch file changes for the PR
                     List<String> prFileChanges = getPrFileChanges(prNumber, repoOwner, repoName, vcs);

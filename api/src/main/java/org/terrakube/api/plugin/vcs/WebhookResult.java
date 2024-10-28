@@ -19,6 +19,4 @@ public class WebhookResult {
     private List<String> fileChanges;
     private String commit;
     private Number prNumber;
-    private String repoOwner;
-    private String repoName;
 }
