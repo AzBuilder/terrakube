@@ -200,10 +200,12 @@ public class WebhookService {
     }
 
     private boolean checkBranch(String webhookBranch, Webhook webhook) {
-        String[] branchList = webhook.getBranch().split(",");
+        // Check if the webhook branch is the default workspace branch
         if (webhookBranch.equals(webhook.getWorkspace().getBranch())) {
             return true;
         }
+
+        String[] branchList = webhook.getBranch().split(",");
         for (String branch : branchList) {
             branch = branch.trim();
             if (webhookBranch.matches(branch)) {
