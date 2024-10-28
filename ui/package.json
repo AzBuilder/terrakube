@@ -6,7 +6,7 @@
     "@ant-design/icons": "^5.5.1",
     "@babel/core": "^7.25.8",
     "@babel/preset-env": "^7.25.8",
-    "@babel/standalone": "^7.25.8",
+    "@babel/standalone": "^7.26.1",
     "@monaco-editor/react": "^4.6.0",
     "@testing-library/jest-dom": "^6.6.2",
     "@testing-library/react": "16.0.1",
