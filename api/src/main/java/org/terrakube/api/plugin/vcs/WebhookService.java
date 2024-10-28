@@ -201,7 +201,9 @@ public class WebhookService {
 
     private boolean checkBranch(String webhookBranch, Webhook webhook) {
         String[] branchList = webhook.getBranch().split(",");
-
+        if (webhookBranch.equals(webhook.getWorkspace().getBranch())) {
+            return true;
+        }
         for (String branch : branchList) {
             branch = branch.trim();
             if (webhookBranch.matches(branch)) {
@@ -218,6 +220,10 @@ public class WebhookService {
             workspaceFolder = workspaceFolder.substring(1);
         }
         for (String file : files) {
+            if (file.startsWith(workspaceFolder)) {
+                log.info("Changed file {} in set workspace path {}", file, workspaceFolder);
+                return true;
+            }
             for (int i = 0; i < triggeredPath.length; i++) {
                 if (file.matches(triggeredPath[i])) {
                     log.info("Changed file {} matches set trigger pattern {}", file, triggeredPath[i]);
