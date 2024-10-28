@@ -833,7 +833,7 @@ public class RemoteTfeService {
 
         job = jobRepository.save(job);
         log.info("Job Created");
-        scheduleJobService.createJobContextNow(job);
+        scheduleJobService.createJobContext(job);
         log.info("Job Context Created");
         return getRun(job.getId(), null);
     }
