@@ -204,13 +204,14 @@ public class WebhookService {
         if (webhookBranch.equals(webhook.getWorkspace().getBranch())) {
             return true;
         }
+
         String[] branchList = webhook.getBranch().split(",");
         for (String branch : branchList) {
-            if (webhookBranch.startsWith(branch)) {
+            branch = branch.trim();
+            if (webhookBranch.matches(branch)) {
                 return true;
             }
         }
-
         return false;
     }
 
