@@ -64,7 +64,10 @@ jobs:
             docker tag $IMAGE_ID executortemp
           else
             docker run --user="root" --entrypoint launcher $IMAGE_ID "apt-get update && apt-get install git jq curl -y"
-            docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER cnb' $(docker ps -lq) executortemp
+            if [ "${{ matrix.os }}" == "jammy-arm" ]; then
+              docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER heroku' $(docker ps -lq) executortemp
+            else
+              docker commit --change='ENTRYPOINT ["/cnb/process/web"]' --change='USER cnb' $(docker ps -lq) executortemp
           fi
       
           IMAGE_ID=$(docker images executortemp -q)
