@@ -30,7 +30,7 @@
         <snakeyaml.version>2.3</snakeyaml.version>
         <quartz.version>2.5.0-rc1</quartz.version>
         <aws-sdk.version>2.29.6</aws-sdk.version>
-        <gcp-libraries-bom.version>26.49.0</gcp-libraries-bom.version>
+        <gcp-libraries-bom.version>26.50.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
         <jedis.version>5.1.5</jedis.version>
         <commons-text.version>1.12.0</commons-text.version>
