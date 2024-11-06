@@ -719,18 +719,34 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       },
     };
     axiosInstance
-      .patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader)
-      .then((response) => {
-        console.log(response);
-        if (response.status === 204) {
-          console.log(response);
-          message.success("Workspace deleted successfully");
-          navigate(`/organizations/${organizationId}/workspaces`);
-        } else {
-          message.error("Workspace deletion failed");
-        }
-      });
-    deleteWebhook();
+        .patch(
+            `/organization/${organizationId}/workspace/${id}/relationships/vcs`,
+            {
+              data: null,
+            },
+            {
+              headers: {
+                "Content-Type": "application/vnd.api+json",
+              },
+            }
+        )
+        .then((response) => {
+          console.log("Deleting VCS refernce successfully");
+          axiosInstance
+              .patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader)
+              .then((response) => {
+                console.log(response);
+                if (response.status === 204) {
+                  console.log(response);
+                  message.success("Workspace deleted successfully");
+                  navigate(`/organizations/${organizationId}/workspaces`);
+                } else {
+                  message.error("Workspace deletion failed");
+                }
+              });
+          deleteWebhook();
+        });
+
   };
 
   return (
