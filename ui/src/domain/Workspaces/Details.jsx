@@ -523,7 +523,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             description: values.description,
             folder: values.folder,
             locked: values.locked,
-            lockedDescription: values.lockedDescription,
+            lockDescription: values.lockDescription,
             executionMode: values.executionMode,
             moduleSshKey: values.moduleSshKey,
             terraformVersion: values.terraformVersion,
@@ -786,24 +786,24 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   workspace.data.attributes.description
                 )}
                 <Space
-                  size={40}
-                  style={{ marginBottom: "40px" }}
-                  direction="horizontal"
+                    size={40}
+                    style={{marginBottom: "40px"}}
+                    direction="horizontal"
                 >
                   <span>
                     {workspace.data.attributes.locked ? (
-                      <>
-                        <LockOutlined /> Locked
-                      </>
+                        <>
+                          <LockOutlined/> Locked
+                        </>
                     ) : (
-                      <>
-                        <UnlockOutlined /> Unlocked
-                      </>
+                        <>
+                          <UnlockOutlined/> Unlocked
+                        </>
                     )}
                   </span>
                   <span>
-                    <ProfileOutlined /> Resources{" "}
-                    <span style={{ fontWeight: "500" }}>
+                    <ProfileOutlined/> Resources{" "}
+                    <span style={{fontWeight: "500"}}>
                       {resources.length}
                     </span>
                   </span>
@@ -812,9 +812,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     <span>
                       {getIaCNameById(workspace.data.attributes?.iacType)}{" "}
                       <a
-                        onClick={handleClickSettings}
-                        className="workspace-button"
-                        style={{ color: "#3b3d45" }}
+                          onClick={handleClickSettings}
+                          className="workspace-button"
+                          style={{color: "#3b3d45"}}
                       >
                         v{workspace.data.attributes.terraformVersion}
                       </a>
@@ -822,22 +822,19 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   </Space>
 
                   <span>
-                    <ClockCircleOutlined /> Updated{" "}
-                    <span style={{ fontWeight: "500" }}>
+                    <ClockCircleOutlined/> Updated{" "}
+                    <span style={{fontWeight: "500"}}>
                       {DateTime.fromISO(lastRun).toRelative() ??
-                        "never executed"}
+                          "never executed"}
                     </span>
                   </span>
-                </Space>
-              </Space>
-              <Space className="workspace-lock-details" direction="vertical">
-                <Paragraph>
+
                   <span>
                     {workspace.data.attributes.locked ? (
                         <>
                           <Alert
                               message="Lock Description"
-                              description="This is a warning notice about copywriting."
+                              description= {workspace.data.attributes.lockDescription}
                               type="warning"
                               showIcon
                           />
@@ -847,8 +844,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         </>
                     )}
                   </span>
-                </Paragraph>
+                </Space>
               </Space>
+
               <Tabs
                   activeKey={activeKey}
                   defaultActiveKey={selectedTab}
@@ -1263,6 +1261,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           description: workspace.data.attributes.description,
                           folder: workspace.data.attributes.folder,
                           locked: workspace.data.attributes.locked,
+                          lockDescription: workspace.data.attributes.lockDescription,
                           moduleSshKey: workspace.data.attributes.moduleSshKey,
                           executionMode:
                             workspace.data.attributes.executionMode,
@@ -1374,7 +1373,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           <Switch disabled={!manageWorkspace}/>
                         </Form.Item>
                         <Form.Item
-                            valuePropName="lockDescription"
+                            valuePropName="value"
                             name="lockDescription"
                             label="Setup custom lock description message"
                         >
