@@ -46,7 +46,22 @@
             <column name="updated_date" type="datetime"/>
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
+            <column name="collection_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_collection_data" references="collection(id)"/>
+            </column>
+        </createTable>
+        <createTable tableName="collection_workspace_reference">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
             <column name="workspace_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_collection_data" references="workspace(id)"/>
+            </column>
+            <column name="collection_id" type="varchar(36)">
                 <constraints nullable="false" foreignKeyName="fk_collection_data" references="collection(id)"/>
             </column>
         </createTable>

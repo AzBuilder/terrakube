@@ -28,7 +28,7 @@ public class Data {
     @Column(name="variable_key")
     private String key;
 
-    @ReadPermission(expression = "user read secret")
+    //@ReadPermission(expression = "user read secret")
     @Column(name="variable_value")
     private String value;
 
