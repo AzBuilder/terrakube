@@ -16,6 +16,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import {
+  Alert,
   Avatar,
   Breadcrumb,
   Button,
@@ -522,6 +523,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             description: values.description,
             folder: values.folder,
             locked: values.locked,
+            lockDescription: values.lockDescription,
             executionMode: values.executionMode,
             moduleSshKey: values.moduleSshKey,
             terraformVersion: values.terraformVersion,
@@ -784,24 +786,24 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   workspace.data.attributes.description
                 )}
                 <Space
-                  size={40}
-                  style={{ marginBottom: "40px" }}
-                  direction="horizontal"
+                    size={40}
+                    style={{marginBottom: "40px"}}
+                    direction="horizontal"
                 >
                   <span>
                     {workspace.data.attributes.locked ? (
-                      <>
-                        <LockOutlined /> Locked
-                      </>
+                        <>
+                          <LockOutlined/> Locked
+                        </>
                     ) : (
-                      <>
-                        <UnlockOutlined /> Unlocked
-                      </>
+                        <>
+                          <UnlockOutlined/> Unlocked
+                        </>
                     )}
                   </span>
                   <span>
-                    <ProfileOutlined /> Resources{" "}
-                    <span style={{ fontWeight: "500" }}>
+                    <ProfileOutlined/> Resources{" "}
+                    <span style={{fontWeight: "500"}}>
                       {resources.length}
                     </span>
                   </span>
@@ -810,9 +812,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     <span>
                       {getIaCNameById(workspace.data.attributes?.iacType)}{" "}
                       <a
-                        onClick={handleClickSettings}
-                        className="workspace-button"
-                        style={{ color: "#3b3d45" }}
+                          onClick={handleClickSettings}
+                          className="workspace-button"
+                          style={{color: "#3b3d45"}}
                       >
                         v{workspace.data.attributes.terraformVersion}
                       </a>
@@ -820,26 +822,43 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   </Space>
 
                   <span>
-                    <ClockCircleOutlined /> Updated{" "}
-                    <span style={{ fontWeight: "500" }}>
+                    <ClockCircleOutlined/> Updated{" "}
+                    <span style={{fontWeight: "500"}}>
                       {DateTime.fromISO(lastRun).toRelative() ??
-                        "never executed"}
+                          "never executed"}
                     </span>
+                  </span>
+
+                  <span>
+                    {workspace.data.attributes.locked ? (
+                        <>
+                          <Alert
+                              message="Lock Description"
+                              description= {workspace.data.attributes.lockDescription}
+                              type="warning"
+                              showIcon
+                          />
+                        </>
+                    ) : (
+                        <>
+                        </>
+                    )}
                   </span>
                 </Space>
               </Space>
+
               <Tabs
-                activeKey={activeKey}
-                defaultActiveKey={selectedTab}
-                onTabClick={handleStatesClick}
-                tabBarExtraContent={
-                  <>
-                    <Space direction="horizontal">
-                      {actions &&
-                        actions
-                          .reduce((acc, action) => {
-                            if (!action.attributes.displayCriteria) {
-                              acc.push(action);
+                  activeKey={activeKey}
+                  defaultActiveKey={selectedTab}
+                  onTabClick={handleStatesClick}
+                  tabBarExtraContent={
+                    <>
+                      <Space direction="horizontal">
+                        {actions &&
+                            actions
+                                .reduce((acc, action) => {
+                                  if (!action.attributes.displayCriteria) {
+                                    acc.push(action);
                               return acc;
                             }
 
@@ -1242,6 +1261,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           description: workspace.data.attributes.description,
                           folder: workspace.data.attributes.folder,
                           locked: workspace.data.attributes.locked,
+                          lockDescription: workspace.data.attributes.lockDescription,
                           moduleSshKey: workspace.data.attributes.moduleSshKey,
                           executionMode:
                             workspace.data.attributes.executionMode,
@@ -1352,7 +1372,13 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         >
                           <Switch disabled={!manageWorkspace}/>
                         </Form.Item>
-
+                        <Form.Item
+                            valuePropName="value"
+                            name="lockDescription"
+                            label="Setup custom lock description message"
+                        >
+                          <Input.TextArea placeholder="Lock description details" disabled={!manageWorkspace}/>
+                        </Form.Item>
                         <Form.Item
                           name="iacType"
                           label="Select IaC type "

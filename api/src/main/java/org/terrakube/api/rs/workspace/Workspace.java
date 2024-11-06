@@ -85,6 +85,9 @@ public class Workspace extends GenericAuditFields {
     @Column(name = "default_template")
     private String defaultTemplate;
 
+    @Column(name = "lock_description")
+    private String lockDescription;
+
     @Column(name = "iac_type")
     private String iacType = "terraform";
 
