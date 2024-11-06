@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="2-24-0-1" author="alfespa17@gmail.com">
+        <createTable tableName="collection">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(512)">
+            </column>
+            <column name="priority" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+        </createTable>
+        <createTable tableName="collection_data">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="variable_description" type="varchar(512)">
+            </column>
+            <column name="variable_key" type="varchar(3072)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variable_value" type="varchar(3072)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sensitive" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hcl" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variable_category" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime"/>
+            <column name="updated_date" type="datetime"/>
+            <column name="created_by" type="varchar2(128)"/>
+            <column name="updated_by" type="varchar2(128)"/>
+            <column name="workspace_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_collection_data" references="collection(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
