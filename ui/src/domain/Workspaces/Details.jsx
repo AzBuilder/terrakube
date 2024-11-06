@@ -522,6 +522,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             description: values.description,
             folder: values.folder,
             locked: values.locked,
+            lockedDescription: values.lockedDescription,
             executionMode: values.executionMode,
             moduleSshKey: values.moduleSshKey,
             terraformVersion: values.terraformVersion,
@@ -828,16 +829,33 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   </span>
                 </Space>
               </Space>
+              <Space className="workspace-lock-details" direction="vertical">
+                  <span>
+                    {workspace.data.attributes.locked ? (
+                        <>
+                          <Alert
+                              message="Lock Description"
+                              description="This is a warning notice about copywriting."
+                              type="warning"
+                              showIcon
+                          />
+                        </>
+                    ) : (
+                        <>
+                        </>
+                    )}
+                  </span>
+              </Space>
               <Tabs
-                activeKey={activeKey}
-                defaultActiveKey={selectedTab}
-                onTabClick={handleStatesClick}
-                tabBarExtraContent={
-                  <>
-                    <Space direction="horizontal">
-                      {actions &&
-                        actions
-                          .reduce((acc, action) => {
+                  activeKey={activeKey}
+                  defaultActiveKey={selectedTab}
+                  onTabClick={handleStatesClick}
+                  tabBarExtraContent={
+                    <>
+                      <Space direction="horizontal">
+                        {actions &&
+                            actions
+                                .reduce((acc, action) => {
                             if (!action.attributes.displayCriteria) {
                               acc.push(action);
                               return acc;
@@ -1352,7 +1370,13 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         >
                           <Switch disabled={!manageWorkspace}/>
                         </Form.Item>
-
+                        <Form.Item
+                            valuePropName="lockDescription"
+                            name="lockDescription"
+                            label="Setup custom lock description message"
+                        >
+                          <Input.TextArea placeholder="Lock description details" disabled={!manageWorkspace}/>
+                        </Form.Item>
                         <Form.Item
                           name="iacType"
                           label="Select IaC type "
