@@ -831,6 +831,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 </Space>
               </Space>
               <Space className="workspace-lock-details" direction="vertical">
+                <Paragraph>
                   <span>
                     {workspace.data.attributes.locked ? (
                         <>
@@ -846,6 +847,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         </>
                     )}
                   </span>
+                </Paragraph>
               </Space>
               <Tabs
                   activeKey={activeKey}
@@ -857,8 +859,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                         {actions &&
                             actions
                                 .reduce((acc, action) => {
-                            if (!action.attributes.displayCriteria) {
-                              acc.push(action);
+                                  if (!action.attributes.displayCriteria) {
+                                    acc.push(action);
                               return acc;
                             }
 
