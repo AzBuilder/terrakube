@@ -86,7 +86,7 @@ public class EphemeralExecutorService {
         Optional<String> configMapMountPathOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get("CONFIG_MAP_MOUNT_PATH"));
         if (configMapNameOpt.isPresent()) {
             String configMapName = configMapNameOpt.get();
-            String mountPath = configMapMountPathOpt.orElse("/etc/config");  // Default mount path if not specified
+            String mountPath = configMapMountPathOpt.orElse("/home/");  // Default mount path if not specified
 
             // Define ConfigMap volume
             Volume configMapVolume = new Volume();
