@@ -20,6 +20,9 @@ public class EphemeralExecutorService {
     private static final String NODE_SELECTOR = "EPHEMERAL_CONFIG_NODE_SELECTOR_TAGS";
     private static final String SERVICE_ACCOUNT = "EPHEMERAL_CONFIG_SERVICE_ACCOUNT";
     private static final String ANNOTATIONS = "EPHEMERAL_CONFIG_ANNOTATIONS";
+    private static final String CONFIG_MAP_NAME = "EPHEMERAL_CONFIG_MAP_NAME";
+    private static final String CONFIG_MAP_PATH = "EPHEMERAL_CONFIG_MAP_MOUNT_PATH";
+
 
     KubernetesClient kubernetesClient;
     EphemeralConfiguration ephemeralConfiguration;
@@ -28,7 +31,6 @@ public class EphemeralExecutorService {
         final String jobName = "job-" + job.getId();
         deleteEphemeralJob(job);
         log.info("Ephemeral Executor Image {}, Job: {}, Namespace: {}, NodeSelector: {}", ephemeralConfiguration.getImage(), jobName, ephemeralConfiguration.getNamespace(), ephemeralConfiguration.getNodeSelector());
-
         SecretEnvSource secretEnvSource = new SecretEnvSource();
         secretEnvSource.setName(ephemeralConfiguration.getSecret());
         EnvFromSource envFromSource = new EnvFromSource();
@@ -48,6 +50,7 @@ public class EphemeralExecutorService {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+
         final List<EnvVar> executorEnvVarFlags = Arrays.asList(executorFlagBatch, executorFlagBatchJsonContent);
 
         Optional<String> nodeSelector = Optional.ofNullable(executorContext.getEnvironmentVariables().getOrDefault(NODE_SELECTOR, null));
@@ -82,8 +85,8 @@ public class EphemeralExecutorService {
         List<Volume> volumes = new ArrayList<>();
         List<VolumeMount> volumeMounts = new ArrayList<>();
 
-        Optional<String> configMapNameOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get("CONFIG_MAP_NAME"));
-        Optional<String> configMapMountPathOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get("CONFIG_MAP_MOUNT_PATH"));
+        Optional<String> configMapNameOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get(CONFIG_MAP_NAME));
+        Optional<String> configMapMountPathOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get(CONFIG_MAP_PATH));
         if (configMapNameOpt.isPresent()) {
             String configMapName = configMapNameOpt.get();
             String mountPath = configMapMountPathOpt.orElse("/tmp");  // Default mount path if not specified
