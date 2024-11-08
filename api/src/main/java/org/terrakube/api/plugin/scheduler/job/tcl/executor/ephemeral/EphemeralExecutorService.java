@@ -50,7 +50,7 @@ public class EphemeralExecutorService {
         }
         final List<EnvVar> executorEnvVarFlags = Arrays.asList(executorFlagBatch, executorFlagBatchJsonContent);
 
-        Optional<String> nodeSelector = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(NODE_SELECTOR) ? executorContext.getEnvironmentVariables().get(NODE_SELECTOR) : null);
+        Optional<String> nodeSelector = Optional.ofNullable(executorContext.getEnvironmentVariables().getOrDefault(NODE_SELECTOR, null));
         Map<String, String> nodeSelectorInfo = new HashMap();
         log.info("Custom Node selector: {} {}", nodeSelector.isPresent(), nodeSelector.isEmpty());
         if(nodeSelector.isPresent()) {
@@ -64,7 +64,7 @@ public class EphemeralExecutorService {
             nodeSelectorInfo = ephemeralConfiguration.getNodeSelector();
         }
 
-        Optional<String> annotationsInfo = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(ANNOTATIONS) ? executorContext.getEnvironmentVariables().get(ANNOTATIONS) : null);
+        Optional<String> annotationsInfo = Optional.ofNullable(executorContext.getEnvironmentVariables().getOrDefault(ANNOTATIONS, null));
         Map<String, String> annotations = new HashMap();
         log.info("Custom Annotations: {}", annotationsInfo.isPresent());
         if(annotationsInfo.isPresent()) {
@@ -75,8 +75,8 @@ public class EphemeralExecutorService {
         }
 
         Optional<String> serviceAccountInfo = Optional.ofNullable(
-                executorContext.getEnvironmentVariables().containsKey(SERVICE_ACCOUNT) ? executorContext.getEnvironmentVariables().get(SERVICE_ACCOUNT) : null);
-        String serviceAccount = serviceAccountInfo.isPresent() ? serviceAccountInfo.get() : null;
+                executorContext.getEnvironmentVariables().getOrDefault(SERVICE_ACCOUNT, null));
+        String serviceAccount = serviceAccountInfo.orElse(null);
 
         // Volume and VolumeMount for ConfigMap if specified
         List<Volume> volumes = new ArrayList<>();
