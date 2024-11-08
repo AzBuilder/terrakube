@@ -799,7 +799,7 @@ export const CreateWorkspace = () => {
                 name="webhookBranch"
                 label="Webhook Branch"
                 tooltip="A list of branch prefixes that will trigger a run."
-                extra="A list of brach prefixes besides the default VCS branch that will trigger a run, for example 'feat,fix'. Values are separated by comma."
+                extra="A list of branch regex besides the default VCS branch that will trigger a run, for example 'feat,fix'. Values are separated by comma."
                 rules={[{ required: false }]}
               >
                 <Input placeholder={defaultBranch} />

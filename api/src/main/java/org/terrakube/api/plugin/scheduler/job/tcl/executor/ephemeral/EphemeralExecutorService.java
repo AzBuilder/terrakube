@@ -1,9 +1,7 @@
 package org.terrakube.api.plugin.scheduler.job.tcl.executor.ephemeral;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fabric8.kubernetes.api.model.EnvFromSource;
-import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.SecretEnvSource;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.AllArgsConstructor;
@@ -22,6 +20,9 @@ public class EphemeralExecutorService {
     private static final String NODE_SELECTOR = "EPHEMERAL_CONFIG_NODE_SELECTOR_TAGS";
     private static final String SERVICE_ACCOUNT = "EPHEMERAL_CONFIG_SERVICE_ACCOUNT";
     private static final String ANNOTATIONS = "EPHEMERAL_CONFIG_ANNOTATIONS";
+    private static final String CONFIG_MAP_NAME = "EPHEMERAL_CONFIG_MAP_NAME";
+    private static final String CONFIG_MAP_PATH = "EPHEMERAL_CONFIG_MAP_MOUNT_PATH";
+
 
     KubernetesClient kubernetesClient;
     EphemeralConfiguration ephemeralConfiguration;
@@ -52,7 +53,7 @@ public class EphemeralExecutorService {
 
         final List<EnvVar> executorEnvVarFlags = Arrays.asList(executorFlagBatch, executorFlagBatchJsonContent);
 
-        Optional<String> nodeSelector = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(NODE_SELECTOR) ? executorContext.getEnvironmentVariables().get(NODE_SELECTOR) : null);
+        Optional<String> nodeSelector = Optional.ofNullable(executorContext.getEnvironmentVariables().getOrDefault(NODE_SELECTOR, null));
         Map<String, String> nodeSelectorInfo = new HashMap();
         log.info("Custom Node selector: {} {}", nodeSelector.isPresent(), nodeSelector.isEmpty());
         if(nodeSelector.isPresent()) {
@@ -66,7 +67,7 @@ public class EphemeralExecutorService {
             nodeSelectorInfo = ephemeralConfiguration.getNodeSelector();
         }
 
-        Optional<String> annotationsInfo = Optional.ofNullable(executorContext.getEnvironmentVariables().containsKey(ANNOTATIONS) ? executorContext.getEnvironmentVariables().get(ANNOTATIONS) : null);
+        Optional<String> annotationsInfo = Optional.ofNullable(executorContext.getEnvironmentVariables().getOrDefault(ANNOTATIONS, null));
         Map<String, String> annotations = new HashMap();
         log.info("Custom Annotations: {}", annotationsInfo.isPresent());
         if(annotationsInfo.isPresent()) {
@@ -77,8 +78,33 @@ public class EphemeralExecutorService {
         }
 
         Optional<String> serviceAccountInfo = Optional.ofNullable(
-                executorContext.getEnvironmentVariables().containsKey(SERVICE_ACCOUNT) ? executorContext.getEnvironmentVariables().get(SERVICE_ACCOUNT) : null);
-        String serviceAccount = serviceAccountInfo.isPresent() ? serviceAccountInfo.get() : null;
+                executorContext.getEnvironmentVariables().getOrDefault(SERVICE_ACCOUNT, null));
+        String serviceAccount = serviceAccountInfo.orElse(null);
+
+        // Volume and VolumeMount for ConfigMap if specified
+        List<Volume> volumes = new ArrayList<>();
+        List<VolumeMount> volumeMounts = new ArrayList<>();
+
+        Optional<String> configMapNameOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get(CONFIG_MAP_NAME));
+        Optional<String> configMapMountPathOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get(CONFIG_MAP_PATH));
+        if (configMapNameOpt.isPresent()) {
+            String configMapName = configMapNameOpt.get();
+            String mountPath = configMapMountPathOpt.orElse("/tmp");  // Default mount path if not specified
+
+            // Define ConfigMap volume
+            Volume configMapVolume = new Volume();
+            configMapVolume.setName("config-volume");
+            ConfigMapVolumeSource configMapVolumeSource = new ConfigMapVolumeSource();
+            configMapVolumeSource.setName(configMapName);
+            configMapVolume.setConfigMap(configMapVolumeSource);
+            volumes.add(configMapVolume);
+
+            // Define VolumeMount for the container
+            VolumeMount configMapMount = new VolumeMount();
+            configMapMount.setName("config-volume");
+            configMapMount.setMountPath(mountPath);
+            volumeMounts.add(configMapMount);
+        }
 
         io.fabric8.kubernetes.api.model.batch.v1.Job k8sJob = new JobBuilder()
                 .withApiVersion("batch/v1")
@@ -95,11 +121,13 @@ public class EphemeralExecutorService {
                 .withNewSpec()
                 .withNodeSelector(nodeSelectorInfo)
                 .withServiceAccountName(serviceAccount)
+                .withVolumes(volumes)
                 .addNewContainer()
                 .withName(jobName)
                 .withEnvFrom(executorEnvVarFromSecret)
                 .withImage(ephemeralConfiguration.getImage())
                 .withEnv(executorEnvVarFlags)
+                .withVolumeMounts(volumeMounts)
                 .endContainer()
                 .withRestartPolicy("Never")
                 .endSpec()
