@@ -1,4 +1,4 @@
-package org.terrakube.api.rs.collection.parameters;
+package org.terrakube.api.rs.collection.item;
 
 import com.yahoo.elide.annotation.Include;
 import com.yahoo.elide.annotation.ReadPermission;
@@ -16,8 +16,8 @@ import java.util.UUID;
 @Include(rootLevel = false)
 @Getter
 @Setter
-@Entity(name = "collection_value")
-public class Data {
+@Entity
+public class Item {
 
     @Id
     @JdbcTypeCode(Types.VARCHAR)
@@ -25,18 +25,18 @@ public class Data {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name="variable_key")
+    @Column(name="item_key")
     private String key;
 
-    //@ReadPermission(expression = "user read secret")
-    @Column(name="variable_value")
+    @ReadPermission(expression = "user read collection")
+    @Column(name="item_value")
     private String value;
 
-    @Column(name="variable_description")
+    @Column(name="item_description")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="variable_category")
+    @Column(name="item_category")
     private Category category;
 
     @Column(name="sensitive")

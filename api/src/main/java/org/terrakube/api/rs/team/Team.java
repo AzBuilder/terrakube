@@ -43,6 +43,9 @@ public class Team {
     @Column(name = "manage_state")
     private boolean manageState;
 
+    @Column(name = "manage_collection")
+    private boolean manageCollection;
+
     @Column(name = "manage_workspace")
     private boolean manageWorkspace;
 

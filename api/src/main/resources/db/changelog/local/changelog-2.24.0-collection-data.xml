@@ -20,17 +20,20 @@
             <column name="updated_date" type="datetime"/>
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
+            <column name="organization_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_collection_org" references="organization(id)"/>
+            </column>
         </createTable>
-        <createTable tableName="collection_data">
+        <createTable tableName="item">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="variable_description" type="varchar(512)">
+            <column name="item_description" type="varchar(512)">
             </column>
-            <column name="variable_key" type="varchar(3072)">
+            <column name="item_key" type="varchar(3072)">
                 <constraints nullable="false"/>
             </column>
-            <column name="variable_value" type="varchar(3072)">
+            <column name="item_value" type="varchar(3072)">
                 <constraints nullable="false"/>
             </column>
             <column name="sensitive" type="boolean">
@@ -39,7 +42,7 @@
             <column name="hcl" type="boolean">
                 <constraints nullable="false"/>
             </column>
-            <column name="variable_category" type="varchar(32)">
+            <column name="item_category" type="varchar(32)">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="datetime"/>
@@ -47,10 +50,10 @@
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
             <column name="collection_id" type="varchar(36)">
-                <constraints nullable="false" foreignKeyName="fk_collection_data" references="collection(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_collection_item" references="collection(id)"/>
             </column>
         </createTable>
-        <createTable tableName="collection_workspace_reference">
+        <createTable tableName="collection_reference">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
             </column>
@@ -58,12 +61,19 @@
             <column name="updated_date" type="datetime"/>
             <column name="created_by" type="varchar2(128)"/>
             <column name="updated_by" type="varchar2(128)"/>
+            <column name="description" type="varchar(512)"/>
             <column name="workspace_id" type="varchar(36)">
-                <constraints nullable="false" foreignKeyName="fk_collection_data" references="workspace(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_reference_workspace" references="workspace(id)"/>
             </column>
             <column name="collection_id" type="varchar(36)">
-                <constraints nullable="false" foreignKeyName="fk_collection_data" references="collection(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_reference_collection" references="collection(id)"/>
             </column>
         </createTable>
+        <addColumn tableName="team">
+            <column name="manage_collection" type="boolean" defaultValue="false"/>
+        </addColumn>
+        <update tableName="team">
+            <column name="manage_collection" valueBoolean="false"/>
+        </update>
     </changeSet>
 </databaseChangeLog>

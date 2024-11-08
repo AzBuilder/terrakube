@@ -10,6 +10,7 @@ import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.agent.Agent;
+import org.terrakube.api.rs.collection.Reference;
 import org.terrakube.api.rs.hooks.workspace.WorkspaceManageHook;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.ssh.Ssh;
@@ -135,4 +136,7 @@ public class Workspace extends GenericAuditFields {
     
     @OneToMany(mappedBy = "workspace", fetch = FetchType.LAZY)
     private List<Webhook> webhook;
+
+    @OneToMany(mappedBy = "workspace", fetch = FetchType.LAZY)
+    private List<Reference> reference;
 }

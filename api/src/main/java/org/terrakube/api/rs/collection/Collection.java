@@ -5,25 +5,23 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLRestriction;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.collection.item.Item;
 
 import java.sql.Types;
+import java.util.List;
 import java.util.UUID;
 
-//@ReadPermission(expression = "team view workspace")
-//@CreatePermission(expression = "team manage workspace")
-//@UpdatePermission(expression = "team manage workspace")
-//@DeletePermission(expression = "team manage workspace")
-//@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = WorkspaceManageHook.class)
-//@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT, hook = WorkspaceManageHook.class)
-@Include
+@ReadPermission(expression = "team view collection")
+@CreatePermission(expression = "team manage collection")
+@UpdatePermission(expression = "team manage collection")
+@DeletePermission(expression = "team manage collection")
+@Include(rootLevel = false)
 @Getter
 @Setter
 @Entity(name = "collection")
-@SQLRestriction(value = "deleted = false")
 public class Collection extends GenericAuditFields {
 
     @Id
@@ -43,4 +41,10 @@ public class Collection extends GenericAuditFields {
 
     @ManyToOne
     private Organization organization;
+
+    @OneToMany(mappedBy = "collection")
+    List<Item> item;
+
+    @OneToMany(mappedBy = "collection")
+    List<Reference> reference;
 }
