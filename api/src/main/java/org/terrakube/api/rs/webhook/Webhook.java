@@ -3,6 +3,7 @@ package org.terrakube.api.rs.webhook;
 import java.sql.Types;
 import java.util.UUID;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
@@ -12,14 +13,6 @@ import org.terrakube.api.rs.workspace.Workspace;
 import com.yahoo.elide.annotation.Include;
 import com.yahoo.elide.annotation.LifeCycleHookBinding;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,7 +42,7 @@ public class Webhook extends GenericAuditFields{
     @Enumerated(EnumType.STRING)
     private WebhookEvent event = WebhookEvent.PUSH;
     
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Workspace workspace;
 }
 

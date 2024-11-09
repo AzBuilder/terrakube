@@ -28,7 +28,7 @@
         <mysql.version>9.1.0</mysql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.3</snakeyaml.version>
-        <quartz.version>2.5.0-rc1</quartz.version>
+        <quartz.version>2.5.0-rc2</quartz.version>
         <aws-sdk.version>2.29.6</aws-sdk.version>
         <gcp-libraries-bom.version>26.50.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>

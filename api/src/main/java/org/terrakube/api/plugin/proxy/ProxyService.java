@@ -108,7 +108,7 @@ public class ProxyService {
         List<Globalvar> globalVariables = globalVarRepository.findByOrganization(organization);
         globalVariables.forEach(globalvar -> VARS.put(globalvar.getKey(), globalvar.getValue()));
 
-        List<Variable> variables = variableRepository.findByWorkspace(workspace);
+        List<Variable> variables = variableRepository.findByWorkspace(workspace).orElse(new ArrayList<>());
         variables.forEach(variable -> VARS.put(variable.getKey(), variable.getValue()));
     }
 

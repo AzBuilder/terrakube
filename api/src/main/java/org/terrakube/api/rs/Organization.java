@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLRestriction;
 import org.terrakube.api.rs.agent.Agent;
+import org.terrakube.api.rs.collection.Collection;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.hooks.organization.OrganizationManageHook;
 import org.terrakube.api.rs.job.Job;
@@ -63,6 +64,10 @@ public class Organization {
 
     @Column(name = "description")
     private String description;
+
+    @UpdatePermission(expression = "user belongs organization")
+    @OneToMany(mappedBy = "organization")
+    private List<Collection> collection;
 
     @UpdatePermission(expression = "user belongs organization")
     @OneToMany(mappedBy = "organization")

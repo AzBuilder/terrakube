@@ -66,4 +66,5 @@
     <include file="/db/changelog/local/changelog-2.23.0-team-manage-state.xml"/>
     <include file="/db/changelog/local/changelog-2.23.1-team-manage-state-hotfix.xml"/>
     <include file="/db/changelog/local/changelog-2.24.0-lock-description.xml"/>
+    <include file="/db/changelog/local/changelog-2.24.0-collection-data.xml"/>
 </databaseChangeLog>
