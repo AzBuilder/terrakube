@@ -14,7 +14,7 @@ import java.util.UUID;
 @Include
 @Getter
 @Setter
-@Entity(name = "collection_reference")
+@Entity(name = "reference")
 public class Reference {
 
     @Id

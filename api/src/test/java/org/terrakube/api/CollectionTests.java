@@ -77,17 +77,42 @@ public class CollectionTests extends ServerApplicationTests {
                         "      \"description\": \"Sample Description\",\n" +
                         "      \"priority\": 10\n" +
                         "      }" +
-
-
                         "   }" +
                         "}")
                 .when()
-                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/collection/"+collectionId)
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/collection/"+collectionId+"/item/")
                 .then()
                 .assertThat()
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
+
+        String referenceId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"reference\",\n" +
+                        "    \"attributes\": {\n" +
+                        "            \"description\": \"my random description\"\n" +
+                        "         },\n" +
+                        "    \"relationships\": {\n" +
+                        "      \"workspace\": {\n" +
+                        "        \"data\": {\n" +
+                        "          \"type\": \"workspace\",\n" +
+                        "          \"id\": \"5ed411ca-7ab8-4d2f-b591-02d0d5788afc\"\n" +
+                        "        }\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/collection/"+collectionId+"/reference/")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
 
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
@@ -102,7 +127,7 @@ public class CollectionTests extends ServerApplicationTests {
                         "   }" +
                         "}")
                 .when()
-                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/collection/"+collectionId+"/item/")
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/collection/"+collectionId+"/reference/"+referenceId)
                 .then()
                 .assertThat()
                 .log()
@@ -182,6 +207,9 @@ public class CollectionTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.FORBIDDEN.value());
+
+        team.setManageCollection(false);
+        teamRepository.save(team);
 
     }
 

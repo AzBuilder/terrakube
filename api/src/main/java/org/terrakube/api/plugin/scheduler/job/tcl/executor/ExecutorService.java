@@ -3,11 +3,8 @@ package org.terrakube.api.plugin.scheduler.job.tcl.executor;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +21,8 @@ import org.terrakube.api.repository.GlobalVarRepository;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.SshRepository;
 import org.terrakube.api.repository.VcsRepository;
+import org.terrakube.api.rs.collection.Collection;
+import org.terrakube.api.rs.collection.Reference;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
@@ -306,10 +305,25 @@ public class ExecutorService {
             for (Globalvar globalvar : job.getOrganization().getGlobalvar()) {
                 if (globalvar.getCategory().equals(category)) {
                     workspaceData.putIfAbsent(globalvar.getKey(), globalvar.getValue());
-                    log.info("Adding {} Variable Key: {} Value {}", category, globalvar.getKey(),
+                    log.info("Adding {} Global Variable Key: {} Value {}", category, globalvar.getKey(),
                             globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
                 }
             }
+
+        if (job.getWorkspace().getReference() != null) {
+            List<Reference> referenceList = job.getWorkspace().getReference();
+
+            List<Collection> collectionList = new ArrayList();
+            for (Reference reference : referenceList) {
+                collectionList.add(reference.getCollection());
+            }
+
+            List<Collection> sortedList = collectionList.stream()
+                    .sorted(Comparator.comparing(Collection::getPriority).reversed())
+                    .toList().
+
+        }
+
         return workspaceData;
     }
 
