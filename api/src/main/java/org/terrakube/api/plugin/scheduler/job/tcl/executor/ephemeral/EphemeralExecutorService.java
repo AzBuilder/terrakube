@@ -26,7 +26,7 @@ public class EphemeralExecutorService {
     KubernetesClient kubernetesClient;
     EphemeralConfiguration ephemeralConfiguration;
 
-    public boolean sendToEphemeralExecutor(Job job, ExecutorContext executorContext) {
+    public ExecutorContext sendToEphemeralExecutor(Job job, ExecutorContext executorContext) {
         final String jobName = "job-" + job.getId();
         deleteEphemeralJob(job);
         log.info("Ephemeral Executor Image {}, Job: {}, Namespace: {}, NodeSelector: {}", ephemeralConfiguration.getImage(), jobName, ephemeralConfiguration.getNamespace(), ephemeralConfiguration.getNodeSelector());
@@ -108,8 +108,13 @@ public class EphemeralExecutorService {
                 .build();
 
         log.info("Running ephemeral job");
-        kubernetesClient.batch().v1().jobs().inNamespace(ephemeralConfiguration.getNamespace()).createOrReplace(k8sJob);
-        return true;
+        try {
+            kubernetesClient.batch().v1().jobs().inNamespace(ephemeralConfiguration.getNamespace()).createOrReplace(k8sJob);
+            return executorContext;
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+        return null;
     }
 
     public void deleteEphemeralJob(Job job){

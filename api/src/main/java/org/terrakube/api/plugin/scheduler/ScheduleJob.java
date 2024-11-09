@@ -167,7 +167,7 @@ public class ScheduleJob implements org.quartz.Job {
                 case terraformApply:
                 case terraformDestroy:
                 case customScripts:
-                    if (executorService.execute(job, stepId, flow.get()))
+                    if (executorService.execute(job, stepId, flow.get()) != null)
                         log.info("Executing Job {} Step Id {}", job.getId(), stepId);
                     else {
                         log.error("Error when sending context to executor marking job {} as failed, step count {}", job.getId(), job.getStep().size());
@@ -304,7 +304,7 @@ public class ScheduleJob implements org.quartz.Job {
             String stepId = tclService.getCurrentStepId(job);
             job.setApprovalTeam("");
             jobRepository.save(job);
-            if (executorService.execute(job, stepId, flow.get()))
+            if (executorService.execute(job, stepId, flow.get()) != null)
                 log.info("Executing Job {} Step Id {}", job.getId(), stepId);
         }
     }

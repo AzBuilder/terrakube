@@ -17,12 +17,10 @@ import org.terrakube.api.plugin.scheduler.job.tcl.executor.ephemeral.EphemeralEx
 import org.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
 import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
 import org.terrakube.api.plugin.vcs.TokenService;
-import org.terrakube.api.repository.GlobalVarRepository;
-import org.terrakube.api.repository.JobRepository;
-import org.terrakube.api.repository.SshRepository;
-import org.terrakube.api.repository.VcsRepository;
+import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.collection.Collection;
 import org.terrakube.api.rs.collection.Reference;
+import org.terrakube.api.rs.collection.item.Item;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
@@ -62,11 +60,16 @@ public class ExecutorService {
 
     @Autowired
     EphemeralExecutorService ephemeralExecutorService;
+
     @Autowired
     TokenService tokenService;
+    @Autowired
+    private VariableRepository variableRepository;
+    @Autowired
+    private ReferenceRepository referenceRepository;
 
     @Transactional
-    public boolean execute(Job job, String stepId, Flow flow) {
+    public ExecutorContext execute(Job job, String stepId, Flow flow) {
         log.info("Pending Job: {} WorkspaceId: {}", job.getId(), job.getWorkspace().getId());
 
         ExecutorContext executorContext = new ExecutorContext();
@@ -111,19 +114,18 @@ public class ExecutorService {
         environmentVariables.put("TF_IN_AUTOMATION", "1");
         environmentVariables.put("workspaceName", job.getWorkspace().getName());
         environmentVariables.put("organizationName", job.getOrganization().getName());
-        List<Variable> variableList = job.getWorkspace().getVariable();
-        if (variableList != null)
-            for (Variable variable : variableList) {
-                if (variable.getCategory().equals(Category.TERRAFORM)) {
-                    log.info("Adding terraform");
-                    terraformVariables.put(variable.getKey(), variable.getValue());
-                } else {
-                    log.info("Adding environment variable");
-                    environmentVariables.put(variable.getKey(), variable.getValue());
-                }
-                log.info("Variable Key: {} Value {}", variable.getKey(),
-                        variable.isSensitive() ? "sensitive" : variable.getValue());
+        List<Variable> variableList = variableRepository.findByWorkspace(job.getWorkspace()).orElse(new ArrayList<>());
+        for (Variable variable : variableList) {
+            if (variable.getCategory().equals(Category.TERRAFORM)) {
+                log.info("Adding terraform");
+                terraformVariables.put(variable.getKey(), variable.getValue());
+            } else {
+                log.info("Adding environment variable");
+                environmentVariables.put(variable.getKey(), variable.getValue());
             }
+            log.info("Variable Key: {} Value {}", variable.getKey(),
+                    variable.isSensitive() ? "sensitive" : variable.getValue());
+        }
 
         environmentVariables = loadOtherEnvironmentVariables(job, flow, environmentVariables);
         terraformVariables = loadOtherTerraformVariables(job, flow, terraformVariables);
@@ -180,7 +182,7 @@ public class ExecutorService {
                 : true;
     }
 
-    private boolean sendToExecutor(Job job, ExecutorContext executorContext) {
+    private ExecutorContext sendToExecutor(Job job, ExecutorContext executorContext) {
         RestTemplate restTemplate = new RestTemplate();
         boolean executed = false;
         try {
@@ -204,7 +206,7 @@ public class ExecutorService {
             executed = false;
         }
 
-        return executed;
+        return executed ? executorContext : null;
     }
 
     private HashMap<String, String> loadOtherEnvironmentVariables(Job job, Flow flow,
@@ -301,28 +303,38 @@ public class ExecutorService {
     }
 
     private HashMap<String, String> loadDefault(Job job, Category category, HashMap<String, String> workspaceData) {
-        if (job.getOrganization().getGlobalvar() != null)
-            for (Globalvar globalvar : job.getOrganization().getGlobalvar()) {
-                if (globalvar.getCategory().equals(category)) {
-                    workspaceData.putIfAbsent(globalvar.getKey(), globalvar.getValue());
-                    log.info("Adding {} Global Variable Key: {} Value {}", category, globalvar.getKey(),
-                            globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
+        for (Globalvar globalvar : globalVarRepository.findByOrganization(job.getOrganization())) {
+            if (globalvar.getCategory().equals(category)) {
+                workspaceData.putIfAbsent(globalvar.getKey(), globalvar.getValue());
+                log.info("Adding {} Global Variable Key: {} Value {}", category, globalvar.getKey(),
+                        globalvar.isSensitive() ? "sensitive" : globalvar.getValue());
+            }
+        }
+
+        List<Reference> referenceList = referenceRepository.findByWorkspace(job.getWorkspace()).orElse(new ArrayList<>());
+
+        List<Collection> collectionList = new ArrayList();
+        for (Reference reference : referenceList) {
+            collectionList.add(reference.getCollection());
+        }
+
+        List<Collection> sortedList = collectionList.stream()
+                .sorted(Comparator.comparing(Collection::getPriority).reversed())
+                .toList();
+
+        sortedList.stream().forEach(collection -> {
+            log.info("Adding data from collection {} using priority {}", collection.getName(), collection.getPriority());
+
+            List<Item> itemList = new ArrayList();
+            itemList = collection.getItem();
+            for (Item item : itemList) {
+                if (item.getCategory().equals(category)) {
+                    workspaceData.putIfAbsent(item.getKey(), item.getValue());
                 }
             }
 
-        if (job.getWorkspace().getReference() != null) {
-            List<Reference> referenceList = job.getWorkspace().getReference();
+        });
 
-            List<Collection> collectionList = new ArrayList();
-            for (Reference reference : referenceList) {
-                collectionList.add(reference.getCollection());
-            }
-
-            List<Collection> sortedList = collectionList.stream()
-                    .sorted(Comparator.comparing(Collection::getPriority).reversed())
-                    .toList().
-
-        }
 
         return workspaceData;
     }

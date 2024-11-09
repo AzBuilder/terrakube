@@ -68,7 +68,7 @@ class ServerApplicationTests {
     @BeforeAll
     public void setUp() {
         RestAssured.port = port;
-        mockServer = mockServer.startClientAndServer(8090);
+        mockServer = mockServer.startClientAndServer(9999);
     }
 
     @AfterAll
