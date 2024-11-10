@@ -62,7 +62,7 @@
             </column>
         </createTable>
         <addUniqueConstraint
-                columnNames="organization_id, collection_id, name"
+                columnNames="collection_id, name"
                 constraintName="const_collection_item"
                 deferrable="true"
                 disabled="true"
