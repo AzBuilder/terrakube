@@ -395,7 +395,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   };
 
   const loadWorkspace = (_loadVersions, _loadWebhook, _loadPermissionSet) => {
-    var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization`;
+    var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,reference`;
     if (_loadWebhook) url += ",webhook";
     axiosInstance
       .get(`organization/${organizationId}/template`)
