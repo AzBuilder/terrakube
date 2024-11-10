@@ -109,6 +109,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [manageWorkspace, setManageWorkspace] = useState(false);
   const [manageState, setManageState] = useState(false);
   const [variables, setVariables] = useState([]);
+  const [reference, setReferences] = useState([]);
   const [history, setHistory] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [open, setOpen] = useState(false);
@@ -402,7 +403,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
         setTemplates(template.data.data);
         axiosInstance
           .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook`
+            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook,reference`
           )
           .then((response) => {
             if (_loadVersions)
@@ -433,7 +434,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 _loadWebhook,
                 setWebhook,
                 setPushWebhookEnabled,
-                setContextState
+                setContextState,
+                setReferences
               );
             }
 
@@ -1633,7 +1635,8 @@ function setupWorkspaceIncludes(
   _loadWebhook,
   setWebhook,
   setPushWebhookEnabled,
-  setContextState
+  setContextState,
+  setReferences,
 ) {
   let variables = [];
   let jobs = [];
@@ -1736,6 +1739,32 @@ function setupWorkspaceIncludes(
           type: element.type,
           ...element.attributes,
         };
+        break;
+      case include.REFERENCE:
+        console.log("Checking references");
+        axiosInstance
+            .get(`organization/${organizationId}/reference/${element.id}?include=item`).then((response) => {
+              console.log(`Reference Data: ${response.data}`)
+              if (response.data.included != null ) {
+                let items = response.data.included;
+                items.forEach((item) => {
+                  if (item.attributes.category == "ENV") {
+                    envVariables.push({
+                      id: item.id,
+                      type: item.type,
+                      ...item.attributes,
+                    });
+                  } else {
+                    variables.push({
+                      id: item.id,
+                      type: item.type,
+                      ...item.attributes,
+                    });
+                  }
+                })
+              }
+            }
+          )
         break;
     }
   });
