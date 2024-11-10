@@ -74,6 +74,7 @@ const include = {
   VCS: "vcs",
   AGENT: "agent",
   WEBHOOK: "webhook",
+  REFERENCE: "reference",
 };
 const { DateTime } = require("luxon");
 const { Content } = Layout;
@@ -1647,6 +1648,7 @@ function setupWorkspaceIncludes(
   let includes = data.included;
   console.log(data.attributes?.iacType);
   includes.forEach((element) => {
+    console.log(element);
     switch (element.type) {
       case include.JOB:
         let finalColor = "";
@@ -1743,24 +1745,29 @@ function setupWorkspaceIncludes(
       case include.REFERENCE:
         console.log("Checking references");
         axiosInstance
-            .get(`organization/${organizationId}/reference/${element.id}?include=item`).then((response) => {
-              console.log(`Reference Data: ${response.data}`)
+            .get(`/reference/${element.id}/collection?include=item`).then((response) => {
               if (response.data.included != null ) {
                 let items = response.data.included;
-                items.forEach((item) => {
-                  if (item.attributes.category == "ENV") {
-                    envVariables.push({
-                      id: item.id,
-                      type: item.type,
-                      ...item.attributes,
-                    });
-                  } else {
-                    variables.push({
-                      id: item.id,
-                      type: item.type,
-                      ...item.attributes,
-                    });
-                  }
+                items.forEach((item) => {            
+                  axiosInstance.get(`/organization/${sessionStorage.getItem(ORGANIZATION_ARCHIVE)}/collection/${item.relationships.collection.data.id}`).then((collection) => {
+                    console.log(`Id Collection: ${collection.data.data.id}`)  
+                    console.log(`Priority Collection: ${collection.data.data.attributes.priority}`) 
+                    //item.attributes.key = item.attributes.key + `(${collection.data.data.attributes.name}-${collection.data.data.attributes.priority})` 
+                    if (item.attributes.category == "ENV") {
+                      envVariables.push({
+                        id: item.id,
+                        type: item.type,
+                        ...item.attributes,
+                      });
+                    } else {
+                      variables.push({
+                        id: item.id ,
+                        type: item.type,
+                        ...item.attributes,
+                      });
+                    }
+                  })
+
                 })
               }
             }
