@@ -24,6 +24,14 @@
                 <constraints nullable="false" foreignKeyName="fk_collection_org" references="organization(id)"/>
             </column>
         </createTable>
+        <addUniqueConstraint
+                columnNames="organization_id, name"
+                constraintName="const_collection"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="collection"
+                validate="true"/>
         <createTable tableName="item">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>
@@ -53,6 +61,14 @@
                 <constraints nullable="false" foreignKeyName="fk_collection_item" references="collection(id)"/>
             </column>
         </createTable>
+        <addUniqueConstraint
+                columnNames="collection_id, item_key"
+                constraintName="const_collection_item"
+                deferrable="true"
+                disabled="true"
+                initiallyDeferred="true"
+                tableName="item"
+                validate="true"/>
         <createTable tableName="reference">
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true"/>

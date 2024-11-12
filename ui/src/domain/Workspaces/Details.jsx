@@ -74,6 +74,7 @@ const include = {
   VCS: "vcs",
   AGENT: "agent",
   WEBHOOK: "webhook",
+  REFERENCE: "reference",
 };
 const { DateTime } = require("luxon");
 const { Content } = Layout;
@@ -109,6 +110,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [manageWorkspace, setManageWorkspace] = useState(false);
   const [manageState, setManageState] = useState(false);
   const [variables, setVariables] = useState([]);
+  const [reference, setReferences] = useState([]);
+  const [collectionVariables, setCollectionVariables] = useState([]);
+  const [collectionEnvVariables, setCollectionEnvVariables] = useState([]);
   const [history, setHistory] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [open, setOpen] = useState(false);
@@ -394,7 +398,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   };
 
   const loadWorkspace = (_loadVersions, _loadWebhook, _loadPermissionSet) => {
-    var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization`;
+    var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,reference`;
     if (_loadWebhook) url += ",webhook";
     axiosInstance
       .get(`organization/${organizationId}/template`)
@@ -402,7 +406,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
         setTemplates(template.data.data);
         axiosInstance
           .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook`
+            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook,reference`
           )
           .then((response) => {
             if (_loadVersions)
@@ -433,7 +437,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 _loadWebhook,
                 setWebhook,
                 setPushWebhookEnabled,
-                setContextState
+                setContextState,
+                setReferences, setCollectionVariables, setCollectionEnvVariables
               );
             }
 
@@ -1257,7 +1262,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace}/>
+                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} />
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
                   {templates ? (
@@ -1633,7 +1638,10 @@ function setupWorkspaceIncludes(
   _loadWebhook,
   setWebhook,
   setPushWebhookEnabled,
-  setContextState
+  setContextState,
+  setReferences,
+  setCollectionVariables,
+  setCollectionEnvVariables
 ) {
   let variables = [];
   let jobs = [];
@@ -1641,9 +1649,13 @@ function setupWorkspaceIncludes(
   let envVariables = [];
   let history = [];
   let schedule = [];
+  let references = [];
+  let collectionVariables = [];
+  let collectionEnvVariables = [];
   let includes = data.included;
   console.log(data.attributes?.iacType);
   includes.forEach((element) => {
+    console.log(element);
     switch (element.type) {
       case include.JOB:
         let finalColor = "";
@@ -1737,14 +1749,46 @@ function setupWorkspaceIncludes(
           ...element.attributes,
         };
         break;
+      case include.REFERENCE:
+        console.log("Checking references");
+        axiosInstance
+            .get(`/reference/${element.id}/collection?include=item`).then((response) => {
+              console.log(`Reference Data: ${response.data}`)
+              let collectionInfo = response.data.data;
+              if (response.data.included != null ) {
+                let items = response.data.included;
+                items.forEach((item) => {
+                  item.attributes.priority = collectionInfo.attributes.priority;
+                  item.attributes.collectionName = collectionInfo.attributes.name;
+                  if (item.attributes.category === "ENV") {
+                    collectionEnvVariables.push({
+                      id: item.id,
+                      type: item.type,
+                      ...item.attributes,
+                    });
+                  } else {
+                    collectionVariables.push({
+                      id: item.id,
+                      type: item.type,
+                      ...item.attributes,
+                    });
+                  }
+                })
+              }
+            }
+          )
+        break;
     }
   });
 
+  console.log("Setting all values for the UI")
   setVariables(variables);
   setEnvVariables(envVariables);
   setJobs(jobs);
   setHistory(history);
   setSchedule(schedule);
+  setCollectionVariables(collectionVariables)
+  setCollectionEnvVariables(collectionEnvVariables)
   if (_loadWebhook) {
     setWebhook(webhooks);
     setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
