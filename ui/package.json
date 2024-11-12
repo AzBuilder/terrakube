@@ -5,7 +5,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@babel/core": "^7.26.0",
-    "@babel/preset-env": "^7.25.8",
+    "@babel/preset-env": "^7.26.0",
     "@babel/standalone": "^7.26.2",
     "@monaco-editor/react": "^4.6.0",
     "@testing-library/jest-dom": "^6.6.3",
