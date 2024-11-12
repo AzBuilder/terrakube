@@ -111,6 +111,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [manageState, setManageState] = useState(false);
   const [variables, setVariables] = useState([]);
   const [reference, setReferences] = useState([]);
+  const [collectionVariables, setCollectionVariables] = useState([]);
+  const [collectionEnvVariables, setCollectionEnvVariables] = useState([]);
   const [history, setHistory] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [open, setOpen] = useState(false);
@@ -436,7 +438,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 setWebhook,
                 setPushWebhookEnabled,
                 setContextState,
-                setReferences
+                setReferences, setCollectionVariables, setCollectionEnvVariables
               );
             }
 
@@ -1260,7 +1262,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace}/>
+                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} />
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
                   {templates ? (
@@ -1638,6 +1640,8 @@ function setupWorkspaceIncludes(
   setPushWebhookEnabled,
   setContextState,
   setReferences,
+  setCollectionVariables,
+  setCollectionEnvVariables
 ) {
   let variables = [];
   let jobs = [];
@@ -1645,6 +1649,9 @@ function setupWorkspaceIncludes(
   let envVariables = [];
   let history = [];
   let schedule = [];
+  let references = [];
+  let collectionVariables = [];
+  let collectionEnvVariables = [];
   let includes = data.included;
   console.log(data.attributes?.iacType);
   includes.forEach((element) => {
@@ -1746,28 +1753,26 @@ function setupWorkspaceIncludes(
         console.log("Checking references");
         axiosInstance
             .get(`/reference/${element.id}/collection?include=item`).then((response) => {
+              console.log(`Reference Data: ${response.data}`)
+              let collectionInfo = response.data.data;
               if (response.data.included != null ) {
                 let items = response.data.included;
-                items.forEach((item) => {            
-                  axiosInstance.get(`/organization/${sessionStorage.getItem(ORGANIZATION_ARCHIVE)}/collection/${item.relationships.collection.data.id}`).then((collection) => {
-                    console.log(`Id Collection: ${collection.data.data.id}`)  
-                    console.log(`Priority Collection: ${collection.data.data.attributes.priority}`) 
-                    //item.attributes.key = item.attributes.key + `(${collection.data.data.attributes.name}-${collection.data.data.attributes.priority})` 
-                    if (item.attributes.category == "ENV") {
-                      envVariables.push({
-                        id: item.id,
-                        type: item.type,
-                        ...item.attributes,
-                      });
-                    } else {
-                      variables.push({
-                        id: item.id ,
-                        type: item.type,
-                        ...item.attributes,
-                      });
-                    }
-                  })
-
+                items.forEach((item) => {
+                  item.attributes.priority = collectionInfo.attributes.priority;
+                  item.attributes.collectionName = collectionInfo.attributes.name;
+                  if (item.attributes.category === "ENV") {
+                    collectionEnvVariables.push({
+                      id: item.id,
+                      type: item.type,
+                      ...item.attributes,
+                    });
+                  } else {
+                    collectionVariables.push({
+                      id: item.id,
+                      type: item.type,
+                      ...item.attributes,
+                    });
+                  }
                 })
               }
             }
@@ -1776,11 +1781,14 @@ function setupWorkspaceIncludes(
     }
   });
 
+  console.log("Setting all values for the UI")
   setVariables(variables);
   setEnvVariables(envVariables);
   setJobs(jobs);
   setHistory(history);
   setSchedule(schedule);
+  setCollectionVariables(collectionVariables)
+  setCollectionEnvVariables(collectionEnvVariables)
   if (_loadWebhook) {
     setWebhook(webhooks);
     setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
