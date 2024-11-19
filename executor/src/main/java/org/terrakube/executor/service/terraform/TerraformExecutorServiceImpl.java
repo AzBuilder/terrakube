@@ -142,7 +142,6 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             result.setExitCode(1);
         }
         return result;
-        
     }
 
     @Override
