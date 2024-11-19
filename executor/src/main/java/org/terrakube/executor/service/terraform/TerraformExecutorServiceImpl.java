@@ -121,7 +121,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                             null).get();
                 }
 
-            if (exitCode != 1) {
+            if(exitCode != 1) {
                 executionPlan = true;
             }
 
@@ -142,6 +142,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             result.setExitCode(1);
         }
         return result;
+        
     }
 
     @Override
