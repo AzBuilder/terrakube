@@ -76,9 +76,9 @@ export const CreateJob = ({ changeJob }) => {
         setVisible(false);
         changeJob(response.data.data.id);
       }).catch((error) => {
-        console.log(error);
+        message.error('Not able to create job: ' + error.response.data.errors[0].detail)
         setVisible(false);
-        message.error(error);
+        console.log(error)
     });
   };
 
