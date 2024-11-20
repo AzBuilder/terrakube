@@ -27,6 +27,7 @@ public class ExecutorContext {
     private boolean refresh;
     private boolean refreshOnly;
     private boolean showHeader;
+    private boolean ignore_error;
     private String accessToken;
     private String moduleSshKey;
     private String commitId;
