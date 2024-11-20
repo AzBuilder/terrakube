@@ -31,18 +31,18 @@ export const CreateJob = ({ changeJob }) => {
 
   const loadTemplates = () => {
     axiosInstance
-      .get(`organization/${organizationId}/template`)
-      .then((response) => {
-        var templatesList = response.data.data.filter(function (obj) {
-          //exclude CLI based templates
-          return (
-            obj.attributes.name !== "Terraform-Plan/Apply-Cli" &&
-            obj.attributes.name !== "Terraform-Plan/Destroy-Cli"
-          );
+        .get(`organization/${organizationId}/template`)
+        .then((response) => {
+          var templatesList = response.data.data.filter(function (obj) {
+            //exclude CLI based templates
+            return (
+                obj.attributes.name !== "Terraform-Plan/Apply-Cli" &&
+                obj.attributes.name !== "Terraform-Plan/Destroy-Cli"
+            );
+          });
+          setTemplates(templatesList);
+          setLoading(false);
         });
-        setTemplates(templatesList);
-        setLoading(false);
-      });
   };
 
   const onCreate = (values) => {
@@ -66,95 +66,95 @@ export const CreateJob = ({ changeJob }) => {
     console.log(body);
 
     axiosInstance
-      .post(`organization/${organizationId}/job`, body, {
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        setVisible(false);
-        changeJob(response.data.data.id);
-      }).catch((error) => {
-        console.log(error);
-        setVisible(false);
-        message.error(error);
+        .post(`organization/${organizationId}/job`, body, {
+          headers: {
+            "Content-Type": "application/vnd.api+json",
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          setVisible(false);
+          changeJob(response.data.data.id);
+        }).catch((error) => {
+      message.error('Not able to create job: ' + error.response.data.errors[0].detail)
+      setVisible(false);
+      console.log(error)
     });
   };
 
   return (
-    <div>
-      <Button
-        type="primary"
-        htmlType="button"
-        onClick={() => {
-          setVisible(true);
-        }}
-        icon={<PlusOutlined />}
-      >
-        New job
-      </Button>
+      <div>
+        <Button
+            type="primary"
+            htmlType="button"
+            onClick={() => {
+              setVisible(true);
+            }}
+            icon={<PlusOutlined />}
+        >
+          New job
+        </Button>
 
-      <Modal
-        open={visible}
-        title="Start a new job"
-        okText="Start"
-        cancelText="Cancel"
-        onCancel={onCancel}
-        onOk={() => {
-          form
-            .validateFields()
-            .then((values) => {
-              form.resetFields();
-              onCreate(values);
-            })
-            .catch((info) => {
-              console.log("Validate Failed:", info);
-            });
-        }}
-      >
-        <Space direction="vertical">
-          <div className="popup-text">
-            <InfoCircleTwoTone style={{ fontSize: "16px" }} /> You will be
-            redirected to the run details page to see this job executed.
-          </div>
-          <Form
-            form={form}
-            layout="vertical"
-            name="create-org"
-            validateMessages={validateMessages}
-          >
-            <Form.Item
-              name="templateId"
-              label="Choose job type"
-              rules={[{ required: true }]}
+        <Modal
+            open={visible}
+            title="Start a new job"
+            okText="Start"
+            cancelText="Cancel"
+            onCancel={onCancel}
+            onOk={() => {
+              form
+                  .validateFields()
+                  .then((values) => {
+                    form.resetFields();
+                    onCreate(values);
+                  })
+                  .catch((info) => {
+                    console.log("Validate Failed:", info);
+                  });
+            }}
+        >
+          <Space direction="vertical">
+            <div className="popup-text">
+              <InfoCircleTwoTone style={{ fontSize: "16px" }} /> You will be
+              redirected to the run details page to see this job executed.
+            </div>
+            <Form
+                form={form}
+                layout="vertical"
+                name="create-org"
+                validateMessages={validateMessages}
             >
-              {loading || !templates ? (
-                <p>Data loading...</p>
-              ) : (
-                <Select>
-                  {templates.map((item) => (
-                    <Select.Option key={item.id} value={item.id}>
+              <Form.Item
+                  name="templateId"
+                  label="Choose job type"
+                  rules={[{ required: true }]}
+              >
+                {loading || !templates ? (
+                    <p>Data loading...</p>
+                ) : (
+                    <Select>
+                      {templates.map((item) => (
+                          <Select.Option key={item.id} value={item.id}>
                       <span
-                        style={
-                          item.attributes.name.includes("Destroy")
-                            ? { color: "red" }
-                            : {}
-                        }
+                          style={
+                            item.attributes.name.includes("Destroy")
+                                ? { color: "red" }
+                                : {}
+                          }
                       >
                         {item.attributes.name.includes("Destroy") && (
-                          <DeleteOutlined style={{ marginRight: 8 }} />
+                            <DeleteOutlined style={{ marginRight: 8 }} />
                         )}
                         {item.attributes.name}
                       </span>
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-            </Form.Item>
-          </Form>
-        </Space>
-      </Modal>
-    </div>
+                          </Select.Option>
+                      ))}
+                    </Select>
+                )}
+              </Form.Item>
+            </Form>
+          </Space>
+        </Modal>
+      </div>
   );
 };

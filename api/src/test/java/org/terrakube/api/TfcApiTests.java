@@ -2,11 +2,20 @@ package org.terrakube.api;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.http.HttpStatus;
+import org.terrakube.api.repository.TeamRepository;
+import org.terrakube.api.rs.team.Team;
+
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 
 class TfcApiTests extends ServerApplicationTests {
+
+    @Autowired
+    TeamRepository teamRepository;
 
     @Test
     void ping() {
@@ -126,6 +135,10 @@ class TfcApiTests extends ServerApplicationTests {
 
     @Test
     void getWorkspace() {
+        Team team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(true);
+        teamRepository.save(team);
+
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
                 .when()
@@ -157,6 +170,10 @@ class TfcApiTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
+
+        team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(false);
+        teamRepository.save(team);
     }
 
     @Test
@@ -187,6 +204,10 @@ class TfcApiTests extends ServerApplicationTests {
 
     @Test
     void lockWorkspace() {
+        Team team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(true);
+        teamRepository.save(team);
+
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
                 .when()
@@ -228,10 +249,18 @@ class TfcApiTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.CONFLICT.value());
+
+        team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(false);
+        teamRepository.save(team);
     }
 
     @Test
     void unlockWorkspace() {
+        Team team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(true);
+        teamRepository.save(team);
+
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
                 .when()
@@ -263,5 +292,9 @@ class TfcApiTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
+
+        team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(false);
+        teamRepository.save(team);
     }
 }
