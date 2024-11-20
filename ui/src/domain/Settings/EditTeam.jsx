@@ -64,6 +64,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
         manageWorkspace: response.data.data.attributes.manageWorkspace,
         manageVcs: response.data.data.attributes.manageVcs,
         manageTemplate: response.data.data.attributes.manageTemplate,
+        manageCollection: response.data.data.attributes.manageCollection,
       });
       setLoading(false);
       loadTokens(response.data.data.attributes.name);
@@ -83,6 +84,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           manageProvider: values.manageProvider,
           manageVcs: values.manageVcs,
           manageTemplate: values.manageTemplate,
+          manageCollection: values.manageCollection,
         },
       },
     };
@@ -120,6 +122,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           manageProvider: values.manageProvider,
           manageVcs: values.manageVcs,
           manageTemplate: values.manageTemplate,
+          manageCollection: values.manageCollection,
         },
       },
     };
@@ -291,6 +294,18 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                   "Allow members to create and administrate all modules within the organization",
                 icon: <InfoCircleOutlined />,
               }}
+            >
+              <Switch />
+            </Form.Item>
+            <Form.Item
+                name="manageCollection"
+                valuePropName="checked"
+                label="Manage Collections"
+                tooltip={{
+                  title:
+                      "Allow members to create and manage all collections within the organization",
+                  icon: <InfoCircleOutlined />,
+                }}
             >
               <Switch />
             </Form.Item>
