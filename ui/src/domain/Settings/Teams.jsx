@@ -136,7 +136,7 @@ export const TeamSettings = ({key}) => {
                           {item.attributes.manageModule ? (
                             <span>Modules</span>
                           ) : null}
-                          {item.attributes.manageModule ? (
+                          {item.attributes.manageCollection ? (
                               <span>Collection</span>
                           ) : null}
                           {item.attributes.manageProvider ? (

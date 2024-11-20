@@ -64,7 +64,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
         manageWorkspace: response.data.data.attributes.manageWorkspace,
         manageVcs: response.data.data.attributes.manageVcs,
         manageTemplate: response.data.data.attributes.manageTemplate,
-        manageCollection: repsonse.data.data.attributes.manageCollection,
+        manageCollection: response.data.data.attributes.manageCollection,
       });
       setLoading(false);
       loadTokens(response.data.data.attributes.name);
