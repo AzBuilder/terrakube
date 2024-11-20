@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Form, Button, Select, Modal, Space } from "antd";
+import { Form, Button, Select, Modal, Space, message } from "antd";
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,
@@ -75,7 +75,11 @@ export const CreateJob = ({ changeJob }) => {
         console.log(response);
         setVisible(false);
         changeJob(response.data.data.id);
-      });
+      }).catch((error) => {
+        console.log(error);
+        setVisible(false);
+        message.error(error);
+    });
   };
 
   return (

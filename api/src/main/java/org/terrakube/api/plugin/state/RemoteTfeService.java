@@ -178,6 +178,21 @@ public class RemoteTfeService {
         return userWithManageWorkspace.get();
     }
 
+    private boolean validateUserManageJob(Organization organization, JwtAuthenticationToken currentUser) {
+        if (validateTerrakubeUser(currentUser))
+            return true;
+        List<String> userGroups = teamTokenService.getCurrentGroups(currentUser);
+        AtomicBoolean userWithManageWorkspace = new AtomicBoolean(false);
+        organization.getTeam().forEach(orgTeam -> {
+            userGroups.forEach(userTeam -> {
+                if (orgTeam.getName().equals(userTeam) && orgTeam.isManageJob()) {
+                    userWithManageWorkspace.set(true);
+                }
+            });
+        });
+        return userWithManageWorkspace.get();
+    }
+
     EntitlementData getOrgEntitlementSet(String organizationName, JwtAuthenticationToken currentUser) {
         Organization organization = organizationRepository.getOrganizationByName(organizationName);
 
@@ -304,6 +319,7 @@ public class RemoteTfeService {
             }
 
             boolean isManageWorkspace = validateUserManageWorkspace(workspace.get().getOrganization(), currentUser);
+            boolean isManageJob = validateUserManageJob(workspace.get().getOrganization(), currentUser);
 
             Map<String, Boolean> defaultAttributes = new HashMap<>();
             defaultAttributes.put("can-create-state-versions", isManageWorkspace);
@@ -312,9 +328,9 @@ public class RemoteTfeService {
             defaultAttributes.put("can-lock", isManageWorkspace);
             defaultAttributes.put("can-manage-run-tasks", isManageWorkspace);
             defaultAttributes.put("can-manage-tags", isManageWorkspace);
-            defaultAttributes.put("can-queue-apply", true);
+            defaultAttributes.put("can-queue-apply", isManageJob);
             defaultAttributes.put("can-queue-destroy", isManageWorkspace);
-            defaultAttributes.put("can-queue-run", true);
+            defaultAttributes.put("can-queue-run", isManageJob);
             defaultAttributes.put("can-read-settings", true);
             defaultAttributes.put("can-read-state-versions", isManageWorkspace);
             defaultAttributes.put("can-read-variable", true);

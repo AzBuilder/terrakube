@@ -139,6 +139,9 @@ export const TeamSettings = ({key}) => {
                           {item.attributes.manageCollection ? (
                               <span>Collection</span>
                           ) : null}
+                          {item.attributes.manageJob ? (
+                              <span>Job</span>
+                          ) : null}
                           {item.attributes.manageProvider ? (
                             <span>Providers</span>
                           ) : null}
