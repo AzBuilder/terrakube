@@ -32,11 +32,11 @@ public class TeamManageJob extends OperationCheck<Job> {
         boolean isServiceAccount = authenticatedUser.isServiceAccount(requestScope.getUser());
         for (Team team : teamList) {
             if (isServiceAccount){
-                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageWorkspace()){
+                if (groupService.isServiceMember(requestScope.getUser(), team.getName()) && team.isManageJob()){
                     return true;
                 }
             } else {
-                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageWorkspace())
+                if (groupService.isMember(requestScope.getUser(), team.getName()) && team.isManageJob())
                     return true;
             }
         }

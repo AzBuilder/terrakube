@@ -70,6 +70,8 @@ public class TeamTokenController {
             permissions.setManageProvider(permissions.manageProvider || group.isManageProvider());
             permissions.setManageTemplate(permissions.manageTemplate || group.isManageTemplate());
             permissions.setManageVcs(permissions.manageVcs || group.isManageVcs());
+            permissions.setManageCollection(permissions.manageCollection || group.isManageCollection());
+            permissions.setManageJob(permissions.manageJob || group.isManageJob());
         });
         return new ResponseEntity<>(permissions, HttpStatus.ACCEPTED);
     }
@@ -120,5 +122,7 @@ public class TeamTokenController {
         private boolean manageProvider;
         private boolean manageVcs;
         private boolean manageTemplate;
+        private boolean manageCollection;
+        private boolean manageJob;
     }
 }

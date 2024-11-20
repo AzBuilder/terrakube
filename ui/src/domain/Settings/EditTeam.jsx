@@ -65,6 +65,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
         manageVcs: response.data.data.attributes.manageVcs,
         manageTemplate: response.data.data.attributes.manageTemplate,
         manageCollection: response.data.data.attributes.manageCollection,
+        manageJob: response.data.data.attributes.manageJob,
       });
       setLoading(false);
       loadTokens(response.data.data.attributes.name);
@@ -85,6 +86,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           manageVcs: values.manageVcs,
           manageTemplate: values.manageTemplate,
           manageCollection: values.manageCollection,
+          manageJob: values.manageJob,
         },
       },
     };
@@ -123,6 +125,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           manageVcs: values.manageVcs,
           manageTemplate: values.manageTemplate,
           manageCollection: values.manageCollection,
+          manageJob: values.manageJob
         },
       },
     };
@@ -304,6 +307,18 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                 tooltip={{
                   title:
                       "Allow members to create and manage all collections within the organization",
+                  icon: <InfoCircleOutlined />,
+                }}
+            >
+              <Switch />
+            </Form.Item>
+            <Form.Item
+                name="manageJob"
+                valuePropName="checked"
+                label="Manage Job"
+                tooltip={{
+                  title:
+                      "Allow members to create jobs inside the organization",
                   icon: <InfoCircleOutlined />,
                 }}
             >

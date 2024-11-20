@@ -2,10 +2,14 @@ package org.terrakube.api;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.repository.TeamRepository;
 import org.terrakube.api.rs.job.Job;
+import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import java.util.List;
@@ -17,6 +21,9 @@ import static org.mockserver.model.HttpResponse.response;
 
 class JobTests extends ServerApplicationTests {
 
+    @Autowired
+    TeamRepository teamRepository;
+
     @Test
     void createJobAsOrgMember() {
         mockServer.reset();
@@ -27,6 +34,10 @@ class JobTests extends ServerApplicationTests {
         ).respond(
                 response().withStatusCode(HttpStatus.ACCEPTED.value()).withBody("")
         );
+
+        Team team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(true);
+        teamRepository.save(team);
 
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
@@ -54,6 +65,10 @@ class JobTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.CREATED.value());
+
+        team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(false);
+        teamRepository.save(team);
     }
 
     @Test
@@ -66,6 +81,10 @@ class JobTests extends ServerApplicationTests {
         ).respond(
                 response().withStatusCode(HttpStatus.ACCEPTED.value()).withBody("")
         );
+
+        Team team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(true);
+        teamRepository.save(team);
 
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
@@ -130,6 +149,10 @@ class JobTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+
+        team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
+        team.setManageJob(false);
+        teamRepository.save(team);
     }
 
 }

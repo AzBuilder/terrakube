@@ -30,7 +30,7 @@ import lombok.Setter;
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)
 @LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.UPDATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = JobManageHook.class)
 @ReadPermission(expression = "team view job")
-@CreatePermission(expression = "team view job")
+@CreatePermission(expression = "team manage job")
 @UpdatePermission(expression = "team manage job OR user is a super service")
 @Include(rootLevel = false)
 @Getter
