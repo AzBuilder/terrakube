@@ -121,11 +121,11 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                             null).get();
                 }
 
-            if(exitCode != 1) {
+            if(exitCode != 1 || terraformJob.isIgnoreError()) {
                 executionPlan = true;
             }
 
-            log.warn("Terraform plan Executed Successfully: {} Exit Code: {}", executionPlan, exitCode);
+            log.warn("Terraform plan Executed: {} Exit Code: {}", executionPlan, exitCode);
 
             scriptAfterSuccessPlan = executePostOperationScripts(terraformJob, terraformWorkingDir, planOutput, executionPlan);
 
@@ -142,7 +142,6 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
             result.setExitCode(1);
         }
         return result;
-
     }
 
     @Override

@@ -30,6 +30,7 @@ public class TerraformJob {
     private boolean showHeader;
     private boolean refresh;
     private boolean refreshOnly;
+    private boolean ignoreError;
     private String moduleSshKey;
     private String commitId;
     private boolean tofu;

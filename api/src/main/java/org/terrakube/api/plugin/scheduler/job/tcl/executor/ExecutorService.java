@@ -135,6 +135,7 @@ public class ExecutorService {
 
         executorContext.setCommandList(flow.getCommands());
         executorContext.setType(flow.getType());
+        executorContext.setIgnoreError(flow.isIgnoreError());
         executorContext.setTerraformVersion(job.getWorkspace().getTerraformVersion());
         if (job.getOverrideSource() == null) {
             executorContext.setSource(job.getWorkspace().getSource());
