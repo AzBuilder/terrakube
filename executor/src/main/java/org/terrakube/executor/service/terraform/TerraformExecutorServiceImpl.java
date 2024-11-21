@@ -121,7 +121,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
                             null).get();
                 }
 
-            if(exitCode != 1 || terraformJob.isIgnore_error()) {
+            if(exitCode != 1 || terraformJob.isIgnoreError()) {
                 executionPlan = true;
             }
 
