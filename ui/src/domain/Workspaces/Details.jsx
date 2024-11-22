@@ -1823,7 +1823,7 @@ function setupWorkspaceIncludes(
   setCollectionVariables(collectionVariables)
   setCollectionEnvVariables(collectionEnvVariables)
   setGlobalVariables(globalVariables);
-  setCollectionEnvVariables(globalEnvVariables);
+  setGlobalEnvVariables(globalEnvVariables);
   if (_loadWebhook) {
     setWebhook(webhooks);
     setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
