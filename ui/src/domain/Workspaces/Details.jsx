@@ -1668,7 +1668,7 @@ function setupWorkspaceIncludes(
         console.log("Checking global variables");
         axiosInstance
             .get(`/organization/${element.id}/globalvar`).then((response) => {
-              console.log(`Global Variables Data: ${response.data}`)
+              console.log(`Global Variables Data: ${response.data.data}`)
               let globalVar = response.data.data;
               if (globalVar != null ) {
                 globalVar.forEach((variable) => {
