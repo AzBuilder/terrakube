@@ -143,11 +143,42 @@ const COLLECTION_VARIABLES_COLUMNS = () => [
   },
 ];
 
+const GLOBAL_VARIABLES_COLUMNS = () => [
+    {
+        title: "Key",
+        dataIndex: "key",
+        width: "25%",
+        key: "key",
+        render: (_, record) => {
+            return (
+                <div>
+                    {record.key} &nbsp;&nbsp;&nbsp;&nbsp;{" "}
+                    {record.hcl && <Tag>HCL</Tag>}{" "}
+                    {record.sensitive && <Tag>Sensitive</Tag>}
+                </div>
+            );
+        },
+    },
+    {
+        title: "Value",
+        dataIndex: "value",
+        key: "value",
+        width: "25%",
+        render: (_, record) => {
+            return record.sensitive ? (
+                <i>Sensitive - write only</i>
+            ) : (
+                <div>{record.value}</div>
+            );
+        },
+    }
+];
+
 const validateMessages = {
   required: "${label} is required!",
 };
 
-export const Variables = ({ vars, env, manageWorkspace, collectionVars, collectionEnvVars }) => {
+export const Variables = ({ vars, env, manageWorkspace, collectionVars, collectionEnvVars, globalVariables, globalEnvVariables }) => {
   const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [form] = Form.useForm();
@@ -243,51 +274,28 @@ export const Variables = ({ vars, env, manageWorkspace, collectionVars, collecti
 
   return (
       <div>
-        <h1>Variables</h1>
-        <div className="App-text">
-          <p>
-            These variables are used for all plans and applies in this
-            workspace.Workspaces using Terraform 0.10.0 or later can also load
-            default values from any *.auto.tfvars files in the configuration.
-          </p>
-          <p>
-            Sensitive variables are hidden from view in the UI and API, and can't
-            be edited. (To change a sensitive variable, delete and replace it.)
-            Sensitive variables can still appear in Terraform logs if your
-            configuration is designed to output them.
-          </p>{" "}
-        </div>
-        <h2>Terraform Variables</h2>
-        <div className="App-text">
-          These Terraform variables are set using a terraform.tfvars file. To use
-          interpolation or set a non-string value for a variable, click its HCL
-          checkbox.
-        </div>
-        <Table
-            dataSource={vars}
-            columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit, manageWorkspace)}
-            rowKey="key"
-        />
-        <Button
-            type="primary"
-            htmlType="button"
-            onClick={() => {
-              setCategory("TERRAFORM");
-              setMode("create");
-              form.resetFields();
-              setVisible(true);
-            }}
-            disabled={!manageWorkspace}
-        >
-          Add variable
-        </Button>
-        <div className="envVariables">
-          <h2>Environment Variables</h2>
+          <h1>Variables</h1>
           <div className="App-text">
-            These variables are set in Terraform's shell environment using export.
+              <p>
+                  These variables are used for all plans and applies in this
+                  workspace.Workspaces using Terraform 0.10.0 or later can also load
+                  default values from any *.auto.tfvars files in the configuration.
+              </p>
+              <p>
+                  Sensitive variables are hidden from view in the UI and API, and can't
+                  be edited. (To change a sensitive variable, delete and replace it.)
+                  Sensitive variables can still appear in Terraform logs if your
+                  configuration is designed to output them.
+              </p>{" "}
+          </div>
+          <h2>Terraform Variables</h2>
+          <div className="App-text">
+              These Terraform variables are set using a terraform.tfvars file. To use
+              interpolation or set a non-string value for a variable, click its HCL
+              checkbox.
           </div>
           <Table
-              dataSource={env}
+              dataSource={vars}
               columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit, manageWorkspace)}
               rowKey="key"
           />
@@ -295,127 +303,179 @@ export const Variables = ({ vars, env, manageWorkspace, collectionVars, collecti
               type="primary"
               htmlType="button"
               onClick={() => {
-                setCategory("ENV");
-                setMode("create");
-                form.resetFields();
-                setVisible(true);
+                  setCategory("TERRAFORM");
+                  setMode("create");
+                  form.resetFields();
+                  setVisible(true);
               }}
               disabled={!manageWorkspace}
           >
-            Add variable
+              Add variable
           </Button>
-        </div>
-        <div className="envVariables">
-          <h2>Collection Values</h2>
-          <div className="App-text">
-            <p>
-              The following values are taken from the collection used by this workspaces, this values are injected
-              inside the Terrakube remote jobs.
-            </p>
+          <div className="envVariables">
+              <h2>Environment Variables</h2>
+              <div className="App-text">
+                  These variables are set in Terraform's shell environment using export.
+              </div>
+              <Table
+                  dataSource={env}
+                  columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit, manageWorkspace)}
+                  rowKey="key"
+              />
+              <Button
+                  type="primary"
+                  htmlType="button"
+                  onClick={() => {
+                      setCategory("ENV");
+                      setMode("create");
+                      form.resetFields();
+                      setVisible(true);
+                  }}
+                  disabled={!manageWorkspace}
+              >
+                  Add variable
+              </Button>
           </div>
-        </div>
+          <div className="envVariables">
+              <h2>Collection Values</h2>
+              <div className="App-text">
+                  <p>
+                      The following values are taken from the collection used by this workspaces, this values are
+                      injected
+                      inside the Terrakube remote jobs.
+                  </p>
+              </div>
+          </div>
 
-        <div className="envVariables">
-          <h2>Terraform Variables</h2>
-          <Table
-              dataSource={collectionVars}
-              columns={COLLECTION_VARIABLES_COLUMNS()}
-              rowKey="key"
-          />
-        </div>
+          <div className="envVariables">
+              <h2>Terraform Variables</h2>
+              <Table
+                  dataSource={collectionVars}
+                  columns={COLLECTION_VARIABLES_COLUMNS()}
+                  rowKey="key"
+              />
+          </div>
 
-        <div className="envVariables">
-          <h2>Environment Variables</h2>
-          <Table
-              dataSource={collectionEnvVars}
-              columns={COLLECTION_VARIABLES_COLUMNS()}
-              rowKey="key"
-          />
-        </div>
+          <div className="envVariables">
+              <h2>Environment Variables</h2>
+              <Table
+                  dataSource={collectionEnvVars}
+                  columns={COLLECTION_VARIABLES_COLUMNS()}
+                  rowKey="key"
+              />
+          </div>
 
-        <Modal
-            width="600px"
-            open={visible}
-            title={
-              mode === "edit"
-                  ? "Edit variable " + variableName
-                  : "Create new variable"
-            }
-            okText="Save variable"
-            cancelText="Cancel"
-            onCancel={onCancel}
-            onOk={() => {
-              form
-                  .validateFields()
-                  .then((values) => {
-                    if (mode === "create") onCreate(values);
-                    else onUpdate(values);
-                  })
-                  .catch((info) => {
-                    console.log("Validate Failed:", info);
-                  });
-            }}
-        >
-          <Space style={{width: "100%"}} direction="vertical">
-            <Form
-                name="create-org"
-                form={form}
-                layout="vertical"
-                validateMessages={validateMessages}
-            >
-              <Form.Item name="key" label="Key" rules={[{required: true}]}>
-                <Input/>
-              </Form.Item>
-              <Form.Item name="value" label="Value" rules={[{required: true}]}>
-                <Input/>
-              </Form.Item>
-              <Form.Item
-                  name="hcl"
-                  valuePropName="checked"
-                  label="HCL"
-                  tooltip={{
-                    title:
-                        "Parse this field as HashiCorp Configuration Language (HCL). This allows you to interpolate values at runtime.",
-                    icon: <InfoCircleOutlined/>,
-                  }}
-              >
-                <Switch/>
-              </Form.Item>
-              <Form.Item
-                  name="sensitive"
-                  valuePropName="checked"
-                  label="Sensitive"
-                  tooltip={{
-                    title:
-                        "Sensitive variables are never shown in the UI or API. They may appear in Terraform logs if your configuration is designed to output them.",
-                    icon: <InfoCircleOutlined/>,
-                  }}
-              >
-                <Switch/>
-              </Form.Item>
-              <Form.Item name="description" label="Description">
-                <Input.TextArea width="800px"/>
-              </Form.Item>
-            </Form>
-          </Space>
-        </Modal>
+          <div className="envVariables">
+              <h2>Global Variables Values</h2>
+              <div className="App-text">
+                  <p>
+                      The following values are taken from the organization global variables, this values are
+                      injected inside the Terrakube remote jobs.
+                  </p>
+              </div>
+          </div>
+
+          <div className="envVariables">
+              <h2>Terraform Global Variables</h2>
+              <Table
+                  dataSource={globalVariables}
+                  columns={GLOBAL_VARIABLES_COLUMNS}
+                  rowKey="key"
+              />
+          </div>
+
+          <div className="envVariables">
+              <h2>Environment Global Variables</h2>
+              <Table
+                  dataSource={globalEnvVariables}
+                  columns={GLOBAL_VARIABLES_COLUMNS()}
+                  rowKey="key"
+              />
+          </div>
+
+          <Modal
+              width="600px"
+              open={visible}
+              title={
+                  mode === "edit"
+                      ? "Edit variable " + variableName
+                      : "Create new variable"
+              }
+              okText="Save variable"
+              cancelText="Cancel"
+              onCancel={onCancel}
+              onOk={() => {
+                  form
+                      .validateFields()
+                      .then((values) => {
+                          if (mode === "create") onCreate(values);
+                          else onUpdate(values);
+                      })
+                      .catch((info) => {
+                          console.log("Validate Failed:", info);
+                      });
+              }}
+          >
+              <Space style={{width: "100%"}} direction="vertical">
+                  <Form
+                      name="create-org"
+                      form={form}
+                      layout="vertical"
+                      validateMessages={validateMessages}
+                  >
+                      <Form.Item name="key" label="Key" rules={[{required: true}]}>
+                          <Input/>
+                      </Form.Item>
+                      <Form.Item name="value" label="Value" rules={[{required: true}]}>
+                          <Input/>
+                      </Form.Item>
+                      <Form.Item
+                          name="hcl"
+                          valuePropName="checked"
+                          label="HCL"
+                          tooltip={{
+                              title:
+                                  "Parse this field as HashiCorp Configuration Language (HCL). This allows you to interpolate values at runtime.",
+                              icon: <InfoCircleOutlined/>,
+                          }}
+                      >
+                          <Switch/>
+                      </Form.Item>
+                      <Form.Item
+                          name="sensitive"
+                          valuePropName="checked"
+                          label="Sensitive"
+                          tooltip={{
+                              title:
+                                  "Sensitive variables are never shown in the UI or API. They may appear in Terraform logs if your configuration is designed to output them.",
+                              icon: <InfoCircleOutlined/>,
+                          }}
+                      >
+                          <Switch/>
+                      </Form.Item>
+                      <Form.Item name="description" label="Description">
+                          <Input.TextArea width="800px"/>
+                      </Form.Item>
+                  </Form>
+              </Space>
+          </Modal>
       </div>
   );
 };
 
 const deleteVariable = (variableId, organizationId, workspaceId) => {
-  console.log(variableId);
+    console.log(variableId);
 
-  axiosInstance
-      .delete(
-          `organization/${organizationId}/workspace/${workspaceId}/variable/${variableId}`,
-          {
-            headers: {
-              "Content-Type": "application/vnd.api+json",
-            },
-          }
-      )
-      .then((response) => {
-        console.log(response);
-      });
+    axiosInstance
+        .delete(
+            `organization/${organizationId}/workspace/${workspaceId}/variable/${variableId}`,
+            {
+                headers: {
+                    "Content-Type": "application/vnd.api+json",
+                },
+            }
+        )
+        .then((response) => {
+            console.log(response);
+        });
 };

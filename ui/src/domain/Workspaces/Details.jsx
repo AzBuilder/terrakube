@@ -75,6 +75,7 @@ const include = {
   AGENT: "agent",
   WEBHOOK: "webhook",
   REFERENCE: "reference",
+  ORGANIZATION: "organization",
 };
 const { DateTime } = require("luxon");
 const { Content } = Layout;
@@ -113,6 +114,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [reference, setReferences] = useState([]);
   const [collectionVariables, setCollectionVariables] = useState([]);
   const [collectionEnvVariables, setCollectionEnvVariables] = useState([]);
+  const [globalVariables, setGlobalVariables] = useState([]);
+  const [globalEnvVariables, setGlobalEnvVariables] = useState([]);
   const [history, setHistory] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [open, setOpen] = useState(false);
@@ -438,7 +441,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 setWebhook,
                 setPushWebhookEnabled,
                 setContextState,
-                setReferences, setCollectionVariables, setCollectionEnvVariables
+                setReferences, setCollectionVariables, setCollectionEnvVariables, setGlobalVariables, setGlobalEnvVariables
               );
             }
 
@@ -1262,7 +1265,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} />
+                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} globalVariables={globalVariables} globalEnvVariable={globalEnvVariables}/>
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
                   {templates ? (
@@ -1641,7 +1644,9 @@ function setupWorkspaceIncludes(
   setContextState,
   setReferences,
   setCollectionVariables,
-  setCollectionEnvVariables
+  setCollectionEnvVariables,
+  setGlobalVariables,
+  setGlobalEnvVariables
 ) {
   let variables = [];
   let jobs = [];
@@ -1652,11 +1657,39 @@ function setupWorkspaceIncludes(
   let references = [];
   let collectionVariables = [];
   let collectionEnvVariables = [];
+  let globalVariables = [];
+  let globalEnvVariables = [];
   let includes = data.included;
   console.log(data.attributes?.iacType);
   includes.forEach((element) => {
     console.log(element);
     switch (element.type) {
+      case include.ORGANIZATION:
+        console.log("Checking global variables");
+        axiosInstance
+            .get(`/organization/${element.id}/globalvar`).then((response) => {
+              console.log(`Global Variables Data: ${response.data}`)
+              let globalVar = response.data.data;
+              if (globalVar != null ) {
+                globalVar.forEach((variable) => {
+                  if (variable.attributes.category === "ENV") {
+                    globalEnvVariables.push({
+                      id: variable.id,
+                      type: variable.type,
+                      ...variable.attributes,
+                    });
+                  } else {
+                    globalVariables.push({
+                      id: variable.id,
+                      type: variable.type,
+                      ...variable.attributes,
+                    });
+                  }
+                })
+              }
+            }
+        )
+        break;
       case include.JOB:
         let finalColor = "";
         switch (element.attributes.status) {
@@ -1789,6 +1822,8 @@ function setupWorkspaceIncludes(
   setSchedule(schedule);
   setCollectionVariables(collectionVariables)
   setCollectionEnvVariables(collectionEnvVariables)
+  setGlobalVariables(globalVariables);
+  setCollectionEnvVariables(globalEnvVariables);
   if (_loadWebhook) {
     setWebhook(webhooks);
     setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
