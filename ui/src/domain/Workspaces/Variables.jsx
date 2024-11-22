@@ -379,7 +379,7 @@ export const Variables = ({ vars, env, manageWorkspace, collectionVars, collecti
               <h2>Terraform Global Variables</h2>
               <Table
                   dataSource={globalVariables}
-                  columns={GLOBAL_VARIABLES_COLUMNS}
+                  columns={GLOBAL_VARIABLES_COLUMNS()}
                   rowKey="key"
               />
           </div>

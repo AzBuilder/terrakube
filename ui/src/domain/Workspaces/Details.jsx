@@ -1265,7 +1265,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} globalVariables={globalVariables} globalEnvVariable={globalEnvVariables}/>
+                  <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} globalVariables={globalVariables} globalEnvVariables={globalEnvVariables}/>
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
                   {templates ? (
@@ -1668,21 +1668,24 @@ function setupWorkspaceIncludes(
         console.log("Checking global variables");
         axiosInstance
             .get(`/organization/${element.id}/globalvar`).then((response) => {
-              console.log(`Global Variables Data: ${response.data.data}`)
+              console.log(`Global Variables Data: ${JSON.stringify(response.data.data)}`)
               let globalVar = response.data.data;
               if (globalVar != null ) {
-                globalVar.forEach((variable) => {
-                  if (variable.attributes.category === "ENV") {
+                globalVar.forEach((variableItem) => {
+                  console.log(`Variable: ${JSON.stringify(variableItem)}`);
+                  if (variableItem.attributes.category === "ENV") {
+                    console.log(`Adding global var env`);
                     globalEnvVariables.push({
-                      id: variable.id,
-                      type: variable.type,
-                      ...variable.attributes,
+                      id: variableItem.id,
+                      type: variableItem.type,
+                      ...variableItem.attributes,
                     });
                   } else {
+                    console.log(`Adding global var terraform`);
                     globalVariables.push({
-                      id: variable.id,
-                      type: variable.type,
-                      ...variable.attributes,
+                      id: variableItem.id,
+                      type: variableItem.type,
+                      ...variableItem.attributes,
                     });
                   }
                 })
