@@ -11,6 +11,8 @@ import org.terrakube.api.plugin.security.user.AuthenticatedUser;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.team.Team;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.terrakube.api.rs.workspace.Workspace;
+import org.terrakube.api.rs.workspace.access.Access;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,35 +34,57 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
         if(authenticatedUser.isSuperUser(requestScope.getUser())){
             return true;
         }else{
-            return isMemberOrganization(requestScope.getUser(), organization);
+            if (isMemberOrganization(requestScope.getUser(), organization)) {
+                return true;
+            } else {
+                return isMemberOrganizationWithLimitedWorkspaceAccess(requestScope.getUser(), organization);
+            }
         }
     }
 
     /**
-     * Review is the authenticated user belongs to the organization by searching the membership in each organization team
+     * Review if the authenticated user belongs to the organization by searching the membership in each organization team
      * @param user
      * @param organization
      * @return
      */
     private boolean isMemberOrganization(User user, Organization organization){
         boolean isServiceAccount=authenticatedUser.isServiceAccount(user);
-        String applicationName="";
-        if (isServiceAccount){
-            applicationName = authenticatedUser.getApplication(user);
-        }
 
         List<Team> teamList = organization.getTeam();
         for (Team team : teamList) {
             if (isServiceAccount) {
-                log.debug("isServiceMember {} {}", team.getName(), groupService.isServiceMember(user, team.getName()));
-                if (groupService.isServiceMember(user, team.getName())) {
+                boolean isServiceMember = groupService.isServiceMember(user, team.getName());
+                log.debug("isServiceMember {} {}", team.getName(), isServiceMember);
+                if (isServiceMember) {
                     return true;
                 }
             } else {
-                log.debug("isMember {} {}", team.getName(), groupService.isMember(user, team.getName()));
-                if (groupService.isMember(user, team.getName()))
+                boolean isMember = groupService.isMember(user, team.getName());
+                log.debug("isMember {} {}", team.getName(), isMember);
+                if (isMember)
                     return true;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Review if the authenticated user belongs to the organization by searching the membership in all workspace inside the organization
+     * @param user
+     * @param organization
+     * @return
+     */
+    private boolean isMemberOrganizationWithLimitedWorkspaceAccess(User user, Organization organization){
+        for (Workspace workspace: organization.getWorkspace()){
+            List<Access> teamList = workspace.getAccess();
+            if (!teamList.isEmpty())
+                for (Access team : teamList) {
+                    boolean isMember = groupService.isMember(user, team.getName());
+                    log.debug("isMember {} {}", team.getName(), isMember);
+                    if (isMember)
+                        return true;
+                }
         }
         return false;
     }
