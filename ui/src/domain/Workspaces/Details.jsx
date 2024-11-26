@@ -392,7 +392,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   
   const loadPermissionSet = () => {
     console.log("Loading Permission Values")
-    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
+    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${id}`;
     axiosInstance.get(url).then((response) => {
       console.log(response.data)
       setManageState(response.data.manageState);
