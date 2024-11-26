@@ -1,6 +1,5 @@
 package org.terrakube.api;
 
-import com.redis.testcontainers.RedisContainer;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -10,13 +9,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.terrakube.api.plugin.token.pat.PatService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
 import org.terrakube.api.repository.*;
-import org.testcontainers.utility.DockerImageName;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
