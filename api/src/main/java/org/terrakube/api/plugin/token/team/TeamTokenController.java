@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -126,6 +127,7 @@ public class TeamTokenController {
         private int hours = 0;
     }
 
+    @ToString
     @Getter
     @Setter
     private class PermissionSet {
