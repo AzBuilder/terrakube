@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface AccessRepository extends JpaRepository<Access, UUID> {
 
     Optional<List<Access>> findAllByWorkspaceOrganizationIdAndNameIn(UUID workspaceOrganizationId, List<String> names);
+
 }

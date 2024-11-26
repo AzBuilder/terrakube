@@ -9,6 +9,8 @@ public interface GroupService {
 
     boolean isServiceMember(User user, String group);
 
-    boolean isMemberWithLimitedAccess(User user, Object elideEntity);
+    boolean isMemberWithLimitedAccessV1(User user, Object elideEntity);
+
+     boolean isMemberWithLimitedAccessV2(User user, Organization organization);
 
 }

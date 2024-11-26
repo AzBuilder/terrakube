@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
 public class AccessTests extends ServerApplicationTests {
@@ -447,6 +448,234 @@ public class AccessTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void viewTemplateAsUserWithLimitedAccess() {
+        String workspaceId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"workspace\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"viewTemplateAsUserWithLimitedAccess\",\n" +
+                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-app-registration.git\",\n" +
+                        "      \"branch\": \"main\",\n" +
+                        "      \"terraformVersion\": \"1.0.11\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace")
+                .then()
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("viewTemplateAsUserWithLimitedAccess"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        String accessId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"access\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"VIEW_TEMPLATE_LIMITED_ACCESS\",\n" +
+                        "      \"manageWorkspace\": false,\n" +
+                        "      \"manageJob\": false,\n" +
+                        "      \"manageState\": false\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/"+workspaceId+"/access")
+                .then()
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("VIEW_TEMPLATE_LIMITED_ACCESS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/template")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .body("data.size()", equalTo(5))
+                .statusCode(HttpStatus.OK.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("VIEW_TEMPLATE_LIMITED_ACCESS_FAKE"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/template")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void viewVcsUserWithLimitedAccess() {
+        String workspaceId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"workspace\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"viewVcsUserWithLimitedAccess\",\n" +
+                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-app-registration.git\",\n" +
+                        "      \"branch\": \"main\",\n" +
+                        "      \"terraformVersion\": \"1.0.11\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace")
+                .then()
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("viewVcsUserWithLimitedAccess"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        String accessId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"access\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"VIEW_VCS_LIMITED_ACCESS\",\n" +
+                        "      \"manageWorkspace\": false,\n" +
+                        "      \"manageJob\": false,\n" +
+                        "      \"manageState\": false\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/"+workspaceId+"/access")
+                .then()
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("VIEW_VCS_LIMITED_ACCESS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/vcs")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .body("data.size()", equalTo(0))
+                .statusCode(HttpStatus.OK.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("VIEW_VCS_LIMITED_ACCESS_FAKE"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/vcs")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void viewModuleUserWithLimitedAccess() {
+        String workspaceId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"workspace\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"viewModuleUserWithLimitedAccess\",\n" +
+                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-app-registration.git\",\n" +
+                        "      \"branch\": \"main\",\n" +
+                        "      \"terraformVersion\": \"1.0.11\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace")
+                .then()
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("viewModuleUserWithLimitedAccess"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        String accessId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"access\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"VIEW_MODULE_LIMITED_ACCESS\",\n" +
+                        "      \"manageWorkspace\": false,\n" +
+                        "      \"manageJob\": false,\n" +
+                        "      \"manageState\": false\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/"+workspaceId+"/access")
+                .then()
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("VIEW_MODULE_LIMITED_ACCESS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/module")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .body("data.size()", equalTo(0))
+                .statusCode(HttpStatus.OK.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("VIEW_MODULE_LIMITED_ACCESS_FAKE"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/module")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
 
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))

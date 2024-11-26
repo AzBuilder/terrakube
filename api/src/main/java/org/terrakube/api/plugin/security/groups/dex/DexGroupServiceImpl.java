@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.security.groups.GroupService;
+import org.terrakube.api.repository.AccessRepository;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.access.Access;
@@ -24,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 public class DexGroupServiceImpl implements GroupService {
 
     RedisTemplate redisTemplate;
+
+    AccessRepository accessRepository;
 
     private static final String REDIS_ORG_LIMITED = "org_%s_%s";
 
@@ -66,8 +69,9 @@ public class DexGroupServiceImpl implements GroupService {
         return arr;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public boolean isMemberWithLimitedAccess(User user, Object elideEntity){
+    public boolean isMemberWithLimitedAccessV1(User user, Object elideEntity){
         List<Access> accessList = null;
 
         String email = (String) ((JwtAuthenticationToken) user.getPrincipal()).getTokenAttributes().get("email");
@@ -95,5 +99,14 @@ public class DexGroupServiceImpl implements GroupService {
             }
         }
         return false;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean isMemberWithLimitedAccessV2(User user, Organization organization){
+        List<String> groups = (List<String>)((JwtAuthenticationToken) user.getPrincipal()).getTokenAttributes().get("groups");
+        Optional<List<Access>> accessList = accessRepository.findAllByWorkspaceOrganizationIdAndNameIn(organization.getId(), groups);
+        log.debug("Groups Size: {}, IsPresent: {},  Group Access {}", groups.size(), accessList.isPresent(), accessList.get().isEmpty());
+        return !accessList.get().isEmpty();
     }
 }
