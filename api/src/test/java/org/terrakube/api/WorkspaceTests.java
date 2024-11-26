@@ -2,10 +2,10 @@ package org.terrakube.api;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
-import org.terrakube.api.repository.TeamRepository;
 import org.terrakube.api.rs.team.Team;
 
 import java.io.File;
@@ -15,11 +15,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
+import static org.mockito.Mockito.when;
 
 class WorkspaceTests extends ServerApplicationTests {
 
-    @Autowired
-    TeamRepository teamRepository;
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    }
 
     @Test
     void searchWorkspaceAsOrgMember() {

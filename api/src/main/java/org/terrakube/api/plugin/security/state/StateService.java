@@ -46,7 +46,7 @@ public class StateService {
               List<Access> accessList = workspaceOptional.get().getAccess();
               if (!accessList.isEmpty())
                   for (Access teamAccess : accessList) {
-                      if (teamAccess.isManageState()) {
+                      if (teamAccess.isManageState() && ((List<String>) groupNames).contains(teamAccess.getName())) {
                           return true;
                       }
                   }

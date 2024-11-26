@@ -6,8 +6,10 @@ import com.yahoo.elide.core.security.RequestScope;
 import com.yahoo.elide.core.security.User;
 import com.yahoo.elide.core.security.checks.OperationCheck;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.terrakube.api.plugin.security.groups.GroupService;
 import org.terrakube.api.plugin.security.user.AuthenticatedUser;
+import org.terrakube.api.repository.AccessRepository;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.team.Team;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
     @Autowired
     GroupService groupService;
 
+    @Autowired
+    AccessRepository accessRepository;
+
     @Override
     public boolean ok(Organization organization, RequestScope requestScope, Optional<ChangeSpec> optional) {
         if(authenticatedUser.isSuperUser(requestScope.getUser())){
@@ -37,7 +42,7 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
             if (isMemberOrganization(requestScope.getUser(), organization)) {
                 return true;
             } else {
-                return isMemberOrganizationWithLimitedWorkspaceAccess(requestScope.getUser(), organization);
+                return isMemberOrganizationWithLimitedWorkspaceAccessV2(requestScope.getUser(), organization);
             }
         }
     }
@@ -75,7 +80,7 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
      * @param organization
      * @return
      */
-    private boolean isMemberOrganizationWithLimitedWorkspaceAccess(User user, Organization organization){
+    private boolean isMemberOrganizationWithLimitedWorkspaceAccessV1(User user, Organization organization){
         for (Workspace workspace: organization.getWorkspace()){
             List<Access> teamList = workspace.getAccess();
             if (!teamList.isEmpty())
@@ -87,6 +92,19 @@ public class UserBelongsOrganization extends OperationCheck<Organization> {
                 }
         }
         return false;
+    }
+
+    /**
+     * Review if the authenticated user belongs to the organization by searching the membership in all workspace using a JPA
+     * @param user
+     * @param organization
+     * @return
+     */
+    private boolean isMemberOrganizationWithLimitedWorkspaceAccessV2(User user, Organization organization){
+        List<String> groups = (List<String>)((JwtAuthenticationToken) user.getPrincipal()).getTokenAttributes().get("groups");
+        Optional<List<Access>> accessList = accessRepository.findAllByWorkspaceOrganizationIdAndNameIn(organization.getId(), groups);
+        log.debug("Groups Size: {}, IsPresent: {},  Group Access {}", groups.size(), accessList.isPresent(), accessList.get().isEmpty());
+        return !accessList.get().isEmpty();
     }
 
 

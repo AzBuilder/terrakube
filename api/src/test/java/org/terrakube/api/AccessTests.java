@@ -2,23 +2,27 @@ package org.terrakube.api;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
-import org.terrakube.api.repository.TeamRepository;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 import static io.restassured.RestAssured.given;
+import static org.mockito.Mockito.when;
 
 public class AccessTests extends ServerApplicationTests {
 
     private static final String STATE_DIRECTORY_JSON = "%s/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
 
-    @Autowired
-    TeamRepository teamRepository;
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    }
 
     @Test
     void searchWorkspaceAccessAsAdmin() {
@@ -48,7 +52,7 @@ public class AccessTests extends ServerApplicationTests {
 
     @Test
     void createWorkspaceAccessAsAdmin() {
-        given()
+        String accessId = given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"), "Content-Type", "application/vnd.api+json")
                 .body("{\n" +
                         "  \"data\": {\n" +
@@ -67,7 +71,17 @@ public class AccessTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .body("data.attributes.name", IsEqual.equalTo("NEW_TEAM_WORKSPACE_ACCESS_ONLY"))
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/5ed411ca-7ab8-4d2f-b591-02d0d5788afc/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -95,7 +109,6 @@ public class AccessTests extends ServerApplicationTests {
 
     @Test
     void searchWorkspacesWithLimitedAccess() {
-
         String workspaceId = given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
                 .body("{\n" +
@@ -127,7 +140,7 @@ public class AccessTests extends ServerApplicationTests {
                 .all()
                 .statusCode(HttpStatus.FORBIDDEN.value());
 
-        given()
+        String accessId = given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"), "Content-Type", "application/vnd.api+json")
                 .body("{\n" +
                         "  \"data\": {\n" +
@@ -146,8 +159,7 @@ public class AccessTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .body("data.attributes.name", IsEqual.equalTo("SEARCH_WITH_LIMITED_ACCESS"))
-                .statusCode(HttpStatus.CREATED.value());
-
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
 
         given()
                 .headers("Authorization", "Bearer " + generatePAT("SEARCH_WITH_LIMITED_ACCESS"))
@@ -166,6 +178,16 @@ public class AccessTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
     }
 
@@ -322,6 +344,16 @@ public class AccessTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.CREATED.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -415,5 +447,15 @@ public class AccessTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.OK.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 }

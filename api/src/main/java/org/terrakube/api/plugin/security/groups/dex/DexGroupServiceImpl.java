@@ -1,16 +1,32 @@
 package org.terrakube.api.plugin.security.groups.dex;
 
 import com.yahoo.elide.core.security.User;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.security.groups.GroupService;
+import org.terrakube.api.rs.Organization;
+import org.terrakube.api.rs.workspace.Workspace;
+import org.terrakube.api.rs.workspace.access.Access;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+@AllArgsConstructor
 @Slf4j
 @Service
 @ConditionalOnProperty(prefix = "org.terrakube.api.groups", name = "type", havingValue = "DEX")
 public class DexGroupServiceImpl implements GroupService {
+
+    RedisTemplate redisTemplate;
+
+    private static final String REDIS_ORG_LIMITED = "org_%s_%s";
+
     @Override
     public boolean isMember(User user, String group) {
         JwtAuthenticationToken principal = ((JwtAuthenticationToken) user.getPrincipal());
@@ -48,5 +64,36 @@ public class DexGroupServiceImpl implements GroupService {
             arr[i] = (String) array.get(i);
         }
         return arr;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean isMemberWithLimitedAccess(User user, Object elideEntity){
+        List<Access> accessList = null;
+
+        String email = (String) ((JwtAuthenticationToken) user.getPrincipal()).getTokenAttributes().get("email");
+
+        if (elideEntity instanceof Organization) {
+            Organization organization = (Organization) elideEntity;
+
+            if (redisTemplate.hasKey(String.format(REDIS_ORG_LIMITED, organization.getId(), email))) {
+                return (Boolean) redisTemplate.opsForValue().get(String.format(REDIS_ORG_LIMITED, organization.getId(), email));
+            } else {
+                for (Workspace workspace : organization.getWorkspace()) {
+                    accessList = workspace.getAccess();
+                    if (!accessList.isEmpty())
+                        for (Access team : accessList) {
+                            boolean isMember = isMember(user, team.getName());
+                            log.info("isMember {} {}", team.getName(), isMember);
+                            if (isMember) {
+                                redisTemplate.opsForValue().set(String.format(REDIS_ORG_LIMITED, organization.getId(), email), Boolean.TRUE, 15, TimeUnit.MINUTES);
+                                return true;
+                            }
+                        }
+                }
+
+                redisTemplate.opsForValue().set(String.format(REDIS_ORG_LIMITED, organization.getId(), email), Boolean.FALSE, 15, TimeUnit.MINUTES);
+            }
+        }
+        return false;
     }
 }
