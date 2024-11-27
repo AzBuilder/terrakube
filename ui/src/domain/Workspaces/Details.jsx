@@ -350,14 +350,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   useEffect(() => {
     setLoading(true);
     loadWorkspace(true, true, true);
-    loadPermissionSet();
+    loadPermissionSet(id);
     setLoading(false);
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false, false, false);
-      loadPermissionSet();
+      loadPermissionSet(id);
     }, 10000);
     return () => clearInterval(interval);
   }, [id]);
