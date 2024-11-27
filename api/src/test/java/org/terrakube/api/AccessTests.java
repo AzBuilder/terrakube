@@ -39,6 +39,19 @@ public class AccessTests extends ServerApplicationTests {
     }
 
     @Test
+    void searchAllWorkspaceInOrgAccessAsNonAdmin() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .get("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
     void searchWorkspaceAccessAsNonAdmin() {
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))

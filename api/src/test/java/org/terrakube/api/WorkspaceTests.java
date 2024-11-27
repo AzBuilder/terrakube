@@ -310,7 +310,7 @@ class WorkspaceTests extends ServerApplicationTests {
 
     @Test
     void createWorkspaceAsOrgMember() {
-        given()
+        String workspaceId = given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
                 .body("{\n" +
                         "  \"data\": {\n" +
@@ -330,7 +330,18 @@ class WorkspaceTests extends ServerApplicationTests {
                 .body("data.attributes.name", IsEqual.equalTo("TestWorkspace"))
                 .log()
                 .all()
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        // Delete the test workspace
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/"+workspaceId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
