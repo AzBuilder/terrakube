@@ -41,9 +41,9 @@
         <commons-io.version>2.18.0</commons-io.version>
         <kubernetes-client.version>6.13.4</kubernetes-client.version>
         <!--BUILDPACK DATA-->
-        <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.292</buildpack.builder>
-        <buildpack.java>gcr.io/paketo-buildpacks/java:13.0.1</buildpack.java>
-        <buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:1.9.0</buildpack.telemetry>
+        <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.358</buildpack.builder>
+        <buildpack.java>gcr.io/paketo-buildpacks/java:17.3.0</buildpack.java>
+        <buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:2.6.0</buildpack.telemetry>
     </properties>
     <build>
         <plugins>
