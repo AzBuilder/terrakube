@@ -350,14 +350,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   useEffect(() => {
     setLoading(true);
     loadWorkspace(true, true, true);
-    loadPermissionSet(id);
+    loadPermissionSet();
     setLoading(false);
     loadSSHKeys();
     loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false, false, false);
-      loadPermissionSet(id);
+      loadPermissionSet();
     }, 10000);
     return () => clearInterval(interval);
   }, [id]);
@@ -390,9 +390,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     });
   };
   
-  const loadPermissionSet = (workspaceId) => {
+  const loadPermissionSet = () => {
     console.log("Loading Permission Values")
-    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${workspaceId}`;
+    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
     axiosInstance.get(url).then((response) => {
       console.log(response.data)
       setManageState(response.data.manageState);
@@ -416,7 +416,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
               loadVersions(response.data.data.attributes.iacType);
 
             if (_loadPermissionSet)
-              loadPermissionSet(id)
+              loadPermissionSet()
 
             setWorkspace(response.data);
             console.log(response.data);
