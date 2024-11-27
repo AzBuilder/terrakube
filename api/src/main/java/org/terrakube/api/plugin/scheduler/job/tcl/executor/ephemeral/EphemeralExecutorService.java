@@ -18,6 +18,7 @@ import java.util.*;
 public class EphemeralExecutorService {
 
     private static final String NODE_SELECTOR = "EPHEMERAL_CONFIG_NODE_SELECTOR_TAGS";
+    private static final String TOLERATIONS = "EPHEMERAL_CONFIG_TOLERATIONS";
     private static final String SERVICE_ACCOUNT = "EPHEMERAL_CONFIG_SERVICE_ACCOUNT";
     private static final String ANNOTATIONS = "EPHEMERAL_CONFIG_ANNOTATIONS";
     private static final String CONFIG_MAP_NAME = "EPHEMERAL_CONFIG_MAP_NAME";
@@ -65,6 +66,23 @@ public class EphemeralExecutorService {
         } else {
             log.info("Using default node selector information");
             nodeSelectorInfo = ephemeralConfiguration.getNodeSelector();
+        }
+
+        Optional<String> tolerationsInfo = Optional.ofNullable(
+                executorContext.getEnvironmentVariables().getOrDefault(TOLERATIONS, null));
+        List<Toleration> tolerations = new ArrayList<>();
+
+        if (tolerationsInfo.isPresent()) {
+            for (String tolerationData : tolerationsInfo.get().split(";")) {
+                String[] info = tolerationData.split(":");
+                Toleration toleration = new Toleration();
+
+                toleration.setKey(info[0]);
+                toleration.setOperator(info.length > 1 ? info[1] : "Exists");
+                toleration.setEffect(info.length > 2 ? info[2] : null);
+
+                tolerations.add(toleration);
+            }
         }
 
         Optional<String> annotationsInfo = Optional.ofNullable(executorContext.getEnvironmentVariables().getOrDefault(ANNOTATIONS, null));
@@ -121,6 +139,7 @@ public class EphemeralExecutorService {
                 .withNewSpec()
                 .withNodeSelector(nodeSelectorInfo)
                 .withServiceAccountName(serviceAccount)
+                .withTolerations(tolerations)
                 .withVolumes(volumes)
                 .addNewContainer()
                 .withName(jobName)
