@@ -71,13 +71,17 @@ public class EphemeralExecutorService {
         Optional<String> tolerationsInfo = Optional.ofNullable(
                 executorContext.getEnvironmentVariables().getOrDefault(TOLERATIONS, null));
         List<Toleration> tolerations = new ArrayList<>();
+
         if (tolerationsInfo.isPresent()) {
             for (String tolerationData : tolerationsInfo.get().split(";")) {
-                String[] info = tolerationData.split("=");
+                String[] info = tolerationData.split(":");
                 Toleration toleration = new Toleration();
-                toleration.setKey(info[0]);
-                toleration.setOperator("Exists");
-                toleration.setEffect(info.length > 1 ? info[1] : null);
+
+                // Assume format is key:operator:effect
+                toleration.setKey(info[0]); // Required key
+                toleration.setOperator(info.length > 1 ? info[1] : "Exists");
+                toleration.setEffect(info.length > 2 ? info[2] : null);
+
                 tolerations.add(toleration);
             }
         }
