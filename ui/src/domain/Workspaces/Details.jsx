@@ -390,9 +390,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     });
   };
   
-  const loadPermissionSet = () => {
+  const loadPermissionSet = (workspaceId) => {
     console.log("Loading Permission Values")
-    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${id}`;
+    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${workspaceId}`;
     axiosInstance.get(url).then((response) => {
       console.log(response.data)
       setManageState(response.data.manageState);
@@ -416,7 +416,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
               loadVersions(response.data.data.attributes.iacType);
 
             if (_loadPermissionSet)
-              loadPermissionSet()
+              loadPermissionSet(id)
 
             setWorkspace(response.data);
             console.log(response.data);
@@ -1843,7 +1843,7 @@ function setupWorkspaceIncludes(
   console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
     var organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
-    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${id}`;
+    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
     axiosInstance.get(url).then((response) => {
       console.log(`Manage Permission Set: ${response.data}`)
       console.log(response.data)
