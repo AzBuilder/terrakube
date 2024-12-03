@@ -48,7 +48,7 @@ public class AccessTests extends ServerApplicationTests {
                 .assertThat()
                 .log()
                 .all()
-                .body("data.size()", equalTo(4))
+                .body("data.size()", equalTo(10))
                 .statusCode(HttpStatus.OK.value());
     }
 
