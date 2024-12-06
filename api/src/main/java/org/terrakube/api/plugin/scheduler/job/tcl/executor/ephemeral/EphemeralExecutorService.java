@@ -77,7 +77,14 @@ public class EphemeralExecutorService {
                 String[] info = tolerationData.split(":");
                 Toleration toleration = new Toleration();
 
-                toleration.setKey(info[0]);
+                if (info[0].contains("=")) {
+                    String[] keyValue = info[0].split("=");
+                    toleration.setKey(keyValue[0]);
+                    toleration.setValue(keyValue[1]);
+                } else {
+                    toleration.setKey(info[0]);
+                }
+                
                 toleration.setOperator(info.length > 1 ? info[1] : "Exists");
                 toleration.setEffect(info.length > 2 ? info[2] : null);
 
