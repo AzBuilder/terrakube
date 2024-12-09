@@ -25,7 +25,7 @@
         <!--groovy.version>3.0.8</groovy.version-->
         <aws-sdk.version>2.29.29</aws-sdk.version>
         <zt-zip.version>1.17</zt-zip.version>
-        <gcp-libraries-bom.version>26.50.0</gcp-libraries-bom.version>
+        <gcp-libraries-bom.version>26.51.0</gcp-libraries-bom.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <!--BUILDPACK DATA-->
