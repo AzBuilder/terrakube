@@ -1,7 +1,7 @@
 import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
 import { message } from "antd";
 import { IconContext } from "react-icons";
-import { SiAzuredevops, SiBitbucket, SiTerraform } from "react-icons/si";
+import { SiBitbucket, SiTerraform } from "react-icons/si";
 import axiosInstance from "../../config/axiosConfig";
 
 export const genericHeader = {
@@ -43,7 +43,7 @@ export const renderVCSLogo = (vcs) => {
     case "AZURE_DEVOPS":
       return (
         <IconContext.Provider value={{ size: "18px" }}>
-          <SiAzuredevops />
+          <VscAzureDevops />
           &nbsp;
         </IconContext.Provider>
       );
