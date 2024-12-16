@@ -17,7 +17,8 @@ import {
   GitlabOutlined,
   DownOutlined,
 } from "@ant-design/icons";
-import { SiBitbucket, SiAzuredevops } from "react-icons/si";
+import { SiBitbucket } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
@@ -806,7 +807,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
             <Dropdown menu={{ items: azDevOpsItems }}>
               <Button size="large">
                 <Space>
-                  <SiAzuredevops /> Azure Devops <DownOutlined />
+                  <VscAzureDevops /> Azure Devops <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>

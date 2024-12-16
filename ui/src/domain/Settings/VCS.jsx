@@ -14,7 +14,8 @@ import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
 import { AddVCS } from "./AddVCS";
 import { useParams } from "react-router-dom";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { SiBitbucket, SiAzuredevops } from "react-icons/si";
+import { SiBitbucket } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import axiosInstance from "../../config/axiosConfig";
 import { IconContext } from "react-icons";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
@@ -42,7 +43,7 @@ export const VCSSettings = ({ vcsMode }) => {
       case "AZURE_DEVOPS":
         return (
           <IconContext.Provider value={{ size: "20px" }}>
-            <SiAzuredevops />
+            <VscAzureDevops />
           </IconContext.Provider>
         );
       default:

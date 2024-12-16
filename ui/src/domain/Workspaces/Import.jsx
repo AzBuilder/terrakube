@@ -26,7 +26,8 @@ import {
   GitlabOutlined,
   DownOutlined,
 } from "@ant-design/icons";
-import { SiBitbucket, SiAzuredevops } from "react-icons/si";
+import { SiBitbucket } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import { useNavigate, Link } from "react-router-dom";
 import parse from "html-react-parser";
 const { Content } = Layout;
@@ -221,7 +222,7 @@ export const ImportWorkspace = () => {
       case "AZURE_DEVOPS":
         return (
           <IconContext.Provider value={{ size: "20px" }}>
-            <SiAzuredevops />
+            <VscAzureDevops />
             &nbsp;
           </IconContext.Provider>
         );
@@ -573,7 +574,7 @@ export const ImportWorkspace = () => {
                       <Dropdown menu={{ items: azDevOpsItems }}>
                         <Button size="large">
                           <Space>
-                            <SiAzuredevops /> Azure Devops <DownOutlined />
+                            <VscAzureDevops /> Azure Devops <DownOutlined />
                           </Space>
                         </Button>
                       </Dropdown>
