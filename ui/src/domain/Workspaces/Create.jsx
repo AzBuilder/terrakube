@@ -23,7 +23,8 @@ import {
 import { React, useEffect, useState, version } from "react";
 import { IconContext } from "react-icons";
 import { BiBookBookmark, BiTerminal, BiUpload } from "react-icons/bi";
-import { SiAzuredevops, SiBitbucket, SiGit } from "react-icons/si";
+import { SiBitbucket, SiGit } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import { Link, useNavigate } from "react-router-dom";
 import { v7 as uuid } from "uuid";
 import {
@@ -208,7 +209,7 @@ export const CreateWorkspace = () => {
       case "AZURE_DEVOPS":
         return (
           <IconContext.Provider value={{ size: "20px" }}>
-            <SiAzuredevops />
+            <VscAzureDevops />
             &nbsp;
           </IconContext.Provider>
         );
@@ -632,7 +633,7 @@ export const CreateWorkspace = () => {
                     <Dropdown menu={{ items: azDevOpsItems }}>
                       <Button size="large">
                         <Space>
-                          <SiAzuredevops /> Azure Devops <DownOutlined />
+                          <VscAzureDevops /> Azure Devops <DownOutlined />
                         </Space>
                       </Button>
                     </Dropdown>

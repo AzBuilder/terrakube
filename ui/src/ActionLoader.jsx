@@ -129,7 +129,7 @@ const importAntdIcons = async (icons) => {
 
 // List of react-icons to consider for dynamic importing
 const reactIcons = [
-  "SiMicrosoftazure",
+  "VscAzure",
   "SiAmazonaws",
   "SiGithub",
   "SiGrafana",
