@@ -29,9 +29,11 @@ import {
 import { GitlabOutlined, GithubOutlined } from "@ant-design/icons";
 import {
   SiBitbucket,
-  SiAzuredevops,
-  SiMicrosoftazure,
 } from "react-icons/si";
+import {
+  VscAzure,
+  VscAzureDevops,
+} from "react-icons/vsc";
 import { FaAws } from "react-icons/fa";
 import { BiBookBookmark } from "react-icons/bi";
 import { RiFolderHistoryLine } from "react-icons/ri";
@@ -74,7 +76,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       case "azurerm":
         return (
           <IconContext.Provider value={{ color: "#008AD7", size: "1.5em" }}>
-            <SiMicrosoftazure />
+            <VscAzure />
           </IconContext.Provider>
         );
       case "aws":
@@ -272,7 +274,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       case "AZURE_DEVOPS":
         return (
           <IconContext.Provider value={{ size: "18px" }}>
-            <SiAzuredevops />
+            <VscAzureDevops />
             &nbsp;
           </IconContext.Provider>
         );

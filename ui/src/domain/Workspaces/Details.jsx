@@ -43,7 +43,8 @@ import { IconContext } from "react-icons";
 import { BiTerminal } from "react-icons/bi";
 import { FiGitCommit } from "react-icons/fi";
 import { HiOutlineExternalLink } from "react-icons/hi";
-import { SiAzuredevops, SiBitbucket, SiTerraform } from "react-icons/si";
+import { SiBitbucket, SiTerraform } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { v7 as uuid } from "uuid";
 import ActionLoader from "../../ActionLoader.jsx";
@@ -700,7 +701,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       case "AZURE_DEVOPS":
         return (
           <IconContext.Provider value={{ size: "18px" }}>
-            <SiAzuredevops />
+            <VscAzureDevops />
             &nbsp;
           </IconContext.Provider>
         );

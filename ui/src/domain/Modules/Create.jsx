@@ -16,7 +16,8 @@ import {
 } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
 import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
-import { SiBitbucket, SiAzuredevops } from "react-icons/si";
+import { SiBitbucket  } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import { IconContext } from "react-icons";
 import { SiGit } from "react-icons/si";
 import { useNavigate, Link } from "react-router-dom";
@@ -102,7 +103,7 @@ export const CreateModule = () => {
       case "AZURE_DEVOPS":
         return (
           <IconContext.Provider value={{ size: "20px" }}>
-            <SiAzuredevops />
+            <VscAzureDevops />
             &nbsp;&nbsp;
           </IconContext.Provider>
         );
@@ -358,7 +359,7 @@ export const CreateModule = () => {
                       &nbsp;&nbsp;Bitbucket
                     </Button>
                     <Button
-                      icon={<SiAzuredevops />}
+                      icon={<VscAzureDevops />}
                       onClick={() => {
                         handleVCSClick("AZURE_DEVOPS");
                       }}

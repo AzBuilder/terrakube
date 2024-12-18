@@ -28,7 +28,8 @@ import {
   ImportOutlined,
 } from "@ant-design/icons";
 import { BiTerminal } from "react-icons/bi";
-import { SiTerraform, SiBitbucket, SiAzuredevops } from "react-icons/si";
+import { SiTerraform, SiBitbucket } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import { IconContext } from "react-icons";
 import axiosInstance, { axiosGraphQL } from "../../config/axiosConfig";
 import { useParams, useNavigate } from "react-router-dom";
@@ -100,7 +101,7 @@ export const OrganizationDetails = ({
       return (
         <IconContext.Provider value={{ size: "18px" }}>
           <Tooltip title="Azure Devops">
-            <SiAzuredevops />
+            <VscAzureDevops />
           </Tooltip>
         </IconContext.Provider>
       );
