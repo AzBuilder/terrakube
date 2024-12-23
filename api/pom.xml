@@ -19,7 +19,7 @@
         <liquibase-core.version>4.30.0</liquibase-core.version>
         <azure.version>5.18.0</azure.version>
         <mssql-jdbc.version>12.8.1.jre11</mssql-jdbc.version>
-        <msal4j.version>1.17.3</msal4j.version>
+        <msal4j.version>1.18.0</msal4j.version>
         <lombok.version>1.18.36</lombok.version>
         <jgit.version>7.1.0.202411261347-r</jgit.version>
         <rest-assured.version>5.5.0</rest-assured.version>
