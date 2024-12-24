@@ -1,14 +1,14 @@
 import { React, useState } from "react";
 import {
-  Form,
-  Input,
-  Button,
-  Switch,
-  Table,
-  Modal,
-  Space,
-  Tag,
-  Popconfirm,
+    Form,
+    Input,
+    Button,
+    Switch,
+    Table,
+    Modal,
+    Space,
+    Tag,
+    Popconfirm, Tooltip,
 } from "antd";
 import {
   ORGANIZATION_ARCHIVE,
@@ -43,7 +43,10 @@ const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit, manageWorkspace) 
       return record.sensitive ? (
         <i>Sensitive - write only</i>
       ) : (
-        <div>{record.value}</div>
+          <Tooltip title={record.description} placement="topLeft" overlayStyle={{width: 400, wordBreak: "break-word"}}
+                   overlayClassName="tooltip" trigger={["hover"]}>
+              <div>{record.value}</div>
+          </Tooltip>
       );
     },
   },
@@ -111,7 +114,10 @@ const COLLECTION_VARIABLES_COLUMNS = () => [
       return record.sensitive ? (
           <i>Sensitive - write only</i>
       ) : (
-          <div>{record.value}</div>
+          <Tooltip title={record.description} placement="topLeft" overlayStyle={{width: 400, wordBreak: "break-word"}}
+                   overlayClassName="tooltip" trigger={["hover"]}>
+              <div>{record.value}</div>
+          </Tooltip>
       );
     },
   },
@@ -168,7 +174,11 @@ const GLOBAL_VARIABLES_COLUMNS = () => [
             return record.sensitive ? (
                 <i>Sensitive - write only</i>
             ) : (
-                <div>{record.value}</div>
+                <Tooltip title={record.description} placement="topLeft"
+                         overlayStyle={{width: 400, wordBreak: "break-word"}} overlayClassName="tooltip"
+                         trigger={["hover"]}>
+                    <div>{record.value}</div>
+                </Tooltip>
             );
         },
     }
