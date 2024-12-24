@@ -42,6 +42,7 @@ public class PatService {
             log.info("Generated Pat {}", pat.getId());
 
             if (days > 0) {
+                log.info("Pat will expire");
                 jws = Jwts.builder()
                         .setIssuer(ISSUER)
                         .setSubject(String.format("%s (Token)", name))
@@ -56,6 +57,7 @@ public class PatService {
                         .signWith(key)
                         .compact();
             } else {
+                log.info("Pat will not expire");
                 jws = Jwts.builder()
                         .setIssuer(ISSUER)
                         .setSubject(String.format("%s (Token)", name))
