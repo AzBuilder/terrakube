@@ -442,10 +442,10 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                             >
                               {" "}
                               <b>
-                                Expires{" "}
-                                {DateTime.fromISO(item.createdDate)
-                                  .plus({ days: item.days })
-                                  .toLocaleString(DateTime.DATETIME_MED)}
+                                Expires{": "}
+                                {(item.days > 0 || item.minutes > 0 || item.hours > 0) ? DateTime.fromISO(item.createdDate)
+                                  .plus({ days: item.days, minutes: item.minutes, hours: item.hours })
+                                  .toLocaleString(DateTime.DATETIME_MED) : "Token without expiration date"}
                               </b>
                             </Tag>
                           </Col>
