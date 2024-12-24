@@ -219,7 +219,7 @@ export const Tokens = () => {
               label="Days"
               rules={[{ required: true }]}
             >
-              <InputNumber min={1} />
+              <InputNumber min={0} />
             </Form.Item>
           </Form>
         </Space>
