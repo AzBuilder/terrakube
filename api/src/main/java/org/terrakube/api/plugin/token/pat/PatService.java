@@ -41,19 +41,36 @@ public class PatService {
         try {
             log.info("Generated Pat {}", pat.getId());
 
-            jws = Jwts.builder()
-                    .setIssuer(ISSUER)
-                    .setSubject(String.format("%s (Token)", name))
-                    .setAudience(ISSUER)
-                    .setId(pat.getId().toString())
-                    .claim("email", email)
-                    .claim("email_verified", true)
-                    .claim("name", String.format("%s (Token)", name))
-                    .claim("groups", groups)
-                    .setIssuedAt(Date.from(Instant.now()))
-                    .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
-                    .signWith(key)
-                    .compact();
+            if (days > 0) {
+                log.info("Pat will expire");
+                jws = Jwts.builder()
+                        .setIssuer(ISSUER)
+                        .setSubject(String.format("%s (Token)", name))
+                        .setAudience(ISSUER)
+                        .setId(pat.getId().toString())
+                        .claim("email", email)
+                        .claim("email_verified", true)
+                        .claim("name", String.format("%s (Token)", name))
+                        .claim("groups", groups)
+                        .setIssuedAt(Date.from(Instant.now()))
+                        .setExpiration(Date.from(Instant.now().plus(days, ChronoUnit.DAYS)))
+                        .signWith(key)
+                        .compact();
+            } else {
+                log.info("Pat will not expire");
+                jws = Jwts.builder()
+                        .setIssuer(ISSUER)
+                        .setSubject(String.format("%s (Token)", name))
+                        .setAudience(ISSUER)
+                        .setId(pat.getId().toString())
+                        .claim("email", email)
+                        .claim("email_verified", true)
+                        .claim("name", String.format("%s (Token)", name))
+                        .claim("groups", groups)
+                        .setIssuedAt(Date.from(Instant.now()))
+                        .signWith(key)
+                        .compact();
+            }
         } catch (Exception e) {
             log.error("Error generating token", e);
             patRepository.delete(pat);
