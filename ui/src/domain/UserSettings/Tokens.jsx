@@ -153,9 +153,9 @@ export const Tokens = () => {
                           {" "}
                           <b>
                             Expires{" "}
-                            {DateTime.fromISO(item.createdDate)
+                            {(item.days > 0) ? DateTime.fromISO(item.createdDate)
                               .plus({ days: item.days })
-                              .toLocaleString(DateTime.DATETIME_MED)}
+                              .toLocaleString(DateTime.DATETIME_MED): "Token without expiration date"}
                           </b>
                         </Tag>
                       </Col>
