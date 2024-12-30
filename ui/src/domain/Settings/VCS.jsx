@@ -91,10 +91,14 @@ export const VCSSettings = ({ vcsMode }) => {
 
   const onDelete = (id) => {
     console.log("deleted " + id);
-    axiosInstance.delete(`organization/${orgid}/vcs/${id}`).then((response) => {
+    axiosInstance.get(`organization/${orgid}/vcs/${id}?include=workspace`).then((response) => {
       console.log(response);
-      loadVCS();
+
     });
+    // axiosInstance.delete(`organization/${orgid}/vcs/${id}`).then((response) => {
+    //   console.log(response);
+    //   loadVCS();
+    // });
   };
 
   const getCallBackUrl = (id) => {

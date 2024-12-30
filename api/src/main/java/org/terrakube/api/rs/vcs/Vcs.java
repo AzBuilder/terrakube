@@ -32,6 +32,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
+import org.terrakube.api.rs.workspace.Workspace;
 
 @ReadPermission(expression = "team view vcs")
 @CreatePermission(expression = "team manage vcs")
@@ -106,6 +107,9 @@ public class Vcs extends GenericAuditFields {
 
     @ManyToOne
     private Organization organization;
+
+    @OneToMany(mappedBy = "vcs")
+    private List<Workspace> workspace;
 
     @OneToMany(mappedBy = "vcs", orphanRemoval = true, cascade = {CascadeType.REMOVE}) 
     private List<GitHubAppToken> gitHubAppToken;
