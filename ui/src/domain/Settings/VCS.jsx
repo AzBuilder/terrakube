@@ -94,7 +94,7 @@ export const VCSSettings = ({ vcsMode }) => {
     console.log("deleted " + id);
     axiosInstance.get(`organization/${orgid}/vcs/${id}?include=workspace`).then((response) => {
       console.log(response.data);
-      if(response.data.included.length > 0) {
+      if(response.data.included != null && response.data.included.length > 0) {
         console.log("VCS used by:")
         console.log(response.data.included);
         message.error("This VCS is currently in use by one or more workspaces. Please remove the VCS from all workspaces before deleting it.");
