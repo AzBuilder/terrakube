@@ -8,7 +8,8 @@ import {
   Row,
   Col,
   Popconfirm,
-  Typography,
+  Typography, 
+  message,
 } from "antd";
 import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
 import { AddVCS } from "./AddVCS";
@@ -92,13 +93,19 @@ export const VCSSettings = ({ vcsMode }) => {
   const onDelete = (id) => {
     console.log("deleted " + id);
     axiosInstance.get(`organization/${orgid}/vcs/${id}?include=workspace`).then((response) => {
-      console.log(response);
-
+      console.log(response.data);
+      if(response.data.included.length > 0) {
+        console.log("VCS used by:")
+        console.log(response.data.included);
+        message.error("This VCS is currently in use by one or more workspaces. Please remove the VCS from all workspaces before deleting it.");
+      } else {
+        axiosInstance.delete(`organization/${orgid}/vcs/${id}`).then((response) => {
+          console.log(response);
+          loadVCS();
+        });
+      }
     });
-    // axiosInstance.delete(`organization/${orgid}/vcs/${id}`).then((response) => {
-    //   console.log(response);
-    //   loadVCS();
-    // });
+
   };
 
   const getCallBackUrl = (id) => {
