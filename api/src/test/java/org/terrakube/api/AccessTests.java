@@ -780,5 +780,26 @@ public class AccessTests extends ServerApplicationTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.ACCEPTED.value());
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access/" + accessId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"))
+                .when()
+                .delete("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId)
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 }
