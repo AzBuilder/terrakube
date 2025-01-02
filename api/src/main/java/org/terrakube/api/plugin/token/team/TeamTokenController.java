@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.terrakube.api.repository.AccessRepository;
 import org.terrakube.api.repository.TeamRepository;
+import org.terrakube.api.repository.WorkspaceRepository;
 import org.terrakube.api.rs.token.group.Group;
 
 import lombok.AllArgsConstructor;
@@ -34,6 +35,7 @@ import org.terrakube.api.rs.workspace.access.Access;
 @RequestMapping("/access-token/v1/teams")
 public class TeamTokenController {
 
+    private final WorkspaceRepository workspaceRepository;
     TeamTokenService teamTokenService;
     TeamRepository teamRepository;
     AccessRepository accessRepository;
@@ -80,6 +82,36 @@ public class TeamTokenController {
         });
 
         log.info("Permissions: {}", permissions);
+        return new ResponseEntity<>(permissions, HttpStatus.ACCEPTED);
+    }
+
+    @Transactional
+    @GetMapping(path = "/permissions/organization/{organizationId}/workspace/{workspaceId}")
+    public ResponseEntity<PermissionSet> getPermissionsWorkspace(Principal principal,
+                                                        @PathVariable("organizationId") String organizationId, @PathVariable("workspaceId") String workspaceId) {
+        JwtAuthenticationToken principalJwt = ((JwtAuthenticationToken) principal);
+        PermissionSet permissions = new PermissionSet();
+        List<String> groups = teamTokenService.getCurrentGroups(principalJwt);
+        teamRepository.findAllByOrganizationIdAndNameIn(UUID.fromString(organizationId), groups).forEach(group -> {
+            permissions.setManageState(permissions.manageState || group.isManageState());
+            permissions.setManageWorkspace(permissions.manageWorkspace || group.isManageWorkspace());
+            permissions.setManageModule(permissions.manageModule || group.isManageModule());
+            permissions.setManageProvider(permissions.manageProvider || group.isManageProvider());
+            permissions.setManageTemplate(permissions.manageTemplate || group.isManageTemplate());
+            permissions.setManageVcs(permissions.manageVcs || group.isManageVcs());
+            permissions.setManageCollection(permissions.manageCollection || group.isManageCollection());
+            permissions.setManageJob(permissions.manageJob || group.isManageJob());
+        });
+
+        workspaceRepository.findById(UUID.fromString(workspaceId)).ifPresent(workspace -> {
+            workspace.getAccess().forEach(access -> {
+               permissions.setManageState(permissions.manageState || access.isManageState());
+               permissions.setManageJob(permissions.manageJob || access.isManageJob());
+               permissions.setManageWorkspace(permissions.manageWorkspace || access.isManageWorkspace());
+            });
+        });
+
+        log.info("Permissions with Workspace: {}", permissions);
         return new ResponseEntity<>(permissions, HttpStatus.ACCEPTED);
     }
 

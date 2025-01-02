@@ -701,4 +701,84 @@ public class AccessTests extends ServerApplicationTests {
                 .all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
+
+    @Test
+    void validateAccessToken() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/json")
+                .when()
+                .get("/access-token/v1/teams/permissions/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8")
+                .then()
+                .assertThat()
+                .body("manageState", IsEqual.equalTo(false))
+                .body("manageWorkspace", IsEqual.equalTo(true))
+                .body("manageModule", IsEqual.equalTo(true))
+                .body("manageProvider", IsEqual.equalTo(true))
+                .body("manageVcs", IsEqual.equalTo(true))
+                .body("manageTemplate", IsEqual.equalTo(true))
+                .body("manageCollection", IsEqual.equalTo(false))
+                .body("manageJob", IsEqual.equalTo(false))
+                .log()
+                .all()
+                .statusCode(HttpStatus.ACCEPTED.value());
+    }
+
+    @Test
+    void validateAccessTokenForWorkspace() {
+        String workspaceId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"workspace\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"validateAccessTokenForWorkspace\",\n" +
+                        "      \"source\": \"https://github.com/AzBuilder/terraform-azurerm-terrakube-app-registration.git\",\n" +
+                        "      \"branch\": \"main\",\n" +
+                        "      \"terraformVersion\": \"1.0.11\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace")
+                .then()
+                .assertThat()
+                .body("data.attributes.name", IsEqual.equalTo("validateAccessTokenForWorkspace"))
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        String accessId = given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"), "Content-Type", "application/vnd.api+json")
+                .body("{\n" +
+                        "  \"data\": {\n" +
+                        "    \"type\": \"access\",\n" +
+                        "    \"attributes\": {\n" +
+                        "      \"name\": \"validateAccessTokenForWorkspace\",\n" +
+                        "      \"manageWorkspace\": true,\n" +
+                        "      \"manageJob\": true,\n" +
+                        "      \"manageState\": true\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .when()
+                .post("/api/v1/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/" + workspaceId + "/access")
+                .then()
+                .log()
+                .all()
+                .body("data.attributes.name", IsEqual.equalTo("validateAccessTokenForWorkspace"))
+                .statusCode(HttpStatus.CREATED.value()).extract().path("data.id");
+
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("validateAccessTokenForWorkspace"), "Content-Type", "application/json")
+                .when()
+                .get("/access-token/v1/teams/permissions/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8/workspace/"+workspaceId)
+                .then()
+                .assertThat()
+                .body("manageState", IsEqual.equalTo(true))
+                .body("manageWorkspace", IsEqual.equalTo(true))
+                .body("manageJob", IsEqual.equalTo(true))
+                .log()
+                .all()
+                .statusCode(HttpStatus.ACCEPTED.value());
+    }
 }
