@@ -17,9 +17,9 @@
         <java.version>17</java.version>
         <elide.version>7.1.4</elide.version>
         <liquibase-core.version>4.30.0</liquibase-core.version>
-        <azure.version>5.18.0</azure.version>
+        <azure.version>5.19.0</azure.version>
         <mssql-jdbc.version>12.8.1.jre11</mssql-jdbc.version>
-        <msal4j.version>1.17.3</msal4j.version>
+        <msal4j.version>1.18.0</msal4j.version>
         <lombok.version>1.18.36</lombok.version>
         <jgit.version>7.1.0.202411261347-r</jgit.version>
         <rest-assured.version>5.5.0</rest-assured.version>
@@ -29,8 +29,8 @@
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.3</snakeyaml.version>
         <quartz.version>2.5.0</quartz.version>
-        <aws-sdk.version>2.29.34</aws-sdk.version>
-        <gcp-libraries-bom.version>26.51.0</gcp-libraries-bom.version>
+        <aws-sdk.version>2.29.43</aws-sdk.version>
+        <gcp-libraries-bom.version>26.52.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
         <jedis.version>5.1.5</jedis.version>
         <commons-text.version>1.13.0</commons-text.version>
@@ -39,7 +39,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <maven-artifact.version>3.9.9</maven-artifact.version>
         <commons-io.version>2.18.0</commons-io.version>
-        <kubernetes-client.version>7.0.0</kubernetes-client.version>
+        <kubernetes-client.version>7.0.1</kubernetes-client.version>
         <!--BUILDPACK DATA-->
         <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.358</buildpack.builder>
         <buildpack.java>gcr.io/paketo-buildpacks/java:17.3.0</buildpack.java>
@@ -281,7 +281,7 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>9.47</version>
+            <version>9.48</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

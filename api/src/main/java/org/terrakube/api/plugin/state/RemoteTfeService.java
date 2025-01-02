@@ -54,6 +54,7 @@ import org.terrakube.api.plugin.state.model.workspace.WorkspaceList;
 import org.terrakube.api.plugin.state.model.workspace.WorkspaceModel;
 import org.terrakube.api.plugin.state.model.workspace.state.consumers.StateConsumerList;
 import org.terrakube.api.plugin.state.model.workspace.tags.TagDataList;
+import org.terrakube.api.plugin.state.model.workspace.vcs.VcsRepo;
 import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.plugin.token.team.TeamTokenService;
 import org.terrakube.api.repository.ArchiveRepository;
@@ -342,6 +343,13 @@ public class RemoteTfeService {
             // defaultAttributes.put("structured-run-output-enabled", true);
 
             attributes.put("permissions", defaultAttributes);
+
+            if (workspace.get().getVcs() != null) {
+                VcsRepo vcsRepo = new VcsRepo();
+                vcsRepo.setBranch(workspace.get().getBranch());
+                vcsRepo.setRepositoryHttpUrl(workspace.get().getSource());
+                attributes.put("vcs-repo", vcsRepo);
+            }
 
             otherAttributes.forEach((key, value) -> attributes.putIfAbsent(key, value));
 

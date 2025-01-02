@@ -126,7 +126,7 @@ public class Workspace extends GenericAuditFields {
     @OneToMany(mappedBy = "workspace")
     private List<WorkspaceTag> workspaceTag;
 
-    @OneToOne
+    @ManyToOne
     private Vcs vcs;
 
     @OneToOne

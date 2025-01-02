@@ -152,10 +152,10 @@ export const Tokens = () => {
                         >
                           {" "}
                           <b>
-                            Expires{" "}
-                            {DateTime.fromISO(item.createdDate)
+                            Expires{": "}
+                            {(item.days > 0) ? DateTime.fromISO(item.createdDate)
                               .plus({ days: item.days })
-                              .toLocaleString(DateTime.DATETIME_MED)}
+                              .toLocaleString(DateTime.DATETIME_MED): "Token without expiration date"}
                           </b>
                         </Tag>
                       </Col>
@@ -219,7 +219,7 @@ export const Tokens = () => {
               label="Days"
               rules={[{ required: true }]}
             >
-              <InputNumber min={1} />
+              <InputNumber min={0} />
             </Form.Item>
           </Form>
         </Space>

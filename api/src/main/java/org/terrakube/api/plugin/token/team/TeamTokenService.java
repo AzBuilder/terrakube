@@ -57,24 +57,41 @@ public class TeamTokenService {
             JSONArray groupArray = new JSONArray();
             groupArray.add(groupName);
 
-            Date expiration = Date.from(Instant.now().plus(days, ChronoUnit.DAYS).plus(hours, ChronoUnit.HOURS).plus(minutes, ChronoUnit.MINUTES));
+            if (days > 0 || hours > 0 || minutes > 0 ) {
+                Date expiration = Date.from(Instant.now().plus(days, ChronoUnit.DAYS).plus(hours, ChronoUnit.HOURS).plus(minutes, ChronoUnit.MINUTES));
+                log.info("Team token will expire: {}", expiration);
 
-            log.info("Team token will expire: {}", expiration);
+                jws = Jwts.builder()
+                        .setIssuer(ISSUER)
+                        .setSubject(String.format("%s (Team Token)", groupName))
+                        .setAudience(ISSUER)
+                        .setId(groupToken.getId().toString())
+                        .claim("email", ownerEmail)
+                        .claim("description", description)
+                        .claim("email_verified", true)
+                        .claim("name", String.format("%s (Token)", groupName))
+                        .claim("groups", groupArray)
+                        .setIssuedAt(Date.from(Instant.now()))
+                        .setExpiration(expiration)
+                        .signWith(key)
+                        .compact();
+            } else {
+                log.info("Team token will not expire:");
 
-            jws = Jwts.builder()
-                    .setIssuer(ISSUER)
-                    .setSubject(String.format("%s (Team Token)", groupName))
-                    .setAudience(ISSUER)
-                    .setId(groupToken.getId().toString())
-                    .claim("email", ownerEmail)
-                    .claim("description", description)
-                    .claim("email_verified", true)
-                    .claim("name", String.format("%s (Token)", groupName))
-                    .claim("groups", groupArray)
-                    .setIssuedAt(Date.from(Instant.now()))
-                    .setExpiration(expiration)
-                    .signWith(key)
-                    .compact();
+                jws = Jwts.builder()
+                        .setIssuer(ISSUER)
+                        .setSubject(String.format("%s (Team Token)", groupName))
+                        .setAudience(ISSUER)
+                        .setId(groupToken.getId().toString())
+                        .claim("email", ownerEmail)
+                        .claim("description", description)
+                        .claim("email_verified", true)
+                        .claim("name", String.format("%s (Token)", groupName))
+                        .claim("groups", groupArray)
+                        .setIssuedAt(Date.from(Instant.now()))
+                        .signWith(key)
+                        .compact();
+            }
 
         } catch (Exception e) {
             log.error("Error generating token.", e);
