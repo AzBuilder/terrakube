@@ -707,7 +707,7 @@ public class AccessTests extends ServerApplicationTests {
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/json")
                 .when()
-                .get("/access-token/v1/teams/permissions/organization/d9b58bd3-f3fc-4056-a026-1163297e80a8")
+                .get("/access-token/v1/teams/permissions/organization/3a130a1c-d96f-4f99-83b8-58d472567e3a") //AWS org in sample data
                 .then()
                 .assertThat()
                 .body("manageState", IsEqual.equalTo(false))
