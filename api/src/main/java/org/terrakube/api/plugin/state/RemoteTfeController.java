@@ -132,7 +132,7 @@ public class RemoteTfeController {
             log.info("Created: {}", newWorkspace.get().toString());
             return ResponseEntity.status(201).body(newWorkspace.get());
         } else {
-            return ResponseEntity.status(500).body(new WorkspaceData());
+            return ResponseEntity.status(403).body(new WorkspaceData());
         }
     }
 

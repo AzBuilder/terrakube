@@ -802,4 +802,46 @@ public class AccessTests extends ServerApplicationTests {
                 .all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
+
+    @Test
+    void readCliEntitlements() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("LIMITED_ACCESS"), "Content-Type", "application/vnd.api+json")
+                .when()
+                .get("/remote/tfe/v2/organizations/simple/entitlement-set")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void getCliWorkspaceInformation() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("LIMITED_ACCESS"), "Content-Type", "application/vnd.api+json")
+                .when()
+                .get("/remote/tfe/v2/organizations/simple/workspaces/sample_simple")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .body("data.attributes.permissions.can-queue-run", IsEqual.equalTo(true))
+                .body("data.attributes.permissions.can-queue-destroy", IsEqual.equalTo(true))
+                .body("data.attributes.permissions.can-queue-apply", IsEqual.equalTo(true))
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void getCliOrganizationCapacity() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("LIMITED_ACCESS"), "Content-Type", "application/vnd.api+json")
+                .when()
+                .get("/remote/tfe/v2/organizations/simple/capacity")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value());
+    }
 }
