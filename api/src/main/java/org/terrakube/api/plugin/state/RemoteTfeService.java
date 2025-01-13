@@ -998,7 +998,8 @@ public class RemoteTfeService {
     RunsDataList getRunsQueue(String organizationName) {
         RunsDataList runsDataList = new RunsDataList();
         runsDataList.setData(new ArrayList<RunsModel>());
-        List<Job> jobList = jobRepository.findAllByStatusInOrderByIdAsc(
+        List<Job> jobList = jobRepository.findAllByOrganizationNameAndStatusInOrderByIdAsc(
+                organizationName,
                 Arrays.asList(
                         JobStatus.pending,
                         JobStatus.running,
