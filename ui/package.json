@@ -41,7 +41,7 @@
     "redux": "^5.0.1",
     "remark-gfm": "4.0.0",
     "unzipit": "^1.4.3",
-    "uuid": "^11.0.4",
+    "uuid": "^11.0.5",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
