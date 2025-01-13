@@ -844,4 +844,32 @@ public class AccessTests extends ServerApplicationTests {
                 .all()
                 .statusCode(HttpStatus.OK.value());
     }
+
+    @Test
+    void createCliWorkspaceLimitedAccess() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("LIMITED_ACCESS"), "Content-Type", "application/vnd.api+json")
+                .body("{\"data\":{\"type\":\"workspaces\",\"attributes\":{\"name\":\"createCliWorkspaceLimitedAccess\"}}}")
+                .when()
+                .post("/remote/tfe/v2/organizations/simple/workspaces")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void createCliWorkspaceNormalUser() {
+        given()
+                .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_DEVELOPERS"), "Content-Type", "application/vnd.api+json")
+                .body("{\"data\":{\"type\":\"workspaces\",\"attributes\":{\"name\":\"createCliWorkspaceNormalUser\"}}}")
+                .when()
+                .post("/remote/tfe/v2/organizations/simple/workspaces")
+                .then()
+                .assertThat()
+                .log()
+                .all()
+                .statusCode(HttpStatus.CREATED.value());
+    }
 }
