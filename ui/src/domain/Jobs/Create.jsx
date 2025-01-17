@@ -13,12 +13,13 @@ import {
 
 const validateMessages = { required: "${label} is required!" };
 
-export const CreateJob = ({ changeJob }) => {
+export const CreateJob = ({ changeJob, defaultBranch }) => {
   const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const [templates, setTemplates] = useState([]);
+  const [branchName, setBranchName] = useState([]);
   const [loading, setLoading] = useState(false);
   const onCancel = () => {
     setVisible(false);
@@ -27,23 +28,36 @@ export const CreateJob = ({ changeJob }) => {
   useEffect(() => {
     setLoading(true);
     loadTemplates();
+    loadBranch();
   }, [organizationId]);
 
-  const loadTemplates = () => {
+  const loadBranch = () => {
     axiosInstance
-        .get(`organization/${organizationId}/template`)
+        .get(`organization/${organizationId}/workspace/${workspaceId}`)
         .then((response) => {
-          var templatesList = response.data.data.filter(function (obj) {
-            //exclude CLI based templates
-            return (
-                obj.attributes.name !== "Terraform-Plan/Apply-Cli" &&
-                obj.attributes.name !== "Terraform-Plan/Destroy-Cli"
-            );
-          });
-          setTemplates(templatesList);
-          setLoading(false);
+            console.log(response.data);
+            console.log(response.data.data.attributes.branch);
+          var branchName = response.data.data.attributes.branch;
+          console.log("Default branch:" + branchName);
+          setBranchName(branchName);
         });
   };
+
+    const loadTemplates = () => {
+        axiosInstance
+            .get(`organization/${organizationId}/template`)
+            .then((response) => {
+                var templatesList = response.data.data.filter(function (obj) {
+                    //exclude CLI based templates
+                    return (
+                        obj.attributes.name !== "Terraform-Plan/Apply-Cli" &&
+                        obj.attributes.name !== "Terraform-Plan/Destroy-Cli"
+                    );
+                });
+                setTemplates(templatesList);
+                setLoading(false);
+            });
+    };
 
   const onCreate = (values) => {
     const body = {
@@ -51,6 +65,7 @@ export const CreateJob = ({ changeJob }) => {
         type: "job",
         attributes: {
           templateReference: values.templateId,
+          overrideBranch: values.branchName,
           via: "UI",
         },
         relationships: {
@@ -123,9 +138,6 @@ export const CreateJob = ({ changeJob }) => {
                 layout="vertical"
                 name="create-org"
                 validateMessages={validateMessages}
-                initialValues={{
-                    branchName: "test-branch-name",
-                }}
             >
               <Form.Item
                   name="templateId"
@@ -159,6 +171,7 @@ export const CreateJob = ({ changeJob }) => {
                     name="branchName"
                     label="Branch Name"
                     tooltip="Select the branch to use for this job. When using the CLI driven workflow do not modify the branch name."
+                    initialValue={branchName}
                 >
                     <Input />
                 </Form.Item>
