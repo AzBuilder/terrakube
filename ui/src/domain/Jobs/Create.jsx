@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Form, Button, Select, Modal, Space, message } from "antd";
+import {Form, Button, Select, Modal, Space, message, Input} from "antd";
 import {
   ORGANIZATION_ARCHIVE,
   WORKSPACE_ARCHIVE,
@@ -123,6 +123,9 @@ export const CreateJob = ({ changeJob }) => {
                 layout="vertical"
                 name="create-org"
                 validateMessages={validateMessages}
+                initialValues={{
+                    branchName: "test-branch-name",
+                }}
             >
               <Form.Item
                   name="templateId"
@@ -152,6 +155,13 @@ export const CreateJob = ({ changeJob }) => {
                     </Select>
                 )}
               </Form.Item>
+                <Form.Item
+                    name="branchName"
+                    label="Branch Name"
+                    tooltip="Select the branch to use for this job. When using the CLI driven workflow do not modify the branch name."
+                >
+                    <Input />
+                </Form.Item>
             </Form>
           </Space>
         </Modal>
