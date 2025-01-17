@@ -182,7 +182,7 @@ public class ExecutorService {
         Optional<Globalvar> defaultExecutor = globalVarRepository.findByOrganizationAndKey(job.getOrganization(), "TERRAKUBE_DEFAULT_EXECUTOR");
         if (defaultExecutor.isPresent()) {
             log.info("Found default executor url {}", defaultExecutor.get().getValue());
-            return defaultExecutor.get().getValue();
+            return defaultExecutor.get().getValue() + "/api/v1/terraform-rs";
         } else {
             log.info("No default executor found, using default executor url {}", this.executorUrl);
             return this.executorUrl;
