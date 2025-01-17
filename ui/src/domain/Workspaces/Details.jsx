@@ -967,7 +967,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                       >
                         {workspace.data.attributes.locked ? "Unlock" : "Lock"}
                       </Button>
-                      <CreateJob changeJob={changeJob} />
+                      <CreateJob changeJob={changeJob } />
                     </Space>
                   </>
                 }
