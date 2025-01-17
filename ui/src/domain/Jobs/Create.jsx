@@ -13,7 +13,7 @@ import {
 
 const validateMessages = { required: "${label} is required!" };
 
-export const CreateJob = ({ changeJob, defaultBranch }) => {
+export const CreateJob = ({ changeJob }) => {
   const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [visible, setVisible] = useState(false);
