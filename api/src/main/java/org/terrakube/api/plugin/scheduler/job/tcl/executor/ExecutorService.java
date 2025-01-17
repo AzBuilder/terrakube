@@ -173,9 +173,20 @@ public class ExecutorService {
     private String getExecutorUrl(Job job) {
         String agentUrl = job.getWorkspace().getAgent() != null
                 ? job.getWorkspace().getAgent().getUrl() + "/api/v1/terraform-rs"
-                : this.executorUrl;
+                : validateDefaultExecutor(job);
         log.info("Job {} Executor agent url: {}", job.getId(), agentUrl);
         return agentUrl;
+    }
+
+    private String validateDefaultExecutor(Job job) {
+        Optional<Globalvar> defaultExecutor = globalVarRepository.findByOrganizationAndKey(job.getOrganization(), "TERRAKUBE_DEFAULT_EXECUTOR");
+        if (defaultExecutor.isPresent()) {
+            log.info("Found default executor url {}", defaultExecutor.get().getValue());
+            return defaultExecutor.get().getValue();
+        } else {
+            log.info("No default executor found, using default executor url {}", this.executorUrl);
+            return this.executorUrl;
+        }
     }
 
     private boolean iacType(Job job) {
