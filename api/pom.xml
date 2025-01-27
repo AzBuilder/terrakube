@@ -25,7 +25,7 @@
         <rest-assured.version>5.5.0</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.5</postgresql.version>
-        <mysql.version>9.1.0</mysql.version>
+        <mysql.version>9.2.0</mysql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.3</snakeyaml.version>
         <quartz.version>2.5.0</quartz.version>
