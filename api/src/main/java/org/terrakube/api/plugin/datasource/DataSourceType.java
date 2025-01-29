@@ -6,5 +6,5 @@ public enum DataSourceType {
     AWS,
     GCP,
     POSTGRESQL,
-    MYSQL
+    MYSQL,
 }
