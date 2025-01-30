@@ -21,4 +21,6 @@ public class DataSourceConfigurationProperties {
     private String sslMode;
     private String databasePort;
     private String databaseSchema;
+    private boolean awsIamAuth;
+    private String awsRegion;
 }

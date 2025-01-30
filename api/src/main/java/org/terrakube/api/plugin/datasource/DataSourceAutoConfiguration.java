@@ -36,7 +36,14 @@ public class DataSourceAutoConfiguration {
                 break;
             case POSTGRESQL:
                 log.info("postgresql datasource using SSL Mode: {}", dataSourceConfigurationProperties.getSslMode());
-                PGSimpleDataSource ds = new PGSimpleDataSource();
+                PGSimpleDataSource ds;
+                if (dataSourceConfigurationProperties.isAwsIamAuth()) {
+                    PostgresAwsIamAuthDataSource dsAwsIam = new PostgresAwsIamAuthDataSource();
+                    dsAwsIam.setRegion(dataSourceConfigurationProperties.getAwsRegion());
+                    ds = dsAwsIam;
+                } else {
+                    ds = new PGSimpleDataSource();
+                }
                 ds.setServerNames(new String[]{dataSourceConfigurationProperties.getHostname()});
                 ds.setPortNumbers(new int[]{Integer.parseInt(dataSourceConfigurationProperties.getDatabasePort())});
                 ds.setDatabaseName(dataSourceConfigurationProperties.getDatabaseName());
