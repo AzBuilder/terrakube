@@ -24,7 +24,7 @@
     "github-markdown-css": "^5.8.1",
     "hcl2-parser": "^1.0.3",
     "html-react-parser": "^5.2.2",
-    "html-to-image": "^1.11.11",
+    "html-to-image": "^1.11.13",
     "loader-utils": "3.3.1",
     "luxon": "^3.5.0",
     "minimatch": "^10.0.1",
