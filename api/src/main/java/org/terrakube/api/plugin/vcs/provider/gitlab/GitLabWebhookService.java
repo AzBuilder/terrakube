@@ -1,6 +1,10 @@
 package org.terrakube.api.plugin.vcs.provider.gitlab;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,6 +112,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
         String ownerAndRepo = String.join("/", extractOwnerAndRepo(workspace.getSource()));
+        String token = workspace.getVcs().getAccessToken();
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
         RestTemplate restTemplate = new RestTemplate();
 
@@ -124,7 +129,14 @@ public class GitLabWebhookService extends WebhookServiceBase {
         log.info(body);
         // Create the entity
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        URI gitlabUri = UriComponentsBuilder.fromHttpUrl(workspace.getVcs().getApiUrl() + "/projects/" + ownerAndRepo + "/hooks").build(true).toUri();
+        String projectId = "";
+        try {
+            log.info("Search gitlab project id using {}, {}", ownerAndRepo, workspace.getVcs().getApiUrl());
+            projectId = getGitlabProjectId(ownerAndRepo, token, workspace.getVcs().getApiUrl());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        URI gitlabUri = UriComponentsBuilder.fromHttpUrl(workspace.getVcs().getApiUrl() + "/projects/" + projectId + "/hooks").build(true).toUri();
 
         // Make the request using the GitLab API
         ResponseEntity<String> response = restTemplate.exchange(
@@ -145,6 +157,36 @@ public class GitLabWebhookService extends WebhookServiceBase {
         }
 
         return id;
+    }
+
+    private String getGitlabProjectId(String ownerAndRepo, String accessToken, String gitlabBaseUrl) throws IOException, InterruptedException {
+        String projectId = "";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(gitlabBaseUrl + "/api/v4/search?scope=projects&search=" + ownerAndRepo))
+                .header("Authorization", "Bearer " + accessToken)
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Check for successful response
+        if (response.statusCode() == 200) {
+            log.info("Response from Gitlab: {}" , response.body());
+            // Initialize Jackson ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Parse the JSON string into a JsonNode
+            JsonNode jsonNode = objectMapper.readTree(response.body());
+
+            projectId = jsonNode.get(0).get("id").asText();
+            log.info("Parsed Project ID: {}", projectId);
+        } else {
+            log.error("Failed to retrieve project ID. HTTP Status: {}", response.statusCode());
+            log.error("Response: {}", response.body());
+        }
+        return projectId;
     }
     
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
