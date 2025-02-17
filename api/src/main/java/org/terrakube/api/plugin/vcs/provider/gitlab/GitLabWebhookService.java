@@ -133,8 +133,9 @@ public class GitLabWebhookService extends WebhookServiceBase {
         try {
             log.info("Search gitlab project id using {}, {}", ownerAndRepo, workspace.getVcs().getApiUrl());
             projectId = getGitlabProjectId(ownerAndRepo, token, workspace.getVcs().getApiUrl());
-        } catch (Exception e) {
+        } catch (InterruptedException | IOException e) {
             log.error(e.getMessage());
+            Thread.currentThread().interrupt();
         }
         URI gitlabUri = UriComponentsBuilder.fromHttpUrl(workspace.getVcs().getApiUrl() + "/projects/" + projectId + "/hooks").build(true).toUri();
 
