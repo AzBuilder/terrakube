@@ -6,7 +6,7 @@
         {
             "label": "setup-java",
             "type": "shell",
-            "command": "source \"$HOME/.sdkman/bin/sdkman-init.sh\" && sdk install java 17.0.6-tem && sdk install maven 3.9.0",
+            "command": "source \"$HOME/.sdkman/bin/sdkman-init.sh\" && sdk install java 21.0.6-tem && sdk install maven 3.9.0",
             "group": {
                 "kind": "build",
                 "isDefault": true
