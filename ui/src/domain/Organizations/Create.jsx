@@ -97,7 +97,7 @@ export const CreateOrganization = ({ setOrganizationName }) => {
               name="name"
               label="Organization name"
               tooltip="e.g. company-name"
-              extra=" Organization names must be unique and will be part of your resource names used in various tools, for example www-prod."
+              extra=" Organization names must be unique and will be part of your resource names used in various tools, for example development, production, finance."
               rules={[
                   { required: true,message: 'This field is required!'},
                   { pattern: /^[a-zA-Z0-9]*$/, message: 'Only letters and numbers are allowed!',}
