@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
+import org.terrakube.api.plugin.security.encryption.InternalEncryptionService;
 import org.terrakube.api.plugin.token.pat.PatService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
 import org.terrakube.api.repository.*;
@@ -47,6 +48,9 @@ class ServerApplicationTests {
 
     @LocalServerPort
     int port;
+
+    @Autowired
+    InternalEncryptionService internalEncryptionService;
 
     @Autowired
     JobRepository jobRepository;

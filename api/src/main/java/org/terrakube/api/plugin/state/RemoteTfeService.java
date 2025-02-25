@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
+import org.terrakube.api.plugin.security.encryption.InternalEncryptionService;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunModel;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
@@ -97,6 +98,8 @@ public class RemoteTfeService {
 
     private AccessRepository accessRepository;
 
+    private InternalEncryptionService internalEncryptionService;
+
     public RemoteTfeService(JobRepository jobRepository,
                             ContentRepository contentRepository,
                             OrganizationRepository organizationRepository,
@@ -113,7 +116,8 @@ public class RemoteTfeService {
                             WorkspaceTagRepository workspaceTagRepository,
                             TeamTokenService teamTokenService,
                             ArchiveRepository archiveRepository,
-                            AccessRepository accessRepository) {
+                            AccessRepository accessRepository,
+                            InternalEncryptionService internalEncryptionService) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -131,6 +135,7 @@ public class RemoteTfeService {
         this.teamTokenService = teamTokenService;
         this.archiveRepository = archiveRepository;
         this.accessRepository = accessRepository;
+        this.internalEncryptionService = internalEncryptionService;
     }
 
     private boolean validateTerrakubeUser(JwtAuthenticationToken currentUser) {
@@ -1151,8 +1156,9 @@ public class RemoteTfeService {
         planRunModel.getAttributes().put("actions", actions);
 
         planRunModel.getAttributes().put("status", planStatus);
+        String encryptedPlanId = internalEncryptionService.encrypt(String.valueOf(planId));
         planRunModel.getAttributes().put("log-read-url",
-                String.format("https://%s/remote/tfe/v2/plans/%s/logs", hostname, planId));
+                String.format("https://%s/remote/tfe/v2/plans/logs/%s", hostname, Arrays.toString(Base64.getUrlEncoder().encode(encryptedPlanId.getBytes(StandardCharsets.UTF_8)))));
         plansData.setData(planRunModel);
         return plansData;
     }
@@ -1188,13 +1194,16 @@ public class RemoteTfeService {
             }
         }
         applyModel.getAttributes().put("status", applyStatus);
+        String encryptedPlanId = internalEncryptionService.encrypt(String.valueOf(planId));
         applyModel.getAttributes().put("log-read-url",
-                String.format("https://%s/remote/tfe/v2/applies/%s/logs", hostname, planId));
+                String.format("https://%s/remote/tfe/v2/applies/logs/%s", hostname, Arrays.toString(Base64.getUrlEncoder().encode(encryptedPlanId.getBytes(StandardCharsets.UTF_8)))));
+
         applyRunData.setData(applyModel);
         return applyRunData;
     }
 
-    byte[] getPlanLogs(int planId, int offset, int limit) {
+    byte[] getPlanLogs(String planId, int offset, int limit) {
+        planId = internalEncryptionService.decrypt(Arrays.toString(Base64.getUrlDecoder().decode(planId.getBytes(StandardCharsets.UTF_8))));
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutput = new TextStringBuilder();
@@ -1228,7 +1237,8 @@ public class RemoteTfeService {
         return logs;
     }
 
-    byte[] getApplyLogs(int planId, int offset, int limit) {
+    byte[] getApplyLogs(String planId, int offset, int limit) {
+        planId = internalEncryptionService.decrypt(Arrays.toString(Base64.getUrlDecoder().decode(planId.getBytes(StandardCharsets.UTF_8))));
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutputApply = new TextStringBuilder();

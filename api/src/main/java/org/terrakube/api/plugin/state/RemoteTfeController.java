@@ -300,16 +300,16 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @GetMapping(produces = "application/vnd.api+json", path = "/plans/{planId}/logs")
-    public ResponseEntity<String> getPlanLogs(@PathVariable("planId") int planId,
+    @GetMapping(produces = "application/vnd.api+json", path = "/plans/logs/{planId}")
+    public ResponseEntity<String> getPlanLogs(@PathVariable("planId") String planId,
             @RequestParam int offset, @RequestParam int limit) throws IOException {
         return ResponseEntity.of(Optional
                 .ofNullable(new String(remoteTfeService.getPlanLogs(planId, offset, limit), StandardCharsets.UTF_8)));
     }
 
     @Transactional
-    @GetMapping(produces = "application/vnd.api+json", path = "/applies/{applyId}/logs")
-    public ResponseEntity<String> getApplyLogs(@PathVariable("applyId") int planId,
+    @GetMapping(produces = "application/vnd.api+json", path = "/applies/logs/{applyId}")
+    public ResponseEntity<String> getApplyLogs(@PathVariable("applyId") String planId,
             @RequestParam int offset, @RequestParam int limit) throws IOException {
         return ResponseEntity
                 .of(Optional.ofNullable(

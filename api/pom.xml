@@ -297,7 +297,6 @@
             <artifactId>kubernetes-client</artifactId>
             <version>${kubernetes-client.version}</version>
         </dependency>
-
     </dependencies>
     <dependencyManagement>
         <dependencies>
