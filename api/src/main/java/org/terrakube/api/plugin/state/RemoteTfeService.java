@@ -1158,7 +1158,7 @@ public class RemoteTfeService {
         planRunModel.getAttributes().put("status", planStatus);
         String encryptedPlanId = internalEncryptionService.encrypt(String.valueOf(planId));
         planRunModel.getAttributes().put("log-read-url",
-                String.format("https://%s/remote/tfe/v2/plans/logs/%s", hostname, Arrays.toString(Base64.getUrlEncoder().encode(encryptedPlanId.getBytes(StandardCharsets.UTF_8)))));
+                String.format("https://%s/remote/tfe/v2/plans/logs/%s", hostname, encryptedPlanId));
         plansData.setData(planRunModel);
         return plansData;
     }
@@ -1196,14 +1196,14 @@ public class RemoteTfeService {
         applyModel.getAttributes().put("status", applyStatus);
         String encryptedPlanId = internalEncryptionService.encrypt(String.valueOf(planId));
         applyModel.getAttributes().put("log-read-url",
-                String.format("https://%s/remote/tfe/v2/applies/logs/%s", hostname, Arrays.toString(Base64.getUrlEncoder().encode(encryptedPlanId.getBytes(StandardCharsets.UTF_8)))));
+                String.format("https://%s/remote/tfe/v2/applies/logs/%s", hostname, encryptedPlanId));
 
         applyRunData.setData(applyModel);
         return applyRunData;
     }
 
     byte[] getPlanLogs(String planId, int offset, int limit) {
-        planId = internalEncryptionService.decrypt(Arrays.toString(Base64.getUrlDecoder().decode(planId.getBytes(StandardCharsets.UTF_8))));
+        planId = internalEncryptionService.decrypt(planId);
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutput = new TextStringBuilder();
@@ -1238,7 +1238,7 @@ public class RemoteTfeService {
     }
 
     byte[] getApplyLogs(String planId, int offset, int limit) {
-        planId = internalEncryptionService.decrypt(Arrays.toString(Base64.getUrlDecoder().decode(planId.getBytes(StandardCharsets.UTF_8))));
+        planId = internalEncryptionService.decrypt(planId);
         Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
         TextStringBuilder logsOutputApply = new TextStringBuilder();
