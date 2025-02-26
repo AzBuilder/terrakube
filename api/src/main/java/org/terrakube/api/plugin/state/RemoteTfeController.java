@@ -300,20 +300,22 @@ public class RemoteTfeController {
     }
 
     @Transactional
-    @GetMapping(produces = "application/vnd.api+json", path = "/plans/logs/{planId}")
-    public ResponseEntity<String> getPlanLogs(@PathVariable("planId") String planId,
+    @GetMapping(produces = "application/vnd.api+json", path = "/plans/logs/{planId1}/{planId2}")
+    public ResponseEntity<String> getPlanLogs(@PathVariable("planId1") String planId1,@PathVariable("planId2") String planId2,
             @RequestParam int offset, @RequestParam int limit) throws IOException {
+        log.info("Getting plan logs for planId: {}", planId1 + "/" + planId2);
         return ResponseEntity.of(Optional
-                .ofNullable(new String(remoteTfeService.getPlanLogs(planId, offset, limit), StandardCharsets.UTF_8)));
+                .ofNullable(new String(remoteTfeService.getPlanLogs(planId1 + "/" + planId2, offset, limit), StandardCharsets.UTF_8)));
     }
 
     @Transactional
-    @GetMapping(produces = "application/vnd.api+json", path = "/applies/logs/{applyId}")
-    public ResponseEntity<String> getApplyLogs(@PathVariable("applyId") String planId,
+    @GetMapping(produces = "application/vnd.api+json", path = "/applies/logs/{applyId1}/{applyId2}")
+    public ResponseEntity<String> getApplyLogs(@PathVariable("applyId1") String applyId1,@PathVariable("applyId2") String applyId2,
             @RequestParam int offset, @RequestParam int limit) throws IOException {
+        log.info("Getting plan logs for applyId: {}", applyId1 + "/" + applyId2);
         return ResponseEntity
                 .of(Optional.ofNullable(
-                        new String(remoteTfeService.getApplyLogs(planId, offset, limit), StandardCharsets.UTF_8)));
+                        new String(remoteTfeService.getApplyLogs(applyId1 + "/" + applyId2, offset, limit), StandardCharsets.UTF_8)));
     }
 
     @Transactional

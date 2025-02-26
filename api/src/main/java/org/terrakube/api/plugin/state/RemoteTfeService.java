@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.terrakube.api.plugin.scheduler.ScheduleJobService;
-import org.terrakube.api.plugin.security.encryption.InternalEncryptionService;
+import org.terrakube.api.plugin.security.encryption.EncryptionService;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunData;
 import org.terrakube.api.plugin.state.model.apply.ApplyRunModel;
 import org.terrakube.api.plugin.state.model.configuration.ConfigurationData;
@@ -98,7 +98,7 @@ public class RemoteTfeService {
 
     private AccessRepository accessRepository;
 
-    private InternalEncryptionService internalEncryptionService;
+    private EncryptionService encryptionService;
 
     public RemoteTfeService(JobRepository jobRepository,
                             ContentRepository contentRepository,
@@ -117,7 +117,7 @@ public class RemoteTfeService {
                             TeamTokenService teamTokenService,
                             ArchiveRepository archiveRepository,
                             AccessRepository accessRepository,
-                            InternalEncryptionService internalEncryptionService) {
+                            EncryptionService encryptionService) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -135,7 +135,7 @@ public class RemoteTfeService {
         this.teamTokenService = teamTokenService;
         this.archiveRepository = archiveRepository;
         this.accessRepository = accessRepository;
-        this.internalEncryptionService = internalEncryptionService;
+        this.encryptionService = encryptionService;
     }
 
     private boolean validateTerrakubeUser(JwtAuthenticationToken currentUser) {
@@ -1156,7 +1156,8 @@ public class RemoteTfeService {
         planRunModel.getAttributes().put("actions", actions);
 
         planRunModel.getAttributes().put("status", planStatus);
-        String encryptedPlanId = internalEncryptionService.encrypt(String.valueOf(planId));
+        String encryptedPlanId = encryptionService.encrypt(String.valueOf(planId));
+        log.info("log-read-url: {}", String.format("https://%s/remote/tfe/v2/plans/logs/%s", hostname, encryptedPlanId));
         planRunModel.getAttributes().put("log-read-url",
                 String.format("https://%s/remote/tfe/v2/plans/logs/%s", hostname, encryptedPlanId));
         plansData.setData(planRunModel);
@@ -1194,7 +1195,8 @@ public class RemoteTfeService {
             }
         }
         applyModel.getAttributes().put("status", applyStatus);
-        String encryptedPlanId = internalEncryptionService.encrypt(String.valueOf(planId));
+        String encryptedPlanId = encryptionService.encrypt(String.valueOf(planId));
+        log.info("log-read-url: {}", String.format("https://%s/remote/tfe/v2/applies/logs/%s", hostname, encryptedPlanId));
         applyModel.getAttributes().put("log-read-url",
                 String.format("https://%s/remote/tfe/v2/applies/logs/%s", hostname, encryptedPlanId));
 
@@ -1203,72 +1205,82 @@ public class RemoteTfeService {
     }
 
     byte[] getPlanLogs(String planId, int offset, int limit) {
-        planId = internalEncryptionService.decrypt(planId);
-        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
+        planId = encryptionService.decrypt(planId);
+        log.info("Searching logs for plan {}", planId);
+        Optional<Job> job = jobRepository.findById(Integer.valueOf(planId));
         byte[] logs = "".getBytes();
-        TextStringBuilder logsOutput = new TextStringBuilder();
-        if (job.getStep() != null && !job.getStep().isEmpty())
-            for (Step step : job.getStep()) {
-                if (step.getStepNumber() == 100) {
-                    log.info("Checking logs for plan: {}", step.getId());
+        if(job.isPresent()) {
+            TextStringBuilder logsOutput = new TextStringBuilder();
+            if (job.get().getStep() != null && !job.get().getStep().isEmpty())
+                for (Step step : job.get().getStep()) {
+                    if (step.getStepNumber() == 100) {
+                        log.info("Checking logs for plan: {}", step.getId());
 
-                    try {
-                        @SuppressWarnings("unchecked")
-                        List<MapRecord<String, String, String>> messagesPlan = redisTemplate.opsForStream()
-                                .read(StreamOffset.fromStart(String.valueOf(job.getId())),
-                                        StreamOffset.latest(String.valueOf(job.getId())));
+                        try {
+                            @SuppressWarnings("unchecked")
+                            List<MapRecord<String, String, String>> messagesPlan = redisTemplate.opsForStream()
+                                    .read(StreamOffset.fromStart(String.valueOf(job.get().getId())),
+                                            StreamOffset.latest(String.valueOf(job.get().getId())));
 
-                        for (MapRecord<String, String, String> mapRecord : messagesPlan) {
-                            Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
-                            logsOutput.appendln(streamData.get("output"));
+                            for (MapRecord<String, String, String> mapRecord : messagesPlan) {
+                                Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
+                                logsOutput.appendln(streamData.get("output"));
+                            }
+
+                            String logsOutputString = logsOutput.toString();
+                            int potentialEndIndex = limit + offset;
+                            int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
+                                    : logsOutputString.length();
+                            logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
+                            log.debug("{}", logs);
+                        } catch (Exception ex) {
+                            log.debug(ex.getMessage());
                         }
-
-                        String logsOutputString = logsOutput.toString();
-                        int potentialEndIndex = limit + offset;
-                        int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
-                                : logsOutputString.length();
-                        logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
-                        log.debug("{}", logs);
-                    } catch (Exception ex) {
-                        log.debug(ex.getMessage());
                     }
                 }
-            }
+        } else {
+            log.warn("No logs found for plan {}", planId);
+        }
         return logs;
     }
 
-    byte[] getApplyLogs(String planId, int offset, int limit) {
-        planId = internalEncryptionService.decrypt(planId);
-        Job job = jobRepository.getReferenceById(Integer.valueOf(planId));
+    byte[] getApplyLogs(String applyId, int offset, int limit) {
+        applyId = encryptionService.decrypt(applyId);
+        log.info("Searching logs for apply {}", applyId);
+        Optional<Job> job = jobRepository.findById(Integer.valueOf(applyId));
         byte[] logs = "".getBytes();
-        TextStringBuilder logsOutputApply = new TextStringBuilder();
-        if (job.getStep() != null && !job.getStep().isEmpty())
-            for (Step step : job.getStep()) {
-                if (step.getStepNumber() == 100) {
-                    log.debug("Checking logs stepId for apply: {}", step.getId());
+        if (job.isPresent()) {
+            TextStringBuilder logsOutputApply = new TextStringBuilder();
+            if (job.get().getStep() != null && !job.get().getStep().isEmpty())
+                for (Step step : job.get().getStep()) {
+                    if (step.getStepNumber() == 100) {
+                        log.debug("Checking logs stepId for apply: {}", step.getId());
 
-                    try {
-                        @SuppressWarnings("unchecked")
-                        List<MapRecord<String, String, String>> messagesApply = redisTemplate.opsForStream().read(
-                                StreamOffset.fromStart(String.valueOf(job.getId())),
-                                StreamOffset.latest(String.valueOf(job.getId())));
+                        try {
+                            @SuppressWarnings("unchecked")
+                            List<MapRecord<String, String, String>> messagesApply = redisTemplate.opsForStream().read(
+                                    StreamOffset.fromStart(String.valueOf(job.get().getId())),
+                                    StreamOffset.latest(String.valueOf(job.get().getId())));
 
-                        for (MapRecord<String, String, String> mapRecord : messagesApply) {
-                            Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
-                            logsOutputApply.appendln(streamData.get("output"));
+                            for (MapRecord<String, String, String> mapRecord : messagesApply) {
+                                Map<String, String> streamData = (Map<String, String>) mapRecord.getValue();
+                                logsOutputApply.appendln(streamData.get("output"));
+                            }
+
+                            String logsOutputString = logsOutputApply.toString();
+                            int potentialEndIndex = limit + offset;
+                            int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
+                                    : logsOutputString.length();
+                            logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
+                            log.debug("{}", logs);
+                        } catch (Exception ex) {
+                            log.debug(ex.getMessage());
                         }
-
-                        String logsOutputString = logsOutputApply.toString();
-                        int potentialEndIndex = limit + offset;
-                        int endIndex = logsOutputString.length() > potentialEndIndex ? potentialEndIndex
-                                : logsOutputString.length();
-                        logs = logsOutputString.substring(offset, endIndex).getBytes(StandardCharsets.UTF_8);
-                        log.debug("{}", logs);
-                    } catch (Exception ex) {
-                        log.debug(ex.getMessage());
                     }
                 }
-            }
+        } else {
+            log.warn("No logs found for apply {}", applyId);
+        }
         return logs;
     }
 

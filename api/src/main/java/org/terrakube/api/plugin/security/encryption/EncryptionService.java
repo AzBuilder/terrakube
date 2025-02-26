@@ -1,21 +1,22 @@
 package org.terrakube.api.plugin.security.encryption;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Base64;
 
 @Service
 @Slf4j
-public class InternalEncryptionService {
+public class EncryptionService {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
 
@@ -45,9 +46,11 @@ public class InternalEncryptionService {
             byte[] encryptedBytes = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
 
             // Encode IV and encrypted data in Base64, and return as "IV:EncryptedData"
-            String ivBase64 = Base64.getEncoder().encodeToString(iv);
-            String encryptedBase64 = Base64.getEncoder().encodeToString(encryptedBytes);
-            return ivBase64 + ":" + encryptedBase64;
+            //String ivBase64 = Base64.getUrlEncoder().encodeToString(iv);
+            //String encryptedBase64 = Base64.getUrlEncoder().encodeToString(encryptedBytes);
+            String ivBase64 = new BigInteger(iv).toString(36);
+            String encryptedBase64 = new BigInteger(encryptedBytes).toString(36);
+            return ivBase64 + "/" + encryptedBase64;
         } catch (Exception e) {
             log.error("Error during AES encryption: {}", e.getMessage(), e);
             throw new RuntimeException("Encryption failed", e);
@@ -63,7 +66,7 @@ public class InternalEncryptionService {
     public String decrypt(String encryptedText) {
         try {
             // Split the input into IV and cipher text
-            String[] parts = encryptedText.split(":");
+            String[] parts = encryptedText.split("/");
             if (parts.length != 2) {
                 throw new IllegalArgumentException("Invalid encrypted string format. Expected 'IV:EncryptedData'");
             }
@@ -71,8 +74,8 @@ public class InternalEncryptionService {
             String encryptedBase64 = parts[1];
 
             // Decode IV and encrypted data from Base64
-            byte[] iv = Base64.getDecoder().decode(ivBase64);
-            byte[] encryptedBytes = Base64.getDecoder().decode(encryptedBase64);
+            byte[] iv = new BigInteger(ivBase64, 36).toByteArray();
+            byte[] encryptedBytes = new BigInteger(encryptedBase64, 36).toByteArray();
 
             // Create SecretKeySpec and IvParameterSpec for decryption
             SecretKeySpec keySpec = new SecretKeySpec(generateHashFromToken(internalToken), "AES");
@@ -112,8 +115,9 @@ public class InternalEncryptionService {
      * @return A randomly generated IV byte array
      */
     private byte[] generateIv() {
-        byte[] iv = new byte[16]; // AES block size is 16 bytes
-        new SecureRandom().nextBytes(iv);
-        return iv;
+        //byte[] iv = new byte[16]; // AES block size is 16 bytes
+        //new SecureRandom().nextBytes(iv);
+        return RandomStringUtils.secureStrong().nextAlphanumeric(16).getBytes(StandardCharsets.UTF_8);
+        //return iv;
     }
 }
