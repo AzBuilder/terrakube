@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
+import org.terrakube.api.plugin.security.encryption.EncryptionService;
 import org.terrakube.api.plugin.token.pat.PatService;
 import org.terrakube.api.plugin.scheduler.job.tcl.TclService;
 import org.terrakube.api.repository.*;
@@ -29,8 +30,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -47,6 +46,9 @@ class ServerApplicationTests {
 
     @LocalServerPort
     int port;
+
+    @Autowired
+    EncryptionService encryptionService;
 
     @Autowired
     JobRepository jobRepository;
