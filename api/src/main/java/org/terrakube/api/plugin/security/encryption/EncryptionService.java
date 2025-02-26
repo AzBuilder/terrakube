@@ -1,25 +1,26 @@
 package org.terrakube.api.plugin.security.encryption;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
 
 @Service
 @Slf4j
 public class EncryptionService {
 
-    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String ALGORITHM = "AES/GCM/NoPadding";
+    private static final int GCM_TAG_LENGTH = 128;  // Tag length in bits
+    private static final int GCM_IV_LENGTH = 16;  // GCM IV length (recommended is 12 bytes)
+
 
     @Value("${org.terrakube.token.internal}")
     private String internalToken;
@@ -37,11 +38,11 @@ public class EncryptionService {
 
             // Generate a random Initialization Vector (IV)
             byte[] iv = generateIv();
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+            GCMParameterSpec parameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
 
             // Configure the Cipher for encryption
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, parameterSpec);
 
             // Perform encryption
             byte[] encryptedBytes = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
@@ -80,7 +81,7 @@ public class EncryptionService {
 
             // Create SecretKeySpec and IvParameterSpec for decryption
             SecretKeySpec keySpec = new SecretKeySpec(generateHashFromToken(internalToken), "AES");
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+            GCMParameterSpec ivSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
 
             // Configure Cipher for decryption
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -116,7 +117,7 @@ public class EncryptionService {
      * @return A randomly generated IV byte array
      */
     private byte[] generateIv() {
-        byte[] iv = new byte[16]; // AES block size is 16 bytes
+        byte[] iv = new byte[GCM_IV_LENGTH]; // AES block size is 16 bytes
         new SecureRandom().nextBytes(iv);
         return iv;
     }
