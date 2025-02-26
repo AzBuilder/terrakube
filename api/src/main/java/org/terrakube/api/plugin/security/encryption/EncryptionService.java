@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
 
 @Service
@@ -115,9 +116,8 @@ public class EncryptionService {
      * @return A randomly generated IV byte array
      */
     private byte[] generateIv() {
-        //byte[] iv = new byte[16]; // AES block size is 16 bytes
-        //new SecureRandom().nextBytes(iv);
-        return RandomStringUtils.secureStrong().nextAlphanumeric(16).getBytes(StandardCharsets.UTF_8);
-        //return iv;
+        byte[] iv = new byte[16]; // AES block size is 16 bytes
+        new SecureRandom().nextBytes(iv);
+        return iv;
     }
 }
