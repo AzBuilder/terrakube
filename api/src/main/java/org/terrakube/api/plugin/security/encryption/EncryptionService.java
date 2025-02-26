@@ -19,7 +19,7 @@ public class EncryptionService {
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128;  // Tag length in bits
-    private static final int GCM_IV_LENGTH = 16;  // GCM IV length (recommended is 12 bytes)
+    private static final int GCM_IV_LENGTH = 12;  // GCM IV length (recommended is 12 bytes)
 
 
     @Value("${org.terrakube.token.internal}")
