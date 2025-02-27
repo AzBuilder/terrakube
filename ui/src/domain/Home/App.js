@@ -24,6 +24,12 @@ const { Header, Footer } = Layout;
 const App = () => {
   const auth = useAuth();
   const [organizationName, setOrganizationName] = useState("...");
+  const expiry = auth?.user?.expires_at;
+  
+  // Checking with the expiry time in the localstorage and when it has crossed the access has been revoked so It will clear the local storage and by default with no localstorage object it will route to login page.
+  if(auth.isAuthenticated && auth?.user && Math.floor(Date.now() / 1000) > expiry){
+    localStorage.clear();
+  }
 
   if (!auth.isAuthenticated) {
     return <Login />;
