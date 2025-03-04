@@ -168,7 +168,7 @@ const App = () => {
           />
         </Routes>
         <Footer style={{ textAlign: "center" }}>
-          Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2024
+          Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2025
         </Footer>
       </Layout>
     </Router>
