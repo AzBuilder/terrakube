@@ -15,6 +15,7 @@ import {
   Popconfirm,
   message,
   Spin,
+  Typography,
 } from "antd";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -27,13 +28,8 @@ import {
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { GitlabOutlined, GithubOutlined } from "@ant-design/icons";
-import {
-  SiBitbucket,
-} from "react-icons/si";
-import {
-  VscAzure,
-  VscAzureDevops,
-} from "react-icons/vsc";
+import { SiBitbucket } from "react-icons/si";
+import { VscAzure, VscAzureDevops } from "react-icons/vsc";
 import { FaAws } from "react-icons/fa";
 import { BiBookBookmark } from "react-icons/bi";
 import { RiFolderHistoryLine } from "react-icons/ri";
@@ -71,6 +67,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const [submodulePath, setSubmodulePath] = useState("");
   const navigate = useNavigate();
 
+  // Renders the provider icon
   const renderLogo = (provider) => {
     switch (provider) {
       case "azurerm":
@@ -97,45 +94,43 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     loadModuleDetails(module.data.attributes.registryPath, e.key);
   };
 
+  // if submodule is empty then load the submodules dropdown list
+  // if submodule is empty then load the root module
+  // if submodule is not empty then load the specific submodule tf files
   async function readFiles(url, submodule = "") {
     const { entries } = await unzip(url);
-    var hclString = "";
-    var modules = [];
+    let hclString = "";
+    const modules = [];
+
     for (const [name, entry] of Object.entries(entries)) {
       if (submodule === "") {
-        // if submodule is empty then load the submodules dropdown list
         if (name.includes("modules/")) {
-          var moduleName = name.split("/")[1];
-
+          const moduleName = name.split("/")[1];
           if (!modules.includes(moduleName) && moduleName !== "") {
-            console.log(moduleName);
             modules.push(moduleName);
           }
         }
-
-        // if submodule is empty then load the root module
         if (name.includes(".tf") && !name.includes("/")) {
-          var contentText = await entry.text();
+          const contentText = await entry.text();
           hclString += "\n" + contentText;
         }
         setSubmodules(modules.sort());
       } else {
-        //  if submodule is not empty then load the specific submodule tf files
         if (
           name.includes(".tf") &&
           name.includes("modules/" + submodule + "/")
         ) {
-          var contentText = await entry.text();
+          const contentText = await entry.text();
           hclString += "\n" + contentText;
         }
         if (name.includes("modules/" + submodule + "/README.md")) {
-          var readme = await entry.text();
+          const readme = await entry.text();
           setMarkdown(readme);
         }
       }
     }
+
     const hclResult = hcl.parseToObject(hclString);
-    console.log(hclResult);
     if (hclResult) {
       setHclObject(hclResult[0]);
       if (hclResult[0]?.variable) {
@@ -144,19 +139,17 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         setInputs("Inputs");
         setLoadingInputs("No inputs");
       }
-
       if (hclResult[0]?.output) {
         setOutputs(`Outputs (${Object.keys(hclResult[0]?.output)?.length})`);
       } else {
         setOutputs("Outputs");
         setLoadingOutputs("No outputs");
       }
-
-      if (hclResult[0]?.resource)
+      if (hclResult[0]?.resource) {
         setResources(
           `Resources (${Object.keys(hclResult[0]?.resource)?.length})`
         );
-      else {
+      } else {
         setResources("Resources");
         setLoadingResources("No resources");
       }
@@ -184,13 +177,11 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   const onDelete = (id) => {
     axiosInstance
       .delete(`organization/${orgid}/module/${id}`)
-      .then((response) => {
-        console.log(response);
+      .then(() => {
         message.success("Module deleted successfully");
         navigate(`/organizations/${orgid}/registry`);
       })
       .catch((error) => {
-        console.log(error);
         message.error("Error deleting module " + error);
       });
   };
@@ -214,7 +205,6 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     axiosInstance
       .get(`organization/${orgid}/module/${id}?include=vcs`)
       .then((response) => {
-        console.log(`organization/${orgid}/module/${id}`);
         setModule(response.data);
         setLoading(false);
         setModuleName(response.data.data.attributes.name);
@@ -361,17 +351,12 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                               <Dropdown
                                 overlay={
                                   <Menu onClick={handleClick}>
-                                    {" "}
                                     {module.data.attributes.versions
                                       .sort(compareVersions)
                                       .reverse()
-                                      .map(function (name, index) {
-                                        return (
-                                          <Menu.Item key={name}>
-                                            {name}
-                                          </Menu.Item>
-                                        );
-                                      })}
+                                      .map((name) => (
+                                        <Menu.Item key={name}>{name}</Menu.Item>
+                                      ))}
                                   </Menu>
                                 }
                                 trigger={["click"]}
@@ -411,12 +396,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         <Dropdown
                           overlay={
                             <Menu onClick={onClickSubmodule}>
-                              {" "}
-                              {submodules.map(function (name, index) {
-                                return (
-                                  <Menu.Item key={name}>{name}</Menu.Item>
-                                );
-                              })}
+                              {submodules.map((name) => (
+                                <Menu.Item key={name}>{name}</Menu.Item>
+                              ))}
                             </Menu>
                           }
                           trigger={["click"]}
@@ -450,12 +432,9 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                           <Dropdown
                             overlay={
                               <Menu onClick={onClickSubmodule}>
-                                {" "}
-                                {submodules.map(function (name, index) {
-                                  return (
-                                    <Menu.Item key={name}>{name}</Menu.Item>
-                                  );
-                                })}
+                                {submodules.map((name) => (
+                                  <Menu.Item key={name}>{name}</Menu.Item>
+                                ))}
                               </Menu>
                             }
                             trigger={["click"]}
@@ -468,6 +447,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       </div>
                     </>
                   )}
+
                   <Tabs
                     className="moduleTabs"
                     onChange={onChange}
@@ -491,46 +471,125 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                             <Space direction="vertical">
                               <h3>Inputs</h3>
                               <span>
-                                These variables should be set in the module
-                                block when using this module.
+                                These variables should be set in the module block
+                                when using this module.
                               </span>
                               <table
-                                style={{ width: "100%", tableLayout: "fixed" }}
+                                style={{
+                                  width: "100%",
+                                  tableLayout: "fixed",
+                                  whiteSpace: "normal",
+                                  wordBreak: "break-word",
+                                  borderCollapse: "collapse",
+                                  border: "1px solid #e8e8e8",
+                                }}
                               >
-                                <thead className="ant-table-thead">
+                                <thead>
                                   <tr>
-                                    <th style={{ width: "25%" }}>Name</th>
-                                    <th style={{ width: "15%" }}>Type</th>
-                                    <th style={{ width: "40%" }}>
+                                    <th
+                                      style={{
+                                        width: "40%",
+                                        textAlign: "left",
+                                        verticalAlign: "top",
+                                        padding: "8px",
+                                        border: "1px solid #e8e8e8",
+                                      }}
+                                    >
+                                      Name
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "20%",
+                                        textAlign: "left",
+                                        verticalAlign: "top",
+                                        padding: "8px",
+                                        border: "1px solid #e8e8e8",
+                                      }}
+                                    >
+                                      Type
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "35%",
+                                        textAlign: "left",
+                                        verticalAlign: "top",
+                                        padding: "8px",
+                                        border: "1px solid #e8e8e8",
+                                      }}
+                                    >
                                       Description
                                     </th>
-                                    <th style={{ width: "20%" }}>Default</th>
+                                    <th
+                                      style={{
+                                        width: "15%",
+                                        textAlign: "left",
+                                        verticalAlign: "top",
+                                        padding: "8px",
+                                        border: "1px solid #e8e8e8",
+                                      }}
+                                    >
+                                      Default
+                                    </th>
                                   </tr>
                                 </thead>
-                                <tbody className="ant-table-tbody">
+                                <tbody>
                                   {Object.keys(hclObject?.variable).map(
                                     (keyName, i) => (
                                       <tr key={i}>
                                         <td
-                                          style={{ width: "10%" }}
-                                          className="ant-table-cell"
+                                          style={{
+                                            textAlign: "left",
+                                            verticalAlign: "top",
+                                            padding: "8px",
+                                            border: "1px solid #e8e8e8",
+                                          }}
                                         >
-                                          <b>{keyName}</b>
+                                          <Typography.Text copyable strong>
+                                            {keyName}
+                                          </Typography.Text>
                                         </td>
-                                        <td className="ant-table-cell">
-                                          <Tag>
+                                        <td
+                                          style={{
+                                            textAlign: "left",
+                                            verticalAlign: "top",
+                                            padding: "8px",
+                                            border: "1px solid #e8e8e8",
+                                          }}
+                                        >
+                                          <span
+                                            style={{
+                                              backgroundColor: "#f5f5f5",
+                                              padding: "4px 8px",
+                                              borderRadius: "4px",
+                                              display: "inline-block",
+                                            }}
+                                          >
                                             {hclObject?.variable[
                                               keyName
                                             ][0]?.type?.replace(/{|}|\$/g, "")}
-                                          </Tag>
+                                          </span>
                                         </td>
-                                        <td className="ant-table-cell">
+                                        <td
+                                          style={{
+                                            textAlign: "left",
+                                            verticalAlign: "top",
+                                            padding: "8px",
+                                            border: "1px solid #e8e8e8",
+                                          }}
+                                        >
                                           {JSON.stringify(
                                             hclObject?.variable[keyName][0]
                                               ?.description
                                           )?.replaceAll('"', "")}
                                         </td>
-                                        <td className="ant-table-cell">
+                                        <td
+                                          style={{
+                                            textAlign: "left",
+                                            verticalAlign: "top",
+                                            padding: "8px",
+                                            border: "1px solid #e8e8e8",
+                                          }}
+                                        >
                                           {JSON.stringify(
                                             hclObject?.variable[keyName][0]
                                               ?.default
@@ -554,30 +613,68 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                             <Space direction="vertical">
                               <h3>Outputs</h3>
                               <span>
-                                These outputs will be returned by this module.
+                                These outputs are returned by this module.
                               </span>
                               <table
-                                style={{ width: "100%", tableLayout: "fixed" }}
+                                style={{
+                                  width: "100%",
+                                  tableLayout: "fixed",
+                                  whiteSpace: "normal",
+                                  wordBreak: "break-word",
+                                  borderCollapse: "collapse",
+                                  border: "1px solid #e8e8e8",
+                                }}
                               >
-                                <thead className="ant-table-thead">
+                                <thead>
                                   <tr>
-                                    <th style={{ width: "30%" }}>Name</th>
-                                    <th style={{ width: "70%" }}>
+                                    <th
+                                      style={{
+                                        width: "30%",
+                                        textAlign: "left",
+                                        verticalAlign: "top",
+                                        padding: "8px",
+                                        border: "1px solid #e8e8e8",
+                                      }}
+                                    >
+                                      Name
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "70%",
+                                        textAlign: "left",
+                                        verticalAlign: "top",
+                                        padding: "8px",
+                                        border: "1px solid #e8e8e8",
+                                      }}
+                                    >
                                       Description
                                     </th>
                                   </tr>
                                 </thead>
-                                <tbody className="ant-table-tbody">
+                                <tbody>
                                   {Object.keys(hclObject?.output).map(
                                     (keyName, i) => (
                                       <tr key={i}>
                                         <td
-                                          style={{ width: "10%" }}
-                                          className="ant-table-cell"
+                                          style={{
+                                            textAlign: "left",
+                                            verticalAlign: "top",
+                                            padding: "8px",
+                                            border: "1px solid #e8e8e8",
+                                          }}
                                         >
-                                          <b>{keyName}</b>
+                                          <Typography.Text copyable strong>
+                                            {keyName}
+                                          </Typography.Text>
                                         </td>
-                                        <td className="ant-table-cell">
+                                        <td
+                                          style={{
+                                            textAlign: "left",
+                                            verticalAlign: "top",
+                                            padding: "8px",
+                                            border: "1px solid #e8e8e8",
+                                          }}
+                                        >
                                           {JSON.stringify(
                                             hclObject?.output[keyName][0]
                                               ?.description
@@ -601,8 +698,8 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                             <Space direction="vertical">
                               <h3>Resources</h3>
                               <span>
-                                This is the list of resources that the module
-                                may create.
+                                This is the list of resources this module can
+                                create.
                               </span>
                               <span>
                                 This module defines{" "}
@@ -647,7 +744,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         title={
                           <p>
                             Module <b>{module.data.attributes.name}</b> will be
-                            permanently deleted <br /> from this organization.
+                            permanently deleted from this organization.
                             <br />
                             Are you sure?
                           </p>
@@ -677,27 +774,34 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       </p>
                     </div>
                     <pre className="moduleCode">
-                      module "{module.data.attributes.name}" {"{"} <br />
+                      module "{module.data.attributes.name}" {"{"}
+                      <br />
                       &nbsp;&nbsp;source = "
                       {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}/
                       {module.data.attributes.registryPath}
-                      {submodulePath}" <br />
-                      &nbsp;&nbsp;version = "{version}" <br />
-                      &nbsp;&nbsp;# insert required variables here <br />
+                      {submodulePath}"
+                      <br />
+                      &nbsp;&nbsp;version = "{version}"
+                      <br />
+                      &nbsp;&nbsp;# insert required variables here
+                      <br />
                       {"}"}
                     </pre>
                     <Tag
                       style={{ width: "100%", fontSize: "13px" }}
                       color="blue"
                     >
-                      When running Terraform on the CLI, you must <br />
-                      configure credentials in .terraformrc or <br />{" "}
-                      terraform.rc to access this module:
+                      <div
+                        style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                      >
+                        When running Terraform on the CLI, you must configure
+                        credentials in .terraformrc or terraform.rc to access
+                        this module:
+                      </div>
                       <pre className="moduleCredentials">
                         credentials "
                         {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}"{" "}
-                        {"{"} <br />
-                        &nbsp;&nbsp;# valid user API token:
+                        {" {"}
                         <br />
                         &nbsp;&nbsp;token = "xxxxxx.yyyyyy.zzzzzzzzzzzzz"
                         <br />
