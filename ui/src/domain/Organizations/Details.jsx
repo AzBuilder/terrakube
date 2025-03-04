@@ -55,7 +55,7 @@ export const OrganizationDetails = ({
   const [filterTags, setFilterTags] = useState([]);
   const [tags, setTags] = useState([]);
   const navigate = useNavigate();
-  
+
   const handleCreate = (e) => {
     navigate("/workspaces/create");
   };
@@ -68,7 +68,8 @@ export const OrganizationDetails = ({
     {
       id: "terraform",
       name: "Terraform",
-      description: "Create an empty template. So you can define your template from scratch.",
+      description:
+        "Create an empty template. So you can define your template from scratch.",
       icon: (
         <IconContext.Provider value={{ size: "1.3em" }}>
           <SiTerraform />
@@ -123,14 +124,6 @@ export const OrganizationDetails = ({
     applyFilters(searchValue, e.target.value, filterTags);
   };
 
-  const onRadioClick = (e) => {
-    const tag = e.target;
-    if (tag.type === "radio" && filterValue === tag.value.toString()) {
-      setFilterValue("");
-      applyFilters(searchValue, "", filterTags);
-    }
-  };
-
   const handleChange = (value) => {
     console.log(`selected ${value}`);
     setFilterTags(value);
@@ -140,9 +133,11 @@ export const OrganizationDetails = ({
   const onSearch = (value) => {
     applyFilters(value, filterValue, filterTags);
   };
-  const updateSearchValue=(e)=>{
+
+  const updateSearchValue = (e) => {
     setSearchValue(e.target.value);
-  }
+  };
+
   const getTagName = (tagId) => {
     return tags.data.find((tag) => tag.id === tagId)?.attributes?.name;
   };
@@ -333,52 +328,93 @@ export const OrganizationDetails = ({
           </div>
           <Row style={{ marginTop: "10px" }}>
             <Col span={12}>
-              <div onClick={onRadioClick}>
-                <Radio.Group onChange={onFilterChange} value={filterValue}>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only workspaces needing attention"
+              <Radio.Group onChange={onFilterChange} value={filterValue}>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only workspaces needing attention"
+                >
+                  <Radio.Button
+                    value="waitingApproval"
+                    onClick={(e) => {
+                      if (filterValue === "waitingApproval") {
+                        setFilterValue("");
+                        applyFilters(searchValue, "", filterTags);
+                        e.stopPropagation();
+                      }
+                    }}
                   >
-                    <Radio.Button value="waitingApproval">
-                      <ExclamationCircleOutlined
-                        style={{ color: "#fa8f37" }}
-                      />
-                    </Radio.Button>
-                  </Tooltip>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only workspaces with error"
+                    <ExclamationCircleOutlined style={{ color: "#fa8f37" }} />
+                  </Radio.Button>
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only workspaces with error"
+                >
+                  <Radio.Button
+                    value="failed"
+                    onClick={(e) => {
+                      if (filterValue === "failed") {
+                        setFilterValue("");
+                        applyFilters(searchValue, "", filterTags);
+                        e.stopPropagation();
+                      }
+                    }}
                   >
-                    <Radio.Button value="failed">
-                      <StopOutlined style={{ color: "#FB0136" }} />
-                    </Radio.Button>
-                  </Tooltip>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only running workspaces"
+                    <StopOutlined style={{ color: "#FB0136" }} />
+                  </Radio.Button>
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only running workspaces"
+                >
+                  <Radio.Button
+                    value="running"
+                    onClick={(e) => {
+                      if (filterValue === "running") {
+                        setFilterValue("");
+                        applyFilters(searchValue, "", filterTags);
+                        e.stopPropagation();
+                      }
+                    }}
                   >
-                    <Radio.Button value="running">
-                      <SyncOutlined style={{ color: "#108ee9" }} />
-                    </Radio.Button>
-                  </Tooltip>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only successfully completed workspaces"
+                    <SyncOutlined style={{ color: "#108ee9" }} />
+                  </Radio.Button>
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only successfully completed workspaces"
+                >
+                  <Radio.Button
+                    value="completed"
+                    onClick={(e) => {
+                      if (filterValue === "completed") {
+                        setFilterValue("");
+                        applyFilters(searchValue, "", filterTags);
+                        e.stopPropagation();
+                      }
+                    }}
                   >
-                    <Radio.Button value="completed">
-                      <CheckCircleOutlined style={{ color: "#2eb039" }} />
-                    </Radio.Button>
-                  </Tooltip>
-                  <Tooltip
-                    placement="bottom"
-                    title="Show only never executed workspaces"
+                    <CheckCircleOutlined style={{ color: "#2eb039" }} />
+                  </Radio.Button>
+                </Tooltip>
+                <Tooltip
+                  placement="bottom"
+                  title="Show only never executed workspaces"
+                >
+                  <Radio.Button
+                    value="never executed"
+                    onClick={(e) => {
+                      if (filterValue === "never executed") {
+                        setFilterValue("");
+                        applyFilters(searchValue, "", filterTags);
+                        e.stopPropagation();
+                      }
+                    }}
                   >
-                    <Radio.Button value="never executed">
-                      <InfoCircleOutlined />
-                    </Radio.Button>
-                  </Tooltip>
-                </Radio.Group>
-              </div>
+                    <InfoCircleOutlined />
+                  </Radio.Button>
+                </Tooltip>
+              </Radio.Group>
             </Col>
             <Col span={12}>
               <Row justify="end">
@@ -450,7 +486,7 @@ export const OrganizationDetails = ({
                                   <p></p>
                                 ) : (
                                   item.workspaceTag.edges.map((tag) => (
-                                    <Tag color="geekblue">
+                                    <Tag color="geekblue" key={tag.node.id}>
                                       {getTagName(tag.node.tagId)}
                                     </Tag>
                                   ))
@@ -463,11 +499,11 @@ export const OrganizationDetails = ({
                       <Space size={40} style={{ marginTop: "25px" }}>
                         <Tag
                           icon={
-                            item.lastStatus == "completed" ? (
+                            item.lastStatus === "completed" ? (
                               <CheckCircleOutlined />
-                            ) : item.lastStatus == "noChanges" ? (
+                            ) : item.lastStatus === "noChanges" ? (
                               <CheckCircleOutlined />
-                            ) : item.lastStatus == "running" ? (
+                            ) : item.lastStatus === "running" ? (
                               <SyncOutlined spin />
                             ) : item.lastStatus === "waitingApproval" ? (
                               <ExclamationCircleOutlined />
@@ -504,10 +540,14 @@ export const OrganizationDetails = ({
                               new URL(fixSshURL(item.source)).hostname
                             )}
                             &nbsp;{" "}
-                            <a href={fixSshURL(item.source)} target="_blank">
-                              {new URL(fixSshURL(item.source))?.pathname
-                                ?.replace(".git", "")
-                                ?.substring(1)}
+                            <a
+                              href={fixSshURL(item.source)}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {new URL(fixSshURL(item.source)).pathname
+                                .replace(".git", "")
+                                .substring(1)}
                             </a>
                           </span>
                         ) : (
