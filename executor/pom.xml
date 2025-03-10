@@ -30,7 +30,7 @@
 		<aws-sdk.version>2.30.31</aws-sdk.version>
 		<google-storage.version>1.17.0</google-storage.version>
 		<slf4j.version>2.0.17</slf4j.version>
-		<gcp-libraries-bom.version>26.55.0</gcp-libraries-bom.version>
+		<gcp-libraries-bom.version>26.56.0</gcp-libraries-bom.version>
 		<commons-compress.version>1.27.1</commons-compress.version>
 		<jedis.version>5.1.5</jedis.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
