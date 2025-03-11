@@ -2,8 +2,6 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
-  GithubOutlined,
-  GitlabOutlined,
   LockOutlined,
   PlayCircleOutlined,
   ProfileOutlined,
@@ -37,10 +35,7 @@ import { IconContext } from "react-icons";
 import { BiTerminal } from "react-icons/bi";
 import { FiGitCommit } from "react-icons/fi";
 import { HiOutlineExternalLink } from "react-icons/hi";
-import { SiBitbucket, SiTerraform } from "react-icons/si";
-import { VscAzureDevops } from "react-icons/vsc";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { v7 as uuid } from "uuid";
 import ActionLoader from "../../ActionLoader.jsx";
 import {
   ORGANIZATION_ARCHIVE,
@@ -61,9 +56,6 @@ import { WorkspaceAdvanced } from "./Settings/Advanced.jsx";
 import { WorkspaceGeneral } from "./Settings/General";
 import { WorkspaceWebhook } from "./Settings/Webhook.jsx";
 import {
-  // atomicHeader,
-  // genericHeader,
-  // loadVersions,
   getIaCIconById,
   getIaCNameById,
   renderVCSLogo,
@@ -98,7 +90,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [manageWorkspace, setManageWorkspace] = useState(false);
   const [manageState, setManageState] = useState(false);
   const [variables, setVariables] = useState([]);
-  const [reference, setReferences] = useState([]);
   const [collectionVariables, setCollectionVariables] = useState([]);
   const [collectionEnvVariables, setCollectionEnvVariables] = useState([]);
   const [globalVariables, setGlobalVariables] = useState([]);
@@ -118,26 +109,17 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [activeKey, setActiveKey] = useState(
     selectedTab !== null ? selectedTab : "1"
   );
-  const [waiting, setWaiting] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
   const [agent, setAgent] = useState("...");
-  // const [sshKeys, setSSHKeys] = useState([]);
-  // const [agentList, setAgentList] = useState([]);
   const [orgTemplates, setOrgTemplates] = useState([]);
   const [vcsProvider, setVCSProvider] = useState("");
   const [resources, setResources] = useState([]);
   const [outputs, setOutputs] = useState([]);
   const [currentStateId, setCurrentStateId] = useState(0);
   const [actions, setActions] = useState([]);
-  const [webhook, setWebhook] = useState({});
-  // const [pushWebhookEnabled, setPushWebhookEnabled] = useState(true);
-  // const [defaultBranch, setDefaultBranch] = useState("");
-  // const [defaultPath, setDefaultPath] = useState("");
-  // const [defaultTemplate, setDefaultTemplate] = useState("");
   const [contextState, setContextState] = useState({});
-  const pushWebhookName = "PUSH";
   const handleClick = (jobid) => {
     changeJob(jobid);
     navigate(
@@ -219,21 +201,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     switchKey(key);
   };
 
-  // const loadSSHKeys = () => {
-  //   axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
-  //     console.log(response.data.data);
-  //     setSSHKeys(response.data.data);
-  //   });
-  // };
-
-  // const loadAgentlist = () => {
-  //   axiosInstance
-  //     .get(`organization/${organizationId}/agent`)
-  //     .then((response) => {
-  //       console.log(response.data.data);
-  //       setAgentList(response.data.data);
-  //     });
-  // };
   const loadOrgTemplates = () => {
     axiosInstance
       .get(`organization/${organizationId}/template`)
@@ -327,8 +294,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     loadWorkspace(true, true, true);
     loadPermissionSet();
     setLoading(false);
-    // loadSSHKeys();
-    // loadAgentlist();
     loadOrgTemplates();
     const interval = setInterval(() => {
       loadWorkspace(false, false, false);
@@ -376,9 +341,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook,reference`
           )
           .then((response) => {
-            // if (_loadVersions)
-            //   loadVersions(response.data.data.attributes.iacType);
-
             if (_loadPermissionSet)
               loadPermissionSet()
 
@@ -402,10 +364,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 setOutputs,
                 setAgent,
                 _loadWebhook,
-                setWebhook,
-                // setPushWebhookEnabled,
                 setContextState,
-                setReferences, setCollectionVariables, setCollectionEnvVariables, setGlobalVariables, setGlobalEnvVariables
+                setCollectionVariables, setCollectionEnvVariables, setGlobalVariables, setGlobalEnvVariables
               );
             }
 
@@ -426,25 +386,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
           });
       });
   };
-
-  // const handlePushWebhookClick = () => {
-  //   setPushWebhookEnabled(!pushWebhookEnabled);
-  // }
-
-  // const handleBranchChange = (e) => {
-  //   setDefaultBranch(e.target.value);
-  // }
-  // const handlePathChange = (e) => {
-  //   setDefaultPath(e.target.value);
-  // }
-  // const handleTemplateChange = (e) => {
-  //   orgTemplates.forEach((template) => {
-  //     if (template.id === e) {
-  //       setDefaultTemplate(template.attributes.name);
-  //       return;
-  //     }
-  //   });
-  // }
 
   const handleClickSettings = () => {
     switchKey("6");
@@ -478,198 +419,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
         }
       });
   };
-
-  // const onFinish = (values) => {
-  //   setWaiting(true);
-  //   const pushWebhookId = webhook[pushWebhookName]?.id;
-  //   const pushWebhookExists = pushWebhookId && pushWebhookId != "";
-  //   const body = {
-  //     "atomic:operations": [{
-  //       op: "update",
-  //       href: `/organization/${organizationId}/workspace/${id}`,
-  //       data: {
-  //         type: "workspace",
-  //         id: id,
-  //         attributes: {
-  //           name: values.name,
-  //           description: values.description,
-  //           folder: values.folder,
-  //           locked: values.locked,
-  //           executionMode: values.executionMode,
-  //           moduleSshKey: values.moduleSshKey,
-  //           terraformVersion: values.terraformVersion,
-  //           iacType: values.iacType,
-  //           branch: values.branch,
-  //           defaultTemplate: values.defaultTemplate,
-  //         },
-  //       },
-  //     }]
-  //   }
-  //   if (pushWebhookEnabled) {
-  //     const newPushWebhookId = pushWebhookExists ? "" : uuid();
-  //     body["atomic:operations"].push({
-  //       op: pushWebhookExists ? "update" : "add",
-  //       href: pushWebhookExists ? `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}` : `/organization/${organizationId}/workspace/${id}/webhook`,
-  //       data: {
-  //         type: "webhook",
-  //         id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
-  //         attributes: {
-  //           id: pushWebhookExists ? pushWebhookId : newPushWebhookId,
-  //           branch: values.pushWebhookBranch,
-  //           path: values.pushWebhookPath,
-  //           event: pushWebhookName,
-  //           templateId: values.pushWebhookTemplate,
-  //         },
-  //       }
-  //     })
-  //   }
-  //   if (!pushWebhookEnabled && pushWebhookExists) {
-  //     body["atomic:operations"].push({
-  //       op: "remove",
-  //       href: `/organization/${organizationId}/workspace/${id}/webhook/${pushWebhookId}`,
-  //     });
-  //   }
-
-  //   console.log(body);
-
-  //   try {
-  //     axiosInstance
-  //       .post("/operations",
-  //         body, atomicHeader
-  //       )
-  //       .then((response) => {
-  //         console.log(response);
-  //         if (response.status === 200) {
-  //           const pushWebhookData = response.data["atomic:results"][1]?.data;
-  //           if (pushWebhookEnabled && pushWebhookData) {
-  //             var updatedWebhook = {};
-  //             updatedWebhook[pushWebhookData.attributes.event] = {
-  //               id: pushWebhookData.id,
-  //               type: pushWebhookData.type,
-  //               ...pushWebhookData.attributes,
-  //             };
-  //             setWebhook(updatedWebhook);
-  //           }
-  //           if (!pushWebhookEnabled && pushWebhookExists) {
-  //             var updatedWebhook = webhook;
-  //             updatedWebhook[pushWebhookName] = null;
-  //             setWebhook(updatedWebhook);
-  //           }
-  //           message.success("workspace updated successfully");
-  //         } else {
-  //           message.error("workspace update failed");
-  //         }
-  //         setWaiting(false);
-  //       });
-  //   } catch (error) {
-  //     console.error("error updating workspace:", error);
-  //     message.error("workspace update failed");
-  //     if (error.response) {
-  //       if (error.response.status === 424) {
-  //         message.error("failed to create push webhook, please check if the set vcs connection has the correct permissions on the linked repository.");
-  //       }
-  //       setWaiting(false);
-  //     }
-  //   }
-
-  //   var bodyAgent;
-  //   console.log(`Using Agent: ${values.executorAgent}`);
-  //   if (values.executorAgent === "default") {
-  //     bodyAgent = {
-  //       data: null,
-  //     };
-  //   } else {
-  //     bodyAgent = {
-  //       data: {
-  //         type: "agent",
-  //         id: values.executorAgent,
-  //       },
-  //     };
-  //   }
-  //   console.log(bodyAgent);
-  //   axiosInstance
-  //     .patch(
-  //       `/organization/${organizationId}/workspace/${id}/relationships/agent`,
-  //       bodyAgent, genericHeader)
-  //     .then((response) => {
-  //       console.log("Update Workspace agent successfully");
-  //       console.log(response);
-  //       if (response.status === 204) {
-  //         console.log("Workspace agent updated successfully");
-  //       } else {
-  //         console.log("Workspace agent update failed");
-  //       }
-  //     });
-  // };
-
-  // const renderVCSLogo = (vcs) => {
-  //   switch (vcs) {
-  //     case "GITLAB":
-  //       return <GitlabOutlined style={{ fontSize: "18px" }} />;
-  //     case "BITBUCKET":
-  //       return (
-  //         <IconContext.Provider value={{ size: "18px" }}>
-  //           <SiBitbucket />
-  //           &nbsp;
-  //         </IconContext.Provider>
-  //       );
-  //     case "AZURE_DEVOPS":
-  //       return (
-  //         <IconContext.Provider value={{ size: "18px" }}>
-  //           <SiAzuredevops />
-  //           &nbsp;
-  //         </IconContext.Provider>
-  //       );
-  //     default:
-  //       return <GithubOutlined style={{ fontSize: "18px" }} />;
-  //   }
-  // };
-
-  // const onDelete = (workspace) => {
-  //   let randomLetters = generateRandomString(4);
-  //   let deletedName = `${workspace.data.attributes.name.substring(
-  //     0,
-  //     21
-  //   )}_DEL_${randomLetters}`;
-  //   console.log(`New deleted name; ${deletedName}`);
-  //   const body = {
-  //     data: {
-  //       type: "workspace",
-  //       id: id,
-  //       attributes: {
-  //         name: deletedName,
-  //         deleted: "true",
-  //       },
-  //     },
-  //   };
-  //   axiosInstance
-  //       .patch(
-  //           `/organization/${organizationId}/workspace/${id}/relationships/vcs`,
-  //           {
-  //             data: null,
-  //           },
-  //           {
-  //             headers: {
-  //               "Content-Type": "application/vnd.api+json",
-  //             },
-  //           }
-  //       )
-  //       .then((response) => {
-  //         console.log("Deleting VCS refernce successfully");
-  //         axiosInstance
-  //             .patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader)
-  //             .then((response) => {
-  //               console.log(response);
-  //               if (response.status === 204) {
-  //                 console.log(response);
-  //                 message.success("Workspace deleted successfully");
-  //                 navigate(`/organizations/${organizationId}/workspaces`);
-  //               } else {
-  //                 message.error("Workspace deletion failed");
-  //               }
-  //             });
-  //         deleteWebhook();
-  //       });
 
   return (
     <Content style={{ padding: "0 50px" }}>
@@ -1219,332 +968,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                     ]}
                   />
                 </Tabs>
-                {/* <TabPane tab="Settings" key="6">
-                  <div className="generalSettings">
-                    <h1>General Settings</h1>
-                    <Spin spinning={waiting}>
-                      <Form
-                        onFinish={onFinish}
-                        initialValues={{
-                          name: workspace.data.attributes.name,
-                          description: workspace.data.attributes.description,
-                          folder: workspace.data.attributes.folder,
-                          locked: workspace.data.attributes.locked,
-                          lockDescription: workspace.data.attributes.lockDescription,
-                          moduleSshKey: workspace.data.attributes.moduleSshKey,
-                          executionMode:
-                            workspace.data.attributes.executionMode,
-                          iacType: workspace.data.attributes.iacType,
-                          branch: workspace.data.attributes.branch,
-                          defaultTemplate:
-                            workspace.data.attributes.defaultTemplate,
-                          executorAgent:
-                            workspace.data.relationships.agent.data?.id == null
-                              ? "default"
-                              : workspace.data.relationships.agent.data?.id,
-                          pushWebhookBranch: webhook[pushWebhookName]?.branch,
-                          pushWebhookPath: webhook[pushWebhookName]?.path,
-                          pushWebhookTemplate: webhook[pushWebhookName]?.templateId,
-                        }}
-                        layout="vertical"
-                        name="form-settings"
-                      >
-                        <Form.Item name="id" label="ID">
-                          <Paragraph copyable={{ tooltips: false }}>
-                            <span className="App-text"> {id}</span>
-                          </Paragraph>
-                        </Form.Item>
-                        <Form.Item
-                          name="name"
-                          rules={[
-                            { required: true },
-                            {
-                              pattern: /^[A-Za-z0-9_-]+$/,
-                              message:
-                                "Only dashes, underscores, and alphanumeric characters are permitted.",
-                            },
-                          ]}
-                          label="Name"
-                        >
-                          <Input disabled={!manageWorkspace}/>
-                        </Form.Item>
-
-                        <Form.Item
-                          valuePropName="value"
-                          name="description"
-                          label="Description"
-                        >
-                          <Input.TextArea placeholder="Workspace description" disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                          name="terraformVersion"
-                          label={
-                            getIaCNameById(
-                              selectedIac || workspace.data.attributes?.iacType
-                            ) + " Version"
-                          }
-                          extra={
-                            "The version of " +
-                            getIaCNameById(
-                              selectedIac || workspace.data.attributes?.iacType
-                            ) +
-                            " to use for this workspace. Upon creating this workspace, the latest version was selected and will be used until it is changed manually. It will not upgrade automatically."
-                          }
-                        >
-                          <Select
-                            defaultValue={
-                              workspace.data.attributes.terraformVersion
-                            }
-                            style={{ width: 250 }}
-                            disabled={!manageWorkspace}
-                          >
-                            {terraformVersions.map(function (name, index) {
-                              return <Option key={name}>{name}</Option>;
-                            })}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          name="folder"
-                          label={
-                            getIaCNameById(
-                              selectedIac || workspace.data.attributes?.iacType
-                            ) + " Working Directory"
-                          }
-                          extra={
-                            "The directory that " +
-                            getIaCNameById(
-                              selectedIac || workspace.data.attributes?.iacType
-                            ) +
-                            " will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
-                          }
-                          onChange={handlePathChange}
-                        >
-                          <Input disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                          name="branch"
-                          label="Default Branch"
-                          tooltip="The branch from which the runs are kicked off, this is used for runs issued from the UI."
-                          extra="Don't update the value when using CLI Driven workflows. This is only used in VCS driven workflow."
-                          onChange={handleBranchChange}
-                        >
-                          <Input disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                          name="locked"
-                          valuePropName="checked"
-                          label="Lock Workspace"
-                          tooltip={{
-                            title: "Lock Workspace",
-                            icon: <InfoCircleOutlined />,
-                          }}
-                        >
-                          <Switch disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                            valuePropName="value"
-                            name="lockDescription"
-                            label="Setup custom lock description message"
-                        >
-                          <Input.TextArea placeholder="Lock description details" disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                          name="iacType"
-                          label="Select IaC type "
-                          extra="IaC type when running the workspace (Example: terraform or tofu) "
-                        >
-                          <Select
-                            defaultValue={workspace.data.attributes?.iacType}
-                            style={{ width: 250 }}
-                            onChange={handleIacChange}
-                            disabled={!manageWorkspace}
-                          >
-                            {iacTypes.map(function (iacType, index) {
-                              return (
-                                <Option key={iacType.id}>
-                                  {getIaCIconById(iacType.id)} {iacType.name}{" "}
-                                </Option>
-                              );
-                            })}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          name="executionMode"
-                          label="Execution Mode"
-                          extra={
-                            "Use this option with terraform remote state/cloud block if you want to execute " +
-                            getIaCNameById(
-                              selectedIac || workspace.data.attributes?.iacType
-                            ) +
-                            " CLI remotely and just upload the state to Terrakube"
-                          }
-                        >
-                          <Select
-                            defaultValue={
-                              workspace.data.attributes.executionMode
-                            }
-                            style={{ width: 250 }}
-                            disabled={!manageWorkspace}
-                          >
-                            <Option key="remote">remote</Option>
-                            <Option key="local">local</Option>
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          name="defaultTemplate"
-                          label="Default template when doing a git push to the repository"
-                          extra="Default template when doing a git push to the repository"
-                        >
-                          <Select
-                            onChange={handleTemplateChange}
-                            defaultValue={
-                              workspace.data.attributes.defaultTemplate
-                            }
-                            placeholder="select default template"
-                            style={{ width: 250 }}
-                            disabled={!manageWorkspace}
-                          >
-                            {orgTemplates.map(function (template, index) {
-                              return (
-                                <Option key={template?.id}>
-                                  {template?.attributes?.name}
-                                </Option>
-                              );
-                            })}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          name="moduleSshKey"
-                          label="Download modules SSH Keys"
-                          extra="Use this option to add a SSH key to allow module downloads"
-                        >
-                          <Select
-                            defaultValue={
-                              workspace.data.attributes.moduleSshKey
-                            }
-                            placeholder="select SSH Key"
-                            style={{ width: 250 }}
-                            disabled={!manageWorkspace}
-                          >
-                            {sshKeys.map(function (sshKey, index) {
-                              return (
-                                <Option key={sshKey?.id}>
-                                  {sshKey?.attributes?.name}
-                                </Option>
-                              );
-                            })}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          name="executorAgent"
-                          label="Executor agent to run the job"
-                          extra="Use this option to select which executor agent will run the job remotely"
-                        >
-                          <Select
-                            defaultValue={
-                              workspace.data.attributes.moduleSshKey
-                            }
-                            placeholder="select Job Agent"
-                            style={{ width: 250 }}
-                            disabled={!manageWorkspace}
-                          >
-                            {agentList.map(function (agentKey, index) {
-                              return (
-                                <Option key={agentKey?.id}>
-                                  {agentKey?.attributes?.name}
-                                </Option>
-                              );
-                            })}
-                            <Option key="default">default</Option>
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          label="Enable Push Webhook?"
-                          hidden={vcsProvider == ""}
-                          tooltip={{
-                            title: "Whether to enable push webhook",
-                            icon: <InfoCircleOutlined />,
-                          }}
-                        >
-                          <Switch onChange={handlePushWebhookClick} defaultValue={pushWebhookEnabled} disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                          hidden={!pushWebhookEnabled}
-                          name="pushWebhookBranch"
-                          label="Webhook Branch"
-                          tooltip="A list of branch prefixes that will trigger a run."
-                          extra="A list of branch regex besides the default VCS branch that will trigger a run, for example 'feat,fix'. Values are separated by comma."
-                          rules={[{ required: false }]}
-                        >
-                          <Input placeholder={defaultBranch} disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                          hidden={!pushWebhookEnabled}
-                          name="pushWebhookPath"
-                          label="Webhook Path"
-                          tooltip="A list of regex to match against the paths in the source that will trigger a run."
-                          extra="A list of regex to match against the paths besides the 'Terraform Working Directory' that will trigger a run, for example 'modules/.*.tf'. Values are separated by comma."
-                          rules={[{ required: false }]}
-                        >
-                          <Input placeholder={defaultPath} disabled={!manageWorkspace}/>
-                        </Form.Item>
-                        <Form.Item
-                          hidden={!pushWebhookEnabled}
-                          name="pushWebhookTemplate"
-                          label="Webhook Template"
-                          tooltip="The template that will be executed when a push event is received from the selected VCS provider."
-                          extra="The template that will be executed when a push event is received from the selected VCS provider."
-                          rules={[{ required: false }]}
-                        >
-                          <Select placeholder={defaultTemplate} style={{ width: 250 }} disabled={!manageWorkspace}>
-                            {orgTemplates.map(function (template, index) {
-                              return (
-                                <Option key={template?.id}>
-                                  {template?.attributes?.name}
-                                </Option>
-                              );
-                            })}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item>
-                          <Button type="primary" htmlType="submit" disabled={!manageWorkspace}>
-                            Save settings
-                          </Button>
-                        </Form.Item>
-                      </Form>
-                    </Spin>
-                    <h1>Delete Workspace</h1>
-                    <div className="App-Text">
-                      Deleting thill permanently delete the
-                      information. Please be certain that you understand this.
-                      This action cannot be undone.
-                    </div>
-                    <Popconfirm
-                      onConfirm={() => {
-                        onDelete(workspace);
-                      }}
-                      style={{ width: "100%" }}
-                      title={
-                        <p>
-                          Workspace will be permanently deleted <br /> from this
-                          organization.
-                          <br />
-                          Are you sure?
-                        </p>
-                      }
-                      okText="Yes"
-                      cancelText="No"
-                      placement="bottom"
-                    >
-                      <Button type="default" danger style={{ width: "100%" }} disabled={!manageWorkspace}>
-                        <Space>
-                          <DeleteOutlined />
-                          Delete from Terrakube
-                        </Space>
-                      </Button>
-                    </Popconfirm>
-                  </div>
-                </TabPane> */}
               </Tabs>
             </div>
           )}
@@ -1571,10 +994,7 @@ function setupWorkspaceIncludes(
   setOutputs,
   setAgent,
   _loadWebhook,
-  setWebhook,
-  // setPushWebhookEnabled,
   setContextState,
-  setReferences,
   setCollectionVariables,
   setCollectionEnvVariables,
   setGlobalVariables,
@@ -1758,10 +1178,6 @@ function setupWorkspaceIncludes(
   setCollectionEnvVariables(collectionEnvVariables)
   setGlobalVariables(globalVariables);
   setGlobalEnvVariables(globalEnvVariables);
-  // if (_loadWebhook) {
-  //   setWebhook(webhooks);
-  //   setPushWebhookEnabled(webhooks["PUSH"] ? true : false);
-  // }
 
   console.log(
     `Parsing state for workspace ${sessionStorage.getItem(WORKSPACE_ARCHIVE)} `
