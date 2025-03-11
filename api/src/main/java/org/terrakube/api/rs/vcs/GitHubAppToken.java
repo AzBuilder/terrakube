@@ -16,7 +16,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +40,6 @@ public class GitHubAppToken extends GenericAuditFields {
     @Column(name = "token")
     private String token;
 
-    @ManyToOne
-    private Vcs vcs;
+    @Column(name = "app_id")
+    private String appId;
 }
