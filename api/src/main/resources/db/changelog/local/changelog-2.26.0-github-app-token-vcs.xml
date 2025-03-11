@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="2-25-1-100" author="Stanley Zhang (stanley.zhang@ityin.net)">
+        <delete tableName="github_app_token" />
+        <addColumn tableName="github_app_token">
+            <column name="app_id" type="varchar(36)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <dropColumn tableName="github_app_token">
+            <column name="vcs_id" />
+        </dropColumn>
+        <createIndex tableName="github_app_token" indexName="index_app_id_owner">
+            <column name = "app_id" />
+            <column name = "owner" />
+        </createIndex> 
+        <createIndex tableName="github_app_token" indexName="index_app_id_installation_id">
+            <column name = "app_id" />
+            <column name = "installation_id" />
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

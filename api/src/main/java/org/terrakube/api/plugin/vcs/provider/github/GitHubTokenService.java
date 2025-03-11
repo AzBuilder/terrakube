@@ -25,10 +25,12 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.terrakube.api.plugin.importer.tfcloud.WorkspaceImport.WorkspaceData.VcsRepo;
 import org.terrakube.api.plugin.scheduler.ScheduleGitHubAppTokenService;
 import org.terrakube.api.plugin.vcs.provider.GetAccessToken;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;
 import org.terrakube.api.repository.GitHubAppTokenRepository;
+import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.vcs.GitHubAppToken;
 import org.terrakube.api.rs.vcs.Vcs;
 
@@ -53,6 +55,8 @@ public class GitHubTokenService implements GetAccessToken<GitHubToken> {
     ObjectMapper objectMapper;
     @Autowired
     GitHubAppTokenRepository gitHubAppTokenRepository;
+    @Autowired
+    VcsRepository vcsRepository;
     @Autowired
     ScheduleGitHubAppTokenService scheduleGitHubAppTokenService;
 
@@ -107,7 +111,7 @@ public class GitHubTokenService implements GetAccessToken<GitHubToken> {
     // already been saved in the GitHubAppToken table
     public String refreshAccessToken(GitHubAppToken gitHubAppToken)
             throws NoSuchAlgorithmException, InvalidKeySpecException, JsonMappingException, JsonProcessingException {
-        Vcs vcs = gitHubAppToken.getVcs();
+        Vcs vcs = vcsRepository.findFirstByClientId(gitHubAppToken.getAppId());
         String jws = generateJWT(vcs.getClientId(), vcs.getPrivateKey());
         return fetchGitHubAppInstallationToken(gitHubAppToken.getInstallationId(), vcs.getApiUrl(), jws,
                 gitHubAppToken.getOwner());
@@ -115,7 +119,7 @@ public class GitHubTokenService implements GetAccessToken<GitHubToken> {
 
     public GitHubAppToken getGitHubAppToken(Vcs vcs, String[] ownerAndRepo)
             throws JsonMappingException, JsonProcessingException, NoSuchAlgorithmException, InvalidKeySpecException {
-        GitHubAppToken gitHubAppToken = gitHubAppTokenRepository.findByVcsAndOwner(vcs, ownerAndRepo[0]);
+        GitHubAppToken gitHubAppToken = gitHubAppTokenRepository.findByAppIdAndOwner(vcs.getClientId(), ownerAndRepo[0]);
         if (gitHubAppToken == null) {
             gitHubAppToken = fetchGitHubAppInstallationToken(vcs, ownerAndRepo);
         }
@@ -140,11 +144,11 @@ public class GitHubTokenService implements GetAccessToken<GitHubToken> {
             gitHubAppToken.setId(UUID.randomUUID());
             gitHubAppToken.setInstallationId(installationId);
             gitHubAppToken.setOwner(ownerAndRepo[0]);
+            gitHubAppToken.setAppId(vcs.getClientId());
             gitHubAppToken
                     .setToken(fetchGitHubAppInstallationToken(installationId, vcs.getApiUrl(), jws, ownerAndRepo[0]));
         }
 
-        gitHubAppToken.setVcs(vcs);
         gitHubAppToken = gitHubAppTokenRepository.save(gitHubAppToken);
         // Schedule a job to refresh the token every 55 minutes
         try {
