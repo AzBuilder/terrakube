@@ -71,6 +71,6 @@
     <include file="/db/changelog/local/changelog-2.24.0-manage-job.xml"/>
     <include file="/db/changelog/local/changelog-2.25.0-workspace-access.xml"/>
     <include file="/db/changelog/local/changelog-2.25.1-webhook-events.xml" />
-    <include file="/db/changelog/local/changelog-2.25.2-webhook-data.xml" />
-    <include file="/db/changelog/local/changelog-2.25.2-webhook-tidyup.xml" />
+    <include file="/db/changelog/local/changelog-2.25.1-webhook-data.xml" />
+    <include file="/db/changelog/local/changelog-2.25.1-webhook-tidyup.xml" />
 </databaseChangeLog>
