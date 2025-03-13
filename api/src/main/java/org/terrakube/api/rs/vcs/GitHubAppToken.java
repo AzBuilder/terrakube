@@ -22,7 +22,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity(name = "github_app_token")
-@Include(rootLevel = false)
+@Include(rootLevel = true)
 public class GitHubAppToken extends GenericAuditFields {
     @Id
     @JdbcTypeCode(Types.VARCHAR)
