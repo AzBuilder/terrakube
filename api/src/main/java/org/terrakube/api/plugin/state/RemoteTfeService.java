@@ -845,6 +845,11 @@ public class RemoteTfeService {
         log.info("Creating new Terrakube Job");
         log.info("Workspace {} Configuration {}", workspaceId, configurationId);
         log.info("isDestroy {} autoApply {}", isDestroy, autoApply);
+        if(runsData.getData().getAttributes().get("target-addrs") != null) {
+            log.info("Target Addresses {}", runsData.getData().getAttributes().get("target-addrs"));
+            List<String> targetAddrs = (List<String>) runsData.getData().getAttributes().get("target-addrs");
+        }
+        //Optional<List<String>> targetList = Optional.ofNullable((List))
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
         String sourceTarGz = String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz",
                 hostname, configurationId);
