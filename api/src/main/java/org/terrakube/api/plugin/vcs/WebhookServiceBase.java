@@ -16,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -83,7 +84,7 @@ public class WebhookServiceBase {
     }
 
     protected ResponseEntity<String> makeApiRequest(HttpHeaders headers, String body, String apiUrl, HttpMethod method) {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
         return restTemplate.exchange(apiUrl, method, entity, String.class);
     }

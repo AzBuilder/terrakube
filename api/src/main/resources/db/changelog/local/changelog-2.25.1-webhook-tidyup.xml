@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="2-25-1-21" author="Stanley Zhang (stanley.zhang@ityin.net)">
+        <dropColumn tableName="webhook">
+            <column name="branch" />
+            <column name="path" />
+            <column name="template_id" />
+            <column name="event" />
+        </dropColumn>
+    </changeSet>
+</databaseChangeLog>

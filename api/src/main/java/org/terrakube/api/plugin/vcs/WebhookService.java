@@ -14,12 +14,14 @@ import org.terrakube.api.plugin.vcs.provider.bitbucket.BitBucketWebhookService;
 import org.terrakube.api.plugin.vcs.provider.github.GitHubWebhookService;
 import org.terrakube.api.plugin.vcs.provider.gitlab.GitLabWebhookService;
 import org.terrakube.api.repository.JobRepository;
+import org.terrakube.api.repository.WebhookEventRepository;
 import org.terrakube.api.repository.WebhookRepository;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.webhook.Webhook;
 import org.terrakube.api.rs.webhook.WebhookEvent;
+import org.terrakube.api.rs.webhook.WebhookEventType;
 import org.terrakube.api.rs.workspace.Workspace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebhookService {
 
     WebhookRepository webhookRepository;
+    WebhookEventRepository webhookEventRepository;
     GitHubWebhookService gitHubWebhookService;
     GitLabWebhookService gitLabWebhookService;
     BitBucketWebhookService bitBucketWebhookService;
@@ -45,8 +48,7 @@ public class WebhookService {
         String result = "";
         Webhook webhook = webhookRepository.getReferenceById(UUID.fromString(webhookId));
         if (webhook == null) {
-            log.error("Webhook {} not found", webhookId);
-            return result;
+            throw new IllegalArgumentException("Webhook not found");
         }
         Workspace workspace = webhook.getWorkspace();
         Vcs vcs = workspace.getVcs();
@@ -63,7 +65,7 @@ public class WebhookService {
         switch (vcs.getVcsType()) {
             case GITHUB:
                 webhookResult = gitHubWebhookService.processWebhook(jsonPayload, headers,
-                        base64WorkspaceId);
+                        base64WorkspaceId, vcs);
                 break;
             case GITLAB:
                 webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,
@@ -79,33 +81,12 @@ public class WebhookService {
 
         log.info("webhook result {}", webhookResult);
 
-        if (!webhookResult.isValid())
+        if (!webhookResult.isValid()
+                || webhookResult.getEvent().equals(String.valueOf(WebhookEventType.PING).toLowerCase()))
             return result;
-
-        String webhookBranch = webhookResult.getBranch();
-
-        // Return if branch in the event doesn't match any set branches or if the file
-        // changes doesn't match the set path
-        if (!checkBranch(webhookBranch, webhook) || !checkFileChanges(webhookResult.getFileChanges(), webhook)) {
-            return result;
-        }
 
         try {
-            String templateId = webhook.getTemplateId();
-
-            // If the webhook branch is the same as the default workspace branch, or the
-            // webhook template is not valid, use the default template of the workspace.
-            if (webhookResult.getBranch().equals(workspace.getBranch()) || templateId == null || templateId.isEmpty()) {
-                templateId = workspace.getDefaultTemplate();
-            }
-            // If the template is still not valid, log an error and return
-            if (templateId == null || templateId.isEmpty()) {
-                log.error(
-                        "No valid template found for the configured webhook event {}, nor default template configured for workspace {}",
-                        webhook.getEvent(), workspace.getName());
-                return result;
-
-            }
+            String templateId = findTemplateId(webhookResult, webhook);
             log.info("webhook event {} for workspace {}, using template with id {}", webhookResult.getEvent(),
                     webhook.getWorkspace().getName(), templateId);
             Job job = new Job();
@@ -113,7 +94,7 @@ public class WebhookService {
             job.setRefresh(true);
             job.setPlanChanges(true);
             job.setRefreshOnly(false);
-            job.setOverrideBranch(webhookBranch);
+            job.setOverrideBranch(webhookResult.getBranch());
             job.setOrganization(workspace.getOrganization());
             job.setWorkspace(workspace);
             job.setCreatedBy(webhookResult.getCreatedBy());
@@ -133,24 +114,19 @@ public class WebhookService {
     }
 
     @Transactional
-    public void createWorkspaceWebhook(Webhook webhook) {
+    public void createOrUpdateWorkspaceWebhook(Webhook webhook) {
         Workspace workspace = webhook.getWorkspace();
         if (workspace.getVcs() == null) {
             log.warn("There is no VCS defined for workspace {}, skipping webhook creation", workspace.getName());
             throw new IllegalArgumentException("No VCS defined for workspace");
         }
 
-        if (webhook.getEvent() == null || webhook.getEvent().toString().isEmpty())
-            webhook.setEvent(WebhookEvent.PUSH);
-
         String webhookRemoteId = "";
-        if (webhook.getTemplateId() == null)
-            webhook.setTemplateId(workspace.getDefaultTemplate());
 
         Vcs vcs = workspace.getVcs();
         switch (vcs.getVcsType()) {
             case GITHUB:
-                webhookRemoteId = gitHubWebhookService.createWebhook(workspace, webhook.getId().toString());
+                webhookRemoteId = gitHubWebhookService.createOrUpdateWebhook(workspace, webhook);
                 break;
             case GITLAB:
                 webhookRemoteId = gitLabWebhookService.createWebhook(workspace, webhook.getId().toString());
@@ -164,7 +140,7 @@ public class WebhookService {
 
         if (webhookRemoteId.isEmpty()) {
             log.error("Error creating the webhook");
-            throw new IllegalArgumentException("Error creating the webhook");
+            throw new IllegalArgumentException("Error creating/updating the webhook");
         }
 
         webhook.setRemoteHookId(webhookRemoteId);
@@ -199,13 +175,8 @@ public class WebhookService {
         }
     }
 
-    private boolean checkBranch(String webhookBranch, Webhook webhook) {
-        // Check if the webhook branch is the default workspace branch
-        if (webhookBranch.equals(webhook.getWorkspace().getBranch())) {
-            return true;
-        }
-
-        String[] branchList = webhook.getBranch().split(",");
+    private boolean checkBranch(String webhookBranch, WebhookEvent webhookEvent) {
+        String[] branchList = webhookEvent.getBranch().split(",");
         for (String branch : branchList) {
             branch = branch.trim();
             if (webhookBranch.matches(branch)) {
@@ -215,17 +186,9 @@ public class WebhookService {
         return false;
     }
 
-    private boolean checkFileChanges(List<String> files, Webhook webhook) {
-        String[] triggeredPath = webhook.getPath().split(",");
-        String workspaceFolder = webhook.getWorkspace().getFolder();
-        if (workspaceFolder.substring(0, 1).equals("/")) {
-            workspaceFolder = workspaceFolder.substring(1);
-        }
+    private boolean checkFileChanges(List<String> files, WebhookEvent webhookEvent) {
+        String[] triggeredPath = webhookEvent.getPath().split(",");
         for (String file : files) {
-            if (file.startsWith(workspaceFolder)) {
-                log.info("Changed file {} in set workspace path {}", file, workspaceFolder);
-                return true;
-            }
             for (int i = 0; i < triggeredPath.length; i++) {
                 if (file.matches(triggeredPath[i])) {
                     log.info("Changed file {} matches set trigger pattern {}", file, triggeredPath[i]);
@@ -235,6 +198,19 @@ public class WebhookService {
         }
         log.info("Changed files {} doesn't match any of the trigger path pattern {}", files, triggeredPath);
         return false;
+    }
+
+    private String findTemplateId(WebhookResult result, Webhook webhook) {
+        return webhookEventRepository
+                .findByWebhookAndEventOrderByPriorityAsc(webhook,
+                        WebhookEventType.valueOf(result.getEvent().toUpperCase()))
+                .stream()
+                .filter(webhookEvent -> checkBranch(result.getBranch(), webhookEvent)
+                        && checkFileChanges(result.getFileChanges(), webhookEvent))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No valid template found for the configured webhook event " + result.getEvent()))
+                .getTemplateId();
     }
 
     private void sendCommitStatus(Job job) {
