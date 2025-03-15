@@ -16,14 +16,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity(name = "github_app_token")
-@Include(rootLevel = false)
+@Include(rootLevel = true)
 public class GitHubAppToken extends GenericAuditFields {
     @Id
     @JdbcTypeCode(Types.VARCHAR)
@@ -41,6 +40,6 @@ public class GitHubAppToken extends GenericAuditFields {
     @Column(name = "token")
     private String token;
 
-    @ManyToOne
-    private Vcs vcs;
+    @Column(name = "app_id")
+    private String appId;
 }
