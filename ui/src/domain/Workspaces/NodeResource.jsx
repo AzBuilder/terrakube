@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { Card, Avatar,Button } from "antd";
 import { Handle } from "reactflow";
-import { getServiceIcon } from "./Icons.js";
+import { getServiceIcon } from "./Icons.jsx";
 import { HiOutlineExternalLink } from "react-icons/hi";
 const { Meta } = Card;
 

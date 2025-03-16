@@ -1,7 +1,7 @@
 import { React, useState } from "react";
 import "./App.css";
 import Login from "../Login/Login";
-import MainMenu from "../Home/MainMenu";
+import MainMenu from "./MainMenu";
 import { Layout } from "antd";
 import logo from "./white_logo.png";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -37,7 +37,7 @@ const App = () => {
 
   return (
     <Router>
-      <Layout className="layout">
+      <Layout className="layout mh-100">
         <Header>
           <a>
             <img className="logo" src={logo} alt="Logo"></img>

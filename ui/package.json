@@ -36,21 +36,20 @@
     "react-markdown": "10.1.0",
     "react-oidc-context": "3.2.0",
     "react-router-dom": "6.28.0",
-    "react-scripts": "5.0.1",
     "react-vis": "^1.12.1",
     "reactflow": "^11.11.3",
     "redux": "^5.0.1",
     "remark-gfm": "4.0.1",
     "unzipit": "^1.4.3",
     "uuid": "^11.1.0",
+    "vite-plugin-commonjs": "^0.10.4",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "dev": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && react-scripts start",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start-two": "vite",
+    "start": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -69,5 +68,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@rollup/plugin-dynamic-import-vars": "^2.1.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.2.2"
   }
 }

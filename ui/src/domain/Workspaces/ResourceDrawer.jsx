@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Drawer, Avatar, Space, Tabs, Col, Row, Spin } from "antd";
-import { getServiceIcon } from "./Icons.js";
+import { getServiceIcon } from "./Icons.jsx";
 import ActionLoader from "../../ActionLoader.jsx";
 import axiosInstance from "../../config/axiosConfig";
 export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {

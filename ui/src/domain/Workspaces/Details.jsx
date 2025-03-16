@@ -51,7 +51,7 @@ import { Schedules } from "../Workspaces/Schedules";
 import { States } from "../Workspaces/States";
 import { Tags } from "../Workspaces/Tags";
 import { Variables } from "../Workspaces/Variables";
-import { getServiceIcon } from "./Icons.js";
+import { getServiceIcon } from "./Icons.jsx";
 import { WorkspaceAdvanced } from "./Settings/Advanced.jsx";
 import { WorkspaceGeneral } from "./Settings/General";
 import { WorkspaceWebhook } from "./Settings/Webhook.jsx";
