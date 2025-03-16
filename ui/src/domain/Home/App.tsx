@@ -124,7 +124,7 @@ const App = () => {
           />
           <Route
             path="/organizations/:orgid/registry/:id"
-            element={<ModuleDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />}
+            element={<ModuleDetails organizationName={organizationName} />}
           />
           <Route path="/organizations/:orgid/settings" element={<OrganizationSettings />} />
           <Route path="/organizations/:orgid/settings/general" element={<OrganizationSettings selectedTab="1" />} />

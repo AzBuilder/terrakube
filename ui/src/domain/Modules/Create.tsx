@@ -1,26 +1,13 @@
-import { React, useState, useEffect } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Breadcrumb,
-  Layout,
-  Steps,
-  Space,
-  Select,
-  message,
-} from "antd";
-import {
-  ORGANIZATION_ARCHIVE,
-  ORGANIZATION_NAME,
-} from "../../config/actionTypes";
-import axiosInstance from "../../config/axiosConfig";
 import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
-import { SiBitbucket  } from "react-icons/si";
-import { VscAzureDevops } from "react-icons/vsc";
+import { Breadcrumb, Button, Form, Input, Layout, Select, Space, Steps, message } from "antd";
+import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
-import { SiGit } from "react-icons/si";
-import { useNavigate, Link } from "react-router-dom";
+import { SiBitbucket, SiGit } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
+import { Link, useNavigate } from "react-router-dom";
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
+import axiosInstance from "../../config/axiosConfig";
+import { SshKey, VcsModel, VcsType } from "../types";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -30,17 +17,27 @@ const validateMessages = {
   },
 };
 
+type CreateVcsForm = {
+  name: string;
+  description: string;
+  provider: string;
+  source: string;
+  folder?: string;
+  tagPrefix?: string;
+  sshKey?: string;
+};
+
 export const CreateModule = () => {
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep3Hidden] = useState(true);
   const [step2Hidden, setStep2Hidden] = useState(true);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
-  const [vcs, setVCS] = useState([]);
+  const [vcs, setVCS] = useState<VcsModel[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [vcsId, setVcsId] = useState("");
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
-  const [sshKeys, setSSHKeys] = useState([]);
+  const [sshKeys, setSSHKeys] = useState<SshKey[]>([]);
   const [sshKeysVisible, setSSHKeysVisible] = useState(false);
 
   useEffect(() => {
@@ -48,7 +45,7 @@ export const CreateModule = () => {
     loadVCSProviders();
   }, [organizationId]);
 
-  const handleGitClick = (id) => {
+  const handleGitClick = (id: string) => {
     if (id === "git") {
       setSSHKeysVisible(true);
     } else {
@@ -59,7 +56,7 @@ export const CreateModule = () => {
     setStep2Hidden(false);
   };
 
-  const handleGitContinueClick = (e) => {
+  const handleGitContinueClick = () => {
     setCurrent(2);
     setStep3Hidden(false);
     setStep2Hidden(true);
@@ -77,7 +74,7 @@ export const CreateModule = () => {
     }
   };
 
-  const handleVCSClick = (vcsType) => {
+  const handleVCSClick = (vcsType: VcsType) => {
     navigate(`/organizations/${organizationId}/settings/vcs/new/${vcsType}`);
   };
 
@@ -89,7 +86,7 @@ export const CreateModule = () => {
     setVCSButtonsVisible(true);
   };
 
-  const renderVCSLogo = (vcs) => {
+  const renderVCSLogo = (vcs: VcsType) => {
     switch (vcs) {
       case "GITLAB":
         return <GitlabOutlined style={{ fontSize: "20px" }} />;
@@ -115,7 +112,7 @@ export const CreateModule = () => {
   const loadVCSProviders = () => {
     axiosInstance.get(`organization/${organizationId}/vcs`).then((response) => {
       console.log(response);
-      setVCS(response.data);
+      setVCS(response.data.data);
       setLoading(false);
     });
   };
@@ -127,8 +124,8 @@ export const CreateModule = () => {
     });
   };
 
-  const onFinish = (values) => {
-    let body = {
+  const onFinish = (values: CreateVcsForm) => {
+    let body: any = {
       data: {
         type: "module",
         attributes: {
@@ -200,9 +197,7 @@ export const CreateModule = () => {
       .then((response) => {
         console.log(response);
         if (response.status === 201) {
-          navigate(
-            `/organizations/${organizationId}/registry/${response.data.data.id}`
-          );
+          navigate(`/organizations/${organizationId}/registry/${response.data.data.id}`);
         }
       })
       .catch((error) => {
@@ -210,13 +205,9 @@ export const CreateModule = () => {
           if (error.response.status === 403) {
             message.error(
               <span>
-                You are not authorized to create Modules. <br /> Please contact
-                your administrator and request the <b>Manage Modules</b>{" "}
-                permission. <br /> For more information, visit the{" "}
-                <a
-                  target="_blank"
-                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
-                >
+                You are not authorized to create Modules. <br /> Please contact your administrator and request the{" "}
+                <b>Manage Modules</b> permission. <br /> For more information, visit the{" "}
+                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
                   Terrakube documentation
                 </a>
                 .
@@ -227,9 +218,9 @@ export const CreateModule = () => {
       });
   };
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<CreateVcsForm>();
 
-  const handleChange = (currentVal) => {
+  const handleChange = (currentVal: number) => {
     setCurrent(currentVal);
     if (currentVal === 1) {
       setStep2Hidden(false);
@@ -251,11 +242,7 @@ export const CreateModule = () => {
             title: sessionStorage.getItem(ORGANIZATION_NAME),
           },
           {
-            title: (
-              <Link to={`/organizations/${organizationId}/registry`}>
-                Modules
-              </Link>
-            ),
+            title: <Link to={`/organizations/${organizationId}/registry`}>Modules</Link>,
           },
           {
             title: "New Module",
@@ -267,15 +254,9 @@ export const CreateModule = () => {
         <div className="createWorkspace">
           <h2>Add Module</h2>
           <div className="App-text">
-            This module will be created under the current organization,{" "}
-            {sessionStorage.getItem(ORGANIZATION_NAME)}.
+            This module will be created under the current organization, {sessionStorage.getItem(ORGANIZATION_NAME)}.
           </div>
-          <Steps
-            direction="horizontal"
-            size="small"
-            current={current}
-            onChange={handleChange}
-          >
+          <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
             <Step title="Connect to VCS" />
             <Step title="Choose a repository" />
             <Step title="Confirm selection" />
@@ -285,8 +266,7 @@ export const CreateModule = () => {
             <Space className="chooseType" direction="vertical">
               <h3>Connect to a version control provider</h3>
               <div className="workflowDescription2 App-text">
-                Choose the version control provider that hosts your module
-                source code.
+                Choose the version control provider that hosts your module source code.
               </div>
               {vcsButtonsVisible ? (
                 <div>
@@ -300,10 +280,10 @@ export const CreateModule = () => {
                     >
                       &nbsp;Git
                     </Button>
-                    {loading || !vcs.data ? (
+                    {loading || vcs.length === 0 ? (
                       <p>Data loading...</p>
                     ) : (
-                      vcs.data.map(function (item, i) {
+                      vcs.map(function (item) {
                         return (
                           <Button
                             icon={renderVCSLogo(item.attributes.vcsType)}
@@ -320,11 +300,7 @@ export const CreateModule = () => {
                     )}
                   </Space>
                   <br />
-                  <Button
-                    onClick={handleDifferent}
-                    className="link"
-                    type="link"
-                  >
+                  <Button onClick={handleDifferent} className="link" type="link">
                     Connect to a different VCS
                   </Button>
                 </div>
@@ -334,7 +310,7 @@ export const CreateModule = () => {
                     <Button
                       icon={<GithubOutlined />}
                       onClick={() => {
-                        handleVCSClick("GITHUB");
+                        handleVCSClick(VcsType.GITHUB);
                       }}
                       size="large"
                     >
@@ -343,7 +319,7 @@ export const CreateModule = () => {
                     <Button
                       icon={<GitlabOutlined />}
                       onClick={() => {
-                        handleVCSClick("GITLAB");
+                        handleVCSClick(VcsType.GITLAB);
                       }}
                       size="large"
                     >
@@ -352,7 +328,7 @@ export const CreateModule = () => {
                     <Button
                       icon={<SiBitbucket />}
                       onClick={() => {
-                        handleVCSClick("BITBUCKET");
+                        handleVCSClick(VcsType.BITBUCKET);
                       }}
                       size="large"
                     >
@@ -361,7 +337,7 @@ export const CreateModule = () => {
                     <Button
                       icon={<VscAzureDevops />}
                       onClick={() => {
-                        handleVCSClick("AZURE_DEVOPS");
+                        handleVCSClick(VcsType.AZURE_DEVOPS);
                       }}
                       size="large"
                     >
@@ -384,15 +360,10 @@ export const CreateModule = () => {
             onFinish={onFinish}
             validateMessages={validateMessages}
           >
-            <Space
-              hidden={step2Hidden}
-              className="chooseType"
-              direction="vertical"
-            >
+            <Space hidden={step2Hidden} className="chooseType" direction="vertical">
               <h3>Choose a repository</h3>
               <div className="workflowDescription2 App-text">
-                Choose the repository that hosts your module source code. The
-                format of your repository name should be{" "}
+                Choose the repository that hosts your module source code. The format of your repository name should be{" "}
                 <b>{"terraform-<PROVIDER>-<NAME>"}</b>.
               </div>
               <Form.Item
@@ -403,8 +374,9 @@ export const CreateModule = () => {
                 rules={[
                   {
                     required: true,
-                    pattern:
-                      "((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)?(/)?",
+                    pattern: new RegExp(
+                      "((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)?(/)?"
+                    ),
                   },
                 ]}
               >
@@ -417,11 +389,7 @@ export const CreateModule = () => {
               </Form.Item>
             </Space>
 
-            <Space
-              hidden={step3Hidden}
-              className="chooseType"
-              direction="vertical"
-            >
+            <Space hidden={step3Hidden} className="chooseType" direction="vertical">
               <h3>Confirm selection</h3>
               <Form.Item
                 name="name"
@@ -438,13 +406,8 @@ export const CreateModule = () => {
                 <Input />
               </Form.Item>
 
-              <Form.Item
-                name="description"
-                label="Module Description"
-                placeholder="(description)"
-                rules={[{ required: true }]}
-              >
-                <Input.TextArea />
+              <Form.Item name="description" label="Module Description" rules={[{ required: true }]}>
+                <Input.TextArea placeholder="(description)" />
               </Form.Item>
               <Form.Item
                 name="provider"
@@ -480,12 +443,8 @@ export const CreateModule = () => {
                 rules={[{ required: false }]}
               >
                 <Select placeholder="select SSH Key" style={{ width: 250 }}>
-                  {sshKeys.map(function (sshKey, index) {
-                    return (
-                      <Select.Option key={sshKey?.id}>
-                        {sshKey?.attributes?.name}
-                      </Select.Option>
-                    );
+                  {sshKeys.map(function (sshKey) {
+                    return <Select.Option key={sshKey?.id}>{sshKey?.attributes?.name}</Select.Option>;
                   })}
                 </Select>
               </Form.Item>

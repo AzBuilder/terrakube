@@ -1,74 +1,84 @@
-import { React, useState, useEffect } from "react";
 import {
-  Menu,
-  Layout,
+  ArrowLeftOutlined,
+  ClockCircleOutlined,
+  CloudOutlined,
+  DeleteOutlined,
+  DownloadOutlined,
+  DownOutlined,
+  GithubOutlined,
+  GitlabOutlined,
+} from "@ant-design/icons";
+import {
   Breadcrumb,
-  Dropdown,
-  Tabs,
-  Space,
-  Tag,
-  Row,
-  Col,
-  Card,
-  Divider,
   Button,
-  Popconfirm,
+  Card,
+  Col,
+  Divider,
+  Dropdown,
+  Layout,
+  Menu,
   message,
+  Popconfirm,
+  Row,
+  Space,
   Spin,
+  Tabs,
+  Tag,
   Typography,
 } from "antd";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../../config/axiosConfig";
-import {
-  DownOutlined,
-  CloudOutlined,
-  ClockCircleOutlined,
-  DownloadOutlined,
-  DeleteOutlined,
-  ArrowLeftOutlined,
-} from "@ant-design/icons";
-import { GitlabOutlined, GithubOutlined } from "@ant-design/icons";
+import { Buffer } from "buffer";
+import * as hcl from "hcl2-parser";
+import { useEffect, useState } from "react";
+import { IconContext } from "react-icons";
+import { BiBookBookmark } from "react-icons/bi";
+import { FaAws } from "react-icons/fa";
+import { MdBusiness } from "react-icons/md";
+import { RiFolderHistoryLine } from "react-icons/ri";
 import { SiBitbucket } from "react-icons/si";
 import { VscAzure, VscAzureDevops } from "react-icons/vsc";
-import { FaAws } from "react-icons/fa";
-import { BiBookBookmark } from "react-icons/bi";
-import { RiFolderHistoryLine } from "react-icons/ri";
-import { IconContext } from "react-icons";
-import { MdBusiness } from "react-icons/md";
 import Markdown from "react-markdown";
-import { compareVersions } from "../Workspaces/Workspaces";
-import { unzip } from "unzipit";
-import "./Module.css";
-import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
-import { Buffer } from "buffer";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import remarkGfm from "remark-gfm";
-const hcl = require("hcl2-parser");
+import { unzip } from "unzipit";
+import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
+import axiosInstance from "../../config/axiosConfig";
+import { ModuleModel, VcsType } from "../types";
+import { compareVersions } from "../Workspaces/Workspaces";
+import "./Module.css";
 const { DateTime } = require("luxon");
-const { TabPane } = Tabs;
 const { Content } = Layout;
 
-export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
-  const { orgid, id } = useParams();
-  const [module, setModule] = useState([]);
+type Props = {
+  organizationName: string;
+};
+
+type Params = {
+  orgid: string;
+  id: string;
+};
+
+export const ModuleDetails = ({ organizationName }: Props) => {
+  const { orgid, id } = useParams<Params>();
+  const [module, setModule] = useState<ModuleModel>();
   const [moduleName, setModuleName] = useState("...");
   const [version, setVersion] = useState("...");
-  const [vcsProvider, setVCSProvider] = useState("");
+  const [vcsProvider, setVCSProvider] = useState<VcsType>();
   const [loading, setLoading] = useState(false);
   const [markdown, setMarkdown] = useState("loading...");
-  const [hclObject, setHclObject] = useState(null);
+  const [hclObject, setHclObject] = useState<any>(null);
   const [inputs, setInputs] = useState("Inputs");
   const [loadingInputs, setLoadingInputs] = useState("loading...");
   const [loadingOutputs, setLoadingOutputs] = useState("loading...");
   const [loadingResources, setLoadingResources] = useState("loading...");
   const [outputs, setOutputs] = useState("Outputs");
   const [resources, setResources] = useState("Resources");
-  const [submodules, setSubmodules] = useState([]);
+  const [submodules, setSubmodules] = useState<string[]>([]);
   const [submodule, setSubmodule] = useState("");
   const [submodulePath, setSubmodulePath] = useState("");
   const navigate = useNavigate();
 
   // Renders the provider icon
-  const renderLogo = (provider) => {
+  const renderLogo = (provider: string) => {
     switch (provider) {
       case "azurerm":
         return (
@@ -87,20 +97,24 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     }
   };
 
-  const handleClick = (e) => {
+  const handleClick = (e: { key: string }) => {
     setMarkdown("loading...");
     setVersion(e.key);
-    loadReadme(module.data.attributes.registryPath, e.key);
-    loadModuleDetails(module.data.attributes.registryPath, e.key);
+    if (module) {
+      loadReadme(module.attributes.registryPath, e.key);
+      loadModuleDetails(module.attributes.registryPath, e.key);
+    } else {
+      setMarkdown("Failed to load module");
+    }
   };
 
   // if submodule is empty then load the submodules dropdown list
   // if submodule is empty then load the root module
   // if submodule is not empty then load the specific submodule tf files
-  async function readFiles(url, submodule = "") {
+  async function readFiles(url: string, submodule = "") {
     const { entries } = await unzip(url);
     let hclString = "";
-    const modules = [];
+    const modules: string[] = [];
 
     for (const [name, entry] of Object.entries(entries)) {
       if (submodule === "") {
@@ -116,10 +130,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         }
         setSubmodules(modules.sort());
       } else {
-        if (
-          name.includes(".tf") &&
-          name.includes("modules/" + submodule + "/")
-        ) {
+        if (name.includes(".tf") && name.includes("modules/" + submodule + "/")) {
           const contentText = await entry.text();
           hclString += "\n" + contentText;
         }
@@ -146,9 +157,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
         setLoadingOutputs("No outputs");
       }
       if (hclResult[0]?.resource) {
-        setResources(
-          `Resources (${Object.keys(hclResult[0]?.resource)?.length})`
-        );
+        setResources(`Resources (${Object.keys(hclResult[0]?.resource)?.length})`);
       } else {
         setResources("Resources");
         setLoadingResources("No resources");
@@ -156,11 +165,11 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     }
   }
 
-  const onClickSubmodule = (e) => {
+  const onClickSubmodule = (e: { key: string }) => {
     setMarkdown("loading...");
     setSubmodule(e.key);
     setSubmodulePath("//modules/" + e.key);
-    loadModuleDetails(module.data.attributes.registryPath, version, e.key);
+    loadModuleDetails(module!.attributes.registryPath, version, e.key);
     if (markdown === "loading...") {
       setMarkdown("");
     }
@@ -170,11 +179,11 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
     setMarkdown("loading...");
     setSubmodule("");
     setSubmodulePath("");
-    loadModuleDetails(module.data.attributes.registryPath, version, "");
-    loadReadme(module.data.attributes.registryPath, version);
+    loadModuleDetails(module!.attributes.registryPath, version, "");
+    loadReadme(module!.attributes.registryPath, version);
   };
 
-  const onDelete = (id) => {
+  const onDelete = (id: string) => {
     axiosInstance
       .delete(`organization/${orgid}/module/${id}`)
       .then(() => {
@@ -186,11 +195,11 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       });
   };
 
-  const onChange = (key) => {
+  const onChange = (key: unknown) => {
     console.log(key);
   };
 
-  async function loadReadmeFile(text) {
+  async function loadReadmeFile(text: string) {
     if (text != null) {
       const textReadme = Buffer.from(text, "base64").toString();
       setMarkdown(textReadme);
@@ -201,56 +210,42 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
 
   useEffect(() => {
     setLoading(true);
-    sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
-    axiosInstance
-      .get(`organization/${orgid}/module/${id}?include=vcs`)
-      .then((response) => {
-        setModule(response.data);
-        setLoading(false);
-        setModuleName(response.data.data.attributes.name);
-        if (
-          response.data.included != null &&
-          response.data.included[0] != null
-        ) {
-          setVCSProvider(response.data.included[0].attributes.vcsType);
-        }
-        const latestVersion = response.data.data.attributes.versions
-          .sort(compareVersions)
-          .reverse()[0];
-        setVersion(latestVersion);
-        loadReadme(response.data.data.attributes.registryPath, latestVersion);
-        loadModuleDetails(
-          response.data.data.attributes.registryPath,
-          latestVersion
-        );
-      });
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid!);
+    axiosInstance.get(`organization/${orgid}/module/${id}?include=vcs`).then((response) => {
+      setModule(response.data.data);
+      setLoading(false);
+      setModuleName(response.data.data.attributes.name);
+      if (response.data.included != null && response.data.included[0] != null) {
+        setVCSProvider(response.data.included[0].attributes.vcsType);
+      }
+      const latestVersion = response.data.data.attributes.versions.sort(compareVersions).reverse()[0];
+      setVersion(latestVersion);
+      loadReadme(response.data.data.attributes.registryPath, latestVersion);
+      loadModuleDetails(response.data.data.attributes.registryPath, latestVersion);
+    });
   }, [orgid, id]);
 
-  const loadModuleDetails = async (path, version, submodule = "") => {
+  const loadModuleDetails = async (path: string, version: string, submodule = "") => {
     setLoadingInputs("loading...");
     setLoadingOutputs("loading...");
     setLoadingResources("loading...");
     setHclObject(null);
     axiosInstance
-      .get(
-        `${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`
-      )
+      .get(`${window._env_.REACT_APP_REGISTRY_URI}/terraform/modules/v1/${path}/${version}/download`)
       .then((resp) => {
         readFiles(resp.headers["x-terraform-get"], submodule);
       });
   };
 
-  const loadReadme = (path, version) => {
+  const loadReadme = (path: string, version: string) => {
     axiosInstance
-      .get(
-        `${window._env_.REACT_APP_REGISTRY_URI}/terraform/readme/v1/${path}/${version}/download`
-      )
+      .get(`${window._env_.REACT_APP_REGISTRY_URI}/terraform/readme/v1/${path}/${version}/download`)
       .then((resp) => {
         loadReadmeFile(resp.data.content);
       });
   };
 
-  const renderVCSLogo = (vcs) => {
+  const renderVCSLogo = (vcs?: VcsType) => {
     switch (vcs) {
       case "GITLAB":
         return <GitlabOutlined style={{ fontSize: "18px" }} />;
@@ -291,7 +286,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
       />
 
       <div className="site-layout-content">
-        {loading || !module.data ? (
+        {loading || !module ? (
           <Spin spinning={loading} tip="Loading Module...">
             <p style={{ marginTop: "50px" }}></p>
           </Spin>
@@ -299,10 +294,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
           <div>
             <Row>
               <Col span={17}>
-                <Space
-                  direction="vertical"
-                  style={{ marginTop: "10px", width: "95%" }}
-                >
+                <Space direction="vertical" style={{ marginTop: "10px", width: "95%" }}>
                   {submodule === "" && (
                     <>
                       <Tag color="blue">
@@ -311,22 +303,13 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                         </span>
                       </Tag>
                       <div>
-                        <h2 className="moduleTitle">
-                          {module.data.attributes.name}
-                        </h2>
-                        <span className="moduleDescription">
-                          {module.data.attributes.description}
-                        </span>
+                        <h2 className="moduleTitle">{module.attributes.name}</h2>
+                        <span className="moduleDescription">{module.attributes.description}</span>
                       </div>
-                      <Space
-                        className="moduleProvider"
-                        size="large"
-                        direction="horizontal"
-                      >
+                      <Space className="moduleProvider" size="large" direction="horizontal">
                         <span>Published by {organizationName}</span>
                         <span>
-                          Provider {renderLogo(module.data.attributes.provider)}{" "}
-                          {module.data.attributes.provider}
+                          Provider {renderLogo(module.attributes.provider)} {module.attributes.provider}
                         </span>
                       </Space>
                       <IconContext.Provider value={{ size: "1.3em" }}>
@@ -351,7 +334,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                               <Dropdown
                                 overlay={
                                   <Menu onClick={handleClick}>
-                                    {module.data.attributes.versions
+                                    {module.attributes.versions
                                       .sort(compareVersions)
                                       .reverse()
                                       .map((name) => (
@@ -367,24 +350,12 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                               </Dropdown>
                               ,
                             </td>
-                            <td>
-                              {DateTime.fromISO(
-                                module.data.attributes.createdDate
-                              ).toRelative()}
-                            </td>
-                            <td>
-                              &nbsp; {module.data.attributes.downloadQuantity}
-                            </td>
+                            <td>{DateTime.fromISO(module.attributes.createdDate).toRelative()}</td>
+                            <td>&nbsp; {module.attributes.downloadQuantity}</td>
                             <td>
                               {renderVCSLogo(vcsProvider)}{" "}
-                              <a
-                                href={fixSshURL(module.data.attributes.source)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {new URL(
-                                  fixSshURL(module.data.attributes.source)
-                                )?.pathname
+                              <a href={fixSshURL(module.attributes.source)} target="_blank" rel="noopener noreferrer">
+                                {new URL(fixSshURL(module.attributes.source))?.pathname
                                   ?.replace(".git", "")
                                   ?.substring(1)}
                               </a>
@@ -403,9 +374,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                           }
                           trigger={["click"]}
                         >
-                          <Button
-                            style={{ marginTop: "20px", fontSize: ".75rem" }}
-                          >
+                          <Button style={{ marginTop: "20px", fontSize: ".75rem" }}>
                             <Space>
                               Submodules
                               <DownOutlined />
@@ -456,11 +425,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       {
                         label: "Readme",
                         key: "1",
-                        children: (
-                          <Markdown remarkPlugins={[remarkGfm]}>
-                            {markdown}
-                          </Markdown>
-                        ),
+                        children: <Markdown remarkPlugins={[remarkGfm]}>{markdown}</Markdown>,
                         className: "markdown-body",
                       },
                       {
@@ -470,10 +435,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                           hclObject && hclObject?.variable ? (
                             <Space direction="vertical">
                               <h3>Inputs</h3>
-                              <span>
-                                These variables should be set in the module block
-                                when using this module.
-                              </span>
+                              <span>These variables should be set in the module block when using this module.</span>
                               <table
                                 style={{
                                   width: "100%",
@@ -533,71 +495,64 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {Object.keys(hclObject?.variable).map(
-                                    (keyName, i) => (
-                                      <tr key={i}>
-                                        <td
+                                  {Object.keys(hclObject?.variable).map((keyName, i) => (
+                                    <tr key={i}>
+                                      <td
+                                        style={{
+                                          textAlign: "left",
+                                          verticalAlign: "top",
+                                          padding: "8px",
+                                          border: "1px solid #e8e8e8",
+                                        }}
+                                      >
+                                        <Typography.Text copyable strong>
+                                          {keyName}
+                                        </Typography.Text>
+                                      </td>
+                                      <td
+                                        style={{
+                                          textAlign: "left",
+                                          verticalAlign: "top",
+                                          padding: "8px",
+                                          border: "1px solid #e8e8e8",
+                                        }}
+                                      >
+                                        <span
                                           style={{
-                                            textAlign: "left",
-                                            verticalAlign: "top",
-                                            padding: "8px",
-                                            border: "1px solid #e8e8e8",
+                                            backgroundColor: "#f5f5f5",
+                                            padding: "4px 8px",
+                                            borderRadius: "4px",
+                                            display: "inline-block",
                                           }}
                                         >
-                                          <Typography.Text copyable strong>
-                                            {keyName}
-                                          </Typography.Text>
-                                        </td>
-                                        <td
-                                          style={{
-                                            textAlign: "left",
-                                            verticalAlign: "top",
-                                            padding: "8px",
-                                            border: "1px solid #e8e8e8",
-                                          }}
-                                        >
-                                          <span
-                                            style={{
-                                              backgroundColor: "#f5f5f5",
-                                              padding: "4px 8px",
-                                              borderRadius: "4px",
-                                              display: "inline-block",
-                                            }}
-                                          >
-                                            {hclObject?.variable[
-                                              keyName
-                                            ][0]?.type?.replace(/{|}|\$/g, "")}
-                                          </span>
-                                        </td>
-                                        <td
-                                          style={{
-                                            textAlign: "left",
-                                            verticalAlign: "top",
-                                            padding: "8px",
-                                            border: "1px solid #e8e8e8",
-                                          }}
-                                        >
-                                          {JSON.stringify(
-                                            hclObject?.variable[keyName][0]
-                                              ?.description
-                                          )?.replaceAll('"', "")}
-                                        </td>
-                                        <td
-                                          style={{
-                                            textAlign: "left",
-                                            verticalAlign: "top",
-                                            padding: "8px",
-                                            border: "1px solid #e8e8e8",
-                                          }}
-                                        >
-                                          {JSON.stringify(
-                                            hclObject?.variable[keyName][0]
-                                              ?.default
-                                          )}
-                                        </td>
-                                      </tr>
-                                    )
-                                  )}
+                                          {hclObject?.variable[keyName][0]?.type?.replace(/{|}|\$/g, "")}
+                                        </span>
+                                      </td>
+                                      <td
+                                        style={{
+                                          textAlign: "left",
+                                          verticalAlign: "top",
+                                          padding: "8px",
+                                          border: "1px solid #e8e8e8",
+                                        }}
+                                      >
+                                        {JSON.stringify(hclObject?.variable[keyName][0]?.description)?.replaceAll(
+                                          '"',
+                                          ""
+                                        )}
+                                      </td>
+                                      <td
+                                        style={{
+                                          textAlign: "left",
+                                          verticalAlign: "top",
+                                          padding: "8px",
+                                          border: "1px solid #e8e8e8",
+                                        }}
+                                      >
+                                        {JSON.stringify(hclObject?.variable[keyName][0]?.default)}
+                                      </td>
+                                    </tr>
+                                  ))}
                                 </tbody>
                               </table>
                             </Space>
@@ -612,9 +567,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                           hclObject && hclObject?.output ? (
                             <Space direction="vertical">
                               <h3>Outputs</h3>
-                              <span>
-                                These outputs are returned by this module.
-                              </span>
+                              <span>These outputs are returned by this module.</span>
                               <table
                                 style={{
                                   width: "100%",
@@ -652,37 +605,35 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {Object.keys(hclObject?.output).map(
-                                    (keyName, i) => (
-                                      <tr key={i}>
-                                        <td
-                                          style={{
-                                            textAlign: "left",
-                                            verticalAlign: "top",
-                                            padding: "8px",
-                                            border: "1px solid #e8e8e8",
-                                          }}
-                                        >
-                                          <Typography.Text copyable strong>
-                                            {keyName}
-                                          </Typography.Text>
-                                        </td>
-                                        <td
-                                          style={{
-                                            textAlign: "left",
-                                            verticalAlign: "top",
-                                            padding: "8px",
-                                            border: "1px solid #e8e8e8",
-                                          }}
-                                        >
-                                          {JSON.stringify(
-                                            hclObject?.output[keyName][0]
-                                              ?.description
-                                          )?.replaceAll('"', "")}
-                                        </td>
-                                      </tr>
-                                    )
-                                  )}
+                                  {Object.keys(hclObject?.output).map((keyName, i) => (
+                                    <tr key={i}>
+                                      <td
+                                        style={{
+                                          textAlign: "left",
+                                          verticalAlign: "top",
+                                          padding: "8px",
+                                          border: "1px solid #e8e8e8",
+                                        }}
+                                      >
+                                        <Typography.Text copyable strong>
+                                          {keyName}
+                                        </Typography.Text>
+                                      </td>
+                                      <td
+                                        style={{
+                                          textAlign: "left",
+                                          verticalAlign: "top",
+                                          padding: "8px",
+                                          border: "1px solid #e8e8e8",
+                                        }}
+                                      >
+                                        {JSON.stringify(hclObject?.output[keyName][0]?.description)?.replaceAll(
+                                          '"',
+                                          ""
+                                        )}
+                                      </td>
+                                    </tr>
+                                  ))}
                                 </tbody>
                               </table>
                             </Space>
@@ -697,27 +648,17 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                           hclObject && hclObject?.resource ? (
                             <Space direction="vertical">
                               <h3>Resources</h3>
-                              <span>
-                                This is the list of resources this module can
-                                create.
-                              </span>
-                              <span>
-                                This module defines{" "}
-                                {Object.keys(hclObject?.resource)?.length}{" "}
-                                resources.
-                              </span>
+                              <span>This is the list of resources this module can create.</span>
+                              <span>This module defines {Object.keys(hclObject?.resource)?.length} resources.</span>
                               <ul>
-                                {Object.keys(hclObject?.resource).map(
-                                  (resourceType, i) =>
-                                    Object.keys(
-                                      hclObject?.resource[resourceType]
-                                    ).map((resourceName, j) => (
-                                      <li key={`${i}-${j}`}>
-                                        <Tag>
-                                          {resourceType}.{resourceName}
-                                        </Tag>
-                                      </li>
-                                    ))
+                                {Object.keys(hclObject?.resource).map((resourceType, i) =>
+                                  Object.keys(hclObject?.resource[resourceType]).map((resourceName, j) => (
+                                    <li key={`${i}-${j}`}>
+                                      <Tag>
+                                        {resourceType}.{resourceName}
+                                      </Tag>
+                                    </li>
+                                  ))
                                 )}
                               </ul>
                             </Space>
@@ -731,20 +672,16 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
               </Col>
               <Col span={7}>
                 <Card>
-                  <Space
-                    style={{ paddingRight: "10px", width: "100%" }}
-                    direction="vertical"
-                  >
+                  <Space style={{ paddingRight: "10px", width: "100%" }} direction="vertical">
                     <div style={{ width: "100%" }}>
                       <Popconfirm
                         onConfirm={() => {
-                          onDelete(id);
+                          onDelete(id!);
                         }}
                         style={{ width: "100%" }}
                         title={
                           <p>
-                            Module <b>{module.data.attributes.name}</b> will be
-                            permanently deleted from this organization.
+                            Module <b>{module.attributes.name}</b> will be permanently deleted from this organization.
                             <br />
                             Are you sure?
                           </p>
@@ -764,21 +701,17 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                     </div>
                     <p className="moduleSubtitles">Usage Instructions</p>
                     <p className="moduleInstructions">
-                      Copy and paste into your Terraform configuration and set
-                      values for the input variables.
+                      Copy and paste into your Terraform configuration and set values for the input variables.
                     </p>
                     <div style={{ width: "100%" }}>
                       <Divider />
-                      <p className="moduleSubtitles">
-                        Copy configuration details
-                      </p>
+                      <p className="moduleSubtitles">Copy configuration details</p>
                     </div>
                     <pre className="moduleCode">
-                      module "{module.data.attributes.name}" {"{"}
+                      module "{module.attributes.name}" {"{"}
                       <br />
-                      &nbsp;&nbsp;source = "
-                      {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}/
-                      {module.data.attributes.registryPath}
+                      &nbsp;&nbsp;source = "{new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}/
+                      {module.attributes.registryPath}
                       {submodulePath}"
                       <br />
                       &nbsp;&nbsp;version = "{version}"
@@ -787,21 +720,13 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
                       <br />
                       {"}"}
                     </pre>
-                    <Tag
-                      style={{ width: "100%", fontSize: "13px" }}
-                      color="blue"
-                    >
-                      <div
-                        style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                      >
-                        When running Terraform on the CLI, you must configure
-                        credentials in .terraformrc or terraform.rc to access
-                        this module:
+                    <Tag style={{ width: "100%", fontSize: "13px" }} color="blue">
+                      <div style={{ whiteSpace: "normal", wordWrap: "break-word" }}>
+                        When running Terraform on the CLI, you must configure credentials in .terraformrc or
+                        terraform.rc to access this module:
                       </div>
                       <pre className="moduleCredentials">
-                        credentials "
-                        {new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}"{" "}
-                        {" {"}
+                        credentials "{new URL(window._env_.REACT_APP_REGISTRY_URI).hostname}" {" {"}
                         <br />
                         &nbsp;&nbsp;token = "xxxxxx.yyyyyy.zzzzzzzzzzzzz"
                         <br />
@@ -820,7 +745,7 @@ export const ModuleDetails = ({ setOrganizationName, organizationName }) => {
   );
 };
 
-function fixSshURL(source) {
+function fixSshURL(source: string) {
   if (source.startsWith("git@")) {
     return source.replace(":", "/").replace("git@", "https://");
   } else {
