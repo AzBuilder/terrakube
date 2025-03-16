@@ -1,15 +1,9 @@
-import { React, useState } from "react";
-import { Layout, Breadcrumb, Tabs } from "antd";
-import "./UserSettings.css";
+import { Breadcrumb, Layout, Tabs } from "antd";
 import { Tokens } from "./Tokens";
+import "./UserSettings.css";
 const { Content } = Layout;
-const { TabPane } = Tabs;
 
 export const UserSettings = () => {
-  const [key, setKey] = useState("");
-  function callback(key) {
-    setKey(key);
-  }
   return (
     <Content style={{ padding: "0 50px" }}>
       <Breadcrumb
@@ -26,7 +20,6 @@ export const UserSettings = () => {
       <div className="site-layout-content">
         <Tabs
           tabPosition="left"
-          onTabClick={callback}
           items={[
             {
               label: "Tokens",

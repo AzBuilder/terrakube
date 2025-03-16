@@ -1,38 +1,44 @@
-import { React, useState, useEffect } from "react";
+import { ClockCircleOutlined, DeleteOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
+  Alert,
   Button,
-  List,
+  Card,
+  Col,
   Form,
-  Modal,
-  Space,
   Input,
   InputNumber,
-  Typography,
-  Alert,
-  Row,
-  Col,
-  Card,
-  Tag,
+  List,
+  Modal,
   Popconfirm,
+  Row,
+  Space,
+  Tag,
+  Typography,
 } from "antd";
-import "./UserSettings.css";
-import { axiosClientAuth } from "../../config/axiosConfig";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  InfoCircleOutlined,
-  DeleteOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
+import { axiosClientAuth } from "../../config/axiosConfig";
+import { UserToken } from "../types";
+import "./UserSettings.css";
+
+type Params = {
+  orgid: string;
+};
+
+type CreateTokenForm = {
+  description: string;
+  days: number;
+};
+
 export const Tokens = () => {
-  const { orgid } = useParams();
-  const [tokens, setTokens] = useState([]);
+  const { orgid } = useParams<Params>();
+  const [tokens, setTokens] = useState<UserToken[]>([]);
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visibleToken, setVisibleToken] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<CreateTokenForm>();
   const onCancel = () => {
     setVisible(false);
   };
@@ -43,7 +49,7 @@ export const Tokens = () => {
     setVisible(true);
   };
 
-  const onCreate = (values) => {
+  const onCreate = (values: CreateTokenForm) => {
     const body = {
       description: values.description,
       days: values.days,
@@ -51,15 +57,11 @@ export const Tokens = () => {
     console.log(body);
 
     axiosClientAuth
-      .post(
-        `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      )
+      .post(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
       .then((response) => {
         console.log(response);
         setToken(response.data.token);
@@ -71,7 +73,7 @@ export const Tokens = () => {
       });
   };
 
-  const onDelete = (id) => {
+  const onDelete = (id: string) => {
     console.log("deleted " + id);
     axiosClientAuth
       .delete(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1/${id}`)
@@ -82,13 +84,11 @@ export const Tokens = () => {
   };
 
   const loadTokens = () => {
-    axiosClientAuth
-      .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1`)
-      .then((response) => {
-        console.log(response);
-        setTokens(response.data);
-        setLoading(false);
-      });
+    axiosClientAuth.get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1`).then((response) => {
+      console.log(response);
+      setTokens(response.data);
+      setLoading(false);
+    });
   };
   useEffect(() => {
     setLoading(true);
@@ -99,9 +99,8 @@ export const Tokens = () => {
     <div className="setting">
       <h1>Tokens</h1>
       <div className="App-text">
-        Your API tokens can be used to access the Terrakube API and perform all
-        the actions your user account is entitled to. For more information, see
-        the Terrakube documentation.
+        Your API tokens can be used to access the Terrakube API and perform all the actions your user account is
+        entitled to. For more information, see the Terrakube documentation.
       </div>
       <Button type="primary" onClick={onNew} htmlType="button">
         Create an API Token
@@ -133,7 +132,8 @@ export const Tokens = () => {
                           style={{ width: "20px" }}
                           title={
                             <p>
-                              This operation is irreversible.<br/>
+                              This operation is irreversible.
+                              <br />
                               Are you sure you want to proceed? <br />
                             </p>
                           }
@@ -146,16 +146,15 @@ export const Tokens = () => {
                     </Row>
                     <Row>
                       <Col span={20}>
-                        <Tag
-                          icon={<ExclamationCircleOutlined />}
-                          color="warning"
-                        >
+                        <Tag icon={<ExclamationCircleOutlined />} color="warning">
                           {" "}
                           <b>
                             Expires{": "}
-                            {(item.days > 0) ? DateTime.fromISO(item.createdDate)
-                              .plus({ days: item.days })
-                              .toLocaleString(DateTime.DATETIME_MED): "Token without expiration date"}
+                            {item.days > 0
+                              ? DateTime.fromISO(item.createdDate)
+                                  .plus({ days: item.days })
+                                  .toLocaleString(DateTime.DATETIME_MED)
+                              : "Token without expiration date"}
                           </b>
                         </Tag>
                       </Col>
@@ -163,9 +162,8 @@ export const Tokens = () => {
                     <br />
                     <Row>
                       <Col span={20} style={{ color: "rgb(82, 87, 97)" }}>
-                        <ClockCircleOutlined /> Created{" "}
-                        <b>{DateTime.fromISO(item.createdDate).toRelative()}</b>{" "}
-                        by user <b>{item.createdBy}</b>
+                        <ClockCircleOutlined /> Created <b>{DateTime.fromISO(item.createdDate).toRelative()}</b> by user{" "}
+                        <b>{item.createdBy}</b>
                       </Col>
                     </Row>
                   </Card>
@@ -201,8 +199,7 @@ export const Tokens = () => {
             <Form.Item
               name="description"
               tooltip={{
-                title:
-                  "Choose a description to help you identify this token later",
+                title: "Choose a description to help you identify this token later",
                 icon: <InfoCircleOutlined />,
               }}
               label="Description"
@@ -238,9 +235,8 @@ export const Tokens = () => {
       >
         <Space style={{ width: "100%" }} direction="vertical">
           <p>
-            Your new API token is displayed below. Treat this token like a
-            password, as it can be used to access your account without a
-            username, password, or two-factor authentication.
+            Your new API token is displayed below. Treat this token like a password, as it can be used to access your
+            account without a username, password, or two-factor authentication.
           </p>
           <p>
             <Paragraph style={{ backgroundColor: "#ebeef2" }} copyable>
@@ -251,8 +247,7 @@ export const Tokens = () => {
             message="Warning"
             description={
               <span>
-                This token <b>will not be displayed again</b>, so make sure to
-                save it to a safe place.
+                This token <b>will not be displayed again</b>, so make sure to save it to a safe place.
               </span>
             }
             type="warning"

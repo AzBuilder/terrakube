@@ -1,37 +1,19 @@
-import {
-  DownOutlined,
-  GithubOutlined,
-  GitlabOutlined
-} from "@ant-design/icons";
-import {
-  Breadcrumb,
-  Button,
-  Card,
-  Dropdown,
-  Form,
-  Input,
-  Layout,
-  List,
-  Select,
-  Space,
-  Steps,
-  message
-} from "antd";
-import { React, useEffect, useState } from "react";
+import { DownOutlined, GithubOutlined, GitlabOutlined } from "@ant-design/icons";
+import { Breadcrumb, Button, Card, Dropdown, Form, Input, Layout, List, Select, Space, Steps, message } from "antd";
+import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { BiBookBookmark, BiTerminal, BiUpload } from "react-icons/bi";
 import { SiBitbucket, SiGit } from "react-icons/si";
 import { VscAzureDevops } from "react-icons/vsc";
 import { Link, useNavigate } from "react-router-dom";
 import { v7 as uuid } from "uuid";
-import {
-  ORGANIZATION_ARCHIVE,
-  ORGANIZATION_NAME,
-} from "../../config/actionTypes";
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
+import { SshKey, Template, VcsModel, VcsType, VcsTypeExtended } from "../types";
 import { compareVersions } from "./Workspaces";
 const { Content } = Layout;
 const { Step } = Steps;
+
 const validateMessages = {
   required: "${label} is required!",
   types: {
@@ -40,12 +22,35 @@ const validateMessages = {
 };
 const { Option } = Select;
 
+type IacType = {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+};
+
+type TofuRelease = {
+  tag_name: string;
+};
+
+type CreateWorkspaceForm = {
+  source: string;
+  folder: string;
+  name: string;
+  terraformVersion: string;
+  branch: string;
+  iacType: string;
+  defaultTemplate: string;
+  sshKey?: string;
+};
+
 export const CreateWorkspace = () => {
-  const [organizationName, setOrganizationName] = useState([]);
-  const [terraformVersions, setTerraformVersions] = useState([]);
-  const [vcs, setVCS] = useState([]);
-  const [sshKeys, setSSHKeys] = useState([]);
-  const [orgTemplates, setOrgTemplates] = useState([]);
+  const [organizationName, setOrganizationName] = useState<string | null>();
+  const [terraformVersions, setTerraformVersions] = useState<string[]>([]);
+  const [vcs, setVCS] = useState<VcsModel[]>([]);
+  const [sshKeys, setSSHKeys] = useState<SshKey[]>([]);
+  const [orgTemplates, setOrgTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
   const [vcsId, setVcsId] = useState("");
@@ -56,8 +61,8 @@ export const CreateWorkspace = () => {
   const [versionControlFlow, setVersionControlFlow] = useState(true);
   const [requiredVcsPush, setRequiredVcsPush] = useState(true);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
-  const [iacTypes, setIacTypes] = useState([]);
-  const [iacType, setIacType] = useState({
+  const [iacTypes, setIacTypes] = useState<IacType[]>([]);
+  const [iacType, setIacType] = useState<IacType>({
     id: "terraform",
     name: "Terraform",
   });
@@ -66,21 +71,21 @@ export const CreateWorkspace = () => {
       label: "Gitlab.com",
       key: "1",
       onClick: () => {
-        handleVCSClick("GITLAB");
+        handleVCSClick(VcsTypeExtended.GITLAB);
       },
     },
     {
       label: "Gitlab Community Edition",
       key: "2",
       onClick: () => {
-        handleVCSClick("GITLAB_COMMUNITY");
+        handleVCSClick(VcsTypeExtended.GITLAB_COMMUNITY);
       },
     },
     {
       label: "Gitlab Enterprise Edition",
       key: "3",
       onClick: () => {
-        handleVCSClick("GITLAB_ENTERPRISE");
+        handleVCSClick(VcsTypeExtended.GITLAB_ENTERPRISE);
       },
     },
   ];
@@ -90,14 +95,14 @@ export const CreateWorkspace = () => {
       label: "Github.com",
       key: "1",
       onClick: () => {
-        handleVCSClick("GITHUB");
+        handleVCSClick(VcsTypeExtended.GITHUB);
       },
     },
     {
       label: "Github Enterprise",
       key: "2",
       onClick: () => {
-        handleVCSClick("GITHUB_ENTERPRISE");
+        handleVCSClick(VcsTypeExtended.GITHUB_ENTERPRISE);
       },
     },
   ];
@@ -107,7 +112,7 @@ export const CreateWorkspace = () => {
       label: "Bitbucket Cloud",
       key: "1",
       onClick: () => {
-        handleVCSClick("BITBUCKET");
+        handleVCSClick(VcsTypeExtended.BITBUCKET);
       },
     },
   ];
@@ -117,7 +122,7 @@ export const CreateWorkspace = () => {
       label: "Azure DevOps Services",
       key: "1",
       onClick: () => {
-        handleVCSClick("AZURE_DEVOPS");
+        handleVCSClick(VcsTypeExtended.AZURE_DEVOPS);
       },
     },
   ];
@@ -131,19 +136,19 @@ export const CreateWorkspace = () => {
     loadVCS();
     getIacTypes();
   }, []);
-  const handleClick = (e) => {
+  const handleClick = () => {
     setCurrent(2);
     setVersionControlFlow(true);
     form.setFieldsValue({ source: "", branch: "" });
   };
 
-  const handleIacTypeClick = (iacType) => {
+  const handleIacTypeClick = (iacType: IacType) => {
     setCurrent(1);
     setIacType(iacType);
     loadVersions(iacType);
   };
 
-  const handleGitClick = (id) => {
+  const handleGitClick = (id: string) => {
     if (id === "git") {
       setSSHKeysVisible(true);
     } else {
@@ -151,14 +156,12 @@ export const CreateWorkspace = () => {
       setVcsId(id);
     }
     setCurrent(3);
-    setRequiredVcsPush(true)
+    setRequiredVcsPush(true);
     setStep3Hidden(false);
   };
 
-  const handleVCSClick = (vcsType) => {
-    navigate(
-      `/organizations/${organizationId}/settings/vcs/new/${vcsType}`
-    );
+  const handleVCSClick = (vcsType: VcsTypeExtended) => {
+    navigate(`/organizations/${organizationId}/settings/vcs/new/${vcsType}`);
   };
 
   const handleConnectDifferent = () => {
@@ -169,7 +172,7 @@ export const CreateWorkspace = () => {
     setVCSButtonsVisible(true);
   };
 
-  const renderVCSLogo = (vcs) => {
+  const renderVCSLogo = (vcs: VcsType) => {
     switch (vcs) {
       case "GITLAB":
         return <GitlabOutlined style={{ fontSize: "20px" }} />;
@@ -195,7 +198,7 @@ export const CreateWorkspace = () => {
   const loadVCS = () => {
     axiosInstance.get(`organization/${organizationId}/vcs`).then((response) => {
       console.log(response);
-      setVCS(response.data);
+      setVCS(response.data.data);
       setLoading(false);
     });
   };
@@ -208,16 +211,14 @@ export const CreateWorkspace = () => {
   };
 
   const loadOrgTemplates = () => {
-    axiosInstance
-      .get(`organization/${organizationId}/template`)
-      .then((response) => {
-        console.log(response.data.data);
-        setOrgTemplates(response.data.data);
-      });
+    axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
+      console.log(response.data.data);
+      setOrgTemplates(response.data.data);
+    });
   };
 
   const [form] = Form.useForm();
-  const handleGitContinueClick = (e) => {
+  const handleGitContinueClick = () => {
     setCurrent(3);
     setStep4Hidden(false);
     setStep3Hidden(true);
@@ -231,7 +232,7 @@ export const CreateWorkspace = () => {
     }
   };
 
-  const handleCliDriven = (e) => {
+  const handleCliDriven = () => {
     setVersionControlFlow(false);
     setCurrent(2);
     setStep4Hidden(false);
@@ -240,21 +241,19 @@ export const CreateWorkspace = () => {
     form.setFieldsValue({ source: "empty", branch: "remote-content" });
   };
 
-  const onFinishFailed = (values, errorFields) => {
-    console.log(values);
-    console.log(errorFields);
+  const onFinishFailed = (errorInfo: any) => {
+    console.log(errorInfo.values);
+    console.log(errorInfo.errorFields);
   };
 
-  const loadVersions = (iacType) => {
-    const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-      }/${iacType.id}/index.json`;
+  const loadVersions = (iacType: IacType) => {
+    const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/${iacType.id}/index.json`;
     axiosInstance.get(versionsApi).then((resp) => {
       console.log(resp);
       const tfVersions = [];
       if (iacType.id === "tofu") {
-        resp.data.forEach((release) => {
-          if (!release.tag_name.includes("-"))
-            tfVersions.push(release.tag_name.replace("v", ""));
+        (resp.data as TofuRelease[]).forEach((release) => {
+          if (!release.tag_name.includes("-")) tfVersions.push(release.tag_name.replace("v", ""));
         });
       } else {
         for (const version in resp.data.versions) {
@@ -266,7 +265,7 @@ export const CreateWorkspace = () => {
     });
   };
 
-  const onFinish = (values) => {
+  const onFinish = (values: CreateWorkspaceForm) => {
     const workspace_lid = uuid();
     let body = {
       "atomic:operations": [
@@ -285,13 +284,14 @@ export const CreateWorkspace = () => {
               iacType: iacType.id,
               defaultTemplate: values.defaultTemplate,
             },
-            relationships: {}
+            relationships: {},
           },
-        }],
+        },
+      ],
     };
 
     if (vcsId !== "") {
-      body["atomic:operations"][0].data.relationships["vcs"] = {
+      (body["atomic:operations"][0].data.relationships as any)["vcs"] = {
         data: {
           type: "vcs",
           id: vcsId,
@@ -300,19 +300,19 @@ export const CreateWorkspace = () => {
     }
 
     if (values.sshKey) {
-      body["atomic:operations"][0].data.relationships["ssh"] = {
+      (body["atomic:operations"][0].data.relationships as any)["ssh"] = {
         data: {
           type: "ssh",
           id: values.sshKey,
         },
-      }
+      };
     }
 
     axiosInstance
       .post(`/operations`, body, {
         headers: {
-          "Content-Type": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
-          "Accept": "application/vnd.api+json;ext=\"https://jsonapi.org/ext/atomic\"",
+          "Content-Type": 'application/vnd.api+json;ext="https://jsonapi.org/ext/atomic"',
+          Accept: 'application/vnd.api+json;ext="https://jsonapi.org/ext/atomic"',
         },
       })
       .then((response) => {
@@ -327,32 +327,24 @@ export const CreateWorkspace = () => {
           if (error.response.status === 403) {
             message.error(
               <span>
-                You are not authorized to create workspaces. <br /> Please
-                contact your administrator and request the{" "}
-                <b>Manage Workspaces</b> permission. <br /> For more
-                information, visit the{" "}
-                <a
-                  target="_blank"
-                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
-                >
+                You are not authorized to create workspaces. <br /> Please contact your administrator and request the{" "}
+                <b>Manage Workspaces</b> permission. <br /> For more information, visit the{" "}
+                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
                   Terrakube documentation
                 </a>
                 .
               </span>
             );
-          }
-          else {
+          } else {
             message.error(
-              <span>
-                An error occurred while submitting the workspace. Please contact your system administrator.
-              </span>
-            )
+              <span>An error occurred while submitting the workspace. Please contact your system administrator.</span>
+            );
           }
         }
       });
   };
 
-  const handleChange = (currentVal) => {
+  const handleChange = (currentVal: number) => {
     setCurrent(currentVal);
     if (currentVal === 3) {
       setStep3Hidden(false);
@@ -376,8 +368,7 @@ export const CreateWorkspace = () => {
       {
         id: "terraform",
         name: "Terraform",
-        description:
-          "Create an empty template. So you can define your template from scratch.",
+        description: "Create an empty template. So you can define your template from scratch.",
         icon: "/providers/terraform.svg",
       },
       { id: "tofu", name: "OpenTofu", icon: "/providers/opentofu.png" },
@@ -395,11 +386,7 @@ export const CreateWorkspace = () => {
             title: organizationName,
           },
           {
-            title: (
-              <Link to={`/organizations/${organizationId}/workspaces`}>
-                Workspaces
-              </Link>
-            ),
+            title: <Link to={`/organizations/${organizationId}/workspaces`}>Workspaces</Link>,
           },
           {
             title: "New Workspace",
@@ -411,17 +398,10 @@ export const CreateWorkspace = () => {
         <div className="createWorkspace">
           <h2>Create a new Workspace</h2>
           <div className="App-text">
-            Workspaces determine how Terrakube organizes infrastructure. A
-            workspace contains your configuration (infrastructure as code),
-            shared variable values, your current and historical state, and run
-            logs.
+            Workspaces determine how Terrakube organizes infrastructure. A workspace contains your configuration
+            (infrastructure as code), shared variable values, your current and historical state, and run logs.
           </div>
-          <Steps
-            direction="horizontal"
-            size="small"
-            current={current}
-            onChange={handleChange}
-          >
+          <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
             <Step title="Choose IaC Type" />
             <Step title="Choose Type" />
             {versionControlFlow ? (
@@ -475,8 +455,8 @@ export const CreateWorkspace = () => {
                 </IconContext.Provider>
                 <span className="workflowType">Version control workflow</span>
                 <div className="workflowDescription App-text">
-                  Store your {iacType?.name} configuration in a git repository,
-                  and trigger runs based on pull requests and merges.
+                  Store your {iacType?.name} configuration in a git repository, and trigger runs based on pull requests
+                  and merges.
                 </div>
                 <div className="workflowSelect"></div>
               </Card>
@@ -486,8 +466,7 @@ export const CreateWorkspace = () => {
                 </IconContext.Provider>
                 <span className="workflowType">CLI-driven workflow</span>
                 <div className="workflowDescription App-text">
-                  Trigger remote {iacType?.name} runs from your local command
-                  line.
+                  Trigger remote {iacType?.name} runs from your local command line.
                 </div>
               </Card>
               <Card hoverable onClick={handleCliDriven}>
@@ -496,8 +475,8 @@ export const CreateWorkspace = () => {
                 </IconContext.Provider>
                 <span className="workflowType">API-driven workflow</span>
                 <div className="workflowDescription App-text">
-                  A more advanced option. Integrate {iacType?.name} into a
-                  larger pipeline using the {iacType?.name} API.
+                  A more advanced option. Integrate {iacType?.name} into a larger pipeline using the {iacType?.name}{" "}
+                  API.
                 </div>
               </Card>
             </Space>
@@ -507,8 +486,8 @@ export const CreateWorkspace = () => {
             <Space className="chooseType" direction="vertical">
               <h3>Connect to a version control provider</h3>
               <div className="workflowDescription2 App-text">
-                Choose the version control provider that hosts the{" "}
-                {iacType?.name}&nbsp; configuration for this workspace.
+                Choose the version control provider that hosts the {iacType?.name}&nbsp; configuration for this
+                workspace.
               </div>
 
               {vcsButtonsVisible ? (
@@ -523,10 +502,10 @@ export const CreateWorkspace = () => {
                     >
                       &nbsp;Git
                     </Button>
-                    {loading || !vcs.data ? (
+                    {loading ? (
                       <p>Data loading...</p>
                     ) : (
-                      vcs.data.map(function (item, i) {
+                      vcs.map(function (item) {
                         return (
                           <Button
                             icon={renderVCSLogo(item.attributes.vcsType)}
@@ -542,11 +521,7 @@ export const CreateWorkspace = () => {
                     )}
                   </Space>{" "}
                   <br />
-                  <Button
-                    onClick={handleConnectDifferent}
-                    className="link"
-                    type="link"
-                  >
+                  <Button onClick={handleConnectDifferent} className="link" type="link">
                     Connect to a different VCS
                   </Button>
                 </div>
@@ -582,11 +557,7 @@ export const CreateWorkspace = () => {
                     </Dropdown>
                   </Space>
                   <br />
-                  <Button
-                    onClick={handleConnectExisting}
-                    className="link"
-                    type="link"
-                  >
+                  <Button onClick={handleConnectExisting} className="link" type="link">
                     Use an existing VCS connection
                   </Button>
                 </div>
@@ -603,15 +574,10 @@ export const CreateWorkspace = () => {
             validateMessages={validateMessages}
             initialValues={{ folder: "/" }}
           >
-            <Space
-              hidden={step2Hidden}
-              className="chooseType"
-              direction="vertical"
-            >
+            <Space hidden={step2Hidden} className="chooseType" direction="vertical">
               <h3>Choose a repository</h3>
               <div className="workflowDescription2 App-text">
-                Choose the repository that hosts your {iacType?.name} source
-                code.
+                Choose the repository that hosts your {iacType?.name} source code.
               </div>
               <Form.Item
                 name="source"
@@ -621,8 +587,9 @@ export const CreateWorkspace = () => {
                 rules={[
                   {
                     required: true,
-                    pattern:
-                      "(empty)|(((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)?(/)?)",
+                    pattern: new RegExp(
+                      "(empty)|(((git|ssh|http(s)?)|(git@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(\\.git)?(/)?)"
+                    ),
                   },
                 ]}
               >
@@ -635,11 +602,7 @@ export const CreateWorkspace = () => {
               </Form.Item>
             </Space>
 
-            <Space
-              hidden={step3Hidden}
-              className="chooseType"
-              direction="vertical"
-            >
+            <Space hidden={step3Hidden} className="chooseType" direction="vertical">
               <h3>Configure settings</h3>
               <Form.Item
                 name="name"
@@ -648,8 +611,7 @@ export const CreateWorkspace = () => {
                   { required: true },
                   {
                     pattern: /^[A-Za-z0-9_-]+$/,
-                    message:
-                      "Only dashes, underscores, and alphanumeric characters are permitted.",
+                    message: "Only dashes, underscores, and alphanumeric characters are permitted.",
                   },
                 ]}
                 extra="The name of your workspace is unique and used in tools, routing, and UI. Dashes, underscores, and alphanumeric characters are permitted."
@@ -660,22 +622,20 @@ export const CreateWorkspace = () => {
               <Form.Item
                 name="branch"
                 label="VCS branch"
-                placeholder="(default branch)"
                 extra="The branch from which the runs are kicked off, this is used for runs issued from the UI."
                 rules={[{ required: true }]}
                 hidden={!versionControlFlow}
               >
-                <Input />
+                <Input placeholder="(default branch)" />
               </Form.Item>
               <Form.Item
                 name="folder"
                 label={iacType?.name + " Working Directory"}
-                placeholder="/"
                 extra=" Default workspace directory. Use / for the root folder"
                 rules={[{ required: true }]}
                 hidden={!versionControlFlow}
               >
-                <Input />
+                <Input placeholder="/" />
               </Form.Item>
               <Form.Item
                 name="defaultTemplate"
@@ -685,12 +645,8 @@ export const CreateWorkspace = () => {
                 hidden={!versionControlFlow}
               >
                 <Select placeholder="Select Template" style={{ width: 250 }}>
-                  {orgTemplates.map(function (template, index) {
-                    return (
-                      <Option key={template?.id}>
-                        {template?.attributes?.name}
-                      </Option>
-                    );
+                  {orgTemplates.map(function (template) {
+                    return <Option key={template?.id}>{template?.attributes?.name}</Option>;
                   })}
                 </Select>
               </Form.Item>
@@ -699,13 +655,11 @@ export const CreateWorkspace = () => {
                 label={iacType?.name + " Version"}
                 rules={[{ required: true }]}
                 extra={
-                  "The version of " +
-                  iacType?.name +
-                  " to use for this workspace. It will not upgrade automatically."
+                  "The version of " + iacType?.name + " to use for this workspace. It will not upgrade automatically."
                 }
               >
                 <Select placeholder="select version" style={{ width: 250 }}>
-                  {terraformVersions.map(function (name, index) {
+                  {terraformVersions.map(function (name) {
                     return <Option key={name}>{name}</Option>;
                   })}
                 </Select>
@@ -719,12 +673,8 @@ export const CreateWorkspace = () => {
                 rules={[{ required: false }]}
               >
                 <Select placeholder="select SSH Key" style={{ width: 250 }}>
-                  {sshKeys.map(function (sshKey, index) {
-                    return (
-                      <Option key={sshKey?.id}>
-                        {sshKey?.attributes?.name}
-                      </Option>
-                    );
+                  {sshKeys.map(function (sshKey) {
+                    return <Option key={sshKey?.id}>{sshKey?.attributes?.name}</Option>;
                   })}
                 </Select>
               </Form.Item>

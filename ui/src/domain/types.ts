@@ -235,3 +235,12 @@ export type ActionAttributes = {
   version: string;
   active: boolean;
 };
+
+// User tokens
+
+export type UserToken = {
+  id: string;
+  deleted: boolean;
+  days: number;
+  description: string;
+} & AuditFieldBase;
