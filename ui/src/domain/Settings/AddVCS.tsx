@@ -146,6 +146,13 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         handleVCSClick("AZURE_DEVOPS");
       },
     },
+    {
+      label: "Azure DevOps (PAT)",
+      key: "2",
+      onClick: () => {
+        handleVCSClick("AZURE_DEVOPS", "PAT");
+      },
+    },
   ];
   const getDocsUrl = (vcs) => {
     switch (vcs) {

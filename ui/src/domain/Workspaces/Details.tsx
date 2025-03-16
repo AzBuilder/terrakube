@@ -9,7 +9,7 @@ import {
   SyncOutlined,
   ThunderboltOutlined,
   UnlockOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Alert,
@@ -28,7 +28,7 @@ import {
   Table,
   Tabs,
   Tag,
-  Typography
+  Typography,
 } from "antd";
 import { React, useEffect, useState } from "react";
 import { IconContext } from "react-icons";
@@ -37,11 +37,7 @@ import { FiGitCommit } from "react-icons/fi";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ActionLoader from "../../ActionLoader.jsx";
-import {
-  ORGANIZATION_ARCHIVE,
-  ORGANIZATION_NAME,
-  WORKSPACE_ARCHIVE,
-} from "../../config/actionTypes";
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME, WORKSPACE_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
 import { CreateJob } from "../Jobs/Create";
 import { DetailsJob } from "../Jobs/Details";
@@ -55,11 +51,7 @@ import { getServiceIcon } from "./Icons.jsx";
 import { WorkspaceAdvanced } from "./Settings/Advanced.jsx";
 import { WorkspaceGeneral } from "./Settings/General";
 import { WorkspaceWebhook } from "./Settings/Webhook.jsx";
-import {
-  getIaCIconById,
-  getIaCNameById,
-  renderVCSLogo,
-} from "./Workspaces";
+import { getIaCIconById, getIaCNameById, renderVCSLogo } from "./Workspaces";
 import "./Workspaces.css";
 const { Option } = Select;
 const { Paragraph } = Typography;
@@ -78,7 +70,12 @@ const { DateTime } = require("luxon");
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
-export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
+type Props = {
+  setOrganizationName: React.Dispatch<React.SetStateAction<string>>;
+  selectedTab?: string;
+};
+
+export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) => {
   const navigate = useNavigate();
   const { id, runid, orgid } = useParams();
   if (orgid !== null && orgid !== undefined && orgid !== "") {
@@ -106,9 +103,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [jobVisible, setJobVisible] = useState(false);
   const [organizationNameLocal, setOrganizationNameLocal] = useState([]);
   const [workspaceName, setWorkspaceName] = useState("...");
-  const [activeKey, setActiveKey] = useState(
-    selectedTab !== null ? selectedTab : "1"
-  );
+  const [activeKey, setActiveKey] = useState(selectedTab !== null ? selectedTab : "1");
   const [templates, setTemplates] = useState([]);
   const [lastRun, setLastRun] = useState("");
   const [executionMode, setExecutionMode] = useState("...");
@@ -122,9 +117,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   const [contextState, setContextState] = useState({});
   const handleClick = (jobid) => {
     changeJob(jobid);
-    navigate(
-      `/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`
-    );
+    navigate(`/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`);
   };
 
   const outputColumns = [
@@ -179,12 +172,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
       sorter: (a, b) => a.type.localeCompare(b.type),
       render: (text, record) => (
         <>
-          <Avatar
-            shape="square"
-            size="small"
-            src={getServiceIcon(record.provider, record.type)}
-          />{" "}
-          &nbsp;{text}
+          <Avatar shape="square" size="small" src={getServiceIcon(record.provider, record.type)} /> &nbsp;{text}
         </>
       ),
     },
@@ -202,12 +190,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   };
 
   const loadOrgTemplates = () => {
-    axiosInstance
-      .get(`organization/${organizationId}/template`)
-      .then((response) => {
-        console.log(response.data.data);
-        setOrgTemplates(response.data.data);
-      });
+    axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
+      console.log(response.data.data);
+      setOrgTemplates(response.data.data);
+    });
   };
 
   const showDrawer = (record) => {
@@ -219,36 +205,24 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
     setActiveKey(key);
     switch (key) {
       case "1":
-        navigate(
-          `/organizations/${organizationId}/workspaces/${id}`
-        );
+        navigate(`/organizations/${organizationId}/workspaces/${id}`);
         break;
       case "2":
         setJobVisible(false);
-        navigate(
-          `/organizations/${organizationId}/workspaces/${id}/runs`
-        );
+        navigate(`/organizations/${organizationId}/workspaces/${id}/runs`);
         break;
       case "3":
         setStateDetailsVisible(false);
-        navigate(
-          `/organizations/${organizationId}/workspaces/${id}/states`
-        );
+        navigate(`/organizations/${organizationId}/workspaces/${id}/states`);
         break;
       case "4":
-        navigate(
-          `/organizations/${organizationId}/workspaces/${id}/variables`
-        );
+        navigate(`/organizations/${organizationId}/workspaces/${id}/variables`);
         break;
       case "5":
-        navigate(
-          `/organizations/${organizationId}/workspaces/${id}/schedules`
-        );
+        navigate(`/organizations/${organizationId}/workspaces/${id}/schedules`);
         break;
       case "6":
-        navigate(
-          `/organizations/${organizationId}/workspaces/${id}/settings`
-        );
+        navigate(`/organizations/${organizationId}/workspaces/${id}/settings`);
         break;
       default:
         break;
@@ -278,9 +252,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
 
   const fetchActions = async () => {
     try {
-      const response = await axiosInstance.get(
-        `action?filter[action]=active==true;type=in=('Workspace/Action')`
-      );
+      const response = await axiosInstance.get(`action?filter[action]=active==true;type=in=('Workspace/Action')`);
       console.log("Actions:", response.data);
       const fetchedActions = response.data.data || [];
       setActions(fetchedActions);
@@ -310,81 +282,83 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
   };
 
   const loadPermissionSet = () => {
-    console.log("Loading Organization Permission Values")
-    const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}`;
+    console.log("Loading Organization Permission Values");
+    const url = `${
+      new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+    }/access-token/v1/teams/permissions/organization/${organizationId}`;
     axiosInstance.get(url).then((response) => {
-      console.log(response.data)
+      console.log(response.data);
       setManageState(response.data.manageState);
       setManageWorkspace(response.data.manageWorkspace);
 
-      if(id !== undefined && id !== null) {
-        console.log("Loading Workspace Permission Values: " + id)
-        const urlWorkspaceAccess = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${id}`;
+      if (id !== undefined && id !== null) {
+        console.log("Loading Workspace Permission Values: " + id);
+        const urlWorkspaceAccess = `${
+          new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+        }/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${id}`;
         axiosInstance.get(urlWorkspaceAccess).then((response) => {
-          console.log(response.data)
+          console.log(response.data);
           setManageState(response.data.manageState);
           setManageWorkspace(response.data.manageWorkspace);
-        })
+        });
       }
-    })
+    });
   };
 
   const loadWorkspace = (_loadVersions, _loadWebhook, _loadPermissionSet) => {
     var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,reference`;
     if (_loadWebhook) url += ",webhook";
-    axiosInstance
-      .get(`organization/${organizationId}/template`)
-      .then((template) => {
-        setTemplates(template.data.data);
-        axiosInstance
-          .get(
-            `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook,reference`
-          )
-          .then((response) => {
-            if (_loadPermissionSet)
-              loadPermissionSet()
+    axiosInstance.get(`organization/${organizationId}/template`).then((template) => {
+      setTemplates(template.data.data);
+      axiosInstance
+        .get(
+          `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,webhook,reference`
+        )
+        .then((response) => {
+          if (_loadPermissionSet) loadPermissionSet();
 
-            setWorkspace(response.data);
-            console.log(response.data);
-            if (response.data.included) {
-              setupWorkspaceIncludes(
-                response.data,
-                setVariables,
-                setJobs,
-                setEnvVariables,
-                setHistory,
-                setSchedule,
-                template.data.data,
-                setLastRun,
-                setVCSProvider,
-                setCurrentStateId,
-                currentStateId,
-                axiosInstance,
-                setResources,
-                setOutputs,
-                setAgent,
-                _loadWebhook,
-                setContextState,
-                setCollectionVariables, setCollectionEnvVariables, setGlobalVariables, setGlobalEnvVariables
-              );
-            }
-
-            const organization = response.data.included.find(
-              (item) => item.type === "organization"
+          setWorkspace(response.data);
+          console.log(response.data);
+          if (response.data.included) {
+            setupWorkspaceIncludes(
+              response.data,
+              setVariables,
+              setJobs,
+              setEnvVariables,
+              setHistory,
+              setSchedule,
+              template.data.data,
+              setLastRun,
+              setVCSProvider,
+              setCurrentStateId,
+              currentStateId,
+              axiosInstance,
+              setResources,
+              setOutputs,
+              setAgent,
+              _loadWebhook,
+              setContextState,
+              setCollectionVariables,
+              setCollectionEnvVariables,
+              setGlobalVariables,
+              setGlobalEnvVariables
             );
-            if (organization) {
-              const organizationName = organization.attributes.name;
-              setOrganizationName(organizationName);
-              sessionStorage.setItem(ORGANIZATION_NAME, organizationName);
-              console.log(organizationName);
-            }
-            setOrganizationNameLocal(sessionStorage.getItem(ORGANIZATION_NAME));
-            setWorkspaceName(response.data.data.attributes.name);
-            setExecutionMode(response.data.data.attributes.executionMode);
-            if (runid && _loadVersions) changeJob(runid); // if runid is provided, show the job details
-            fetchActions();
-          });
-      });
+          }
+
+          const organization = response.data.included.find((item) => item.type === "organization");
+          if (organization) {
+            const organizationName = organization.attributes.name;
+            setOrganizationName(organizationName);
+            sessionStorage.setItem(ORGANIZATION_NAME, organizationName);
+            console.log(organizationName);
+          }
+          setOrganizationNameLocal(sessionStorage.getItem(ORGANIZATION_NAME));
+          setWorkspaceName(response.data.data.attributes.name);
+          setExecutionMode(response.data.data.attributes.executionMode);
+          if (runid && _loadVersions) changeJob(runid); // if runid is provided, show the job details
+          fetchActions();
+        });
+    });
   };
 
   const handleClickSettings = () => {
@@ -429,11 +403,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
             title: organizationNameLocal,
           },
           {
-            title: (
-              <Link to={`/organizations/${organizationId}/workspaces`}>
-                Workspaces
-              </Link>
-            ),
+            title: <Link to={`/organizations/${organizationId}/workspaces`}>Workspaces</Link>,
           },
           {
             title: workspaceName,
@@ -453,112 +423,85 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                 <h2>{workspace.data.attributes.name}</h2>
               </div>
               <Space className="workspace-details" direction="vertical">
-                <Paragraph
-                  style={{ margin: "0px" }}
-                  copyable={{ text: id, tooltips: false }}
-                >
+                <Paragraph style={{ margin: "0px" }} copyable={{ text: id, tooltips: false }}>
                   <span className="workspace-details"> ID: {id} </span>
                 </Paragraph>
-                {(workspace.data.attributes?.description === "") ? (
-                  <a
-                    className="workspace-button"
-                    onClick={handleClickSettings}
-                    style={{ color: "#3b3d45" }}
-                  >
+                {workspace.data.attributes?.description === "" ? (
+                  <a className="workspace-button" onClick={handleClickSettings} style={{ color: "#3b3d45" }}>
                     Add workspace description
                   </a>
-                )
-                  :
-                  (
-                    workspace.data.attributes.description
-                  )}
-                <Space
-                    size={40}
-                    style={{marginBottom: "40px"}}
-                    direction="horizontal"
-                >
+                ) : (
+                  workspace.data.attributes.description
+                )}
+                <Space size={40} style={{ marginBottom: "40px" }} direction="horizontal">
                   <span>
                     {workspace.data.attributes.locked ? (
-                        <>
-                          <LockOutlined/> Locked
-                        </>
+                      <>
+                        <LockOutlined /> Locked
+                      </>
                     ) : (
-                        <>
-                          <UnlockOutlined/> Unlocked
-                        </>
+                      <>
+                        <UnlockOutlined /> Unlocked
+                      </>
                     )}
                   </span>
                   <span>
-                    <ProfileOutlined/> Resources{" "}
-                    <span style={{fontWeight: "500"}}>
-                      {resources.length}
-                    </span>
+                    <ProfileOutlined /> Resources <span style={{ fontWeight: "500" }}>{resources.length}</span>
                   </span>
                   <Space direction="horizontal">
                     {getIaCIconById(workspace.data.attributes?.iacType)}
                     <span>
                       {getIaCNameById(workspace.data.attributes?.iacType)}{" "}
-                      <a
-                          onClick={handleClickSettings}
-                          className="workspace-button"
-                          style={{color: "#3b3d45"}}
-                      >
+                      <a onClick={handleClickSettings} className="workspace-button" style={{ color: "#3b3d45" }}>
                         v{workspace.data.attributes.terraformVersion}
                       </a>
                     </span>
                   </Space>
 
                   <span>
-                    <ClockCircleOutlined/> Updated{" "}
-                    <span style={{fontWeight: "500"}}>
-                      {DateTime.fromISO(lastRun).toRelative() ??
-                          "never executed"}
+                    <ClockCircleOutlined /> Updated{" "}
+                    <span style={{ fontWeight: "500" }}>
+                      {DateTime.fromISO(lastRun).toRelative() ?? "never executed"}
                     </span>
                   </span>
 
                   <span>
                     {workspace.data.attributes.locked ? (
-                        <>
-                          <Alert
-                              message="Lock Description"
-                              description= {workspace.data.attributes.lockDescription}
-                              type="warning"
-                              showIcon
-                          />
-                        </>
+                      <>
+                        <Alert
+                          message="Lock Description"
+                          description={workspace.data.attributes.lockDescription}
+                          type="warning"
+                          showIcon
+                        />
+                      </>
                     ) : (
-                        <>
-                        </>
+                      <></>
                     )}
                   </span>
                 </Space>
               </Space>
 
               <Tabs
-                  activeKey={activeKey}
-                  defaultActiveKey={selectedTab}
-                  onTabClick={handleStatesClick}
-                  tabBarExtraContent={
-                    <>
-                      <Space direction="horizontal">
-                        {actions &&
-                            actions
-                                .reduce((acc, action) => {
-                                  if (!action.attributes.displayCriteria) {
-                                    acc.push(action);
+                activeKey={activeKey}
+                defaultActiveKey={selectedTab}
+                onTabClick={handleStatesClick}
+                tabBarExtraContent={
+                  <>
+                    <Space direction="horizontal">
+                      {actions &&
+                        actions
+                          .reduce((acc, action) => {
+                            if (!action.attributes.displayCriteria) {
+                              acc.push(action);
                               return acc;
                             }
 
                             let displayCriteria;
                             try {
-                              displayCriteria = JSON.parse(
-                                action.attributes.displayCriteria
-                              );
+                              displayCriteria = JSON.parse(action.attributes.displayCriteria);
                             } catch (error) {
-                              console.error(
-                                "Error parsing displayCriteria JSON:",
-                                error
-                              );
+                              console.error("Error parsing displayCriteria JSON:", error);
                               return acc;
                             }
 
@@ -567,9 +510,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                 workspace: workspace.data,
                                 state: contextState,
                                 resources: resources,
-                                apiUrl: new URL(
-                                  window._env_.REACT_APP_TERRAKUBE_API_URL
-                                ).origin,
+                                apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
                                 settings: action.settings,
                               });
                               if (settings) {
@@ -583,10 +524,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
 
                             return acc;
                           }, [])
-                          .filter(
-                            (action) =>
-                              action?.attributes.type === "Workspace/Action"
-                          )
+                          .filter((action) => action?.attributes.type === "Workspace/Action")
                           .map((action, index) => (
                             <ActionLoader
                               key={index}
@@ -595,9 +533,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                 workspace: workspace.data,
                                 state: contextState,
                                 resources: resources,
-                                apiUrl: new URL(
-                                  window._env_.REACT_APP_TERRAKUBE_API_URL
-                                ).origin,
+                                apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
                                 settings: action.settings,
                               }}
                             />
@@ -605,21 +541,13 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                       <Button
                         type="default"
                         htmlType="button"
-                        onClick={() =>
-                          handleLockButton(workspace.data.attributes.locked)
-                        }
-                        icon={
-                          workspace.data.attributes.locked ? (
-                            <UnlockOutlined />
-                          ) : (
-                            <LockOutlined />
-                          )
-                        }
+                        onClick={() => handleLockButton(workspace.data.attributes.locked)}
+                        icon={workspace.data.attributes.locked ? <UnlockOutlined /> : <LockOutlined />}
                         disabled={!manageWorkspace}
                       >
                         {workspace.data.attributes.locked ? "Unlock" : "Lock"}
                       </Button>
-                      <CreateJob changeJob={changeJob } />
+                      <CreateJob changeJob={changeJob} />
                     </Space>
                   </>
                 }
@@ -629,18 +557,13 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   <Row>
                     <Col span={19} style={{ paddingRight: "20px" }}>
                       {workspace.data.attributes.source === "empty" &&
-                        workspace.data.attributes.branch === "remote-content" &&
-                        workspace.data.relationships.history.data.length < 1 ? (
-                        <CLIDriven
-                          organizationName={organizationNameLocal}
-                          workspaceName={workspaceName}
-                        />
+                      workspace.data.attributes.branch === "remote-content" &&
+                      workspace.data.relationships.history.data.length < 1 ? (
+                        <CLIDriven organizationName={organizationNameLocal} workspaceName={workspaceName} />
                       ) : (
                         <div>
                           <h3>Latest Run</h3>
-                          <div
-                            style={{ marginRight: "150px", borderWidth: "1px" }}
-                          >
+                          <div style={{ marginRight: "150px", borderWidth: "1px" }}>
                             <List
                               itemLayout="horizontal"
                               style={{
@@ -650,41 +573,28 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                               dataSource={
                                 jobs.length > 0
                                   ? jobs
-                                    .sort((a, b) => a.id - b.id)
-                                    .reverse()
-                                    .slice(0, 1)
+                                      .sort((a, b) => a.id - b.id)
+                                      .reverse()
+                                      .slice(0, 1)
                                   : []
                               }
                               renderItem={(item) => (
                                 <List.Item>
                                   <List.Item.Meta
                                     style={{ margin: "0px", padding: "0px" }}
-                                    avatar={
-                                      <Avatar
-                                        shape="square"
-                                        icon={<UserOutlined />}
-                                      />
-                                    }
+                                    avatar={<Avatar shape="square" icon={<UserOutlined />} />}
                                     description={
                                       <div>
                                         <Row>
                                           <Col span={20}>
                                             <h4 className="ant-list-item-meta-title">
-                                              <a
-                                                onClick={() =>
-                                                  handleClick(item.id)
-                                                }
-                                              >
-                                                {item.title}
-                                              </a>{" "}
+                                              <a onClick={() => handleClick(item.id)}>{item.title}</a>{" "}
                                             </h4>
-                                            <b>{item.createdBy}</b> triggered a
-                                            run {item.latestChange} via{" "}
+                                            <b>{item.createdBy}</b> triggered a run {item.latestChange} via{" "}
                                             <b>{item.via || "UI"}</b>{" "}
                                             {item.commitId !== "000000000" ? (
                                               <>
-                                                <FiGitCommit />{" "}
-                                                {item.commitId?.substring(0, 6)}{" "}
+                                                <FiGitCommit /> {item.commitId?.substring(0, 6)}{" "}
                                               </>
                                             ) : (
                                               ""
@@ -695,23 +605,17 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                               <div className="textLeft">
                                                 <Tag
                                                   icon={
-                                                    item.status ==
-                                                      "completed" ? (
+                                                    item.status == "completed" ? (
                                                       <CheckCircleOutlined />
-                                                    ) : item.status ==
-                                                      "running" ? (
+                                                    ) : item.status == "running" ? (
                                                       <SyncOutlined spin />
-                                                    ) : item.status ===
-                                                      "waitingApproval" ? (
+                                                    ) : item.status === "waitingApproval" ? (
                                                       <ExclamationCircleOutlined />
-                                                    ) : item.status ===
-                                                      "cancelled" ? (
+                                                    ) : item.status === "cancelled" ? (
                                                       <StopOutlined />
-                                                    ) : item.status ===
-                                                      "failed" ? (
+                                                    ) : item.status === "failed" ? (
                                                       <StopOutlined />
-                                                    ) : item.status ===
-                                                      "notExecuted" ? (
+                                                    ) : item.status === "notExecuted" ? (
                                                       <CheckCircleOutlined />
                                                     ) : (
                                                       <ClockCircleOutlined />
@@ -730,13 +634,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                         <Row>
                                           <Col span={20}></Col>
                                           <Col>
-                                            <Button
-                                              onClick={() =>
-                                                handleClick(item.id)
-                                              }
-                                            >
-                                              See details
-                                            </Button>
+                                            <Button onClick={() => handleClick(item.id)}>See details</Button>
                                           </Col>
                                         </Row>
                                       </div>
@@ -753,22 +651,12 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                               {
                                 label: `Resources (${resources.length})`,
                                 key: "1",
-                                children: (
-                                  <Table
-                                    dataSource={resources}
-                                    columns={resourceColumns}
-                                  />
-                                ),
+                                children: <Table dataSource={resources} columns={resourceColumns} />,
                               },
                               {
                                 label: `Outputs (${outputs.length})`,
                                 key: "2",
-                                children: (
-                                  <Table
-                                    dataSource={outputs}
-                                    columns={outputColumns}
-                                  />
-                                ),
+                                children: <Table dataSource={outputs} columns={outputColumns} />,
                               },
                             ]}
                           />
@@ -788,20 +676,12 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                       <Space direction="vertical">
                         <br />
                         <span className="App-text">
-                          {workspace.data.attributes.branch !==
-                            "remote-content" ? (
+                          {workspace.data.attributes.branch !== "remote-content" ? (
                             <>
                               {" "}
                               {renderVCSLogo(vcsProvider)}{" "}
-                              <a
-                                href={fixSshURL(
-                                  workspace.data.attributes.source
-                                )}
-                                target="_blank"
-                              >
-                                {new URL(
-                                  fixSshURL(workspace.data.attributes.source)
-                                )?.pathname
+                              <a href={fixSshURL(workspace.data.attributes.source)} target="_blank">
+                                {new URL(fixSshURL(workspace.data.attributes.source))?.pathname
                                   ?.replace(".git", "")
                                   ?.substring(1)}
                               </a>
@@ -816,19 +696,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                           )}
                         </span>
                         <span className="App-text">
-                          <ThunderboltOutlined /> Execution Mode:{" "}
-                          <a onClick={handleClickSettings}>{executionMode}</a>{" "}
+                          <ThunderboltOutlined /> Execution Mode: <a onClick={handleClickSettings}>{executionMode}</a>{" "}
                         </span>
                         <span className="App-text">
                           <PlayCircleOutlined /> Auto apply: <a>Off</a>{" "}
                         </span>
                         <Divider />
                         <h4>Tags</h4>
-                        <Tags
-                          organizationId={organizationId}
-                          workspaceId={id}
-                          manageWorkspace={manageWorkspace}
-                        />
+                        <Tags organizationId={organizationId} workspaceId={id} manageWorkspace={manageWorkspace} />
                       </Space>
                     </Col>
                   </Row>
@@ -870,42 +745,24 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                                   {item.status}
                                 </Tag>{" "}
                                 <br />
-                                <span className="metadata">
-                                  {item.latestChange}
-                                </span>
+                                <span className="metadata">{item.latestChange}</span>
                               </div>
                             }
                           >
                             <List.Item.Meta
                               style={{ margin: "0px", padding: "0px" }}
-                              avatar={
-                                <Avatar
-                                  shape="square"
-                                  icon={<UserOutlined />}
-                                />
-                              }
-                              title={
-                                <a onClick={() => handleClick(item.id)}>
-                                  {item.title}
-                                </a>
-                              }
+                              avatar={<Avatar shape="square" icon={<UserOutlined />} />}
+                              title={<a onClick={() => handleClick(item.id)}>{item.title}</a>}
                               description={
                                 <span>
                                   {" "}
                                   #job-{item.id} |
                                   {item.commitId !== "000000000" ? (
-                                    <>
-                                      {" "}
-                                      commitId {item.commitId?.substring(
-                                        0,
-                                        6
-                                      )}{" "}
-                                    </>
+                                    <> commitId {item.commitId?.substring(0, 6)} </>
                                   ) : (
                                     ""
                                   )}
-                                  | <b>{item.createdBy}</b> triggered via{" "}
-                                  {item.via || "UI"}
+                                  | <b>{item.createdBy}</b> triggered via {item.via || "UI"}
                                 </span>
                               }
                             />
@@ -928,42 +785,50 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }) => {
                   />
                 </TabPane>
                 <TabPane tab="Variables" key="4">
-                <Variables vars={variables} env={envVariables} manageWorkspace={manageWorkspace} collectionVars={collectionVariables} collectionEnvVars={collectionEnvVariables} globalVariables={globalVariables} globalEnvVariables={globalEnvVariables}/>
+                  <Variables
+                    vars={variables}
+                    env={envVariables}
+                    manageWorkspace={manageWorkspace}
+                    collectionVars={collectionVariables}
+                    collectionEnvVars={collectionEnvVariables}
+                    globalVariables={globalVariables}
+                    globalEnvVariables={globalEnvVariables}
+                  />
                 </TabPane>
                 <TabPane tab="Schedules" key="5">
-                  {templates ? (
-                    <Schedules schedules={schedule} manageWorkspace={manageWorkspace} />
-                  ) : (
-                    <p>Loading...</p>
-                  )}
+                  {templates ? <Schedules schedules={schedule} manageWorkspace={manageWorkspace} /> : <p>Loading...</p>}
                 </TabPane>
                 <Tabs tab="Settings" key="6">
-                  <Tabs tabPosition="left"
+                  <Tabs
+                    tabPosition="left"
                     items={[
                       {
                         label: "General",
                         key: "61",
-                        children: <WorkspaceGeneral 
-                          workspaceData={workspace.data}
-                          orgTemplates={orgTemplates}
-                          manageWorkspace={manageWorkspace}
-                        />
+                        children: (
+                          <WorkspaceGeneral
+                            workspaceData={workspace.data}
+                            orgTemplates={orgTemplates}
+                            manageWorkspace={manageWorkspace}
+                          />
+                        ),
                       },
                       {
                         label: "Webhook",
                         key: "62",
-                        children: <WorkspaceWebhook
-                          workspace={workspace.data}
-                          vcsProvider={vcsProvider}
-                          orgTemplates={orgTemplates}
-                          manageWorkspace={manageWorkspace} />
+                        children: (
+                          <WorkspaceWebhook
+                            workspace={workspace.data}
+                            vcsProvider={vcsProvider}
+                            orgTemplates={orgTemplates}
+                            manageWorkspace={manageWorkspace}
+                          />
+                        ),
                       },
                       {
                         label: "Advanced",
                         key: "63",
-                        children: <WorkspaceAdvanced
-                          workspace={workspace.data}
-                          manageWorkspace={manageWorkspace} />
+                        children: <WorkspaceAdvanced workspace={workspace.data} manageWorkspace={manageWorkspace} />,
                       },
                     ]}
                   />
@@ -1018,32 +883,30 @@ function setupWorkspaceIncludes(
     switch (element.type) {
       case include.ORGANIZATION:
         console.log("Checking global variables");
-        axiosInstance
-            .get(`/organization/${element.id}/globalvar`).then((response) => {
-              console.log(`Global Variables Data: ${JSON.stringify(response.data.data)}`)
-              let globalVar = response.data.data;
-              if (globalVar != null ) {
-                globalVar.forEach((variableItem) => {
-                  console.log(`Variable: ${JSON.stringify(variableItem)}`);
-                  if (variableItem.attributes.category === "ENV") {
-                    console.log(`Adding global var env`);
-                    globalEnvVariables.push({
-                      id: variableItem.id,
-                      type: variableItem.type,
-                      ...variableItem.attributes,
-                    });
-                  } else {
-                    console.log(`Adding global var terraform`);
-                    globalVariables.push({
-                      id: variableItem.id,
-                      type: variableItem.type,
-                      ...variableItem.attributes,
-                    });
-                  }
-                })
+        axiosInstance.get(`/organization/${element.id}/globalvar`).then((response) => {
+          console.log(`Global Variables Data: ${JSON.stringify(response.data.data)}`);
+          let globalVar = response.data.data;
+          if (globalVar != null) {
+            globalVar.forEach((variableItem) => {
+              console.log(`Variable: ${JSON.stringify(variableItem)}`);
+              if (variableItem.attributes.category === "ENV") {
+                console.log(`Adding global var env`);
+                globalEnvVariables.push({
+                  id: variableItem.id,
+                  type: variableItem.type,
+                  ...variableItem.attributes,
+                });
+              } else {
+                console.log(`Adding global var terraform`);
+                globalVariables.push({
+                  id: variableItem.id,
+                  type: variableItem.type,
+                  ...variableItem.attributes,
+                });
               }
-            }
-        )
+            });
+          }
+        });
         break;
       case include.JOB:
         let finalColor = "";
@@ -1072,15 +935,11 @@ function setupWorkspaceIncludes(
         }
         jobs.push({
           id: element.id,
-          title:
-            "Queue manually using " +
-            getIaCNameById(data?.data?.attributes?.iacType),
+          title: "Queue manually using " + getIaCNameById(data?.data?.attributes?.iacType),
           statusColor: finalColor,
           commitId: element.attributes.commitId,
           stepNumber: element.attributes.stepNumber,
-          latestChange: DateTime.fromISO(
-            element.attributes.createdDate
-          ).toRelative(),
+          latestChange: DateTime.fromISO(element.attributes.createdDate).toRelative(),
           ...element.attributes,
         });
         setLastRun(element.attributes.updatedDate);
@@ -1089,12 +948,8 @@ function setupWorkspaceIncludes(
         console.log(element);
         history.push({
           id: element.id,
-          title:
-            "Queue manually using " +
-            getIaCNameById(data?.data?.attributes?.iacType),
-          relativeDate: DateTime.fromISO(
-            element.attributes.createdDate
-          ).toRelative(),
+          title: "Queue manually using " + getIaCNameById(data?.data?.attributes?.iacType),
+          relativeDate: DateTime.fromISO(element.attributes.createdDate).toRelative(),
           createdDate: element.attributes.createdDate,
           ...element.attributes,
         });
@@ -1103,9 +958,7 @@ function setupWorkspaceIncludes(
       case include.SCHEDULE:
         schedule.push({
           id: element.id,
-          name: templates?.find(
-            (template) => template.id === element.attributes.templateReference
-          )?.attributes?.name,
+          name: templates?.find((template) => template.id === element.attributes.templateReference)?.attributes?.name,
           ...element.attributes,
         });
         break;
@@ -1139,86 +992,75 @@ function setupWorkspaceIncludes(
         break;
       case include.REFERENCE:
         console.log("Checking references");
-        axiosInstance
-            .get(`/reference/${element.id}/collection?include=item`).then((response) => {
-              console.log(`Reference Data: ${response.data}`)
-              let collectionInfo = response.data.data;
-              if (response.data.included != null ) {
-                let items = response.data.included;
-                items.forEach((item) => {
-                  item.attributes.priority = collectionInfo.attributes.priority;
-                  item.attributes.collectionName = collectionInfo.attributes.name;
-                  if (item.attributes.category === "ENV") {
-                    collectionEnvVariables.push({
-                      id: item.id,
-                      type: item.type,
-                      ...item.attributes,
-                    });
-                  } else {
-                    collectionVariables.push({
-                      id: item.id,
-                      type: item.type,
-                      ...item.attributes,
-                    });
-                  }
-                })
+        axiosInstance.get(`/reference/${element.id}/collection?include=item`).then((response) => {
+          console.log(`Reference Data: ${response.data}`);
+          let collectionInfo = response.data.data;
+          if (response.data.included != null) {
+            let items = response.data.included;
+            items.forEach((item) => {
+              item.attributes.priority = collectionInfo.attributes.priority;
+              item.attributes.collectionName = collectionInfo.attributes.name;
+              if (item.attributes.category === "ENV") {
+                collectionEnvVariables.push({
+                  id: item.id,
+                  type: item.type,
+                  ...item.attributes,
+                });
+              } else {
+                collectionVariables.push({
+                  id: item.id,
+                  type: item.type,
+                  ...item.attributes,
+                });
               }
-            }
-          )
+            });
+          }
+        });
         break;
     }
   });
 
-  console.log("Setting all values for the UI")
+  console.log("Setting all values for the UI");
   setVariables(variables);
   setEnvVariables(envVariables);
   setJobs(jobs);
   setHistory(history);
-  setSchedule(schedule);  setCollectionVariables(collectionVariables)
-  setCollectionEnvVariables(collectionEnvVariables)
+  setSchedule(schedule);
+  setCollectionVariables(collectionVariables);
+  setCollectionEnvVariables(collectionEnvVariables);
   setGlobalVariables(globalVariables);
   setGlobalEnvVariables(globalEnvVariables);
 
-  console.log(
-    `Parsing state for workspace ${sessionStorage.getItem(WORKSPACE_ARCHIVE)} `
-  );
+  console.log(`Parsing state for workspace ${sessionStorage.getItem(WORKSPACE_ARCHIVE)} `);
   // set state data
-  var lastState = history
-    .sort((a, b) => a.jobReference - b.jobReference)
-    .reverse()[0];
+  var lastState = history.sort((a, b) => a.jobReference - b.jobReference).reverse()[0];
   // reload state only if there is a new version
   console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
     const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
     const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
-      const url = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${workspaceId}`;
-      axiosInstance.get(url).then((response) => {
-        console.log(`Manage Permission Workspace Set:`)
-        console.log(response.data)
-        loadState(
-            lastState,
-            axiosInstance,
-            setOutputs,
-            setResources,
-            sessionStorage.getItem(WORKSPACE_ARCHIVE),
-            setContextState,
-            response.data.manageState
-        );
-      })
+    const url = `${
+      new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+    }/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${workspaceId}`;
+    axiosInstance.get(url).then((response) => {
+      console.log(`Manage Permission Workspace Set:`);
+      console.log(response.data);
+      loadState(
+        lastState,
+        axiosInstance,
+        setOutputs,
+        setResources,
+        sessionStorage.getItem(WORKSPACE_ARCHIVE),
+        setContextState,
+        response.data.manageState
+      );
+    });
   }
   setCurrentStateId(lastState?.id);
 }
 
-function loadState(
-  state,
-  axiosInstance,
-  setOutputs,
-  setResources,
-  workspaceId,
-  setContextState,
-  manageState
-) {
-  console.log(`Loading State ${manageState} `)
+function loadState(state, axiosInstance, setOutputs, setResources, workspaceId, setContextState, manageState) {
+  console.log(`Loading State ${manageState} `);
   if (!state || !manageState) {
     return;
   }
@@ -1232,7 +1074,8 @@ function loadState(
     if (result.outputs.length < 1 && result.resources.length < 1) {
       axiosInstance
         .get(
-          `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
+          `${
+            new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
           }/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`
         )
         .then((currentStateData) => {
@@ -1240,9 +1083,7 @@ function loadState(
           console.log(currentStateData.data);
           currentState = currentStateData.data;
           setContextState(currentState);
-          console.log(
-            "Parsing state using current state data instead of json representation"
-          );
+          console.log("Parsing state using current state data instead of json representation");
           result = parseOldState(currentState);
 
           console.log("result parsing state", result);
@@ -1293,9 +1134,7 @@ function parseState(state) {
 
   // parse root module resources
   if (state?.values?.root_module?.resources != null) {
-    for (const [key, value] of Object.entries(
-      state?.values?.root_module?.resources
-    )) {
+    for (const [key, value] of Object.entries(state?.values?.root_module?.resources)) {
       resources.push({
         name: value.name,
         type: value.type,
@@ -1401,9 +1240,7 @@ function parseOldState(state) {
 
 function parseChildModules(resources, child_modules) {
   child_modules?.forEach((moduleVal, index) => {
-    console.log(
-      `Checking nested child ${moduleVal.address} with index ${index}`
-    );
+    console.log(`Checking nested child ${moduleVal.address} with index ${index}`);
     if (moduleVal.resources != null)
       for (const [key, value] of Object.entries(moduleVal.resources)) {
         resources.push({

@@ -1,18 +1,23 @@
-import { React, useState } from "react";
-import { Layout, Breadcrumb, Tabs,Tag } from "antd";
-import "./Settings.css";
-import { GeneralSettings } from "./General";
-import { TeamSettings } from "./Teams";
-import { VCSSettings } from "./VCS";
-import { TemplatesSettings } from "./Templates";
-import { ActionSettings } from "./Actions"
-import { TagsSettings } from "./Tags";
+import { Breadcrumb, Layout, Tabs, Tag } from "antd";
+import { useState } from "react";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
-import { SSHKeysSettings } from "./SSHKeys";
+import { ActionSettings } from "./Actions";
+import { GeneralSettings } from "./General";
 import { GlobalVariablesSettings } from "./GlobalVariables";
+import "./Settings.css";
+import { SSHKeysSettings } from "./SSHKeys";
+import { TagsSettings } from "./Tags";
+import { TeamSettings } from "./Teams";
+import { TemplatesSettings } from "./Templates";
+import { VCSSettings } from "./VCS";
 const { Content } = Layout;
 
-export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
+type Props = {
+  selectedTab?: string;
+  vcsMode?: "new" | "list";
+};
+
+export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
   const [key, setKey] = useState("");
   function callback(key) {
     setKey(key);
@@ -73,9 +78,13 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }) => {
               children: <TagsSettings />,
             },
             {
-              label: <>Actions <Tag color="blue">beta</Tag></>,
+              label: (
+                <>
+                  Actions <Tag color="blue">beta</Tag>
+                </>
+              ),
               key: "8",
-              children: <ActionSettings/>,
+              children: <ActionSettings />,
             },
           ]}
         />

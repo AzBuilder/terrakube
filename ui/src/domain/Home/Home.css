@@ -4,36 +4,34 @@
   margin-block: 10px;
 }
 
-
 .logo {
   float: left;
-    width: 35px;
-    margin-top: 16px;
-    margin-right: 10px;
+  width: 35px;
+  margin-top: 16px;
+  margin-right: 10px;
 }
 
-.user{
+.user {
   float: right;
-    height: 51px;
-    margin: 4px 0 10px 0;
+  height: 51px;
+  margin: 4px 0 10px 0;
 }
 
-
-.menu{
+.menu {
   float: left;
   width: 60%;
 }
 .site-layout-content {
-    min-height: 600px;
-    padding: 24px;
-    background: #fff;
+  min-height: 600px;
+  padding: 24px;
+  background: #fff;
 }
 
 .avatar-hover-effect {
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.65); 
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .avatar-hover-effect:hover {
-  color: #fff; 
+  color: #fff;
 }

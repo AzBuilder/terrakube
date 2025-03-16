@@ -1,22 +1,16 @@
-import { React, useEffect, useState } from "react";
-import "antd/dist/reset.css";
-import "./Home.css";
+import { PoweroffOutlined, QuestionCircleOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Dropdown, message } from "antd";
-import {
-  UserOutlined,
-  PoweroffOutlined,
-  QuestionCircleOutlined,
-} from "@ant-design/icons";
-import getUserFromStorage from "../../config/authUser";
-import { useAuth } from "../../config/authConfig";
+import "antd/dist/reset.css";
+import { ItemType } from "antd/es/menu/interface";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ORGANIZATION_ARCHIVE,
-  ORGANIZATION_NAME,
-} from "../../config/actionTypes";
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
+import { useAuth } from "../../config/authConfig";
+import getUserFromStorage from "../../config/authUser";
+import "./Home.css";
 
-export const ProfilePicture = (props) => {
-  const [username, setUsername] = useState(null);
+export const ProfilePicture = () => {
+  const [username, setUsername] = useState<string>();
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -32,12 +26,12 @@ export const ProfilePicture = (props) => {
 
   useEffect(() => {
     const user = getUserFromStorage();
-    if (user && user.profile) {
+    if (user && user.profile?.name) {
       setUsername(user.profile.name);
     }
   }, []);
 
-  const menuItems = [
+  const menuItems: ItemType[] = [
     {
       key: "user-id",
       label: (
@@ -61,11 +55,7 @@ export const ProfilePicture = (props) => {
       key: "help",
       icon: <QuestionCircleOutlined />,
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://docs.terrakube.io/"
-        >
+        <a target="_blank" rel="noopener noreferrer" href="https://docs.terrakube.io/">
           Help
         </a>
       ),
@@ -87,11 +77,7 @@ export const ProfilePicture = (props) => {
         }}
         trigger={["click"]}
       >
-        <Avatar
-          className="avatar-hover-effect"
-          size="default"
-          icon={<UserOutlined />}
-        />
+        <Avatar className="avatar-hover-effect" size="default" icon={<UserOutlined />} />
       </Dropdown>
     </>
   );
