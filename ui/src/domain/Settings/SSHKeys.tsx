@@ -1,28 +1,35 @@
-import { React, useState, useEffect } from "react";
-import {
-  Button,
-  List,
-  Popconfirm,
-  Form,
-  Modal,
-  Space,
-  Input,
-  Select,
-} from "antd";
-import "./Settings.css";
-import axiosInstance from "../../config/axiosConfig";
+import { DeleteOutlined } from "@ant-design/icons";
+import { Button, Form, Input, List, Modal, Popconfirm, Select, Space } from "antd";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import axiosInstance from "../../config/axiosConfig";
+import { SshKey } from "../types";
+import "./Settings.css";
 const { TextArea } = Input;
+
+type Params = {
+  orgid: string;
+};
+
+type AddSshKeyForm = {
+  name: string;
+} & UpdateSshKeyForm;
+
+type UpdateSshKeyForm = {
+  description: string;
+  sshType: string;
+  privateKey: string;
+};
+
 export const SSHKeysSettings = () => {
-  const { orgid } = useParams();
-  const [sshKeys, setSSHKeys] = useState([]);
+  const { orgid } = useParams<Params>();
+  const [sshKeys, setSSHKeys] = useState<SshKey[]>([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [sshKeyName, setSSHKeyName] = useState(false);
+  const [sshKeyName, setSSHKeyName] = useState<string>();
   const [mode, setMode] = useState("create");
-  const [sshKeyId, setSSHKeyId] = useState([]);
-  const [form] = Form.useForm();
+  const [sshKeyId] = useState([]);
+  const [form] = Form.useForm<AddSshKeyForm | UpdateSshKeyForm>();
   const onCancel = () => {
     setVisible(false);
   };
@@ -34,7 +41,7 @@ export const SSHKeysSettings = () => {
     setMode("create");
   };
 
-  const onDelete = (id) => {
+  const onDelete = (id: string) => {
     console.log("deleted " + id);
     axiosInstance.delete(`organization/${orgid}/ssh/${id}`).then((response) => {
       console.log(response);
@@ -42,7 +49,7 @@ export const SSHKeysSettings = () => {
     });
   };
 
-  const onCreate = (values) => {
+  const onCreate = (values: AddSshKeyForm) => {
     const body = {
       data: {
         type: "ssh",
@@ -70,7 +77,7 @@ export const SSHKeysSettings = () => {
       });
   };
 
-  const onUpdate = (values) => {
+  const onUpdate = (values: UpdateSshKeyForm) => {
     const body = {
       data: {
         type: "ssh",
@@ -101,7 +108,7 @@ export const SSHKeysSettings = () => {
   const loadSSHKeys = () => {
     axiosInstance.get(`organization/${orgid}/ssh`).then((response) => {
       console.log(response);
-      setSSHKeys(response.data);
+      setSSHKeys(response.data.data);
       setLoading(false);
     });
   };
@@ -114,9 +121,8 @@ export const SSHKeysSettings = () => {
     <div className="setting">
       <h1>SSH Keys</h1>
       <div className="App-text">
-        Terrakube uses these private SSH keys for downloading private Terraform
-        modules with Git-based sources during a Terraform run. SSH keys for
-        downloading modules are assigned per-workspace.
+        Terrakube uses these private SSH keys for downloading private Terraform modules with Git-based sources during a
+        Terraform run. SSH keys for downloading modules are assigned per-workspace.
       </div>
       <Button type="primary" onClick={onNew} htmlType="button">
         Add a Private SSH Key
@@ -124,12 +130,12 @@ export const SSHKeysSettings = () => {
       <br></br>
 
       <h3 style={{ marginTop: "30px" }}>SSH Keys</h3>
-      {loading || !sshKeys.data ? (
+      {loading ? (
         <p>Data loading...</p>
       ) : (
         <List
           itemLayout="horizontal"
-          dataSource={sshKeys.data}
+          dataSource={sshKeys}
           renderItem={(item) => (
             <List.Item
               actions={[
@@ -141,8 +147,8 @@ export const SSHKeysSettings = () => {
                   title={
                     <p>
                       This will permanently delete this SSH Key <br />
-                      Any workspaces configured with this SSH key will no longer
-                      use it to download Terraform modules. <br />
+                      Any workspaces configured with this SSH key will no longer use it to download Terraform modules.{" "}
+                      <br />
                       Are you sure?
                     </p>
                   }
@@ -156,10 +162,7 @@ export const SSHKeysSettings = () => {
                 </Popconfirm>,
               ]}
             >
-              <List.Item.Meta
-                description={item.attributes.description}
-                title={item.attributes.name}
-              />
+              <List.Item.Meta description={item.attributes.description} title={item.attributes.name} />
             </List.Item>
           )}
         />
@@ -168,11 +171,7 @@ export const SSHKeysSettings = () => {
       <Modal
         width="650px"
         open={visible}
-        title={
-          mode === "edit"
-            ? "Edit Private SSH Key " + sshKeyName
-            : "Add a new Private SSH Key"
-        }
+        title={mode === "edit" ? "Edit Private SSH Key " + sshKeyName : "Add a new Private SSH Key"}
         okText="Save SSH Key"
         onCancel={onCancel}
         cancelText="Cancel"
@@ -180,7 +179,7 @@ export const SSHKeysSettings = () => {
           form
             .validateFields()
             .then((values) => {
-              if (mode === "create") onCreate(values);
+              if (mode === "create") onCreate(values as AddSshKeyForm);
               else onUpdate(values);
             })
             .catch((info) => {
@@ -198,18 +197,10 @@ export const SSHKeysSettings = () => {
               ""
             )}
 
-            <Form.Item
-              name="description"
-              label="Description"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="description" label="Description" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item
-              name="sshType"
-              label="SSH Type"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="sshType" label="SSH Type" rules={[{ required: true }]}>
               <Select placeholder="Please select a ssh type">
                 <Select.Option value="rsa">RSA</Select.Option>
                 <Select.Option value="ed25519">ED25519</Select.Option>
@@ -221,14 +212,9 @@ export const SSHKeysSettings = () => {
               label="Private SSH Key"
               extra={
                 <p>
-                  Generate a new key with{" "}
-                  <code style={{ backgroundColor: "#ebeef2" }}>
-                    ssh-keygen -t rsa -m PEM
-                  </code>
-                  , and paste the private key. The contents should begin with{" "}
-                  <code style={{ backgroundColor: "#ebeef2" }}>
-                    -----BEGIN RSA PRIVATE KEY-----
-                  </code>
+                  Generate a new key with <code style={{ backgroundColor: "#ebeef2" }}>ssh-keygen -t rsa -m PEM</code>,
+                  and paste the private key. The contents should begin with{" "}
+                  <code style={{ backgroundColor: "#ebeef2" }}>-----BEGIN RSA PRIVATE KEY-----</code>
                 </p>
               }
             >

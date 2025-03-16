@@ -1,8 +1,8 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 import dynamicImportVars from "@rollup/plugin-dynamic-import-vars";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 import commonjs from "vite-plugin-commonjs";
-import viteTsconfigPaths from "vite-tsconfig-paths";
+//import viteTsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig(() => {
   return {
@@ -12,7 +12,11 @@ export default defineConfig(() => {
     build: {
       outDir: "build",
     },
-    plugins: [react(), commonjs(), viteTsconfigPaths()],
+    plugins: [
+      react(), 
+      commonjs(), 
+    //  viteTsconfigPaths()
+    ],
     rollup: {
       plugins: [
         dynamicImportVars({

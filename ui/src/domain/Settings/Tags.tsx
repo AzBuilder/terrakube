@@ -1,38 +1,28 @@
-import { React, useState, useEffect } from "react";
-import {
-  Button,
-  List,
-  Popconfirm,
-  Form,
-  Modal,
-  Space,
-  Input,
-  Switch,
-  Avatar,
-  Divider,
-} from "antd";
-import "./Settings.css";
-import axiosInstance from "../../config/axiosConfig";
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined, TagOutlined } from "@ant-design/icons";
+import { Avatar, Button, Form, Input, List, Modal, Popconfirm, Space } from "antd";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  InfoCircleOutlined,
-  TagOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import axiosInstance from "../../config/axiosConfig";
+import { Tag } from "../types";
+import "./Settings.css";
+
+type AddTagForm = {
+  name: string;
+};
+
 export const TagsSettings = () => {
   const { orgid } = useParams();
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [tagName, setTagName] = useState(false);
+  const [tagName, setTagName] = useState<string>();
   const [mode, setMode] = useState("create");
-  const [tagId, setTagId] = useState([]);
-  const [form] = Form.useForm();
+  const [tagId, setTagId] = useState<string>();
+  const [form] = Form.useForm<AddTagForm>();
   const onCancel = () => {
     setVisible(false);
   };
-  const onEdit = (id) => {
+  const onEdit = (id: string) => {
     setMode("edit");
     setTagId(id);
     setVisible(true);
@@ -52,7 +42,7 @@ export const TagsSettings = () => {
     setMode("create");
   };
 
-  const onDelete = (id) => {
+  const onDelete = (id: string) => {
     console.log("deleted " + id);
     axiosInstance.delete(`organization/${orgid}/tag/${id}`).then((response) => {
       console.log(response);
@@ -60,7 +50,7 @@ export const TagsSettings = () => {
     });
   };
 
-  const onCreate = (values) => {
+  const onCreate = (values: AddTagForm) => {
     const body = {
       data: {
         type: "tag",
@@ -85,7 +75,7 @@ export const TagsSettings = () => {
       });
   };
 
-  const onUpdate = (values) => {
+  const onUpdate = (values: AddTagForm) => {
     const body = {
       data: {
         type: "tag",
@@ -114,7 +104,7 @@ export const TagsSettings = () => {
   const loadTags = () => {
     axiosInstance.get(`organization/${orgid}/tag`).then((response) => {
       console.log(response);
-      setTags(response.data);
+      setTags(response.data.data);
       setLoading(false);
     });
   };
@@ -126,21 +116,19 @@ export const TagsSettings = () => {
   return (
     <div className="setting">
       <h1>Tag Management</h1>
-      <div className="App-text">
-        Tags are used to help identify and group together workspaces..
-      </div>
+      <div className="App-text">Tags are used to help identify and group together workspaces..</div>
       <Button type="primary" onClick={onNew} htmlType="button">
         Create tag
       </Button>
       <br></br>
 
       <h3 style={{ marginTop: "30px" }}>Tags</h3>
-      {loading || !tags.data ? (
+      {loading ? (
         <p>Data loading...</p>
       ) : (
         <List
           itemLayout="horizontal"
-          dataSource={tags.data}
+          dataSource={tags}
           renderItem={(item) => (
             <List.Item
               actions={[
@@ -178,12 +166,7 @@ export const TagsSettings = () => {
               ]}
             >
               <List.Item.Meta
-                avatar={
-                  <Avatar
-                    style={{ backgroundColor: "#1890ff" }}
-                    icon={<TagOutlined />}
-                  ></Avatar>
-                }
+                avatar={<Avatar style={{ backgroundColor: "#1890ff" }} icon={<TagOutlined />}></Avatar>}
                 title={item.attributes.name}
               />
             </List.Item>

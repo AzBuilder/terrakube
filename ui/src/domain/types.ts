@@ -15,6 +15,7 @@ export type Organization = {
 export type OrganizationAttributes = {
   description?: string;
   name: string;
+  executionMode?: string;
 };
 
 export type ApiResponse<T> = {
@@ -33,6 +34,10 @@ export type Template = {
 };
 export type TemplateAttributes = {
   name: string;
+  description: string;
+  tcl: string;
+  image: string;
+  color?: string;
 };
 
 // Jobs
@@ -89,6 +94,19 @@ export enum VcsType {
   PUBLIC = "PUBLIC",
 }
 
+export enum VcsTypeExtended {
+  GITHUB = "GITHUB",
+  GITHUB_ENTERPRISE = "GITHUB_ENTERPRISE",
+  GITLAB = "GITLAB",
+  GITLAB_ENTERPRISE = "GITLAB_ENTERPRISE",
+  GITLAB_COMMUNITY = "GITLAB_COMMUNITY",
+  BITBUCKET = "BITBUCKET",
+  BITBUCKET_SERVER = "BITBUCKET_SERVER",
+  AZURE_DEVOPS = "AZURE_DEVOPS",
+  AZURE_DEVOPS_SERVER = "AZURE_DEVOPS_SERVER",
+  PUBLIC = "PUBLIC",
+}
+
 export type VcsModel = {
   id: string;
   attributes: VcsAttributes;
@@ -97,7 +115,23 @@ export type VcsModel = {
 export type VcsAttributes = {
   name: string;
   vcsType: VcsType;
-};
+  description: string;
+  clientId: string;
+  callback: string;
+  endpoint: string;
+  apiUrl: string;
+  connectionType: VcsConnectionType;
+  status: VcsStatus;
+} & AuditFieldBase;
+export enum VcsConnectionType {
+  OAUTH = "OAUTH",
+  STANDALONE = "STANDALONE",
+}
+export enum VcsStatus {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  ERROR = "ERROR",
+}
 
 // SSH Keys
 
@@ -107,6 +141,8 @@ export type SshKey = {
 };
 export type SshKeyAttributes = {
   name: string;
+  description: string;
+  sshType: string;
 };
 
 // Modules
@@ -131,3 +167,71 @@ export type ModuleAttributes = {
 export type FlatModule = {
   id: string;
 } & ModuleAttributes;
+
+// Team
+
+export type Team = {
+  id: string;
+  attributes: TeamAttributes;
+};
+
+export type TeamAttributes = {
+  manageCollection: boolean;
+  manageJob: boolean;
+  manageModule: boolean;
+  manageProvider: boolean;
+  manageState: boolean;
+  manageTemplate: boolean;
+  manageVcs: boolean;
+  manageWorkspace: boolean;
+  name: string;
+};
+
+// Token
+export type TeamToken = {
+  id: string;
+  days: number;
+  hours: number;
+  minutes: number;
+  group: string;
+  description: string;
+  deleted: boolean;
+} & AuditFieldBase;
+
+// Variables
+
+export type GlobalVariable = {
+  id: string;
+  attributes: GlobalVariableAttributes;
+};
+export type GlobalVariableAttributes = {
+  key: string;
+  value: string;
+  hcl: boolean;
+  category: string;
+  description: string;
+  sensitive: boolean;
+};
+
+// Tags
+export type Tag = {
+  id: string;
+  attributes: TagAttributes;
+};
+export type TagAttributes = {
+  name: string;
+};
+
+// Actions
+
+export type Action = {
+  id: string;
+  attributes: ActionAttributes;
+};
+export type ActionAttributes = {
+  name: string;
+  type: string;
+  category: string;
+  version: string;
+  active: boolean;
+};

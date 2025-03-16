@@ -19,7 +19,7 @@ type Props = {
 
 export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
   const [key, setKey] = useState("");
-  function callback(key) {
+  function callback(key: string) {
     setKey(key);
   }
   return (

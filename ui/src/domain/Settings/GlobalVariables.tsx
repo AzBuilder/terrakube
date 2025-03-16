@@ -1,63 +1,108 @@
-import { React,useState, useEffect } from "react";
-import { Button, Table, Popconfirm ,Form,Modal,Space,Input,Switch,Select,Tag} from "antd";
-import './Settings.css';
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Modal, Popconfirm, Select, Space, Switch, Table, Tag } from "antd";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
-import {useParams} from "react-router-dom";
-import { InfoCircleOutlined,EditOutlined,DeleteOutlined} from '@ant-design/icons';
-export const GlobalVariablesSettings = () => {
+import { GlobalVariable } from "../types";
+import "./Settings.css";
 
+type CreateVariableForm = {
+  sensitive: boolean;
+} & UpdateVariableForm;
+
+type UpdateVariableForm = {
+  key: string;
+  value: string;
+  hcl: boolean;
+  category: string;
+  description: string;
+};
+
+export const GlobalVariablesSettings = () => {
   const { orgid } = useParams();
-  const [globalVariables, setGlobalVariables] = useState([]);
+  const [globalVariables, setGlobalVariables] = useState<GlobalVariable[]>([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [variableKey, setVariableKey] = useState(false);
+  const [variableKey, setVariableKey] = useState<string>();
   const [mode, setMode] = useState("create");
-  const [variableId, setVariableId] = useState([]);
-  const [form] = Form.useForm();
+  const [variableId, setVariableId] = useState<string>();
+  const [form] = Form.useForm<CreateVariableForm>();
 
-  const VARIABLES_COLUMS = (organizationId,onEdit) => [
+  const VARIABLES_COLUMS = (onEdit: (id: string) => void) => [
     {
-      title: 'Key',
-      dataIndex: 'key',
+      title: "Key",
+      dataIndex: "key",
       width: "40%",
-      key: 'key',
-      render: (_, record) => {
-        return  <div>{record.attributes.key} &nbsp;&nbsp;&nbsp;&nbsp; <Tag visible={record.attributes.hcl}>HCL</Tag> <Tag visible={record.attributes.sensitive}>Sensitive</Tag></div> ;
-      }
+      key: "key",
+      render: (_: any, record: GlobalVariable) => {
+        return (
+          <div>
+            {record.attributes.key} &nbsp;&nbsp;&nbsp;&nbsp; <Tag visible={record.attributes.hcl}>HCL</Tag>{" "}
+            <Tag visible={record.attributes.sensitive}>Sensitive</Tag>
+          </div>
+        );
+      },
     },
     {
-      title: 'Value',
-      dataIndex: 'value',
-      key: 'value',
+      title: "Value",
+      dataIndex: "value",
+      key: "value",
       width: "40%",
-      render: (_, record) => {
-        return record.attributes.sensitive ? <i>Sensitive - write only</i> : <div>{record.attributes.value}</div> ;
-      }
+      render: (_: any, record: GlobalVariable) => {
+        return record.attributes.sensitive ? <i>Sensitive - write only</i> : <div>{record.attributes.value}</div>;
+      },
     },
     {
-      title: 'Actions',
-      key: 'action',
-      render: (_, record) => {
-        return <div>
-          <Button  type="link" icon={<EditOutlined />} onClick={() => onEdit(record.id)}>Edit</Button>
-          <Popconfirm  onConfirm={() => {onDelete(record.id)}} title={<p>This will permanently delete this global variable <br/>and it will no longer be used in future runs. <br/>
-            Are you sure?</p>} okText="Yes" cancelText="No"> <Button danger type="link" icon={<DeleteOutlined />}>Delete</Button></Popconfirm>
-        </div>
-      }
-    }
-  ]
+      title: "Actions",
+      key: "action",
+      render: (_: any, record: GlobalVariable) => {
+        return (
+          <div>
+            <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(record.id)}>
+              Edit
+            </Button>
+            <Popconfirm
+              onConfirm={() => {
+                onDelete(record.id);
+              }}
+              title={
+                <p>
+                  This will permanently delete this global variable <br />
+                  and it will no longer be used in future runs. <br />
+                  Are you sure?
+                </p>
+              }
+              okText="Yes"
+              cancelText="No"
+            >
+              {" "}
+              <Button danger type="link" icon={<DeleteOutlined />}>
+                Delete
+              </Button>
+            </Popconfirm>
+          </div>
+        );
+      },
+    },
+  ];
   const onCancel = () => {
     setVisible(false);
   };
-  const onEdit = (id) => {
+  const onEdit = (id: string) => {
     setMode("edit");
     setVariableId(id);
     setVisible(true);
-    axiosInstance.get(`organization/${orgid}/globalvar/${id}`)
-    .then(response => {
+    axiosInstance.get(`organization/${orgid}/globalvar/${id}`).then((response) => {
       console.log(response);
       setVariableKey(response.data.data.attributes.key);
-      form.setFieldsValue({key: response.data.data.attributes.key,value:response.data.data.attributes.value, hcl:response.data.data.attributes.hcl, sensitive:response.data.data.attributes.sensitive,category:response.data.data.attributes.category,description:response.data.data.attributes.description});
+      form.setFieldsValue({
+        key: response.data.data.attributes.key,
+        value: response.data.data.attributes.value,
+        hcl: response.data.data.attributes.hcl,
+        sensitive: response.data.data.attributes.sensitive,
+        category: response.data.data.attributes.category,
+        description: response.data.data.attributes.description,
+      });
     });
   };
 
@@ -68,17 +113,15 @@ export const GlobalVariablesSettings = () => {
     setMode("create");
   };
 
-  const onDelete = (id) => {
+  const onDelete = (id: string) => {
     console.log("deleted " + id);
-    axiosInstance.delete(`organization/${orgid}/globalvar/${id}`)
-    .then(response => {
+    axiosInstance.delete(`organization/${orgid}/globalvar/${id}`).then((response) => {
       console.log(response);
       loadGlobalVariables();
     });
   };
 
-
-  const onCreate = (values) => {
+  const onCreate = (values: CreateVariableForm) => {
     const body = {
       data: {
         type: "globalvar",
@@ -88,18 +131,19 @@ export const GlobalVariablesSettings = () => {
           sensitive: values.sensitive,
           description: values.description,
           hcl: values.hcl,
-          category: values.category
-        }
-      }
-    }
+          category: values.category,
+        },
+      },
+    };
     console.log(body);
 
-    axiosInstance.post(`organization/${orgid}/globalvar`, body, {
-      headers: {
-        'Content-Type': 'application/vnd.api+json'
-      }
-    })
-      .then(response => {
+    axiosInstance
+      .post(`organization/${orgid}/globalvar`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then((response) => {
         console.log(response);
         loadGlobalVariables();
         setVisible(false);
@@ -107,28 +151,29 @@ export const GlobalVariablesSettings = () => {
       });
   };
 
-  const onUpdate = (values) => {
+  const onUpdate = (values: UpdateVariableForm) => {
     const body = {
       data: {
         type: "globalvar",
-        id:variableId,
+        id: variableId,
         attributes: {
           key: values.key,
           value: values.value,
           description: values.description,
           hcl: values.hcl,
-          category: values.category
-        }
-      }
-    }
+          category: values.category,
+        },
+      },
+    };
     console.log(body);
 
-    axiosInstance.patch(`organization/${orgid}/globalvar/${variableId}`, body, {
-      headers: {
-        'Content-Type': 'application/vnd.api+json'
-      }
-    })
-      .then(response => {
+    axiosInstance
+      .patch(`organization/${orgid}/globalvar/${variableId}`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then((response) => {
         console.log(response);
         loadGlobalVariables();
         setVisible(false);
@@ -136,51 +181,59 @@ export const GlobalVariablesSettings = () => {
       });
   };
 
-
-
-  const loadGlobalVariables= ()=>{
-    axiosInstance.get(`organization/${orgid}/globalvar`)
-    .then(response => {
+  const loadGlobalVariables = () => {
+    axiosInstance.get(`organization/${orgid}/globalvar`).then((response) => {
       console.log(response);
-      setGlobalVariables(response.data);
+      setGlobalVariables(response.data.data);
       setLoading(false);
     });
-  }
+  };
   useEffect(() => {
     setLoading(true);
     loadGlobalVariables();
-
   }, [orgid]);
-
 
   return (
     <div className="setting">
       <h1>Global Variables</h1>
       <div className="App-text">
-      Global Variables allow you to define and apply variables one time across multiple workspaces within an organization.
+        Global Variables allow you to define and apply variables one time across multiple workspaces within an
+        organization.
       </div>
-      <Button type="primary" onClick={onNew} htmlType="button">Create global variable</Button><br></br>
-     
-      <h3 style={{marginTop:"30px"}}>Global Variables</h3>
-      {loading || !globalVariables.data ? (
-          <p>Data loading...</p>
-        ) : (
-          <Table dataSource={globalVariables.data} columns={VARIABLES_COLUMS(orgid,onEdit)} rowKey='key' />)}
+      <Button type="primary" onClick={onNew} htmlType="button">
+        Create global variable
+      </Button>
+      <br></br>
 
-   <Modal width="600px" open={visible} title={mode === "edit" ? "Edit global variable " + variableKey : "Create new global variable"} okText="Save global variable" onCancel={onCancel} cancelText="Cancel" 
+      <h3 style={{ marginTop: "30px" }}>Global Variables</h3>
+      {loading ? (
+        <p>Data loading...</p>
+      ) : (
+        <Table dataSource={globalVariables} columns={VARIABLES_COLUMS(onEdit)} rowKey="key" />
+      )}
+
+      <Modal
+        width="600px"
+        open={visible}
+        title={mode === "edit" ? "Edit global variable " + variableKey : "Create new global variable"}
+        okText="Save global variable"
+        onCancel={onCancel}
+        cancelText="Cancel"
         onOk={() => {
-          form.validateFields().then((values) => {
-            if(mode === "create")
-              onCreate(values);
-            else
-              onUpdate(values);
-          }).catch((info) => {
-            console.log('Validate Failed:', info);
-          });
-        }}>
-        <Space style={{width:"100%"}} direction="vertical">
-          <Form name="globalVariable" form={form} layout="vertical" >
-          <Form.Item name="key" label="Key" rules={[{ required: true }]}>
+          form
+            .validateFields()
+            .then((values) => {
+              if (mode === "create") onCreate(values);
+              else onUpdate(values);
+            })
+            .catch((info) => {
+              console.log("Validate Failed:", info);
+            });
+        }}
+      >
+        <Space style={{ width: "100%" }} direction="vertical">
+          <Form name="globalVariable" form={form} layout="vertical">
+            <Form.Item name="key" label="Key" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
@@ -193,18 +246,39 @@ export const GlobalVariablesSettings = () => {
               </Select>
             </Form.Item>
             <Form.Item name="description" rules={[{ required: true }]} label="Description">
-              <Input.TextArea width="800px" />
-            </Form.Item>    
-            <Form.Item name="hcl" valuePropName="checked" label="HCL" tooltip={{ title: 'Parse this field as HashiCorp Configuration Language (HCL). This allows you to interpolate values at runtime.', icon: <InfoCircleOutlined /> }} >
+              <Input.TextArea style={{ width: "800px" }} />
+            </Form.Item>
+            <Form.Item
+              name="hcl"
+              valuePropName="checked"
+              label="HCL"
+              tooltip={{
+                title:
+                  "Parse this field as HashiCorp Configuration Language (HCL). This allows you to interpolate values at runtime.",
+                icon: <InfoCircleOutlined />,
+              }}
+            >
               <Switch />
             </Form.Item>
-            {mode === "create"?(
-            <Form.Item name="sensitive" valuePropName="checked" label="Sensitive" tooltip={{ title: 'Sensitive variables are never shown in the UI or API. They may appear in Terraform logs if your configuration is designed to output them.', icon: <InfoCircleOutlined /> }} >
-              <Switch />
-            </Form.Item> ):""}
+            {mode === "create" ? (
+              <Form.Item
+                name="sensitive"
+                valuePropName="checked"
+                label="Sensitive"
+                tooltip={{
+                  title:
+                    "Sensitive variables are never shown in the UI or API. They may appear in Terraform logs if your configuration is designed to output them.",
+                  icon: <InfoCircleOutlined />,
+                }}
+              >
+                <Switch />
+              </Form.Item>
+            ) : (
+              ""
+            )}
           </Form>
         </Space>
       </Modal>
     </div>
   );
-}
+};

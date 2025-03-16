@@ -1,45 +1,61 @@
-import { React, useState, useRef, useEffect } from "react";
-import './Settings.css';
-import { Space, Button, Form, Input } from "antd";
-import axiosInstance from "../../config/axiosConfig";
+import { Editor, type OnMount, type OnValidate } from "@monaco-editor/react";
+import { Button, Form, Input, Space } from "antd";
+import { Buffer } from "buffer";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import Editor from "@monaco-editor/react";
-import { Buffer } from 'buffer';
+import axiosInstance from "../../config/axiosConfig";
+import { Template } from "../types";
+import "./Settings.css";
 
 const validateMessages = {
-  required: '${label} is required!'
-}
-export const EditTemplate = ({ setMode,templateId, loadTemplates}) => {
+  required: "${label} is required!",
+};
+
+type Props = {
+  setMode: (mode: string) => void;
+  templateId: string;
+  loadTemplates: () => void;
+};
+
+type IStandaloneCodeEditor = Parameters<OnMount>[0];
+type IMarkerArray = Parameters<OnValidate>[0];
+
+type EditTemplateForm = {
+  name: string;
+  description?: string;
+  tcl: string;
+  version: string;
+};
+
+export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
   const { orgid } = useParams();
   const [tcl, setTCL] = useState("");
-  const editorRef = useRef(null);
-  const [template, setTemplate] = useState([]);
+  const editorRef = useRef<IStandaloneCodeEditor>(null);
+  const [template, setTemplate] = useState<Template>();
   const [loading, setLoading] = useState(true);
-
-  function handleEditorDidMount(editor, monaco) {
+  function handleEditorDidMount(editor: IStandaloneCodeEditor) {
     editorRef.current = editor;
   }
 
   useEffect(() => {
     loadTemplate(templateId);
-  }, [ templateId]);
+  }, [templateId]);
 
-  function handleEditorValidation(markers) {
-    markers.forEach(marker => console.log("onValidate:", marker.message));
+  function handleEditorValidation(markers: IMarkerArray) {
+    markers.forEach((marker) => console.log("onValidate:", marker.message));
   }
 
-  const loadTemplate= (templateId)=>{
-    axiosInstance.get(`organization/${orgid}/template/${templateId}`)
-    .then(response => {
+  const loadTemplate = (templateId: string) => {
+    axiosInstance.get(`organization/${orgid}/template/${templateId}`).then((response) => {
       console.log(response);
       setTemplate(response.data.data);
-      let buff = new Buffer(response.data.data.attributes.tcl, 'base64');
-      setTCL(buff.toString('ascii'));
+      let buff = Buffer.from(response.data.data.attributes.tcl, "base64");
+      setTCL(buff.toString("ascii"));
       setLoading(false);
     });
-  }
+  };
 
-  const onFinish = (values) => {
+  const onFinish = (values: EditTemplateForm) => {
     const body = {
       data: {
         type: "template",
@@ -47,56 +63,71 @@ export const EditTemplate = ({ setMode,templateId, loadTemplates}) => {
         attributes: {
           name: values.name,
           description: values.description,
-          tcl: Buffer.from(editorRef.current.getValue()).toString('base64'),
-          version: "1.0.0"
-        }
-      }
-    }
+          tcl: Buffer.from(editorRef.current.getValue()).toString("base64"),
+          version: "1.0.0",
+        },
+      },
+    };
     console.log(body);
 
-    axiosInstance.patch(`organization/${orgid}/template/${templateId}`, body, {
-      headers: {
-        'Content-Type': 'application/vnd.api+json'
-      }
-    })
-      .then(response => {
+    axiosInstance
+      .patch(`organization/${orgid}/template/${templateId}`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then((response) => {
         console.log(response);
-        if (response.status == "204") {
+        if (response.status == 204) {
           setMode("list");
           loadTemplates();
-
         }
-      })
+      });
   };
   return (
     <div>
       <h1>Edit Template</h1>
       <Space className="chooseType" direction="vertical">
-      {loading || !template ? (
-            <p>Data loading...</p>
-          ) : (
-        <Form initialValues={{name:template.attributes.name,description: template.attributes.description}} onFinish={onFinish} validateMessages={validateMessages} name="create-vcs" layout="vertical">
-          <Form.Item name="name" label="Name" extra=" A name for your Template. This will appear in the workspaces when you execute a new job." rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="Description" >
-            <Input.TextArea />
-          </Form.Item>
-          <Form.Item name="tcl" label="Template">
-            <div className="editor">
-              <Editor height="40vh" onMount={handleEditorDidMount} onValidate={handleEditorValidation} defaultLanguage="yaml" defaultValue={tcl} />
-            </div>
-          </Form.Item>
-          <Button type="primary" htmlType="submit">Save Template</Button>
-        </Form>
-      )}
+        {loading ? (
+          <p>Data loading...</p>
+        ) : template ? (
+          <Form
+            initialValues={{ name: template.attributes.name, description: template.attributes.description }}
+            onFinish={onFinish}
+            validateMessages={validateMessages}
+            name="create-vcs"
+            layout="vertical"
+          >
+            <Form.Item
+              name="name"
+              label="Name"
+              extra=" A name for your Template. This will appear in the workspaces when you execute a new job."
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item name="description" label="Description">
+              <Input.TextArea />
+            </Form.Item>
+            <Form.Item name="tcl" label="Template">
+              <div className="editor">
+                <Editor
+                  height="40vh"
+                  onMount={handleEditorDidMount}
+                  onValidate={handleEditorValidation}
+                  defaultLanguage="yaml"
+                  defaultValue={tcl}
+                />
+              </div>
+            </Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save Template
+            </Button>
+          </Form>
+        ) : (
+          <p>Failed to load template...</p>
+        )}
       </Space>
-
-
-
-
-
-
     </div>
   );
-}
+};

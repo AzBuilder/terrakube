@@ -1,34 +1,51 @@
-import { React, useState, useRef, useEffect } from "react";
-import "./Settings.css";
-import { Steps, Space, Button, Form, Input, Card, List, message } from "antd";
-import { HiOutlineExternalLink } from "react-icons/hi";
-import axiosInstance from "../../config/axiosConfig";
-import { useParams } from "react-router-dom";
-import Editor from "@monaco-editor/react";
+import { Editor, type OnMount, type OnValidate } from "@monaco-editor/react";
+import { Button, Card, Form, Input, List, message, Space, Steps } from "antd";
 import { Buffer } from "buffer";
+import { useEffect, useRef, useState } from "react";
+import { HiOutlineExternalLink } from "react-icons/hi";
+import { useParams } from "react-router-dom";
+import axiosInstance from "../../config/axiosConfig";
+import { TemplateAttributes } from "../types";
+import "./Settings.css";
 const { Step } = Steps;
 const { Meta } = Card;
 const validateMessages = {
   required: "${label} is required!",
 };
-export const AddTemplate = ({ setMode, loadTemplates }) => {
+
+type Props = {
+  setMode: (mode: string) => void;
+  loadTemplates: () => void;
+};
+
+type IStandaloneCodeEditor = Parameters<OnMount>[0];
+type IMarkerArray = Parameters<OnValidate>[0];
+
+type AddTemplateForm = {
+  name: string;
+  description?: string;
+  tcl: string;
+  version: string;
+};
+export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
   const { orgid } = useParams();
   const [current, setCurrent] = useState(0);
   const [tcl, setTCL] = useState("");
-  const [templates, setTemplates] = useState("");
-  const editorRef = useRef(null);
+  const [templates, setTemplates] = useState<TemplateAttributes[]>([]);
+  const editorRef = useRef<IStandaloneCodeEditor>(null);
 
-  function handleEditorDidMount(editor, monaco) {
+  function handleEditorDidMount(editor: IStandaloneCodeEditor) {
     editorRef.current = editor;
   }
-  const handleChange = (currentVal) => {
+
+  const handleChange = (currentVal: number) => {
     setCurrent(currentVal);
     if (currentVal === 2) {
       editorRef.current.defaultValue = tcl;
     }
   };
-  const handleClick = (item) => {
-    let buff = new Buffer(item.tcl, "base64");
+  const handleClick = (item: TemplateAttributes) => {
+    let buff = Buffer.from(item.tcl, "base64");
     setTCL(buff.toString("ascii"));
     setCurrent(1);
   };
@@ -39,27 +56,22 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
 
   const getTCLTemplates = () => {
     //TODO: Use github repo to get Templates
-    let templates = [
+    let templates: TemplateAttributes[] = [
       {
         name: "Blank Template",
-        description:
-          "Create an empty template. So you can define your template from scratch.",
+        description: "Create an empty template. So you can define your template from scratch.",
         tcl: "ZmxvdzoKICAtIHR5cGU6ICJ0ZXJyYWZvcm1QbGFuIgogICAgbmFtZTogIlBsYW4iCiAgICBzdGVwOiAxMDAKICAtIHR5cGU6ICJ0ZXJyYWZvcm1BcHBseSIKICAgIG5hbWU6ICJBcHBseSIKICAgIHN0ZXA6IDIwMA==",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/No_image.svg/2048px-No_image.svg.png",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/No_image.svg/2048px-No_image.svg.png",
       },
       {
         name: "Snyk",
-        description:
-          "This template uses Snyk to scan and monitor your workspace for security vulnerabilities.",
+        description: "This template uses Snyk to scan and monitor your workspace for security vulnerabilities.",
         tcl: "ZmxvdzoKICAtIHR5cGU6ICJjdXN0b21TY3JpcHRzIgogICAgc3RlcDogMTAwCiAgICBjb21tYW5kczoKICAgICAgLSBydW50aW1lOiAiR1JPT1ZZIgogICAgICAgIHByaW9yaXR5OiAxMDAKICAgICAgICBhZnRlcjogdHJ1ZQogICAgICAgIHNjcmlwdDogfAogICAgICAgICAgaW1wb3J0IFNueWsKCiAgICAgICAgICBuZXcgU255aygpLmxvYWRUb29sKAogICAgICAgICAgICAiJHdvcmtpbmdEaXJlY3RvcnkiLAogICAgICAgICAgICAiJGJhc2hUb29sc0RpcmVjdG9yeSIsCiAgICAgICAgICAgICIxLjgzMS4wIikKICAgICAgICAgICJTbnlrIERvd25sb2FkIENvbXBsZXRlZC4uLiIKICAgICAgLSBydW50aW1lOiAiQkFTSCIKICAgICAgICBwcmlvcml0eTogMjAwCiAgICAgICAgYWZ0ZXI6IHRydWUKICAgICAgICBzY3JpcHQ6IHwKICAgICAgICAgIGNkICR3b3JraW5nRGlyZWN0b3J5OwogICAgICAgICAgc255ayBpYWMgdGVzdCAuOw==",
-        image:
-          "https://res.cloudinary.com/snyk/image/upload/v1537345897/press-kit/brand/logo-vertical-black.png",
+        image: "https://res.cloudinary.com/snyk/image/upload/v1537345897/press-kit/brand/logo-vertical-black.png",
       },
       {
         name: "Terrascan",
-        description:
-          "Terrascan is a static code analyzer for Infrastructure as Code.",
+        description: "Terrascan is a static code analyzer for Infrastructure as Code.",
         tcl: "ZmxvdzoKICAtIHR5cGU6ICJjdXN0b21TY3JpcHRzIgogICAgc3RlcDogMTAwCiAgICBjb21tYW5kczoKICAgICAgLSBydW50aW1lOiAiR1JPT1ZZIgogICAgICAgIHByaW9yaXR5OiAxMDAKICAgICAgICBhZnRlcjogdHJ1ZQogICAgICAgIHNjcmlwdDogfAogICAgICAgICAgaW1wb3J0IFRlcnJhc2NhbgoKICAgICAgICAgIG5ldyBUZXJyYXNjYW4oKS5sb2FkVG9vbCgKICAgICAgICAgICAgIiR3b3JraW5nRGlyZWN0b3J5IiwKICAgICAgICAgICAgIiRiYXNoVG9vbHNEaXJlY3RvcnkiLAogICAgICAgICAgICAiMS4xMi4wIikKICAgICAgICAgICJUZXJyYXNjYW4gRG93bmxvYWQgQ29tcGxldGVkLi4uIgogICAgICAtIHJ1bnRpbWU6ICJCQVNIIgogICAgICAgIHByaW9yaXR5OiAyMDAKICAgICAgICBhZnRlcjogdHJ1ZQogICAgICAgIHNjcmlwdDogfAogICAgICAgICAgY2QgJHdvcmtpbmdEaXJlY3Rvcnk7CiAgICAgICAgICB0ZXJyYXNjYW4gc2NhbiAtaSB0ZXJyYWZvcm0gLXQgYXp1cmU7",
         image:
           "https://raw.githubusercontent.com/accurics/terrascan/master/docs/img/Terrascan_By_Accurics_Logo_38B34A-333F48.svg",
@@ -77,32 +89,29 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
         description:
           "This template uses Terratag allowing for tags or labels to be applied across an entire set of Terraform files.",
         tcl: "ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbiIKICBzdGVwOiAxMDAKICBjb21tYW5kczoKICAgIC0gcnVudGltZTogIkdST09WWSIKICAgICAgcHJpb3JpdHk6IDEwMAogICAgICBiZWZvcmU6IHRydWUKICAgICAgc2NyaXB0OiB8CiAgICAgICAgaW1wb3J0IFRlcnJhVGFnCiAgICAgICAgbmV3IFRlcnJhVGFnKCkubG9hZFRvb2woCiAgICAgICAgICAiJHdvcmtpbmdEaXJlY3RvcnkiLAogICAgICAgICAgIiRiYXNoVG9vbHNEaXJlY3RvcnkiLAogICAgICAgICAgIjAuMS4zMCIpCiAgICAgICAgIlRlcnJhdGFnIGRvd25sb2FkIGNvbXBsZXRlZCIKICAgIC0gcnVudGltZTogIkJBU0giCiAgICAgIHByaW9yaXR5OiAyMDAKICAgICAgYmVmb3JlOiB0cnVlCiAgICAgIHNjcmlwdDogfAogICAgICAgIGNkICR3b3JraW5nRGlyZWN0b3J5CiAgICAgICAgdGVycmF0YWcgLXRhZ3M9IntcImVudmlyb25tZW50X2lkXCI6IFwiZGV2ZWxvcG1lbnRcIn0iCi0gdHlwZTogInRlcnJhZm9ybUFwcGx5IgogIHN0ZXA6IDMwMA==",
-        image:
-          "https://raw.githubusercontent.com/env0/terratag/master/ttlogo.png",
+        image: "https://raw.githubusercontent.com/env0/terratag/master/ttlogo.png",
       },
       {
         name: "Infracost",
-        description:
-          "This template uses Infracost to show cloud cost estimates for your wokspace resources.",
+        description: "This template uses Infracost to show cloud cost estimates for your wokspace resources.",
         tcl: "ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbiIKICBzdGVwOiAxMDAKICBjb21tYW5kczoKICAgIC0gcnVudGltZTogIkdST09WWSIKICAgICAgcHJpb3JpdHk6IDEwMAogICAgICBhZnRlcjogdHJ1ZQogICAgICBzY3JpcHQ6IHwKICAgICAgICBpbXBvcnQgSW5mcmFjb3N0CgogICAgICAgIFN0cmluZyBjcmVkZW50aWFscyA9ICJ2ZXJzaW9uOiBcIjAuMVwiXG4iICsKICAgICAgICAgICAgICAgICJhcGlfa2V5OiAkSU5GUkFDT1NUX0tFWSBcbiIgKwogICAgICAgICAgICAgICAgInByaWNpbmdfYXBpX2VuZHBvaW50OiBodHRwczovL3ByaWNpbmcuYXBpLmluZnJhY29zdC5pbyIKCiAgICAgICAgbmV3IEluZnJhY29zdCgpLmxvYWRUb29sKAogICAgICAgICAgICIkd29ya2luZ0RpcmVjdG9yeSIsCiAgICAgICAgICAgIiRiYXNoVG9vbHNEaXJlY3RvcnkiLCAKICAgICAgICAgICAiMC45LjExIiwKICAgICAgICAgICBjcmVkZW50aWFscykKICAgICAgICAiSW5mcmFjb3N0IERvd25sb2FkIENvbXBsZXRlZC4uLiIKICAgIC0gcnVudGltZTogIkJBU0giCiAgICAgIHByaW9yaXR5OiAyMDAKICAgICAgYWZ0ZXI6IHRydWUKICAgICAgc2NyaXB0OiB8CiAgICAgICAgdGVycmFmb3JtIHNob3cgLWpzb24gdGVycmFmb3JtTGlicmFyeS50ZlBsYW4gPiBwbGFuLmpzb24gCiAgICAgICAgaW5mcmFjb3N0IGJyZWFrZG93biAtLXBhdGggcGxhbi5qc29u",
-        image:
-          "https://raw.githubusercontent.com/infracost/infracost/master/.github/assets/logo.svg",
+        image: "https://raw.githubusercontent.com/infracost/infracost/master/.github/assets/logo.svg",
       },
     ];
 
     setTemplates(templates);
   };
 
-  const handleContinue = (e) => {
+  const handleContinue = () => {
     setCurrent(2);
     setTCL(editorRef.current.getValue());
   };
 
-  function handleEditorValidation(markers) {
+  function handleEditorValidation(markers: IMarkerArray) {
     markers.forEach((marker) => console.log("onValidate:", marker.message));
   }
 
-  const onFinish = (values) => {
+  const onFinish = (values: AddTemplateForm) => {
     const body = {
       data: {
         type: "template",
@@ -124,7 +133,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
       })
       .then((response) => {
         console.log(response);
-        if (response.status == "201") {
+        if (response.status == 201) {
           loadTemplates();
           setMode("list");
         }
@@ -134,14 +143,9 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
           if (error.response.status === 403) {
             message.error(
               <span>
-                You are not authorized to create Templates. <br /> Please
-                contact your administrator and request the{" "}
-                <b>Manage Templates</b> permission. <br /> For more information,
-                visit the{" "}
-                <a
-                  target="_blank"
-                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
-                >
+                You are not authorized to create Templates. <br /> Please contact your administrator and request the{" "}
+                <b>Manage Templates</b> permission. <br /> For more information, visit the{" "}
+                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
                   Terrakube documentation
                 </a>
                 .
@@ -155,15 +159,10 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
     <div>
       <h1>Create a new Template</h1>
       <div className="App-text">
-        Templates allow you to define a custom flow so you can run any tool
-        before or after terraform plan/apply/destroy.
+        Templates allow you to define a custom flow so you can run any tool before or after terraform
+        plan/apply/destroy.
       </div>
-      <Steps
-        direction="horizontal"
-        size="small"
-        current={current}
-        onChange={handleChange}
-      >
+      <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
         <Step title="Choose Type" />
         <Step title="Define Template" />
         <Step title="Configure Settings" />
@@ -194,11 +193,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
                 >
                   <Meta
                     title={item.name}
-                    description={
-                      <div style={{ height: "90px", overflow: "hidden" }}>
-                        {item.description}
-                      </div>
-                    }
+                    description={<div style={{ height: "90px", overflow: "hidden" }}>{item.description}</div>}
                   />
                 </Card>
               </List.Item>
@@ -210,8 +205,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
         <Space className="chooseType" direction="vertical">
           <h3>Set up template</h3>
           <p className="paragraph">
-            For additional information about templates and custom flows in
-            Terrakube, please read our{" "}
+            For additional information about templates and custom flows in Terrakube, please read our{" "}
             <Button
               className="link"
               target="_blank"
@@ -232,12 +226,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
             />
           </div>
           <br />
-          <Button
-            style={{ float: "right" }}
-            type="primary"
-            onClick={handleContinue}
-            htmlType="button"
-          >
+          <Button style={{ float: "right" }} type="primary" onClick={handleContinue} htmlType="button">
             Continue
           </Button>
         </Space>
@@ -245,12 +234,7 @@ export const AddTemplate = ({ setMode, loadTemplates }) => {
       {current == 2 && (
         <Space className="chooseType" direction="vertical">
           <h3>Configure settings</h3>
-          <Form
-            onFinish={onFinish}
-            validateMessages={validateMessages}
-            name="create-vcs"
-            layout="vertical"
-          >
+          <Form onFinish={onFinish} validateMessages={validateMessages} name="create-vcs" layout="vertical">
             <Form.Item
               name="name"
               label="Name"

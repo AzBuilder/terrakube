@@ -1,57 +1,68 @@
-import { React, useState } from "react";
-import "./Settings.css";
-import {
-  Steps,
-  Space,
-  Button,
-  Form,
-  Input,
-  Row,
-  Col,
-  Typography,
-  message,
-  Dropdown,
-} from "antd";
-import {
-  GithubOutlined,
-  GitlabOutlined,
-  DownOutlined,
-} from "@ant-design/icons";
+import { DownOutlined, GithubOutlined, GitlabOutlined } from "@ant-design/icons";
+import { Button, Col, Dropdown, Form, Input, Row, Space, Steps, Typography, message } from "antd";
+import TextArea from "antd/es/input/TextArea";
+import { useState } from "react";
+import { HiOutlineExternalLink } from "react-icons/hi";
 import { SiBitbucket } from "react-icons/si";
 import { VscAzureDevops } from "react-icons/vsc";
-import { HiOutlineExternalLink } from "react-icons/hi";
-import axiosInstance from "../../config/axiosConfig";
 import { useParams } from "react-router-dom";
-import { ORGANIZATION_NAME } from "../../config/actionTypes";
 import { v1 as uuidv1 } from "uuid";
-import TextArea from "antd/es/input/TextArea";
+import { ORGANIZATION_NAME } from "../../config/actionTypes";
+import axiosInstance from "../../config/axiosConfig";
+import { VcsConnectionType, VcsType, VcsTypeExtended } from "../types";
+import "./Settings.css";
 
 const { Paragraph } = Typography;
 const { Step } = Steps;
 const validateMessages = {
   required: "${label} is required!",
 };
-export const AddVCS = ({ setMode, loadVCS }) => {
-  const { orgid, vcsName } = useParams();
+
+type Props = {
+  setMode: (mode: string) => void;
+  loadVCS: () => void;
+};
+
+type Params = {
+  orgid: string;
+  vcsName: VcsTypeExtended;
+};
+
+type CreateVcsForm = {
+  name: string;
+  description: string;
+  connectionType: VcsConnectionType;
+  vcsType: VcsType;
+  clientId: string;
+  clientSecret: string;
+  privateKey: string;
+  callback: string;
+  endpoint: string;
+  apiUrl: string;
+  redirectUrl: string;
+  status: string;
+};
+
+export const AddVCS = ({ setMode, loadVCS }: Props) => {
+  const { orgid, vcsName } = useParams<Params>();
   const [current, setCurrent] = useState(vcsName ? 1 : 0);
-  const [vcsType, setVcsType] = useState(vcsName ? vcsName : "GITHUB");
-  const [connectionType, setConnectionType] = useState("OAUTH");
-  const [uuid, setUUID] = useState(uuidv1());
-  const handleChange = (currentVal) => {
+  const [vcsType, setVcsType] = useState<VcsTypeExtended>(vcsName ? vcsName : VcsTypeExtended.GITHUB);
+  const [connectionType, setConnectionType] = useState(VcsConnectionType.OAUTH);
+  const [uuid] = useState(uuidv1());
+  const handleChange = (currentVal: number) => {
     setCurrent(currentVal);
   };
-  const handleVCSClick = (vcs, connectionType = "OAUTH") => {
+  const handleVCSClick = (vcs: VcsTypeExtended, connectionType: VcsConnectionType = VcsConnectionType.OAUTH) => {
     setCurrent(1);
     setVcsType(vcs);
     setConnectionType(connectionType);
   };
 
   const getCallBackUrl = () => {
-    return `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-      }/callback/v1/vcs/${uuid}`;
+    return `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/callback/v1/vcs/${uuid}`;
   };
 
-  const renderVCSType = (vcs) => {
+  const renderVCSType = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
         return "GitLab";
@@ -78,21 +89,21 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       label: "Gitlab.com",
       key: "1",
       onClick: () => {
-        handleVCSClick("GITLAB");
+        handleVCSClick(VcsTypeExtended.GITLAB);
       },
     },
     {
       label: "Gitlab Community Edition",
       key: "2",
       onClick: () => {
-        handleVCSClick("GITLAB_ENTERPRISE");
+        handleVCSClick(VcsTypeExtended.GITLAB_COMMUNITY);
       },
     },
     {
       label: "Gitlab Enterprise Edition",
       key: "3",
       onClick: () => {
-        handleVCSClick("GITLAB_ENTERPRISE");
+        handleVCSClick(VcsTypeExtended.GITHUB_ENTERPRISE);
       },
     },
   ];
@@ -102,28 +113,28 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       label: "Github.com (GitHub App)",
       key: "1",
       onClick: () => {
-        handleVCSClick("GITHUB", "STANDALONE");
+        handleVCSClick(VcsTypeExtended.GITHUB, VcsConnectionType.STANDALONE);
       },
     },
     {
       label: "Github.com (oAuth App)",
       key: "2",
       onClick: () => {
-        handleVCSClick("GITHUB");
+        handleVCSClick(VcsTypeExtended.GITHUB);
       },
     },
     {
       label: "GitHub Enterprise (GitHub App)",
       key: "3",
       onClick: () => {
-        handleVCSClick("GITHUB_ENTERPRISE", "STANDALONE");
+        handleVCSClick(VcsTypeExtended.GITHUB_ENTERPRISE, VcsConnectionType.STANDALONE);
       },
     },
     {
       label: "GitHub Enterprise (oAuth App)",
       key: "4",
       onClick: () => {
-        handleVCSClick("GITHUB_ENTERPRISE");
+        handleVCSClick(VcsTypeExtended.GITHUB_ENTERPRISE);
       },
     },
   ];
@@ -133,7 +144,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       label: "Bitbucket Cloud",
       key: "1",
       onClick: () => {
-        handleVCSClick("BITBUCKET");
+        handleVCSClick(VcsTypeExtended.BITBUCKET);
       },
     },
   ];
@@ -143,18 +154,11 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       label: "Azure DevOps Services",
       key: "1",
       onClick: () => {
-        handleVCSClick("AZURE_DEVOPS");
-      },
-    },
-    {
-      label: "Azure DevOps (PAT)",
-      key: "2",
-      onClick: () => {
-        handleVCSClick("AZURE_DEVOPS", "PAT");
+        handleVCSClick(VcsTypeExtended.AZURE_DEVOPS);
       },
     },
   ];
-  const getDocsUrl = (vcs) => {
+  const getDocsUrl = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
         return "https://docs.terrakube.io/user-guide/vcs-providers/gitlab.com";
@@ -176,7 +180,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getClientIdName = (vcs) => {
+  const getClientIdName = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
@@ -193,7 +197,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getVcsType = (vcs) => {
+  const getVcsType = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
@@ -210,7 +214,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getAPIUrl = (vcs) => {
+  const getAPIUrl = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
         return "https://gitlab.com/api/v4";
@@ -225,7 +229,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getAPIUrlPlaceholder = (vcs) => {
+  const getAPIUrlPlaceholder = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB_ENTERPRISE":
       case "GITLAB_COMMUNITY":
@@ -241,7 +245,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getHttpsPlaceholder = (vcs) => {
+  const getHttpsPlaceholder = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB_ENTERPRISE":
       case "GITLAB_COMMUNITY":
@@ -257,7 +261,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const httpsHidden = (vcs) => {
+  const httpsHidden = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "BITBUCKET":
@@ -269,7 +273,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const apiUrlHidden = (vcs) => {
+  const apiUrlHidden = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "BITBUCKET":
@@ -281,7 +285,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getSecretIdName = (vcs) => {
+  const getSecretIdName = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
@@ -298,7 +302,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const renderStep1 = (vcs) => {
+  const renderStep1 = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
@@ -308,21 +312,15 @@ export const AddVCS = ({ setMode, loadVCS }) => {
               1. On {renderVCSType(vcsType)},{" "}
               {vcsType === "GITLAB" ? (
                 <>
-                  <Button
-                    className="link"
-                    target="_blank"
-                    href="https://gitlab.com/-/profile/applications"
-                    type="link"
-                  >
-                    register a new OAuth Application&nbsp;{" "}
-                    <HiOutlineExternalLink />
+                  <Button className="link" target="_blank" href="https://gitlab.com/-/profile/applications" type="link">
+                    register a new OAuth Application&nbsp; <HiOutlineExternalLink />
                   </Button>
                   . Enter the following information:
                 </>
               ) : (
                 <span>
-                  navigate to User Settings → Application and register a new
-                  OAuth Application with the following information.
+                  navigate to User Settings → Application and register a new OAuth Application with the following
+                  information.
                 </span>
               )}
             </p>
@@ -332,9 +330,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 <Col span={6}>
                   <b>Name:</b>{" "}
                 </Col>
-                <Col span={18}>
-                  Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
-                </Col>
+                <Col span={18}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Col>
               </Row>
               <Row>
                 <Col span={6}>
@@ -364,10 +360,9 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return (
           <div>
             <p className="paragraph">
-              1. On {renderVCSType(vcsType)}, logged in as whichever account you
-              want Terrakube to act as, add a new OAuth Consumer. You can find
-              the OAuth Consumer settings page under your workspace settings.
-              Enter the following information:
+              1. On {renderVCSType(vcsType)}, logged in as whichever account you want Terrakube to act as, add a new
+              OAuth Consumer. You can find the OAuth Consumer settings page under your workspace settings. Enter the
+              following information:
             </p>
             <div className="paragraph">
               <p></p>
@@ -375,9 +370,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 <Col span={6}>
                   <b>Name:</b>{" "}
                 </Col>
-                <Col span={18}>
-                  Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
-                </Col>
+                <Col span={18}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Col>
               </Row>
               <Row>
                 <Col span={6}>
@@ -400,9 +393,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 </Col>
                 <Col span={18}>
                   {" "}
-                  <Paragraph copyable>
-                    {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
-                  </Paragraph>
+                  <Paragraph copyable>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Paragraph>
                 </Col>
               </Row>
               <Row>
@@ -459,9 +450,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 <Col span={6}>
                   <b>Application name:</b>{" "}
                 </Col>
-                <Col span={18}>
-                  Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
-                </Col>
+                <Col span={18}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Col>
               </Row>
               <Row>
                 <Col span={6}>
@@ -469,9 +458,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 </Col>
                 <Col span={18}>
                   {" "}
-                  <Paragraph copyable>
-                    {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
-                  </Paragraph>
+                  <Paragraph copyable>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Paragraph>
                 </Col>
               </Row>
               <Row>
@@ -507,7 +494,11 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                 <Button
                   className="link"
                   target="_blank"
-                  href={connectionType === "OAUTH" ? "https://github.com/settings/applications/new" : "https://github.com/settings/apps/new"}
+                  href={
+                    connectionType === "OAUTH"
+                      ? "https://github.com/settings/applications/new"
+                      : "https://github.com/settings/apps/new"
+                  }
                   type="link"
                 >
                   register a new {connectionType == "OAUTH" ? "OAuth" : "GitHub"} Application&nbsp;{" "}
@@ -519,18 +510,23 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   <i>yourdomain.com</i>/settings/{connectionType == "OAUTH" ? "applications" : "apps"}/new
                 </span>
               )}
-              with the below information{connectionType === "OAUTH" ? (<span>:</span>) : (<span>, install it to your organization or account, and grant necessary permissions. Please check
-                <Button
-                  className="link"
-                  target="_blank"
-                  href="https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps"
-                  type="link"
-                >
-                &nbsp;here to learn more.<HiOutlineExternalLink />
-                </Button>
+              with the below information
+              {connectionType === "OAUTH" ? (
+                <span>:</span>
+              ) : (
+                <span>
+                  , install it to your organization or account, and grant necessary permissions. Please check
+                  <Button
+                    className="link"
+                    target="_blank"
+                    href="https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps"
+                    type="link"
+                  >
+                    &nbsp;here to learn more.
+                    <HiOutlineExternalLink />
+                  </Button>
                 </span>
-                )
-              }
+              )}
             </div>
             <div className="paragraph">
               <p></p>
@@ -539,9 +535,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   <b>Application Name:</b>{" "}
                 </Col>
                 <Col span={18}>
-                  <Paragraph copyable>
-                    Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
-                  </Paragraph>
+                  <Paragraph copyable>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Paragraph>
                 </Col>
               </Row>
               <Row>
@@ -549,9 +543,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   <b>Homepage URL:</b>{" "}
                 </Col>
                 <Col span={18}>
-                  <Paragraph copyable>
-                    {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
-                  </Paragraph>
+                  <Paragraph copyable>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Paragraph>
                 </Col>
               </Row>
               <Row hidden={connectionType != "OAUTH"}>
@@ -568,7 +560,9 @@ export const AddVCS = ({ setMode, loadVCS }) => {
                   <b>Webhook:</b>{" "}
                 </Col>
                 <Col span={18}>
-                  <Paragraph><b>untick</b> Active</Paragraph>
+                  <Paragraph>
+                    <b>untick</b> Active
+                  </Paragraph>
                 </Col>
               </Row>
               <Row hidden={connectionType === "OAUTH"}>
@@ -593,45 +587,43 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const renderStep2 = (vcs) => {
+  const renderStep2 = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
         return (
           <p className="paragraph">
-            2. After clicking the "Save application" button, you'll be taken to
-            the new application's page. Enter the Application ID and Secret
-            below:
+            2. After clicking the "Save application" button, you'll be taken to the new application's page. Enter the
+            Application ID and Secret below:
           </p>
         );
       case "BITBUCKET":
       case "BITBUCKET_SERVER":
         return (
           <p className="paragraph">
-            2. After clicking the "Save" button, you'll be taken to the OAuth
-            settings page. Find your new OAuth consumer under the "OAuth
-            Consumers" heading, and click its name to reveal its details. Enter
-            the Key and Secret below:
+            2. After clicking the "Save" button, you'll be taken to the OAuth settings page. Find your new OAuth
+            consumer under the "OAuth Consumers" heading, and click its name to reveal its details. Enter the Key and
+            Secret below:
           </p>
         );
       case "AZURE_DEVOPS":
       case "AZURE_DEVOPS_SERVER":
         return (
           <p className="paragraph">
-            2. Create the application. On the following page, you'll find its
-            details. Enter the App ID and Client Secret below:
+            2. Create the application. On the following page, you'll find its details. Enter the App ID and Client
+            Secret below:
           </p>
         );
       default:
         return (
           <p className="paragraph">
-            2. After clicking the "Register application" button, you'll be taken
-            to the new application's page. Enter the Client ID below:
+            2. After clicking the "Register application" button, you'll be taken to the new application's page. Enter
+            the Client ID below:
           </p>
         );
     }
   };
 
-  const renderStep3 = (vcs) => {
+  const renderStep3 = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
@@ -646,7 +638,9 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         return (
           <div>
             <p className="paragraph">
-              3. Next, generate a {connectionType === "OAUTH" ? "client secret and" : "private key and convert it to PKCS#8 format then"} enter the value below:
+              3. Next, generate a{" "}
+              {connectionType === "OAUTH" ? "client secret and" : "private key and convert it to PKCS#8 format then"}{" "}
+              enter the value below:
             </p>
             <br />
           </div>
@@ -654,7 +648,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const getConnectUrl = (vcs, clientId, callbackUrl, endpoint) => {
+  const getConnectUrl = (vcs: VcsTypeExtended, clientId: string, callbackUrl: string, endpoint: string) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
@@ -677,12 +671,11 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       default:
         if (endpoint != null)
           return `${endpoint}/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
-        else
-          return `https://github.com/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
+        else return `https://github.com/login/oauth/authorize?client_id=${clientId}&allow_signup=false&scope=repo`;
     }
   };
 
-  const getDefaultHttps = (vcsType) => {
+  const getDefaultHttps = (vcsType: VcsTypeExtended) => {
     switch (vcsType) {
       case "GITLAB":
         return `https://gitlab.com`;
@@ -697,7 +690,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = (values: CreateVcsForm) => {
     console.log(`Using endpoint ${values.endpoint}`);
     const body = {
       data: {
@@ -729,7 +722,7 @@ export const AddVCS = ({ setMode, loadVCS }) => {
       .then((response) => {
         console.log("created");
         console.log(response);
-        if (response.status == "201") {
+        if (response.status == 201) {
           if (connectionType === "OAUTH") {
             window.location.replace(
               getConnectUrl(
@@ -749,14 +742,9 @@ export const AddVCS = ({ setMode, loadVCS }) => {
           if (error.response.status === 403) {
             message.error(
               <span>
-                You are not authorized to create VCS Settings. <br /> Please
-                contact your administrator and request the{" "}
-                <b>Manage VCS Settings</b> permission. <br /> For more
-                information, visit the{" "}
-                <a
-                  target="_blank"
-                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
-                >
+                You are not authorized to create VCS Settings. <br /> Please contact your administrator and request the{" "}
+                <b>Manage VCS Settings</b> permission. <br /> For more information, visit the{" "}
+                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
                   Terrakube documentation
                 </a>
                 .
@@ -770,17 +758,11 @@ export const AddVCS = ({ setMode, loadVCS }) => {
     <div>
       <h1>Add VCS Provider</h1>
       <div className="App-text">
-        To connect workspaces, modules, and policy sets to git repositories
-        containing Terraform configurations, Terrakube needs access to your
-        version control system (VCS) provider. Use this page to configure OAuth
+        To connect workspaces, modules, and policy sets to git repositories containing Terraform configurations,
+        Terrakube needs access to your version control system (VCS) provider. Use this page to configure OAuth
         authentication with your VCS provider.
       </div>
-      <Steps
-        direction="horizontal"
-        size="small"
-        current={current}
-        onChange={handleChange}
-      >
+      <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
         <Step title="Connect to VCS" />
         <Step title="Set up provider" />
       </Steps>
@@ -825,14 +807,8 @@ export const AddVCS = ({ setMode, loadVCS }) => {
         <Space className="chooseType" direction="vertical">
           <h3>Set up provider</h3>
           <p className="paragraph">
-            For additional information about connecting to{" "}
-            {renderVCSType(vcsType)} to Terrakube, please read our{" "}
-            <Button
-              className="link"
-              target="_blank"
-              href={getDocsUrl(vcsType)}
-              type="link"
-            >
+            For additional information about connecting to {renderVCSType(vcsType)} to Terrakube, please read our{" "}
+            <Button className="link" target="_blank" href={getDocsUrl(vcsType)} type="link">
               documentation&nbsp; <HiOutlineExternalLink />.
             </Button>
           </p>
@@ -856,27 +832,13 @@ export const AddVCS = ({ setMode, loadVCS }) => {
             >
               <Input placeholder={renderVCSType(vcsType)} />
             </Form.Item>
-            <Form.Item
-              name="endpoint"
-              label="HTTPS URL"
-              rules={[{ required: true }]}
-              hidden={httpsHidden(vcsType)}
-            >
+            <Form.Item name="endpoint" label="HTTPS URL" rules={[{ required: true }]} hidden={httpsHidden(vcsType)}>
               <Input placeholder={getHttpsPlaceholder(vcsType)} />
             </Form.Item>
-            <Form.Item
-              name="apiUrl"
-              label="API URL"
-              rules={[{ required: true }]}
-              hidden={apiUrlHidden(vcsType)}
-            >
+            <Form.Item name="apiUrl" label="API URL" rules={[{ required: true }]} hidden={apiUrlHidden(vcsType)}>
               <Input placeholder={getAPIUrlPlaceholder(vcsType)} />
             </Form.Item>
-            <Form.Item
-              name="clientId"
-              label={getClientIdName(vcsType)}
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="clientId" label={getClientIdName(vcsType)} rules={[{ required: true }]}>
               <Input placeholder={connectionType === "OAUTH" ? "ex. 824ff023a7136981f322" : "970081"} />
             </Form.Item>
             {renderStep3(vcsType)}

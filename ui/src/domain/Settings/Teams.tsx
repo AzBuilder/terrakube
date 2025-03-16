@@ -1,73 +1,60 @@
-import { React, useState, useEffect } from "react";
-import {EditTeam} from "./EditTeam";
-import {
-  Button,
-  List,
-  Popconfirm,
-  Space,
-  Avatar,
-  Divider,
-} from "antd";
-import "./Settings.css";
-import axiosInstance from "../../config/axiosConfig";
+import { DeleteOutlined, EditOutlined, TeamOutlined } from "@ant-design/icons";
+import { Avatar, Button, Divider, List, Popconfirm, Space } from "antd";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  TeamOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import axiosInstance from "../../config/axiosConfig";
+import { Team } from "../types";
+import { EditTeam } from "./EditTeam";
+import "./Settings.css";
 
-export const TeamSettings = ({key}) => {
+type Props = {
+  key: string;
+};
+
+export const TeamSettings = ({ key }: Props) => {
   const { orgid } = useParams();
-  const [teams, setTeams] = useState([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [mode, setMode] = useState<"list" | "edit" | "create">("list");
+  const [teamId, setTeamId] = useState<string>();
 
-  const [mode, setMode] = useState("list");
-  const [teamId, setTeamId] = useState([]);
-
-  const onEdit = (id) => {
+  const onEdit = (id: string) => {
     setMode("edit");
     setTeamId(id);
-    setVisible(true);
-
   };
 
   const onNew = () => {
     setMode("create");
   };
 
-  const onDelete = (id) => {
+  const onDelete = (id: string) => {
     console.log("deleted " + id);
-    axiosInstance
-      .delete(`organization/${orgid}/team/${id}`)
-      .then((response) => {
-        console.log(response);
-        loadTeams();
-      });
+    axiosInstance.delete(`organization/${orgid}/team/${id}`).then((response) => {
+      console.log(response);
+      loadTeams();
+    });
   };
 
   const loadTeams = () => {
     axiosInstance.get(`organization/${orgid}/team`).then((response) => {
       console.log(response);
-      setTeams(response.data);
+      setTeams(response.data.data);
       setLoading(false);
     });
   };
   useEffect(() => {
     setLoading(true);
     loadTeams();
-  }, [orgid,key]);
+  }, [orgid, key]);
 
   return (
     <div className="setting">
-      {(mode !== "list" && <EditTeam mode={mode} setMode={setMode} teamId={teamId} loadTeams={loadTeams}/>) || (
+      {(mode !== "list" && <EditTeam mode={mode} setMode={setMode} teamId={teamId} loadTeams={loadTeams} />) || (
         <>
           <h1>Team Management</h1>
           <div className="App-text">
-            Teams let you group users into specific categories to enable finer
-            grained access control policies. For example, your developers could
-            be on a dev team that only has access to run jobs.
+            Teams let you group users into specific categories to enable finer grained access control policies. For
+            example, your developers could be on a dev team that only has access to run jobs.
           </div>
           <Button type="primary" onClick={onNew} htmlType="button">
             Create team
@@ -75,12 +62,12 @@ export const TeamSettings = ({key}) => {
           <br></br>
 
           <h3 style={{ marginTop: "30px" }}>Teams</h3>
-          {loading || !teams.data ? (
+          {loading || teams.length === 0 ? (
             <p>Data loading...</p>
           ) : (
             <List
               itemLayout="horizontal"
-              dataSource={teams.data}
+              dataSource={teams}
               renderItem={(item) => (
                 <List.Item
                   actions={[
@@ -116,39 +103,20 @@ export const TeamSettings = ({key}) => {
                   ]}
                 >
                   <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        style={{ backgroundColor: "#1890ff" }}
-                        icon={<TeamOutlined />}
-                      ></Avatar>
-                    }
+                    avatar={<Avatar style={{ backgroundColor: "#1890ff" }} icon={<TeamOutlined />}></Avatar>}
                     title={item.attributes.name}
                     description={
                       <div>
                         Access to Manage:&nbsp;&nbsp;&nbsp;
                         <Space split={<Divider type="vertical" />}>
-                          {item.attributes.manageWorkspace ? (
-                            <span>Workspaces</span>
-                          ) : null}
-                          {item.attributes.manageState ? (
-                              <span>State</span>
-                          ) : null}
-                          {item.attributes.manageModule ? (
-                            <span>Modules</span>
-                          ) : null}
-                          {item.attributes.manageCollection ? (
-                              <span>Collection</span>
-                          ) : null}
-                          {item.attributes.manageJob ? (
-                              <span>Job</span>
-                          ) : null}
-                          {item.attributes.manageProvider ? (
-                            <span>Providers</span>
-                          ) : null}
+                          {item.attributes.manageWorkspace ? <span>Workspaces</span> : null}
+                          {item.attributes.manageState ? <span>State</span> : null}
+                          {item.attributes.manageModule ? <span>Modules</span> : null}
+                          {item.attributes.manageCollection ? <span>Collection</span> : null}
+                          {item.attributes.manageJob ? <span>Job</span> : null}
+                          {item.attributes.manageProvider ? <span>Providers</span> : null}
                           {item.attributes.manageVcs ? <span>Vcs</span> : null}
-                          {item.attributes.manageTemplate ? (
-                            <span>Templates</span>
-                          ) : null}
+                          {item.attributes.manageTemplate ? <span>Templates</span> : null}
                         </Space>
                       </div>
                     }

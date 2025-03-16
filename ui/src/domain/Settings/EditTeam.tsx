@@ -1,50 +1,75 @@
-import { React, useState, useEffect } from "react";
-import "./Settings.css";
+import { ClockCircleOutlined, DeleteOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
-  Space,
-  Switch,
+  Alert,
+  Button,
+  Card,
+  Col,
   Form,
   Input,
-  Button,
+  InputNumber,
   List,
   Modal,
-  InputNumber,
-  Typography,
-  Alert,
-  Row,
-  Tooltip,
-  Col,
   Popconfirm,
+  Row,
+  Space,
+  Switch,
   Tag,
-  Card
+  Tooltip,
+  Typography,
 } from "antd";
-import axiosInstance, { axiosClientAuth } from "../../config/axiosConfig";
-import { useParams } from "react-router-dom";
-import {
-  InfoCircleOutlined,
-  DeleteOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
 import FormItem from "antd/es/form/FormItem";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axiosInstance, { axiosClientAuth } from "../../config/axiosConfig";
+import { TeamToken } from "../types";
+import "./Settings.css";
 const { DateTime } = require("luxon");
 const { Paragraph } = Typography;
 
-export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
+type Props = {
+  mode: "edit" | "create";
+  setMode: React.Dispatch<React.SetStateAction<"list" | "edit" | "create">>;
+  teamId?: string;
+  loadTeams: () => void;
+};
+
+type CreateTeamForm = {
+  name: string;
+} & UpdatTeamForm;
+
+type UpdatTeamForm = {
+  manageCollection: boolean;
+  manageJob: boolean;
+  manageModule: boolean;
+  manageProvider: boolean;
+  manageState: boolean;
+  manageTemplate: boolean;
+  manageVcs: boolean;
+  manageWorkspace: boolean;
+};
+
+type TokenForm = {
+  description: string;
+  days: number;
+  minutes: number;
+  hours: number;
+};
+
+export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
   const { orgid } = useParams();
   const [loading, setLoading] = useState(true);
   const [loadingTokens, setLoadingTokens] = useState(true);
   const [form] = Form.useForm();
   const [formToken] = Form.useForm();
-  const [teamName, setTeamName] = useState(false);
-  const [tokens, setTokens] = useState([]);
+  const [teamName, setTeamName] = useState<string>();
+  const [tokens, setTokens] = useState<TeamToken[]>([]);
   const [visible, setVisible] = useState(false);
   const [visibleToken, setVisibleToken] = useState(false);
   const [creating, setCreating] = useState(false);
   const [token, setToken] = useState("");
   const [createTokenDisabled, setCreateTokenDisabled] = useState(true);
   useEffect(() => {
-    if (mode === "edit") {
+    if (mode === "edit" && teamId) {
       setLoading(true);
       setLoadingTokens(true);
       loadTeam(teamId);
@@ -54,7 +79,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     }
   }, [teamId]);
 
-  const loadTeam = (id) => {
+  const loadTeam = (id: string) => {
     axiosInstance.get(`organization/${orgid}/team/${id}`).then((response) => {
       setTeamName(response.data.data.attributes.name);
       form.setFieldsValue({
@@ -73,7 +98,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     });
   };
 
-  const onCreate = (values) => {
+  const onCreate = (values: CreateTeamForm) => {
     const body = {
       data: {
         type: "team",
@@ -112,7 +137,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     setVisible(true);
   };
 
-  const onUpdate = (values) => {
+  const onUpdate = (values: UpdatTeamForm) => {
     const body = {
       data: {
         type: "team",
@@ -125,7 +150,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           manageVcs: values.manageVcs,
           manageTemplate: values.manageTemplate,
           manageCollection: values.manageCollection,
-          manageJob: values.manageJob
+          manageJob: values.manageJob,
         },
       },
     };
@@ -145,15 +170,15 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
       });
   };
 
-  const onFinish = (values) => {
+  const onFinish = (values: CreateTeamForm | UpdatTeamForm) => {
     if (mode === "edit") {
       onUpdate(values);
     } else {
-      onCreate(values);
+      onCreate(values as CreateTeamForm);
     }
   };
 
-  const onDelete = (id) => {
+  const onDelete = (id: string) => {
     console.log("deleted " + id);
     axiosClientAuth
       .delete(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/${id}`)
@@ -173,7 +198,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     formToken.resetFields();
   };
 
-  const onCreateToken = (values) => {
+  const onCreateToken = (values: TokenForm) => {
     const body = {
       description: values.description,
       days: values.days,
@@ -184,17 +209,11 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
     console.log(body);
 
     axiosClientAuth
-      .post(
-        `${
-          new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-        }/access-token/v1/teams`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      )
+      .post(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
       .then((response) => {
         console.log(response);
         setToken(response.data.token);
@@ -206,30 +225,20 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
       });
   };
 
-  const loadTokens = (tokenName) => {
+  const loadTokens = (tokenName?: string) => {
     axiosClientAuth
-      .get(
-        `${
-          new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-        }/access-token/v1/teams`
-      )
+      .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams`)
       .then((response) => {
         console.log(response);
-        var filteredTokens = response.data.filter(
-          (token) => token.group === tokenName
-        );
+        var filteredTokens = response.data.filter((token: any) => token.group === tokenName);
         setTokens(filteredTokens);
         setLoadingTokens(false);
       });
   };
 
-  const loadUserTeams = (teamName) => {
+  const loadUserTeams = (teamName: string) => {
     axiosClientAuth
-      .get(
-        `${
-          new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-        }/access-token/v1/teams/current-teams`
-      )
+      .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/current-teams`)
       .then((response) => {
         console.log(response);
         if (response.data?.groups.includes(teamName)) {
@@ -281,8 +290,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
               valuePropName="checked"
               label="Manage Workspaces"
               tooltip={{
-                title:
-                  "Allow members to create and administrate all workspaces within the organization",
+                title: "Allow members to create and administrate all workspaces within the organization",
                 icon: <InfoCircleOutlined />,
               }}
             >
@@ -293,34 +301,31 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
               valuePropName="checked"
               label="Manage Modules"
               tooltip={{
-                title:
-                  "Allow members to create and administrate all modules within the organization",
+                title: "Allow members to create and administrate all modules within the organization",
                 icon: <InfoCircleOutlined />,
               }}
             >
               <Switch />
             </Form.Item>
             <Form.Item
-                name="manageCollection"
-                valuePropName="checked"
-                label="Manage Collections"
-                tooltip={{
-                  title:
-                      "Allow members to create and manage all collections within the organization",
-                  icon: <InfoCircleOutlined />,
-                }}
+              name="manageCollection"
+              valuePropName="checked"
+              label="Manage Collections"
+              tooltip={{
+                title: "Allow members to create and manage all collections within the organization",
+                icon: <InfoCircleOutlined />,
+              }}
             >
               <Switch />
             </Form.Item>
             <Form.Item
-                name="manageJob"
-                valuePropName="checked"
-                label="Manage Job"
-                tooltip={{
-                  title:
-                      "Allow members to create jobs inside the organization",
-                  icon: <InfoCircleOutlined />,
-                }}
+              name="manageJob"
+              valuePropName="checked"
+              label="Manage Job"
+              tooltip={{
+                title: "Allow members to create jobs inside the organization",
+                icon: <InfoCircleOutlined />,
+              }}
             >
               <Switch />
             </Form.Item>
@@ -329,8 +334,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
               valuePropName="checked"
               label="Manage Providers"
               tooltip={{
-                title:
-                  "Allow members to create and administrate all providers within the organization",
+                title: "Allow members to create and administrate all providers within the organization",
                 icon: <InfoCircleOutlined />,
               }}
             >
@@ -341,8 +345,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
               valuePropName="checked"
               label="Manage VCS Settings"
               tooltip={{
-                title:
-                  "Allow members to create and administrate all VCS Settings within the organization",
+                title: "Allow members to create and administrate all VCS Settings within the organization",
                 icon: <InfoCircleOutlined />,
               }}
             >
@@ -353,8 +356,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
               valuePropName="checked"
               label="Manage Templates"
               tooltip={{
-                title:
-                  "Allow members to create and administrate all Templates within the organization",
+                title: "Allow members to create and administrate all Templates within the organization",
                 icon: <InfoCircleOutlined />,
               }}
             >
@@ -369,9 +371,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                 <></>
               )}
               <Button type="primary" htmlType="submit">
-                {mode === "edit"
-                  ? "Update team organization access"
-                  : "Create team"}
+                {mode === "edit" ? "Update team organization access" : "Create team"}
               </Button>
             </Space>
           </Form>
@@ -382,19 +382,12 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
         <>
           <h2 style={{ marginTop: "30px" }}>Team API Tokens</h2>
           <div className="App-text">
-            You can use team API tokens to perform API actions. The token’s
-            access level matches the team’s access level. For example, if a team
-            can execute jobs on workspaces, the token can also create jobs on
-            workspaces through the API.
+            You can use team API tokens to perform API actions. The token’s access level matches the team’s access
+            level. For example, if a team can execute jobs on workspaces, the token can also create jobs on workspaces
+            through the API.
           </div>
           <Tooltip title="A team token can only be generated if you are member of this team.">
-            <Button
-              type="primary"
-              disabled={createTokenDisabled}
-              onClick={onNewToken}
-              htmlType="button"
-              to
-            >
+            <Button type="primary" disabled={createTokenDisabled} onClick={onNewToken} htmlType="button">
               Create a Team Token
             </Button>
           </Tooltip>
@@ -436,16 +429,15 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                         </Row>
                         <Row>
                           <Col span={20}>
-                            <Tag
-                              icon={<ExclamationCircleOutlined />}
-                              color="warning"
-                            >
+                            <Tag icon={<ExclamationCircleOutlined />} color="warning">
                               {" "}
                               <b>
                                 Expires{": "}
-                                {(item.days > 0 || item.minutes > 0 || item.hours > 0) ? DateTime.fromISO(item.createdDate)
-                                  .plus({ days: item.days, minutes: item.minutes, hours: item.hours })
-                                  .toLocaleString(DateTime.DATETIME_MED) : "Token without expiration date"}
+                                {item.days > 0 || item.minutes > 0 || item.hours > 0
+                                  ? DateTime.fromISO(item.createdDate)
+                                      .plus({ days: item.days, minutes: item.minutes, hours: item.hours })
+                                      .toLocaleString(DateTime.DATETIME_MED)
+                                  : "Token without expiration date"}
                               </b>
                             </Tag>
                           </Col>
@@ -453,11 +445,8 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                         <br />
                         <Row>
                           <Col span={20} style={{ color: "rgb(82, 87, 97)" }}>
-                            <ClockCircleOutlined /> Created{" "}
-                            <b>
-                              {DateTime.fromISO(item.createdDate).toRelative()}
-                            </b>{" "}
-                            by user <b>{item.createdBy}</b>
+                            <ClockCircleOutlined /> Created <b>{DateTime.fromISO(item.createdDate).toRelative()}</b> by
+                            user <b>{item.createdBy}</b>
                           </Col>
                         </Row>
                       </Card>
@@ -489,17 +478,11 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
             }}
           >
             <Space style={{ width: "100%" }} direction="vertical">
-              <Form
-                name="tokens"
-                initialValues={{ minutes: 0, hours: 0, days: 0 }}
-                form={formToken}
-                layout="vertical"
-              >
+              <Form name="tokens" initialValues={{ minutes: 0, hours: 0, days: 0 }} form={formToken} layout="vertical">
                 <Form.Item
                   name="description"
                   tooltip={{
-                    title:
-                      "Choose a description to help you identify this token later",
+                    title: "Choose a description to help you identify this token later",
                     icon: <InfoCircleOutlined />,
                   }}
                   label="Description"
@@ -557,9 +540,8 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
           >
             <Space style={{ width: "100%" }} direction="vertical">
               <p>
-                Your new Team API token is displayed below. Treat this token
-                like a password, as it can be used to access your account
-                without a username, password, or two-factor authentication.
+                Your new Team API token is displayed below. Treat this token like a password, as it can be used to
+                access your account without a username, password, or two-factor authentication.
               </p>
               <p>
                 <Paragraph style={{ backgroundColor: "#ebeef2" }} copyable>
@@ -570,8 +552,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }) => {
                 message="Warning"
                 description={
                   <span>
-                    This token <b>will not be displayed again</b>, so make sure
-                    to save it to a safe place.
+                    This token <b>will not be displayed again</b>, so make sure to save it to a safe place.
                   </span>
                 }
                 type="warning"

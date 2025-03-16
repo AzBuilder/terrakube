@@ -1,50 +1,50 @@
-import { React, useState, useEffect } from "react";
 import {
-  Button,
-  Layout,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  GithubOutlined,
+  GitlabOutlined,
+  ImportOutlined,
+  InfoCircleOutlined,
+  PlusOutlined,
+  StopOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
+import {
   Breadcrumb,
-  Input,
-  List,
-  Space,
+  Button,
   Card,
+  Col,
+  Input,
+  Layout,
+  List,
+  Radio,
+  RadioChangeEvent,
+  Row,
+  Select,
+  Space,
   Tag,
   Tooltip,
-  Radio,
-  Row,
-  Col,
-  Select,
 } from "antd";
-import {
-  GitlabOutlined,
-  GithubOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  SyncOutlined,
-  ExclamationCircleOutlined,
-  InfoCircleOutlined,
-  CloseCircleOutlined,
-  StopOutlined,
-  PlusOutlined,
-  ImportOutlined,
-} from "@ant-design/icons";
-import { BiTerminal } from "react-icons/bi";
-import { SiTerraform, SiBitbucket } from "react-icons/si";
-import { VscAzureDevops } from "react-icons/vsc";
+import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
+import { BiTerminal } from "react-icons/bi";
+import { SiBitbucket, SiTerraform } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
+import { useNavigate, useParams } from "react-router-dom";
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance, { axiosGraphQL } from "../../config/axiosConfig";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  ORGANIZATION_ARCHIVE,
-  ORGANIZATION_NAME,
-} from "../../config/actionTypes";
 const { Content } = Layout;
 const { DateTime } = require("luxon");
 const { Search } = Input;
 
-export const OrganizationDetails = ({
-  setOrganizationName,
-  organizationName,
-}) => {
+type Props = {
+  organizationName: string;
+  setOrganizationName: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export const OrganizationDetails = ({ setOrganizationName, organizationName }: Props) => {
   const { id } = useParams();
   const [organization, setOrganization] = useState({});
   const [workspaces, setWorkspaces] = useState([]);
@@ -56,11 +56,11 @@ export const OrganizationDetails = ({
   const [tags, setTags] = useState([]);
   const navigate = useNavigate();
 
-  const handleCreate = (e) => {
+  const handleCreate = () => {
     navigate("/workspaces/create");
   };
 
-  const handleImport = (e) => {
+  const handleImport = () => {
     navigate("/workspaces/import");
   };
 
@@ -68,8 +68,7 @@ export const OrganizationDetails = ({
     {
       id: "terraform",
       name: "Terraform",
-      description:
-        "Create an empty template. So you can define your template from scratch.",
+      description: "Create an empty template. So you can define your template from scratch.",
       icon: (
         <IconContext.Provider value={{ size: "1.3em" }}>
           <SiTerraform />
@@ -83,7 +82,7 @@ export const OrganizationDetails = ({
     },
   ];
 
-  const renderVCSLogo = (hostname) => {
+  const renderVCSLogo = (hostname: string) => {
     if (hostname.includes("gitlab"))
       return (
         <Tooltip title="Gitlab">
@@ -114,27 +113,27 @@ export const OrganizationDetails = ({
     );
   };
 
-  const handleClick = (workspaceId) => {
+  const handleClick = (workspaceId: string) => {
     console.log(id);
     navigate("/organizations/" + id + "/workspaces/" + workspaceId);
   };
 
-  const onFilterChange = (e) => {
+  const onFilterChange = (e: RadioChangeEvent) => {
     setFilterValue(e.target.value);
     applyFilters(searchValue, e.target.value, filterTags);
   };
 
-  const handleChange = (value) => {
+  const handleChange = (value: any) => {
     console.log(`selected ${value}`);
     setFilterTags(value);
     applyFilters(searchValue, filterValue, value);
   };
 
-  const onSearch = (value) => {
+  const onSearch = (value: string) => {
     applyFilters(value, filterValue, filterTags);
   };
 
-  const updateSearchValue = (e) => {
+  const updateSearchValue = (e: React.ChangeEventHandler<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
@@ -142,8 +141,7 @@ export const OrganizationDetails = ({
     return tags.data.find((tag) => tag.id === tagId)?.attributes?.name;
   };
 
-  const filterOption = (input, option) =>
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+  const filterOption = (input, option) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const getIaCIconById = (id) => {
     const item = iacTypes.find((iacType) => iacType.id === id);
@@ -159,22 +157,12 @@ export const OrganizationDetails = ({
     console.log(filterValue || "filter empty");
     console.log(selectedTags || "tags empty");
 
-    var filteredWorkspaces = filterWorkspaces(
-      workspaces,
-      searchValue,
-      filterValue,
-      selectedTags
-    );
+    var filteredWorkspaces = filterWorkspaces(workspaces, searchValue, filterValue, selectedTags);
     setFilteredWorkspaces(filteredWorkspaces);
     return;
   };
 
-  const filterWorkspaces = (
-    workspaces,
-    searchValue,
-    filterValue,
-    selectedTags
-  ) => {
+  const filterWorkspaces = (workspaces, searchValue, filterValue, selectedTags) => {
     // filter by description and name
     var filteredWorkspaces = workspaces.filter((workspace) => {
       if (workspace.description) {
@@ -189,16 +177,13 @@ export const OrganizationDetails = ({
 
     // filter by status
     filteredWorkspaces = filteredWorkspaces.filter(
-      (workspace) =>
-        workspace.lastStatus === (filterValue || workspace.lastStatus)
+      (workspace) => workspace.lastStatus === (filterValue || workspace.lastStatus)
     );
 
     // filter by tag
     filteredWorkspaces = filteredWorkspaces.filter((workspace) => {
       if (selectedTags && selectedTags.length > 0) {
-        return workspace.workspaceTag.edges.some((tag) =>
-          selectedTags.includes(tag.node.tagId)
-        );
+        return workspace.workspaceTag.edges.some((tag) => selectedTags.includes(tag.node.tagId));
       } else {
         return true;
       }
@@ -269,8 +254,7 @@ export const OrganizationDetails = ({
       })
       .then((response) => {
         console.log(response);
-        var organizationName =
-          response.data.data.organization.edges[0].node.name;
+        var organizationName = response.data.data.organization.edges[0].node.name;
         setOrganization(response.data.data.organization.edges[0].node);
 
         setupOrganizationIncludes(
@@ -309,19 +293,10 @@ export const OrganizationDetails = ({
           <div className="variableActions">
             <h2>Workspaces</h2>
             <Space>
-              <Button
-                icon={<ImportOutlined />}
-                htmlType="button"
-                onClick={handleImport}
-              >
+              <Button icon={<ImportOutlined />} htmlType="button" onClick={handleImport}>
                 Import workspaces
               </Button>
-              <Button
-                icon={<PlusOutlined />}
-                type="primary"
-                htmlType="button"
-                onClick={handleCreate}
-              >
+              <Button icon={<PlusOutlined />} type="primary" htmlType="button" onClick={handleCreate}>
                 New workspace
               </Button>
             </Space>
@@ -329,10 +304,7 @@ export const OrganizationDetails = ({
           <Row style={{ marginTop: "10px" }}>
             <Col span={12}>
               <Radio.Group onChange={onFilterChange} value={filterValue}>
-                <Tooltip
-                  placement="bottom"
-                  title="Show only workspaces needing attention"
-                >
+                <Tooltip placement="bottom" title="Show only workspaces needing attention">
                   <Radio.Button
                     value="waitingApproval"
                     onClick={(e) => {
@@ -346,10 +318,7 @@ export const OrganizationDetails = ({
                     <ExclamationCircleOutlined style={{ color: "#fa8f37" }} />
                   </Radio.Button>
                 </Tooltip>
-                <Tooltip
-                  placement="bottom"
-                  title="Show only workspaces with error"
-                >
+                <Tooltip placement="bottom" title="Show only workspaces with error">
                   <Radio.Button
                     value="failed"
                     onClick={(e) => {
@@ -363,10 +332,7 @@ export const OrganizationDetails = ({
                     <StopOutlined style={{ color: "#FB0136" }} />
                   </Radio.Button>
                 </Tooltip>
-                <Tooltip
-                  placement="bottom"
-                  title="Show only running workspaces"
-                >
+                <Tooltip placement="bottom" title="Show only running workspaces">
                   <Radio.Button
                     value="running"
                     onClick={(e) => {
@@ -380,10 +346,7 @@ export const OrganizationDetails = ({
                     <SyncOutlined style={{ color: "#108ee9" }} />
                   </Radio.Button>
                 </Tooltip>
-                <Tooltip
-                  placement="bottom"
-                  title="Show only successfully completed workspaces"
-                >
+                <Tooltip placement="bottom" title="Show only successfully completed workspaces">
                   <Radio.Button
                     value="completed"
                     onClick={(e) => {
@@ -397,10 +360,7 @@ export const OrganizationDetails = ({
                     <CheckCircleOutlined style={{ color: "#2eb039" }} />
                   </Radio.Button>
                 </Tooltip>
-                <Tooltip
-                  placement="bottom"
-                  title="Show only never executed workspaces"
-                >
+                <Tooltip placement="bottom" title="Show only never executed workspaces">
                   <Radio.Button
                     value="never executed"
                     onClick={(e) => {
@@ -430,9 +390,7 @@ export const OrganizationDetails = ({
                     onChange={handleChange}
                     value={filterTags}
                     filterSort={(optionA, optionB) =>
-                      (optionA?.label ?? "")
-                        .toLowerCase()
-                        .localeCompare((optionB?.label ?? "").toLowerCase())
+                      (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
                     }
                     loading={!tags.data}
                     options={tags?.data?.map(function (tag) {
@@ -464,15 +422,8 @@ export const OrganizationDetails = ({
               pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
               renderItem={(item) => (
                 <List.Item>
-                  <Card
-                    onClick={() => handleClick(item.id)}
-                    style={{ width: "100%" }}
-                    hoverable
-                  >
-                    <Space
-                      style={{ color: "rgb(82, 87, 97)", width: "100%" }}
-                      direction="vertical"
-                    >
+                  <Card onClick={() => handleClick(item.id)} style={{ width: "100%" }} hoverable>
+                    <Space style={{ color: "rgb(82, 87, 97)", width: "100%" }} direction="vertical">
                       <Row>
                         <Col span={12}>
                           <h3>{item.name}</h3>
@@ -527,8 +478,7 @@ export const OrganizationDetails = ({
                         <span>
                           <ClockCircleOutlined />
                           &nbsp;&nbsp;
-                          {DateTime.fromISO(item.lastRun).toRelative() ??
-                            "never executed"}
+                          {DateTime.fromISO(item.lastRun).toRelative() ?? "never executed"}
                         </span>
                         <span>
                           {getIaCIconById(item.iacType)}
@@ -536,18 +486,10 @@ export const OrganizationDetails = ({
                         </span>
                         {item.branch !== "remote-content" ? (
                           <span>
-                            {renderVCSLogo(
-                              new URL(fixSshURL(item.source)).hostname
-                            )}
+                            {renderVCSLogo(new URL(fixSshURL(item.source)).hostname)}
                             &nbsp;{" "}
-                            <a
-                              href={fixSshURL(item.source)}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              {new URL(fixSshURL(item.source)).pathname
-                                .replace(".git", "")
-                                .substring(1)}
+                            <a href={fixSshURL(item.source)} target="_blank" rel="noreferrer">
+                              {new URL(fixSshURL(item.source)).pathname.replace(".git", "").substring(1)}
                             </a>
                           </span>
                         ) : (
@@ -584,12 +526,7 @@ function fixSshURL(source) {
   }
 }
 
-function setupOrganizationIncludes(
-  includes,
-  setWorkspaces,
-  setFilteredWorkspaces,
-  filter
-) {
+function setupOrganizationIncludes(includes, setWorkspaces, setFilteredWorkspaces, filter) {
   let workspaces = [];
 
   includes.forEach((element) => {
@@ -623,12 +560,7 @@ function setupOrganizationIncludes(
   const _filterValue = sessionStorage.getItem("filterValue") || "";
   const _selectedTags = sessionStorage.getItem("selectedTags") || [];
 
-  var filteredWorkspaces = filter(
-    workspaces,
-    _searchValue,
-    _filterValue,
-    _selectedTags
-  );
+  var filteredWorkspaces = filter(workspaces, _searchValue, _filterValue, _selectedTags);
 
   setFilteredWorkspaces(filteredWorkspaces);
   console.log(workspaces);
