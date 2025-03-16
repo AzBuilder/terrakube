@@ -1,5 +1,5 @@
-import { React, useEffect, useState } from "react";
 import { Select } from "antd";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
 
 export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
@@ -23,34 +23,31 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
     };
 
     //search for existing tag if you type the name and hit enter
-    let existingTagId
-    console.log("Searching existing value")
-    axiosInstance
-    .get(`organization/${organizationId}/tag?filter[tag]=name==${tagName}`)
-    .then((oldTag) => {
-      existingTagId = oldTag.data?.data[0]?.id
-      console.log(`Existing TagId ${existingTagId} for ${tagName}`)
+    let existingTagId;
+    console.log("Searching existing value");
+    axiosInstance.get(`organization/${organizationId}/tag?filter[tag]=name==${tagName}`).then((oldTag) => {
+      existingTagId = oldTag.data?.data[0]?.id;
+      console.log(`Existing TagId ${existingTagId} for ${tagName}`);
 
-      if(existingTagId === undefined){
-        console.log('Tag does not exists, creating a new one....')
+      if (existingTagId === undefined) {
+        console.log("Tag does not exists, creating a new one....");
         axiosInstance
-        .post(`organization/${organizationId}/tag`, body, {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        })
-        .then((response) => {
-          newTags.push(response.data?.data);
-          setNewTags(newTags);
-          console.log(newTags);
-          addTagToWorkspace(response.data?.data?.id);
-        });
+          .post(`organization/${organizationId}/tag`, body, {
+            headers: {
+              "Content-Type": "application/vnd.api+json",
+            },
+          })
+          .then((response) => {
+            newTags.push(response.data?.data);
+            setNewTags(newTags);
+            console.log(newTags);
+            addTagToWorkspace(response.data?.data?.id);
+          });
       } else {
-        console.log('Adding existing tag to workspace ....')
-        addTagToWorkspace(existingTagId)
+        console.log("Adding existing tag to workspace ....");
+        addTagToWorkspace(existingTagId);
       }
     });
-
   };
   const addTagToWorkspace = (tagId) => {
     const body = {
@@ -63,15 +60,11 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
     };
 
     axiosInstance
-      .post(
-        `organization/${organizationId}/workspace/${workspaceId}/workspaceTag`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      )
+      .post(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
       .then((response) => {
         currentTags.data.push(response.data?.data);
         console.log(currentTags);
@@ -86,9 +79,7 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
     var id = currentTags.data.find((x) => x.attributes.tagId === tagId)?.id;
     console.log(id);
     axiosInstance
-      .delete(
-        `organization/${organizationId}/workspace/${workspaceId}/workspaceTag/${id}`
-      )
+      .delete(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag/${id}`)
       .then((response) => {
         var currentTagsFilter = currentTags.data.filter(function (x) {
           return x.id !== id;
@@ -105,20 +96,14 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
     return match != null;
   }
   const loadTags = () => {
-    axiosInstance
-      .get(
-        `organization/${organizationId}/workspace/${workspaceId}/workspaceTag`
-      )
-      .then((response) => {
-        axiosInstance
-          .get(`organization/${organizationId}/tag`)
-          .then((response) => {
-            setTags(response.data);
-            setLoading(false);
-          });
-        setCurrentTags(response.data);
-        console.log(response.data);
+    axiosInstance.get(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag`).then((response) => {
+      axiosInstance.get(`organization/${organizationId}/tag`).then((response) => {
+        setTags(response.data);
+        setLoading(false);
       });
+      setCurrentTags(response.data);
+      console.log(response.data);
+    });
   };
   useEffect(() => {
     loadTags();

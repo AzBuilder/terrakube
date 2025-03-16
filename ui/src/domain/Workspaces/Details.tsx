@@ -22,7 +22,6 @@ import {
   List,
   message,
   Row,
-  Select,
   Space,
   Spin,
   Table,
@@ -30,7 +29,7 @@ import {
   Tag,
   Typography,
 } from "antd";
-import { React, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { BiTerminal } from "react-icons/bi";
 import { FiGitCommit } from "react-icons/fi";
@@ -53,8 +52,8 @@ import { WorkspaceGeneral } from "./Settings/General";
 import { WorkspaceWebhook } from "./Settings/Webhook.jsx";
 import { getIaCIconById, getIaCNameById, renderVCSLogo } from "./Workspaces";
 import "./Workspaces.css";
-const { Option } = Select;
 const { Paragraph } = Typography;
+
 const include = {
   VARIABLE: "variable",
   JOB: "job",
@@ -115,7 +114,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   const [currentStateId, setCurrentStateId] = useState(0);
   const [actions, setActions] = useState([]);
   const [contextState, setContextState] = useState({});
-  const handleClick = (jobid) => {
+  const handleClick = (jobid: string) => {
     changeJob(jobid);
     navigate(`/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`);
   };

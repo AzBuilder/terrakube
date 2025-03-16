@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../config/axiosConfig";
 import { deleteWebhook, genericHeader } from "../Workspaces";
 
+
+type Props = {
+
+}
+
 export const WorkspaceAdvanced = ({ workspace, manageWorkspace }) => {
   const organizationId = workspace.relationships.organization.data.id;
   const navigate = useNavigate();

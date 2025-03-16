@@ -1,35 +1,28 @@
-import { React, useState, useEffect } from "react";
+import { DownOutlined, GithubOutlined, GitlabOutlined } from "@ant-design/icons";
 import {
+  Breadcrumb,
+  Button,
+  Card,
+  Dropdown,
   Form,
   Input,
-  Button,
-  Breadcrumb,
   Layout,
-  Steps,
-  Card,
-  Space,
-  Dropdown,
   List,
+  Space,
   Spin,
+  Steps,
   Table,
   message,
 } from "antd";
-import {
-  ORGANIZATION_ARCHIVE,
-  ORGANIZATION_NAME,
-} from "../../config/actionTypes";
-import axiosInstance from "../../config/axiosConfig";
-import { BiTerminal, BiBookBookmark, BiUpload } from "react-icons/bi";
+import parse from "html-react-parser";
+import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
-import {
-  GithubOutlined,
-  GitlabOutlined,
-  DownOutlined,
-} from "@ant-design/icons";
+import { BiBookBookmark, BiTerminal, BiUpload } from "react-icons/bi";
 import { SiBitbucket } from "react-icons/si";
 import { VscAzureDevops } from "react-icons/vsc";
-import { useNavigate, Link } from "react-router-dom";
-import parse from "html-react-parser";
+import { Link, useNavigate } from "react-router-dom";
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
+import axiosInstance from "../../config/axiosConfig";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -65,10 +58,7 @@ export const ImportWorkspace = () => {
       title: "Terraform Version",
       dataIndex: ["attributes", "terraform-version"],
       sorter: {
-        compare: (a, b) =>
-          a.attributes["terraform-version"].localeCompare(
-            b.attributes["terraform-version"]
-          ),
+        compare: (a, b) => a.attributes["terraform-version"].localeCompare(b.attributes["terraform-version"]),
         multiple: 2,
       },
     },
@@ -79,14 +69,8 @@ export const ImportWorkspace = () => {
         compare: (a, b) => {
           const vcsRepoA = a.attributes["vcs-repo"];
           const vcsRepoB = b.attributes["vcs-repo"];
-          const serviceProviderA =
-            vcsRepoA && vcsRepoA["service-provider"]
-              ? vcsRepoA["service-provider"]
-              : "";
-          const serviceProviderB =
-            vcsRepoB && vcsRepoB["service-provider"]
-              ? vcsRepoB["service-provider"]
-              : "";
+          const serviceProviderA = vcsRepoA && vcsRepoA["service-provider"] ? vcsRepoA["service-provider"] : "";
+          const serviceProviderB = vcsRepoB && vcsRepoB["service-provider"] ? vcsRepoB["service-provider"] : "";
           return serviceProviderA.localeCompare(serviceProviderB);
         },
         multiple: 2,
@@ -267,9 +251,7 @@ export const ImportWorkspace = () => {
       var result = await importWorkspace(workspace);
       console.log("result" + result);
       setWorkspacesImport((prevWorkspaces) =>
-        prevWorkspaces.map((w) =>
-          w.id === workspace.id ? { ...w, status: result } : w
-        )
+        prevWorkspaces.map((w) => (w.id === workspace.id ? { ...w, status: result } : w))
       );
     }
   };
@@ -277,9 +259,7 @@ export const ImportWorkspace = () => {
   const importWorkspace = async (workspace) => {
     try {
       const response = await axiosInstance.post(
-        `${
-          new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-        }/importer/tfcloud/workspaces`,
+        `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/importer/tfcloud/workspaces`,
         {
           organizationId: organizationId,
           vcsId: vcsId,
@@ -310,11 +290,7 @@ export const ImportWorkspace = () => {
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
+      console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
       setWorkspacesImport(selectedRows);
     },
     getCheckboxProps: (record) => ({
@@ -328,9 +304,9 @@ export const ImportWorkspace = () => {
 
     axiosInstance
       .get(
-        `${
-          new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-        }/importer/tfcloud/workspaces?organization=${values.organization}`,
+        `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/importer/tfcloud/workspaces?organization=${
+          values.organization
+        }`,
         {
           headers: {
             "X-TFC-Token": values.apiToken,
@@ -375,8 +351,7 @@ export const ImportWorkspace = () => {
       {
         id: "tfcloud",
         name: "Terraform Cloud",
-        description:
-          "Create an empty template. So you can define your template from scratch.",
+        description: "Create an empty template. So you can define your template from scratch.",
         icon: "/platforms/terraform-cloud.svg",
         height: "60px",
       },
@@ -400,11 +375,7 @@ export const ImportWorkspace = () => {
             title: organizationName,
           },
           {
-            title: (
-              <Link to={`/organizations/${organizationId}/workspaces`}>
-                Workspaces
-              </Link>
-            ),
+            title: <Link to={`/organizations/${organizationId}/workspaces`}>Workspaces</Link>,
           },
           {
             title: "Import Workspaces",
@@ -416,16 +387,10 @@ export const ImportWorkspace = () => {
         <div className="importWorkspace">
           <h2>Import Workspaces</h2>
           <div className="App-text">
-            Easily transfer workspaces from Terraform Cloud and Terraform
-            Enterprise to Terrakube.
+            Easily transfer workspaces from Terraform Cloud and Terraform Enterprise to Terrakube.
           </div>
           <Content hidden={stepsHidden}>
-            <Steps
-              direction="horizontal"
-              size="small"
-              current={current}
-              onChange={handleChange}
-            >
+            <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
               <Step title="Choose Platform" />
               <Step title="Choose Type" />
               {versionControlFlow ? (
@@ -481,8 +446,8 @@ export const ImportWorkspace = () => {
                   </IconContext.Provider>
                   <span className="workflowType">Version control workflow</span>
                   <div className="workflowDescription App-text">
-                    Store your Terraform configuration in a git repository, and
-                    trigger runs based on pull requests and merges.
+                    Store your Terraform configuration in a git repository, and trigger runs based on pull requests and
+                    merges.
                   </div>
                   <div className="workflowSelect"></div>
                 </Card>
@@ -501,8 +466,7 @@ export const ImportWorkspace = () => {
                   </IconContext.Provider>
                   <span className="workflowType">API-driven workflow</span>
                   <div className="workflowDescription App-text">
-                    A more advanced option. Integrate Terraform into a larger
-                    pipeline using the Terraform API.
+                    A more advanced option. Integrate Terraform into a larger pipeline using the Terraform API.
                   </div>
                 </Card>
               </Space>
@@ -512,10 +476,8 @@ export const ImportWorkspace = () => {
               <Space className="chooseType" direction="vertical">
                 <h3>Connect to a version control provider</h3>
                 <div className="workflowDescription2 App-text">
-                  Choose the version control provider hosting your Terraform
-                  configurations for workspace import. For workspaces across
-                  different VCS providers, please run the importer separately
-                  for each.
+                  Choose the version control provider hosting your Terraform configurations for workspace import. For
+                  workspaces across different VCS providers, please run the importer separately for each.
                 </div>
 
                 {vcsButtonsVisible ? (
@@ -540,11 +502,7 @@ export const ImportWorkspace = () => {
                       )}
                     </Space>{" "}
                     <br />
-                    <Button
-                      onClick={handleConnectDifferent}
-                      className="link"
-                      type="link"
-                    >
+                    <Button onClick={handleConnectDifferent} className="link" type="link">
                       Connect to a different VCS
                     </Button>
                   </div>
@@ -580,11 +538,7 @@ export const ImportWorkspace = () => {
                       </Dropdown>
                     </Space>
                     <br />
-                    <Button
-                      onClick={handleConnectExisting}
-                      className="link"
-                      type="link"
-                    >
+                    <Button onClick={handleConnectExisting} className="link" type="link">
                       Use an existing VCS connection
                     </Button>
                   </div>
@@ -600,34 +554,21 @@ export const ImportWorkspace = () => {
               onFinishFailed={onFinishFailed}
               validateMessages={validateMessages}
               initialValues={{
-                apiUrl:
-                  platform.id === "tfcloud"
-                    ? "https://app.terraform.io/api/v2"
-                    : "",
+                apiUrl: platform.id === "tfcloud" ? "https://app.terraform.io/api/v2" : "",
               }}
             >
-              <Space
-                hidden={step3Hidden}
-                className="chooseType"
-                direction="vertical"
-              >
+              <Space hidden={step3Hidden} className="chooseType" direction="vertical">
                 <h3>Connect to Platform</h3>
                 <div className="workflowDescription2 App-text">
-                  Provide the API token to connect with Terraform Cloud API.
-                  Terrakube will use this token exclusively for the duration of
-                  the migration process and will not store it. For guidance on
-                  generating an API token, refer to the{" "}
+                  Provide the API token to connect with Terraform Cloud API. Terrakube will use this token exclusively
+                  for the duration of the migration process and will not store it. For guidance on generating an API
+                  token, refer to the{" "}
                   <a href="https://developer.hashicorp.com/terraform/cloud-docs/users-teams-organizations/api-tokens">
                     Terraform Cloud documentation on API tokens
                   </a>
                   .
                 </div>
-                <Form.Item
-                  name="apiUrl"
-                  label="API URL"
-                  hidden={apiUrlHidden}
-                  rules={[{ required: true }]}
-                >
+                <Form.Item name="apiUrl" label="API URL" hidden={apiUrlHidden} rules={[{ required: true }]}>
                   <Input placeholder="ex. https://<TERRAFORM ENTERPRISE HOSTNAME>/api/v2" />
                 </Form.Item>
                 <Form.Item
@@ -654,16 +595,11 @@ export const ImportWorkspace = () => {
               </Space>
             </Form>
 
-            <Space
-              className="chooseType"
-              hidden={workspacesHidden}
-              direction="vertical"
-            >
+            <Space className="chooseType" hidden={workspacesHidden} direction="vertical">
               <h3>Import Workspaces</h3>
               <div className="workflowDescription2 App-text">
-                Select one or multiple workspaces that you wish to import. After
-                making your selection, click the 'Import' button to initiate the
-                import process. The chosen workspaces will be imported into the
+                Select one or multiple workspaces that you wish to import. After making your selection, click the
+                'Import' button to initiate the import process. The chosen workspaces will be imported into the
                 organization specified in the previous step.
               </div>
               <Spin spinning={workspacesLoading} tip="Loading Workspaces...">
@@ -683,11 +619,7 @@ export const ImportWorkspace = () => {
                 />
                 <br />
 
-                <Button
-                  onClick={handleImportClick}
-                  type="primary"
-                  htmlType="button"
-                >
+                <Button onClick={handleImportClick} type="primary" htmlType="button">
                   Import Workspaces
                 </Button>
               </Spin>
@@ -696,18 +628,15 @@ export const ImportWorkspace = () => {
           <Space hidden={listHidden} direction="vertical">
             <h3>Importing Workspaces</h3>
             <div className="workflowDescription2 App-text">
-              Import of the selected workspaces is underway. You can monitor the
-              progress for each workspace in the section below.
+              Import of the selected workspaces is underway. You can monitor the progress for each workspace in the
+              section below.
             </div>
             <List
               dataSource={workspacesImport}
               renderItem={(item) => (
                 <List.Item>
                   {" "}
-                  <List.Item.Meta
-                    title={item.name}
-                    description={<ul>{parse(item.status || "Waiting...")}</ul>}
-                  />
+                  <List.Item.Meta title={item.name} description={<ul>{parse(item.status || "Waiting...")}</ul>} />
                 </List.Item>
               )}
             ></List>
