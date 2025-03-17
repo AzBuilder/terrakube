@@ -18,10 +18,9 @@
             <column name="updated_date" type="datetime" />
             <column name="created_by" type="varchar(128)" />
             <column name="updated_by" type="varchar(128)" />
-            <column name="job_id" type="varchar(36)" />
+            <column name="job_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_job_address" references="job(id)"/>
+            </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="address" baseColumnNames="job_id"
-            constraintName="fk_address_job_id" referencedTableName="job"
-            referencedColumnNames="id" onDelete="SET NULL" />
     </changeSet>
 </databaseChangeLog>
