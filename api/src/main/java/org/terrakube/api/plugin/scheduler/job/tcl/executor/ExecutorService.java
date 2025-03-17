@@ -189,7 +189,7 @@ public class ExecutorService {
 
             if(!tfCliArgsPlan.isEmpty()) {
                 log.info("Adding TF_CLI_ARGS_PLAN to environment variables: {}", tfCliArgsPlan.toString());
-                executorContext.getEnvironmentVariables().put("TF_CLI_ARGS_plan", tfCliArgsPlan.toString());
+                executorContext.getEnvironmentVariables().putIfAbsent("TF_CLI_ARGS_plan", tfCliArgsPlan.toString());
             }
         }
 
