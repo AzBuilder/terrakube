@@ -174,7 +174,7 @@ public class ExecutorService {
     }
 
     private ExecutorContext validateJobAddress(ExecutorContext executorContext, Job job) {
-        if (job.getAddress() != null && !job.getAddress().isEmpty()) {
+        if (job.getAddress() != null && !job.getAddress().isEmpty() && (job.getTerraformPlan() == null || job.getTerraformPlan().isEmpty())) {
             List<Address> addressList = job.getAddress();
             StringBuilder tfCliArgsPlan= new StringBuilder();
             for(Address address : addressList) {
@@ -188,7 +188,8 @@ public class ExecutorService {
             }
 
             if(!tfCliArgsPlan.isEmpty()) {
-                executorContext.getEnvironmentVariables().put("TF_CLI_ARGS_PLAN", tfCliArgsPlan.toString());
+                log.info("Adding TF_CLI_ARGS_PLAN to environment variables: {}", tfCliArgsPlan.toString());
+                executorContext.getEnvironmentVariables().put("TF_CLI_ARGS_plan", tfCliArgsPlan.toString());
             }
         }
 
