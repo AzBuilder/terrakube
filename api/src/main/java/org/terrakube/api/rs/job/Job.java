@@ -5,6 +5,7 @@ import java.util.List;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.hooks.job.JobManageHook;
+import org.terrakube.api.rs.job.address.Address;
 import org.terrakube.api.rs.job.step.Step;
 import org.terrakube.api.rs.workspace.Workspace;
 
@@ -101,6 +102,9 @@ public class Job extends GenericAuditFields {
     @UpdatePermission(expression = "user is a super service")
     @OneToMany(mappedBy = "job")
     private List<Step> step;
+
+    @OneToMany(mappedBy = "job")
+    private List<Address> address;
 
 }
 

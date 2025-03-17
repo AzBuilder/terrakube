@@ -54,6 +54,8 @@ import org.terrakube.api.repository.*;
 import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.address.Address;
+import org.terrakube.api.rs.job.address.AddressType;
 import org.terrakube.api.rs.job.step.Step;
 import org.terrakube.api.rs.tag.Tag;
 import org.terrakube.api.rs.template.Template;
@@ -74,6 +76,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class RemoteTfeService {
 
+    private AddressRepository addressRepository;
     private JobRepository jobRepository;
     private ContentRepository contentRepository;
     private OrganizationRepository organizationRepository;
@@ -117,7 +120,7 @@ public class RemoteTfeService {
                             TeamTokenService teamTokenService,
                             ArchiveRepository archiveRepository,
                             AccessRepository accessRepository,
-                            EncryptionService encryptionService) {
+                            EncryptionService encryptionService, AddressRepository addressRepository) {
         this.jobRepository = jobRepository;
         this.contentRepository = contentRepository;
         this.organizationRepository = organizationRepository;
@@ -136,6 +139,7 @@ public class RemoteTfeService {
         this.archiveRepository = archiveRepository;
         this.accessRepository = accessRepository;
         this.encryptionService = encryptionService;
+        this.addressRepository = addressRepository;
     }
 
     private boolean validateTerrakubeUser(JwtAuthenticationToken currentUser) {
@@ -845,12 +849,7 @@ public class RemoteTfeService {
         log.info("Creating new Terrakube Job");
         log.info("Workspace {} Configuration {}", workspaceId, configurationId);
         log.info("isDestroy {} autoApply {}", isDestroy, autoApply);
-        if(runsData.getData().getAttributes().get("target-addrs") != null) {
-            log.info("Target Addresses {}", runsData.getData().getAttributes().get("target-addrs"));
-            List<String> targetAddrs = (List<String>) runsData.getData().getAttributes().get("target-addrs");
-            log.info("Target Addresses Java List {}", targetAddrs);
-        }
-        //Optional<List<String>> targetList = Optional.ofNullable((List))
+
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
         String sourceTarGz = String.format("https://%s/remote/tfe/v2/configuration-versions/%s/terraformContent.tar.gz",
                 hostname, configurationId);
@@ -890,6 +889,33 @@ public class RemoteTfeService {
 
         job = jobRepository.save(job);
         log.info("Job Created");
+
+        if(runsData.getData().getAttributes().get("target-addrs") != null) {
+            log.info("Target Addresses {}", runsData.getData().getAttributes().get("target-addrs"));
+            List<String> targetAddrs = (List<String>) runsData.getData().getAttributes().get("target-addrs");
+            for(String target: targetAddrs){
+                Address address = new Address();
+                address.setName(target);
+                address.setType(AddressType.TARGET);
+                address.setJob(job);
+                addressRepository.save(address);
+            }
+            log.info("Target Addresses Java List {}", targetAddrs);
+        }
+
+        if(runsData.getData().getAttributes().get("replace-addrs") != null) {
+            log.info("Target Addresses {}", runsData.getData().getAttributes().get("replace-addrs"));
+            List<String> replaceAddres = (List<String>) runsData.getData().getAttributes().get("replace-addrs");
+            for(String replace: replaceAddres){
+                Address address = new Address();
+                address.setName(replace);
+                address.setType(AddressType.REPLACE);
+                address.setJob(job);
+                addressRepository.save(address);
+            }
+            log.info("Target Addresses Java List {}", replaceAddres);
+        }
+
         scheduleJobService.createJobContext(job);
         log.info("Job Context Created");
         return getRun(job.getId(), null);
