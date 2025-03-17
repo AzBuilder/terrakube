@@ -1,14 +1,16 @@
-import { React } from "react";
+import { FileJpgOutlined } from "@ant-design/icons";
 import { Dropdown } from "antd";
-import {
-  FileJpgOutlined,
-} from "@ant-design/icons";
-import { toPng, toSvg, toJpeg } from "html-to-image";
+import { toJpeg, toPng, toSvg } from "html-to-image";
+import { BsFiletypeJson, BsFiletypePng, BsFiletypeSvg } from "react-icons/bs";
 import axiosInstance from "../../config/axiosConfig";
-import{BsFiletypeSvg,BsFiletypeJson,BsFiletypePng} from "react-icons/bs";
 
-export const DownloadState = ({stateUrl, manageState}) => {
-  function downloadImage(dataUrl, fileName) {
+type Props = {
+  stateUrl: string;
+  manageState: boolean;
+};
+
+export const DownloadState = ({ stateUrl, manageState }: Props) => {
+  function downloadImage(dataUrl: string, fileName: string) {
     const a = document.createElement("a");
     a.setAttribute("download", fileName);
     a.setAttribute("href", dataUrl);
@@ -19,12 +21,12 @@ export const DownloadState = ({stateUrl, manageState}) => {
     const imageWidth = 1024;
     const imageHeight = 768;
 
-    toPng(document.querySelector(".react-flow__renderer"), {
+    toPng(document.querySelector(".react-flow__renderer") as HTMLElement, {
       width: imageWidth,
       height: imageHeight,
       style: {
-        width: imageWidth,
-        height: imageHeight,
+        width: imageWidth.toString(),
+        height: imageHeight.toString(),
       },
     }).then((dataUrl) => {
       downloadImage(dataUrl, "terrakube-state-diagram.png");
@@ -35,13 +37,13 @@ export const DownloadState = ({stateUrl, manageState}) => {
     const imageWidth = 1024;
     const imageHeight = 768;
 
-    toJpeg(document.querySelector(".react-flow__renderer"), {
+    toJpeg(document.querySelector(".react-flow__renderer") as HTMLElement, {
       backgroundColor: "white",
       width: imageWidth,
       height: imageHeight,
       style: {
-        width: imageWidth,
-        height: imageHeight,
+        width: imageWidth.toString(),
+        height: imageHeight.toString(),
       },
     }).then((dataUrl) => {
       downloadImage(dataUrl, "terrakube-state-diagram.jpg");
@@ -52,12 +54,12 @@ export const DownloadState = ({stateUrl, manageState}) => {
     const imageWidth = 1024;
     const imageHeight = 768;
 
-    toSvg(document.querySelector(".react-flow__renderer"), {
+    toSvg(document.querySelector(".react-flow__renderer") as HTMLElement, {
       width: imageWidth,
       height: imageHeight,
       style: {
-        width: imageWidth,
-        height: imageHeight,
+        width: imageWidth.toString(),
+        height: imageHeight.toString(),
       },
     }).then((dataUrl) => {
       downloadImage(dataUrl, "terrakube-state-diagram.svg");
@@ -65,10 +67,10 @@ export const DownloadState = ({stateUrl, manageState}) => {
   };
 
   const downloadJSON = () => {
-    axiosInstance.request({ url: stateUrl, method: "GET", responseType:"blob" }).then((response) => {  
+    axiosInstance.request({ url: stateUrl, method: "GET", responseType: "blob" }).then((response) => {
       const href = window.URL.createObjectURL(response.data);
 
-      const anchorElement = document.createElement('a');
+      const anchorElement = document.createElement("a");
 
       anchorElement.href = href;
       anchorElement.download = "terrakube-state.json";
@@ -81,11 +83,11 @@ export const DownloadState = ({stateUrl, manageState}) => {
     });
   };
 
-  const handleButtonClick = (e) => {
+  const handleButtonClick = () => {
     downloadJSON();
   };
 
-  const handleMenuClick = (e) => {
+  const handleMenuClick = (e: { key: string }) => {
     switch (e.key) {
       case "1":
         downloadJSON();

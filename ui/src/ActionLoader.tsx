@@ -1,20 +1,11 @@
-import React, { useEffect, useState, Component } from "react";
 import * as Icons from "@ant-design/icons";
 import { transform } from "@babel/standalone";
-import { Typography, Collapse, DatePicker} from "antd";
-import {
-  XYPlot,
-  XAxis,
-  YAxis,
-  HorizontalGridLines,
-  VerticalGridLines,
-  LineSeries,
-  Hint,
-  Crosshair
-} from "react-vis";
+import { Collapse, DatePicker, Typography } from "antd";
+import React, { Component, ErrorInfo, ReactNode, useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { Crosshair, Hint, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, XYPlot, YAxis } from "react-vis";
 import "react-vis/dist/style.css";
 import axiosInstance from "./config/axiosConfig";
-import ReactMarkdown from "react-markdown";
 
 // List of antd components to consider for dynamic importing
 const antdComponents = [
@@ -83,45 +74,39 @@ const antdComponents = [
 
 const { Panel } = Collapse;
 const { Paragraph, Text } = Typography;
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 const { DateTime } = require("luxon");
 
 // List of antd icons to consider for dynamic importing
-const antdIcons = Object.keys(Icons).filter((name) =>
-  name.endsWith("Outlined")
-);
+const antdIcons = Object.keys(Icons).filter((name) => name.endsWith("Outlined"));
 
 // Function to identify required antd components
-const getRequiredAntdComponents = (componentString) => {
-  return antdComponents.filter((component) =>
-    componentString.includes(component)
-  );
+const getRequiredAntdComponents = (componentString: string) => {
+  return antdComponents.filter((component) => componentString.includes(component));
 };
 
 // Function to identify required antd icons
-const getRequiredAntdIcons = (componentString) => {
+const getRequiredAntdIcons = (componentString: string) => {
   return antdIcons.filter((icon) => componentString.includes(icon));
 };
 
 // Function to dynamically import antd components
-const importAntdComponents = async (components) => {
+const importAntdComponents = async (components: string[]) => {
   const imports = await Promise.all(
-    components.map((component) => import(`antd/es/${component.toLowerCase()}/index.js`))
+    components.map((component: string) => import(`antd/es/${component.toLowerCase()}/index.js`))
   );
-  const importedComponents = {};
-  components.forEach((component, index) => {
+  const importedComponents: Record<string, any> = {};
+  components.forEach((component: string, index: number) => {
     importedComponents[component] = imports[index].default;
   });
   return importedComponents;
 };
 
 // Function to dynamically import antd icons
-const importAntdIcons = async (icons) => {
-  const imports = await Promise.all(
-    icons.map((icon) => import(`@ant-design/icons/es/icons/${icon}`))
-  );
-  const importedIcons = {};
-  icons.forEach((icon, index) => {
+const importAntdIcons = async (icons: any) => {
+  const imports = await Promise.all(icons.map((icon: string) => import(`@ant-design/icons/es/icons/${icon}`)));
+  const importedIcons: Record<string, any> = {};
+  icons.forEach((icon: string, index: number) => {
     importedIcons[icon] = imports[index].default;
   });
   return importedIcons;
@@ -142,33 +127,39 @@ const reactIcons = [
 ];
 
 // Function to identify required react-icons components
-const getRequiredReactIcons = (componentString) => {
+const getRequiredReactIcons = (componentString: string) => {
   return reactIcons.filter((icon) => componentString.includes(icon));
 };
 
 // Function to dynamically import react-icons components
-const importReactIcons = async (icons) => {
-  const imports = await Promise.all(
-    icons.map((icon) => import(`react-icons/si`))
-  );
-  const importedIcons = {};
-  icons.forEach((icon, index) => {
+const importReactIcons = async (icons: string[]) => {
+  const imports: any = await Promise.all(icons.map(() => import(`react-icons/si`)));
+  const importedIcons: Record<any, any> = {};
+  icons.forEach((icon: any, index: any) => {
     importedIcons[icon] = imports[index][icon];
   });
   return importedIcons;
 };
 
-class ErrorBoundary extends Component {
-  constructor(props) {
+type Props = {
+  children: ReactNode;
+};
+
+type State = {
+  hasError: boolean;
+};
+
+class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_: Error) {
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("ErrorBoundary caught an error", error, errorInfo);
   }
 
@@ -181,8 +172,8 @@ class ErrorBoundary extends Component {
   }
 }
 
-const ActionLoader = ({ action, context }) => {
-  const [Component, setComponent] = useState(null);
+const ActionLoader = ({ action, context }: { action: any; context: any }) => {
+  const [Component, setComponent] = useState<any>(null);
 
   useEffect(() => {
     const loadComponent = async () => {
@@ -190,17 +181,15 @@ const ActionLoader = ({ action, context }) => {
         const componentString = decodeURIComponent(escape(window.atob(action)));
         console.debug("Decoded Component String:", componentString);
 
-        const requiredAntdComponents =
-          getRequiredAntdComponents(componentString);
+        const requiredAntdComponents = getRequiredAntdComponents(componentString);
         const requiredAntdIcons = getRequiredAntdIcons(componentString);
         const requiredReactIcons = getRequiredReactIcons(componentString);
 
-        const [importedComponents, importedIcons, importedReactIcons] =
-          await Promise.all([
-            importAntdComponents(requiredAntdComponents),
-            importAntdIcons(requiredAntdIcons),
-            importReactIcons(requiredReactIcons),
-          ]);
+        const [importedComponents, importedIcons, importedReactIcons] = await Promise.all([
+          importAntdComponents(requiredAntdComponents),
+          importAntdIcons(requiredAntdIcons),
+          importReactIcons(requiredReactIcons),
+        ]);
 
         // Transform JSX to JavaScript
         let transpiledCode = transform(componentString, {
@@ -209,9 +198,9 @@ const ActionLoader = ({ action, context }) => {
         console.debug("Transpiled Code:", transpiledCode);
 
         // Remove the last semicolon
-        const lastSemicolonIndex = transpiledCode.lastIndexOf(";");
+        const lastSemicolonIndex = transpiledCode!.lastIndexOf(";");
         if (lastSemicolonIndex !== -1) {
-          transpiledCode = transpiledCode.slice(0, lastSemicolonIndex);
+          transpiledCode = transpiledCode!.slice(0, lastSemicolonIndex);
         }
 
         // Create the component function
@@ -258,9 +247,7 @@ const ActionLoader = ({ action, context }) => {
           RangePicker,
           DateTime,
           ReactMarkdown,
-          ...requiredAntdComponents.map(
-            (component) => importedComponents[component]
-          ),
+          ...requiredAntdComponents.map((component) => importedComponents[component]),
           ...requiredAntdIcons.map((icon) => importedIcons[icon]),
           ...requiredReactIcons.map((icon) => importedReactIcons[icon])
         );

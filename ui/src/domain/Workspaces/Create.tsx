@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { v7 as uuid } from "uuid";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
-import { SshKey, Template, VcsModel, VcsType, VcsTypeExtended } from "../types";
+import { SshKey, Template, TofuRelease, VcsModel, VcsType, VcsTypeExtended } from "../types";
 import { compareVersions } from "./Workspaces";
 const { Content } = Layout;
 const { Step } = Steps;
@@ -30,9 +30,6 @@ type IacType = {
   color?: string;
 };
 
-type TofuRelease = {
-  tag_name: string;
-};
 
 type CreateWorkspaceForm = {
   source: string;

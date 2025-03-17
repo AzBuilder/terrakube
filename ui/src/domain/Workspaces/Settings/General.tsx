@@ -1,52 +1,49 @@
-import { 
-  InfoCircleOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Form,
-  Input,
-  Select,
-  Spin,
-  Switch,
-  Typography,
-  message,
-} from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, Spin, Switch, Typography, message } from "antd";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../config/axiosConfig";
-import {
-  compareVersions,
-  getIaCIconById,
-  getIaCNameById,
-  iacTypes,
-  atomicHeader,
-  genericHeader,
-} from "../Workspaces";
+import { Agent, SshKey, Template, TofuRelease, Workspace } from "../../types";
+import { atomicHeader, compareVersions, genericHeader, getIaCIconById, getIaCNameById, iacTypes } from "../Workspaces";
 
-export const WorkspaceGeneral = ({
-  workspaceData,
-  orgTemplates,
-  manageWorkspace,
-}) => {
+type Props = {
+  workspaceData: Workspace;
+  orgTemplates: Template[];
+  manageWorkspace: boolean;
+};
+
+type UpdateWorkspaceForm = {
+  name: string;
+  description?: string;
+  folder?: string;
+  locked: boolean;
+  lockDescription?: string;
+  executionMode: string;
+  moduleSshKey?: string;
+  terraformVersion: string;
+  iacType: string;
+  branch: string;
+  defaultTemplate?: string;
+  executorAgent?: string;
+};
+
+export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace }: Props) => {
   const organizationId = workspaceData.relationships.organization.data.id;
   const id = workspaceData.id;
-  const Paragraph = Typography;
   const Option = Select;
   const [selectedIac, setSelectedIac] = useState("");
-  const [terraformVersions, setTerraformVersions] = useState([]);
-  const [agentList, setAgentList] = useState([]);
-  const [sshKeys, setSSHKeys] = useState([]);
+  const [terraformVersions, setTerraformVersions] = useState<string[]>([]);
+  const [agentList, setAgentList] = useState<Agent[]>([]);
+  const [sshKeys, setSSHKeys] = useState<SshKey[]>([]);
   const [waiting, setWaiting] = useState(false);
 
-  const loadVersions = (iacType) => {
-    const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
-      }/${iacType}/index.json`;
+  const loadVersions = (iacType: string) => {
+    const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/${iacType}/index.json`;
     axiosInstance.get(versionsApi).then((resp) => {
       const tfVersions = [];
       console.log(resp);
       if (iacType === "tofu") {
-        resp.data.forEach((release) => {
-          if (!release.tag_name.includes("-"))
-            tfVersions.push(release.tag_name.replace("v", ""));
+        resp.data.forEach((release: TofuRelease) => {
+          if (!release.tag_name.includes("-")) tfVersions.push(release.tag_name.replace("v", ""));
         });
       } else {
         for (const version in resp.data.versions) {
@@ -63,12 +60,10 @@ export const WorkspaceGeneral = ({
     });
   };
   const loadAgentlist = () => {
-    axiosInstance
-      .get(`organization/${organizationId}/agent`)
-      .then((response) => {
-        console.log(response.data.data);
-        setAgentList(response.data.data);
-      });
+    axiosInstance.get(`organization/${organizationId}/agent`).then((response) => {
+      console.log(response.data.data);
+      setAgentList(response.data.data);
+    });
   };
 
   useEffect(() => {
@@ -79,52 +74,50 @@ export const WorkspaceGeneral = ({
     setWaiting(false);
   }, []);
 
-  const handleIacChange = (iac) => {
+  const handleIacChange = (iac: string) => {
     setSelectedIac(iac);
     loadVersions(iac);
-  }
-  const onFinish = (values) => {
+  };
+  const onFinish = (values: UpdateWorkspaceForm) => {
     setWaiting(true);
     const body = {
-      "atomic:operations": [{
-        op: "update",
-        href: `/organization/${organizationId}/workspace/${id}`,
-        data: {
-          type: "workspace",
-          id: id,
-          attributes: {
-            name: values.name,
-            description: values.description,
-            folder: values.folder,
-            locked: values.locked,
-            lockDescription: values.lockDescription,
-            executionMode: values.executionMode,
-            moduleSshKey: values.moduleSshKey,
-            terraformVersion: values.terraformVersion,
-            iacType: values.iacType,
-            branch: values.branch,
-            defaultTemplate: values.defaultTemplate,
+      "atomic:operations": [
+        {
+          op: "update",
+          href: `/organization/${organizationId}/workspace/${id}`,
+          data: {
+            type: "workspace",
+            id: id,
+            attributes: {
+              name: values.name,
+              description: values.description,
+              folder: values.folder,
+              locked: values.locked,
+              lockDescription: values.lockDescription,
+              executionMode: values.executionMode,
+              moduleSshKey: values.moduleSshKey,
+              terraformVersion: values.terraformVersion,
+              iacType: values.iacType,
+              branch: values.branch,
+              defaultTemplate: values.defaultTemplate,
+            },
           },
         },
-      }]
-    }
+      ],
+    };
 
     console.log(body);
 
     try {
-      axiosInstance
-        .post("/operations",
-          body, atomicHeader
-        )
-        .then((response) => {
-          console.log(response);
-          if (response.status === 200) {
-            message.success("workspace updated successfully");
-          } else {
-            message.error("workspace update failed");
-          }
-          setWaiting(false);
-        });
+      axiosInstance.post("/operations", body, atomicHeader).then((response) => {
+        console.log(response);
+        if (response.status === 200) {
+          message.success("workspace updated successfully");
+        } else {
+          message.error("workspace update failed");
+        }
+        setWaiting(false);
+      });
     } catch (error) {
       console.error("error updating workspace:", error);
       message.error("workspace update failed");
@@ -147,9 +140,7 @@ export const WorkspaceGeneral = ({
     }
     console.log(bodyAgent);
     axiosInstance
-      .patch(
-        `/organization/${organizationId}/workspace/${id}/relationships/agent`,
-        bodyAgent, genericHeader)
+      .patch(`/organization/${organizationId}/workspace/${id}/relationships/agent`, bodyAgent, genericHeader)
       .then((response) => {
         console.log("Update Workspace agent successfully");
         console.log(response);
@@ -174,14 +165,12 @@ export const WorkspaceGeneral = ({
             locked: workspaceData.attributes?.locked,
             lockDescription: workspaceData.attributes.lockDescription,
             moduleSshKey: workspaceData.attributes?.moduleSshKey,
-            executionMode:
-              workspaceData.attributes?.executionMode,
+            executionMode: workspaceData.attributes?.executionMode,
             iacType: workspaceData.attributes?.iacType,
             branch: workspaceData.attributes?.branch,
-            defaultTemplate:
-              workspaceData.attributes?.defaultTemplate,
+            defaultTemplate: workspaceData.attributes?.defaultTemplate,
             executorAgent:
-              workspaceData.relationships.agent.data?.id == null
+              workspaceData.relationships.agent?.data?.id == null
                 ? "default"
                 : workspaceData.relationships.agent.data?.id,
           }}
@@ -189,9 +178,9 @@ export const WorkspaceGeneral = ({
           name="form-settings"
         >
           <Form.Item name="id" label="ID">
-            <Paragraph copyable={{ tooltips: false }}>
+            <Typography.Paragraph copyable={{ tooltips: false }}>
               <span className="App-text"> {id}</span>
-            </Paragraph>
+            </Typography.Paragraph>
           </Form.Item>
           <Form.Item
             name="name"
@@ -199,8 +188,7 @@ export const WorkspaceGeneral = ({
               { required: true },
               {
                 pattern: /^[A-Za-z0-9_-]+$/,
-                message:
-                  "Only dashes, underscores, and alphanumeric characters are permitted.",
+                message: "Only dashes, underscores, and alphanumeric characters are permitted.",
               },
             ]}
             label="Name"
@@ -208,52 +196,34 @@ export const WorkspaceGeneral = ({
             <Input disabled={!manageWorkspace} />
           </Form.Item>
 
-          <Form.Item
-            valuePropName="value"
-            name="description"
-            label="Description"
-          >
+          <Form.Item valuePropName="value" name="description" label="Description">
             <Input.TextArea placeholder="Workspace description" disabled={!manageWorkspace} />
           </Form.Item>
           <Form.Item
             name="terraformVersion"
-            label={
-              getIaCNameById(
-                selectedIac || workspaceData.attributes?.iacType
-              ) + " Version"
-            }
+            label={getIaCNameById(selectedIac || workspaceData.attributes?.iacType) + " Version"}
             extra={
               "The version of " +
-              getIaCNameById(
-                selectedIac || workspaceData.attributes?.iacType
-              ) +
+              getIaCNameById(selectedIac || workspaceData.attributes?.iacType) +
               " to use for this workspace. Upon creating this workspace, the latest version was selected and will be used until it is changed manually. It will not upgrade automatically."
             }
           >
             <Select
-              defaultValue={
-                workspaceData.attributes?.terraformVersion
-              }
+              defaultValue={workspaceData.attributes?.terraformVersion}
               style={{ width: 250 }}
               disabled={!manageWorkspace}
             >
-              {terraformVersions.map(function (name, index) {
+              {terraformVersions.map(function (name) {
                 return <Option key={name}>{name}</Option>;
               })}
             </Select>
           </Form.Item>
           <Form.Item
             name="folder"
-            label={
-              getIaCNameById(
-                selectedIac || workspaceData.attributes?.iacType
-              ) + " Working Directory"
-            }
+            label={getIaCNameById(selectedIac || workspaceData.attributes?.iacType) + " Working Directory"}
             extra={
               "The directory that " +
-              getIaCNameById(
-                selectedIac || workspaceData.attributes?.iacType
-              ) +
+              getIaCNameById(selectedIac || workspaceData.attributes?.iacType) +
               " will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."
             }
           >
@@ -278,11 +248,7 @@ export const WorkspaceGeneral = ({
           >
             <Switch disabled={!manageWorkspace} />
           </Form.Item>
-          <Form.Item
-            valuePropName="value"
-            name="lockDescription"
-            label="Setup custom lock description message"
-          >
+          <Form.Item valuePropName="value" name="lockDescription" label="Setup custom lock description message">
             <Input.TextArea placeholder="Lock description details" disabled={!manageWorkspace} />
           </Form.Item>
           <Form.Item
@@ -296,7 +262,7 @@ export const WorkspaceGeneral = ({
               onChange={handleIacChange}
               disabled={!manageWorkspace}
             >
-              {iacTypes.map(function (iacType, index) {
+              {iacTypes.map(function (iacType) {
                 return (
                   <Option key={iacType.id}>
                     {getIaCIconById(iacType.id)} {iacType.name}{" "}
@@ -310,16 +276,12 @@ export const WorkspaceGeneral = ({
             label="Execution Mode"
             extra={
               "Use this option with terraform remote state/cloud block if you want to execute " +
-              getIaCNameById(
-                selectedIac || workspaceData.attributes?.iacType
-              ) +
+              getIaCNameById(selectedIac || workspaceData.attributes?.iacType) +
               " CLI remotely and just upload the state to Terrakube"
             }
           >
             <Select
-              defaultValue={
-                workspaceData.attributes.executionMode
-              }
+              defaultValue={workspaceData.attributes.executionMode}
               style={{ width: 250 }}
               disabled={!manageWorkspace}
             >
@@ -333,19 +295,13 @@ export const WorkspaceGeneral = ({
             extra="Default template when doing a git push to the repository"
           >
             <Select
-              defaultValue={
-                workspaceData.attributes.defaultTemplate
-              }
+              defaultValue={workspaceData.attributes.defaultTemplate}
               placeholder="select default template"
               style={{ width: 250 }}
               disabled={!manageWorkspace}
             >
-              {orgTemplates.map(function (template, index) {
-                return (
-                  <Option key={template?.id}>
-                    {template?.attributes?.name}
-                  </Option>
-                );
+              {orgTemplates.map(function (template) {
+                return <Option key={template?.id}>{template?.attributes?.name}</Option>;
               })}
             </Select>
           </Form.Item>
@@ -355,19 +311,13 @@ export const WorkspaceGeneral = ({
             extra="Use this option to add a SSH key to allow module downloads"
           >
             <Select
-              defaultValue={
-                workspaceData.attributes.moduleSshKey
-              }
+              defaultValue={workspaceData.attributes.moduleSshKey}
               placeholder="select SSH Key"
               style={{ width: 250 }}
               disabled={!manageWorkspace}
             >
-              {sshKeys.map(function (sshKey, index) {
-                return (
-                  <Option key={sshKey?.id}>
-                    {sshKey?.attributes?.name}
-                  </Option>
-                );
+              {sshKeys.map(function (sshKey) {
+                return <Option key={sshKey?.id}>{sshKey?.attributes?.name}</Option>;
               })}
             </Select>
           </Form.Item>
@@ -377,19 +327,13 @@ export const WorkspaceGeneral = ({
             extra="Use this option to select which executor agent will run the job remotely"
           >
             <Select
-              defaultValue={
-                workspaceData.attributes.moduleSshKey
-              }
+              defaultValue={workspaceData.attributes.moduleSshKey}
               placeholder="select Job Agent"
               style={{ width: 250 }}
               disabled={!manageWorkspace}
             >
-              {agentList.map(function (agentKey, index) {
-                return (
-                  <Option key={agentKey?.id}>
-                    {agentKey?.attributes?.name}
-                  </Option>
-                );
+              {agentList.map(function (agentKey) {
+                return <Option key={agentKey?.id}>{agentKey?.attributes?.name}</Option>;
               })}
               <Option key="default">default</Option>
             </Select>

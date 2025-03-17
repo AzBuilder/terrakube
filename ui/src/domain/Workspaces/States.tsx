@@ -1,79 +1,79 @@
-import { React, useState, useRef, useCallback, useMemo } from "react";
-import {
-  List,
-  Space,
-  Card,
-  Row,
-  Col,
-  Avatar,
-  Tooltip,
-  Button,
-  Popconfirm,
-  message,
-} from "antd";
-import Editor from "@monaco-editor/react";
-import axiosInstance, { axiosClient } from "../../config/axiosConfig";
+import { InfoCircleOutlined, RollbackOutlined, UserOutlined } from "@ant-design/icons";
+import Editor, { OnMount } from "@monaco-editor/react";
+import { Avatar, Button, Card, Col, List, Popconfirm, Row, Space, Tooltip, message } from "antd";
+import { useCallback, useMemo, useRef, useState } from "react";
 import ReactFlow, {
-  Controls,
   Background,
-  applyNodeChanges,
+  Controls,
+  Edge,
+  EdgeChange,
+  MarkerType,
+  Node,
+  NodeChange,
   applyEdgeChanges,
+  applyNodeChanges,
 } from "reactflow";
-import NodeResource from "./NodeResource";
-import { DownloadState } from "./DownloadState";
-import {
-  InfoCircleOutlined,
-  UserOutlined,
-  RollbackOutlined,
-} from "@ant-design/icons";
 import "reactflow/dist/style.css";
+import axiosInstance, { axiosClient } from "../../config/axiosConfig";
+import { ErrorResource, FlatJobHistory, Resource, StateOutput, StateOutputResource, Workspace } from "../types";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
+import { DownloadState } from "./DownloadState";
+import NodeResource from "./NodeResource";
+
+type IStandaloneCodeEditor = Parameters<OnMount>[0];
+
+type Props = {
+  history: FlatJobHistory[];
+  setStateDetailsVisible: (val: boolean) => void;
+  stateDetailsVisible: boolean;
+  workspace: Workspace;
+  onRollback: any;
+  manageState: boolean;
+};
 
 export const States = ({
   history,
   setStateDetailsVisible,
   stateDetailsVisible,
   workspace,
-  organizationId,
-  organizationName,
   onRollback,
   manageState,
-}) => {
-  const [currentState, setCurrentState] = useState({});
+}: Props) => {
+  const [currentState, setCurrentState] = useState<FlatJobHistory>();
   const [stateContent, setStateContent] = useState("");
   const [rawStateContent, setRawStateContent] = useState("");
   const [activeTab, setactivetab] = useState("diagram");
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  const [nodes, setNodes] = useState<Node<Resource | ErrorResource>[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
   const [open, setOpen] = useState(false);
   const [resource, setResource] = useState({});
-  const onNodesChange = useCallback(
-    (changes) => setNodes((ns) => applyNodeChanges(changes, ns)),
-    []
-  );
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((es) => applyEdgeChanges(changes, es)),
-    []
-  );
-  const editorRef = useRef(null);
-  const jsonEditorRef = useRef(null);
-  const handleClick = (state) => {
+  const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((ns) => applyNodeChanges(changes, ns)), []);
+  const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((es) => applyEdgeChanges(changes, es)), []);
+  const editorRef = useRef<IStandaloneCodeEditor>(null);
+  const jsonEditorRef = useRef<IStandaloneCodeEditor>(null);
+  const handleClick = (state: FlatJobHistory) => {
     changeState(state);
   };
 
-  function handleEditorDidMount(editor, monaco) {
+  function handleEditorDidMount(editor: IStandaloneCodeEditor) {
     editorRef.current = editor;
   }
 
-  function handleJSONEditorDidMount(editor, monaco) {
+  function handleJSONEditorDidMount(editor: IStandaloneCodeEditor) {
     jsonEditorRef.current = editor;
   }
-  const showDrawer = (record) => {
+  const showDrawer = (record: Resource) => {
     setOpen(true);
     setResource(record);
   };
 
-  function pushNode(nodes, dependencies, element, xmap, y) {
+  function pushNode(
+    nodes: Node<Resource | ErrorResource>[],
+    dependencies: number,
+    element: StateOutputResource,
+    xmap: any,
+    y: number
+  ) {
     nodes.push({
       id: element.address,
       type: "resourceNode",
@@ -91,7 +91,7 @@ export const States = ({
     return nodes;
   }
 
-  function pushEdge(edges, dependencies, element, elementDependsOn) {
+  function pushEdge(edges: Edge[], dependencies: number, element: StateOutputResource, elementDependsOn: any[]) {
     if (dependencies > 0)
       elementDependsOn.forEach((dep) => {
         edges.push({
@@ -100,7 +100,12 @@ export const States = ({
           target: dep,
           className: "normal-edge",
           animated: true,
-          arrowHeadType: "arrow",
+          markerEnd: {
+            type: MarkerType.Arrow,
+          },
+          markerStart: {
+            type: MarkerType.Arrow,
+          },
           style: { stroke: "#1890ff" },
         });
       });
@@ -108,54 +113,37 @@ export const States = ({
     return edges;
   }
 
-  function loadData(resp) {
-    console.log(resp.data);
+  function loadData(resp: StateOutput) {
+    console.log(resp);
 
-    let nodes = [];
-    let edges = [];
+    let nodes: Node<Resource | ErrorResource>[] = [];
+    let edges: Edge[] = [];
     let x = new Map();
     let y = 100;
 
-    if (
-      resp.data != null &&
-      resp.data.values != null &&
-      resp.data.values.root_module != null
-    ) {
+    if (resp != null && resp.values != null && resp.values.root_module != null) {
       try {
-        if (resp.data.values.root_module.resources != null) {
-          resp.data.values.root_module.resources.forEach((element) => {
+        if (resp.values.root_module.resources != null) {
+          resp.values.root_module.resources.forEach((element) => {
             let dependencies = 0;
-            if (element.depends_on != null)
-              dependencies = element.depends_on.length;
-            x.set(
-              dependencies,
-              (x.get(dependencies) ? x.get(dependencies) : 0) + 350
-            );
+            if (element.depends_on != null) dependencies = element.depends_on.length;
+            x.set(dependencies, (x.get(dependencies) ? x.get(dependencies) : 0) + 350);
 
             nodes = pushNode(nodes, dependencies, element, x, y);
             edges = pushEdge(edges, dependencies, element, element.depends_on);
           });
         }
 
-        if (resp.data.values.root_module.child_modules != null) {
-          resp.data.values.root_module.child_modules.forEach((child) => {
+        if (resp.values.root_module.child_modules != null) {
+          resp.values.root_module.child_modules.forEach((child) => {
             if (child.resources != null)
-              child.resources.forEach((element) => {
+              child.resources.forEach((element: StateOutputResource) => {
                 let dependencies = 0;
-                if (element.depends_on != null)
-                  dependencies = element.depends_on.length;
-                x.set(
-                  dependencies,
-                  (x.get(dependencies) ? x.get(dependencies) : 0) + 350
-                );
+                if (element.depends_on != null) dependencies = element.depends_on.length;
+                x.set(dependencies, (x.get(dependencies) ? x.get(dependencies) : 0) + 350);
 
                 nodes = pushNode(nodes, dependencies, element, x, y);
-                edges = pushEdge(
-                  edges,
-                  dependencies,
-                  element,
-                  element.depends_on
-                );
+                edges = pushEdge(edges, dependencies, element, element.depends_on);
               });
           });
         }
@@ -178,18 +166,17 @@ export const States = ({
     setEdges(edges);
   }
 
-  const changeState = (state) => {
+  const changeState = (state: FlatJobHistory) => {
     setCurrentState(state);
     setStateDetailsVisible(true);
 
-    const apiDomain = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL)
-      .hostname;
+    const apiDomain = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).hostname;
     if (state.output.includes(apiDomain))
       axiosInstance
         .get(state.output)
         .then((resp) => {
           setStateContent(JSON.stringify(resp.data, null, "\t"));
-          loadData(resp);
+          loadData(resp.data);
 
           //GET RAW STATE BASICALLY JUST ADDING .raw.json
           axiosInstance
@@ -210,7 +197,7 @@ export const States = ({
       axiosClient
         .get(state.output)
         .then((resp) => {
-          loadData(resp);
+          loadData(resp.data);
         })
         .catch((err) => {
           setStateContent(`{"error":"Failed to load state ${err}"}`);
@@ -250,11 +237,11 @@ export const States = ({
     },
   ];
 
-  const onTabChange = (key) => {
+  const onTabChange = (key: string) => {
     setactivetab(key);
     if (key === "json" && jsonEditorRef.current) {
       jsonEditorRef.current.layout();
-    } else if(key === "raw" && editorRef.current) {
+    } else if (key === "raw" && editorRef.current) {
       editorRef.current.layout();
     }
   };
@@ -267,7 +254,7 @@ export const States = ({
   );
 
   const handleRollback = () => {
-    const outputUrl = currentState.output;
+    const outputUrl = currentState!.output;
     const rollbackUrl = outputUrl.replace("/state/", "/rollback/"); // Replace /state/ with /rollback/
 
     axiosInstance
@@ -285,11 +272,11 @@ export const States = ({
       .catch((error) => {
         // Extract error message from the API response
         var errorMessage = "An unexpected error occurred.";
-        if(error.response?.status === 403) {
+        if (error.response?.status === 403) {
           errorMessage = "You do not have permission to perform this action.";
         }
 
-        errorMessage = error.response?.data || errorMessage          
+        errorMessage = error.response?.data || errorMessage;
 
         // Show the error message
         message.error(`Failed to roll back the state: ${errorMessage}`);
@@ -303,29 +290,23 @@ export const States = ({
     <div>
       {!stateDetailsVisible ? (
         <List
-          split=""
+          split
           className="moduleList"
           dataSource={history.sort(
-            (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+            (a: FlatJobHistory, b: FlatJobHistory) =>
+              new Date(b.createdDate).getTime() - new Date(a.createdDate!).getTime()
           )}
           renderItem={(item) => (
             <List.Item>
-              <Card
-                onClick={() => handleClick(item)}
-                style={{ width: "100%" }}
-                hoverable
-              >
+              <Card onClick={() => handleClick(item)} style={{ width: "100%" }} hoverable>
                 <Space className="states" size={40} split="|">
                   <span>#{item.id}</span>
                   <span>
-                    <b>{item.createdBy}</b> triggered from Terraform{" "}
-                    {item.relativeDate}
+                    <b>{item.createdBy}</b> triggered from Terraform {item.relativeDate}
                   </span>
                   <span>
                     <a>
-                      {/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-                        item.jobReference
-                      )
+                      {/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.jobReference)
                         ? `rollback to #${item.jobReference}`
                         : `job #${item.jobReference}`}
                     </a>
@@ -342,22 +323,18 @@ export const States = ({
               <Avatar shape="square" icon={<UserOutlined />} />
             </Col>
             <Col span={19}>
-              <h3>{currentState.title}</h3>
+              <h3>{currentState?.title}</h3>
               <Space className="stateDetails" size={40} split="|">
-                <span>#{currentState.id}</span>
+                <span>#{currentState?.id}</span>
                 <span>
-                  <b>{currentState.createdBy}</b> triggered from Terraform{" "}
-                  <span className="stateDetails">
-                    {currentState.relativeDate}
-                  </span>
+                  <b>{currentState?.createdBy}</b> triggered from Terraform{" "}
+                  <span className="stateDetails">{currentState?.relativeDate}</span>
                 </span>
                 <span>
                   <a>
-                    {/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-                      currentState.jobReference
-                    )
-                      ? `rollback to #${currentState.jobReference}`
-                      : `job #${currentState.jobReference}`}
+                    {/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentState!.jobReference)
+                      ? `rollback to #${currentState?.jobReference}`
+                      : `job #${currentState?.jobReference}`}
                   </a>
                 </span>
               </Space>
@@ -368,10 +345,9 @@ export const States = ({
                   title="Are you sure?"
                   description={
                     <span>
-                      Restoring this workspace to its previous state may lead to
-                      loss of data. <br /> Any resources that have been added or
-                      modified since this state was saved <br /> will no longer
-                      be tracked by Terrakube.
+                      Restoring this workspace to its previous state may lead to loss of data. <br /> Any resources that
+                      have been added or modified since this state was saved <br /> will no longer be tracked by
+                      Terrakube.
                     </span>
                   }
                   onConfirm={handleRollback}
@@ -384,7 +360,7 @@ export const States = ({
                     </Button>
                   </Tooltip>
                 </Popconfirm>
-                <DownloadState stateUrl={currentState.output} manageState={manageState} />
+                <DownloadState stateUrl={currentState!.output} manageState={manageState} />
               </Space>
             </Col>
           </Row>
@@ -401,14 +377,7 @@ export const States = ({
               >
                 {activeTab === "diagram" ? (
                   <div style={{ height: 500 }}>
-                    <ResourceDrawer
-                      resource={resource}
-                      setOpen={setOpen}
-                      open={open}
-                      workspace={workspace}
-                      organizationId={organizationId}
-                      organizationName={organizationName}
-                    />
+                    <ResourceDrawer resource={resource} setOpen={setOpen} open={open} workspace={workspace} />
                     <ReactFlow
                       zoomOnScroll={false}
                       nodeTypes={nodeTypes}

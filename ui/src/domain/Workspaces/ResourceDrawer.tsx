@@ -1,23 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { Drawer, Avatar, Space, Tabs, Col, Row, Spin } from "antd";
-import { getServiceIcon } from "./Icons.jsx";
-import ActionLoader from "../../ActionLoader.jsx";
+import { Avatar, Col, Drawer, Row, Space, Spin, Tabs } from "antd";
+import { useEffect, useState } from "react";
+import ActionLoader from "../../ActionLoader.js";
 import axiosInstance from "../../config/axiosConfig";
-export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {
+import { ActionWithSettings, Resource, Workspace } from "../types.js";
+import { getServiceIcon } from "./Icons.jsx";
+
+type Props = {
+  open: boolean;
+  setOpen: (val: boolean) => void;
+  resource?: Resource;
+  workspace: Workspace;
+};
+
+export const ResourceDrawer = ({ open, resource, setOpen, workspace }: Props) => {
+  console.log({ open, resource, workspace });
   const [drawerOpen, setDrawerOpen] = useState(open);
-  const [actions, setActions] = useState([]);
+  const [actions, setActions] = useState<ActionWithSettings[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchActions = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(`action?filter[action]=active==true;type=in=('Workspace/ResourceDrawer/Action','Workspace/ResourceDrawer/Tab')`);
+        const response = await axiosInstance.get(
+          `action?filter[action]=active==true;type=in=('Workspace/ResourceDrawer/Action','Workspace/ResourceDrawer/Tab')`
+        );
         console.log("Actions:", response.data);
         const fetchedActions = response.data.data || [];
 
         // Filter actions and attach settings to each action
-        const filteredActions = fetchedActions.reduce((acc, action) => {
+        const filteredActions = fetchedActions.reduce((acc: any, action: ActionWithSettings) => {
           if (!action.attributes.displayCriteria) {
             acc.push(action);
             return acc;
@@ -27,12 +39,15 @@ export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {
           try {
             displayCriteria = JSON.parse(action.attributes.displayCriteria);
           } catch (error) {
-            console.error('Error parsing displayCriteria JSON:', error);
+            console.error("Error parsing displayCriteria JSON:", error);
             return acc;
           }
 
           for (const criteria of displayCriteria) {
-            const settings = evaluateCriteria(criteria, { state: resource, apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin });
+            const settings = evaluateCriteria(criteria, {
+              state: resource,
+              apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
+            });
             if (settings) {
               action.settings = settings; // Attach settings to the action
               console.log("settings");
@@ -69,42 +84,40 @@ export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {
   const context = {
     state: resource,
     apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
-    workspace: workspace
+    workspace: workspace,
   };
 
   // Function to evaluate display criteria and return settings
-  const evaluateCriteria = (criteria, context) => {
+  const evaluateCriteria = (criteria: any, _: any) => {
     try {
-      console.log('Evaluating criteria:', criteria);
+      console.log("Evaluating criteria:", criteria);
       const result = eval(criteria.filter);
-      console.log('Result:', result);
+      console.log("Result:", result);
       if (result) {
         if (!criteria.settings) {
           return {};
         }
-        return criteria.settings.reduce((acc, setting) => {
+        return criteria.settings.reduce((acc: any, setting: any) => {
           acc[setting.key] = setting.value;
           return acc;
         }, {});
       }
     } catch (error) {
-      console.error('Error evaluating criteria:', error);
+      console.error("Error evaluating criteria:", error);
     }
     return null;
-  };  
+  };
 
   return (
     <Drawer
       width={640}
       title={
-        <>
-          <Avatar
-            shape="square"
-            size="small"
-            src={getServiceIcon(resource.provider, resource.type)}
-          />{" "}
-          {resource.name}
-        </>
+        resource && (
+          <>
+            <Avatar shape="square" size="small" src={getServiceIcon(resource.provider, resource.type)} />{" "}
+            {resource.name}
+          </>
+        )
       }
       placement="right"
       onClose={onClose}
@@ -119,20 +132,16 @@ export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {
           <Row>
             <Col span={24}>
               <Space size={5} direction="horizontal">
-              {actions &&
-                actions
-                  .filter(
-                    (action) =>
-                      action?.attributes.type ===
-                      "Workspace/ResourceDrawer/Action"
-                  )
-                  .map((action, index) => (
-                    <ActionLoader
-                      key={index}
-                      action={action?.attributes.action}
-                      context={{ ...context, settings: action.settings }}
-                    />
-                  ))}
+                {actions &&
+                  actions
+                    .filter((action) => action?.attributes.type === "Workspace/ResourceDrawer/Action")
+                    .map((action, index) => (
+                      <ActionLoader
+                        key={index}
+                        action={action?.attributes.action}
+                        context={{ ...context, settings: action.settings }}
+                      />
+                    ))}
               </Space>
             </Col>
           </Row>
@@ -141,9 +150,7 @@ export const ResourceDrawer = ({ open, resource, setOpen, workspace }) => {
             defaultActiveKey="1"
             items={[
               ...actions
-                .filter(
-                  (action) => action?.attributes.type === "Workspace/ResourceDrawer/Tab"
-                )
+                .filter((action) => action?.attributes.type === "Workspace/ResourceDrawer/Tab")
                 .map((action, index) => ({
                   key: `tab-${index + 1}`,
                   label: action.attributes.label,

@@ -15,6 +15,7 @@ import {
   message,
 } from "antd";
 import parse from "html-react-parser";
+import { ValidateErrorEntity } from "rc-field-form/lib/interface";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { BiBookBookmark, BiTerminal, BiUpload } from "react-icons/bi";
@@ -23,6 +24,7 @@ import { VscAzureDevops } from "react-icons/vsc";
 import { Link, useNavigate } from "react-router-dom";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
+import { VcsModel, VcsType, VcsTypeExtended } from "../types";
 const { Content } = Layout;
 const { Step } = Steps;
 const validateMessages = {
@@ -32,9 +34,17 @@ const validateMessages = {
   },
 };
 
+type Platform = {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  height?: string;
+};
+
 export const ImportWorkspace = () => {
-  const [organizationName, setOrganizationName] = useState([]);
-  const [vcs, setVCS] = useState([]);
+  const [organizationName, setOrganizationName] = useState<string>();
+  const [vcs, setVCS] = useState<VcsModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [vcsButtonsVisible, setVCSButtonsVisible] = useState(true);
   const [vcsId, setVcsId] = useState("");
@@ -42,7 +52,7 @@ export const ImportWorkspace = () => {
   const [workspacesHidden, setWorkspacesHidden] = useState(true);
   const [workspacesLoading, setWorkspacesLoading] = useState(false);
   const [apiUrlHidden, setApiUrlHidden] = useState(true);
-  const [workspacesImport, setWorkspacesImport] = useState([]);
+  const [workspacesImport, setWorkspacesImport] = useState<any[]>([]);
   const [stepsHidden, setStepsHidden] = useState(false);
   const [listHidden, setListHidden] = useState(true);
   const columns = [
@@ -50,7 +60,7 @@ export const ImportWorkspace = () => {
       title: "Name",
       dataIndex: ["attributes", "name"],
       sorter: {
-        compare: (a, b) => a.attributes.name.localeCompare(b.attributes.name),
+        compare: (a: any, b: any) => a.attributes.name.localeCompare(b.attributes.name),
         multiple: 1,
       },
     },
@@ -58,7 +68,7 @@ export const ImportWorkspace = () => {
       title: "Terraform Version",
       dataIndex: ["attributes", "terraform-version"],
       sorter: {
-        compare: (a, b) => a.attributes["terraform-version"].localeCompare(b.attributes["terraform-version"]),
+        compare: (a: any, b: any) => a.attributes["terraform-version"].localeCompare(b.attributes["terraform-version"]),
         multiple: 2,
       },
     },
@@ -66,7 +76,7 @@ export const ImportWorkspace = () => {
       title: "Vcs Provider",
       dataIndex: ["attributes", "vcs-repo", "service-provider"],
       sorter: {
-        compare: (a, b) => {
+        compare: (a: any, b: any) => {
           const vcsRepoA = a.attributes["vcs-repo"];
           const vcsRepoB = b.attributes["vcs-repo"];
           const serviceProviderA = vcsRepoA && vcsRepoA["service-provider"] ? vcsRepoA["service-provider"] : "";
@@ -85,8 +95,8 @@ export const ImportWorkspace = () => {
   const [step3Hidden, setStep4Hidden] = useState(true);
   const [versionControlFlow, setVersionControlFlow] = useState(true);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
-  const [platforms, setPlatforms] = useState([]);
-  const [platform, setPlatform] = useState({
+  const [platforms, setPlatforms] = useState<Platform[]>([]);
+  const [platform, setPlatform] = useState<Platform>({
     id: "tfcloud",
     name: "Terraform Cloud",
   });
@@ -95,21 +105,21 @@ export const ImportWorkspace = () => {
       label: "Gitlab.com",
       key: "1",
       onClick: () => {
-        handleVCSClick("GITLAB");
+        handleVCSClick(VcsTypeExtended.GITLAB);
       },
     },
     {
       label: "Gitlab Community Edition",
       key: "2",
       onClick: () => {
-        handleVCSClick("GITLAB_COMMUNITY");
+        handleVCSClick(VcsTypeExtended.GITLAB_COMMUNITY);
       },
     },
     {
       label: "Gitlab Enterprise Edition",
       key: "3",
       onClick: () => {
-        handleVCSClick("GITLAB_ENTERPRISE");
+        handleVCSClick(VcsTypeExtended.GITLAB_ENTERPRISE);
       },
     },
   ];
@@ -119,14 +129,14 @@ export const ImportWorkspace = () => {
       label: "Github.com",
       key: "1",
       onClick: () => {
-        handleVCSClick("GITHUB");
+        handleVCSClick(VcsTypeExtended.GITHUB);
       },
     },
     {
       label: "Github Enterprise",
       key: "2",
       onClick: () => {
-        handleVCSClick("GITHUB_ENTERPRISE");
+        handleVCSClick(VcsTypeExtended.GITHUB_ENTERPRISE);
       },
     },
   ];
@@ -136,7 +146,7 @@ export const ImportWorkspace = () => {
       label: "Bitbucket Cloud",
       key: "1",
       onClick: () => {
-        handleVCSClick("BITBUCKET");
+        handleVCSClick(VcsTypeExtended.BITBUCKET);
       },
     },
   ];
@@ -146,24 +156,24 @@ export const ImportWorkspace = () => {
       label: "Azure DevOps Services",
       key: "1",
       onClick: () => {
-        handleVCSClick("AZURE_DEVOPS");
+        handleVCSClick(VcsTypeExtended.AZURE_DEVOPS);
       },
     },
   ];
   const navigate = useNavigate();
   useEffect(() => {
-    setOrganizationName(sessionStorage.getItem(ORGANIZATION_NAME));
+    setOrganizationName(sessionStorage.getItem(ORGANIZATION_NAME) ?? undefined);
     setLoading(true);
     loadVCS();
     getPlatforms();
   }, []);
-  const handleClick = (e) => {
+  const handleClick = () => {
     setCurrent(2);
     setVersionControlFlow(true);
     form.setFieldsValue({ source: "", branch: "" });
   };
 
-  const handlePlatformClick = (platform) => {
+  const handlePlatformClick = (platform: Platform) => {
     setCurrent(1);
     setPlatform(platform);
     if (platform.id === "tfcloud") {
@@ -175,12 +185,12 @@ export const ImportWorkspace = () => {
     }
   };
 
-  const handleGitClick = (id) => {
+  const handleGitClick = (id: string) => {
     setVcsId(id);
     handleChange(3);
   };
 
-  const handleVCSClick = (vcsType) => {
+  const handleVCSClick = (vcsType: VcsTypeExtended) => {
     navigate(`/organizations/${organizationId}/settings/vcs/new/${vcsType}`);
   };
 
@@ -192,7 +202,7 @@ export const ImportWorkspace = () => {
     setVCSButtonsVisible(true);
   };
 
-  const renderVCSLogo = (vcs) => {
+  const renderVCSLogo = (vcs: VcsType) => {
     switch (vcs) {
       case "GITLAB":
         return <GitlabOutlined style={{ fontSize: "20px" }} />;
@@ -218,23 +228,23 @@ export const ImportWorkspace = () => {
   const loadVCS = () => {
     axiosInstance.get(`organization/${organizationId}/vcs`).then((response) => {
       console.log(response);
-      setVCS(response.data);
+      setVCS(response.data.data);
       setLoading(false);
     });
   };
 
   const [form] = Form.useForm();
 
-  const handleCliDriven = (e) => {
+  const handleCliDriven = () => {
     setVersionControlFlow(false);
     setCurrent(2);
     setStep4Hidden(false);
     form.setFieldsValue({ source: "empty", branch: "remote-content" });
   };
 
-  const onFinishFailed = (values, errorFields) => {
-    console.log(values);
-    console.log(errorFields);
+  const onFinishFailed = (errorInfo: ValidateErrorEntity<any>) => {
+    console.log(errorInfo.values);
+    console.log(errorInfo.errorFields);
   };
 
   const handleImportClick = async () => {
@@ -256,7 +266,7 @@ export const ImportWorkspace = () => {
     }
   };
 
-  const importWorkspace = async (workspace) => {
+  const importWorkspace = async (workspace: any) => {
     try {
       const response = await axiosInstance.post(
         `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/importer/tfcloud/workspaces`,
@@ -289,16 +299,16 @@ export const ImportWorkspace = () => {
   };
 
   const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
+    onChange: (selectedRowKeys: (string | number | bigint)[], selectedRows: any[]) => {
       console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
       setWorkspacesImport(selectedRows);
     },
-    getCheckboxProps: (record) => ({
+    getCheckboxProps: (record: any) => ({
       name: record.id,
     }),
   };
 
-  const onFinish = (values) => {
+  const onFinish = (values: any) => {
     handleChange(4);
     setWorkspacesLoading(true);
 
@@ -326,7 +336,7 @@ export const ImportWorkspace = () => {
       });
   };
 
-  const handleChange = (currentVal) => {
+  const handleChange = (currentVal: number) => {
     setCurrent(currentVal);
 
     if (currentVal === 3) {
@@ -347,7 +357,7 @@ export const ImportWorkspace = () => {
   };
 
   const getPlatforms = () => {
-    let platforms = [
+    let platforms: Platform[] = [
       {
         id: "tfcloud",
         name: "Terraform Cloud",
@@ -483,10 +493,10 @@ export const ImportWorkspace = () => {
                 {vcsButtonsVisible ? (
                   <div>
                     <Space direction="horizontal">
-                      {loading || !vcs.data ? (
+                      {loading || vcs.length === 0 ? (
                         <p>Data loading...</p>
                       ) : (
-                        vcs.data.map(function (item, i) {
+                        vcs.map(function (item) {
                           return (
                             <Button
                               icon={renderVCSLogo(item.attributes.vcsType)}
@@ -608,7 +618,7 @@ export const ImportWorkspace = () => {
                     type: "checkbox",
                     ...rowSelection,
                   }}
-                  rowKey={(record) => record.id}
+                  rowKey={(record: any) => record.id}
                   dataSource={workspaces}
                   columns={columns}
                   pagination={{

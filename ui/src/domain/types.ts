@@ -1,9 +1,23 @@
-// Shated
+// Shared
 type AuditFieldBase = {
   createdDate?: string;
   createdBy?: string;
   updatDate?: string;
   updateBy?: string;
+};
+export type RelationshipItem = {
+  data: { type: string; id: string };
+};
+export type RelationshipArray = {
+  data: RelationshipItem[];
+};
+export type TofuRelease = {
+  tag_name: string;
+};
+
+export type AttributeWrapped<T> = {
+  id: string;
+  attributes: T;
 };
 
 // Organization
@@ -87,6 +101,7 @@ export type JobStep = {
 // VCS
 
 export enum VcsType {
+  UNKNOWN = "UNKNOWN",
   GITHUB = "GITHUB",
   GITLAB = "GITLAB",
   BITBUCKET = "BITBUCKET",
@@ -200,17 +215,33 @@ export type TeamToken = {
 
 // Variables
 
-export type GlobalVariable = {
+export type Variable = {
   id: string;
-  attributes: GlobalVariableAttributes;
+  attributes: VariableAttributes;
 };
-export type GlobalVariableAttributes = {
+export type VariableAttributes = {
   key: string;
   value: string;
   hcl: boolean;
   category: string;
   description: string;
   sensitive: boolean;
+};
+
+export type FlatVariable = {
+  id: string;
+} & VariableAttributes;
+
+export type CreateVariableForm = {
+  sensitive: boolean;
+} & UpdateVariableForm;
+
+export type UpdateVariableForm = {
+  key: string;
+  value: string;
+  hcl: boolean;
+  category: string;
+  description: string;
 };
 
 // Tags
@@ -237,12 +268,15 @@ export type Action = {
 };
 export type ActionAttributes = {
   name: string;
+  label: string;
+  action: string;
   type: string;
   category: string;
   version: string;
   active: boolean;
+  displayCriteria: string;
 };
-
+export type ActionWithSettings = Action & { settings?: any };
 // User tokens
 
 export type UserToken = {
@@ -270,3 +304,120 @@ export type ScheduleAttributes = {
 export type FlatSchedule = {
   id: string;
 } & ScheduleAttributes;
+
+// Workspaces
+export type Workspace = {
+  id: string;
+  attributes: WorkspaceAttributes;
+  relationships: {
+    organization: RelationshipItem;
+    webhook?: RelationshipItem;
+    agent?: RelationshipItem;
+    history?: RelationshipArray;
+  };
+};
+export type WorkspaceAttributes = {
+  branch: string;
+  defaultTemplate?: string;
+  deleted: boolean;
+  description?: string;
+  executionMode: string;
+  folder?: string;
+  iacType: string;
+  lockDescription?: string;
+  locked: boolean;
+  moduleSshKey?: string;
+  name: string;
+  source: string;
+  terraformVersion: string;
+} & AuditFieldBase;
+
+export type Webhook = {
+  id: string;
+  attributes: WebhookAttributes;
+};
+export type WebhookAttributes = {
+  remoteHookId: string;
+};
+export enum WebhookEventType {
+  PUSH = "PUSH",
+  PULL_REQUEST = "PULL_REQUEST",
+  PING = "PING",
+}
+export type WebhookEvent = {
+  id: string;
+  attributes: WebhookEventAttributes;
+};
+export type WebhookEventAttributes = {
+  branch: string;
+  path: string;
+  templateId: string;
+  priority: number;
+  event: WebhookEventType;
+};
+
+// Agent
+export type Agent = AttributeWrapped<AgentAttributes>;
+export type AgentAttributes = {
+  name: string;
+};
+
+// States
+export type Resource = {
+  name: string;
+  provider: string;
+  type: string;
+  values: Record<string, any>;
+  depends_on: string;
+  showDrawer: (data: Resource) => void;
+};
+export type ErrorResource = {
+  name: string;
+  provider: string;
+  type: unknown;
+};
+
+// History
+
+export type JobHistory = AttributeWrapped<JobHistoryAttributes>;
+export type JobHistoryAttributes = {
+  jobReference: string;
+  lineage: string;
+  md5: string;
+  output: string;
+  serial: number;
+} & AuditFieldBase;
+
+export type FlatJobHistory = {
+  id: string;
+  title: string;
+  relativeDate: string;
+  createdDate: string;
+} & JobHistoryAttributes;
+
+// State output
+export type StateOutput = {
+  format_version: string;
+  terraform_version: string;
+  values: {
+    output: {
+      [key: string]: StateOutputValue;
+    };
+    root_module: {
+      resources: StateOutputResource[];
+      child_modules: any[];
+    };
+  };
+};
+export type StateOutputValue = { sensitive?: boolean; value: string; type: string };
+
+export type StateOutputResource = {
+  address: string;
+  mode: string;
+  type: string;
+  name: string;
+  provider_name: string;
+  schema_version: number;
+  values: Record<string, any>;
+  depends_on: any;
+};

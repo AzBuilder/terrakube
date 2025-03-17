@@ -70,9 +70,11 @@
   },
   "devDependencies": {
     "@rollup/plugin-dynamic-import-vars": "^2.1.5",
+    "@types/babel__standalone": "^7.1.9",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/react-vis": "^1.11.15",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
     "@vitejs/plugin-react": "^4.3.4",

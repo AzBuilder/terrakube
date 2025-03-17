@@ -1,16 +1,17 @@
-import React, { memo } from "react";
-import { Card, Avatar,Button } from "antd";
-import { Handle } from "reactflow";
-import { getServiceIcon } from "./Icons.jsx";
+import { Avatar, Button, Card } from "antd";
+import { memo } from "react";
 import { HiOutlineExternalLink } from "react-icons/hi";
+import { Handle, NodeProps, Position } from "reactflow";
+import { Resource } from "../types.js";
+import { getServiceIcon } from "./Icons.jsx";
 const { Meta } = Card;
 
-export default memo(({ data, isConnectable }) => {
+export default memo(({ data, isConnectable }: NodeProps<Resource>) => {
   return (
     <>
       <Handle
         type="source"
-        position="top"
+        position={Position.Top}
         style={{ background: "#555" }}
         onConnect={(params) => console.log("handle onConnect", params)}
         isConnectable={isConnectable}
@@ -32,7 +33,7 @@ export default memo(({ data, isConnectable }) => {
       </Card>
       <Handle
         type="target"
-        position="bottom"
+        position={Position.Bottom}
         id="b"
         style={{ background: "#555" }}
         isConnectable={isConnectable}
@@ -41,7 +42,7 @@ export default memo(({ data, isConnectable }) => {
   );
 });
 
-const GetResourceIcon = (resource) => {
+const GetResourceIcon = (resource: Resource) => {
   const iconSource = getServiceIcon(resource.provider, resource.type);
   return <Avatar shape="square" size="large" src={iconSource} />;
 };

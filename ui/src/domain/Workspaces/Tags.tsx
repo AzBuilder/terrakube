@@ -8,6 +8,7 @@ type Props = {
   manageWorkspace: boolean;
 };
 export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) => {
+  console.log({ organizationId, workspaceId, manageWorkspace });
   const [tags, setTags] = useState<Tag[]>([]);
   const [newTags, setNewTags] = useState<Tag[]>([]);
   const [currentTags, setCurrentTags] = useState<WorkspaceTag[]>([]);

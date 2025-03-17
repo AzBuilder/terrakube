@@ -2,19 +2,20 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Popconfirm, Space, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../config/axiosConfig";
-import { deleteWebhook, genericHeader } from "../Workspaces";
-
+import { Workspace } from "../../types";
+import { genericHeader } from "../Workspaces";
 
 type Props = {
+  workspace: Workspace;
+  manageWorkspace: boolean;
+};
 
-}
-
-export const WorkspaceAdvanced = ({ workspace, manageWorkspace }) => {
+export const WorkspaceAdvanced = ({ workspace, manageWorkspace }: Props) => {
   const organizationId = workspace.relationships.organization.data.id;
   const navigate = useNavigate();
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  function generateRandomString(length) {
+  console.log("workspace", workspace);
+  function generateRandomString(length: number) {
     let result = "";
     const charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
@@ -23,7 +24,7 @@ export const WorkspaceAdvanced = ({ workspace, manageWorkspace }) => {
 
     return result;
   }
-  const onDelete = (workspace) => {
+  const onDelete = (workspace: Workspace) => {
     const id = workspace.id;
     let randomLetters = generateRandomString(4);
     let deletedName = `${workspace.attributes.name.substring(0, 21)}_DEL_${randomLetters}`;
@@ -50,7 +51,7 @@ export const WorkspaceAdvanced = ({ workspace, manageWorkspace }) => {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         console.log("Deleting VCS refernce successfully");
         axiosInstance.patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader).then((response) => {
           console.log(response);
@@ -62,7 +63,6 @@ export const WorkspaceAdvanced = ({ workspace, manageWorkspace }) => {
             message.error("Workspace deletion failed");
           }
         });
-        deleteWebhook();
       });
   };
 

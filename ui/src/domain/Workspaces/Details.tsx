@@ -35,11 +35,12 @@ import { BiTerminal } from "react-icons/bi";
 import { FiGitCommit } from "react-icons/fi";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ActionLoader from "../../ActionLoader";
+import ActionLoader from "../../ActionLoader.js";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME, WORKSPACE_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
 import { CreateJob } from "../Jobs/Create";
 import { DetailsJob } from "../Jobs/Details";
+import { Action, ActionWithSettings, Resource, StateOutputValue, VcsType, Workspace } from "../types.js";
 import { CLIDriven } from "../Workspaces/CLIDriven";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
 import { Schedules } from "../Workspaces/Schedules";
@@ -74,15 +75,23 @@ type Props = {
   selectedTab?: string;
 };
 
+type Params = {
+  id: string;
+  runid: string;
+  orgid: string;
+};
+
+type StateOutputVariableWithName = { name: string } & StateOutputValue;
+
 export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) => {
   const navigate = useNavigate();
-  const { id, runid, orgid } = useParams();
+  const { id, runid, orgid } = useParams<Params>();
   if (orgid !== null && orgid !== undefined && orgid !== "") {
     sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
   }
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
-  sessionStorage.setItem(WORKSPACE_ARCHIVE, id);
-  const [workspace, setWorkspace] = useState({});
+  sessionStorage.setItem(WORKSPACE_ARCHIVE, id!);
+  const [workspace, setWorkspace] = useState<Workspace>();
   const [manageWorkspace, setManageWorkspace] = useState(false);
   const [manageState, setManageState] = useState(false);
   const [variables, setVariables] = useState([]);
@@ -93,14 +102,14 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   const [history, setHistory] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [open, setOpen] = useState(false);
-  const [resource, setResource] = useState({});
+  const [resource, setResource] = useState<Resource>();
   const [envVariables, setEnvVariables] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [stateDetailsVisible, setStateDetailsVisible] = useState(false);
-  const [jobId, setJobId] = useState(0);
+  const [jobId, setJobId] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [jobVisible, setJobVisible] = useState(false);
-  const [organizationNameLocal, setOrganizationNameLocal] = useState([]);
+  const [organizationNameLocal, setOrganizationNameLocal] = useState<string>();
   const [workspaceName, setWorkspaceName] = useState("...");
   const [activeKey, setActiveKey] = useState(selectedTab !== null ? selectedTab : "1");
   const [templates, setTemplates] = useState([]);
@@ -108,11 +117,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   const [executionMode, setExecutionMode] = useState("...");
   const [agent, setAgent] = useState("...");
   const [orgTemplates, setOrgTemplates] = useState([]);
-  const [vcsProvider, setVCSProvider] = useState("");
+  const [vcsProvider, setVCSProvider] = useState<VcsType>();
   const [resources, setResources] = useState([]);
-  const [outputs, setOutputs] = useState([]);
+  const [outputs, setOutputs] = useState<StateOutputVariableWithName[]>([]);
   const [currentStateId, setCurrentStateId] = useState(0);
-  const [actions, setActions] = useState([]);
+  const [actions, setActions] = useState<Action[]>([]);
   const [contextState, setContextState] = useState({});
   const handleClick = (jobid: string) => {
     changeJob(jobid);
@@ -124,19 +133,19 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
       title: "Name",
       dataIndex: "name",
       key: "name",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a: StateOutputVariableWithName, b: StateOutputVariableWithName) => a.name.localeCompare(b.name),
     },
     {
       title: "Type",
       dataIndex: "type",
       key: "type",
-      sorter: (a, b) => a.type.localeCompare(b.type),
+      sorter: (a: StateOutputVariableWithName, b: StateOutputVariableWithName) => a.type.localeCompare(b.type),
     },
     {
       title: "Value",
       dataIndex: "value",
       key: "value",
-      render: (text) => (
+      render: (text: string) => (
         <Paragraph style={{ margin: "0px" }} copyable={{ tooltips: false }}>
           {text}
         </Paragraph>
@@ -149,8 +158,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
       title: "Name",
       dataIndex: "name",
       key: "name",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      render: (text, record) => (
+      sorter: (a: Resource, b: Resource) => a.name.localeCompare(b.name),
+      render: (text: string, record: Resource) => (
         <Button onClick={() => showDrawer(record)} type="link">
           {text} &nbsp;
           <HiOutlineExternalLink />
@@ -161,15 +170,15 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
       title: "Provider",
       dataIndex: "provider",
       key: "provider",
-      sorter: (a, b) => a.provider.localeCompare(b.provider),
+      sorter: (a: Resource, b: Resource) => a.provider.localeCompare(b.provider),
     },
     {
       title: "Type",
       dataIndex: "type",
       key: "type",
-      onFilter: (value, record) => record.type.indexOf(value) === 0,
-      sorter: (a, b) => a.type.localeCompare(b.type),
-      render: (text, record) => (
+      onFilter: (value: string, record: Resource) => record.type.indexOf(value) === 0,
+      sorter: (a: Resource, b: Resource) => a.type.localeCompare(b.type),
+      render: (text: string, record: Resource) => (
         <>
           <Avatar shape="square" size="small" src={getServiceIcon(record.provider, record.type)} /> &nbsp;{text}
         </>
@@ -181,10 +190,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
       key: "module",
     },
   ];
-  const handleStatesClick = (key) => {
+  const handleStatesClick = (key: string) => {
     switchKey(key);
   };
-  const callback = (key) => {
+  const callback = (key: string) => {
     switchKey(key);
   };
 
@@ -195,12 +204,12 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
     });
   };
 
-  const showDrawer = (record) => {
+  const showDrawer = (record: Resource) => {
     setOpen(true);
     setResource(record);
   };
 
-  const switchKey = (key) => {
+  const switchKey = (key: string) => {
     setActiveKey(key);
     switch (key) {
       case "1":
@@ -228,7 +237,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
     }
   };
 
-  const evaluateCriteria = (criteria, context) => {
+  const evaluateCriteria = (criteria: any, context: any) => {
     try {
       console.log("Evaluating criteria:", criteria);
       console.log(context);
@@ -238,7 +247,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
         if (!criteria.settings) {
           return {};
         }
-        return criteria.settings.reduce((acc, setting) => {
+        return criteria.settings.reduce((acc: any, setting: any) => {
           acc[setting.key] = setting.value;
           return acc;
         }, {});
@@ -273,7 +282,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
     return () => clearInterval(interval);
   }, [id]);
 
-  const changeJob = (id) => {
+  const changeJob = (id: string) => {
     console.log(id);
     setJobId(id);
     setJobVisible(true);
@@ -304,7 +313,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
     });
   };
 
-  const loadWorkspace = (_loadVersions, _loadWebhook, _loadPermissionSet) => {
+  const loadWorkspace = (_loadVersions: boolean, _loadWebhook = false, _loadPermissionSet = false) => {
     var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,reference`;
     if (_loadWebhook) url += ",webhook";
     axiosInstance.get(`organization/${organizationId}/template`).then((template) => {
@@ -316,7 +325,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
         .then((response) => {
           if (_loadPermissionSet) loadPermissionSet();
 
-          setWorkspace(response.data);
+          setWorkspace(response.data.data);
           console.log(response.data);
           if (response.data.included) {
             setupWorkspaceIncludes(
@@ -351,7 +360,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
             sessionStorage.setItem(ORGANIZATION_NAME, organizationName);
             console.log(organizationName);
           }
-          setOrganizationNameLocal(sessionStorage.getItem(ORGANIZATION_NAME));
+          setOrganizationNameLocal(sessionStorage.getItem(ORGANIZATION_NAME)!);
           setWorkspaceName(response.data.data.attributes.name);
           setExecutionMode(response.data.data.attributes.executionMode);
           if (runid && _loadVersions) changeJob(runid); // if runid is provided, show the job details
@@ -364,7 +373,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
     switchKey("6");
   };
 
-  const handleLockButton = (locked) => {
+  const handleLockButton = (locked: boolean) => {
     const body = {
       data: {
         type: "workspace",
@@ -388,7 +397,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
           message.success("Workspace " + newstatus + " successfully");
         } else {
           var newstatus = locked ? "unlock" : "lock";
-          message.errr("Workspace " + newstatus + " failed");
+          message.error("Workspace " + newstatus + " failed");
         }
       });
   };
@@ -412,29 +421,29 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
 
       <div className="site-layout-content">
         <div className="workspaceDisplay">
-          {loading || !workspace.data || !variables || !jobs ? (
+          {loading || !workspace || !variables || !jobs ? (
             <Spin spinning={true} tip="Loading Workspace...">
               <p style={{ marginTop: "50px" }}></p>
             </Spin>
           ) : (
             <div className="orgWrapper">
               <div className="variableActions">
-                <h2>{workspace.data.attributes.name}</h2>
+                <h2>{workspace.attributes.name}</h2>
               </div>
               <Space className="workspace-details" direction="vertical">
                 <Paragraph style={{ margin: "0px" }} copyable={{ text: id, tooltips: false }}>
                   <span className="workspace-details"> ID: {id} </span>
                 </Paragraph>
-                {workspace.data.attributes?.description === "" ? (
+                {workspace.attributes?.description === "" ? (
                   <a className="workspace-button" onClick={handleClickSettings} style={{ color: "#3b3d45" }}>
                     Add workspace description
                   </a>
                 ) : (
-                  workspace.data.attributes.description
+                  workspace.attributes.description
                 )}
                 <Space size={40} style={{ marginBottom: "40px" }} direction="horizontal">
                   <span>
-                    {workspace.data.attributes.locked ? (
+                    {workspace.attributes.locked ? (
                       <>
                         <LockOutlined /> Locked
                       </>
@@ -448,11 +457,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                     <ProfileOutlined /> Resources <span style={{ fontWeight: "500" }}>{resources.length}</span>
                   </span>
                   <Space direction="horizontal">
-                    {getIaCIconById(workspace.data.attributes?.iacType)}
+                    {getIaCIconById(workspace.attributes?.iacType)}
                     <span>
-                      {getIaCNameById(workspace.data.attributes?.iacType)}{" "}
+                      {getIaCNameById(workspace.attributes?.iacType)}{" "}
                       <a onClick={handleClickSettings} className="workspace-button" style={{ color: "#3b3d45" }}>
-                        v{workspace.data.attributes.terraformVersion}
+                        v{workspace.attributes.terraformVersion}
                       </a>
                     </span>
                   </Space>
@@ -465,11 +474,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                   </span>
 
                   <span>
-                    {workspace.data.attributes.locked ? (
+                    {workspace.attributes.locked ? (
                       <>
                         <Alert
                           message="Lock Description"
-                          description={workspace.data.attributes.lockDescription}
+                          description={workspace.attributes.lockDescription}
                           type="warning"
                           showIcon
                         />
@@ -490,7 +499,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                     <Space direction="horizontal">
                       {actions &&
                         actions
-                          .reduce((acc, action) => {
+                          .reduce((acc: ActionWithSettings[], action: ActionWithSettings) => {
                             if (!action.attributes.displayCriteria) {
                               acc.push(action);
                               return acc;
@@ -506,7 +515,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
 
                             for (const criteria of displayCriteria) {
                               const settings = evaluateCriteria(criteria, {
-                                workspace: workspace.data,
+                                workspace: workspace,
                                 state: contextState,
                                 resources: resources,
                                 apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
@@ -529,7 +538,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                               key={index}
                               action={action?.attributes.action}
                               context={{
-                                workspace: workspace.data,
+                                workspace: workspace,
                                 state: contextState,
                                 resources: resources,
                                 apiUrl: new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin,
@@ -540,11 +549,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                       <Button
                         type="default"
                         htmlType="button"
-                        onClick={() => handleLockButton(workspace.data.attributes.locked)}
-                        icon={workspace.data.attributes.locked ? <UnlockOutlined /> : <LockOutlined />}
+                        onClick={() => handleLockButton(workspace.attributes.locked)}
+                        icon={workspace.attributes.locked ? <UnlockOutlined /> : <LockOutlined />}
                         disabled={!manageWorkspace}
                       >
-                        {workspace.data.attributes.locked ? "Unlock" : "Lock"}
+                        {workspace.attributes.locked ? "Unlock" : "Lock"}
                       </Button>
                       <CreateJob changeJob={changeJob} />
                     </Space>
@@ -555,9 +564,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                 <TabPane tab="Overview" key="1">
                   <Row>
                     <Col span={19} style={{ paddingRight: "20px" }}>
-                      {workspace.data.attributes.source === "empty" &&
-                      workspace.data.attributes.branch === "remote-content" &&
-                      workspace.data.relationships.history.data.length < 1 ? (
+                      {workspace.attributes.source === "empty" &&
+                      workspace.attributes.branch === "remote-content" &&
+                      (workspace.relationships?.history?.data?.length || 0) < 1 ? (
                         <CLIDriven organizationName={organizationNameLocal} workspaceName={workspaceName} />
                       ) : (
                         <div>
@@ -660,14 +669,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                             ]}
                           />
 
-                          <ResourceDrawer
-                            resource={resource}
-                            workspace={workspace.data}
-                            setOpen={setOpen}
-                            open={open}
-                            organizationId={organizationId}
-                            organizationName={organizationNameLocal}
-                          />
+                          <ResourceDrawer resource={resource} workspace={workspace} setOpen={setOpen} open={open} />
                         </div>
                       )}
                     </Col>
@@ -675,12 +677,12 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                       <Space direction="vertical">
                         <br />
                         <span className="App-text">
-                          {workspace.data.attributes.branch !== "remote-content" ? (
+                          {workspace.attributes.branch !== "remote-content" ? (
                             <>
                               {" "}
                               {renderVCSLogo(vcsProvider)}{" "}
-                              <a href={fixSshURL(workspace.data.attributes.source)} target="_blank">
-                                {new URL(fixSshURL(workspace.data.attributes.source))?.pathname
+                              <a href={fixSshURL(workspace.attributes.source)} target="_blank">
+                                {new URL(fixSshURL(workspace.attributes.source))?.pathname
                                   ?.replace(".git", "")
                                   ?.substring(1)}
                               </a>
@@ -776,9 +778,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                     history={history}
                     setStateDetailsVisible={setStateDetailsVisible}
                     stateDetailsVisible={stateDetailsVisible}
-                    workspace={workspace.data}
-                    organizationId={organizationId}
-                    organizationName={organizationNameLocal}
+                    workspace={workspace}
                     onRollback={loadWorkspace}
                     manageState={manageState}
                   />
@@ -806,7 +806,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                         key: "61",
                         children: (
                           <WorkspaceGeneral
-                            workspaceData={workspace.data}
+                            workspaceData={workspace}
                             orgTemplates={orgTemplates}
                             manageWorkspace={manageWorkspace}
                           />
@@ -817,7 +817,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                         key: "62",
                         children: (
                           <WorkspaceWebhook
-                            workspace={workspace.data}
+                            workspace={workspace}
                             vcsProvider={vcsProvider}
                             orgTemplates={orgTemplates}
                             manageWorkspace={manageWorkspace}
@@ -827,7 +827,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                       {
                         label: "Advanced",
                         key: "63",
-                        children: <WorkspaceAdvanced workspace={workspace.data} manageWorkspace={manageWorkspace} />,
+                        children: <WorkspaceAdvanced workspace={workspace} manageWorkspace={manageWorkspace} />,
                       },
                     ]}
                   />
@@ -1260,7 +1260,7 @@ function parseChildModules(resources, child_modules) {
   return resources;
 }
 
-function fixSshURL(source) {
+function fixSshURL(source: string) {
   if (source.startsWith("git@")) {
     return source.replace(":", "/").replace("git@", "https://");
   } else {

@@ -3,24 +3,14 @@ import { Button, Form, Input, Modal, Popconfirm, Select, Space, Switch, Table, T
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
-import { GlobalVariable } from "../types";
+import { CreateVariableForm, UpdateVariableForm, Variable } from "../types";
 import "./Settings.css";
 
-type CreateVariableForm = {
-  sensitive: boolean;
-} & UpdateVariableForm;
 
-type UpdateVariableForm = {
-  key: string;
-  value: string;
-  hcl: boolean;
-  category: string;
-  description: string;
-};
 
 export const GlobalVariablesSettings = () => {
   const { orgid } = useParams();
-  const [globalVariables, setGlobalVariables] = useState<GlobalVariable[]>([]);
+  const [globalVariables, setGlobalVariables] = useState<Variable[]>([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [variableKey, setVariableKey] = useState<string>();
@@ -34,7 +24,7 @@ export const GlobalVariablesSettings = () => {
       dataIndex: "key",
       width: "40%",
       key: "key",
-      render: (_: any, record: GlobalVariable) => {
+      render: (_: any, record: Variable) => {
         return (
           <div>
             {record.attributes.key} &nbsp;&nbsp;&nbsp;&nbsp; <Tag visible={record.attributes.hcl}>HCL</Tag>{" "}
@@ -48,14 +38,14 @@ export const GlobalVariablesSettings = () => {
       dataIndex: "value",
       key: "value",
       width: "40%",
-      render: (_: any, record: GlobalVariable) => {
+      render: (_: any, record: Variable) => {
         return record.attributes.sensitive ? <i>Sensitive - write only</i> : <div>{record.attributes.value}</div>;
       },
     },
     {
       title: "Actions",
       key: "action",
-      render: (_: any, record: GlobalVariable) => {
+      render: (_: any, record: Variable) => {
         return (
           <div>
             <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(record.id)}>

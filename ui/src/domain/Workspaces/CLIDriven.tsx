@@ -2,7 +2,7 @@ import { Button, Tabs } from "antd";
 import { HiOutlineExternalLink } from "react-icons/hi";
 
 type Props = {
-  organizationName: string;
+  organizationName?: string;
   workspaceName: string;
 };
 export const CLIDriven = ({ organizationName, workspaceName }: Props) => {
