@@ -848,6 +848,7 @@ public class RemoteTfeService {
         if(runsData.getData().getAttributes().get("target-addrs") != null) {
             log.info("Target Addresses {}", runsData.getData().getAttributes().get("target-addrs"));
             List<String> targetAddrs = (List<String>) runsData.getData().getAttributes().get("target-addrs");
+            log.info("Target Addresses Java List {}", targetAddrs);
         }
         //Optional<List<String>> targetList = Optional.ofNullable((List))
         Workspace workspace = workspaceRepository.getReferenceById(UUID.fromString(workspaceId));
