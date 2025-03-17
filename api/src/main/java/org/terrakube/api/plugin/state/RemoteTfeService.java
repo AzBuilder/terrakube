@@ -913,7 +913,7 @@ public class RemoteTfeService {
                 address.setJob(job);
                 addressRepository.save(address);
             }
-            log.info("Target Addresses Java List {}", replaceAddres);
+            log.info("Replace Addresses Java List {}", replaceAddres);
         }
 
         scheduleJobService.createJobContext(job);
