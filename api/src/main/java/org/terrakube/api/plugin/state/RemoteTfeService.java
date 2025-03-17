@@ -904,7 +904,7 @@ public class RemoteTfeService {
         }
 
         if(runsData.getData().getAttributes().get("replace-addrs") != null) {
-            log.info("Target Addresses {}", runsData.getData().getAttributes().get("replace-addrs"));
+            log.info("Replace Addresses {}", runsData.getData().getAttributes().get("replace-addrs"));
             List<String> replaceAddres = (List<String>) runsData.getData().getAttributes().get("replace-addrs");
             for(String replace: replaceAddres){
                 Address address = new Address();
