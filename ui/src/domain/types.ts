@@ -251,3 +251,22 @@ export type UserToken = {
   days: number;
   description: string;
 } & AuditFieldBase;
+
+// Schedules
+export type Schedule = {
+  id: string;
+  attributes: ScheduleAttributes;
+};
+
+export type ScheduleAttributes = {
+  cron: string;
+  description?: string;
+  enabled: boolean;
+  tcl?: string;
+  templateReference: string;
+  name: string;
+} & AuditFieldBase;
+
+export type FlatSchedule = {
+  id: string;
+} & ScheduleAttributes;

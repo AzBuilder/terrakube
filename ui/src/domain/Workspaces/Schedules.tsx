@@ -1,112 +1,31 @@
-import { React, useState, useEffect } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  Table,
-  Modal,
-  Tag,
-  Space,
-  Popconfirm,
-} from "antd";
-import { Cron } from "react-js-cron";
-import "react-js-cron/dist/styles.css"
-import {
-  ORGANIZATION_ARCHIVE,
-  WORKSPACE_ARCHIVE,
-} from "../../config/actionTypes";
-import axiosInstance from "../../config/axiosConfig";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  ClockCircleOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { ClockCircleOutlined, DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag } from "antd";
 import cronstrue from "cronstrue";
+import { useEffect, useMemo, useState } from "react";
+import { Cron } from "react-js-cron";
+import "react-js-cron/dist/styles.css";
+import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from "../../config/actionTypes";
+import axiosInstance from "../../config/axiosConfig";
+import { FlatSchedule, Template } from "../types";
 var C2Q = require("cron-to-quartz");
 
-const VARIABLES_COLUMS = (organizationId, workspaceId, onEdit) => [
-  {
-    title: "Id",
-    dataIndex: "id",
-    width: "30%",
-    key: "id",
-    render: (_, record) => {
-      return record.id;
-    },
-  },
-  {
-    title: "Job Type",
-    dataIndex: "jobType",
-    key: "jobType",
-    width: "10%",
-    render: (_, record) => {
-      return record.name;
-    },
-  },
-  {
-    title: "Schedule",
-    dataIndex: "cron",
-    key: "cron",
-    width: "30%",
-    render: (_, record) => {
-      return (
-        <span>
-          <Tag color="default">cron: {record.cron} </Tag>
-          <Tag icon={<InfoCircleOutlined />} color="default">
-            {cronstrue.toString(record.cron, {
-              dayOfWeekStartIndexZero: false,
-            })}
-          </Tag>
-        </span>
-      );
-    },
-  },
-  {
-    title: "Actions",
-    key: "action",
-    render: (_, record, manageWorkspace) => {
-      return (
-        <div>
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => onEdit(record)}
-            disabled={!manageWorkspace}
-          >
-            Edit
-          </Button>
-          <Popconfirm
-            onConfirm={() => {
-              deleteSchedule(record.id, organizationId, workspaceId);
-            }}
-            title={
-              <p>
-                This will permanently delete this schedule <br />
-                Are you sure?
-              </p>
-            }
-            okText="Yes"
-            cancelText="No"
-          >
-            {" "}
-            <Button danger type="link" icon={<DeleteOutlined />} manageWorkspace={!manageWorkspace}>
-              Delete
-            </Button>
-          </Popconfirm>
-        </div>
-      );
-    },
-  },
-];
+type ScheduleForm = {
+  templateId: string;
+};
 
 const validateMessages = {
   required: "${label} is required!",
-  pattern: "${label} is not valid cron expression!",
+  pattern: {
+    mismatch: "${label} is not valid cron expression!",
+  },
 };
 
-export const Schedules = ({ schedules, manageWorkspace }) => {
+type Props = {
+  schedules: FlatSchedule[];
+  manageWorkspace: boolean;
+};
+
+export const Schedules = ({ schedules, manageWorkspace }: Props) => {
   const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [form] = Form.useForm();
@@ -118,32 +37,103 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
   const defaultValue = "* * * * *";
   const [value, setValue] = useState(defaultValue);
 
+  const VARIABLES_COLUMS = useMemo(() => {
+    return [
+      {
+        title: "Id",
+        dataIndex: "id",
+        width: "30%",
+        key: "id",
+        render: (_: string, record: FlatSchedule) => {
+          return record.id;
+        },
+      },
+      {
+        title: "Job Type",
+        dataIndex: "jobType",
+        key: "jobType",
+        width: "10%",
+        render: (_: string, record: FlatSchedule) => {
+          return record.name;
+        },
+      },
+      {
+        title: "Schedule",
+        dataIndex: "cron",
+        key: "cron",
+        width: "30%",
+        render: (_: string, record: FlatSchedule) => {
+          return (
+            <span>
+              <Tag color="default">cron: {record.cron} </Tag>
+              <Tag icon={<InfoCircleOutlined />} color="default">
+                {cronstrue.toString(record.cron, {
+                  dayOfWeekStartIndexZero: false,
+                })}
+              </Tag>
+            </span>
+          );
+        },
+      },
+      {
+        title: "Actions",
+        key: "action",
+        render: (_: string, record: FlatSchedule) => {
+          return (
+            <div>
+              <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(record)} disabled={!manageWorkspace}>
+                Edit
+              </Button>
+              <Popconfirm
+                onConfirm={() => {
+                  deleteSchedule(record.id, organizationId!, workspaceId!);
+                }}
+                title={
+                  <p>
+                    This will permanently delete this schedule <br />
+                    Are you sure?
+                  </p>
+                }
+                okText="Yes"
+                cancelText="No"
+              >
+                {" "}
+                <Button danger type="link" icon={<DeleteOutlined />} disabled={!manageWorkspace}>
+                  Delete
+                </Button>
+              </Popconfirm>
+            </div>
+          );
+        },
+      },
+    ];
+  }, [organizationId, workspaceId, manageWorkspace]);
+
+  console.log("scheds", schedules);
+
   useEffect(() => {
     setLoading(true);
     loadTemplates();
   }, [organizationId]);
 
   const loadTemplates = () => {
-    axiosInstance
-      .get(`organization/${organizationId}/template`)
-      .then((response) => {
-        console.log(response);
-        var templatesList = response.data.data.filter(function (obj) {
-          //exclude CLI based templates
-          return (
-            obj.attributes.name !== "Terraform-Plan/Apply-Cli" &&
-            obj.attributes.name !== "Terraform-Plan/Destroy-Cli"
-          );
-        });
-        setTemplates(templatesList);
-        setLoading(false);
+    axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
+      console.log(response);
+      var templatesList = response.data.data.filter(function (obj: Template) {
+        //exclude CLI based templates
+        return (
+          obj.attributes.name !== "Terraform-Plan/Apply-Cli" && obj.attributes.name !== "Terraform-Plan/Destroy-Cli"
+        );
       });
+      setTemplates(templatesList);
+      setLoading(false);
+    });
   };
 
   const onCancel = () => {
     setVisible(false);
   };
-  const onEdit = (schedule) => {
+  const onEdit = (schedule: FlatSchedule) => {
     setMode("edit");
     setScheduleId(schedule.id);
     form.setFieldsValue({
@@ -153,7 +143,7 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
     setVisible(true);
   };
 
-  const onCreate = (values) => {
+  const onCreate = (values: ScheduleForm) => {
     const body = {
       data: {
         type: "schedule",
@@ -166,15 +156,11 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
     console.log(body);
 
     axiosInstance
-      .post(
-        `organization/${organizationId}/workspace/${workspaceId}/schedule`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      )
+      .post(`organization/${organizationId}/workspace/${workspaceId}/schedule`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
       .then((response) => {
         console.log(response);
         setVisible(false);
@@ -182,7 +168,7 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
       });
   };
 
-  const onUpdate = (values) => {
+  const onUpdate = (values: ScheduleForm) => {
     const body = {
       data: {
         type: "schedule",
@@ -196,15 +182,11 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
     console.log(body);
 
     axiosInstance
-      .patch(
-        `organization/${organizationId}/workspace/${workspaceId}/schedule/${scheduleId}`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      )
+      .patch(`organization/${organizationId}/workspace/${workspaceId}/schedule/${scheduleId}`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
       .then((response) => {
         console.log(response);
         setVisible(false);
@@ -216,14 +198,9 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
     <div>
       <h2>Schedules</h2>
       <div className="App-text">
-        Schedules allows you to automatically trigger a Job in your workspace on
-        a scheduled basis.
+        Schedules allows you to automatically trigger a Job in your workspace on a scheduled basis.
       </div>
-      <Table
-        dataSource={schedules}
-        columns={VARIABLES_COLUMS(organizationId, workspaceId, onEdit)}
-        rowKey="key"
-      />
+      <Table dataSource={schedules} columns={VARIABLES_COLUMS} rowKey="key" />
       <Button
         type="primary"
         icon={<ClockCircleOutlined />}
@@ -258,12 +235,7 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
         }}
       >
         <Space style={{ width: "100%" }} direction="vertical">
-          <Form
-            name="create-org"
-            form={form}
-            layout="vertical"
-            validateMessages={validateMessages}
-          >
+          <Form name="create-org" form={form} layout="vertical" validateMessages={validateMessages}>
             <Form.Item
               name="templateId"
               label="Job Type"
@@ -277,7 +249,7 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
                 <p>Data loading...</p>
               ) : (
                 <Select>
-                  {templates.map((item) => (
+                  {templates.map((item: Template) => (
                     <Select.Option value={item.id} key={item.id}>
                       {item.attributes.name}
                     </Select.Option>
@@ -298,18 +270,15 @@ export const Schedules = ({ schedules, manageWorkspace }) => {
   );
 };
 
-const deleteSchedule = (scheduleId, organizationId, workspaceId) => {
+const deleteSchedule = (scheduleId: string, organizationId: string, workspaceId: string) => {
   console.log(scheduleId);
 
   axiosInstance
-    .delete(
-      `organization/${organizationId}/workspace/${workspaceId}/schedule/${scheduleId}`,
-      {
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-        },
-      }
-    )
+    .delete(`organization/${organizationId}/workspace/${workspaceId}/schedule/${scheduleId}`, {
+      headers: {
+        "Content-Type": "application/vnd.api+json",
+      },
+    })
     .then((response) => {
       console.log(response);
     });
