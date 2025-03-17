@@ -1,6 +1,7 @@
 import * as Icons from "@ant-design/icons";
 import { transform } from "@babel/standalone";
 import { Collapse, DatePicker, Typography } from "antd";
+import { DateTime } from "luxon";
 import React, { Component, ErrorInfo, ReactNode, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Crosshair, Hint, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, XYPlot, YAxis } from "react-vis";
@@ -75,8 +76,6 @@ const antdComponents = [
 const { Panel } = Collapse;
 const { Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
-const { DateTime } = require("luxon");
-
 // List of antd icons to consider for dynamic importing
 const antdIcons = Object.keys(Icons).filter((name) => name.endsWith("Outlined"));
 

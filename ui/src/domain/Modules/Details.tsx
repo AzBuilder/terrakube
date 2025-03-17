@@ -28,6 +28,7 @@ import {
 } from "antd";
 import { Buffer } from "buffer";
 import * as hcl from "hcl2-parser";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { BiBookBookmark } from "react-icons/bi";
@@ -45,7 +46,6 @@ import axiosInstance from "../../config/axiosConfig";
 import { ModuleModel, VcsType } from "../types";
 import { compareVersions } from "../Workspaces/Workspaces";
 import "./Module.css";
-const { DateTime } = require("luxon");
 const { Content } = Layout;
 
 type Props = {

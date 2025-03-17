@@ -15,12 +15,12 @@ import {
   Tag,
   Typography,
 } from "antd";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { axiosClientAuth } from "../../config/axiosConfig";
 import { UserToken } from "../types";
 import "./UserSettings.css";
-
 type Params = {
   orgid: string;
 };
@@ -42,7 +42,7 @@ export const Tokens = () => {
   const onCancel = () => {
     setVisible(false);
   };
-  const { DateTime } = require("luxon");
+
   const { Paragraph } = Typography;
   const onNew = () => {
     form.resetFields();

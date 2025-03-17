@@ -11,6 +11,9 @@ export type RelationshipItem = {
 export type RelationshipArray = {
   data: RelationshipItem[];
 };
+export type IncludedItem<T> = {
+  type: string;
+} & T;
 export type TofuRelease = {
   tag_name: string;
 };
@@ -87,6 +90,7 @@ export type JobAttributes = {
   via: JobVia;
   output: string;
   approvalTeam: string;
+  commitId: string;
 } & AuditFieldBase;
 
 export type JobStep = {
@@ -97,7 +101,12 @@ export type JobStep = {
   output: string;
   outputLog: string;
 };
-
+export type FlatJob = {
+  id: string;
+  latestChange: string;
+  title: string;
+  statusColor: string;
+} & JobAttributes;
 // VCS
 
 export enum VcsType {

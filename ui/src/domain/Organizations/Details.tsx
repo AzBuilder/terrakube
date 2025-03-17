@@ -27,6 +27,7 @@ import {
   Tag,
   Tooltip,
 } from "antd";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { BiTerminal } from "react-icons/bi";
@@ -36,7 +37,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance, { axiosGraphQL } from "../../config/axiosConfig";
 const { Content } = Layout;
-const { DateTime } = require("luxon");
 const { Search } = Input;
 
 type Props = {

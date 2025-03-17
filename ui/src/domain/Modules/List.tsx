@@ -1,5 +1,6 @@
 import { ClockCircleOutlined, CloudOutlined, CloudUploadOutlined, DownloadOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Card, Input, Layout, List, Space, Tag } from "antd";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { FaAws } from "react-icons/fa";
@@ -12,7 +13,6 @@ import axiosInstance from "../../config/axiosConfig";
 import { FlatModule, ModuleModel } from "../types";
 import { compareVersions } from "../Workspaces/Workspaces";
 import "./Module.css";
-const { DateTime } = require("luxon");
 const { Content } = Layout;
 const include = { MODULE: "module" };
 const { Search } = Input;

@@ -29,6 +29,8 @@ import {
   Tag,
   Typography,
 } from "antd";
+import { AxiosInstance } from "axios";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { BiTerminal } from "react-icons/bi";
@@ -40,7 +42,22 @@ import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME, WORKSPACE_ARCHIVE } from "../.
 import axiosInstance from "../../config/axiosConfig";
 import { CreateJob } from "../Jobs/Create";
 import { DetailsJob } from "../Jobs/Details";
-import { Action, ActionWithSettings, Resource, StateOutputValue, VcsType, Workspace } from "../types.js";
+import {
+  Action,
+  ActionWithSettings,
+  FlatJob,
+  FlatJobHistory,
+  FlatSchedule,
+  FlatVariable,
+  IncludedItem,
+  Organization,
+  Resource,
+  Schedule,
+  StateOutputValue,
+  Template,
+  VcsType,
+  Workspace
+} from "../types.js";
 import { CLIDriven } from "../Workspaces/CLIDriven";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
 import { Schedules } from "../Workspaces/Schedules";
@@ -66,7 +83,6 @@ const include = {
   REFERENCE: "reference",
   ORGANIZATION: "organization",
 };
-const { DateTime } = require("luxon");
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
@@ -89,22 +105,22 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   if (orgid !== null && orgid !== undefined && orgid !== "") {
     sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid);
   }
-  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE)!;
   sessionStorage.setItem(WORKSPACE_ARCHIVE, id!);
   const [workspace, setWorkspace] = useState<Workspace>();
   const [manageWorkspace, setManageWorkspace] = useState(false);
   const [manageState, setManageState] = useState(false);
-  const [variables, setVariables] = useState([]);
-  const [collectionVariables, setCollectionVariables] = useState([]);
-  const [collectionEnvVariables, setCollectionEnvVariables] = useState([]);
-  const [globalVariables, setGlobalVariables] = useState([]);
-  const [globalEnvVariables, setGlobalEnvVariables] = useState([]);
-  const [history, setHistory] = useState([]);
-  const [schedule, setSchedule] = useState([]);
+  const [variables, setVariables] = useState<FlatVariable[]>([]);
+  const [collectionVariables, setCollectionVariables] = useState<any[]>([]);
+  const [collectionEnvVariables, setCollectionEnvVariables] = useState<any[]>([]);
+  const [globalVariables, setGlobalVariables] = useState<FlatVariable[]>([]);
+  const [globalEnvVariables, setGlobalEnvVariables] = useState<FlatVariable[]>([]);
+  const [history, setHistory] = useState<FlatJobHistory[]>([]);
+  const [schedule, setSchedule] = useState<FlatSchedule[]>([]);
   const [open, setOpen] = useState(false);
   const [resource, setResource] = useState<Resource>();
-  const [envVariables, setEnvVariables] = useState([]);
-  const [jobs, setJobs] = useState([]);
+  const [envVariables, setEnvVariables] = useState<FlatVariable[]>([]);
+  const [jobs, setJobs] = useState<FlatJob[]>([]);
   const [stateDetailsVisible, setStateDetailsVisible] = useState(false);
   const [jobId, setJobId] = useState<string>();
   const [loading, setLoading] = useState(false);
@@ -117,10 +133,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   const [executionMode, setExecutionMode] = useState("...");
   const [agent, setAgent] = useState("...");
   const [orgTemplates, setOrgTemplates] = useState([]);
-  const [vcsProvider, setVCSProvider] = useState<VcsType>();
-  const [resources, setResources] = useState([]);
+  const [vcsProvider, setVCSProvider] = useState<VcsType>(VcsType.UNKNOWN);
+  const [resources, setResources] = useState<Resource[]>([]);
   const [outputs, setOutputs] = useState<StateOutputVariableWithName[]>([]);
-  const [currentStateId, setCurrentStateId] = useState(0);
+  const [currentStateId, setCurrentStateId] = useState("");
   const [actions, setActions] = useState<Action[]>([]);
   const [contextState, setContextState] = useState({});
   const handleClick = (jobid: string) => {
@@ -176,7 +192,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
       title: "Type",
       dataIndex: "type",
       key: "type",
-      onFilter: (value: string, record: Resource) => record.type.indexOf(value) === 0,
+      onFilter: (value: React.Key | boolean, record: Resource) => record.type.indexOf(value as any) === 0,
       sorter: (a: Resource, b: Resource) => a.type.localeCompare(b.type),
       render: (text: string, record: Resource) => (
         <>
@@ -353,7 +369,9 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
             );
           }
 
-          const organization = response.data.included.find((item) => item.type === "organization");
+          const organization: Organization | undefined = response.data.included.find(
+            (item: IncludedItem<Organization>) => item.type === "organization"
+          );
           if (organization) {
             const organizationName = organization.attributes.name;
             setOrganizationName(organizationName);
@@ -581,7 +599,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                               dataSource={
                                 jobs.length > 0
                                   ? jobs
-                                      .sort((a, b) => a.id - b.id)
+                                      .sort((a: any, b: any) => a.id - b.id)
                                       .reverse()
                                       .slice(0, 1)
                                   : []
@@ -704,7 +722,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                         </span>
                         <Divider />
                         <h4>Tags</h4>
-                        <Tags organizationId={organizationId} workspaceId={id} manageWorkspace={manageWorkspace} />
+                        <Tags organizationId={organizationId} workspaceId={id!} manageWorkspace={manageWorkspace} />
                       </Space>
                     </Col>
                   </Row>
@@ -712,13 +730,13 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
 
                 <TabPane tab="Runs" key="2">
                   {jobVisible ? (
-                    <DetailsJob jobId={jobId} />
+                    <DetailsJob jobId={jobId!} />
                   ) : (
                     <div>
                       <h3>Run List</h3>
                       <List
                         itemLayout="horizontal"
-                        dataSource={jobs.sort((a, b) => a.id - b.id).reverse()}
+                        dataSource={jobs.sort((a, b) => parseInt(a.id) - parseInt(b.id)).reverse()}
                         renderItem={(item) => (
                           <List.Item
                             extra={
@@ -797,7 +815,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                 <TabPane tab="Schedules" key="5">
                   {templates ? <Schedules schedules={schedule} manageWorkspace={manageWorkspace} /> : <p>Loading...</p>}
                 </TabPane>
-                <Tabs tab="Settings" key="6">
+                <TabPane tab="Settings" key="6">
                   <Tabs
                     tabPosition="left"
                     items={[
@@ -831,7 +849,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                       },
                     ]}
                   />
-                </Tabs>
+                </TabPane>
               </Tabs>
             </div>
           )}
@@ -842,51 +860,50 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
 };
 
 function setupWorkspaceIncludes(
-  data,
-  setVariables,
-  setJobs,
-  setEnvVariables,
-  setHistory,
-  setSchedule,
-  templates,
-  setLastRun,
-  setVCSProvider,
-  setCurrentStateId,
-  currentStateId,
-  axiosInstance,
-  setResources,
-  setOutputs,
-  setAgent,
-  _loadWebhook,
-  setContextState,
-  setCollectionVariables,
-  setCollectionEnvVariables,
-  setGlobalVariables,
-  setGlobalEnvVariables
+  data: any,
+  setVariables: (val: any[]) => void,
+  setJobs: (val: any[]) => void,
+  setEnvVariables: (val: any[]) => void,
+  setHistory: (val: FlatJobHistory[]) => void,
+  setSchedule: (val: any[]) => void,
+  templates: Template[],
+  setLastRun: (val: string) => void,
+  setVCSProvider: (val: VcsType) => void,
+  setCurrentStateId: (val: string) => void,
+  currentStateId: string,
+  axiosInstance: any,
+  setResources: (val: any[]) => void,
+  setOutputs: (val: any[]) => void,
+  setAgent: (val: any) => void,
+  _loadWebhook: boolean,
+  setContextState: (val: any) => void,
+  setCollectionVariables: (val: any[]) => void,
+  setCollectionEnvVariables: (val: any[]) => void,
+  setGlobalVariables: (val: FlatVariable[]) => void,
+  setGlobalEnvVariables: (val: FlatVariable[]) => void
 ) {
-  let variables = [];
-  let jobs = [];
-  let webhooks = {};
-  let envVariables = [];
-  let history = [];
-  let schedule = [];
-  let references = [];
-  let collectionVariables = [];
-  let collectionEnvVariables = [];
-  let globalVariables = [];
-  let globalEnvVariables = [];
+  let variables: FlatVariable[] = [];
+  let jobs: FlatJob[] = [];
+  let webhooks: any = {};
+  let envVariables: FlatVariable[] = [];
+  let history: FlatJobHistory[] = [];
+  let schedule: Schedule[] = [];
+  let collectionVariables: any[] = [];
+  let collectionEnvVariables: any[] = [];
+  let globalVariables: FlatVariable[] = [];
+  let globalEnvVariables: FlatVariable[] = [];
   let includes = data.included;
   console.log(data.attributes?.iacType);
-  includes.forEach((element) => {
+  includes.forEach((element: any) => {
     console.log(element);
     switch (element.type) {
       case include.ORGANIZATION:
         console.log("Checking global variables");
-        axiosInstance.get(`/organization/${element.id}/globalvar`).then((response) => {
+        axiosInstance.get(`/organization/${element.id}/globalvar`).then((response: any) => {
           console.log(`Global Variables Data: ${JSON.stringify(response.data.data)}`);
           let globalVar = response.data.data;
           if (globalVar != null) {
-            globalVar.forEach((variableItem) => {
+            globalVar.forEach((variableItem: any) => {
               console.log(`Variable: ${JSON.stringify(variableItem)}`);
               if (variableItem.attributes.category === "ENV") {
                 console.log(`Adding global var env`);
@@ -957,7 +974,8 @@ function setupWorkspaceIncludes(
       case include.SCHEDULE:
         schedule.push({
           id: element.id,
-          name: templates?.find((template) => template.id === element.attributes.templateReference)?.attributes?.name,
+          name: templates?.find((template: Template) => template.id === element.attributes.templateReference)
+            ?.attributes?.name,
           ...element.attributes,
         });
         break;
@@ -991,12 +1009,12 @@ function setupWorkspaceIncludes(
         break;
       case include.REFERENCE:
         console.log("Checking references");
-        axiosInstance.get(`/reference/${element.id}/collection?include=item`).then((response) => {
+        axiosInstance.get(`/reference/${element.id}/collection?include=item`).then((response: any) => {
           console.log(`Reference Data: ${response.data}`);
           let collectionInfo = response.data.data;
           if (response.data.included != null) {
             let items = response.data.included;
-            items.forEach((item) => {
+            items.forEach((item: any) => {
               item.attributes.priority = collectionInfo.attributes.priority;
               item.attributes.collectionName = collectionInfo.attributes.name;
               if (item.attributes.category === "ENV") {
@@ -1032,7 +1050,9 @@ function setupWorkspaceIncludes(
 
   console.log(`Parsing state for workspace ${sessionStorage.getItem(WORKSPACE_ARCHIVE)} `);
   // set state data
-  var lastState = history.sort((a, b) => a.jobReference - b.jobReference).reverse()[0];
+  var lastState = history
+    .sort((a: FlatJobHistory, b: FlatJobHistory) => parseInt(a.jobReference) - parseInt(b.jobReference))
+    .reverse()[0];
   // reload state only if there is a new version
   console.log("Get latest state");
   if (currentStateId !== lastState?.id) {
@@ -1041,7 +1061,7 @@ function setupWorkspaceIncludes(
     const url = `${
       new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
     }/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${workspaceId}`;
-    axiosInstance.get(url).then((response) => {
+    axiosInstance.get(url).then((response: any) => {
       console.log(`Manage Permission Workspace Set:`);
       console.log(response.data);
       loadState(
@@ -1049,7 +1069,7 @@ function setupWorkspaceIncludes(
         axiosInstance,
         setOutputs,
         setResources,
-        sessionStorage.getItem(WORKSPACE_ARCHIVE),
+        sessionStorage.getItem(WORKSPACE_ARCHIVE)!,
         setContextState,
         response.data.manageState
       );
@@ -1058,7 +1078,15 @@ function setupWorkspaceIncludes(
   setCurrentStateId(lastState?.id);
 }
 
-function loadState(state, axiosInstance, setOutputs, setResources, workspaceId, setContextState, manageState) {
+function loadState(
+  state: any,
+  axiosInstance: AxiosInstance,
+  setOutputs: (val: any) => void,
+  setResources: (val: any) => void,
+  workspaceId: string,
+  setContextState: (val: any) => void,
+  manageState: boolean
+) {
   console.log(`Loading State ${manageState} `);
   if (!state || !manageState) {
     return;
@@ -1089,7 +1117,7 @@ function loadState(state, axiosInstance, setOutputs, setResources, workspaceId, 
           setResources(result.resources);
           setOutputs(result.outputs);
         })
-        .catch(function (error) {
+        .catch(function (error: Error) {
           console.error(error);
         });
     } else {
@@ -1100,26 +1128,22 @@ function loadState(state, axiosInstance, setOutputs, setResources, workspaceId, 
   });
 }
 
-function parseState(state) {
-  var resources = [];
-  var outputs = [];
+function parseState(state: any) {
+  var resources: any[] = [];
+  var outputs: StateOutputVariableWithName[] = [];
   console.log("Current state");
   console.log(state);
   // parse root outputs
   if (state?.values?.outputs != null) {
-    for (const [key, value] of Object.entries(state?.values?.outputs)) {
+    for (const [key, value] of Object.entries(state?.values?.outputs) as [any, any][]) {
       if (typeof value.type === "string") {
-        console.log(typeof value.type);
         outputs.push({
           name: key,
           type: value.type,
           value: value.value,
         });
       } else {
-        console.log(typeof value.type);
         const jsonObject = JSON.stringify(value.value);
-        const jsonType = value.type.toString();
-        console.log(jsonObject);
         outputs.push({
           name: key,
           type: "Other type",
@@ -1133,7 +1157,7 @@ function parseState(state) {
 
   // parse root module resources
   if (state?.values?.root_module?.resources != null) {
-    for (const [key, value] of Object.entries(state?.values?.root_module?.resources)) {
+    for (const [_, value] of Object.entries(state?.values?.root_module?.resources) as [any, any][]) {
       resources.push({
         name: value.name,
         type: value.type,
@@ -1149,10 +1173,10 @@ function parseState(state) {
 
   // parse child module resources
   if (state?.values?.root_module?.child_modules?.length > 0) {
-    state?.values?.root_module?.child_modules?.forEach((moduleVal, index) => {
+    state?.values?.root_module?.child_modules?.forEach((moduleVal: any, index: any) => {
       console.log(`Checking child ${moduleVal.address} with index ${index}`);
       if (moduleVal.resources != null)
-        for (const [key, value] of Object.entries(moduleVal.resources)) {
+        for (const [_, value] of Object.entries(moduleVal.resources) as [any, any][]) {
           resources.push({
             name: value.name,
             type: value.type,
@@ -1174,15 +1198,15 @@ function parseState(state) {
   return { resources: resources, outputs: outputs };
 }
 
-function parseOldState(state) {
-  var resources = [];
+function parseOldState(state: any) {
+  var resources: any[] = [];
   var outputs = [];
   console.log("Current State Data using fallback parsing method");
   console.log(state);
 
   console.log("Parsing outputs fallback method");
   if (state?.outputs != null) {
-    for (const [key, value] of Object.entries(state?.outputs)) {
+    for (const [key, value] of Object.entries(state?.outputs) as [any, any][]) {
       if (typeof value.type === "string") {
         console.log(typeof value.type);
         outputs.push({
@@ -1207,7 +1231,7 @@ function parseOldState(state) {
 
   console.log("Parsing resources and modules fallback method");
   if (state?.resources != null && state?.resources.length > 0) {
-    state?.resources.forEach((value) => {
+    state?.resources.forEach((value: any) => {
       if (value.module != null) {
         resources.push({
           name: value.name,
@@ -1237,11 +1261,11 @@ function parseOldState(state) {
   return { resources: resources, outputs: outputs };
 }
 
-function parseChildModules(resources, child_modules) {
-  child_modules?.forEach((moduleVal, index) => {
+function parseChildModules(resources: any, child_modules?: any) {
+  child_modules?.forEach((moduleVal: any, index: number) => {
     console.log(`Checking nested child ${moduleVal.address} with index ${index}`);
     if (moduleVal.resources != null)
-      for (const [key, value] of Object.entries(moduleVal.resources)) {
+      for (const [_, value] of Object.entries(moduleVal.resources) as [any, any][]) {
         resources.push({
           name: value.name,
           type: value.type,

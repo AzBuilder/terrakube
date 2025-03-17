@@ -18,12 +18,12 @@ import {
   Typography,
 } from "antd";
 import FormItem from "antd/es/form/FormItem";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance, { axiosClientAuth } from "../../config/axiosConfig";
 import { TeamToken } from "../types";
 import "./Settings.css";
-const { DateTime } = require("luxon");
 const { Paragraph } = Typography;
 
 type Props = {

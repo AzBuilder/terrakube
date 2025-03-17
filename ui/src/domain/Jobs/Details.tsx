@@ -15,12 +15,11 @@ import Ansi from "ansi-to-react";
 import { Avatar, Button, Card, Collapse, message, Radio, RadioChangeEvent, Space, Spin, Tag } from "antd";
 import { AxiosResponse } from "axios";
 import parse from "html-react-parser";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
 import { Job, JobStep } from "../types";
-
-const { DateTime } = require("luxon");
 
 type Props = {
   jobId: string;
