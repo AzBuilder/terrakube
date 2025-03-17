@@ -1,18 +1,23 @@
 import { Select } from "antd";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
-
-export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
-  const [tags, setTags] = useState([]);
-  const [newTags, setNewTags] = useState([]);
-  const [currentTags, setCurrentTags] = useState([]);
+import { Tag, WorkspaceTag } from "../types";
+type Props = {
+  organizationId: string;
+  workspaceId: string;
+  manageWorkspace: boolean;
+};
+export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) => {
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [newTags, setNewTags] = useState<Tag[]>([]);
+  const [currentTags, setCurrentTags] = useState<WorkspaceTag[]>([]);
   const [loading, setLoading] = useState(false);
-  const handleSelect = (tagId) => {
+  const handleSelect = (tagId: string) => {
     // create a new Tag
     if (!isGuid(tagId)) createNewTag(tagId);
     else addTagToWorkspace(tagId);
   };
-  const createNewTag = (tagName) => {
+  const createNewTag = (tagName: string) => {
     const body = {
       data: {
         type: "tag",
@@ -38,8 +43,7 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
             },
           })
           .then((response) => {
-            newTags.push(response.data?.data);
-            setNewTags(newTags);
+            setNewTags((prev) => [...prev, response.data?.data]);
             console.log(newTags);
             addTagToWorkspace(response.data?.data?.id);
           });
@@ -49,7 +53,7 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
       }
     });
   };
-  const addTagToWorkspace = (tagId) => {
+  const addTagToWorkspace = (tagId: string) => {
     const body = {
       data: {
         type: "workspacetag",
@@ -66,42 +70,40 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
         },
       })
       .then((response) => {
-        currentTags.data.push(response.data?.data);
+        currentTags.push(response.data?.data);
         console.log(currentTags);
         setCurrentTags(currentTags);
       });
   };
-  const handleDeselect = (tagId) => {
+  const handleDeselect = (tagId: string) => {
+    let currentTag: string | undefined = tagId;
     if (!isGuid(tagId)) {
-      tagId = newTags.find((x) => x.attributes.name === tagId)?.id;
+      currentTag = newTags.find((x) => x.attributes.name === tagId)?.id;
     }
-    console.log(tagId);
-    var id = currentTags.data.find((x) => x.attributes.tagId === tagId)?.id;
+
+    var id = currentTags.find((x) => x.attributes.tagId === currentTag)?.id;
     console.log(id);
-    axiosInstance
-      .delete(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag/${id}`)
-      .then((response) => {
-        var currentTagsFilter = currentTags.data.filter(function (x) {
-          return x.id !== id;
-        });
-        currentTags.data = currentTagsFilter;
-        setCurrentTags(currentTags);
-        console.log(currentTags);
+    axiosInstance.delete(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag/${id}`).then(() => {
+      var currentTagsFilter = currentTags.filter(function (x) {
+        return x.id !== id;
       });
+      setCurrentTags(currentTagsFilter);
+      console.log(currentTags);
+    });
   };
 
-  function isGuid(value) {
+  function isGuid(value: string) {
     var regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/i;
     var match = regex.exec(value);
     return match != null;
   }
   const loadTags = () => {
     axiosInstance.get(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag`).then((response) => {
-      axiosInstance.get(`organization/${organizationId}/tag`).then((response) => {
-        setTags(response.data);
+      axiosInstance.get(`organization/${organizationId}/tag`).then((res) => {
+        setTags(res.data.data);
         setLoading(false);
       });
-      setCurrentTags(response.data);
+      setCurrentTags(response.data.data);
       console.log(response.data);
     });
   };
@@ -109,7 +111,14 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
     loadTags();
   }, [workspaceId]);
 
-  return loading || !tags.data ? (
+  console.log(
+    "mapped",
+    currentTags.map(function (tag) {
+      return tag.attributes?.tagId;
+    })
+  );
+
+  return loading || tags.length === 0 ? (
     <p>loading...</p>
   ) : (
     <Select
@@ -117,10 +126,10 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }) => {
       style={{ width: "100%" }}
       onSelect={handleSelect}
       onDeselect={handleDeselect}
-      defaultValue={currentTags.data.map(function (tag) {
+      defaultValue={currentTags.map(function (tag) {
         return tag.attributes?.tagId;
       })}
-      options={tags.data.map(function (tag) {
+      options={tags.map(function (tag) {
         return { label: tag.attributes.name, value: tag.id };
       })}
       placeholder="Add a tag"

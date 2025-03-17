@@ -221,9 +221,16 @@ export type Tag = {
 export type TagAttributes = {
   name: string;
 };
+export type WorkspaceTag = {
+  id: string;
+  attributes: {
+    tagId: string;
+  } & AuditFieldBase;
+  relationships: any;
+  type: string;
+};
 
 // Actions
-
 export type Action = {
   id: string;
   attributes: ActionAttributes;
