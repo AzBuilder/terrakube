@@ -1,5 +1,5 @@
 import { Select } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
 import { Tag, WorkspaceTag } from "../types";
 type Props = {
@@ -9,9 +9,21 @@ type Props = {
 };
 export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) => {
   const [tags, setTags] = useState<Tag[]>([]);
-  const [newTags, setNewTags] = useState<Tag[]>([]);
   const [currentTags, setCurrentTags] = useState<WorkspaceTag[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const selectedTags = useMemo(() => {
+    return currentTags.map(function (tag) {
+      return tag.attributes?.tagId;
+    });
+  }, [currentTags]);
+
+  const allTags = useMemo(() => {
+    return tags.map(function (tag) {
+      return { label: tag.attributes.name, value: tag.id };
+    });
+  }, [tags]);
+
   const handleSelect = (tagId: string) => {
     // create a new Tag
     if (!isGuid(tagId)) createNewTag(tagId);
@@ -40,8 +52,7 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
             },
           })
           .then((response) => {
-            setNewTags((prev) => [...prev, response.data?.data]);
-
+            setTags((prev) => [...prev, response.data?.data]);
             addTagToWorkspace(response.data?.data?.id);
           });
       } else {
@@ -66,14 +77,13 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
         },
       })
       .then((response) => {
-        currentTags.push(response.data?.data);
-        setCurrentTags(currentTags);
+        setCurrentTags((prev) => [...prev, response.data.data]);
       });
   };
   const handleDeselect = (tagId: string) => {
     let currentTag: string | undefined = tagId;
     if (!isGuid(tagId)) {
-      currentTag = newTags.find((x) => x.attributes.name === tagId)?.id;
+      currentTag = tags.find((x) => x.attributes.name === tagId)?.id;
     }
 
     var id = currentTags.find((x) => x.attributes.tagId === currentTag)?.id;
@@ -93,41 +103,29 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
   }
   const loadTags = () => {
     axiosInstance.get(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag`).then((response) => {
+      setCurrentTags(response.data.data);
       axiosInstance.get(`organization/${organizationId}/tag`).then((res) => {
         setTags(res.data.data);
+        console.log("workspace tags", response.data);
         setLoading(false);
       });
-      setCurrentTags(response.data.data);
-      console.log(response.data);
     });
   };
   useEffect(() => {
     loadTags();
   }, [workspaceId]);
 
-  console.log(
-    "mapped",
-    currentTags.map(function (tag) {
-      return tag.attributes?.tagId;
-    })
-  );
-
-  return loading ? (
-    <p>loading...</p>
-  ) : (
+  return (
     <Select
       mode="tags"
       style={{ width: "100%" }}
+      value={selectedTags}
+      options={allTags}
+      placeholder="Add a tag"
+      loading={loading}
+      disabled={!manageWorkspace}
       onSelect={handleSelect}
       onDeselect={handleDeselect}
-      defaultValue={currentTags.map(function (tag) {
-        return tag.attributes?.tagId;
-      })}
-      options={tags.map(function (tag) {
-        return { label: tag.attributes.name, value: tag.id };
-      })}
-      placeholder="Add a tag"
-      disabled={!manageWorkspace}
     />
   );
 };
