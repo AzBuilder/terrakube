@@ -1,6 +1,6 @@
-const INITIAL_STATE = [];
+const INITIAL_STATE: any[] = [];
 
-function userReducer(state = INITIAL_STATE, action) {
+function userReducer(state = INITIAL_STATE, action: any) {
   switch (action.type) {
     default:
       return state;
