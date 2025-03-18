@@ -14,7 +14,6 @@ export default defineConfig(() => {
         output: {
           manualChunks: function (id) {
             if (id.includes("react-icons")) return "icons";
-
           },
         },
       },
