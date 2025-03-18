@@ -1,6 +1,6 @@
 import { UserManager, WebStorageStateStore } from "oidc-client-ts";
-import { AuthContext, AuthContextProps } from "react-oidc-context";
 import React from "react";
+import { AuthContext, AuthContextProps } from "react-oidc-context";
 
 export const oidcConfig = {
   authority: window._env_.REACT_APP_AUTHORITY,

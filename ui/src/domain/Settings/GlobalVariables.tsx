@@ -6,8 +6,6 @@ import axiosInstance from "../../config/axiosConfig";
 import { CreateVariableForm, UpdateVariableForm, Variable } from "../types";
 import "./Settings.css";
 
-
-
 export const GlobalVariablesSettings = () => {
   const { orgid } = useParams();
   const [globalVariables, setGlobalVariables] = useState<Variable[]>([]);

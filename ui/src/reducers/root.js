@@ -1,8 +1,8 @@
-import { combineReducers } from 'redux';
-import organizationReducer from './organization/index';
- 
+import { combineReducers } from "redux";
+import organizationReducer from "./organization/index";
+
 const rootReducer = combineReducers({
-  organizationState: organizationReducer
+  organizationState: organizationReducer,
 });
- 
+
 export default rootReducer;

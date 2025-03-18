@@ -1,10 +1,9 @@
-const INITIAL_STATE = [
-
-];
+const INITIAL_STATE = [];
 
 function userReducer(state = INITIAL_STATE, action) {
-  switch(action.type) {
-    default : return state;
+  switch (action.type) {
+    default:
+      return state;
   }
 }
 

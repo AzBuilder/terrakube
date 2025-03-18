@@ -56,7 +56,7 @@ import {
   StateOutputValue,
   Template,
   VcsType,
-  Workspace
+  Workspace,
 } from "../types.js";
 import { CLIDriven } from "../Workspaces/CLIDriven";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
@@ -715,7 +715,8 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                           )}
                         </span>
                         <span className="App-text">
-                          <ThunderboltOutlined /> Execution Mode: <a onClick={handleClickSettings}>{executionMode}</a>{" "}
+                          <ThunderboltOutlined /> Execution Mode:{" "}
+                          <a onClick={handleClickSettings}>{executionMode}</a>{" "}
                         </span>
                         <span className="App-text">
                           <PlayCircleOutlined /> Auto apply: <a>Off</a>{" "}

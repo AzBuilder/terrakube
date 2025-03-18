@@ -1,4 +1,4 @@
-@import 'antd/dist/reset.css';
+@import "antd/dist/reset.css";
 
 .App {
   display: flex;
@@ -40,22 +40,22 @@
   }
 }
 
-.App-text{
-  color:rgb(82, 87, 97);
+.App-text {
+  color: rgb(82, 87, 97);
   margin-bottom: 35px;
 }
 
-.popup-text{
-  color:rgb(82, 87, 97);
+.popup-text {
+  color: rgb(82, 87, 97);
   margin-bottom: 15px;
 }
 
-h1  {
+h1 {
   border-bottom: 1px solid rgb(220, 224, 230);
   font-weight: 700;
 }
 
-.paragraph{
-  color:rgb(82, 87, 97);
-  margin:0;
+.paragraph {
+  color: rgb(82, 87, 97);
+  margin: 0;
 }

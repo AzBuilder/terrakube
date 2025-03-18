@@ -541,16 +541,16 @@ function setupOrganizationIncludes(includes, setWorkspaces, setFilteredWorkspace
         lastStatus == "completed"
           ? "#2eb039"
           : lastStatus == "running"
-          ? "#108ee9"
-          : lastStatus == "waitingApproval"
-          ? "#fa8f37"
-          : lastStatus === "rejected"
-          ? "#FB0136"
-          : lastStatus === "failed"
-          ? "#FB0136"
-          : lastStatus == "noChanges"
-          ? "#e037fa"
-          : "",
+            ? "#108ee9"
+            : lastStatus == "waitingApproval"
+              ? "#fa8f37"
+              : lastStatus === "rejected"
+                ? "#FB0136"
+                : lastStatus === "failed"
+                  ? "#FB0136"
+                  : lastStatus == "noChanges"
+                    ? "#e037fa"
+                    : "",
       ...element.node,
     });
   });
