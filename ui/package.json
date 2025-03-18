@@ -46,7 +46,9 @@
     "start-two": "vite",
     "start": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "format:check": "prettier ./src --check",
+    "format": "prettier ./src --write"
   },
   "eslintConfig": {
     "extends": [
