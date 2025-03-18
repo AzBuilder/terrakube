@@ -85,18 +85,13 @@ export const VCSSettings = ({ vcsMode }: Props) => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
     axiosInstance.get(`organization/${orgid}/vcs/${id}?include=workspace`).then((response) => {
-      console.log(response.data);
       if (response.data.included != null && response.data.included.length > 0) {
-        console.log("VCS used by:");
-        console.log(response.data.included);
         message.error(
           "This VCS is currently in use by one or more workspaces. Please remove the VCS from all workspaces before deleting it."
         );
       } else {
         axiosInstance.delete(`organization/${orgid}/vcs/${id}`).then((response) => {
-          console.log(response);
           loadVCS();
         });
       }
@@ -114,7 +109,6 @@ export const VCSSettings = ({ vcsMode }: Props) => {
 
   const loadVCS = () => {
     axiosInstance.get(`organization/${orgid}/vcs`).then((response) => {
-      console.log(response);
       setVCS(response.data.data);
       setLoading(false);
     });

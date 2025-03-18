@@ -14,7 +14,7 @@ export const WorkspaceAdvanced = ({ workspace, manageWorkspace }: Props) => {
   const organizationId = workspace.relationships.organization.data.id;
   const navigate = useNavigate();
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  console.log("workspace", workspace);
+
   function generateRandomString(length: number) {
     let result = "";
     const charactersLength = characters.length;
@@ -28,7 +28,7 @@ export const WorkspaceAdvanced = ({ workspace, manageWorkspace }: Props) => {
     const id = workspace.id;
     let randomLetters = generateRandomString(4);
     let deletedName = `${workspace.attributes.name.substring(0, 21)}_DEL_${randomLetters}`;
-    console.log(`New deleted name; ${deletedName}`);
+
     const body = {
       data: {
         type: "workspace",
@@ -52,11 +52,8 @@ export const WorkspaceAdvanced = ({ workspace, manageWorkspace }: Props) => {
         }
       )
       .then(() => {
-        console.log("Deleting VCS refernce successfully");
         axiosInstance.patch(`organization/${organizationId}/workspace/${id}`, body, genericHeader).then((response) => {
-          console.log(response);
           if (response.status === 204) {
-            console.log(response);
             message.success("Workspace deleted successfully");
             navigate(`/organizations/${organizationId}/workspaces`);
           } else {

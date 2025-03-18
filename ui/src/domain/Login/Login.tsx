@@ -21,7 +21,6 @@ const Login = () => {
 };
 
 function App() {
-  console.log(mgr);
   mgr.signinRedirect();
 }
 

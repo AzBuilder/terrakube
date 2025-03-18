@@ -36,10 +36,7 @@ export const CreateJob = ({ changeJob }: Props) => {
 
   const loadBranch = () => {
     axiosInstance.get(`organization/${organizationId}/workspace/${workspaceId}`).then((response) => {
-      console.log(response.data);
-      console.log(response.data.data.attributes.branch);
       var branchName = response.data.data.attributes.branch;
-      console.log("Default branch:" + branchName);
       setBranchName(branchName);
     });
   };
@@ -76,7 +73,6 @@ export const CreateJob = ({ changeJob }: Props) => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${organizationId}/job`, body, {
@@ -85,7 +81,6 @@ export const CreateJob = ({ changeJob }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         setVisible(false);
         changeJob(response.data.data.id);
       })

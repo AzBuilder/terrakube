@@ -193,7 +193,6 @@ export const CreateWorkspace = () => {
 
   const loadVCS = () => {
     axiosInstance.get(`organization/${organizationId}/vcs`).then((response) => {
-      console.log(response);
       setVCS(response.data.data);
       setLoading(false);
     });
@@ -201,14 +200,12 @@ export const CreateWorkspace = () => {
 
   const loadSSHKeys = () => {
     axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
-      console.log(response.data.data);
       setSSHKeys(response.data.data);
     });
   };
 
   const loadOrgTemplates = () => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
-      console.log(response.data.data);
       setOrgTemplates(response.data.data);
     });
   };
@@ -245,7 +242,6 @@ export const CreateWorkspace = () => {
   const loadVersions = (iacType: IacType) => {
     const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/${iacType.id}/index.json`;
     axiosInstance.get(versionsApi).then((resp) => {
-      console.log(resp);
       const tfVersions = [];
       if (iacType.id === "tofu") {
         (resp.data as TofuRelease[]).forEach((release) => {
@@ -257,7 +253,6 @@ export const CreateWorkspace = () => {
         }
       }
       setTerraformVersions(tfVersions.sort(compareVersions).reverse());
-      console.log(tfVersions);
     });
   };
 
@@ -312,9 +307,7 @@ export const CreateWorkspace = () => {
         },
       })
       .then((response) => {
-        console.log(response.status);
         if (response.status === 200) {
-          console.log(`/organizations/${organizationId}/workspaces/${response.data["atomic:results"][0].data.id}`);
           navigate(`/organizations/${organizationId}/workspaces/${response.data["atomic:results"][0].data.id}`);
         }
       })

@@ -13,7 +13,6 @@ type Props = {
 };
 
 export const ResourceDrawer = ({ open, resource, setOpen, workspace }: Props) => {
-  console.log({ open, resource, workspace });
   const [drawerOpen, setDrawerOpen] = useState(open);
   const [actions, setActions] = useState<ActionWithSettings[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +24,6 @@ export const ResourceDrawer = ({ open, resource, setOpen, workspace }: Props) =>
         const response = await axiosInstance.get(
           `action?filter[action]=active==true;type=in=('Workspace/ResourceDrawer/Action','Workspace/ResourceDrawer/Tab')`
         );
-        console.log("Actions:", response.data);
         const fetchedActions = response.data.data || [];
 
         // Filter actions and attach settings to each action
@@ -50,8 +48,7 @@ export const ResourceDrawer = ({ open, resource, setOpen, workspace }: Props) =>
             });
             if (settings) {
               action.settings = settings; // Attach settings to the action
-              console.log("settings");
-              console.log(action);
+
               acc.push(action);
               break;
             }
@@ -90,9 +87,7 @@ export const ResourceDrawer = ({ open, resource, setOpen, workspace }: Props) =>
   // Function to evaluate display criteria and return settings
   const evaluateCriteria = (criteria: any, _: any) => {
     try {
-      console.log("Evaluating criteria:", criteria);
       const result = eval(criteria.filter);
-      console.log("Result:", result);
       if (result) {
         if (!criteria.settings) {
           return {};

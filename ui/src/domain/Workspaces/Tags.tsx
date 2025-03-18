@@ -8,7 +8,6 @@ type Props = {
   manageWorkspace: boolean;
 };
 export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) => {
-  console.log({ organizationId, workspaceId, manageWorkspace });
   const [tags, setTags] = useState<Tag[]>([]);
   const [newTags, setNewTags] = useState<Tag[]>([]);
   const [currentTags, setCurrentTags] = useState<WorkspaceTag[]>([]);
@@ -30,13 +29,10 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
 
     //search for existing tag if you type the name and hit enter
     let existingTagId;
-    console.log("Searching existing value");
     axiosInstance.get(`organization/${organizationId}/tag?filter[tag]=name==${tagName}`).then((oldTag) => {
       existingTagId = oldTag.data?.data[0]?.id;
-      console.log(`Existing TagId ${existingTagId} for ${tagName}`);
 
       if (existingTagId === undefined) {
-        console.log("Tag does not exists, creating a new one....");
         axiosInstance
           .post(`organization/${organizationId}/tag`, body, {
             headers: {
@@ -45,11 +41,10 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
           })
           .then((response) => {
             setNewTags((prev) => [...prev, response.data?.data]);
-            console.log(newTags);
+
             addTagToWorkspace(response.data?.data?.id);
           });
       } else {
-        console.log("Adding existing tag to workspace ....");
         addTagToWorkspace(existingTagId);
       }
     });
@@ -72,7 +67,6 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
       })
       .then((response) => {
         currentTags.push(response.data?.data);
-        console.log(currentTags);
         setCurrentTags(currentTags);
       });
   };
@@ -83,13 +77,12 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
     }
 
     var id = currentTags.find((x) => x.attributes.tagId === currentTag)?.id;
-    console.log(id);
+
     axiosInstance.delete(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag/${id}`).then(() => {
       var currentTagsFilter = currentTags.filter(function (x) {
         return x.id !== id;
       });
       setCurrentTags(currentTagsFilter);
-      console.log(currentTags);
     });
   };
 
@@ -119,7 +112,7 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
     })
   );
 
-  return loading || tags.length === 0 ? (
+  return loading ? (
     <p>loading...</p>
   ) : (
     <Select

@@ -114,7 +114,6 @@ export const OrganizationDetails = ({ setOrganizationName, organizationName }: P
   };
 
   const handleClick = (workspaceId: string) => {
-    console.log(id);
     navigate("/organizations/" + id + "/workspaces/" + workspaceId);
   };
 
@@ -124,7 +123,6 @@ export const OrganizationDetails = ({ setOrganizationName, organizationName }: P
   };
 
   const handleChange = (value: any) => {
-    console.log(`selected ${value}`);
     setFilterTags(value);
     applyFilters(searchValue, filterValue, value);
   };
@@ -153,9 +151,6 @@ export const OrganizationDetails = ({ setOrganizationName, organizationName }: P
     sessionStorage.setItem("searchValue", searchValue);
     sessionStorage.setItem("filterValue", filterValue);
     sessionStorage.setItem("selectedTags", selectedTags);
-    console.log(searchValue || "serach empty");
-    console.log(filterValue || "filter empty");
-    console.log(selectedTags || "tags empty");
 
     var filteredWorkspaces = filterWorkspaces(workspaces, searchValue, filterValue, selectedTags);
     setFilteredWorkspaces(filteredWorkspaces);

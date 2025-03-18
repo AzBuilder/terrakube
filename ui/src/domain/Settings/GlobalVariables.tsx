@@ -81,7 +81,6 @@ export const GlobalVariablesSettings = () => {
     setVariableId(id);
     setVisible(true);
     axiosInstance.get(`organization/${orgid}/globalvar/${id}`).then((response) => {
-      console.log(response);
       setVariableKey(response.data.data.attributes.key);
       form.setFieldsValue({
         key: response.data.data.attributes.key,
@@ -102,9 +101,7 @@ export const GlobalVariablesSettings = () => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
     axiosInstance.delete(`organization/${orgid}/globalvar/${id}`).then((response) => {
-      console.log(response);
       loadGlobalVariables();
     });
   };
@@ -123,7 +120,6 @@ export const GlobalVariablesSettings = () => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${orgid}/globalvar`, body, {
@@ -132,7 +128,6 @@ export const GlobalVariablesSettings = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         loadGlobalVariables();
         setVisible(false);
         form.resetFields();
@@ -153,7 +148,6 @@ export const GlobalVariablesSettings = () => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .patch(`organization/${orgid}/globalvar/${variableId}`, body, {
@@ -162,7 +156,6 @@ export const GlobalVariablesSettings = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         loadGlobalVariables();
         setVisible(false);
         form.resetFields();
@@ -171,7 +164,6 @@ export const GlobalVariablesSettings = () => {
 
   const loadGlobalVariables = () => {
     axiosInstance.get(`organization/${orgid}/globalvar`).then((response) => {
-      console.log(response);
       setGlobalVariables(response.data.data);
       setLoading(false);
     });

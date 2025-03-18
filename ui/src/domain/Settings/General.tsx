@@ -20,7 +20,6 @@ export const GeneralSettings = () => {
   useEffect(() => {
     setLoading(true);
     axiosInstance.get(`organization/${orgid}`).then((response) => {
-      console.log(response);
       setOrganization(response.data.data);
       setLoading(false);
     });
@@ -39,7 +38,6 @@ export const GeneralSettings = () => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .patch(`organization/${orgid}`, body, {
@@ -48,7 +46,6 @@ export const GeneralSettings = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status == 204) {
           message.success("Organization updated successfully");
         } else {
@@ -76,9 +73,7 @@ export const GeneralSettings = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status == 204) {
-          console.log(response);
           message.success("Organization deleted successfully, please logout and login to Terrakube");
         } else {
           message.error("Organization deletion failed");

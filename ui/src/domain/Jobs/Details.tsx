@@ -191,8 +191,6 @@ export const DetailsJob = ({ jobId }: Props) => {
     const api = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL);
 
     axiosInstance.get(`${api.protocol}//${api.host}/context/v1/${jobId}`).then((response) => {
-      console.log("terrakube");
-      console.log(response?.data?.terrakubeUI);
       if (response?.data?.terrakubeUI) setUITemplates(response?.data?.terrakubeUI);
     });
   };
@@ -285,7 +283,6 @@ export const DetailsJob = ({ jobId }: Props) => {
                       ),
                       children: (
                         <>
-                          {console.log(uiTemplates)}
                           {uiTemplates.hasOwnProperty(item.stepNumber) ? (
                             <>
                               <div

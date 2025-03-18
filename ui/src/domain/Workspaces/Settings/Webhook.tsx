@@ -44,7 +44,6 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
         .get(`organization/${organizationId}/workspace/${workspaceId}/webhook/${webhookId}`)
         .then((response) => {
           setRemoteHookId(response.data.data.attributes.remoteHookId);
-          console.log(response);
         });
       axiosInstance
         .get(`organization/${organizationId}/workspace/${workspaceId}/webhook/${webhookId}/events`)
@@ -74,9 +73,7 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
         });
     } catch (error) {
       message.error("Failed to load webhook");
-      console.log(error);
     }
-    console.log(webhookEvents);
   };
   const handleEventChange = (index: number, _: any, name: string, value: string) => {
     webhookEvents[index][name] = value;
@@ -103,7 +100,6 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
       axiosInstance
         .delete(`organization/${organizationId}/workspace/${workspaceId}/webhook/${webhookId}/events/${record.id}`)
         .then((response) => {
-          console.log(response);
           if (response.status != 204) {
             message.error("Failed to delete webhook event");
             return;
@@ -126,7 +122,6 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
       axiosInstance
         .delete(`organization/${organizationId}/workspace/${workspaceId}/webhook/${webhookId}`)
         .then((response) => {
-          console.log(response);
           if (response.status != 204) {
             message.error("Failed to disable webhook");
             setWaiting(false);
@@ -212,7 +207,6 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
     };
 
     axiosInstance.post("/operations", body, atomicHeader).then((response) => {
-      console.log(response);
       if (response.status != 200) {
         message.error("Failed to save webhook");
         setWaiting(false);

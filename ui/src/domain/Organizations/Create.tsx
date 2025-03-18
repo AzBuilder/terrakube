@@ -28,7 +28,6 @@ export const CreateOrganization = ({ setOrganizationName }: Props) => {
         attributes: values,
       },
     };
-    console.log(body);
 
     axiosInstance
       .post("organization", body, {
@@ -37,7 +36,6 @@ export const CreateOrganization = ({ setOrganizationName }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 201) {
           sessionStorage.setItem(ORGANIZATION_ARCHIVE, response.data.data.id);
           sessionStorage.setItem(ORGANIZATION_NAME, response.data.data.attributes.name);

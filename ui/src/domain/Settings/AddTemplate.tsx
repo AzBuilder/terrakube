@@ -123,7 +123,6 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${orgid}/template`, body, {
@@ -132,7 +131,6 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status == 201) {
           loadTemplates();
           setMode("list");

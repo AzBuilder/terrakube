@@ -691,7 +691,6 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
   };
 
   const onFinish = (values: CreateVcsForm) => {
-    console.log(`Using endpoint ${values.endpoint}`);
     const body = {
       data: {
         type: "vcs",
@@ -711,8 +710,6 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
         },
       },
     };
-    console.log(body);
-
     axiosInstance
       .post(`organization/${orgid}/vcs`, body, {
         headers: {
@@ -720,8 +717,6 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
         },
       })
       .then((response) => {
-        console.log("created");
-        console.log(response);
         if (response.status == 201) {
           if (connectionType === "OAUTH") {
             window.location.replace(

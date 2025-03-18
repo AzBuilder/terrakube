@@ -47,7 +47,6 @@ export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
 
   const loadTemplate = (templateId: string) => {
     axiosInstance.get(`organization/${orgid}/template/${templateId}`).then((response) => {
-      console.log(response);
       setTemplate(response.data.data);
       let buff = Buffer.from(response.data.data.attributes.tcl, "base64");
       setTCL(buff.toString("ascii"));
@@ -68,7 +67,6 @@ export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .patch(`organization/${orgid}/template/${templateId}`, body, {
@@ -77,7 +75,6 @@ export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status == 204) {
           setMode("list");
           loadTemplates();

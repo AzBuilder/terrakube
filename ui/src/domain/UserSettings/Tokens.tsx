@@ -54,7 +54,6 @@ export const Tokens = () => {
       description: values.description,
       days: values.days,
     };
-    console.log(body);
 
     axiosClientAuth
       .post(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1`, body, {
@@ -63,7 +62,6 @@ export const Tokens = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         setToken(response.data.token);
         loadTokens();
         setVisible(false);
@@ -74,18 +72,13 @@ export const Tokens = () => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
-    axiosClientAuth
-      .delete(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1/${id}`)
-      .then((response) => {
-        console.log(response);
-        loadTokens();
-      });
+    axiosClientAuth.delete(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1/${id}`).then(() => {
+      loadTokens();
+    });
   };
 
   const loadTokens = () => {
     axiosClientAuth.get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/pat/v1`).then((response) => {
-      console.log(response);
       setTokens(response.data);
       setLoading(false);
     });

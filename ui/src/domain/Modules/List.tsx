@@ -50,7 +50,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
     setLoading(true);
     sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgid!);
     axiosInstance.get(`organization/${orgid}?include=module`).then((response) => {
-      console.log(response);
       if (response.data.included) {
         setupOrganizationIncludes(response.data.included, setModules, setFilteredModules);
       }
@@ -62,7 +61,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
   }, [orgid]);
   const navigate = useNavigate();
   const handleClick = (id: string) => {
-    console.log(id);
     navigate("/organizations/" + orgid + "/registry/" + id);
   };
 

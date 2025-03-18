@@ -111,7 +111,6 @@ export const CreateModule = () => {
 
   const loadVCSProviders = () => {
     axiosInstance.get(`organization/${organizationId}/vcs`).then((response) => {
-      console.log(response);
       setVCS(response.data.data);
       setLoading(false);
     });
@@ -119,7 +118,6 @@ export const CreateModule = () => {
 
   const loadSSHKeys = () => {
     axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
-      console.log(response.data.data);
       setSSHKeys(response.data.data);
     });
   };
@@ -186,7 +184,6 @@ export const CreateModule = () => {
         },
       };
     }
-    console.log(body);
 
     axiosInstance
       .post(`organization/${organizationId}/module`, body, {
@@ -195,7 +192,6 @@ export const CreateModule = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 201) {
           navigate(`/organizations/${organizationId}/registry/${response.data.data.id}`);
         }

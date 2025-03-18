@@ -27,7 +27,6 @@ export const TagsSettings = () => {
     setTagId(id);
     setVisible(true);
     axiosInstance.get(`organization/${orgid}/tag/${id}`).then((response) => {
-      console.log(response);
       setTagName(response.data.data.attributes.name);
       form.setFieldsValue({
         name: response.data.data.attributes.name,
@@ -43,9 +42,7 @@ export const TagsSettings = () => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
     axiosInstance.delete(`organization/${orgid}/tag/${id}`).then((response) => {
-      console.log(response);
       loadTags();
     });
   };
@@ -59,7 +56,6 @@ export const TagsSettings = () => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${orgid}/tag`, body, {
@@ -68,7 +64,6 @@ export const TagsSettings = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         loadTags();
         setVisible(false);
         form.resetFields();
@@ -85,7 +80,6 @@ export const TagsSettings = () => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .patch(`organization/${orgid}/tag/${tagId}`, body, {
@@ -93,8 +87,7 @@ export const TagsSettings = () => {
           "Content-Type": "application/vnd.api+json",
         },
       })
-      .then((response) => {
-        console.log(response);
+      .then(() => {
         loadTags();
         setVisible(false);
         form.resetFields();
@@ -103,7 +96,6 @@ export const TagsSettings = () => {
 
   const loadTags = () => {
     axiosInstance.get(`organization/${orgid}/tag`).then((response) => {
-      console.log(response);
       setTags(response.data.data);
       setLoading(false);
     });

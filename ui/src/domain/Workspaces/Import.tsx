@@ -227,7 +227,6 @@ export const ImportWorkspace = () => {
 
   const loadVCS = () => {
     axiosInstance.get(`organization/${organizationId}/vcs`).then((response) => {
-      console.log(response);
       setVCS(response.data.data);
       setLoading(false);
     });
@@ -259,7 +258,7 @@ export const ImportWorkspace = () => {
 
     for (const workspace of workspacesImport) {
       var result = await importWorkspace(workspace);
-      console.log("result" + result);
+
       setWorkspacesImport((prevWorkspaces) =>
         prevWorkspaces.map((w) => (w.id === workspace.id ? { ...w, status: result } : w))
       );
@@ -290,7 +289,7 @@ export const ImportWorkspace = () => {
           },
         }
       );
-      console.log(response);
+
       return response?.data;
     } catch (error) {
       console.error("Error importing workspace:", error);
@@ -300,7 +299,6 @@ export const ImportWorkspace = () => {
 
   const rowSelection = {
     onChange: (selectedRowKeys: (string | number | bigint)[], selectedRows: any[]) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
       setWorkspacesImport(selectedRows);
     },
     getCheckboxProps: (record: any) => ({
@@ -325,7 +323,6 @@ export const ImportWorkspace = () => {
         }
       )
       .then((response) => {
-        console.log(response);
         setWorkspaces(response.data);
         setWorkspacesLoading(false);
       })

@@ -215,7 +215,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
 
   const loadOrgTemplates = () => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
-      console.log(response.data.data);
       setOrgTemplates(response.data.data);
     });
   };
@@ -253,12 +252,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
     }
   };
 
-  const evaluateCriteria = (criteria: any, context: any) => {
+  const evaluateCriteria = (criteria: any, _: any) => {
     try {
-      console.log("Evaluating criteria:", criteria);
-      console.log(context);
       const result = eval(criteria.filter);
-      console.log("Result:", result);
+
       if (result) {
         if (!criteria.settings) {
           return {};
@@ -277,7 +274,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   const fetchActions = async () => {
     try {
       const response = await axiosInstance.get(`action?filter[action]=active==true;type=in=('Workspace/Action')`);
-      console.log("Actions:", response.data);
+
       const fetchedActions = response.data.data || [];
       setActions(fetchedActions);
     } catch (error) {
@@ -299,29 +296,24 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   }, [id]);
 
   const changeJob = (id: string) => {
-    console.log(id);
     setJobId(id);
     setJobVisible(true);
     setActiveKey("2");
   };
 
   const loadPermissionSet = () => {
-    console.log("Loading Organization Permission Values");
     const url = `${
       new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
     }/access-token/v1/teams/permissions/organization/${organizationId}`;
     axiosInstance.get(url).then((response) => {
-      console.log(response.data);
       setManageState(response.data.manageState);
       setManageWorkspace(response.data.manageWorkspace);
 
       if (id !== undefined && id !== null) {
-        console.log("Loading Workspace Permission Values: " + id);
         const urlWorkspaceAccess = `${
           new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
         }/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${id}`;
         axiosInstance.get(urlWorkspaceAccess).then((response) => {
-          console.log(response.data);
           setManageState(response.data.manageState);
           setManageWorkspace(response.data.manageWorkspace);
         });
@@ -342,7 +334,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
           if (_loadPermissionSet) loadPermissionSet();
 
           setWorkspace(response.data.data);
-          console.log(response.data);
+
           if (response.data.included) {
             setupWorkspaceIncludes(
               response.data,
@@ -376,7 +368,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
             const organizationName = organization.attributes.name;
             setOrganizationName(organizationName);
             sessionStorage.setItem(ORGANIZATION_NAME, organizationName);
-            console.log(organizationName);
           }
           setOrganizationNameLocal(sessionStorage.getItem(ORGANIZATION_NAME)!);
           setWorkspaceName(response.data.data.attributes.name);
@@ -408,7 +399,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 204) {
           loadWorkspace(true);
           var newstatus = locked ? "unlocked" : "locked";
@@ -541,8 +531,6 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                               });
                               if (settings) {
                                 action.settings = settings; // Attach settings to the action
-                                console.log("settings");
-                                console.log(action);
                                 acc.push(action);
                                 break;
                               }
@@ -894,27 +882,20 @@ function setupWorkspaceIncludes(
   let globalVariables: FlatVariable[] = [];
   let globalEnvVariables: FlatVariable[] = [];
   let includes = data.included;
-  console.log(data.attributes?.iacType);
   includes.forEach((element: any) => {
-    console.log(element);
     switch (element.type) {
       case include.ORGANIZATION:
-        console.log("Checking global variables");
         axiosInstance.get(`/organization/${element.id}/globalvar`).then((response: any) => {
-          console.log(`Global Variables Data: ${JSON.stringify(response.data.data)}`);
           let globalVar = response.data.data;
           if (globalVar != null) {
             globalVar.forEach((variableItem: any) => {
-              console.log(`Variable: ${JSON.stringify(variableItem)}`);
               if (variableItem.attributes.category === "ENV") {
-                console.log(`Adding global var env`);
                 globalEnvVariables.push({
                   id: variableItem.id,
                   type: variableItem.type,
                   ...variableItem.attributes,
                 });
               } else {
-                console.log(`Adding global var terraform`);
                 globalVariables.push({
                   id: variableItem.id,
                   type: variableItem.type,
@@ -1009,9 +990,7 @@ function setupWorkspaceIncludes(
         };
         break;
       case include.REFERENCE:
-        console.log("Checking references");
         axiosInstance.get(`/reference/${element.id}/collection?include=item`).then((response: any) => {
-          console.log(`Reference Data: ${response.data}`);
           let collectionInfo = response.data.data;
           if (response.data.included != null) {
             let items = response.data.included;
@@ -1038,7 +1017,6 @@ function setupWorkspaceIncludes(
     }
   });
 
-  console.log("Setting all values for the UI");
   setVariables(variables);
   setEnvVariables(envVariables);
   setJobs(jobs);
@@ -1049,13 +1027,12 @@ function setupWorkspaceIncludes(
   setGlobalVariables(globalVariables);
   setGlobalEnvVariables(globalEnvVariables);
 
-  console.log(`Parsing state for workspace ${sessionStorage.getItem(WORKSPACE_ARCHIVE)} `);
   // set state data
   var lastState = history
     .sort((a: FlatJobHistory, b: FlatJobHistory) => parseInt(a.jobReference) - parseInt(b.jobReference))
     .reverse()[0];
   // reload state only if there is a new version
-  console.log("Get latest state");
+
   if (currentStateId !== lastState?.id) {
     const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
     const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
@@ -1063,8 +1040,6 @@ function setupWorkspaceIncludes(
       new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin
     }/access-token/v1/teams/permissions/organization/${organizationId}/workspace/${workspaceId}`;
     axiosInstance.get(url).then((response: any) => {
-      console.log(`Manage Permission Workspace Set:`);
-      console.log(response.data);
       loadState(
         lastState,
         axiosInstance,
@@ -1088,7 +1063,6 @@ function loadState(
   setContextState: (val: any) => void,
   manageState: boolean
 ) {
-  console.log(`Loading State ${manageState} `);
   if (!state || !manageState) {
     return;
   }
@@ -1107,14 +1081,10 @@ function loadState(
           }/tfstate/v1/organization/${organizationId}/workspace/${workspaceId}/state/terraform.tfstate`
         )
         .then((currentStateData) => {
-          console.log("Current State Data");
-          console.log(currentStateData.data);
           currentState = currentStateData.data;
           setContextState(currentState);
-          console.log("Parsing state using current state data instead of json representation");
           result = parseOldState(currentState);
 
-          console.log("result parsing state", result);
           setResources(result.resources);
           setOutputs(result.outputs);
         })
@@ -1122,7 +1092,6 @@ function loadState(
           console.error(error);
         });
     } else {
-      console.log("result parsing state", result);
       setResources(result.resources);
       setOutputs(result.outputs);
     }
@@ -1132,8 +1101,7 @@ function loadState(
 function parseState(state: any) {
   var resources: any[] = [];
   var outputs: StateOutputVariableWithName[] = [];
-  console.log("Current state");
-  console.log(state);
+
   // parse root outputs
   if (state?.values?.outputs != null) {
     for (const [key, value] of Object.entries(state?.values?.outputs) as [any, any][]) {
@@ -1175,7 +1143,6 @@ function parseState(state: any) {
   // parse child module resources
   if (state?.values?.root_module?.child_modules?.length > 0) {
     state?.values?.root_module?.child_modules?.forEach((moduleVal: any, index: any) => {
-      console.log(`Checking child ${moduleVal.address} with index ${index}`);
       if (moduleVal.resources != null)
         for (const [_, value] of Object.entries(moduleVal.resources) as [any, any][]) {
           resources.push({
@@ -1202,23 +1169,18 @@ function parseState(state: any) {
 function parseOldState(state: any) {
   var resources: any[] = [];
   var outputs = [];
-  console.log("Current State Data using fallback parsing method");
-  console.log(state);
 
-  console.log("Parsing outputs fallback method");
   if (state?.outputs != null) {
     for (const [key, value] of Object.entries(state?.outputs) as [any, any][]) {
       if (typeof value.type === "string") {
-        console.log(typeof value.type);
         outputs.push({
           name: key,
           type: value.type,
           value: value.value,
         });
       } else {
-        console.log(typeof value.type);
         const jsonObject = JSON.stringify(value.value);
-        console.log(jsonObject);
+
         outputs.push({
           name: key,
           type: "Other type",
@@ -1257,14 +1219,11 @@ function parseOldState(state: any) {
     console.log("State has no resources/modules");
   }
 
-  console.log({ resources: resources, outputs: outputs });
-
   return { resources: resources, outputs: outputs };
 }
 
 function parseChildModules(resources: any, child_modules?: any) {
   child_modules?.forEach((moduleVal: any, index: number) => {
-    console.log(`Checking nested child ${moduleVal.address} with index ${index}`);
     if (moduleVal.resources != null)
       for (const [_, value] of Object.entries(moduleVal.resources) as [any, any][]) {
         resources.push({

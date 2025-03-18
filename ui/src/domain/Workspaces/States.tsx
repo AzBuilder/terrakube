@@ -114,8 +114,6 @@ export const States = ({
   }
 
   function loadData(resp: StateOutput) {
-    console.log(resp);
-
     let nodes: Node<Resource | ErrorResource>[] = [];
     let edges: Edge[] = [];
     let x = new Map();
@@ -371,7 +369,6 @@ export const States = ({
                 tabList={tabs}
                 activeTabKey={activeTab}
                 onTabChange={(key) => {
-                  console.log(key);
                   onTabChange(key);
                 }}
               >

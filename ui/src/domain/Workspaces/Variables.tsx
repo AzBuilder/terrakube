@@ -197,7 +197,6 @@ export const Variables = ({
   globalVariables,
   globalEnvVariables,
 }: Props) => {
-  console.log({ vars, env, manageWorkspace, collectionVars, collectionEnvVars, globalVariables, globalEnvVariables });
   const workspaceId = sessionStorage.getItem(WORKSPACE_ARCHIVE);
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [form] = Form.useForm<CreateVariableForm>();
@@ -238,7 +237,6 @@ export const Variables = ({
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${organizationId}/workspace/${workspaceId}/variable`, body, {
@@ -247,7 +245,6 @@ export const Variables = ({
         },
       })
       .then((response) => {
-        console.log(response);
         setVisible(false);
         form.resetFields();
       });
@@ -268,7 +265,6 @@ export const Variables = ({
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .patch(`organization/${organizationId}/workspace/${workspaceId}/variable/${variableId}`, body, {
@@ -277,7 +273,6 @@ export const Variables = ({
         },
       })
       .then((response) => {
-        console.log(response);
         setVisible(false);
         form.resetFields();
       });
@@ -444,8 +439,6 @@ export const Variables = ({
 };
 
 const deleteVariable = (variableId: string, organizationId: string, workspaceId: string) => {
-  console.log(variableId);
-
   axiosInstance
     .delete(`organization/${organizationId}/workspace/${workspaceId}/variable/${variableId}`, {
       headers: {

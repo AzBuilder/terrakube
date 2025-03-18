@@ -40,7 +40,6 @@ export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace 
     const versionsApi = `${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/${iacType}/index.json`;
     axiosInstance.get(versionsApi).then((resp) => {
       const tfVersions = [];
-      console.log(resp);
       if (iacType === "tofu") {
         resp.data.forEach((release: TofuRelease) => {
           if (!release.tag_name.includes("-")) tfVersions.push(release.tag_name.replace("v", ""));
@@ -55,13 +54,11 @@ export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace 
   };
   const loadSSHKeys = () => {
     axiosInstance.get(`organization/${organizationId}/ssh`).then((response) => {
-      console.log(response.data.data);
       setSSHKeys(response.data.data);
     });
   };
   const loadAgentlist = () => {
     axiosInstance.get(`organization/${organizationId}/agent`).then((response) => {
-      console.log(response.data.data);
       setAgentList(response.data.data);
     });
   };
@@ -106,11 +103,8 @@ export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace 
       ],
     };
 
-    console.log(body);
-
     try {
       axiosInstance.post("/operations", body, atomicHeader).then((response) => {
-        console.log(response);
         if (response.status === 200) {
           message.success("workspace updated successfully");
         } else {
@@ -125,7 +119,7 @@ export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace 
     }
 
     var bodyAgent;
-    console.log(`Using Agent: ${values.executorAgent}`);
+
     if (values.executorAgent === "default") {
       bodyAgent = {
         data: null,
@@ -138,12 +132,10 @@ export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace 
         },
       };
     }
-    console.log(bodyAgent);
+
     axiosInstance
       .patch(`/organization/${organizationId}/workspace/${id}/relationships/agent`, bodyAgent, genericHeader)
       .then((response) => {
-        console.log("Update Workspace agent successfully");
-        console.log(response);
         if (response.status === 204) {
           console.log("Workspace agent updated successfully");
         } else {

@@ -29,9 +29,7 @@ export const TemplatesSettings = ({ key }: Props) => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
-    axiosInstance.delete(`organization/${orgid}/template/${id}`).then((response) => {
-      console.log(response);
+    axiosInstance.delete(`organization/${orgid}/template/${id}`).then(() => {
       loadTemplates();
     });
   };
@@ -43,7 +41,6 @@ export const TemplatesSettings = ({ key }: Props) => {
 
   const loadTemplates = () => {
     axiosInstance.get(`organization/${orgid}/template`).then((response) => {
-      console.log(response);
       setTemplates(response.data.data);
       setLoading(false);
     });

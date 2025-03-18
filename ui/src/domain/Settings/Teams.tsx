@@ -28,16 +28,13 @@ export const TeamSettings = ({ key }: Props) => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
-    axiosInstance.delete(`organization/${orgid}/team/${id}`).then((response) => {
-      console.log(response);
+    axiosInstance.delete(`organization/${orgid}/team/${id}`).then(() => {
       loadTeams();
     });
   };
 
   const loadTeams = () => {
     axiosInstance.get(`organization/${orgid}/team`).then((response) => {
-      console.log(response);
       setTeams(response.data.data);
       setLoading(false);
     });

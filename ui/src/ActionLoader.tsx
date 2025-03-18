@@ -92,7 +92,7 @@ const getRequiredAntdIcons = (componentString: string) => {
 // Function to dynamically import antd components
 const importAntdComponents = async (components: string[]) => {
   const imports = await Promise.all(
-    components.map((component: string) => import(`antd/es/${component.toLowerCase()}/index.js`))
+    components.map((component: string) => import(/* @vite-ignore */ `antd/es/${component.toLowerCase()}/index.js`))
   );
   const importedComponents: Record<string, any> = {};
   components.forEach((component: string, index: number) => {
@@ -103,7 +103,9 @@ const importAntdComponents = async (components: string[]) => {
 
 // Function to dynamically import antd icons
 const importAntdIcons = async (icons: any) => {
-  const imports = await Promise.all(icons.map((icon: string) => import(`@ant-design/icons/es/icons/${icon}`)));
+  const imports = await Promise.all(
+    icons.map((icon: string) => import(/* @vite-ignore */ `@ant-design/icons/es/icons/${icon}`))
+  );
   const importedIcons: Record<string, any> = {};
   icons.forEach((icon: string, index: number) => {
     importedIcons[icon] = imports[index].default;

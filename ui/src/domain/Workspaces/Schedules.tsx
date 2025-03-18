@@ -109,8 +109,6 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
     ];
   }, [organizationId, workspaceId, manageWorkspace]);
 
-  console.log("scheds", schedules);
-
   useEffect(() => {
     setLoading(true);
     loadTemplates();
@@ -118,7 +116,6 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
 
   const loadTemplates = () => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
-      console.log(response);
       var templatesList = response.data.data.filter(function (obj: Template) {
         //exclude CLI based templates
         return (
@@ -153,7 +150,6 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${organizationId}/workspace/${workspaceId}/schedule`, body, {
@@ -162,7 +158,6 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         setVisible(false);
         form.resetFields();
       });
@@ -179,7 +174,6 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .patch(`organization/${organizationId}/workspace/${workspaceId}/schedule/${scheduleId}`, body, {
@@ -188,7 +182,6 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         setVisible(false);
         form.resetFields();
       });
@@ -271,8 +264,6 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
 };
 
 const deleteSchedule = (scheduleId: string, organizationId: string, workspaceId: string) => {
-  console.log(scheduleId);
-
   axiosInstance
     .delete(`organization/${organizationId}/workspace/${workspaceId}/schedule/${scheduleId}`, {
       headers: {

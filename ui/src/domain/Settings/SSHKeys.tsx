@@ -42,9 +42,7 @@ export const SSHKeysSettings = () => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
-    axiosInstance.delete(`organization/${orgid}/ssh/${id}`).then((response) => {
-      console.log(response);
+    axiosInstance.delete(`organization/${orgid}/ssh/${id}`).then(() => {
       loadSSHKeys();
     });
   };
@@ -61,7 +59,6 @@ export const SSHKeysSettings = () => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${orgid}/ssh`, body, {
@@ -70,7 +67,6 @@ export const SSHKeysSettings = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         loadSSHKeys();
         setVisible(false);
         form.resetFields();
@@ -89,7 +85,6 @@ export const SSHKeysSettings = () => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .patch(`organization/${orgid}/ssh/${sshKeyId}`, body, {
@@ -97,8 +92,7 @@ export const SSHKeysSettings = () => {
           "Content-Type": "application/vnd.api+json",
         },
       })
-      .then((response) => {
-        console.log(response);
+      .then(() => {
         loadSSHKeys();
         setVisible(false);
         form.resetFields();
@@ -107,7 +101,6 @@ export const SSHKeysSettings = () => {
 
   const loadSSHKeys = () => {
     axiosInstance.get(`organization/${orgid}/ssh`).then((response) => {
-      console.log(response);
       setSSHKeys(response.data.data);
       setLoading(false);
     });

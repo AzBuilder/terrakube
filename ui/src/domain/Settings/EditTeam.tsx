@@ -115,7 +115,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         },
       },
     };
-    console.log(body);
 
     axiosInstance
       .post(`organization/${orgid}/team`, body, {
@@ -124,7 +123,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         loadTeams();
         loadTokens();
         setMode("list");
@@ -154,8 +152,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         },
       },
     };
-    console.log(body);
-
     axiosInstance
       .patch(`organization/${orgid}/team/${teamId}`, body, {
         headers: {
@@ -163,7 +159,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         loadTeams();
         setMode("list");
         form.resetFields();
@@ -179,11 +174,9 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
   };
 
   const onDelete = (id: string) => {
-    console.log("deleted " + id);
     axiosClientAuth
       .delete(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/${id}`)
       .then((response) => {
-        console.log(response);
         loadTokens();
       });
   };
@@ -206,7 +199,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
       hours: values.hours,
       group: teamName,
     };
-    console.log(body);
 
     axiosClientAuth
       .post(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams`, body, {
@@ -215,7 +207,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         },
       })
       .then((response) => {
-        console.log(response);
         setToken(response.data.token);
         loadTokens(teamName);
         setVisible(false);
@@ -229,7 +220,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
     axiosClientAuth
       .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams`)
       .then((response) => {
-        console.log(response);
         var filteredTokens = response.data.filter((token: any) => token.group === tokenName);
         setTokens(filteredTokens);
         setLoadingTokens(false);
@@ -240,7 +230,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
     axiosClientAuth
       .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams/current-teams`)
       .then((response) => {
-        console.log(response);
         if (response.data?.groups.includes(teamName)) {
           setCreateTokenDisabled(false);
         }
@@ -469,7 +458,6 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
                 .validateFields()
                 .then((values) => {
                   setCreating(true);
-                  console.log(values);
                   onCreateToken(values);
                 })
                 .catch((info) => {
