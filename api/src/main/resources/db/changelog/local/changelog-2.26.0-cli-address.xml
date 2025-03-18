@@ -18,7 +18,7 @@
             <column name="updated_date" type="datetime" />
             <column name="created_by" type="varchar(128)" />
             <column name="updated_by" type="varchar(128)" />
-            <column name="job_id" type="varchar(36)">
+            <column name="job_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_job_address" references="job(id)"/>
             </column>
         </createTable>
