@@ -24,6 +24,8 @@ import org.terrakube.api.rs.collection.item.Item;
 import org.terrakube.api.rs.globalvar.Globalvar;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.address.Address;
+import org.terrakube.api.rs.job.address.AddressType;
 import org.terrakube.api.rs.ssh.Ssh;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.parameters.Category;
@@ -165,9 +167,33 @@ public class ExecutorService {
         executorContext.setRefresh(job.isRefresh());
         executorContext.setRefreshOnly(job.isRefreshOnly());
         executorContext.setAgentUrl(getExecutorUrl(job));
+        executorContext = validateJobAddress(executorContext, job);
         return executorContext.getEnvironmentVariables().containsKey("TERRAKUBE_ENABLE_EPHEMERAL_EXECUTOR")
                 ? ephemeralExecutorService.sendToEphemeralExecutor(job, executorContext)
                 : sendToExecutor(job, executorContext);
+    }
+
+    private ExecutorContext validateJobAddress(ExecutorContext executorContext, Job job) {
+        if (job.getAddress() != null && !job.getAddress().isEmpty() && (job.getTerraformPlan() == null || job.getTerraformPlan().isEmpty())) {
+            List<Address> addressList = job.getAddress();
+            StringBuilder tfCliArgsPlan= new StringBuilder();
+            for(Address address : addressList) {
+                if (address.getType().equals(AddressType.TARGET)) {
+                    tfCliArgsPlan.append(String.format(" -target=\"%s\"", address.getName()));
+                }
+
+                if (address.getType().equals(AddressType.REPLACE)) {
+                    tfCliArgsPlan.append(String.format(" -replace=\"%s\"", address.getName()));
+                }
+            }
+
+            if(!tfCliArgsPlan.isEmpty()) {
+                log.info("Adding TF_CLI_ARGS_PLAN to environment variables: {}", tfCliArgsPlan.toString());
+                executorContext.getEnvironmentVariables().putIfAbsent("TF_CLI_ARGS_plan", tfCliArgsPlan.toString());
+            }
+        }
+
+        return executorContext;
     }
 
     private String getExecutorUrl(Job job) {

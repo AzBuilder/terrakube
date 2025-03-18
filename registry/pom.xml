@@ -23,7 +23,7 @@
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
         <rest-assured.version>5.5.1</rest-assured.version>
         <!--groovy.version>3.0.8</groovy.version-->
-        <aws-sdk.version>2.30.36</aws-sdk.version>
+        <aws-sdk.version>2.31.1</aws-sdk.version>
         <zt-zip.version>1.17</zt-zip.version>
         <gcp-libraries-bom.version>26.56.0</gcp-libraries-bom.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
@@ -133,6 +133,7 @@
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-spring-test-listener</artifactId>
             <version>${mockserver-spring-test-listener.version}</version>
+	    <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>
