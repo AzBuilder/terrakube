@@ -106,7 +106,6 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
       setCurrentTags(response.data.data);
       axiosInstance.get(`organization/${organizationId}/tag`).then((res) => {
         setTags(res.data.data);
-        console.log("workspace tags", response.data);
         setLoading(false);
       });
     });
