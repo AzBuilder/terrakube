@@ -43,8 +43,8 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start-two": "vite",
-    "start": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && vite",
+    "start": "vite",
+    "poststart": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/",
     "build": "vite build",
     "serve": "vite preview",
     "format:check": "prettier ./src --check",
