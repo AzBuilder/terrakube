@@ -1,11 +1,11 @@
 .login-wrapper {
   width: 328px;
-  margin:0px auto;
-  padding-top:200px;
+  margin: 0px auto;
+  padding-top: 200px;
 }
 
-.login-container{
-  background-image: url(https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg);
+.login-container {
+  background-image: url(/background-image.svg);
   background-repeat: no-repeat;
   background-position: center 110px;
   background-size: 100%;
@@ -13,7 +13,6 @@
 }
 
 .loginLogo {
- width: 230px;
- text-align: center;
-
+  width: 230px;
+  text-align: center;
 }

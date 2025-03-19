@@ -1,23 +1,21 @@
-
-
 .jobActions {
   display: flex;
   justify-content: space-between;
 }
 
 .tableWrapper {
-  margin-top: 3em;;
+  margin-top: 3em;
 }
 
-.envVariables{
+.envVariables {
   margin-top: 50px;
 }
 
-.textLeft{
+.textLeft {
   text-align: left;
 }
 
-.generalSettings{
+.generalSettings {
   width: 60%;
   margin: auto;
   margin-top: 20px;
@@ -26,45 +24,44 @@
 .variableActions {
   display: flex;
   justify-content: space-between;
-  clear: both
+  clear: both;
 }
 
-.createWorkspace{
+.createWorkspace {
   width: 65%;
   margin: auto;
   margin-top: 20px;
 }
 
-
-.importWorkspace{
+.importWorkspace {
   width: 75%;
   margin: auto;
   margin-top: 20px;
 }
-.chooseType{
+.chooseType {
   width: 100%;
-  margin-top:30px;
+  margin-top: 30px;
 }
 
-.workflowType{
+.workflowType {
   margin-left: 10px;
   font-weight: 500;
 }
 
-.workflowDescription{
+.workflowDescription {
   margin-top: 20px;
   margin-bottom: 20px;
 }
 
-.workflowDescription2{
+.workflowDescription2 {
   margin-bottom: 20px;
 }
 
-.workflowDescription3{
+.workflowDescription3 {
   margin-bottom: 0px;
 }
 
-.workflowSelect{
+.workflowSelect {
   text-align: right;
   margin-right: 40px;
 }
@@ -80,9 +77,9 @@
 
 #code-content {
   color: #ffffff;
-  font-family: SFMono-Regular,consolas,"Liberation Mono",menlo,courier,monospace;
-  padding:20px;
-  font-size: .875em;
+  font-family: SFMono-Regular, consolas, "Liberation Mono", menlo, courier, monospace;
+  padding: 20px;
+  font-size: 0.875em;
   white-space: pre-wrap;
 }
 
@@ -90,21 +87,20 @@
   padding: 0px;
 }
 
-.metadata{
+.metadata {
   font-size: 13px;
   padding-top: 10px;
   display: block;
   color: rgb(140 140 140) !important;
 }
 
-
-.states{
+.states {
   font-size: 13px;
   padding-top: 10px;
   color: #6f7682;
 }
 
-.stateDetails{
+.stateDetails {
   font-size: 13px;
   color: #6f7682;
 }
@@ -112,20 +108,20 @@
 .code {
   background-color: #f1f2f3;
   color: #000;
-  padding: 0.2em 0.4em; 
+  padding: 0.2em 0.4em;
 }
 
-.workspace-details{
-  color:rgb(82, 87, 97);
+.workspace-details {
+  color: rgb(82, 87, 97);
   font-size: 14px;
 }
 
-.workspace-button{
+.workspace-button {
   text-decoration: underline;
-  color:"black";
+  color: "black";
   font-weight: 400;
 }
 
-.react-flow__attribution{
+.react-flow__attribution {
   display: none;
 }

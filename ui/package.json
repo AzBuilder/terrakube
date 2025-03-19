@@ -2,6 +2,7 @@
   "name": "azb-client",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
     "@babel/core": "^7.26.10",
@@ -9,9 +10,6 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/standalone": "^7.26.9",
     "@monaco-editor/react": "^4.7.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "16.2.0",
-    "@testing-library/user-event": "^14.6.1",
     "ansi-to-react": "^6.1.6",
     "antd": "^5.24.4",
     "axios": "^1.8.2",
@@ -36,7 +34,6 @@
     "react-markdown": "10.1.0",
     "react-oidc-context": "3.2.0",
     "react-router-dom": "6.28.0",
-    "react-scripts": "5.0.1",
     "react-vis": "^1.12.1",
     "reactflow": "^11.11.3",
     "redux": "^5.0.1",
@@ -46,11 +43,14 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "dev": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && react-scripts start",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "poststart": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/",
+    "build": "vite build",
+    "serve": "vite preview --port 3000",
+    "lint:check": "eslint ./src",
+    "lint": "eslint --fix ./src",
+    "format:check": "prettier ./src --check",
+    "format": "prettier ./src --write"
   },
   "eslintConfig": {
     "extends": [
@@ -69,5 +69,33 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@rollup/plugin-dynamic-import-vars": "^2.1.5",
+    "@types/babel__standalone": "^7.1.9",
+    "@types/luxon": "^3.4.2",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/react-vis": "^1.11.15",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^4.2.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1",
+    "vite": "^6.2.2",
+    "vite-plugin-commonjs": "^0.10.4",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

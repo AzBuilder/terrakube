@@ -1,50 +1,49 @@
+.moduleList {
+  width: 100%;
+  margin-top: 30px;
+}
 
-.moduleList{
-    width: 100%;
-    margin-top:30px;
-  }
-
-.modulesWrapper{
+.modulesWrapper {
   margin: auto;
-    margin-top: 20px;
-    width: 80%;
-  }
+  margin-top: 20px;
+  width: 80%;
+}
 
-.moduleProvider{
-  color:rgb(82, 87, 97);
+.moduleProvider {
+  color: rgb(82, 87, 97);
   font-size: 13px;
   margin-top: 5px;
 }
 
-.moduleDescription{
+.moduleDescription {
   font-size: 15px;
 }
 
-.moduleTitle{
+.moduleTitle {
   font-size: 30px;
   margin: 0;
 }
 
-.moduleDetails{
-  color:rgb(82, 87, 97);
+.moduleDetails {
+  color: rgb(82, 87, 97);
   font-size: 13px;
   margin-top: 5px;
 }
 
-.moduleDetails td{
+.moduleDetails td {
   padding-right: 20px;
-  padding-top:5px;
+  padding-top: 5px;
 }
 
-.black{
-  color:black;
+.black {
+  color: black;
 }
 
-.moduleTabs{
+.moduleTabs {
   margin-top: 20px;
 }
 
-.moduleCode{
+.moduleCode {
   border-width: 1px;
   border-style: solid;
   border-color: rgb(186, 193, 204);
@@ -55,10 +54,10 @@
   overflow-x: auto;
   width: 100%;
   padding: 5px;
-  background-color: rgb(247, 248, 250)
+  background-color: rgb(247, 248, 250);
 }
 
-.moduleCredentials{
+.moduleCredentials {
   border-width: 1px;
   border-style: solid;
   border-color: rgb(186, 193, 204);
@@ -73,12 +72,12 @@
   margin-top: 10px;
 }
 
-.moduleInstructions{
+.moduleInstructions {
   font-size: 13px;
   width: 100%;
 }
 
-.moduleSubtitles{
+.moduleSubtitles {
   font-size: 15px;
   font-weight: 400;
 }
