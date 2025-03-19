@@ -46,7 +46,7 @@ export const States = ({
   const [nodes, setNodes] = useState<Node<Resource | ErrorResource>[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [open, setOpen] = useState(false);
-  const [resource, setResource] = useState({});
+  const [resource, setResource] = useState<Resource>();
   const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((ns) => applyNodeChanges(changes, ns)), []);
   const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((es) => applyEdgeChanges(changes, es)), []);
   const editorRef = useRef<IStandaloneCodeEditor>(null);
