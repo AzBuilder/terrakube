@@ -25,7 +25,6 @@
         <rest-assured.version>5.5.1</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.5</postgresql.version>
-        <mysql.version>9.2.0</mysql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <quartz.version>2.5.0</quartz.version>
@@ -225,11 +224,6 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql.version}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>

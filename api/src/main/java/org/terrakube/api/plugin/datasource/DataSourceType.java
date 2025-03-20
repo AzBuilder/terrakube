@@ -5,6 +5,5 @@ public enum DataSourceType {
     SQL_AZURE,
     AWS,
     GCP,
-    POSTGRESQL,
-    MYSQL,
+    POSTGRESQL
 }
