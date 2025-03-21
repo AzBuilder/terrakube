@@ -2,7 +2,7 @@ import dynamicImportVars from "@rollup/plugin-dynamic-import-vars";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import commonjs from "vite-plugin-commonjs";
-
+import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig(() => {
   return {
     server: {
@@ -18,7 +18,7 @@ export default defineConfig(() => {
         },
       },
     },
-    plugins: [react(), commonjs()],
+    plugins: [react(), commonjs(), tsconfigPaths()],
     rollup: {
       plugins: [dynamicImportVars()],
     },

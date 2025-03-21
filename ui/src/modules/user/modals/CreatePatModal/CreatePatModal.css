@@ -1,0 +1,12 @@
+.create-pat-modal {
+  width: "600px";
+  .content {
+    width: 100%;
+  }
+
+  .created-token {
+    padding: 10px 15px;
+    background-color: #ebeef2;
+    border-radius: 15px;
+  }
+}

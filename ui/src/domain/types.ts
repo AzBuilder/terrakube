@@ -1,10 +1,7 @@
 // Shared
-type AuditFieldBase = {
-  createdDate?: string;
-  createdBy?: string;
-  updatDate?: string;
-  updateBy?: string;
-};
+
+import { AuditFieldBase } from "@/modules/types";
+
 export type RelationshipItem = {
   data: { type: string; id: string };
 };
@@ -286,14 +283,6 @@ export type ActionAttributes = {
   displayCriteria: string;
 };
 export type ActionWithSettings = Action & { settings?: any };
-// User tokens
-
-export type UserToken = {
-  id: string;
-  deleted: boolean;
-  days: number;
-  description: string;
-} & AuditFieldBase;
 
 // Schedules
 export type Schedule = {
