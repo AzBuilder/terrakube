@@ -1,0 +1,24 @@
+.organization-grid {
+  padding: 10px;
+  margin-top: 20px;
+}
+.org-card {
+  padding: 10px;
+  display: block;
+  border: 1px solid rgb(224, 224, 224);
+  border-radius: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+
+  &:hover {
+    background-color: rgb(240, 242, 245);
+  }
+}
+.org-card-icon {
+  font-size: 50px;
+  width: 60px;
+  display: flex;
+}
+.org-card-title {
+  font-size: 20px;
+}
