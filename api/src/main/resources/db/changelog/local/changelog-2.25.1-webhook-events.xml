@@ -32,6 +32,6 @@
             referencedColumnNames="id" onDelete="CASCADE" />
         <addForeignKeyConstraint baseTableName="webhook_event" baseColumnNames="template_id"
             constraintName="fk_webhook_event_template_id" referencedTableName="template"
-            referencedColumnNames="id" onDelete="SET NULL" />
+            referencedColumnNames="id"/>
     </changeSet>
 </databaseChangeLog>
