@@ -21,7 +21,7 @@ export default function OrganizationsPickerPage() {
     action: () => organizationService.listOrganizations(),
     onReturn: (data) => {
       const mapped = data.map(mapOrganization);
-      setOrganizations([mapped[0]]);
+      setOrganizations(mapped);
     },
   });
 
