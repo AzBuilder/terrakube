@@ -117,7 +117,7 @@ async function get<T>(path: string, options: RequestOptions): Promise<ApiRespons
     });
     return {
       isError: false,
-      data: response.data,
+      data: options.dataWrapped ? response.data?.data : response.data,
       responseCode: response.status,
     };
   });

@@ -9,6 +9,7 @@ export type QueryParams = { [key: string]: string | boolean | number };
 export type RequestOptions = {
   query?: QueryParams;
   requireAuth?: boolean;
+  dataWrapped?: boolean;
 };
 export type ErrorInformation = {
   title: string;

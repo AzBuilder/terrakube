@@ -13,11 +13,11 @@ import { CreateWorkspace } from "../Workspaces/Create";
 import { WorkspaceDetails } from "../Workspaces/Details";
 import { ImportWorkspace } from "../Workspaces/Import";
 import "./App.css";
-import { Home } from "./Home";
 import MainMenu from "./MainMenu";
 import { ProfilePicture } from "./ProfilePicture";
 import logo from "./white_logo.png";
 import { UserSettingsPage } from "@/modules/user/UserSettingsPage";
+import OrganizationsPickerPage from "@/modules/organizations/OrganizationsPickerPage";
 
 const { Header, Footer } = Layout;
 
@@ -51,7 +51,7 @@ const App = () => {
         </Header>
 
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<OrganizationsPickerPage />} />
           <Route
             path="/organizations/create"
             element={<CreateOrganization setOrganizationName={setOrganizationName} />}

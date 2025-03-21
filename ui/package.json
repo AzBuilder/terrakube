@@ -50,7 +50,11 @@
     "lint:check": "eslint ./src",
     "lint": "eslint --fix ./src",
     "format:check": "prettier ./src --check",
-    "format": "prettier ./src --write"
+    "format": "prettier ./src --write",
+    "lint:modules:check": "eslint ./src/modules",
+    "lint:modules": "eslint --fix ./src/modules",
+    "format:modules:check": "prettier ./src/modules --check",
+    "format:modules": "prettier ./src/modules --write"
   },
   "eslintConfig": {
     "extends": [
