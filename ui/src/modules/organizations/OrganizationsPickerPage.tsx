@@ -68,7 +68,7 @@ export default function OrganizationsPickerPage() {
           {loading && (
             <Flex align="center" className="organization-picker-page-loader" vertical gap="middle">
               <Spin tip="Loading" size="large" />
-              <Typography.Text>Loading tokens...</Typography.Text>
+              <Typography.Text>Loading organizations...</Typography.Text>
             </Flex>
           )}
           {!loading && organizations.length === 0 && (
