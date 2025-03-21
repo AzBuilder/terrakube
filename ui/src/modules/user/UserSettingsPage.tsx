@@ -1,11 +1,10 @@
 import { Breadcrumb, Layout, Tabs } from "antd";
-import { Tokens } from "./Tokens";
-import "./UserSettings.css";
+import { Tokens } from "./components/PatSection/PatSection";
 const { Content } = Layout;
 
-export const UserSettings = () => {
+export const UserSettingsPage = () => {
   return (
-    <Content style={{ padding: "0 50px" }}>
+    <Content className="user-settings-page">
       <Breadcrumb
         style={{ margin: "16px 0" }}
         items={[
@@ -17,12 +16,12 @@ export const UserSettings = () => {
           },
         ]}
       />
-      <div className="site-layout-content">
+      <div className="tabs">
         <Tabs
           tabPosition="left"
           items={[
             {
-              label: "Tokens",
+              label: "Tokens (PAT)",
               key: "1",
               children: <Tokens />,
             },

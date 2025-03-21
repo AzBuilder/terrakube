@@ -9,7 +9,6 @@ import { ModuleList } from "../Modules/List";
 import { CreateOrganization } from "../Organizations/Create";
 import { OrganizationDetails } from "../Organizations/Details";
 import { OrganizationSettings } from "../Settings/Settings";
-import { UserSettings } from "../UserSettings/UserSettings";
 import { CreateWorkspace } from "../Workspaces/Create";
 import { WorkspaceDetails } from "../Workspaces/Details";
 import { ImportWorkspace } from "../Workspaces/Import";
@@ -18,6 +17,7 @@ import { Home } from "./Home";
 import MainMenu from "./MainMenu";
 import { ProfilePicture } from "./ProfilePicture";
 import logo from "./white_logo.png";
+import { UserSettingsPage } from "@/modules/user/UserSettingsPage";
 
 const { Header, Footer } = Layout;
 
@@ -134,7 +134,7 @@ const App = () => {
             path="/organizations/:orgid/settings/vcs/new/:vcsName"
             element={<OrganizationSettings selectedTab="4" vcsMode="new" />}
           />
-          <Route path="/settings/tokens" element={<UserSettings />} />
+          <Route path="/settings/tokens" element={<UserSettingsPage />} />
           <Route path="/organizations/:orgid/settings/ssh" element={<OrganizationSettings selectedTab="6" />} />
           <Route path="/organizations/:orgid/settings/tags" element={<OrganizationSettings selectedTab="7" />} />
           <Route path="/organizations/:orgid/settings/actions" element={<OrganizationSettings selectedTab="8" />} />
