@@ -25,10 +25,6 @@ export const Tokens = () => {
     onReturn: (data) => {
       setTokens(data);
     },
-    requestErrorInfo: {
-      title: "Failed to cancel job",
-      message: "Failed to cancel job. Please try again",
-    },
   });
 
   useEffect(() => {
