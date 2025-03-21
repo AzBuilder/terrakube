@@ -6,7 +6,7 @@ import "./PatSection.css";
 import CreatePatModal from "@/modules/user/modals/CreatePatModal/CreatePatModal";
 import userService from "@/modules/user/userService";
 import useApiRequest from "@/modules/api/useApiRequest";
-import TokenGrid from "@/modules/user/components/TokenList/TokenGrid";
+import TokenGrid from "@/modules/user/components/TokenGrid/TokenGrid";
 
 type Params = {
   orgid: string;

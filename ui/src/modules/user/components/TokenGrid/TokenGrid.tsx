@@ -21,9 +21,9 @@ export default function TokenGrid({ tokens, onDeleted }: Props) {
   return (
     <div className="token-list">
       {error && <Alert message="Failed to delete token" type="error" showIcon banner />}
-      <Row gutter={[16, 16]} style={{ marginTop: error !== undefined ? "10px" : undefined }}>
+      <Row wrap={true} gutter={[16, 16]} style={{ marginTop: error !== undefined ? "10px" : undefined }}>
         {tokens.map((tkn) => (
-          <Col span={8} key={tkn.id}>
+          <Col xxl={8} xl={12} md={24} key={tkn.id}>
             <TokenGridItem token={tkn} onDelete={(id: string) => execute(id)} loading={loading} />
           </Col>
         ))}

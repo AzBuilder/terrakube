@@ -1,5 +1,6 @@
 import { Breadcrumb, Layout, Tabs } from "antd";
 import { Tokens } from "./components/PatSection/PatSection";
+import "./UserSettingsPage.css";
 const { Content } = Layout;
 
 export const UserSettingsPage = () => {
