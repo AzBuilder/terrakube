@@ -1,5 +1,5 @@
-import { Organization } from "../../domain/types";
-import { OrganizationModel } from "./types";
+import { ApiWorkspaceTag, Organization } from "../../domain/types";
+import { OrganizationModel, TagModel } from "./types";
 
 function mapOrganization(apiData: Organization): OrganizationModel {
   return {
@@ -10,4 +10,11 @@ function mapOrganization(apiData: Organization): OrganizationModel {
   };
 }
 
-export { mapOrganization };
+function mapTag(apiData: ApiWorkspaceTag): TagModel {
+  return {
+    id: apiData.id,
+    name: apiData.attributes.name,
+  };
+}
+
+export { mapOrganization, mapTag };

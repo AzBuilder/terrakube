@@ -258,10 +258,11 @@ export type Tag = {
 export type TagAttributes = {
   name: string;
 };
-export type WorkspaceTag = {
+export type ApiWorkspaceTag = {
   id: string;
   attributes: {
     tagId: string;
+    name: string;
   } & AuditFieldBase;
   relationships: any;
   type: string;
