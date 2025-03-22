@@ -7,7 +7,6 @@ import { CreateModule } from "../Modules/Create";
 import { ModuleDetails } from "../Modules/Details";
 import { ModuleList } from "../Modules/List";
 import { CreateOrganization } from "../Organizations/Create";
-import { OrganizationDetails } from "../Organizations/Details";
 import { OrganizationSettings } from "../Settings/Settings";
 import { CreateWorkspace } from "../Workspaces/Create";
 import { WorkspaceDetails } from "../Workspaces/Details";
@@ -57,12 +56,6 @@ const App = () => {
             path="/organizations/create"
             element={<CreateOrganization setOrganizationName={setOrganizationName} />}
           />
-          {/* <Route
-            path="/organizations/:id/workspaces"
-            element={
-              <OrganizationDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
-            }
-          /> */}
           <Route
             path="/organizations/:id/workspaces"
             element={
