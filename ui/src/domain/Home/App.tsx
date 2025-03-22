@@ -18,6 +18,7 @@ import { ProfilePicture } from "./ProfilePicture";
 import logo from "./white_logo.png";
 import { UserSettingsPage } from "@/modules/user/UserSettingsPage";
 import OrganizationsPickerPage from "@/modules/organizations/OrganizationsPickerPage";
+import OrganizationsDetailPage from "@/modules/organizations/OrganizationDetailsPage";
 
 const { Header, Footer } = Layout;
 
@@ -56,10 +57,16 @@ const App = () => {
             path="/organizations/create"
             element={<CreateOrganization setOrganizationName={setOrganizationName} />}
           />
-          <Route
+          {/* <Route
             path="/organizations/:id/workspaces"
             element={
               <OrganizationDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
+            }
+          /> */}
+          <Route
+            path="/organizations/:id/workspaces"
+            element={
+              <OrganizationsDetailPage setOrganizationName={setOrganizationName} organizationName={organizationName} />
             }
           />
           <Route path="/workspaces/create" element={<CreateWorkspace />} />

@@ -10,6 +10,7 @@ export type RequestOptions = {
   query?: QueryParams;
   requireAuth?: boolean;
   dataWrapped?: boolean;
+  contentType?: string;
 };
 export type ErrorInformation = {
   title: string;

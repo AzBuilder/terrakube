@@ -1,7 +1,7 @@
 import { Select } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
-import { Tag, WorkspaceTag } from "../types";
+import { Tag, ApiWorkspaceTag } from "../types";
 type Props = {
   organizationId: string;
   workspaceId: string;
@@ -9,7 +9,7 @@ type Props = {
 };
 export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) => {
   const [tags, setTags] = useState<Tag[]>([]);
-  const [currentTags, setCurrentTags] = useState<WorkspaceTag[]>([]);
+  const [currentTags, setCurrentTags] = useState<ApiWorkspaceTag[]>([]);
   const [loading, setLoading] = useState(false);
 
   const selectedTags = useMemo(() => {

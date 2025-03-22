@@ -6,6 +6,7 @@ const BASE_API_URL = new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin;
 
 const defaultRequestOptions: RequestOptions = {
   requireAuth: true,
+  contentType: "application/vnd.api+json",
 };
 
 function getOptions(options?: RequestOptions): RequestOptions {
@@ -102,7 +103,7 @@ export async function apiDelete(path: string, options?: RequestOptions): Promise
 async function get<T>(path: string, options: RequestOptions): Promise<ApiResponse<T>> {
   return await requestWrapper(options.requireAuth, async (accessToken?: string) => {
     const headers: Record<string, string> = {
-      "Content-type": "application/vnd.api+json",
+      "Content-type": options.contentType!,
     };
 
     if (options.requireAuth) {
@@ -130,7 +131,7 @@ async function post<TRequest, TResponse>(
 ): Promise<ApiResponse<TResponse>> {
   return await requestWrapper(options.requireAuth, async (accessToken?: string) => {
     const headers: Record<string, string> = {
-      "Content-type": "application/vnd.api+json",
+      "Content-type": options.contentType!,
     };
 
     if (options.requireAuth) {
@@ -146,7 +147,7 @@ async function post<TRequest, TResponse>(
 
     return {
       isError: false,
-      data: response.data,
+      data: options.dataWrapped ? response.data?.data : response.data,
       responseCode: response.status,
     };
   });
@@ -158,7 +159,7 @@ async function put<TRequest, TResponse>(
 ): Promise<ApiResponse<TResponse>> {
   return await requestWrapper(options.requireAuth, async (accessToken?: string) => {
     const headers: Record<string, string> = {
-      "Content-type": "application/vnd.api+json",
+      "Content-type": options.contentType!,
     };
 
     if (options.requireAuth) {
@@ -173,7 +174,7 @@ async function put<TRequest, TResponse>(
     });
     return {
       isError: false,
-      data: response.data,
+      data: options.dataWrapped ? response.data?.data : response.data,
       responseCode: response.status,
     };
   });
@@ -181,7 +182,7 @@ async function put<TRequest, TResponse>(
 async function intDelete<T>(path: string, options: RequestOptions): Promise<ApiResponse<T>> {
   return await requestWrapper(options.requireAuth, async (accessToken?: string) => {
     const headers: Record<string, string> = {
-      "Content-type": "application/vnd.api+json",
+      "Content-type": options.contentType!,
     };
 
     if (options.requireAuth) {
