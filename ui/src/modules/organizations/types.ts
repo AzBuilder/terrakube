@@ -4,3 +4,8 @@ export type OrganizationModel = {
   name: string;
   executionMode?: string;
 };
+
+export type TagModel = {
+  id: string;
+  name: string;
+};
