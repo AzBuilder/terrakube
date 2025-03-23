@@ -74,4 +74,5 @@
     <include file="/db/changelog/local/changelog-2.25.1-webhook-data.xml" />
     <include file="/db/changelog/local/changelog-2.25.1-webhook-tidyup.xml" />
     <include file="/db/changelog/local/changelog-2.26.0-cli-address.xml" />
+    <include file="/db/changelog/local/changelog-2.26.0-github-app-token-vcs.xml"/>
 </databaseChangeLog>
