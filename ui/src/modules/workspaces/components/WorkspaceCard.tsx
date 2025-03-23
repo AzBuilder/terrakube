@@ -47,9 +47,9 @@ export default function WorkspaceCard({ item, tags }: Props) {
             <IacTypeLogo type={item.iacType} />
             {item.terraformVersion}
           </Space>
-          {item.branch !== "remote-content" && item.source ? (
+          {item.branch !== "remote-content" && item.normalizedSource ? (
             <Space>
-              <VcsLogo type={getVcsTypeFromUrl(item.source)} />
+              <VcsLogo type={getVcsTypeFromUrl(item.normalizedSource)} />
               <a href={item.normalizedSource} target="_blank" rel="noreferrer">
                 {item.normalizedSource ? getVcsNameFromUrl(item.normalizedSource) : "Unknown"}
               </a>

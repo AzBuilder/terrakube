@@ -10,7 +10,6 @@ import { OrganizationModel } from "./types";
 import OrganizationGrid from "./components/OrganizationGrid/OrganizationGrid";
 import PageWrapper from "@/modules/layout/PageWrapper/PageWrapper";
 
-
 export default function OrganizationsPickerPage() {
   const [organizations, setOrganizations] = useState<OrganizationModel[]>([]);
   const navigate = useNavigate();

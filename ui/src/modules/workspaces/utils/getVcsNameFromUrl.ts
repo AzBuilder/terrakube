@@ -1,11 +1,9 @@
-export default function (url: string): string {
-  const urlObj = new URL(url);
-  const pathname = urlObj.pathname;
-  const hostname = urlObj.hostname;
+import formatSshUrl from "./formatSshUrl";
 
-  if (hostname === "dev.azure.com") {
-    return pathname.replace("/v3/", "");
-  }
-  if (pathname.endsWith(".git")) return pathname.replace(".git", "").substring(1);
-  return pathname;
+export default function (normalizedUrl: string): string {
+  // Let's just be safe in case the wrong url was passed
+  const fixedUrl = formatSshUrl(normalizedUrl);
+  const urlObj = new URL(fixedUrl);
+  const pathname = urlObj.pathname;
+  return pathname.substring(1);
 }

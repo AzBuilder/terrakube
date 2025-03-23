@@ -1,7 +1,7 @@
 import { apiPost } from "@/modules/api/apiWrapper";
 import { ApiResponse } from "@/modules/api/types";
 import { ListWorkspacesResponse, WorkspaceListItem } from "@/modules/workspaces/types";
-import fixSshUrl from "@/modules/workspaces/utils/fixSshUrl";
+import formatSshUrl from "@/modules/workspaces/utils/formatSshUrl";
 
 async function listWorkspaces(organizationId: string): Promise<ApiResponse<ListWorkspacesResponse>> {
   const body = {
@@ -80,7 +80,7 @@ async function listWorkspaces(organizationId: string): Promise<ApiResponse<ListW
       branch: element.node.branch,
       iacType: element.node.iacType,
       source: element.node.source,
-      normalizedSource: fixSshUrl(element.node.source),
+      normalizedSource: formatSshUrl(element.node.source),
       terraformVersion: element.node.terraformVersion,
       tags: element.node?.workspaceTag?.edges?.map((e: any) => e.node.tagId),
     };
