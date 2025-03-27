@@ -139,7 +139,7 @@ const App = () => {
           <Route path="/organizations/:orgid/settings/tags" element={<OrganizationSettings selectedTab="7" />} />
           <Route path="/organizations/:orgid/settings/actions" element={<OrganizationSettings selectedTab="8" />} />
         </Routes>
-        <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2025</Footer>
+        <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©{new Date().getFullYear()}</Footer>
       </Layout>
     </Router>
   );
