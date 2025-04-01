@@ -23,6 +23,8 @@ public class EphemeralExecutorService {
     private static final String ANNOTATIONS = "EPHEMERAL_CONFIG_ANNOTATIONS";
     private static final String CONFIG_MAP_NAME = "EPHEMERAL_CONFIG_MAP_NAME";
     private static final String CONFIG_MAP_PATH = "EPHEMERAL_CONFIG_MAP_MOUNT_PATH";
+    private static final String TF_CACHE_DIR = "TF_PLUGIN_CACHE_DIR";
+    private static final String PVC_CLAIM_NAME = "PVC_CLAIM_NAME";
 
 
     KubernetesClient kubernetesClient;
@@ -129,6 +131,25 @@ public class EphemeralExecutorService {
             configMapMount.setName("config-volume");
             configMapMount.setMountPath(mountPath);
             volumeMounts.add(configMapMount);
+        }
+
+        Optional<String> configPVCOpt = Optional.ofNullable(executorContext.getEnvironmentVariables().get(TF_CACHE_DIR));
+        if (configPVCOpt.isPresent()) {
+            String configPVCpath = configPVCOpt.get();
+            String PluginVolumeName = "tf-plugin-volume";
+            Volume sharedVolume = new Volume();
+            sharedVolume.setName(PluginVolumeName);
+            PersistentVolumeClaimVolumeSource pvcSource = new PersistentVolumeClaimVolumeSource();
+            Optional<String> configPVCClaimName = Optional.ofNullable(executorContext.getEnvironmentVariables().get(PVC_CLAIM_NAME));
+            pvcSource.setClaimName(configPVCClaimName.orElse("terrakube-plugin-pvc"));
+            sharedVolume.setPersistentVolumeClaim(pvcSource);
+
+            VolumeMount sharedVolumeMount = new VolumeMount();
+            sharedVolumeMount.setName(PluginVolumeName);
+            sharedVolumeMount.setMountPath(configPVCpath);
+
+            volumes.add(sharedVolume);
+            volumeMounts.add(sharedVolumeMount);
         }
 
         io.fabric8.kubernetes.api.model.batch.v1.Job k8sJob = new JobBuilder()
