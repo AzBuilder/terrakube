@@ -140,8 +140,8 @@ public class EphemeralExecutorService {
             Volume sharedVolume = new Volume();
             sharedVolume.setName(PluginVolumeName);
             PersistentVolumeClaimVolumeSource pvcSource = new PersistentVolumeClaimVolumeSource();
-            Optional<String> configPVCClaimName = Optional.ofNullable(executorContext.getEnvironmentVariables().get(PVC_CLAIM_NAME));
-            pvcSource.setClaimName(configPVCClaimName.orElse("terrakube-plugin-pvc"));
+            String pvcClaimName = executorContext.getEnvironmentVariables().getOrDefault(PVC_CLAIM_NAME, "terrakube-plugin-pvc");
+            pvcSource.setClaimName(pvcClaimName);
             sharedVolume.setPersistentVolumeClaim(pvcSource);
 
             VolumeMount sharedVolumeMount = new VolumeMount();
