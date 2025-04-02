@@ -5599,10 +5599,10 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-luxon@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.5.0.tgz#6b6f65c5cd1d61d1fd19dbf07ee87a50bf4b8e20"
-  integrity sha512-rh+Zjr6DNfUYR3bPwJEnuwDdqMbxZW7LOQfUN4B54+Cl+0o5zaU9RJ6bcidfDtC1cWCZXQ+nvX8bf6bAji37QQ==
+luxon@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.6.0.tgz#e84453dbdbd716b5eac95bee702b379863059f83"
+  integrity sha512-WE7p0p7W1xji9qxkLYsvcIxZyfP48GuFrWIBQZIsbjCyf65dG1rv4n83HcOyEyhvzxJCrUoObCRNFgRNIQ5KNA==
 
 magic-string@^0.30.11, magic-string@^0.30.3:
   version "0.30.17"
