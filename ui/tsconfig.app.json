@@ -20,7 +20,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "@/modules/*": ["./src/modules/*"]
+    }
   },
   "include": ["*.ts", "src"]
 }

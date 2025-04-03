@@ -53,14 +53,6 @@ public class DataSourceAutoConfiguration {
                 ds.setSslMode(dataSourceConfigurationProperties.getSslMode());
                 dataSource = ds;
                 break;
-            case MYSQL:
-                DriverManagerDataSource mysql = new DriverManagerDataSource();
-                mysql.setDriverClassName("com.mysql.cj.jdbc.Driver");
-                mysql.setUrl(String.format("jdbc:mysql://%s:%s/%s?serverTimezone=UTC", dataSourceConfigurationProperties.getHostname(), dataSourceConfigurationProperties.getDatabasePort(), dataSourceConfigurationProperties.getDatabaseName()));
-                mysql.setUsername(dataSourceConfigurationProperties.getDatabaseUser());
-                mysql.setPassword(dataSourceConfigurationProperties.getDatabasePassword());
-                dataSource = mysql;
-                break;
             default:
                 DriverManagerDataSource h2DataSource = new DriverManagerDataSource();
                 h2DataSource.setDriverClassName("org.h2.Driver");

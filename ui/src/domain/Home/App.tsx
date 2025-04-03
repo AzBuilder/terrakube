@@ -7,17 +7,17 @@ import { CreateModule } from "../Modules/Create";
 import { ModuleDetails } from "../Modules/Details";
 import { ModuleList } from "../Modules/List";
 import { CreateOrganization } from "../Organizations/Create";
-import { OrganizationDetails } from "../Organizations/Details";
 import { OrganizationSettings } from "../Settings/Settings";
-import { UserSettings } from "../UserSettings/UserSettings";
 import { CreateWorkspace } from "../Workspaces/Create";
 import { WorkspaceDetails } from "../Workspaces/Details";
 import { ImportWorkspace } from "../Workspaces/Import";
 import "./App.css";
-import { Home } from "./Home";
 import MainMenu from "./MainMenu";
 import { ProfilePicture } from "./ProfilePicture";
 import logo from "./white_logo.png";
+import { UserSettingsPage } from "@/modules/user/UserSettingsPage";
+import OrganizationsPickerPage from "@/modules/organizations/OrganizationsPickerPage";
+import OrganizationsDetailPage from "@/modules/organizations/OrganizationDetailsPage";
 
 const { Header, Footer } = Layout;
 
@@ -51,7 +51,7 @@ const App = () => {
         </Header>
 
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<OrganizationsPickerPage />} />
           <Route
             path="/organizations/create"
             element={<CreateOrganization setOrganizationName={setOrganizationName} />}
@@ -59,7 +59,7 @@ const App = () => {
           <Route
             path="/organizations/:id/workspaces"
             element={
-              <OrganizationDetails setOrganizationName={setOrganizationName} organizationName={organizationName} />
+              <OrganizationsDetailPage setOrganizationName={setOrganizationName} organizationName={organizationName} />
             }
           />
           <Route path="/workspaces/create" element={<CreateWorkspace />} />
@@ -134,12 +134,12 @@ const App = () => {
             path="/organizations/:orgid/settings/vcs/new/:vcsName"
             element={<OrganizationSettings selectedTab="4" vcsMode="new" />}
           />
-          <Route path="/settings/tokens" element={<UserSettings />} />
+          <Route path="/settings/tokens" element={<UserSettingsPage />} />
           <Route path="/organizations/:orgid/settings/ssh" element={<OrganizationSettings selectedTab="6" />} />
           <Route path="/organizations/:orgid/settings/tags" element={<OrganizationSettings selectedTab="7" />} />
           <Route path="/organizations/:orgid/settings/actions" element={<OrganizationSettings selectedTab="8" />} />
         </Routes>
-        <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©2025</Footer>
+        <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©{new Date().getFullYear()}</Footer>
       </Layout>
     </Router>
   );

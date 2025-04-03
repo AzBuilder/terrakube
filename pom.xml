@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.9</version>
+        <version>3.3.10</version>
     </parent>
 
     <groupId>org.terrakube</groupId>
@@ -15,12 +15,12 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>2.25.0</revision>
+        <revision>2.26.0</revision>
         <sonar.organization>azbuilder</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.project.key>AzBuilder_azb-server</sonar.project.key>
         <!-- plugins -->
-        <sonar.version>5.0.0.4389</sonar.version>
+        <sonar.version>5.1.0.4751</sonar.version>
         <jacoco.version>0.8.12</jacoco.version>
         <aggregate.report.dir>coverage/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
     </properties>

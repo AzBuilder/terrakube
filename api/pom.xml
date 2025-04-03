@@ -17,20 +17,19 @@
         <java.version>17</java.version>
         <elide.version>7.1.4</elide.version>
         <liquibase-core.version>4.31.1</liquibase-core.version>
-        <azure.version>5.20.1</azure.version>
-        <mssql-jdbc.version>12.8.1.jre11</mssql-jdbc.version>
+        <azure.version>5.21.0</azure.version>
+        <mssql-jdbc.version>12.10.0.jre11</mssql-jdbc.version>
         <msal4j.version>1.19.1</msal4j.version>
-        <lombok.version>1.18.36</lombok.version>
-        <jgit.version>7.1.0.202411261347-r</jgit.version>
+        <lombok.version>1.18.38</lombok.version>
+        <jgit.version>7.2.0.202503040940-r</jgit.version>
         <rest-assured.version>5.5.1</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.5</postgresql.version>
-        <mysql.version>9.2.0</mysql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <quartz.version>2.5.0</quartz.version>
-        <aws-sdk.version>2.31.1</aws-sdk.version>
-        <gcp-libraries-bom.version>26.56.0</gcp-libraries-bom.version>
+        <aws-sdk.version>2.31.11</aws-sdk.version>
+        <gcp-libraries-bom.version>26.59.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
         <jedis.version>5.1.5</jedis.version>
         <commons-text.version>1.13.0</commons-text.version>
@@ -225,11 +224,6 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql.version}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
