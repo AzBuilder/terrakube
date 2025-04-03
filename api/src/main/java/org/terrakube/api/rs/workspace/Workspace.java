@@ -84,8 +84,8 @@ public class Workspace extends GenericAuditFields {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Column(name = "allow_remote_apply")
-    private boolean allow_remote_apply = false;
+    @Column(name = "allowRemoteApply")
+    private boolean allowRemoteApply = false;
 
     @Column(name = "default_template")
     private String defaultTemplate;
