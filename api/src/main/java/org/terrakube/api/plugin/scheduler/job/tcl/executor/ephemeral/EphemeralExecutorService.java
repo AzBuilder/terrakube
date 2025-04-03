@@ -137,19 +137,30 @@ public class EphemeralExecutorService {
         if (configPVCOpt.isPresent()) {
             String configPVCpath = configPVCOpt.get();
             String PluginVolumeName = "tf-plugin-volume";
-            Volume sharedVolume = new Volume();
-            sharedVolume.setName(PluginVolumeName);
-            PersistentVolumeClaimVolumeSource pvcSource = new PersistentVolumeClaimVolumeSource();
             String pvcClaimName = executorContext.getEnvironmentVariables().getOrDefault(PVC_CLAIM_NAME, "terrakube-plugin-pvc");
-            pvcSource.setClaimName(pvcClaimName);
-            sharedVolume.setPersistentVolumeClaim(pvcSource);
 
-            VolumeMount sharedVolumeMount = new VolumeMount();
-            sharedVolumeMount.setName(PluginVolumeName);
-            sharedVolumeMount.setMountPath(configPVCpath);
+            boolean pvcExists = kubernetesClient.persistentVolumeClaims()
+                    .inNamespace(ephemeralConfiguration.getNamespace())
+                    .withName(pvcClaimName)
+                    .get() != null;
 
-            volumes.add(sharedVolume);
-            volumeMounts.add(sharedVolumeMount);
+            if (pvcExists) {
+                log.info("PVC {} exists, attaching to the volume.", pvcClaimName);
+                Volume sharedVolume = new Volume();
+                sharedVolume.setName(PluginVolumeName);
+                PersistentVolumeClaimVolumeSource pvcSource = new PersistentVolumeClaimVolumeSource();
+                pvcSource.setClaimName(pvcClaimName);
+                sharedVolume.setPersistentVolumeClaim(pvcSource);
+
+                VolumeMount sharedVolumeMount = new VolumeMount();
+                sharedVolumeMount.setName(PluginVolumeName);
+                sharedVolumeMount.setMountPath(configPVCpath);
+
+                volumes.add(sharedVolume);
+                volumeMounts.add(sharedVolumeMount);
+            } else {
+                log.warn("PVC {} does not exist, skipping volume attachment.", pvcClaimName);
+            }
         }
 
         io.fabric8.kubernetes.api.model.batch.v1.Job k8sJob = new JobBuilder()
