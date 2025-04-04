@@ -26,6 +26,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
@@ -110,7 +111,4 @@ public class Vcs extends GenericAuditFields {
 
     @OneToMany(mappedBy = "vcs")
     private List<Workspace> workspace;
-
-    @OneToMany(mappedBy = "vcs", orphanRemoval = true, cascade = {CascadeType.REMOVE}) 
-    private List<GitHubAppToken> gitHubAppToken;
 }

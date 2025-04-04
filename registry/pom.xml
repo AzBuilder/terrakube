@@ -16,16 +16,16 @@
     <properties>
         <azure.version>5.21.0</azure.version>
         <java.version>17</java.version>
-        <lombok.version>1.18.36</lombok.version>
-        <terrakube-client-starter.version>0.16.0-beta.1</terrakube-client-starter.version>
+        <lombok.version>1.18.38</lombok.version>
+        <terrakube-client-starter.version>0.16.0-beta.2</terrakube-client-starter.version>
         <jgit.version>7.2.0.202503040940-r</jgit.version>
         <commons-io.version>2.18.0</commons-io.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
         <rest-assured.version>5.5.1</rest-assured.version>
         <!--groovy.version>3.0.8</groovy.version-->
-        <aws-sdk.version>2.31.6</aws-sdk.version>
+        <aws-sdk.version>2.31.11</aws-sdk.version>
         <zt-zip.version>1.17</zt-zip.version>
-        <gcp-libraries-bom.version>26.57.0</gcp-libraries-bom.version>
+        <gcp-libraries-bom.version>26.59.0</gcp-libraries-bom.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <!--BUILDPACK DATA-->

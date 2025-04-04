@@ -95,7 +95,7 @@ public class ModuleServiceImpl implements ModuleService {
         String token = vcs.getAttributes().getAccessToken();
         if(token == null && vcs.getAttributes().getConnectionType().equals("STANDALONE")) {
             log.info("The VCS connection is on a standalone app, getting the GitHub App token");
-            GitHubAppToken gitHubAppToken = getGitHubAppTokenInformation(vcs.getRelationships().getOrganization().getData().getId(), vcs.getId(), repository_source);
+            GitHubAppToken gitHubAppToken = getGitHubAppTokenInformation(repository_source, vcs.getAttributes().getClientId());
             token = gitHubAppToken.getAttributes().getToken();
         }
         return token;
@@ -108,10 +108,10 @@ public class ModuleServiceImpl implements ModuleService {
         return terrakubeClient.getSshById(organizationId, sshId).getData();
     }
     
-    private GitHubAppToken getGitHubAppTokenInformation(String organizationId, String vcsId, String repository_source) {
+    private GitHubAppToken getGitHubAppTokenInformation(String vcsClientId, String repository_source) {
         URI uri = URI.create(repository_source);
         String owner = uri.getPath().split("/")[1];
-        List<GitHubAppToken> gitHubAppTokens = terrakubeClient.getGitHubAppTokenByVcsIdAndOwner(organizationId, vcsId, owner).getData();
+        List<GitHubAppToken> gitHubAppTokens = terrakubeClient.getGitHubAppTokenByVcsIdAndOwner(owner, vcsClientId).getData();
         if (gitHubAppTokens.size() == 0)  return null;
         return gitHubAppTokens.get(0);
     } 
