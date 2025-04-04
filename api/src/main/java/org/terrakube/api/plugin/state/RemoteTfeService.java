@@ -372,7 +372,7 @@ public class RemoteTfeService {
 
             attributes.put("permissions", defaultAttributes);
 
-            if (workspace.get().getVcs() != null) {
+            if (workspace.get().getVcs() != null && !workspace.get().isAllowRemoteApply()) {
                 VcsRepo vcsRepo = new VcsRepo();
                 vcsRepo.setBranch(workspace.get().getBranch());
                 vcsRepo.setRepositoryHttpUrl(workspace.get().getSource());
