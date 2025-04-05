@@ -10,6 +10,7 @@ import "antd/dist/reset.css";
 import { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { GoStack } from "react-icons/go";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
 import { ApiResponse, FlatOrganization, Organization } from "../types";
@@ -37,6 +38,8 @@ export const MainMenu = ({ organizationName, setOrganizationName }: Props) => {
       setDefaultSelected(["registry"]);
     } else if (location.pathname.includes("settings")) {
       setDefaultSelected(["settings"]);
+    } else if (location.pathname.includes("stacks")) {
+      setDefaultSelected(["stacks"]);
     } else {
       setDefaultSelected(["workspaces"]);
     }
@@ -89,6 +92,15 @@ export const MainMenu = ({ organizationName, setOrganizationName }: Props) => {
             onClick: () => {
               navigate(`/organizations/${organizationId}/workspaces`);
               setDefaultSelected(["workspaces"]);
+            },
+          },
+          {
+            label: "Stacks",
+            key: "stacks",
+            icon: <GoStack />,
+            onClick: () => {
+              navigate(`/organizations/${organizationId}/stacks`);
+              setDefaultSelected(["stacks"]);
             },
           },
           {

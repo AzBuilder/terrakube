@@ -19,6 +19,7 @@ import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.workspace.Workspace;
+import org.terrakube.api.model.Stack;
 
 import com.yahoo.elide.annotation.CreatePermission;
 import com.yahoo.elide.annotation.DeletePermission;
@@ -109,6 +110,10 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<Tag> tag;
+
+    @UpdatePermission(expression = "user belongs organization")
+    @OneToMany(mappedBy = "organization")
+    private List<Stack> stack;
 
     @Column(name = "execution_mode")
     private String executionMode;

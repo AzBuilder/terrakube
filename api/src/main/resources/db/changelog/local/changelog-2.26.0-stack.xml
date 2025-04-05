@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2.26.0-stack" author="terrakube">
+        <createTable tableName="stack">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="organization_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(500)"/>
+            <column name="tool_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="iac_engine" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="repo_url" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_branch" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vcs_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="updated_date" type="timestamp"/>
+            <column name="created_by" type="varchar(128)"/>
+            <column name="updated_by" type="varchar(128)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="organization_id"
+                                baseTableName="stack"
+                                constraintName="fk_stack_organization"
+                                referencedColumnNames="id"
+                                referencedTableName="organization"/>
+
+        <addForeignKeyConstraint baseColumnNames="vcs_id"
+                                baseTableName="stack"
+                                constraintName="fk_stack_vcs"
+                                referencedColumnNames="id"
+                                referencedTableName="vcs"/>
+    </changeSet>
+</databaseChangeLog> 

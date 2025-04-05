@@ -11,6 +11,7 @@ import { OrganizationSettings } from "../Settings/Settings";
 import { CreateWorkspace } from "../Workspaces/Create";
 import { WorkspaceDetails } from "../Workspaces/Details";
 import { ImportWorkspace } from "../Workspaces/Import";
+import { StacksList } from "../Stacks/StacksList";
 import "./App.css";
 import MainMenu from "./MainMenu";
 import { ProfilePicture } from "./ProfilePicture";
@@ -61,6 +62,10 @@ const App = () => {
             element={
               <OrganizationsDetailPage setOrganizationName={setOrganizationName} organizationName={organizationName} />
             }
+          />
+          <Route
+            path="/organizations/:id/stacks"
+            element={<StacksList />}
           />
           <Route path="/workspaces/create" element={<CreateWorkspace />} />
           <Route path="/workspaces/import" element={<ImportWorkspace />} />
