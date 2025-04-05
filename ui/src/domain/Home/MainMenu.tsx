@@ -5,7 +5,7 @@ import {
   PlusCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { Menu } from "antd";
+import { Menu, Tag, Space } from "antd";
 import "antd/dist/reset.css";
 import { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";

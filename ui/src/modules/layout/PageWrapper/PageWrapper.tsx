@@ -4,9 +4,10 @@ import { Content } from "antd/es/layout/layout";
 import "./PageWrapper.css";
 import { NavLink } from "react-router-dom";
 import clsx from "classnames";
+import { ReactNode } from "react";
 
 type Props = {
-  title: string;
+  title: ReactNode;
   subTitle?: string;
   children: any;
   error?: ErrorInformation;

@@ -1,4 +1,4 @@
-import { Layout, Typography, Button, List } from "antd";
+import { Layout, Typography, Button, List, Tag, Space } from "antd";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { listStacks } from "@/modules/stacks/stackService";
@@ -47,7 +47,12 @@ export function StacksList() {
 
   return (
     <PageWrapper
-      title="Stacks"
+      title={
+        <Space>
+          Stacks
+          <Tag color="blue" style={{ fontSize: '12px', padding: '0 6px', marginLeft: '8px' }}>BETA</Tag>
+        </Space>
+      }
       subTitle={`Stacks in the ${organizationName} organization`}
       loadingText="Loading stacks..."
       loading={loading}

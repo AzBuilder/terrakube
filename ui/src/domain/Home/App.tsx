@@ -12,6 +12,7 @@ import { CreateWorkspace } from "../Workspaces/Create";
 import { WorkspaceDetails } from "../Workspaces/Details";
 import { ImportWorkspace } from "../Workspaces/Import";
 import { StacksList } from "../Stacks/StacksList";
+import { CreateStack } from "../Stacks/Create";
 import "./App.css";
 import MainMenu from "./MainMenu";
 import { ProfilePicture } from "./ProfilePicture";
@@ -66,6 +67,10 @@ const App = () => {
           <Route
             path="/organizations/:id/stacks"
             element={<StacksList />}
+          />
+          <Route
+            path="/organizations/:id/stacks/create"
+            element={<CreateStack />}
           />
           <Route path="/workspaces/create" element={<CreateWorkspace />} />
           <Route path="/workspaces/import" element={<ImportWorkspace />} />
