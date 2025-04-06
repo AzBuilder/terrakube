@@ -1,6 +1,6 @@
 import { Layout, ConfigProvider } from "antd";
 import { useState, useEffect } from "react";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 import { useAuth } from "../../config/authConfig";
 import {
   getThemeConfig,
@@ -56,126 +56,173 @@ const App = () => {
     return <Login />;
   }
 
-  return (
-    <ConfigProvider theme={getThemeConfig(colorScheme, themeMode)}>
-      <Router>
-        <Layout className="layout mh-100">
-          <Header>
-            <a>
-              <img className="logo" src={logo} alt="Logo"></img>
-            </a>
-            <div className="menu">
-              <MainMenu
-                organizationName={organizationName}
-                setOrganizationName={setOrganizationName}
-                themeMode={themeMode}
-              />
-            </div>
-            <div className="user">
-              <ProfilePicture />
-            </div>
-          </Header>
-
-          <Routes>
-            <Route path="/" element={<OrganizationsPickerPage />} />
-            <Route
-              path="/organizations/create"
-              element={<CreateOrganization setOrganizationName={setOrganizationName} />}
-            />
-            <Route
-              path="/organizations/:id/workspaces"
-              element={
-                <OrganizationsDetailPage
-                  setOrganizationName={setOrganizationName}
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <ConfigProvider theme={getThemeConfig(colorScheme, themeMode)}>
+          <Layout className="layout mh-100">
+            <Header>
+              <a>
+                <img className="logo" src={logo} alt="Logo"></img>
+              </a>
+              <div className="menu">
+                <MainMenu
                   organizationName={organizationName}
+                  setOrganizationName={setOrganizationName}
+                  themeMode={themeMode}
                 />
-              }
+              </div>
+              <div className="user">
+                <ProfilePicture />
+              </div>
+            </Header>
+            <Outlet />
+            <Footer style={{ textAlign: "center" }}>
+              Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©{new Date().getFullYear()}
+            </Footer>
+          </Layout>
+        </ConfigProvider>
+      ),
+      children: [
+        {
+          path: "/",
+          element: <OrganizationsPickerPage />,
+        },
+        {
+          path: "/organizations/create",
+          element: <CreateOrganization setOrganizationName={setOrganizationName} />,
+        },
+        {
+          path: "/organizations/:id/workspaces",
+          element: (
+            <OrganizationsDetailPage
+              setOrganizationName={setOrganizationName}
+              organizationName={organizationName}
             />
-            <Route path="/workspaces/create" element={<CreateWorkspace />} />
-            <Route path="/workspaces/import" element={<ImportWorkspace />} />
-            <Route path="/workspaces/:id" element={<WorkspaceDetails setOrganizationName={setOrganizationName} />} />
-            <Route
-              path="/organizations/:orgid/workspaces/:id"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} />}
-            />
-            <Route
-              path="/workspaces/:id/runs"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />}
-            />
-            <Route
-              path="/organizations/:orgid/workspaces/:id/runs"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />}
-            />
-            <Route
-              path="/workspaces/:id/runs/:runid"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />}
-            />
-            <Route
-              path="/organizations/:orgid/workspaces/:id/runs/:runid"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />}
-            />
-            <Route
-              path="/workspaces/:id/states"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="3" />}
-            />
-            <Route
-              path="/organizations/:orgid/workspaces/:id/states"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="3" />}
-            />
-            <Route
-              path="/workspaces/:id/variables"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="4" />}
-            />
-            <Route
-              path="/organizations/:orgid/workspaces/:id/variables"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="4" />}
-            />
-            <Route
-              path="/workspaces/:id/schedules"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="5" />}
-            />
-            <Route
-              path="/organizations/:orgid/workspaces/:id/schedules"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="5" />}
-            />
-            <Route
-              path="/workspaces/:id/settings"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="6" />}
-            />
-            <Route
-              path="/organizations/:orgid/workspaces/:id/settings"
-              element={<WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="6" />}
-            />
-            <Route path="/organizations/:orgid/registry/create" element={<CreateModule />} />
-            <Route
-              path="/organizations/:orgid/registry"
-              element={<ModuleList setOrganizationName={setOrganizationName} organizationName={organizationName} />}
-            />
-            <Route
-              path="/organizations/:orgid/registry/:id"
-              element={<ModuleDetails organizationName={organizationName} />}
-            />
-            <Route path="/organizations/:orgid/settings" element={<OrganizationSettings />} />
-            <Route path="/organizations/:orgid/settings/general" element={<OrganizationSettings selectedTab="1" />} />
-            <Route path="/organizations/:orgid/settings/teams" element={<OrganizationSettings selectedTab="2" />} />
-            <Route path="/organizations/:orgid/settings/vcs" element={<OrganizationSettings selectedTab="4" />} />
-            <Route
-              path="/organizations/:orgid/settings/vcs/new/:vcsName"
-              element={<OrganizationSettings selectedTab="4" vcsMode="new" />}
-            />
-            <Route path="/settings/tokens" element={<UserSettingsPage />} />
-            <Route path="/settings/theme" element={<UserSettingsPage />} />
-            <Route path="/organizations/:orgid/settings/ssh" element={<OrganizationSettings selectedTab="6" />} />
-            <Route path="/organizations/:orgid/settings/tags" element={<OrganizationSettings selectedTab="7" />} />
-            <Route path="/organizations/:orgid/settings/actions" element={<OrganizationSettings selectedTab="8" />} />
-          </Routes>
-          <Footer style={{ textAlign: "center" }}>
-            Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©{new Date().getFullYear()}
-          </Footer>
-        </Layout>
-      </Router>
-    </ConfigProvider>
-  );
+          ),
+        },
+        {
+          path: "/workspaces/create",
+          element: <CreateWorkspace />,
+        },
+        {
+          path: "/workspaces/import",
+          element: <ImportWorkspace />,
+        },
+        {
+          path: "/workspaces/:id",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} />,
+        },
+        {
+          path: "/organizations/:orgid/workspaces/:id",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} />,
+        },
+        {
+          path: "/workspaces/:id/runs",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />,
+        },
+        {
+          path: "/organizations/:orgid/workspaces/:id/runs",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />,
+        },
+        {
+          path: "/workspaces/:id/runs/:runid",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />,
+        },
+        {
+          path: "/organizations/:orgid/workspaces/:id/runs/:runid",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="2" />,
+        },
+        {
+          path: "/workspaces/:id/states",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="3" />,
+        },
+        {
+          path: "/organizations/:orgid/workspaces/:id/states",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="3" />,
+        },
+        {
+          path: "/workspaces/:id/variables",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="4" />,
+        },
+        {
+          path: "/organizations/:orgid/workspaces/:id/variables",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="4" />,
+        },
+        {
+          path: "/workspaces/:id/schedules",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="5" />,
+        },
+        {
+          path: "/organizations/:orgid/workspaces/:id/schedules",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="5" />,
+        },
+        {
+          path: "/workspaces/:id/settings",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="6" />,
+        },
+        {
+          path: "/organizations/:orgid/workspaces/:id/settings",
+          element: <WorkspaceDetails setOrganizationName={setOrganizationName} selectedTab="6" />,
+        },
+        {
+          path: "/organizations/:orgid/registry/create",
+          element: <CreateModule />,
+        },
+        {
+          path: "/organizations/:orgid/registry",
+          element: <ModuleList setOrganizationName={setOrganizationName} organizationName={organizationName} />,
+        },
+        {
+          path: "/organizations/:orgid/registry/:id",
+          element: <ModuleDetails organizationName={organizationName} />,
+        },
+        {
+          path: "/organizations/:orgid/settings",
+          element: <OrganizationSettings />,
+        },
+        {
+          path: "/organizations/:orgid/settings/general",
+          element: <OrganizationSettings selectedTab="1" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/teams",
+          element: <OrganizationSettings selectedTab="2" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/vcs",
+          element: <OrganizationSettings selectedTab="4" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/vcs/new/:vcsName",
+          element: <OrganizationSettings selectedTab="4" vcsMode="new" />,
+        },
+        {
+          path: "/settings/tokens",
+          element: <UserSettingsPage />,
+        },
+        {
+          path: "/settings/theme",
+          element: <UserSettingsPage />,
+        },
+        {
+          path: "/organizations/:orgid/settings/ssh",
+          element: <OrganizationSettings selectedTab="6" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/tags",
+          element: <OrganizationSettings selectedTab="7" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/actions",
+          element: <OrganizationSettings selectedTab="8" />,
+        },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 };
 
 export default App;
