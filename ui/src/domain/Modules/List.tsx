@@ -107,12 +107,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
       }
     >
       <div className="site-layout-content">
-        <Search
-          placeholder="Filter modules"
-          onSearch={onSearch}
-          allowClear
-          style={{ marginBottom: "16px" }}
-        />
+        <Search placeholder="Filter modules" onSearch={onSearch} allowClear style={{ marginBottom: "16px" }} />
         <List
           split={false}
           dataSource={filteredModules}
@@ -138,18 +133,14 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
                       </Tag>
                       <Space>
                         {renderLogo(item.provider)}
-                        <Typography.Text>
-                          {item.provider}
-                        </Typography.Text>
+                        <Typography.Text>{item.provider}</Typography.Text>
                       </Space>
                       <Space>
                         <IconContext.Provider value={{ size: "1.3em" }}>
                           <RiFolderHistoryLine />
                         </IconContext.Provider>
                         <Typography.Text>
-                          {item.versions.length > 0 
-                            ? item.versions.sort(compareVersions).reverse()[0] 
-                            : "No versions"}
+                          {item.versions.length > 0 ? item.versions.sort(compareVersions).reverse()[0] : "No versions"}
                         </Typography.Text>
                       </Space>
                       <Space>
@@ -160,9 +151,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
                       </Space>
                       <Space>
                         <DownloadOutlined />
-                        <Typography.Text>
-                          {item.downloadQuantity}
-                        </Typography.Text>
+                        <Typography.Text>{item.downloadQuantity}</Typography.Text>
                       </Space>
                     </Space>
                   </Space>

@@ -117,7 +117,7 @@ export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
                   onValidate={handleEditorValidation}
                   defaultLanguage="yaml"
                   defaultValue={tcl}
-                  theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
+                  theme={getMonacoTheme(token.colorBgContainer === "#141414" ? "dark" : "light")}
                   options={monacoOptions}
                 />
               </div>

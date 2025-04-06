@@ -2,7 +2,13 @@ import { Layout, ConfigProvider } from "antd";
 import { useState, useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { useAuth } from "../../config/authConfig";
-import { getThemeConfig, ColorSchemeOption, ThemeMode, defaultColorScheme, defaultThemeMode } from "../../config/themeConfig";
+import {
+  getThemeConfig,
+  ColorSchemeOption,
+  ThemeMode,
+  defaultColorScheme,
+  defaultThemeMode,
+} from "../../config/themeConfig";
 import Login from "../Login/Login";
 import { CreateModule } from "../Modules/Create";
 import { ModuleDetails } from "../Modules/Details";
@@ -31,8 +37,8 @@ const App = () => {
 
   useEffect(() => {
     // Load color scheme and theme mode preferences from localStorage
-    const savedScheme = localStorage.getItem('terrakube-color-scheme') as ColorSchemeOption;
-    const savedThemeMode = localStorage.getItem('terrakube-theme-mode') as ThemeMode;
+    const savedScheme = localStorage.getItem("terrakube-color-scheme") as ColorSchemeOption;
+    const savedThemeMode = localStorage.getItem("terrakube-theme-mode") as ThemeMode;
     if (savedScheme) {
       setColorScheme(savedScheme);
     }
@@ -59,7 +65,11 @@ const App = () => {
               <img className="logo" src={logo} alt="Logo"></img>
             </a>
             <div className="menu">
-              <MainMenu organizationName={organizationName} setOrganizationName={setOrganizationName} themeMode={themeMode} />
+              <MainMenu
+                organizationName={organizationName}
+                setOrganizationName={setOrganizationName}
+                themeMode={themeMode}
+              />
             </div>
             <div className="user">
               <ProfilePicture />
@@ -75,7 +85,10 @@ const App = () => {
             <Route
               path="/organizations/:id/workspaces"
               element={
-                <OrganizationsDetailPage setOrganizationName={setOrganizationName} organizationName={organizationName} />
+                <OrganizationsDetailPage
+                  setOrganizationName={setOrganizationName}
+                  organizationName={organizationName}
+                />
               }
             />
             <Route path="/workspaces/create" element={<CreateWorkspace />} />
@@ -156,7 +169,9 @@ const App = () => {
             <Route path="/organizations/:orgid/settings/tags" element={<OrganizationSettings selectedTab="7" />} />
             <Route path="/organizations/:orgid/settings/actions" element={<OrganizationSettings selectedTab="8" />} />
           </Routes>
-          <Footer style={{ textAlign: "center" }}>Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©{new Date().getFullYear()}</Footer>
+          <Footer style={{ textAlign: "center" }}>
+            Terrakube {window._env_.REACT_APP_TERRAKUBE_VERSION} ©{new Date().getFullYear()}
+          </Footer>
         </Layout>
       </Router>
     </ConfigProvider>

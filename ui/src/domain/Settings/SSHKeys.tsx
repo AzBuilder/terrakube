@@ -117,8 +117,8 @@ export const SSHKeysSettings = () => {
       <h1>SSH Keys</h1>
       <div>
         <Typography.Text type="secondary" className="App-text">
-          Terrakube uses these private SSH keys for downloading private Terraform modules with Git-based sources during a
-          Terraform run. SSH keys for downloading modules are assigned per-workspace.
+          Terrakube uses these private SSH keys for downloading private Terraform modules with Git-based sources during
+          a Terraform run. SSH keys for downloading modules are assigned per-workspace.
         </Typography.Text>
       </div>
       <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
@@ -209,8 +209,9 @@ export const SSHKeysSettings = () => {
               label="Private SSH Key"
               extra={
                 <p>
-                  Generate a new key with <code style={{ backgroundColor: token.colorBgContainer }}>ssh-keygen -t rsa -m PEM</code>,
-                  make sure the private key starts with{" "}
+                  Generate a new key with{" "}
+                  <code style={{ backgroundColor: token.colorBgContainer }}>ssh-keygen -t rsa -m PEM</code>, make sure
+                  the private key starts with{" "}
                   <code style={{ backgroundColor: token.colorBgContainer }}>-----BEGIN RSA PRIVATE KEY-----</code>
                 </p>
               }

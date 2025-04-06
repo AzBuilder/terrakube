@@ -457,9 +457,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                     Add workspace description
                   </a>
                 ) : (
-                  <Typography.Text type="secondary">
-                    {workspace.attributes.description}
-                  </Typography.Text>
+                  <Typography.Text type="secondary">{workspace.attributes.description}</Typography.Text>
                 )}
                 <Space size={40} style={{ marginBottom: "40px" }} direction="horizontal">
                   <Typography.Text>

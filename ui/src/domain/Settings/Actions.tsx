@@ -215,8 +215,8 @@ export const ActionSettings = () => {
       <h1>Actions</h1>
       <div>
         <Typography.Text type="secondary" className="App-text">
-          Actions are used to extend the Terrakube UI. For example, you can add a new button to restart a VM directly from
-          Terrakube.
+          Actions are used to extend the Terrakube UI. For example, you can add a new button to restart a VM directly
+          from Terrakube.
         </Typography.Text>
       </div>
       {!isEditing ? (
@@ -421,11 +421,11 @@ export const ActionSettings = () => {
               }}
             >
               <div className="editor">
-                <Editor 
-                  height="40vh" 
-                  onMount={handleEditorDidMount} 
+                <Editor
+                  height="40vh"
+                  onMount={handleEditorDidMount}
                   defaultLanguage="javascript"
-                  theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
+                  theme={getMonacoTheme(token.colorBgContainer === "#141414" ? "dark" : "light")}
                   options={monacoOptions}
                 />
               </div>

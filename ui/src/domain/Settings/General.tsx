@@ -76,25 +76,28 @@ export const GeneralSettings = () => {
   };
 
   const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-    message.error('Failed to update organization settings');
+    console.log("Failed:", errorInfo);
+    message.error("Failed to update organization settings");
   };
 
   useEffect(() => {
     setLoading(true);
-    axiosInstance.get(`organization/${orgid}`).then((response) => {
-      setOrganization(response.data.data);
-      form.setFieldsValue({
-        name: response.data.data.attributes.name,
-        description: response.data.data.attributes.description,
-        executionMode: response.data.data.attributes.executionMode,
+    axiosInstance
+      .get(`organization/${orgid}`)
+      .then((response) => {
+        setOrganization(response.data.data);
+        form.setFieldsValue({
+          name: response.data.data.attributes.name,
+          description: response.data.data.attributes.description,
+          executionMode: response.data.data.attributes.executionMode,
+        });
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        message.error("Failed to load organization settings");
+        setLoading(false);
       });
-      setLoading(false);
-    }).catch((error) => {
-      console.log(error);
-      message.error('Failed to load organization settings');
-      setLoading(false);
-    });
   }, [orgid, form]);
 
   return (
@@ -130,14 +133,14 @@ export const GeneralSettings = () => {
                 <Space direction="vertical">
                   <Radio value="remote">
                     <b>Remote</b>
-                    <Typography.Text type="secondary" style={{ display: 'block' }}>
+                    <Typography.Text type="secondary" style={{ display: "block" }}>
                       Terrakube hosts your plans and applies, allowing you and your team to collaborate and review jobs
                       in the app.
                     </Typography.Text>
                   </Radio>
                   <Radio value="local">
                     <b>Local</b>
-                    <Typography.Text type="secondary" style={{ display: 'block' }}>
+                    <Typography.Text type="secondary" style={{ display: "block" }}>
                       Your planning and applying jobs are performed on your own machines. Terrakube is used just for
                       storing and syncing the state.
                     </Typography.Text>
@@ -156,8 +159,8 @@ export const GeneralSettings = () => {
       <h1>Delete this Organization</h1>
       <div>
         <Typography.Text type="secondary" className="App-text">
-          Deleting the organization will permanently delete all workspaces associated with it. Please be certain that you
-          understand this.
+          Deleting the organization will permanently delete all workspaces associated with it. Please be certain that
+          you understand this.
         </Typography.Text>
       </div>
       <Popconfirm
