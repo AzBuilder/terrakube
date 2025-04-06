@@ -7,7 +7,7 @@ const ColorBox = ({ color }: { color: string }) => (
   <span className="color-box" style={{ backgroundColor: color }}></span>
 );
 
-const ColorOption = ({ color, label }: { color: string, label: string }) => (
+const ColorOption = ({ color, label }: { color: string; label: string }) => (
   <div className="color-option">
     <ColorBox color={color} />
     <span>{label}</span>
@@ -20,8 +20,8 @@ export const ThemeSection = () => {
 
   useEffect(() => {
     // Load color scheme and theme mode preferences from localStorage
-    const savedScheme = localStorage.getItem('terrakube-color-scheme') as ColorSchemeOption;
-    const savedThemeMode = localStorage.getItem('terrakube-theme-mode') as ThemeMode;
+    const savedScheme = localStorage.getItem("terrakube-color-scheme") as ColorSchemeOption;
+    const savedThemeMode = localStorage.getItem("terrakube-theme-mode") as ThemeMode;
     if (savedScheme) {
       setColorScheme(savedScheme);
     }
@@ -32,34 +32,34 @@ export const ThemeSection = () => {
 
   const handleColorSchemeChange = (value: ColorSchemeOption) => {
     setColorScheme(value);
-    localStorage.setItem('terrakube-color-scheme', value);
+    localStorage.setItem("terrakube-color-scheme", value);
     // Automatically reload the page
     window.location.reload();
   };
 
   const handleThemeModeChange = (value: ThemeMode) => {
     setThemeMode(value);
-    localStorage.setItem('terrakube-theme-mode', value);
+    localStorage.setItem("terrakube-theme-mode", value);
     // Automatically reload the page
     window.location.reload();
   };
 
   const colorOptions = [
     {
-      value: 'default',
-      color: '#1890ff',
-      label: 'Default (The classic Terrakube theme)',
+      value: "default",
+      color: "#1890ff",
+      label: "Default (The classic Terrakube theme)",
     },
     {
-      value: 'terrakube',
-      color: '#722ED1',
-      label: 'Terrakube (Uses the main Terrakube logo colors)',
+      value: "terrakube",
+      color: "#722ED1",
+      label: "Terrakube (Uses the main Terrakube logo colors)",
     },
   ];
 
   const themeModeOptions = [
     {
-      value: 'light',
+      value: "light",
       label: (
         <div className="color-option">
           <ColorBox color="#ffffff" />
@@ -68,7 +68,7 @@ export const ThemeSection = () => {
       ),
     },
     {
-      value: 'dark',
+      value: "dark",
       label: (
         <div className="color-option">
           <ColorBox color="#000000" />
@@ -90,15 +90,15 @@ export const ThemeSection = () => {
       </Flex>
 
       <Card className="theme-card">
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
           <div>
             <Typography.Title level={5}>Color Scheme</Typography.Title>
             <Select
               value={colorScheme}
               onChange={handleColorSchemeChange}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               optionLabelProp="label"
-              options={colorOptions.map(opt => ({
+              options={colorOptions.map((opt) => ({
                 value: opt.value,
                 label: <ColorOption color={opt.color} label={opt.value} />,
                 children: <ColorOption color={opt.color} label={opt.label} />,
@@ -110,7 +110,7 @@ export const ThemeSection = () => {
             <Select
               value={themeMode}
               onChange={handleThemeModeChange}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               options={themeModeOptions}
             />
           </div>
@@ -118,4 +118,4 @@ export const ThemeSection = () => {
       </Card>
     </div>
   );
-}; 
+};

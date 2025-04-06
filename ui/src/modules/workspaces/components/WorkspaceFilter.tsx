@@ -31,7 +31,7 @@ export default function WorkspaceFilter({ workspaces, onFiltered, organizationId
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-  
+
   const [statusFilter, setStatusFilter] = useState<string>(sessionStorage.getItem("filterValue") || "All");
   const [searchFilter, setSearchFilter] = useState(sessionStorage.getItem("searchValue") || "");
   const [tagsFilter, setTagsFilter] = useState<string[]>((sessionStorage.getItem("selectedTags") as any) || []);

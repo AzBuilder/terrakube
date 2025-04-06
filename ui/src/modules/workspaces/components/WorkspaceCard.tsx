@@ -1,5 +1,5 @@
 import { ClockCircleOutlined } from "@ant-design/icons";
-import { Card, Space, Row, Col, Typography, Flex, theme } from "antd";
+import { Card, Space, Row, Col, Typography, Flex } from "antd";
 import { DateTime } from "luxon";
 import { IconContext } from "react-icons";
 import { BiTerminal } from "react-icons/bi";
@@ -17,8 +17,6 @@ type Props = {
   tags: TagModel[];
 };
 export default function WorkspaceCard({ item, tags }: Props) {
-  const { token } = theme.useToken();
-  
   return (
     <Card hoverable>
       <Space style={{ width: "100%" }} direction="vertical">
@@ -51,9 +49,7 @@ export default function WorkspaceCard({ item, tags }: Props) {
           </Space>
           <Space>
             <IacTypeLogo type={item.iacType} />
-            <Typography.Text>
-              {item.terraformVersion}
-            </Typography.Text>
+            <Typography.Text>{item.terraformVersion}</Typography.Text>
           </Space>
           {item.branch !== "remote-content" && item.normalizedSource ? (
             <Space>
@@ -66,7 +62,7 @@ export default function WorkspaceCard({ item, tags }: Props) {
             <Typography.Text
               style={{
                 verticalAlign: "middle",
-                display: "inline-block"
+                display: "inline-block",
               }}
             >
               <IconContext.Provider value={{ size: "1.4em" }}>
