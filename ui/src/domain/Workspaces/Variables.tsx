@@ -289,16 +289,16 @@ export const Variables = ({
           </p>
           <p>
             Sensitive variables are hidden from view in the UI and API, and can't be edited. (To change a sensitive
-            variable, delete and replace it.) Sensitive variables can still appear in Terraform logs if your configuration
-            is designed to output them.
+            variable, delete and replace it.) Sensitive variables can still appear in Terraform logs if your
+            configuration is designed to output them.
           </p>
         </Typography.Text>
       </div>
       <h2>Terraform Variables</h2>
       <div>
         <Typography.Text type="secondary" className="App-text">
-          These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string value
-          for a variable, click its HCL checkbox.
+          These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string
+          value for a variable, click its HCL checkbox.
         </Typography.Text>
       </div>
       <Table
@@ -352,8 +352,8 @@ export const Variables = ({
         <div>
           <Typography.Text type="secondary" className="App-text">
             <p>
-              The following values are taken from the collection used by this workspaces, this values are injected inside
-              the Terrakube remote jobs.
+              The following values are taken from the collection used by this workspaces, this values are injected
+              inside the Terrakube remote jobs.
             </p>
           </Typography.Text>
         </div>

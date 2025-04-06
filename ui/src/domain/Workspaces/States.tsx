@@ -398,7 +398,7 @@ export const States = ({
                     onMount={handleEditorDidMount}
                     defaultLanguage="json"
                     defaultValue={manageState ? rawStateContent : "No access to raw state"}
-                    theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
+                    theme={getMonacoTheme(token.colorBgContainer === "#141414" ? "dark" : "light")}
                   />
                 ) : (
                   <Editor
@@ -408,7 +408,7 @@ export const States = ({
                     onMount={handleJSONEditorDidMount}
                     defaultLanguage="json"
                     defaultValue={manageState ? stateContent : "No access to state"}
-                    theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
+                    theme={getMonacoTheme(token.colorBgContainer === "#141414" ? "dark" : "light")}
                   />
                 )}
               </Card>

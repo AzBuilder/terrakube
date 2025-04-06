@@ -212,7 +212,9 @@ export const VCSSettings = ({ vcsMode }: Props) => {
                       <Row>
                         <Col span={6}>
                           {item.attributes.status !== "COMPLETED" ? (
-                            <Typography.Text type="secondary">Connect to {renderVCSType(item.attributes.vcsType)}</Typography.Text>
+                            <Typography.Text type="secondary">
+                              Connect to {renderVCSType(item.attributes.vcsType)}
+                            </Typography.Text>
                           ) : (
                             <Typography.Text type="secondary">Connection</Typography.Text>
                           )}

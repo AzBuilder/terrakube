@@ -509,7 +509,8 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                     <b>Webhook:</b> <b>untick</b> Active
                   </li>
                   <li>
-                    <b>Repository permissions:</b> Commit statuses: Read and write (Only if webhook to be used on VCS workflow workspaces)
+                    <b>Repository permissions:</b> Commit statuses: Read and write (Only if webhook to be used on VCS
+                    workflow workspaces)
                     <br />
                     Content: Read-only
                     <br />
@@ -692,8 +693,8 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
       <h1>Add VCS Provider</h1>
       <div>
         <Typography.Text type="secondary" className="App-text">
-          To connect workspaces and modules to git repositories containing configurations,
-          Terrakube needs access to your version control system (VCS) provider.
+          To connect workspaces and modules to git repositories containing configurations, Terrakube needs access to
+          your version control system (VCS) provider.
         </Typography.Text>
       </div>
       <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>

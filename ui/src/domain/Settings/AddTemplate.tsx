@@ -8,7 +8,6 @@ import axiosInstance from "../../config/axiosConfig";
 import { getMonacoTheme, monacoOptions } from "../../config/monacoConfig";
 import { TemplateAttributes } from "../types";
 import "./Settings.css";
-import { InfoCircleOutlined } from "@ant-design/icons";
 const { Step } = Steps;
 const { Meta } = Card;
 const validateMessages = {
@@ -226,7 +225,7 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
               onValidate={handleEditorValidation}
               defaultLanguage="yaml"
               defaultValue={tcl}
-              theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
+              theme={getMonacoTheme(token.colorBgContainer === "#141414" ? "dark" : "light")}
               options={monacoOptions}
             />
           </div>

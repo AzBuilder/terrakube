@@ -117,7 +117,7 @@ export const MainMenu = ({ organizationName, setOrganizationName, themeMode }: P
 
   return (
     <>
-      <Menu selectedKeys={defaultSelected} theme='dark' mode="horizontal" items={items} />
+      <Menu selectedKeys={defaultSelected} theme="dark" mode="horizontal" items={items} />
     </>
   );
 };

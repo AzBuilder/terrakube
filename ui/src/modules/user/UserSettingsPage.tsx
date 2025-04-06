@@ -6,11 +6,6 @@ import { ThemeSection } from "./components/ThemeSection/ThemeSection";
 import "./UserSettingsPage.css";
 const { Content } = Layout;
 
-const tabs = {
-  tokens: "1",
-  theme: "2",
-};
-
 export const UserSettingsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
