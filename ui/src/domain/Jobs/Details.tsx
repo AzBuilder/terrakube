@@ -1,12 +1,14 @@
 import {
   CheckCircleOutlined,
-  CheckCircleTwoTone,
   CheckOutlined,
   ClockCircleOutlined,
-  CloseCircleTwoTone,
+  CloseCircleOutlined,
   CloseOutlined,
   CommentOutlined,
   ExclamationCircleOutlined,
+  LoadingOutlined,
+  MinusCircleOutlined,
+  PlayCircleOutlined,
   StopOutlined,
   SyncOutlined,
   UserOutlined,
@@ -85,17 +87,17 @@ export const DetailsJob = ({ jobId }: Props) => {
   const getIconStatus = (item: JobStep) => {
     switch (item.status) {
       case "completed":
-        return <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} />;
+        return <CheckCircleOutlined style={{ fontSize: "20px", color: "#52c41a" }} />;
       case "noChanges":
-        return <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: "20px" }} />;
+        return <CheckCircleOutlined style={{ fontSize: "20px", color: "#52c41a" }} />;
       case "notExecuted":
-        return <CheckCircleTwoTone twoToneColor="#fa8f37" style={{ fontSize: "20px" }} />;
+        return <CheckCircleOutlined style={{ fontSize: "20px", color: "#fa8f37" }} />;
       case "running":
         return <SyncOutlined spin style={{ color: "#108ee9", fontSize: "20px" }} />;
       case "failed":
-        return <CloseCircleTwoTone twoToneColor="#FB0136" style={{ fontSize: "20px" }} />;
+        return <CloseCircleOutlined style={{ fontSize: "20px", color: "#FB0136" }} />;
       case "cancelled":
-        return <CloseCircleTwoTone twoToneColor="#FB0136" style={{ fontSize: "20px" }} />;
+        return <CloseCircleOutlined style={{ fontSize: "20px", color: "#FB0136" }} />;
       default:
         return <ClockCircleOutlined style={{ fontSize: "20px" }} />;
     }

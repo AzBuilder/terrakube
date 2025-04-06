@@ -1,5 +1,5 @@
 import { ErrorInformation } from "@/modules/api/types";
-import { Breadcrumb, Typography, Alert, Flex, Spin } from "antd";
+import { Breadcrumb, Typography, Alert, Flex, Spin, theme } from "antd";
 import { Content } from "antd/es/layout/layout";
 import "./PageWrapper.css";
 import { NavLink } from "react-router-dom";
@@ -31,6 +31,10 @@ export default function PageWrapper({
   actions,
   fluid,
 }: Props) {
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
   return (
     <Content className="page-wrapper">
       {breadcrumbs && (
@@ -42,7 +46,7 @@ export default function PageWrapper({
           ))}
         </Breadcrumb>
       )}
-      <div className="page-wrapper-content">
+      <div className="page-wrapper-content" style={{ background: colorBgContainer }}>
         <div
           className={clsx(
             "page-wrapper-inner",

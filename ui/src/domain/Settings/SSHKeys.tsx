@@ -1,5 +1,5 @@
-import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Form, Input, List, Modal, Popconfirm, Select, Space } from "antd";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, List, Modal, Popconfirm, Select, Space, Typography, theme } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -30,6 +30,8 @@ export const SSHKeysSettings = () => {
   const [mode, setMode] = useState("create");
   const [sshKeyId] = useState([]);
   const [form] = Form.useForm<AddSshKeyForm | UpdateSshKeyForm>();
+  const { token } = theme.useToken();
+
   const onCancel = () => {
     setVisible(false);
   };
@@ -113,11 +115,13 @@ export const SSHKeysSettings = () => {
   return (
     <div className="setting">
       <h1>SSH Keys</h1>
-      <div className="App-text">
-        Terrakube uses these private SSH keys for downloading private Terraform modules with Git-based sources during a
-        Terraform run. SSH keys for downloading modules are assigned per-workspace.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Terrakube uses these private SSH keys for downloading private Terraform modules with Git-based sources during a
+          Terraform run. SSH keys for downloading modules are assigned per-workspace.
+        </Typography.Text>
       </div>
-      <Button type="primary" onClick={onNew} htmlType="button">
+      <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
         Add a Private SSH Key
       </Button>
       <br></br>
@@ -205,9 +209,9 @@ export const SSHKeysSettings = () => {
               label="Private SSH Key"
               extra={
                 <p>
-                  Generate a new key with <code style={{ backgroundColor: "#ebeef2" }}>ssh-keygen -t rsa -m PEM</code>,
-                  and paste the private key. The contents should begin with{" "}
-                  <code style={{ backgroundColor: "#ebeef2" }}>-----BEGIN RSA PRIVATE KEY-----</code>
+                  Generate a new key with <code style={{ backgroundColor: token.colorBgContainer }}>ssh-keygen -t rsa -m PEM</code>,
+                  make sure the private key starts with{" "}
+                  <code style={{ backgroundColor: token.colorBgContainer }}>-----BEGIN RSA PRIVATE KEY-----</code>
                 </p>
               }
             >

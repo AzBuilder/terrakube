@@ -1,5 +1,5 @@
-import { DeleteOutlined, InfoCircleTwoTone, PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Select, Space, message } from "antd";
+import { DeleteOutlined, InfoCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Modal, Select, Space, message, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
@@ -123,9 +123,11 @@ export const CreateJob = ({ changeJob }: Props) => {
         }}
       >
         <Space direction="vertical">
-          <div className="popup-text">
-            <InfoCircleTwoTone style={{ fontSize: "16px" }} /> You will be redirected to the run details page to see
-            this job executed.
+          <div>
+            <InfoCircleOutlined style={{ fontSize: "16px", marginRight: "8px", color: "#1677ff" }} />
+            <Typography.Text type="secondary">
+              You will be redirected to the run details page to see this job executed.
+            </Typography.Text>
           </div>
           <Form form={form} layout="vertical" name="create-org" validateMessages={validateMessages}>
             <Form.Item name="templateId" label="Choose job type" rules={[{ required: true }]}>

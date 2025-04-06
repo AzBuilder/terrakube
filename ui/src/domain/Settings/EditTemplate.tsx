@@ -1,9 +1,10 @@
 import { Editor, type OnMount, type OnValidate } from "@monaco-editor/react";
-import { Button, Form, Input, Space } from "antd";
+import { Button, Form, Input, Space, theme } from "antd";
 import { Buffer } from "buffer";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
+import { getMonacoTheme, monacoOptions } from "../../config/monacoConfig";
 import { Template } from "../types";
 import "./Settings.css";
 
@@ -33,6 +34,8 @@ export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
   const editorRef = useRef<IStandaloneCodeEditor>(null);
   const [template, setTemplate] = useState<Template>();
   const [loading, setLoading] = useState(true);
+  const { token } = theme.useToken();
+
   function handleEditorDidMount(editor: IStandaloneCodeEditor) {
     editorRef.current = editor;
   }
@@ -114,6 +117,8 @@ export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
                   onValidate={handleEditorValidation}
                   defaultLanguage="yaml"
                   defaultValue={tcl}
+                  theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
+                  options={monacoOptions}
                 />
               </div>
             </Form.Item>

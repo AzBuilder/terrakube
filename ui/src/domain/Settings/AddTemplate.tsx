@@ -1,12 +1,14 @@
 import { Editor, type OnMount, type OnValidate } from "@monaco-editor/react";
-import { Button, Card, Form, Input, List, message, Space, Steps } from "antd";
+import { Button, Card, Form, Input, List, message, Space, Steps, Typography, theme } from "antd";
 import { Buffer } from "buffer";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
+import { getMonacoTheme, monacoOptions } from "../../config/monacoConfig";
 import { TemplateAttributes } from "../types";
 import "./Settings.css";
+import { InfoCircleOutlined } from "@ant-design/icons";
 const { Step } = Steps;
 const { Meta } = Card;
 const validateMessages = {
@@ -33,6 +35,7 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
   const [tcl, setTCL] = useState("");
   const [templates, setTemplates] = useState<TemplateAttributes[]>([]);
   const editorRef = useRef<IStandaloneCodeEditor>(null);
+  const { token } = theme.useToken();
 
   function handleEditorDidMount(editor: IStandaloneCodeEditor) {
     editorRef.current = editor;
@@ -88,7 +91,7 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
         name: "Terratag",
         description:
           "This template uses Terratag allowing for tags or labels to be applied across an entire set of Terraform files.",
-        tcl: "ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbiIKICBzdGVwOiAxMDAKICBjb21tYW5kczoKICAgIC0gcnVudGltZTogIkdST09WWSIKICAgICAgcHJpb3JpdHk6IDEwMAogICAgICBiZWZvcmU6IHRydWUKICAgICAgc2NyaXB0OiB8CiAgICAgICAgaW1wb3J0IFRlcnJhVGFnCiAgICAgICAgbmV3IFRlcnJhVGFnKCkubG9hZFRvb2woCiAgICAgICAgICAiJHdvcmtpbmdEaXJlY3RvcnkiLAogICAgICAgICAgIiRiYXNoVG9vbHNEaXJlY3RvcnkiLAogICAgICAgICAgIjAuMS4zMCIpCiAgICAgICAgIlRlcnJhdGFnIGRvd25sb2FkIGNvbXBsZXRlZCIKICAgIC0gcnVudGltZTogIkJBU0giCiAgICAgIHByaW9yaXR5OiAyMDAKICAgICAgYmVmb3JlOiB0cnVlCiAgICAgIHNjcmlwdDogfAogICAgICAgIGNkICR3b3JraW5nRGlyZWN0b3J5CiAgICAgICAgdGVycmF0YWcgLXRhZ3M9IntcImVudmlyb25tZW50X2lkXCI6IFwiZGV2ZWxvcG1lbnRcIn0iCi0gdHlwZTogInRlcnJhZm9ybUFwcGx5IgogIHN0ZXA6IDMwMA==",
+        tcl: "ZmxvdzoKLSB0eXBlOiAidGVycmFmb3JtUGxhbiIKICBzdGVwOiAxMDAKICBjb21tYW5kczoKICAgIC0gcnVudGltZTogIkdST09WWSIKICAgICAgcHJpb3JpdHk6IDEwMAogICAgICBiZWZvcmU6IHRydWUKICAgICAgc2NyaXB0OiB8CiAgICAgICAgaW1wb3J0IFRlcnJhVGFnCiAgICAgICAgbmV3IFRlcnJhVGFnKCkubG9hZFRvb2woCiAgICAgICAgICAiJHdvcmtpbmdEaXJlY3RvcnkiLAogICAgICAgICAgIiRiYXNoVG9vbHNEaXJlY3RvcnkiLAogICAgICAgICAgIjAuMS4zMCIpCiAgICAgICAgIlRlcnJhdGFnIGrvd25sb2FkIGNvbXBsZXRlZCIKICAgIC0gcnVudGltZTogIkJBU0giCiAgICAgIHByaW9yaXR5OiAyMDAKICAgICAgYmVmb3JlOiB0cnVlCiAgICAgIHNjcmlwdDogfAogICAgICAgIGNkICR3b3JraW5nRGlyZWN0b3J5CiAgICAgICAgdGVycmF0YWcgLXRhZ3M9IntcImVudmlyb25tZW50X2lkXCI6IFwiZGV2ZWxvcG1lbnRcIn0iCi0gdHlwZTogInRlcnJhZm9ybUFwcGx5IgogIHN0ZXA6IDMwMA==",
         image: "https://raw.githubusercontent.com/env0/terratag/master/ttlogo.png",
       },
       {
@@ -156,9 +159,11 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
   return (
     <div>
       <h1>Create a new Template</h1>
-      <div className="App-text">
-        Templates allow you to define a custom flow so you can run any tool before or after terraform
-        plan/apply/destroy.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Templates allow you to define a custom flow so you can run any tool before or after terraform
+          plan/apply/destroy.
+        </Typography.Text>
       </div>
       <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
         <Step title="Choose Type" />
@@ -182,7 +187,7 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
                       style={{
                         padding: "10px",
                         height: 120,
-                        backgroundColor: item.color,
+                        backgroundColor: token.colorBgContainer,
                       }}
                       alt="example"
                       src={item.image}
@@ -221,6 +226,8 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
               onValidate={handleEditorValidation}
               defaultLanguage="yaml"
               defaultValue={tcl}
+              theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
+              options={monacoOptions}
             />
           </div>
           <br />

@@ -39,11 +39,11 @@ export default function CreatePatModal({ onCancel, onCreated, visible }: Props) 
     tokenValue === undefined
       ? {
           okText: "Create",
-          okButtonProps: { loading, color: "purple", variant: "solid" },
+          okButtonProps: { loading, type: "primary" },
           onOk: () => submitForm(),
           onCancel: onCancel,
           cancelText: "Cancel",
-          cancelButtonProps: { color: "danger", variant: "text" },
+          cancelButtonProps: { type: "text", danger: true },
         }
       : {
           footer: null,
@@ -116,8 +116,8 @@ export default function CreatePatModal({ onCancel, onCreated, visible }: Props) 
           />
           <Flex justify="end">
             <Button
-              color="red"
-              variant="filled"
+              type="primary"
+              danger
               onClick={() => {
                 onCreated();
                 onCancel();

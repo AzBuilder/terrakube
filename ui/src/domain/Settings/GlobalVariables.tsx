@@ -1,5 +1,5 @@
-import { DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Popconfirm, Select, Space, Switch, Table, Tag } from "antd";
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Modal, Popconfirm, Select, Space, Switch, Table, Tag, Typography, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -176,21 +176,21 @@ export const GlobalVariablesSettings = () => {
   return (
     <div className="setting">
       <h1>Global Variables</h1>
-      <div className="App-text">
-        Global Variables allow you to define and apply variables one time across multiple workspaces within an
-        organization.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Global Variables allow you to define and apply variables one time across multiple workspaces within an
+          organization.
+        </Typography.Text>
       </div>
-      <Button type="primary" onClick={onNew} htmlType="button">
+      <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
         Create global variable
       </Button>
       <br></br>
 
       <h3 style={{ marginTop: "30px" }}>Global Variables</h3>
-      {loading ? (
-        <p>Data loading...</p>
-      ) : (
+      <Spin spinning={loading} tip="Loading Global Variables...">
         <Table dataSource={globalVariables} columns={VARIABLES_COLUMS(onEdit)} rowKey="key" />
-      )}
+      </Spin>
 
       <Modal
         width="600px"
