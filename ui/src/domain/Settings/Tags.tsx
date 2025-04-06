@@ -1,5 +1,5 @@
-import { DeleteOutlined, EditOutlined, InfoCircleOutlined, TagOutlined } from "@ant-design/icons";
-import { Avatar, Button, Form, Input, List, Modal, Popconfirm, Space } from "antd";
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined, PlusOutlined, TagOutlined } from "@ant-design/icons";
+import { Avatar, Button, Form, Input, List, Modal, Popconfirm, Space, Typography, theme, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -19,6 +19,8 @@ export const TagsSettings = () => {
   const [mode, setMode] = useState("create");
   const [tagId, setTagId] = useState<string>();
   const [form] = Form.useForm<AddTagForm>();
+  const { token } = theme.useToken();
+
   const onCancel = () => {
     setVisible(false);
   };
@@ -108,16 +110,18 @@ export const TagsSettings = () => {
   return (
     <div className="setting">
       <h1>Tag Management</h1>
-      <div className="App-text">Tags are used to help identify and group together workspaces..</div>
-      <Button type="primary" onClick={onNew} htmlType="button">
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Tags are used to help identify and group together workspaces..
+        </Typography.Text>
+      </div>
+      <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
         Create tag
       </Button>
       <br></br>
 
       <h3 style={{ marginTop: "30px" }}>Tags</h3>
-      {loading ? (
-        <p>Data loading...</p>
-      ) : (
+      <Spin spinning={loading} tip="Loading Tags...">
         <List
           itemLayout="horizontal"
           dataSource={tags}
@@ -158,13 +162,13 @@ export const TagsSettings = () => {
               ]}
             >
               <List.Item.Meta
-                avatar={<Avatar style={{ backgroundColor: "#1890ff" }} icon={<TagOutlined />}></Avatar>}
+                avatar={<Avatar style={{ backgroundColor: token.colorPrimary }} icon={<TagOutlined />}></Avatar>}
                 title={item.attributes.name}
               />
             </List.Item>
           )}
         />
-      )}
+      </Spin>
 
       <Modal
         width="600px"

@@ -1,8 +1,8 @@
 .user-settings-page {
-  padding: 0 50px;
-  .tabs {
-    min-height: 600px;
-    padding: 24px;
-    background: #fff;
-  }
+  padding: 24px;
+}
+
+.tabs {
+  padding: 24px;
+  min-height: 600px;
 }

@@ -1,16 +1,31 @@
 .moduleList {
   width: 100%;
-  margin-top: 30px;
 }
 
 .modulesWrapper {
-  margin: auto;
-  margin-top: 20px;
-  width: 80%;
+  width: 100%;
+}
+
+.moduleList .ant-list-item {
+  padding: 16px 0;
+}
+
+.moduleList .ant-card {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.moduleList .ant-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.moduleList .ant-card-body {
+  padding: 24px;
 }
 
 .moduleProvider {
-  color: rgb(82, 87, 97);
   font-size: 13px;
   margin-top: 5px;
 }
@@ -25,7 +40,7 @@
 }
 
 .moduleDetails {
-  color: rgb(82, 87, 97);
+  display: block;
   font-size: 13px;
   margin-top: 5px;
 }
@@ -46,29 +61,29 @@
 .moduleCode {
   border-width: 1px;
   border-style: solid;
-  border-color: rgb(186, 193, 204);
+  border-color: var(--border-color);
   border-image: initial;
-  color: rgb(82, 87, 97);
+  color: inherit;
   font-family: SFMono-Regular, consolas, "Liberation Mono", menlo, courier, monospace;
   font-size: 12px;
   overflow-x: auto;
   width: 100%;
   padding: 5px;
-  background-color: rgb(247, 248, 250);
+  background-color: var(--code-bg);
 }
 
 .moduleCredentials {
   border-width: 1px;
   border-style: solid;
-  border-color: rgb(186, 193, 204);
+  border-color: var(--border-color);
   border-image: initial;
-  color: rgb(82, 87, 97);
+  color: inherit;
   font-family: SFMono-Regular, consolas, "Liberation Mono", menlo, courier, monospace;
   font-size: 12px;
   overflow-x: auto;
   width: 100%;
   padding: 5px;
-  background-color: rgb(247, 248, 250);
+  background-color: var(--code-bg);
   margin-top: 10px;
 }
 
@@ -84,4 +99,121 @@
 
 .markdown-body {
   font-size: small;
+  color: inherit;
+  background-color: inherit;
+}
+
+/* Style all text elements to inherit theme colors */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6,
+.markdown-body p,
+.markdown-body li,
+.markdown-body table,
+.markdown-body blockquote {
+  color: inherit;
+  background-color: inherit;
+}
+
+/* Markdown tables */
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  color: inherit;
+  background-color: inherit;
+}
+
+.markdown-body table tr {
+  background-color: inherit;
+  border-top: 1px solid var(--border-color);
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: var(--table-row-bg);
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 6px 13px;
+  border: 1px solid var(--border-color);
+  background-color: inherit;
+}
+
+.markdown-body table th {
+  background-color: var(--table-header-bg);
+  font-weight: 600;
+}
+
+/* Code blocks */
+.markdown-body pre {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  color: inherit;
+}
+
+.markdown-body code {
+  background-color: var(--code-bg);
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  color: inherit;
+}
+
+/* Ensure code blocks inside pre tags inherit color */
+.markdown-body pre code {
+  color: inherit;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  border-radius: 0;
+  border: none;
+}
+
+/* Links */
+.markdown-body a {
+  color: var(--ant-primary-color);
+}
+
+.markdown-body a:hover {
+  color: var(--ant-primary-color-hover);
+}
+
+/* Blockquotes */
+.markdown-body blockquote {
+  color: inherit;
+  opacity: 0.8;
+  padding-left: 1em;
+  border-left: 0.25em solid var(--border-color);
+  margin: 1em 0;
+}
+
+/* Lists */
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+}
+
+.markdown-body li + li {
+  margin-top: 0.25em;
+}
+
+/* Horizontal rule */
+.markdown-body hr {
+  height: 1px;
+  border: none;
+  background-color: var(--border-color);
+  margin: 24px 0;
+}
+
+.site-layout-content {
+  padding: 0 24px;
 }

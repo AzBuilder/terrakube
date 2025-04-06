@@ -16,6 +16,7 @@ import {
   Tag,
   Tooltip,
   Typography,
+  theme,
 } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import { DateTime } from "luxon";
@@ -68,6 +69,8 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
   const [creating, setCreating] = useState(false);
   const [token, setToken] = useState("");
   const [createTokenDisabled, setCreateTokenDisabled] = useState(true);
+  const { token: themeToken } = theme.useToken();
+
   useEffect(() => {
     if (mode === "edit" && teamId) {
       setLoading(true);
@@ -371,7 +374,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         <>
           <h2 style={{ marginTop: "30px" }}>Team API Tokens</h2>
           <div className="App-text">
-            You can use team API tokens to perform API actions. The token’s access level matches the team’s access
+            You can use team API tokens to perform API actions. The token's access level matches the team's access
             level. For example, if a team can execute jobs on workspaces, the token can also create jobs on workspaces
             through the API.
           </div>
@@ -433,7 +436,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
                         </Row>
                         <br />
                         <Row>
-                          <Col span={20} style={{ color: "rgb(82, 87, 97)" }}>
+                          <Col span={20} style={{ color: themeToken.colorTextSecondary }}>
                             <ClockCircleOutlined /> Created <b>{DateTime.fromISO(item.createdDate).toRelative()}</b> by
                             user <b>{item.createdBy}</b>
                           </Col>
@@ -532,7 +535,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
                 access your account without a username, password, or two-factor authentication.
               </p>
               <p>
-                <Paragraph style={{ backgroundColor: "#ebeef2" }} copyable>
+                <Paragraph style={{ backgroundColor: themeToken.colorBgContainer }} copyable>
                   {token}
                 </Paragraph>
               </p>

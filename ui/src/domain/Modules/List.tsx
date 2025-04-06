@@ -1,5 +1,5 @@
 import { ClockCircleOutlined, CloudOutlined, CloudUploadOutlined, DownloadOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Card, Input, Layout, List, Space, Tag } from "antd";
+import { Breadcrumb, Button, Card, Input, Layout, List, Space, Tag, Typography, theme, Row, Col } from "antd";
 import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
@@ -13,6 +13,8 @@ import axiosInstance from "../../config/axiosConfig";
 import { FlatModule, ModuleModel } from "../types";
 import { compareVersions } from "../Workspaces/Workspaces";
 import "./Module.css";
+import PageWrapper from "@/modules/layout/PageWrapper/PageWrapper";
+
 const { Content } = Layout;
 const include = { MODULE: "module" };
 const { Search } = Input;
@@ -31,6 +33,11 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
   const [modules, setModules] = useState<FlatModule[]>([]);
   const [filteredModules, setFilteredModules] = useState<FlatModule[]>([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   const onSearch = (value: string) => {
     applyFilters(value);
@@ -42,7 +49,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
       setFilteredModules(filteredModules);
       return;
     }
-
     setFilteredModules(modules);
   };
 
@@ -59,10 +65,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
       setOrganizationName(response.data.data.attributes.name);
     });
   }, [orgid]);
-  const navigate = useNavigate();
-  const handleClick = (id: string) => {
-    navigate("/organizations/" + orgid + "/registry/" + id);
-  };
 
   const renderLogo = (provider: string) => {
     switch (provider) {
@@ -88,79 +90,89 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
   };
 
   return (
-    <Content style={{ padding: "0 50px" }}>
-      <Breadcrumb
-        style={{ margin: "16px 0" }}
-        items={[
-          {
-            title: organizationName,
-          },
-          {
-            title: <Link to={`/organizations/${orgid}/registry`}>Modules</Link>,
-          },
-        ]}
-      />
-
+    <PageWrapper
+      title="Modules"
+      subTitle={`Modules in the ${organizationName} organization`}
+      loadingText="Loading modules..."
+      loading={loading}
+      breadcrumbs={[
+        { label: organizationName, path: "/" },
+        { label: "Modules", path: `/organizations/${orgid}/registry` },
+      ]}
+      fluid
+      actions={
+        <Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} onClick={handlePublish}>
+          Publish module
+        </Button>
+      }
+    >
       <div className="site-layout-content">
-        <div className="modulesWrapper">
-          <div className="variableActions">
-            <h2>Modules</h2>
-            <Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} onClick={handlePublish}>
-              Publish module
-            </Button>
-          </div>
-          <Search
-            placeholder="Filter modules"
-            onSearch={onSearch}
-            allowClear
-            style={{ width: "100%", marginTop: "10px" }}
-          />
-          <List
-            split
-            loading={{ spinning: loading, tip: "Loading Modules..." }}
-            className="moduleList"
-            dataSource={filteredModules}
-            pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
-            renderItem={(item) => (
-              <List.Item>
-                <Card onClick={() => handleClick(item.id)} style={{ width: "100%" }} hoverable>
-                  <Space style={{ color: "rgb(82, 87, 97)" }} direction="vertical">
-                    <h3>{item.name}</h3>
-                    {item.description}
+        <Search
+          placeholder="Filter modules"
+          onSearch={onSearch}
+          allowClear
+          style={{ marginBottom: "16px" }}
+        />
+        <List
+          split={false}
+          dataSource={filteredModules}
+          pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
+          renderItem={(item) => (
+            <List.Item>
+              <Link to={`/organizations/${orgid}/registry/${item.id}`} style={{ width: "100%" }}>
+                <Card hoverable>
+                  <Space style={{ width: "100%" }} direction="vertical">
+                    <Row>
+                      <Col span={24}>
+                        <Typography.Title level={3}>{item.name}</Typography.Title>
+                        <Typography.Text type="secondary">
+                          {item.description || "No description provided for this module"}
+                        </Typography.Text>
+                      </Col>
+                    </Row>
                     <Space size={40} style={{ marginTop: "25px" }}>
                       <Tag color="blue">
-                        <span>
+                        <Space size={4}>
                           <MdBusiness /> Private
-                        </span>
+                        </Space>
                       </Tag>
-                      <span>
-                        {renderLogo(item.provider)}&nbsp;&nbsp;{item.provider}
-                      </span>
-                      <span>
+                      <Space>
+                        {renderLogo(item.provider)}
+                        <Typography.Text>
+                          {item.provider}
+                        </Typography.Text>
+                      </Space>
+                      <Space>
                         <IconContext.Provider value={{ size: "1.3em" }}>
                           <RiFolderHistoryLine />
                         </IconContext.Provider>
-                        &nbsp;&nbsp;
-                        {item.versions.sort(compareVersions).reverse()[0]}
-                      </span>
-                      <span>
+                        <Typography.Text>
+                          {item.versions.length > 0 
+                            ? item.versions.sort(compareVersions).reverse()[0] 
+                            : "No versions"}
+                        </Typography.Text>
+                      </Space>
+                      <Space>
                         <ClockCircleOutlined />
-                        &nbsp;&nbsp;
-                        {DateTime.fromISO(item.createdDate).toRelative()}
-                      </span>
-                      <span>
+                        <Typography.Text>
+                          {item.createdDate ? DateTime.fromISO(item.createdDate).toRelative() : "Unknown"}
+                        </Typography.Text>
+                      </Space>
+                      <Space>
                         <DownloadOutlined />
-                        &nbsp;&nbsp; {item.downloadQuantity}
-                      </span>
+                        <Typography.Text>
+                          {item.downloadQuantity}
+                        </Typography.Text>
+                      </Space>
                     </Space>
                   </Space>
                 </Card>
-              </List.Item>
-            )}
-          />
-        </div>
+              </Link>
+            </List.Item>
+          )}
+        />
       </div>
-    </Content>
+    </PageWrapper>
   );
 };
 

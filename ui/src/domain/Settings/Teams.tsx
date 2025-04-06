@@ -1,5 +1,5 @@
-import { DeleteOutlined, EditOutlined, TeamOutlined } from "@ant-design/icons";
-import { Avatar, Button, Divider, List, Popconfirm, Space } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
+import { Avatar, Button, Divider, List, Popconfirm, Space, Typography, theme, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -17,6 +17,7 @@ export const TeamSettings = ({ key }: Props) => {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"list" | "edit" | "create">("list");
   const [teamId, setTeamId] = useState<string>();
+  const { token } = theme.useToken();
 
   const onEdit = (id: string) => {
     setMode("edit");
@@ -49,19 +50,19 @@ export const TeamSettings = ({ key }: Props) => {
       {(mode !== "list" && <EditTeam mode={mode} setMode={setMode} teamId={teamId} loadTeams={loadTeams} />) || (
         <>
           <h1>Team Management</h1>
-          <div className="App-text">
-            Teams let you group users into specific categories to enable finer grained access control policies. For
-            example, your developers could be on a dev team that only has access to run jobs.
+          <div>
+            <Typography.Text type="secondary" className="App-text">
+              Teams let you group users into specific categories to enable finer grained access control policies. For
+              example, your developers could be on a dev team that only has access to run jobs.
+            </Typography.Text>
           </div>
-          <Button type="primary" onClick={onNew} htmlType="button">
+          <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
             Create team
           </Button>
           <br></br>
 
           <h3 style={{ marginTop: "30px" }}>Teams</h3>
-          {loading || teams.length === 0 ? (
-            <p>Data loading...</p>
-          ) : (
+          <Spin spinning={loading} tip="Loading Teams...">
             <List
               itemLayout="horizontal"
               dataSource={teams}
@@ -100,7 +101,7 @@ export const TeamSettings = ({ key }: Props) => {
                   ]}
                 >
                   <List.Item.Meta
-                    avatar={<Avatar style={{ backgroundColor: "#1890ff" }} icon={<TeamOutlined />}></Avatar>}
+                    avatar={<Avatar style={{ backgroundColor: token.colorPrimary }} icon={<TeamOutlined />}></Avatar>}
                     title={item.attributes.name}
                     description={
                       <div>
@@ -121,7 +122,7 @@ export const TeamSettings = ({ key }: Props) => {
                 </List.Item>
               )}
             />
-          )}
+          </Spin>
         </>
       )}
     </div>

@@ -41,7 +41,7 @@ export const Tokens = () => {
             all the actions your user account is entitled to. For more information, see the Terrakube documentation.
           </Typography.Text>
         </Flex>
-        <Button color="purple" variant="solid" onClick={() => setVisible(true)}>
+        <Button type="primary" onClick={() => setVisible(true)}>
           New token
         </Button>
       </Flex>
@@ -61,14 +61,10 @@ export const Tokens = () => {
         <Flex justify="center">
           <Empty
             className="no-content"
-            styles={{
-              description: {
-                textAlign: "center",
-              },
-            }}
+            style={{ textAlign: "center" }}
             description="You have not created any Personal Access Tokens. Create one now to start integrating with the Terrakube API"
           >
-            <Button color="purple" variant="filled" onClick={() => setVisible(true)}>
+            <Button type="primary" onClick={() => setVisible(true)}>
               Create a new token
             </Button>
           </Empty>

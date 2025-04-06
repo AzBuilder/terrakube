@@ -1,6 +1,6 @@
 import { InfoCircleOutlined, RollbackOutlined, UserOutlined } from "@ant-design/icons";
 import Editor, { OnMount } from "@monaco-editor/react";
-import { Avatar, Button, Card, Col, List, Popconfirm, Row, Space, Tooltip, message } from "antd";
+import { Avatar, Button, Card, Col, List, Popconfirm, Row, Space, Tooltip, message, theme } from "antd";
 import { useCallback, useMemo, useRef, useState } from "react";
 import ReactFlow, {
   Background,
@@ -15,6 +15,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import axiosInstance, { axiosClient } from "../../config/axiosConfig";
+import { getMonacoTheme, monacoOptions } from "../../config/monacoConfig";
 import { ErrorResource, FlatJobHistory, Resource, StateOutput, StateOutputResource, Workspace } from "../types";
 import { ResourceDrawer } from "../Workspaces/ResourceDrawer";
 import { DownloadState } from "./DownloadState";
@@ -51,6 +52,7 @@ export const States = ({
   const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((es) => applyEdgeChanges(changes, es)), []);
   const editorRef = useRef<IStandaloneCodeEditor>(null);
   const jsonEditorRef = useRef<IStandaloneCodeEditor>(null);
+  const { token } = theme.useToken();
   const handleClick = (state: FlatJobHistory) => {
     changeState(state);
   };
@@ -392,19 +394,21 @@ export const States = ({
                   <Editor
                     key="raw"
                     height="60vh"
-                    options={{ readOnly: "true" }}
+                    options={{ ...monacoOptions, readOnly: true }}
                     onMount={handleEditorDidMount}
                     defaultLanguage="json"
                     defaultValue={manageState ? rawStateContent : "No access to raw state"}
+                    theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
                   />
                 ) : (
                   <Editor
                     key="json"
                     height="60vh"
-                    options={{ readOnly: "true" }}
+                    options={{ ...monacoOptions, readOnly: true }}
                     onMount={handleJSONEditorDidMount}
                     defaultLanguage="json"
                     defaultValue={manageState ? stateContent : "No access to state"}
+                    theme={getMonacoTheme(token.colorBgContainer === '#141414' ? 'dark' : 'light')}
                   />
                 )}
               </Card>

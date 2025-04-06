@@ -41,8 +41,8 @@
 }
 
 .App-text {
-  color: rgb(82, 87, 97);
   margin-bottom: 35px;
+  display: block;
 }
 
 .popup-text {
@@ -51,6 +51,5 @@
 }
 
 .paragraph {
-  color: rgb(82, 87, 97);
   margin: 0;
 }
