@@ -91,25 +91,35 @@ const getRequiredAntdIcons = (componentString: string) => {
 
 // Function to dynamically import antd components
 const importAntdComponents = async (components: string[]) => {
-  const imports = await Promise.all(
-    components.map((component: string) => import(/* @vite-ignore */ `antd/es/${component.toLowerCase()}/index.js`))
-  );
-  const importedComponents: Record<string, any> = {};
-  components.forEach((component: string, index: number) => {
-    importedComponents[component] = imports[index].default;
-  });
-  return importedComponents;
+  // Import the entire antd library instead of individual components
+  try {
+    const antd = await import("antd");
+
+    const importedComponents: Record<string, any> = {};
+    components.forEach((component: string) => {
+      // Access the component directly from the antd object
+      importedComponents[component] = antd[component as keyof typeof antd];
+    });
+    return importedComponents;
+  } catch (error) {
+    console.error(`Error importing antd components:`, error);
+    return {};
+  }
 };
 
 // Function to dynamically import antd icons
 const importAntdIcons = async (icons: any) => {
-  const imports = await Promise.all(
-    icons.map((icon: string) => import(/* @vite-ignore */ `@ant-design/icons/es/icons/${icon}`))
-  );
+  // Use the already imported Icons from '@ant-design/icons'
   const importedIcons: Record<string, any> = {};
-  icons.forEach((icon: string, index: number) => {
-    importedIcons[icon] = imports[index].default;
+
+  icons.forEach((icon: string) => {
+    if (Icons[icon as keyof typeof Icons]) {
+      importedIcons[icon] = Icons[icon as keyof typeof Icons];
+    } else {
+      console.error(`Icon ${icon} not found in @ant-design/icons`);
+    }
   });
+
   return importedIcons;
 };
 
@@ -134,12 +144,25 @@ const getRequiredReactIcons = (componentString: string) => {
 
 // Function to dynamically import react-icons components
 const importReactIcons = async (icons: string[]) => {
-  const imports: any = await Promise.all(icons.map(() => import(`react-icons/si`)));
-  const importedIcons: Record<any, any> = {};
-  icons.forEach((icon: any, index: any) => {
-    importedIcons[icon] = imports[index][icon];
-  });
-  return importedIcons;
+  if (icons.length === 0) return {};
+
+  try {
+    const siModule = await import("react-icons/si");
+    const importedIcons: Record<string, any> = {};
+
+    icons.forEach((icon: string) => {
+      if (siModule[icon]) {
+        importedIcons[icon] = siModule[icon];
+      } else {
+        console.error(`Icon ${icon} not found in react-icons/si`);
+      }
+    });
+
+    return importedIcons;
+  } catch (error) {
+    console.error("Error importing react-icons:", error);
+    return {};
+  }
 };
 
 type Props = {
@@ -175,6 +198,7 @@ class ErrorBoundary extends Component<Props, State> {
 
 const ActionLoader = ({ action, context }: { action: any; context: any }) => {
   const [Component, setComponent] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadComponent = async () => {
@@ -182,9 +206,16 @@ const ActionLoader = ({ action, context }: { action: any; context: any }) => {
         const componentString = decodeURIComponent(escape(window.atob(action)));
         console.debug("Decoded Component String:", componentString);
 
+        // Import entire antd library upfront
+        const antd = await import("antd");
+
         const requiredAntdComponents = getRequiredAntdComponents(componentString);
         const requiredAntdIcons = getRequiredAntdIcons(componentString);
         const requiredReactIcons = getRequiredReactIcons(componentString);
+
+        console.debug("Required Antd Components:", requiredAntdComponents);
+        console.debug("Required Antd Icons:", requiredAntdIcons);
+        console.debug("Required React Icons:", requiredReactIcons);
 
         const [importedComponents, importedIcons, importedReactIcons] = await Promise.all([
           importAntdComponents(requiredAntdComponents),
@@ -204,32 +235,8 @@ const ActionLoader = ({ action, context }: { action: any; context: any }) => {
           transpiledCode = transpiledCode!.slice(0, lastSemicolonIndex);
         }
 
-        // Create the component function
-        const createComponent = new Function(
-          "React",
-          "useEffect",
-          "useState",
-          "Panel",
-          "Paragraph",
-          "Text",
-          "XYPlot",
-          "LineSeries",
-          "XAxis",
-          "YAxis",
-          "Hint",
-          "Crosshair",
-          "HorizontalGridLines",
-          "VerticalGridLines",
-          "axiosInstance",
-          "RangePicker",
-          "DateTime",
-          "ReactMarkdown",
-          ...requiredAntdComponents,
-          ...requiredAntdIcons,
-          ...requiredReactIcons,
-          `return (${transpiledCode})`
-        );
-        const component = createComponent(
+        // Create a context with all required components from antd
+        const scopeContext: Record<string, any> = {
           React,
           useEffect,
           useState,
@@ -248,21 +255,48 @@ const ActionLoader = ({ action, context }: { action: any; context: any }) => {
           RangePicker,
           DateTime,
           ReactMarkdown,
-          ...requiredAntdComponents.map((component) => importedComponents[component]),
-          ...requiredAntdIcons.map((icon) => importedIcons[icon]),
-          ...requiredReactIcons.map((icon) => importedReactIcons[icon])
-        );
+          // Add all of antd components to the context
+          ...antd,
+        };
+
+        // Add the imported icons
+        for (const icon of requiredAntdIcons) {
+          if (importedIcons[icon]) {
+            scopeContext[icon] = importedIcons[icon];
+          }
+        }
+
+        // Add the imported react-icons
+        for (const icon of requiredReactIcons) {
+          if (importedReactIcons[icon]) {
+            scopeContext[icon] = importedReactIcons[icon];
+          }
+        }
+
+        // Create the component function with the entire context
+        const functionParams = Object.keys(scopeContext);
+        const functionArgs = functionParams.map((key) => scopeContext[key]);
+
+        const createComponent = new Function(...functionParams, `return (${transpiledCode})`);
+
+        const component = createComponent(...functionArgs);
         console.debug("Component Function:", component);
 
         setComponent(() => component);
+        setError(null);
       } catch (error) {
         console.error("Error creating component:", error);
+        setError(`Error: ${error instanceof Error ? error.message : String(error)}`);
         setComponent(() => () => <div>Error loading component</div>);
       }
     };
 
     loadComponent();
   }, [action]);
+
+  if (error) {
+    return <div className="error-message">Error loading component: {error}</div>;
+  }
 
   if (!Component) {
     return <div>Loading...</div>;
