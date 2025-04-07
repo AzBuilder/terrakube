@@ -1,0 +1,33 @@
+.theme-section {
+  padding: 20px 0;
+}
+
+.theme-card {
+  margin-top: 24px;
+}
+
+.color-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.color-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Style for the selected item in the dropdown */
+.ant-select-selection-item .color-option {
+  padding: 0;
+}
+
+/* Style for the dropdown items */
+.ant-select-item-option-content .color-option {
+  padding: 0;
+}

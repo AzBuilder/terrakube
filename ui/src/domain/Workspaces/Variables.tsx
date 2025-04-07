@@ -1,5 +1,5 @@
-import { DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Popconfirm, Space, Switch, Table, Tag, Tooltip } from "antd";
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Modal, Popconfirm, Space, Switch, Table, Tag, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
@@ -281,21 +281,25 @@ export const Variables = ({
   return (
     <div>
       <h1>Variables</h1>
-      <div className="App-text">
-        <p>
-          These variables are used for all plans and applies in this workspace.Workspaces using Terraform 0.10.0 or
-          later can also load default values from any *.auto.tfvars files in the configuration.
-        </p>
-        <p>
-          Sensitive variables are hidden from view in the UI and API, and can't be edited. (To change a sensitive
-          variable, delete and replace it.) Sensitive variables can still appear in Terraform logs if your configuration
-          is designed to output them.
-        </p>{" "}
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          <p>
+            These variables are used for all plans and applies in this workspace.Workspaces using Terraform 0.10.0 or
+            later can also load default values from any *.auto.tfvars files in the configuration.
+          </p>
+          <p>
+            Sensitive variables are hidden from view in the UI and API, and can't be edited. (To change a sensitive
+            variable, delete and replace it.) Sensitive variables can still appear in Terraform logs if your
+            configuration is designed to output them.
+          </p>
+        </Typography.Text>
       </div>
       <h2>Terraform Variables</h2>
-      <div className="App-text">
-        These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string value
-        for a variable, click its HCL checkbox.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          These Terraform variables are set using a terraform.tfvars file. To use interpolation or set a non-string
+          value for a variable, click its HCL checkbox.
+        </Typography.Text>
       </div>
       <Table
         dataSource={vars}
@@ -312,38 +316,46 @@ export const Variables = ({
           setVisible(true);
         }}
         disabled={!manageWorkspace}
+        icon={<PlusOutlined />}
       >
         Add variable
       </Button>
       <div className="envVariables">
         <h2>Environment Variables</h2>
-        <div className="App-text">These variables are set in Terraform's shell environment using export.</div>
-        <Table
-          dataSource={env}
-          columns={VARIABLES_COLUMS(organizationId!, workspaceId!, onEdit, manageWorkspace)}
-          rowKey="key"
-        />
-        <Button
-          type="primary"
-          htmlType="button"
-          onClick={() => {
-            setCategory("ENV");
-            setMode("create");
-            form.resetFields();
-            setVisible(true);
-          }}
-          disabled={!manageWorkspace}
-        >
-          Add variable
-        </Button>
+        <div>
+          <Typography.Text type="secondary" className="App-text">
+            These variables are set in Terraform's shell environment using export.
+          </Typography.Text>
+        </div>
       </div>
+      <Table
+        dataSource={env}
+        columns={VARIABLES_COLUMS(organizationId!, workspaceId!, onEdit, manageWorkspace)}
+        rowKey="key"
+      />
+      <Button
+        type="primary"
+        htmlType="button"
+        onClick={() => {
+          setCategory("ENV");
+          setMode("create");
+          form.resetFields();
+          setVisible(true);
+        }}
+        disabled={!manageWorkspace}
+        icon={<PlusOutlined />}
+      >
+        Add variable
+      </Button>
       <div className="envVariables">
         <h2>Collection Values</h2>
-        <div className="App-text">
-          <p>
-            The following values are taken from the collection used by this workspaces, this values are injected inside
-            the Terrakube remote jobs.
-          </p>
+        <div>
+          <Typography.Text type="secondary" className="App-text">
+            <p>
+              The following values are taken from the collection used by this workspaces, this values are injected
+              inside the Terrakube remote jobs.
+            </p>
+          </Typography.Text>
         </div>
       </div>
 
@@ -359,11 +371,13 @@ export const Variables = ({
 
       <div className="envVariables">
         <h2>Global Variables Values</h2>
-        <div className="App-text">
-          <p>
-            The following values are taken from the organization global variables, this values are injected inside the
-            Terrakube remote jobs.
-          </p>
+        <div>
+          <Typography.Text type="secondary" className="App-text">
+            <p>
+              The following values are taken from the organization global variables, this values are injected inside the
+              Terrakube remote jobs.
+            </p>
+          </Typography.Text>
         </div>
       </div>
 

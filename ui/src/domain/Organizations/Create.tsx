@@ -1,4 +1,4 @@
-import { Breadcrumb, Button, Form, Input, Layout, message } from "antd";
+import { Breadcrumb, Button, Form, Input, Layout, message, theme, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
@@ -20,6 +20,9 @@ type Props = {
 
 export const CreateOrganization = ({ setOrganizationName }: Props) => {
   const navigate = useNavigate();
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   const onFinish = (values: CreateOrganizationForm) => {
     const body = {
@@ -78,11 +81,13 @@ export const CreateOrganization = ({ setOrganizationName }: Props) => {
           },
         ]}
       />
-      <div className="site-layout-content">
+      <div className="site-layout-content" style={{ background: colorBgContainer }}>
         <div className="createOrganization">
           <h1>Create a new organization</h1>
-          <div className="App-text">
-            Organizations are privately shared spaces for teams to collaborate on infrastructure.
+          <div>
+            <Typography.Text type="secondary" className="App-text">
+              Organizations are privately shared spaces for teams to collaborate on infrastructure.
+            </Typography.Text>
           </div>
           <Form layout="vertical" name="create-org" onFinish={onFinish} validateMessages={validateMessages}>
             <Form.Item

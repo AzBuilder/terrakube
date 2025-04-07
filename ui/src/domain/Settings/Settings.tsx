@@ -1,4 +1,4 @@
-import { Breadcrumb, Layout, Tabs, Tag } from "antd";
+import { Breadcrumb, Layout, Tabs, Tag, theme } from "antd";
 import { useState } from "react";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
 import { ActionSettings } from "./Actions";
@@ -10,6 +10,7 @@ import { TagsSettings } from "./Tags";
 import { TeamSettings } from "./Teams";
 import { TemplatesSettings } from "./Templates";
 import { VCSSettings } from "./VCS";
+import { useNavigate, useParams } from "react-router-dom";
 const { Content } = Layout;
 
 type Props = {
@@ -18,12 +19,17 @@ type Props = {
 };
 
 export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
+  const { orgid } = useParams();
+  const navigate = useNavigate();
   const [key, setKey] = useState("");
+  const { token } = theme.useToken();
+
   function callback(key: string) {
     setKey(key);
   }
+
   return (
-    <Content style={{ padding: "0 50px" }}>
+    <Content style={{ padding: "0 50px", background: token.colorBgContainer }}>
       <Breadcrumb
         style={{ margin: "16px 0" }}
         items={[
@@ -36,7 +42,7 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
         ]}
       />
 
-      <div className="site-layout-content">
+      <div className="site-layout-content" style={{ background: token.colorBgContainer }}>
         <Tabs
           tabPosition="left"
           defaultActiveKey={selectedTab}
@@ -80,7 +86,7 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
             {
               label: (
                 <>
-                  Actions <Tag color="blue">beta</Tag>
+                  Actions <Tag color={token.colorPrimary}>beta</Tag>
                 </>
               ),
               key: "8",

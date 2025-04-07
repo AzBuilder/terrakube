@@ -7,10 +7,11 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import { Editor, type OnMount } from "@monaco-editor/react";
-import { Button, Form, Input, Popconfirm, Select, Space, Switch, Table, Tooltip } from "antd";
+import { Button, Form, Input, Popconfirm, Select, Space, Switch, Table, Tooltip, Typography, theme } from "antd";
 import { Buffer } from "buffer";
 import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../../config/axiosConfig";
+import { getMonacoTheme, monacoOptions } from "../../config/monacoConfig";
 import { Action } from "../types";
 import "./Settings.css";
 
@@ -49,6 +50,7 @@ export const ActionSettings = () => {
   const [actionId, setActionId] = useState<string>();
   const [form] = Form.useForm();
   const editorRef = useRef<IStandaloneCodeEditor>(null);
+  const { token } = theme.useToken();
 
   const ACTIONS_COLUMNS = (onEdit: (id: string) => void) => [
     {
@@ -211,9 +213,11 @@ export const ActionSettings = () => {
   return (
     <div className="setting">
       <h1>Actions</h1>
-      <div className="App-text">
-        Actions are used to extend the Terrakube UI. For example, you can add a new button to restart a VM directly from
-        Terrakube.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Actions are used to extend the Terrakube UI. For example, you can add a new button to restart a VM directly
+          from Terrakube.
+        </Typography.Text>
       </div>
       {!isEditing ? (
         <>
@@ -417,7 +421,13 @@ export const ActionSettings = () => {
               }}
             >
               <div className="editor">
-                <Editor height="40vh" onMount={handleEditorDidMount} defaultLanguage="javascript" />
+                <Editor
+                  height="40vh"
+                  onMount={handleEditorDidMount}
+                  defaultLanguage="javascript"
+                  theme={getMonacoTheme(token.colorBgContainer === "#141414" ? "dark" : "light")}
+                  options={monacoOptions}
+                />
               </div>
             </Form.Item>
             <Form.Item name="active" valuePropName="checked" label="Active">

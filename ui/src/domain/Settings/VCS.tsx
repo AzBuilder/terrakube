@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, GithubOutlined, GitlabOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, GithubOutlined, GitlabOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Divider, List, Popconfirm, Row, Typography, message } from "antd";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
@@ -121,7 +121,7 @@ export const VCSSettings = ({ vcsMode }: Props) => {
           {" "}
           <h1 style={{ paddingBottom: "10px" }}>
             VCS Providers
-            <Button type="primary" onClick={onAddVCS} className="addVCS" htmlType="button">
+            <Button type="primary" onClick={onAddVCS} className="addVCS" htmlType="button" icon={<PlusOutlined />}>
               Add a VCS Provider
             </Button>{" "}
           </h1>
@@ -177,7 +177,9 @@ export const VCSSettings = ({ vcsMode }: Props) => {
                   >
                     <div className="paragraph">
                       <Row>
-                        <Col span={6}>Callback URL</Col>
+                        <Col span={6}>
+                          <Typography.Text type="secondary">Callback URL</Typography.Text>
+                        </Col>
                         <Col span={18}>
                           <Paragraph copyable> {getCallBackUrl(item.attributes?.callback ?? item.id)} </Paragraph>
                         </Col>
@@ -186,15 +188,23 @@ export const VCSSettings = ({ vcsMode }: Props) => {
                     <Divider />
                     <div className="paragraph">
                       <Row>
-                        <Col span={6}>API URL</Col>
-                        <Col span={18}>{item.attributes?.apiUrl}</Col>
+                        <Col span={6}>
+                          <Typography.Text type="secondary">API URL</Typography.Text>
+                        </Col>
+                        <Col span={18}>
+                          <Typography.Text type="secondary">{item.attributes?.apiUrl}</Typography.Text>
+                        </Col>
                       </Row>
                     </div>
                     <Divider />
                     <div className="paragraph">
                       <Row>
-                        <Col span={6}>Created</Col>
-                        <Col span={18}>{item.attributes.createdDate}</Col>
+                        <Col span={6}>
+                          <Typography.Text type="secondary">Created</Typography.Text>
+                        </Col>
+                        <Col span={18}>
+                          <Typography.Text type="secondary">{item.attributes.createdDate}</Typography.Text>
+                        </Col>
                       </Row>
                     </div>
                     <Divider />
@@ -202,28 +212,30 @@ export const VCSSettings = ({ vcsMode }: Props) => {
                       <Row>
                         <Col span={6}>
                           {item.attributes.status !== "COMPLETED" ? (
-                            <span>Connect to {renderVCSType(item.attributes.vcsType)}</span>
+                            <Typography.Text type="secondary">
+                              Connect to {renderVCSType(item.attributes.vcsType)}
+                            </Typography.Text>
                           ) : (
-                            <span>Connection</span>
+                            <Typography.Text type="secondary">Connection</Typography.Text>
                           )}
                         </Col>
                         <Col span={12}>
                           {item.attributes.status !== "COMPLETED" ? (
-                            <span>
+                            <Typography.Text type="secondary">
                               Connecting to {renderVCSType(item.attributes.vcsType)} will take your{" "}
                               {renderVCSType(item.attributes.vcsType)} user through the OAuth flow to create an
                               authorization token for access to all repositories for this organization. This means that
                               your currently logged in {renderVCSType(item.attributes.vcsType)} user token will be used
                               for all {renderVCSType(item.attributes.vcsType)} API interactions by any Terrakube user
                               anywhere within the scope of <b>{sessionStorage.getItem(ORGANIZATION_NAME)}</b>.
-                            </span>
+                            </Typography.Text>
                           ) : (
-                            <span>
+                            <Typography.Text type="secondary">
                               A connection was made on {item.attributes.createdDate} by authenticating via OAuth as{" "}
                               {renderVCSType(item.attributes.vcsType)} user <b>{item.attributes.createdBy}</b>, which
                               assigned an OAuth token for use by all Terrakube users in the{" "}
                               <b>{sessionStorage.getItem(ORGANIZATION_NAME)}</b> organization.
-                            </span>
+                            </Typography.Text>
                           )}
                         </Col>
                         <Col span={6}>

@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, List, Popconfirm } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -56,7 +56,7 @@ export const TemplatesSettings = ({ key }: Props) => {
             {" "}
             <h1 style={{ paddingBottom: "10px" }}>
               Templates
-              <Button type="primary" onClick={onAddVCS} className="addVCS" htmlType="button">
+              <Button type="primary" onClick={onAddVCS} className="addVCS" htmlType="button" icon={<PlusOutlined />}>
                 Add a Template
               </Button>{" "}
             </h1>

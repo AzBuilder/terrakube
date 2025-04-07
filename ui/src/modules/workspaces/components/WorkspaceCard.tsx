@@ -19,11 +19,13 @@ type Props = {
 export default function WorkspaceCard({ item, tags }: Props) {
   return (
     <Card hoverable>
-      <Space style={{ color: "rgb(82, 87, 97)", width: "100%" }} direction="vertical">
+      <Space style={{ width: "100%" }} direction="vertical">
         <Row>
           <Col span={12}>
             <Typography.Title level={3}>{item.name}</Typography.Title>
-            {item.description || "No description provided for this workspace"}
+            <Typography.Text type="secondary">
+              {item.description || "No description provided for this workspace"}
+            </Typography.Text>
           </Col>
           <Col span={12}>
             <Row justify="start">
@@ -41,11 +43,13 @@ export default function WorkspaceCard({ item, tags }: Props) {
           </Space>
           <Space>
             <ClockCircleOutlined />
-            {item.lastRun ? DateTime.fromISO(item.lastRun).toRelative() : "Never Executed"}
+            <Typography.Text>
+              {item.lastRun ? DateTime.fromISO(item.lastRun).toRelative() : "Never Executed"}
+            </Typography.Text>
           </Space>
           <Space>
             <IacTypeLogo type={item.iacType} />
-            {item.terraformVersion}
+            <Typography.Text>{item.terraformVersion}</Typography.Text>
           </Space>
           {item.branch !== "remote-content" && item.normalizedSource ? (
             <Space>
@@ -55,7 +59,7 @@ export default function WorkspaceCard({ item, tags }: Props) {
               </a>
             </Space>
           ) : (
-            <span
+            <Typography.Text
               style={{
                 verticalAlign: "middle",
                 display: "inline-block",
@@ -65,7 +69,7 @@ export default function WorkspaceCard({ item, tags }: Props) {
                 <BiTerminal />
               </IconContext.Provider>
               &nbsp;&nbsp;cli/api driven workflow
-            </span>
+            </Typography.Text>
           )}
         </Space>
       </Space>

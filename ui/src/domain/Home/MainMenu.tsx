@@ -15,13 +15,15 @@ import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionType
 import axiosInstance from "../../config/axiosConfig";
 import { ApiResponse, FlatOrganization, Organization } from "../types";
 import "./Home.css";
+import { ThemeMode } from "../../config/themeConfig";
 
 type Props = {
   organizationName: string;
   setOrganizationName: React.Dispatch<React.SetStateAction<string>>;
+  themeMode?: ThemeMode;
 };
 
-export const MainMenu = ({ organizationName, setOrganizationName }: Props) => {
+export const MainMenu = ({ organizationName, setOrganizationName, themeMode }: Props) => {
   const [orgs, setOrgs] = useState<FlatOrganization[]>([]);
   const [defaultSelected, setDefaultSelected] = useState(["registry"]);
   const location = useLocation();

@@ -1,5 +1,5 @@
 import { ClockCircleOutlined, DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag } from "antd";
+import { Button, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag, Typography } from "antd";
 import cronstrue from "cronstrue";
 import { useEffect, useMemo, useState } from "react";
 import { Cron } from "react-js-cron";
@@ -190,8 +190,10 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
   return (
     <div>
       <h2>Schedules</h2>
-      <div className="App-text">
-        Schedules allows you to automatically trigger a Job in your workspace on a scheduled basis.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Schedules allows you to automatically trigger a Job in your workspace on a scheduled basis.
+        </Typography.Text>
       </div>
       <Table dataSource={schedules} columns={VARIABLES_COLUMS} rowKey="key" />
       <Button

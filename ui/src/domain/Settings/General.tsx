@@ -1,5 +1,5 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Popconfirm, Radio, Space, Spin } from "antd";
+import { Button, Form, Input, message, Popconfirm, Radio, Space, Typography, theme, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
@@ -17,13 +17,7 @@ export const GeneralSettings = () => {
   const [organization, setOrganization] = useState<Organization>();
   const [loading, setLoading] = useState(false);
   const [waiting, setWaiting] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    axiosInstance.get(`organization/${orgid}`).then((response) => {
-      setOrganization(response.data.data);
-      setLoading(false);
-    });
-  }, [orgid]);
+  const [form] = Form.useForm();
 
   const onFinish = (values: GeneralSettingsForm) => {
     setWaiting(true);
@@ -81,17 +75,47 @@ export const GeneralSettings = () => {
       });
   };
 
+  const onFinishFailed = (errorInfo: any) => {
+    console.log("Failed:", errorInfo);
+    message.error("Failed to update organization settings");
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    axiosInstance
+      .get(`organization/${orgid}`)
+      .then((response) => {
+        setOrganization(response.data.data);
+        form.setFieldsValue({
+          name: response.data.data.attributes.name,
+          description: response.data.data.attributes.description,
+          executionMode: response.data.data.attributes.executionMode,
+        });
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        message.error("Failed to load organization settings");
+        setLoading(false);
+      });
+  }, [orgid, form]);
+
   return (
     <div className="setting">
       <h1>General Settings</h1>
       {loading || organization === undefined ? (
-        <p>Data loading...</p>
+        <Spin tip="Loading Organization Settings..." />
       ) : (
         <Spin spinning={waiting}>
+          <div>
+            <Typography.Text type="secondary" className="App-text">
+              Configure general settings for your organization.
+            </Typography.Text>
+          </div>
           <Form
-            onFinish={onFinish}
             layout="vertical"
             name="form-settings"
+            onFinish={onFinish}
             initialValues={{
               name: organization.attributes.name,
               description: organization.attributes.description,
@@ -109,17 +133,17 @@ export const GeneralSettings = () => {
                 <Space direction="vertical">
                   <Radio value="remote">
                     <b>Remote</b>
-                    <p style={{ color: "#656a76" }}>
+                    <Typography.Text type="secondary" style={{ display: "block" }}>
                       Terrakube hosts your plans and applies, allowing you and your team to collaborate and review jobs
                       in the app.
-                    </p>
+                    </Typography.Text>
                   </Radio>
                   <Radio value="local">
                     <b>Local</b>
-                    <p style={{ color: "#656a76" }}>
+                    <Typography.Text type="secondary" style={{ display: "block" }}>
                       Your planning and applying jobs are performed on your own machines. Terrakube is used just for
                       storing and syncing the state.
-                    </p>
+                    </Typography.Text>
                   </Radio>
                 </Space>
               </Radio.Group>
@@ -133,9 +157,11 @@ export const GeneralSettings = () => {
         </Spin>
       )}
       <h1>Delete this Organization</h1>
-      <div className="App-text">
-        Deleting the organization will permanently delete all workspaces associated with it. Please be certain that you
-        understand this.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Deleting the organization will permanently delete all workspaces associated with it. Please be certain that
+          you understand this.
+        </Typography.Text>
       </div>
       <Popconfirm
         onConfirm={() => {

@@ -1,5 +1,20 @@
 import { DownOutlined, GithubOutlined, GitlabOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Card, Dropdown, Form, Input, Layout, List, Select, Space, Steps, message } from "antd";
+import {
+  Breadcrumb,
+  Button,
+  Card,
+  Dropdown,
+  Form,
+  Input,
+  Layout,
+  List,
+  Select,
+  Space,
+  Steps,
+  message,
+  theme,
+  Typography,
+} from "antd";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { BiBookBookmark, BiTerminal, BiUpload } from "react-icons/bi";
@@ -42,6 +57,9 @@ type CreateWorkspaceForm = {
 };
 
 export const CreateWorkspace = () => {
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
   const [organizationName, setOrganizationName] = useState<string | null>();
   const [terraformVersions, setTerraformVersions] = useState<string[]>([]);
   const [vcs, setVCS] = useState<VcsModel[]>([]);
@@ -383,12 +401,14 @@ export const CreateWorkspace = () => {
         ]}
       />
 
-      <div className="site-layout-content">
+      <div className="site-layout-content" style={{ background: colorBgContainer }}>
         <div className="createWorkspace">
           <h2>Create a new Workspace</h2>
-          <div className="App-text">
-            Workspaces determine how Terrakube organizes infrastructure. A workspace contains your configuration
-            (infrastructure as code), shared variable values, your current and historical state, and run logs.
+          <div>
+            <Typography.Text type="secondary" className="App-text">
+              Workspaces determine how Terrakube organizes infrastructure. A workspace contains your configuration
+              (infrastructure as code), shared variable values, your current and historical state, and run logs.
+            </Typography.Text>
           </div>
           <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
             <Step title="Choose IaC Type" />

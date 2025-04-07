@@ -25,6 +25,7 @@ import {
   Tabs,
   Tag,
   Typography,
+  theme,
 } from "antd";
 import { Buffer } from "buffer";
 import * as hcl from "hcl2-parser";
@@ -76,6 +77,29 @@ export const ModuleDetails = ({ organizationName }: Props) => {
   const [submodule, setSubmodule] = useState("");
   const [submodulePath, setSubmodulePath] = useState("");
   const navigate = useNavigate();
+
+  const {
+    token: {
+      colorBgContainer,
+      colorText,
+      colorBgTextHover,
+      colorBorder,
+      colorPrimary,
+      colorPrimaryHover,
+      colorFillSecondary,
+      colorFillTertiary,
+    },
+  } = theme.useToken();
+
+  // Add CSS variables for markdown theming
+  useEffect(() => {
+    document.documentElement.style.setProperty("--code-bg", colorBgTextHover);
+    document.documentElement.style.setProperty("--border-color", colorBorder);
+    document.documentElement.style.setProperty("--ant-primary-color", colorPrimary);
+    document.documentElement.style.setProperty("--ant-primary-color-hover", colorPrimaryHover);
+    document.documentElement.style.setProperty("--table-header-bg", colorFillSecondary);
+    document.documentElement.style.setProperty("--table-row-bg", colorFillTertiary);
+  }, [colorBgTextHover, colorBorder, colorPrimary, colorPrimaryHover, colorFillSecondary, colorFillTertiary]);
 
   // Renders the provider icon
   const renderLogo = (provider: string) => {
@@ -285,7 +309,7 @@ export const ModuleDetails = ({ organizationName }: Props) => {
         ]}
       />
 
-      <div className="site-layout-content">
+      <div className="site-layout-content" style={{ background: colorBgContainer }}>
         {loading || !module ? (
           <Spin spinning={loading} tip="Loading Module...">
             <p style={{ marginTop: "50px" }}></p>
@@ -307,58 +331,81 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                         <span className="moduleDescription">{module.attributes.description}</span>
                       </div>
                       <Space className="moduleProvider" size="large" direction="horizontal">
-                        <span>Published by {organizationName}</span>
-                        <span>
+                        <Typography.Text type="secondary">Published by {organizationName}</Typography.Text>
+                        <Typography.Text type="secondary">
                           Provider {renderLogo(module.attributes.provider)} {module.attributes.provider}
-                        </span>
+                        </Typography.Text>
                       </Space>
                       <IconContext.Provider value={{ size: "1.3em" }}>
                         <table className="moduleDetails">
                           <tr>
                             <td>
-                              <RiFolderHistoryLine /> Version
+                              <Typography.Text type="secondary">
+                                <RiFolderHistoryLine /> Version
+                              </Typography.Text>
                             </td>
                             <td>
-                              <ClockCircleOutlined /> Published
+                              <Typography.Text type="secondary">
+                                <ClockCircleOutlined /> Published
+                              </Typography.Text>
                             </td>
                             <td>
-                              <DownloadOutlined /> Provisions
+                              <Typography.Text type="secondary">
+                                <DownloadOutlined /> Provisions
+                              </Typography.Text>
                             </td>
                             <td>
-                              <BiBookBookmark /> Source
+                              <Typography.Text type="secondary">
+                                <BiBookBookmark /> Source
+                              </Typography.Text>
                             </td>
                           </tr>
                           <tr className="black">
                             <td>
-                              {version}{" "}
-                              <Dropdown
-                                overlay={
-                                  <Menu onClick={handleClick}>
-                                    {module.attributes.versions
-                                      .sort(compareVersions)
-                                      .reverse()
-                                      .map((name) => (
-                                        <Menu.Item key={name}>{name}</Menu.Item>
-                                      ))}
-                                  </Menu>
-                                }
-                                trigger={["click"]}
-                              >
-                                <a className="ant-dropdown-link">
-                                  Change <DownOutlined />
-                                </a>
-                              </Dropdown>
-                              ,
+                              <Typography.Text>
+                                {version}{" "}
+                                <Dropdown
+                                  overlay={
+                                    <Menu onClick={handleClick}>
+                                      {module.attributes.versions
+                                        .sort(compareVersions)
+                                        .reverse()
+                                        .map((name) => (
+                                          <Menu.Item key={name}>{name}</Menu.Item>
+                                        ))}
+                                    </Menu>
+                                  }
+                                  trigger={["click"]}
+                                >
+                                  <a className="ant-dropdown-link">
+                                    Change <DownOutlined />
+                                  </a>
+                                </Dropdown>
+                              </Typography.Text>
                             </td>
-                            <td>{DateTime.fromISO(module.attributes.createdDate).toRelative()}</td>
-                            <td>&nbsp; {module.attributes.downloadQuantity}</td>
                             <td>
-                              {renderVCSLogo(vcsProvider)}{" "}
-                              <a href={fixSshURL(module.attributes.source)} target="_blank" rel="noopener noreferrer">
-                                {new URL(fixSshURL(module.attributes.source))?.pathname
-                                  ?.replace(".git", "")
-                                  ?.substring(1)}
-                              </a>
+                              <Typography.Text>
+                                {DateTime.fromISO(module.attributes.createdDate).toRelative()}
+                              </Typography.Text>
+                            </td>
+                            <td>
+                              <Typography.Text>&nbsp; {module.attributes.downloadQuantity}</Typography.Text>
+                            </td>
+                            <td>
+                              <Typography.Text>
+                                {renderVCSLogo(vcsProvider)}{" "}
+                                {module.attributes.source && (
+                                  <a
+                                    href={fixSshURL(module.attributes.source)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {new URL(fixSshURL(module.attributes.source)).pathname
+                                      .replace(".git", "")
+                                      .substring(1)}
+                                  </a>
+                                )}
+                              </Typography.Text>
                             </td>
                           </tr>
                         </table>
@@ -425,7 +472,11 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                       {
                         label: "Readme",
                         key: "1",
-                        children: <Markdown remarkPlugins={[remarkGfm]}>{markdown}</Markdown>,
+                        children: (
+                          <div className="markdown-body" style={{ backgroundColor: colorBgContainer }}>
+                            <Markdown remarkPlugins={[remarkGfm]}>{markdown}</Markdown>
+                          </div>
+                        ),
                         className: "markdown-body",
                       },
                       {
@@ -443,7 +494,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                   whiteSpace: "normal",
                                   wordBreak: "break-word",
                                   borderCollapse: "collapse",
-                                  border: "1px solid #e8e8e8",
+                                  border: `1px solid ${colorBorder}`,
+                                  backgroundColor: colorBgContainer,
                                 }}
                               >
                                 <thead>
@@ -454,7 +506,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                         textAlign: "left",
                                         verticalAlign: "top",
                                         padding: "8px",
-                                        border: "1px solid #e8e8e8",
+                                        border: `1px solid ${colorBorder}`,
+                                        backgroundColor: colorFillSecondary,
                                       }}
                                     >
                                       Name
@@ -465,7 +518,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                         textAlign: "left",
                                         verticalAlign: "top",
                                         padding: "8px",
-                                        border: "1px solid #e8e8e8",
+                                        border: `1px solid ${colorBorder}`,
+                                        backgroundColor: colorFillSecondary,
                                       }}
                                     >
                                       Type
@@ -476,7 +530,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                         textAlign: "left",
                                         verticalAlign: "top",
                                         padding: "8px",
-                                        border: "1px solid #e8e8e8",
+                                        border: `1px solid ${colorBorder}`,
+                                        backgroundColor: colorFillSecondary,
                                       }}
                                     >
                                       Description
@@ -487,7 +542,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                         textAlign: "left",
                                         verticalAlign: "top",
                                         padding: "8px",
-                                        border: "1px solid #e8e8e8",
+                                        border: `1px solid ${colorBorder}`,
+                                        backgroundColor: colorFillSecondary,
                                       }}
                                     >
                                       Default
@@ -496,13 +552,16 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                 </thead>
                                 <tbody>
                                   {Object.keys(hclObject?.variable).map((keyName, i) => (
-                                    <tr key={i}>
+                                    <tr
+                                      key={i}
+                                      style={{ backgroundColor: i % 2 === 0 ? colorBgContainer : colorFillTertiary }}
+                                    >
                                       <td
                                         style={{
                                           textAlign: "left",
                                           verticalAlign: "top",
                                           padding: "8px",
-                                          border: "1px solid #e8e8e8",
+                                          border: `1px solid ${colorBorder}`,
                                         }}
                                       >
                                         <Typography.Text copyable strong>
@@ -514,12 +573,11 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                           textAlign: "left",
                                           verticalAlign: "top",
                                           padding: "8px",
-                                          border: "1px solid #e8e8e8",
+                                          border: `1px solid ${colorBorder}`,
                                         }}
                                       >
                                         <span
                                           style={{
-                                            backgroundColor: "#f5f5f5",
                                             padding: "4px 8px",
                                             borderRadius: "4px",
                                             display: "inline-block",
@@ -533,7 +591,7 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                           textAlign: "left",
                                           verticalAlign: "top",
                                           padding: "8px",
-                                          border: "1px solid #e8e8e8",
+                                          border: `1px solid ${colorBorder}`,
                                         }}
                                       >
                                         {JSON.stringify(hclObject?.variable[keyName][0]?.description)?.replaceAll(
@@ -546,7 +604,7 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                           textAlign: "left",
                                           verticalAlign: "top",
                                           padding: "8px",
-                                          border: "1px solid #e8e8e8",
+                                          border: `1px solid ${colorBorder}`,
                                         }}
                                       >
                                         {JSON.stringify(hclObject?.variable[keyName][0]?.default)}
@@ -575,7 +633,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                   whiteSpace: "normal",
                                   wordBreak: "break-word",
                                   borderCollapse: "collapse",
-                                  border: "1px solid #e8e8e8",
+                                  border: `1px solid ${colorBorder}`,
+                                  backgroundColor: colorBgContainer,
                                 }}
                               >
                                 <thead>
@@ -586,7 +645,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                         textAlign: "left",
                                         verticalAlign: "top",
                                         padding: "8px",
-                                        border: "1px solid #e8e8e8",
+                                        border: `1px solid ${colorBorder}`,
+                                        backgroundColor: colorFillSecondary,
                                       }}
                                     >
                                       Name
@@ -597,7 +657,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                         textAlign: "left",
                                         verticalAlign: "top",
                                         padding: "8px",
-                                        border: "1px solid #e8e8e8",
+                                        border: `1px solid ${colorBorder}`,
+                                        backgroundColor: colorFillSecondary,
                                       }}
                                     >
                                       Description
@@ -606,13 +667,16 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                 </thead>
                                 <tbody>
                                   {Object.keys(hclObject?.output).map((keyName, i) => (
-                                    <tr key={i}>
+                                    <tr
+                                      key={i}
+                                      style={{ backgroundColor: i % 2 === 0 ? colorBgContainer : colorFillTertiary }}
+                                    >
                                       <td
                                         style={{
                                           textAlign: "left",
                                           verticalAlign: "top",
                                           padding: "8px",
-                                          border: "1px solid #e8e8e8",
+                                          border: `1px solid ${colorBorder}`,
                                         }}
                                       >
                                         <Typography.Text copyable strong>
@@ -624,7 +688,7 @@ export const ModuleDetails = ({ organizationName }: Props) => {
                                           textAlign: "left",
                                           verticalAlign: "top",
                                           padding: "8px",
-                                          border: "1px solid #e8e8e8",
+                                          border: `1px solid ${colorBorder}`,
                                         }}
                                       >
                                         {JSON.stringify(hclObject?.output[keyName][0]?.description)?.replaceAll(
@@ -745,7 +809,8 @@ export const ModuleDetails = ({ organizationName }: Props) => {
   );
 };
 
-function fixSshURL(source: string) {
+function fixSshURL(source: string | undefined): string {
+  if (!source) return "";
   if (source.startsWith("git@")) {
     return source.replace(":", "/").replace("git@", "https://");
   } else {

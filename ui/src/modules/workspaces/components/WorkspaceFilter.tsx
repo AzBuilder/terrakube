@@ -6,7 +6,7 @@ import {
   CheckCircleOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { Card, Row, Col, Segmented, Flex, Select, Input } from "antd";
+import { Card, Row, Col, Segmented, Flex, Select, Input, theme } from "antd";
 import { JobStatus } from "../../../domain/types";
 import { useEffect, useMemo, useState } from "react";
 import { WorkspaceListItem } from "@/modules/workspaces/types";
@@ -28,6 +28,10 @@ enum Additional {
 }
 
 export default function WorkspaceFilter({ workspaces, onFiltered, organizationId, onTagsLoaded }: Props) {
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
   const [statusFilter, setStatusFilter] = useState<string>(sessionStorage.getItem("filterValue") || "All");
   const [searchFilter, setSearchFilter] = useState(sessionStorage.getItem("searchValue") || "");
   const [tagsFilter, setTagsFilter] = useState<string[]>((sessionStorage.getItem("selectedTags") as any) || []);
@@ -81,7 +85,7 @@ export default function WorkspaceFilter({ workspaces, onFiltered, organizationId
 
   return (
     <Card
-      style={{ backgroundColor: "#f3f3f3", marginTop: "10px" }}
+      style={{ marginTop: "10px", background: colorBgContainer }}
       styles={{
         body: {
           padding: "5px 10px",

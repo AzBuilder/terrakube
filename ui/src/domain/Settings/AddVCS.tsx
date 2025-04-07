@@ -302,13 +302,32 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
     }
   };
 
+  const getScopes = (vcs: VcsTypeExtended) => {
+    switch (vcs) {
+      case "GITLAB":
+        return "api";
+      case "GITLAB_ENTERPRISE":
+      case "GITLAB_COMMUNITY":
+        return "api";
+      case "BITBUCKET":
+        return "repository";
+      case "BITBUCKET_SERVER":
+        return "repository";
+      case "AZURE_DEVOPS":
+      case "AZURE_DEVOPS_SERVER":
+        return "vso.code+vso.code_status";
+      default:
+        return "repo";
+    }
+  };
+
   const renderStep1 = (vcs: VcsTypeExtended) => {
     switch (vcs) {
       case "GITLAB":
       case "GITLAB_ENTERPRISE":
         return (
           <div>
-            <p className="paragraph">
+            <Typography.Text type="secondary" className="paragraph">
               1. On {renderVCSType(vcsType)},{" "}
               {vcsType === "GITLAB" ? (
                 <>
@@ -323,35 +342,22 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                   information.
                 </span>
               )}
-            </p>
+            </Typography.Text>
             <div className="paragraph">
-              <p></p>
-              <Row>
-                <Col span={6}>
-                  <b>Name:</b>{" "}
-                </Col>
-                <Col span={18}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Redirect URI:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  {" "}
-                  <Paragraph copyable>{getCallBackUrl()}</Paragraph>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Scopes:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  Only the following should be checked:
-                  <br />
-                  api
-                </Col>
-              </Row>
-              <p></p>
+              <Typography.Text type="secondary" className="paragraph">
+                <p></p>
+                <ul className="disc-list">
+                  <li>
+                    <b>Name:</b> Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                  </li>
+                  <li>
+                    <b>Redirect URI:</b> {getCallBackUrl()}
+                  </li>
+                  <li>
+                    <b>Scopes:</b> {getScopes(vcsType)}
+                  </li>
+                </ul>
+              </Typography.Text>
             </div>
           </div>
         );
@@ -359,66 +365,43 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
       case "BITBUCKET_SERVER":
         return (
           <div>
-            <p className="paragraph">
+            <Typography.Text type="secondary" className="paragraph">
               1. On {renderVCSType(vcsType)}, logged in as whichever account you want Terrakube to act as, add a new
               OAuth Consumer. You can find the OAuth Consumer settings page under your workspace settings. Enter the
               following information:
-            </p>
+            </Typography.Text>
             <div className="paragraph">
-              <p></p>
-              <Row>
-                <Col span={6}>
-                  <b>Name:</b>{" "}
-                </Col>
-                <Col span={18}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Description:</b>{" "}
-                </Col>
-                <Col span={18}>Any description of your choice</Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Callback URL:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  {" "}
-                  <Paragraph copyable>{getCallBackUrl()}</Paragraph>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>URL:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  {" "}
-                  <Paragraph copyable>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Paragraph>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>This is a private consumer (checkbox):</b>{" "}
-                </Col>
-                <Col span={18}>Checked</Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Permissions (checkboxes):</b>{" "}
-                </Col>
-                <Col span={18}>
-                  The following should be checked:
-                  <br />
-                  Account: Write
-                  <br />
-                  Repositories: Admin
-                  <br />
-                  Pull requests: Write
-                  <br />
-                  Webhooks: Read and write
-                </Col>
-              </Row>
-              <p></p>
+              <Typography.Text type="secondary" className="paragraph">
+                <p></p>
+                <ul className="disc-list">
+                  <li>
+                    <b>Name:</b> Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                  </li>
+                  <li>
+                    <b>Description:</b> Any description of your choice
+                  </li>
+                  <li>
+                    <b>Callback URL:</b> {getCallBackUrl()}
+                  </li>
+                  <li>
+                    <b>URL:</b> {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
+                  </li>
+                  <li>
+                    <b>This is a private consumer (checkbox):</b> Checked
+                  </li>
+                  <li>
+                    <b>Permissions (checkboxes):</b> The following should be checked:
+                    <br />
+                    Account: Write
+                    <br />
+                    Repositories: Admin
+                    <br />
+                    Pull requests: Write
+                    <br />
+                    Webhooks: Read and write
+                  </li>
+                </ul>
+              </Typography.Text>
             </div>
           </div>
         );
@@ -426,7 +409,7 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
       case "AZURE_DEVOPS_SERVER":
         return (
           <div>
-            <p className="paragraph">
+            <Typography.Text type="secondary" className="paragraph">
               1. On {renderVCSType(vcsType)},{" "}
               <Button
                 className="link"
@@ -437,58 +420,39 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                 register a new OAuth Application&nbsp; <HiOutlineExternalLink />
               </Button>
               . Enter the following information:
-            </p>
+            </Typography.Text>
             <div className="paragraph">
-              <p></p>
-              <Row>
-                <Col span={6}>
-                  <b>Company Name:</b>{" "}
-                </Col>
-                <Col span={6}>Terrakube</Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Application name:</b>{" "}
-                </Col>
-                <Col span={18}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Application website:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  {" "}
-                  <Paragraph copyable>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Paragraph>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Callback URL:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  {" "}
-                  <Paragraph copyable>{getCallBackUrl()}</Paragraph>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Authorized scopes (checkboxes):</b>{" "}
-                </Col>
-                <Col span={18}>
-                  Only the following should be checked: <br />
-                  Code (read)
-                  <br />
-                  Code (status)
-                </Col>
-              </Row>
-              <p></p>
+              <Typography.Text type="secondary" className="paragraph">
+                <p></p>
+                <ul className="disc-list">
+                  <li>
+                    <b>Company Name:</b> Terrakube
+                  </li>
+                  <li>
+                    <b>Application name:</b> Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                  </li>
+                  <li>
+                    <b>Application website:</b> {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
+                  </li>
+                  <li>
+                    <b>Callback URL:</b> {getCallBackUrl()}
+                  </li>
+                  <li>
+                    <b>Authorized scopes (checkboxes):</b> Only the following should be checked:
+                    <br />
+                    Code (read)
+                    <br />
+                    Code (status)
+                  </li>
+                </ul>
+              </Typography.Text>
             </div>
           </div>
         );
       default:
         return (
           <div>
-            <div className="paragraph">
+            <Typography.Text type="secondary" className="paragraph">
               1. On {renderVCSType(vcsType)},{" "}
               {vcsType === "GITHUB" ? (
                 <Button
@@ -527,60 +491,35 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                   </Button>
                 </span>
               )}
-            </div>
+            </Typography.Text>
             <div className="paragraph">
-              <p></p>
-              <Row>
-                <Col span={6}>
-                  <b>Application Name:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  <Paragraph copyable>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Paragraph>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={6}>
-                  <b>Homepage URL:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  <Paragraph copyable>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Paragraph>
-                </Col>
-              </Row>
-              <Row hidden={connectionType != "OAUTH"}>
-                <Col span={6}>
-                  <b>Authorization callback URL:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  {" "}
-                  <Paragraph copyable>{getCallBackUrl()}</Paragraph>
-                </Col>
-              </Row>
-              <Row hidden={connectionType === "OAUTH"}>
-                <Col span={6}>
-                  <b>Webhook:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  <Paragraph>
-                    <b>untick</b> Active
-                  </Paragraph>
-                </Col>
-              </Row>
-              <Row hidden={connectionType === "OAUTH"}>
-                <Col span={6}>
-                  <b>Repository permissions:</b>{" "}
-                </Col>
-                <Col span={18}>
-                  <Paragraph>
-                    <ul className="disc-list">
-                      <li>Commit statuses: Read and write (Only if webhook to be used on VCS workflow workspaces)</li>
-                      <li>Content: Read-only</li>
-                      <li>Metadata: Read-only</li>
-                      <li>Webhooks: Read and write (Only if webhook to be used on VCS workflow workspaces)</li>
-                    </ul>
-                  </Paragraph>
-                </Col>
-              </Row>
-              <p></p>
+              <Typography.Text type="secondary" className="paragraph">
+                <p></p>
+                <ul className="disc-list">
+                  <li>
+                    <b>Application Name:</b> Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                  </li>
+                  <li>
+                    <b>Homepage URL:</b> {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
+                  </li>
+                  <li>
+                    <b>Authorization callback URL:</b> {getCallBackUrl()}
+                  </li>
+                  <li>
+                    <b>Webhook:</b> <b>untick</b> Active
+                  </li>
+                  <li>
+                    <b>Repository permissions:</b> Commit statuses: Read and write (Only if webhook to be used on VCS
+                    workflow workspaces)
+                    <br />
+                    Content: Read-only
+                    <br />
+                    Metadata: Read-only
+                    <br />
+                    Webhooks: Read and write (Only if webhook to be used on VCS workflow workspaces)
+                  </li>
+                </ul>
+              </Typography.Text>
             </div>
           </div>
         );
@@ -591,34 +530,34 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
     switch (vcs) {
       case "GITLAB":
         return (
-          <p className="paragraph">
+          <Typography.Text type="secondary" className="paragraph">
             2. After clicking the "Save application" button, you'll be taken to the new application's page. Enter the
             Application ID and Secret below:
-          </p>
+          </Typography.Text>
         );
       case "BITBUCKET":
       case "BITBUCKET_SERVER":
         return (
-          <p className="paragraph">
+          <Typography.Text type="secondary" className="paragraph">
             2. After clicking the "Save" button, you'll be taken to the OAuth settings page. Find your new OAuth
             consumer under the "OAuth Consumers" heading, and click its name to reveal its details. Enter the Key and
             Secret below:
-          </p>
+          </Typography.Text>
         );
       case "AZURE_DEVOPS":
       case "AZURE_DEVOPS_SERVER":
         return (
-          <p className="paragraph">
+          <Typography.Text type="secondary" className="paragraph">
             2. Create the application. On the following page, you'll find its details. Enter the App ID and Client
             Secret below:
-          </p>
+          </Typography.Text>
         );
       default:
         return (
-          <p className="paragraph">
+          <Typography.Text type="secondary" className="paragraph">
             2. After clicking the "Register application" button, you'll be taken to the new application's page. Enter
             the Client ID below:
-          </p>
+          </Typography.Text>
         );
     }
   };
@@ -637,11 +576,11 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
       default:
         return (
           <div>
-            <p className="paragraph">
+            <Typography.Text type="secondary" className="paragraph">
               3. Next, generate a{" "}
               {connectionType === "OAUTH" ? "client secret and" : "private key and convert it to PKCS#8 format then"}{" "}
               enter the value below:
-            </p>
+            </Typography.Text>
             <br />
           </div>
         );
@@ -752,10 +691,11 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
   return (
     <div>
       <h1>Add VCS Provider</h1>
-      <div className="App-text">
-        To connect workspaces, modules, and policy sets to git repositories containing Terraform configurations,
-        Terrakube needs access to your version control system (VCS) provider. Use this page to configure OAuth
-        authentication with your VCS provider.
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          To connect workspaces and modules to git repositories containing configurations, Terrakube needs access to
+          your version control system (VCS) provider.
+        </Typography.Text>
       </div>
       <Steps direction="horizontal" size="small" current={current} onChange={handleChange}>
         <Step title="Connect to VCS" />
@@ -801,12 +741,12 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
       {current == 1 && (
         <Space className="chooseType" direction="vertical">
           <h3>Set up provider</h3>
-          <p className="paragraph">
+          <Typography.Text type="secondary" className="paragraph">
             For additional information about connecting to {renderVCSType(vcsType)} to Terrakube, please read our{" "}
             <Button className="link" target="_blank" href={getDocsUrl(vcsType)} type="link">
               documentation&nbsp; <HiOutlineExternalLink />.
             </Button>
-          </p>
+          </Typography.Text>
           {renderStep1(vcsType)}
           {renderStep2(vcsType)}
           <Form

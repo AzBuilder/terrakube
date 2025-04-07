@@ -28,6 +28,12 @@ import {
   Tabs,
   Tag,
   Typography,
+  Card,
+  Segmented,
+  Flex,
+  Select,
+  Input,
+  theme,
 } from "antd";
 import { AxiosInstance } from "axios";
 import { DateTime } from "luxon";
@@ -139,6 +145,10 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   const [currentStateId, setCurrentStateId] = useState("");
   const [actions, setActions] = useState<Action[]>([]);
   const [contextState, setContextState] = useState({});
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
   const handleClick = (jobid: string) => {
     changeJob(jobid);
     navigate(`/organizations/${organizationId}/workspaces/${id}/runs/${jobid}`);
@@ -427,7 +437,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
         ]}
       />
 
-      <div className="site-layout-content">
+      <div className="site-layout-content" style={{ background: colorBgContainer }}>
         <div className="workspaceDisplay">
           {loading || !workspace || !variables || !jobs ? (
             <Spin spinning={true} tip="Loading Workspace...">
@@ -440,17 +450,17 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
               </div>
               <Space className="workspace-details" direction="vertical">
                 <Paragraph style={{ margin: "0px" }} copyable={{ text: id, tooltips: false }}>
-                  <span className="workspace-details"> ID: {id} </span>
+                  <Typography.Text type="secondary"> ID: {id} </Typography.Text>
                 </Paragraph>
                 {workspace.attributes?.description === "" ? (
-                  <a className="workspace-button" onClick={handleClickSettings} style={{ color: "#3b3d45" }}>
+                  <a className="workspace-button" onClick={handleClickSettings}>
                     Add workspace description
                   </a>
                 ) : (
-                  workspace.attributes.description
+                  <Typography.Text type="secondary">{workspace.attributes.description}</Typography.Text>
                 )}
                 <Space size={40} style={{ marginBottom: "40px" }} direction="horizontal">
-                  <span>
+                  <Typography.Text>
                     {workspace.attributes.locked ? (
                       <>
                         <LockOutlined /> Locked
@@ -460,26 +470,26 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                         <UnlockOutlined /> Unlocked
                       </>
                     )}
-                  </span>
-                  <span>
+                  </Typography.Text>
+                  <Typography.Text>
                     <ProfileOutlined /> Resources <span style={{ fontWeight: "500" }}>{resources.length}</span>
-                  </span>
+                  </Typography.Text>
                   <Space direction="horizontal">
                     {getIaCIconById(workspace.attributes?.iacType)}
-                    <span>
+                    <Typography.Text>
                       {getIaCNameById(workspace.attributes?.iacType)}{" "}
-                      <a onClick={handleClickSettings} className="workspace-button" style={{ color: "#3b3d45" }}>
+                      <a onClick={handleClickSettings} className="workspace-button">
                         v{workspace.attributes.terraformVersion}
                       </a>
-                    </span>
+                    </Typography.Text>
                   </Space>
 
-                  <span>
+                  <Typography.Text>
                     <ClockCircleOutlined /> Updated{" "}
                     <span style={{ fontWeight: "500" }}>
                       {DateTime.fromISO(lastRun).toRelative() ?? "never executed"}
                     </span>
-                  </span>
+                  </Typography.Text>
 
                   <span>
                     {workspace.attributes.locked ? (
@@ -682,7 +692,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                     <Col span={5}>
                       <Space direction="vertical">
                         <br />
-                        <span className="App-text">
+                        <span>
                           {workspace.attributes.branch !== "remote-content" ? (
                             <>
                               {" "}
@@ -702,11 +712,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                             </>
                           )}
                         </span>
-                        <span className="App-text">
+                        <span>
                           <ThunderboltOutlined /> Execution Mode:{" "}
                           <a onClick={handleClickSettings}>{executionMode}</a>{" "}
                         </span>
-                        <span className="App-text">
+                        <span>
                           <PlayCircleOutlined /> Auto apply: <a>Off</a>{" "}
                         </span>
                         <Divider />

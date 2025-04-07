@@ -1,5 +1,5 @@
 import { GithubOutlined, GitlabOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Form, Input, Layout, Select, Space, Steps, message } from "antd";
+import { Breadcrumb, Button, Form, Input, Layout, Select, Space, Steps, message, theme } from "antd";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { SiBitbucket, SiGit } from "react-icons/si";
@@ -28,6 +28,9 @@ type CreateVcsForm = {
 };
 
 export const CreateModule = () => {
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [step3Hidden, setStep3Hidden] = useState(true);
   const [step2Hidden, setStep2Hidden] = useState(true);
@@ -246,7 +249,7 @@ export const CreateModule = () => {
         ]}
       />
 
-      <div className="site-layout-content">
+      <div className="site-layout-content" style={{ background: colorBgContainer }}>
         <div className="createWorkspace">
           <h2>Add Module</h2>
           <div className="App-text">

@@ -13,6 +13,7 @@ import {
   Steps,
   Table,
   message,
+  theme,
 } from "antd";
 import parse from "html-react-parser";
 import { ValidateErrorEntity } from "rc-field-form/lib/interface";
@@ -43,6 +44,9 @@ type Platform = {
 };
 
 export const ImportWorkspace = () => {
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
   const [organizationName, setOrganizationName] = useState<string>();
   const [vcs, setVCS] = useState<VcsModel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -390,7 +394,7 @@ export const ImportWorkspace = () => {
         ]}
       />
 
-      <div className="site-layout-content">
+      <div className="site-layout-content" style={{ background: colorBgContainer }}>
         <div className="importWorkspace">
           <h2>Import Workspaces</h2>
           <div className="App-text">

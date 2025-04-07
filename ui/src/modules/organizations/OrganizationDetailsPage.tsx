@@ -55,7 +55,7 @@ export default function OrganizationsDetailPage({ organizationName, setOrganizat
           <Button icon={<ImportOutlined />}>
             <Link to="/workspaces/import">Import workspaces</Link>
           </Button>
-          <Button icon={<PlusOutlined />} variant="solid" color="purple">
+          <Button icon={<PlusOutlined />} type="primary">
             <Link to="/workspaces/create">New workspace</Link>
           </Button>
         </Space>
