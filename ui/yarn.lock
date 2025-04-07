@@ -2582,10 +2582,10 @@ ansi-to-react@^6.1.6:
     anser "^1.4.1"
     escape-carriage "^1.3.0"
 
-antd@^5.24.4:
-  version "5.24.4"
-  resolved "https://registry.npmjs.org/antd/-/antd-5.24.4.tgz"
-  integrity sha512-s89666DcoWeekJFaIqbtz2vRlIvgPR28GuDYYGUpW1mVP08bV7HZAPBH5lFJKYNGKrN3dHbZGgRK5aNRD2iPHg==
+antd@^5.24.6:
+  version "5.24.6"
+  resolved "https://registry.yarnpkg.com/antd/-/antd-5.24.6.tgz#d3597d65d19c499dedd240acc693b96a63d72bf8"
+  integrity sha512-xIlTa/1CTbgkZsdU/dOXkYvJXb9VoiMwsaCzpKFH2zAEY3xqOfwQ57/DdG7lAdrWP7QORtSld4UA6suxzuTHXw==
   dependencies:
     "@ant-design/colors" "^7.2.0"
     "@ant-design/cssinjs" "^1.23.0"
@@ -2609,7 +2609,7 @@ antd@^5.24.4:
     rc-drawer "~7.2.0"
     rc-dropdown "~4.2.1"
     rc-field-form "~2.7.0"
-    rc-image "~7.11.0"
+    rc-image "~7.11.1"
     rc-input "~1.7.3"
     rc-input-number "~9.4.0"
     rc-mentions "~2.19.1"
@@ -6594,9 +6594,9 @@ rc-field-form@~2.7.0:
     "@rc-component/async-validator" "^5.0.3"
     rc-util "^5.32.2"
 
-rc-image@~7.11.0:
+rc-image@~7.11.1:
   version "7.11.1"
-  resolved "https://registry.npmjs.org/rc-image/-/rc-image-7.11.1.tgz"
+  resolved "https://registry.yarnpkg.com/rc-image/-/rc-image-7.11.1.tgz#3ab290708dc053d3681de94186522e4e594f6772"
   integrity sha512-XuoWx4KUXg7hNy5mRTy1i8c8p3K8boWg6UajbHpDXS5AlRVucNfTi5YxTtPBTBzegxAZpvuLfh3emXFt6ybUdA==
   dependencies:
     "@babel/runtime" "^7.11.2"
