@@ -1,5 +1,5 @@
-import { Layout, Typography, Button, List, Tag, Space } from "antd";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Button, List, Tag, Space, Empty, Flex } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { listStacks } from "@/modules/stacks/stackService";
 import { StackListItem, ListStacksResponse } from "@/modules/stacks/types";
@@ -8,9 +8,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import PageWrapper from "@/modules/layout/PageWrapper/PageWrapper";
 import { ORGANIZATION_NAME } from "../../config/actionTypes";
 import useApiRequest from "@/modules/api/useApiRequest";
-
-const { Content } = Layout;
-const { Title } = Typography;
 
 export function StacksList() {
   const { id: organizationId } = useParams();
@@ -21,7 +18,6 @@ export function StacksList() {
   );
 
   const handleReturn = useCallback((response: ListStacksResponse) => {
-    console.log('Stack response:', response); // Debug log
     setStacks(response.stacks || []);
     if (response.organizationName) {
       setOrganizationName(response.organizationName);
@@ -30,20 +26,16 @@ export function StacksList() {
   }, []);
 
   const { loading, execute, error } = useApiRequest<ListStacksResponse, void>({
-    action: () => {
-      console.log('Executing stack request for org:', organizationId); // Debug log
-      return listStacks(organizationId!);
-    },
+    action: () => listStacks(organizationId!),
     onReturn: handleReturn,
-    showErrorAsNotification: true, // Show errors as notifications instead of failing silently
+    showErrorAsNotification: true,
   });
 
   useEffect(() => {
     if (organizationId) {
-      console.log('Triggering stack fetch for org:', organizationId); // Debug log
       execute();
     }
-  }, [organizationId]); // Remove execute from deps to prevent loops
+  }, [organizationId]);
 
   return (
     <PageWrapper
@@ -74,12 +66,15 @@ export function StacksList() {
         </Space>
       }
     >
-      <div style={{ width: '100%' }}>
-        {stacks.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Title level={4}>No stacks have been created yet.</Title>
-            <p>Create a new stack to get started with your infrastructure as code.</p>
-          </div>
+      <div style={{ width: '100%', marginTop: '24px' }}>
+        {!loading && stacks.length === 0 ? (
+          <Flex justify="center">
+            <Empty
+              style={{ textAlign: "center" }}
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No stacks have been created yet. Create a new stack to get started with your infrastructure as code."
+            />
+          </Flex>
         ) : (
           <List
             split={false}

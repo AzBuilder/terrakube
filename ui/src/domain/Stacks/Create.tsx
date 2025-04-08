@@ -1,12 +1,11 @@
 import { DownOutlined, GithubOutlined, GitlabOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Card, Dropdown, Form, Input, Layout, List, Select, Space, Steps, message } from "antd";
+import { Button, Card, Dropdown, Form, Input, Layout, List, Select, Space, Steps, message } from "antd";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
-import { BiBookBookmark } from "react-icons/bi";
 import { SiBitbucket, SiTerraform } from "react-icons/si";
 import { RiAliensLine } from "react-icons/ri";
 import { VscAzureDevops } from "react-icons/vsc";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import { VcsModel, VcsType, VcsTypeExtended } from "../types";
 import { CreateStackForm, ToolType } from "@/modules/stacks/types";
@@ -194,7 +193,7 @@ export function CreateStack() {
     {
       title: "Select Tool",
       content: (
-        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+        <div style={{ width: '100%', maxWidth: '1200px', margin: "0 auto" }}>
           <h3>Choose your IaC stack tool</h3>
           <p style={{ color: '#666', marginBottom: '24px' }}>Select the Infrastructure as Code tool you'll use to manage your infrastructure.</p>
           <List
@@ -230,7 +229,7 @@ export function CreateStack() {
     {
       title: "Connect to VCS",
       content: (
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+        <div style={{ width: '100%', maxWidth: '1200px', margin: "0 auto" }}>
           <h3>Connect to a version control provider</h3>
           <p style={{ color: '#666', marginBottom: '24px' }}>Choose the version control provider that hosts the {selectedToolType.name} configuration for this stack.</p>
           {vcsButtonsVisible ? (
@@ -313,7 +312,7 @@ export function CreateStack() {
     {
       title: "Configure Stack",
       content: (
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+        <div style={{ width: '100%', maxWidth: '1200px', margin: "0 auto" }}>
           <h3>Configure settings</h3>
           <p style={{ color: '#666', marginBottom: '24px' }}>Configure the basic settings for your stack.</p>
           <Form
@@ -325,6 +324,7 @@ export function CreateStack() {
               toolType: selectedToolType.id,
               vcsId,
             }}
+            style={{ width: '100%' }}
           >
             <Form.Item
               name="repoUrl"
@@ -379,8 +379,9 @@ export function CreateStack() {
         { label: "Stacks", path: `/organizations/${organizationId}/stacks` },
         { label: "Create", path: `/organizations/${organizationId}/stacks/create` },
       ]}
+      fluid
     >
-      <div style={{ padding: "24px 0" }}>
+      <div style={{ width: '100%', padding: "24px 0" }}>
         <Steps 
           current={current} 
           items={steps.map(s => ({ title: s.title }))} 
