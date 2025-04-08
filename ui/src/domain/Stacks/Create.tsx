@@ -1,5 +1,5 @@
 import { DownOutlined, GithubOutlined, GitlabOutlined } from "@ant-design/icons";
-import { Button, Card, Dropdown, Form, Input, Layout, List, Select, Space, Steps, message } from "antd";
+import { Button, Card, Dropdown, Form, Input, Layout, List, Select, Space, Steps, message, Empty } from "antd";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { SiBitbucket, SiTerraform } from "react-icons/si";
@@ -142,23 +142,21 @@ export function CreateStack() {
   const renderVCSLogo = (vcsType: VcsType) => {
     switch (vcsType) {
       case "GITLAB":
-        return <GitlabOutlined style={{ fontSize: "20px" }} />;
+        return <GitlabOutlined style={{ fontSize: "24px" }} />;
       case "BITBUCKET":
         return (
-          <IconContext.Provider value={{ size: "20px" }}>
+          <IconContext.Provider value={{ size: "24px" }}>
             <SiBitbucket />
-            &nbsp;&nbsp;
           </IconContext.Provider>
         );
       case "AZURE_DEVOPS":
         return (
-          <IconContext.Provider value={{ size: "20px" }}>
+          <IconContext.Provider value={{ size: "24px" }}>
             <VscAzureDevops />
-            &nbsp;
           </IconContext.Provider>
         );
       default:
-        return <GithubOutlined style={{ fontSize: "20px" }} />;
+        return <GithubOutlined style={{ fontSize: "24px" }} />;
     }
   };
 
@@ -201,23 +199,15 @@ export function CreateStack() {
             dataSource={toolTypes}
             renderItem={(item) => (
               <List.Item>
-                <Card
-                  hoverable
+                <Card 
+                  hoverable 
                   onClick={() => handleToolTypeClick(item)}
-                  style={{ textAlign: "center", cursor: "pointer", padding: "12px" }}
-                  bodyStyle={{ padding: "12px" }}
+                  style={{ padding: '12px' }}
+                  bodyStyle={{ padding: '12px' }}
                 >
-                  <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                    {typeof item.icon === 'string' ? (
-                      <img 
-                        src={item.icon} 
-                        alt={item.name} 
-                        style={{ width: 32, height: 32 }} 
-                      />
-                    ) : (
-                      item.icon
-                    )}
-                    <h4 style={{ margin: 0 }}>{item.name}</h4>
+                  <Space>
+                    {item.icon}
+                    <span>{item.name}</span>
                   </Space>
                 </Card>
               </List.Item>
@@ -237,6 +227,20 @@ export function CreateStack() {
               <List
                 grid={{ gutter: 16, column: 2 }}
                 dataSource={vcs}
+                locale={{
+                  emptyText: (
+                    <div style={{ padding: '32px' }}>
+                      <Empty 
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        imageStyle={{ margin: '0 auto' }}
+                        description={false}
+                      />
+                      <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                        <h4 style={{ margin: 0 }}>No VCS Providers Found</h4>
+                      </div>
+                    </div>
+                  )
+                }}
                 renderItem={(item) => (
                   <List.Item>
                     <Card 
@@ -253,53 +257,61 @@ export function CreateStack() {
                   </List.Item>
                 )}
               />
-              <div style={{ marginTop: 24, textAlign: "center" }}>
-                <Button type="link" onClick={handleConnectDifferent}>
+              <div style={{ marginTop: 24 }}>
+                <Button type="link" onClick={handleConnectDifferent} style={{ paddingLeft: 0 }}>
                   Connect to a different VCS provider
                 </Button>
               </div>
             </>
           ) : (
             <div>
-              <Space direction="horizontal" style={{ width: "100%", justifyContent: "center", gap: "16px" }}>
+              <Space size="middle" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                 <Dropdown menu={{ items: githubItems }}>
-                  <Button style={{ width: '150px', height: '40px' }}>
-                    <Space>
-                      <GithubOutlined />
-                      Github
+                  <Button style={{ width: '200px', height: '48px', display: 'flex', alignItems: 'center' }}>
+                    <Space style={{ flex: 1, justifyContent: 'space-between' }}>
+                      <Space>
+                        <GithubOutlined style={{ fontSize: '24px' }} />
+                        Github
+                      </Space>
                       <DownOutlined />
                     </Space>
                   </Button>
                 </Dropdown>
                 <Dropdown menu={{ items: gitlabItems }}>
-                  <Button style={{ width: '150px', height: '40px' }}>
-                    <Space>
-                      <GitlabOutlined />
-                      Gitlab
+                  <Button style={{ width: '200px', height: '48px', display: 'flex', alignItems: 'center' }}>
+                    <Space style={{ flex: 1, justifyContent: 'space-between' }}>
+                      <Space>
+                        <GitlabOutlined style={{ fontSize: '24px' }} />
+                        Gitlab
+                      </Space>
                       <DownOutlined />
                     </Space>
                   </Button>
                 </Dropdown>
                 <Dropdown menu={{ items: bitBucketItems }}>
-                  <Button style={{ width: '150px', height: '40px' }}>
-                    <Space>
-                      <SiBitbucket />
-                      Bitbucket
+                  <Button style={{ width: '200px', height: '48px', display: 'flex', alignItems: 'center' }}>
+                    <Space style={{ flex: 1, justifyContent: 'space-between' }}>
+                      <Space>
+                        <SiBitbucket style={{ fontSize: '24px' }} />
+                        Bitbucket
+                      </Space>
                       <DownOutlined />
                     </Space>
                   </Button>
                 </Dropdown>
                 <Dropdown menu={{ items: azDevOpsItems }}>
-                  <Button style={{ width: '150px', height: '40px' }}>
-                    <Space>
-                      <VscAzureDevops />
-                      Azure DevOps
+                  <Button style={{ width: '200px', height: '48px', display: 'flex', alignItems: 'center' }}>
+                    <Space style={{ flex: 1, justifyContent: 'space-between' }}>
+                      <Space>
+                        <VscAzureDevops style={{ fontSize: '24px' }} />
+                        Azure DevOps
+                      </Space>
                       <DownOutlined />
                     </Space>
                   </Button>
                 </Dropdown>
               </Space>
-              <div style={{ marginTop: 24, textAlign: "center" }}>
+              <div style={{ marginTop: 24 }}>
                 <Button type="link" onClick={handleConnectExisting}>
                   Connect to an existing VCS provider
                 </Button>
