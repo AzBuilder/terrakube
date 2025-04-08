@@ -63,32 +63,37 @@ export function StacksList() {
       ]}
       fluid
       actions={
-        <Button 
-          icon={<PlusOutlined />} 
-          type="primary"
-          onClick={() => navigate(`/organizations/${organizationId}/stacks/create`)}
-        >
-          Create Stack
-        </Button>
+        <Space>
+          <Button 
+            icon={<PlusOutlined />} 
+            type="primary"
+            onClick={() => navigate(`/organizations/${organizationId}/stacks/create`)}
+          >
+            Create Stack
+          </Button>
+        </Space>
       }
     >
-      {stacks.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <Title level={4}>No stacks have been created yet.</Title>
-          <p>Create a new stack to get started with your infrastructure as code.</p>
-        </div>
-      ) : (
-        <List
-          split={false}
-          dataSource={stacks}
-          pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
-          renderItem={(item) => (
-            <List.Item>
-              <StackCard item={item} />
-            </List.Item>
-          )}
-        />
-      )}
+      <div style={{ width: '100%' }}>
+        {stacks.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <Title level={4}>No stacks have been created yet.</Title>
+            <p>Create a new stack to get started with your infrastructure as code.</p>
+          </div>
+        ) : (
+          <List
+            split={false}
+            dataSource={stacks}
+            pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
+            style={{ width: '100%' }}
+            renderItem={(item) => (
+              <List.Item style={{ width: '100%' }}>
+                <StackCard item={item} />
+              </List.Item>
+            )}
+          />
+        )}
+      </div>
     </PageWrapper>
   );
 } 

@@ -220,6 +220,14 @@ const App = () => {
           path: "/organizations/:orgid/settings/actions",
           element: <OrganizationSettings selectedTab="8" />,
         },
+        {
+          path: "/organizations/:orgid/stacks",
+          element: <StacksList setOrganizationName={setOrganizationName} organizationName={organizationName} />,
+        },
+        {
+          path: "/organizations/:orgid/stacks/create",
+          element: <CreateStack />,
+        },
       ],
     },
   ]);
