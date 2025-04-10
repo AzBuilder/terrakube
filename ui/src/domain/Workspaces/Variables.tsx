@@ -41,7 +41,7 @@ const VARIABLES_COLUMS = (
           overlayClassName="tooltip"
           trigger={["hover"]}
         >
-          <div>{record.value}</div>
+          <div style={{ maxWidth: 2000, maxHeight: 100, overflow: "auto" }}>{record.value}</div>
         </Tooltip>
       );
     },
@@ -111,7 +111,7 @@ const COLLECTION_VARIABLES_COLUMNS = () => [
           overlayClassName="tooltip"
           trigger={["hover"]}
         >
-          <div>{record.value}</div>
+          <div style={{ maxWidth: 2000, maxHeight: 100, overflow: "auto" }}>{record.value}</div>
         </Tooltip>
       );
     },
@@ -167,7 +167,7 @@ const GLOBAL_VARIABLES_COLUMNS = () => [
           overlayClassName="tooltip"
           trigger={["hover"]}
         >
-          <div>{record.value}</div>
+          <div style={{ maxWidth: 2000, maxHeight: 100, overflow: "auto" }}>{record.value}</div>
         </Tooltip>
       );
     },
@@ -416,7 +416,7 @@ export const Variables = ({
               <Input />
             </Form.Item>
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
-              <Input />
+              <Input.TextArea rows={1} autoSize={{ maxRows: 5 }} />
             </Form.Item>
             <Form.Item
               name="hcl"
