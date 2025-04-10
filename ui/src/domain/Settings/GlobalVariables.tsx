@@ -217,7 +217,7 @@ export const GlobalVariablesSettings = () => {
               <Input />
             </Form.Item>
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
-              <Input />
+              <Input.TextArea rows={1} autoSize={{ maxRows: 5 }} />
             </Form.Item>
             <Form.Item name="category" label="Category" rules={[{ required: true }]}>
               <Select placeholder="Please select a category">
