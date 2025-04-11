@@ -8,7 +8,9 @@ import {
   SyncOutlined,
 } from "@ant-design/icons";
 import { FlatJob, JobStatus } from "../../../domain/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axiosInstance from "../../../config/axiosConfig";
+import { ORGANIZATION_ARCHIVE } from "../../../config/actionTypes";
 
 // Helper function to format date
 const formatDate = (dateString?: string) => {
@@ -29,6 +31,30 @@ type Props = {
 export default function RunList({ jobs, onRunClick }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+  const [templateNames, setTemplateNames] = useState<{[key: string]: string}>({});
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+
+  // Load all templates to map template IDs to names
+  useEffect(() => {
+    axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
+      const templates = response.data.data;
+      const templateMap: {[key: string]: string} = {};
+
+      templates.forEach((template: any) => {
+        templateMap[template.id] = template.attributes.name;
+      });
+
+      setTemplateNames(templateMap);
+    });
+  }, [organizationId]);
+
+  const getTemplateName = (job: FlatJob) => {
+    const templateId = (job as any).templateReference;
+    if (templateId && templateNames[templateId]) {
+      return templateNames[templateId];
+    }
+    return "Terraform";
+  };
 
   const renderStatusTag = (status: JobStatus, statusColor: string) => (
     <Tag
@@ -92,7 +118,7 @@ export default function RunList({ jobs, onRunClick }: Props) {
               }
               description={
                 <span>
-                  #job-{item.id} &nbsp;&nbsp;|&nbsp;&nbsp; <b>{item.createdBy}</b> triggered via <b>{item.via || "UI"}</b> &nbsp;&nbsp;|&nbsp;&nbsp; <a>#{item.commitId?.substring(0, 6)}</a>
+                  #job-{item.id} &nbsp;&nbsp;|&nbsp;&nbsp; <b>{item.createdBy}</b> triggered via <b>{item.via || "UI"}</b> using template <b>{getTemplateName(item)}</b> &nbsp;&nbsp;|&nbsp;&nbsp; <a>#{item.commitId?.substring(0, 6)}</a>
                 </span>
               }
             />
