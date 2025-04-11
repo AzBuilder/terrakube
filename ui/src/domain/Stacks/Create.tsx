@@ -100,22 +100,44 @@ export function CreateStack() {
   ];
 
   useEffect(() => {
-    loadVCS();
-  }, []);
+    if (organizationId) {
+      loadVCS();
+    }
+  }, [organizationId]);
 
   const loadVCS = async () => {
+    if (!organizationId) {
+      console.error('Organization ID is missing');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await apiGet<{ data: VcsModel[] }>(`/api/v1/organization/${organizationId}/vcs`, {
         dataWrapped: true,
       });
+      
+      console.log('VCS API Response:', response);
+      
       if (!response.isError && response.data) {
+        console.log('Setting VCS data:', response.data.data);
         setVCS(response.data.data);
+      } else {
+        console.error('Failed to load VCS providers:', response);
+        message.error('Failed to load VCS providers');
       }
+    } catch (error) {
+      console.error('Error loading VCS providers:', error);
+      message.error('Failed to load VCS providers');
     } finally {
       setLoading(false);
     }
   };
+
+  // Add debug log for vcs state changes
+  useEffect(() => {
+    console.log('Current VCS state:', vcs);
+  }, [vcs]);
 
   const handleToolTypeClick = (toolType: ToolType) => {
     setSelectedToolType(toolType);
@@ -158,6 +180,49 @@ export function CreateStack() {
       default:
         return <GithubOutlined style={{ fontSize: "24px" }} />;
     }
+  };
+
+  // Add debug log in the render section
+  const renderVCSList = () => {
+    console.log('Rendering VCS list with data:', vcs);
+    return (
+      <List
+        grid={{ gutter: 16, column: 2 }}
+        dataSource={vcs}
+        locale={{
+          emptyText: (
+            <div style={{ padding: '32px' }}>
+              <Empty 
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                imageStyle={{ margin: '0 auto' }}
+                description={false}
+              />
+              <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                <h4 style={{ margin: 0 }}>No VCS Providers Found</h4>
+              </div>
+            </div>
+          )
+        }}
+        renderItem={(item) => {
+          console.log('Rendering VCS item:', item);
+          return (
+            <List.Item>
+              <Card 
+                hoverable 
+                onClick={() => handleGitClick(item.id)}
+                style={{ padding: '12px' }}
+                bodyStyle={{ padding: '12px' }}
+              >
+                <Space>
+                  {renderVCSLogo(item.attributes.vcsType)}
+                  <span>{item.attributes.name}</span>
+                </Space>
+              </Card>
+            </List.Item>
+          );
+        }}
+      />
+    );
   };
 
   const onFinish = async (values: CreateStackForm) => {
@@ -224,39 +289,7 @@ export function CreateStack() {
           <p style={{ color: '#666', marginBottom: '24px' }}>Choose the version control provider that hosts the {selectedToolType.name} configuration for this stack.</p>
           {vcsButtonsVisible ? (
             <>
-              <List
-                grid={{ gutter: 16, column: 2 }}
-                dataSource={vcs}
-                locale={{
-                  emptyText: (
-                    <div style={{ padding: '32px' }}>
-                      <Empty 
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        imageStyle={{ margin: '0 auto' }}
-                        description={false}
-                      />
-                      <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                        <h4 style={{ margin: 0 }}>No VCS Providers Found</h4>
-                      </div>
-                    </div>
-                  )
-                }}
-                renderItem={(item) => (
-                  <List.Item>
-                    <Card 
-                      hoverable 
-                      onClick={() => handleGitClick(item.id)}
-                      style={{ padding: '12px' }}
-                      bodyStyle={{ padding: '12px' }}
-                    >
-                      <Space>
-                        {renderVCSLogo(item.attributes.vcsType)}
-                        <span>{item.attributes.name}</span>
-                      </Space>
-                    </Card>
-                  </List.Item>
-                )}
-              />
+              {renderVCSList()}
               <div style={{ marginTop: 24 }}>
                 <Button type="link" onClick={handleConnectDifferent} style={{ paddingLeft: 0 }}>
                   Connect to a different VCS provider
