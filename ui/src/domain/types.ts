@@ -80,7 +80,8 @@ export enum JobVia {
   Cli = "CLI",
   Github = "Github",
   Gitlab = "Gitlab",
-  Bitbucket = "Bitbucket"
+  Bitbucket = "Bitbucket",
+  Schedule = "Schedule"
 }
 
 export type JobAttributes = {

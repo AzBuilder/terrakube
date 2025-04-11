@@ -29,6 +29,18 @@ const formatDate = (dateString?: string) => {
   }
 };
 
+// Safely parse JSON with a fallback value
+const safeJsonParse = (jsonString: string | null, fallback: any): any => {
+  if (!jsonString) return fallback;
+  
+  try {
+    return JSON.parse(jsonString);
+  } catch (e) {
+    console.warn('Failed to parse JSON:', e);
+    return fallback;
+  }
+};
+
 type Props = {
   jobs: FlatJob[];
   onRunClick: (id: string) => void;
@@ -70,17 +82,21 @@ export default function RunList({ jobs, onRunClick }: Props) {
     return jobsToFilter;
   }, []);
 
-  // Apply all filters (status and template)
+  // Apply all filters (status and templates)
   const applyAllFilters = useCallback((jobsToFilter: FlatJob[]) => {
     const statusFilter = sessionStorage.getItem(RUNS_FILTER_KEY) || "All";
-    const templateFilter = sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY) || "All";
+    const templateFiltersStr = sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY) || "[]";
+    const templateFilters = safeJsonParse(templateFiltersStr, []) as string[];
     
     // Apply status filter
     let filtered = applyFilter(jobsToFilter, statusFilter);
     
-    // Apply template filter
-    if (templateFilter !== "All") {
-      filtered = filtered.filter(job => (job as any).templateReference === templateFilter);
+    // Apply template filters
+    if (templateFilters.length > 0) {
+      filtered = filtered.filter(job => {
+        const templateId = (job as any).templateReference;
+        return templateId && templateFilters.includes(templateId);
+      });
     }
     
     return filtered;

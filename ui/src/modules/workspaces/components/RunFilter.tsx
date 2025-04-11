@@ -7,7 +7,7 @@ import {
   ClockCircleOutlined,
   PauseCircleOutlined,
 } from "@ant-design/icons";
-import { Card, Row, Col, Segmented, theme, Select } from "antd";
+import { Card, Row, Col, Segmented, theme, Select, Flex } from "antd";
 import { FlatJob, JobStatus } from "../../../domain/types";
 import { useEffect, useState, useMemo, ReactNode } from "react";
 
@@ -52,6 +52,18 @@ const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+// Safely parse JSON with a fallback value
+const safeJsonParse = (jsonString: string | null, fallback: any): any => {
+  if (!jsonString) return fallback;
+  
+  try {
+    return JSON.parse(jsonString);
+  } catch (e) {
+    console.warn('Failed to parse JSON:', e);
+    return fallback;
+  }
+};
+
 // Statuses to always show in the filter
 const alwaysShowStatuses = [
   'All',
@@ -70,8 +82,8 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
   const [statusFilter, setStatusFilter] = useState<string>(
     sessionStorage.getItem(RUNS_FILTER_KEY) || "All"
   );
-  const [templateFilter, setTemplateFilter] = useState<string>(
-    sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY) || "All"
+  const [templateFilters, setTemplateFilters] = useState<string[]>(
+    safeJsonParse(sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY), [])
   );
   const [statusCounts, setStatusCounts] = useState<StatusCount>({});
 
@@ -81,10 +93,10 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
   }, [statusFilter]);
 
   useEffect(() => {
-    sessionStorage.setItem(RUNS_TEMPLATE_FILTER_KEY, templateFilter);
-  }, [templateFilter]);
+    sessionStorage.setItem(RUNS_TEMPLATE_FILTER_KEY, JSON.stringify(templateFilters));
+  }, [templateFilters]);
 
-  // Get unique template IDs from jobs
+  // Get template options for the dropdown
   const templateOptions = useMemo(() => {
     const uniqueTemplates = new Set<string>();
     
@@ -95,17 +107,10 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
       }
     });
     
-    const options = [{ label: "All Templates", value: "All" }];
-    
-    Array.from(uniqueTemplates).forEach(templateId => {
-      const templateName = templateNames[templateId] || `Template ${templateId}`;
-      options.push({
-        label: templateName,
-        value: templateId
-      });
-    });
-    
-    return options;
+    return Array.from(uniqueTemplates).map(templateId => ({
+      label: templateNames[templateId] || `Template ${templateId}`,
+      value: templateId
+    }));
   }, [jobs, templateNames]);
 
   // Count the number of jobs in each status and track available statuses
@@ -165,21 +170,24 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
     // Apply status filter
     let filteredJobs = applyFilter(jobs, statusFilter);
     
-    // Apply template filter
-    if (templateFilter !== "All") {
-      filteredJobs = filteredJobs.filter(job => (job as any).templateReference === templateFilter);
+    // Apply template filters
+    if (templateFilters.length > 0) {
+      filteredJobs = filteredJobs.filter(job => {
+        const templateId = (job as any).templateReference;
+        return templateId && templateFilters.includes(templateId);
+      });
     }
     
     onFiltered(filteredJobs);
-  }, [statusFilter, templateFilter, jobs, applyFilter, onFiltered]);
+  }, [statusFilter, templateFilters, jobs, applyFilter, onFiltered]);
 
   // Handle filter changes
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value);
   };
 
-  const handleTemplateFilterChange = (value: string) => {
-    setTemplateFilter(value);
+  const handleTemplateFilterChange = (values: string[]) => {
+    setTemplateFilters(values);
   };
 
   return (
@@ -192,25 +200,31 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
       }}
     >
       <Row align="middle">
-        <Col span={18}>
+        <Col span={16}>
           <Segmented
             onChange={handleStatusFilterChange}
             value={statusFilter}
             options={filterOptions}
           />
         </Col>
-        <Col span={6} style={{ textAlign: 'right' }}>
-          <Select 
-            style={{ width: 200 }}
-            value={templateFilter}
-            onChange={handleTemplateFilterChange}
-            options={templateOptions}
-            showSearch
-            optionFilterProp="label"
-            filterOption={(input, option) =>
-              (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
-            }
-          />
+        <Col span={8}>
+          <Flex justify="end">
+            <Select 
+              mode="multiple"
+              style={{ width: 250 }}
+              value={templateFilters}
+              onChange={handleTemplateFilterChange}
+              options={templateOptions}
+              placeholder="Filter by template"
+              maxTagCount="responsive"
+              showSearch
+              allowClear
+              optionFilterProp="label"
+              filterOption={(input, option) =>
+                (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
+              }
+            />
+          </Flex>
         </Col>
       </Row>
     </Card>
