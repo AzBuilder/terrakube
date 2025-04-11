@@ -74,12 +74,13 @@ export enum JobStatus {
   Failed = "failed",
   Unknown = "unknown",
 }
+
 export enum JobVia {
   Ui = "UI",
   Cli = "CLI",
   Github = "Github",
   Gitlab = "Gitlab",
-  Bitbucket = "Bitbucket",
+  Bitbucket = "Bitbucket"
 }
 
 export type JobAttributes = {
@@ -100,10 +101,14 @@ export type JobStep = {
 };
 export type FlatJob = {
   id: string;
-  latestChange: string;
   title: string;
+  status: JobStatus;
   statusColor: string;
-} & JobAttributes;
+  latestChange: string;
+  commitId?: string;
+  createdBy: string;
+  via?: JobVia;
+};
 // VCS
 
 export enum VcsType {

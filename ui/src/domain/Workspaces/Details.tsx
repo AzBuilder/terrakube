@@ -76,6 +76,7 @@ import { WorkspaceGeneral } from "./Settings/General";
 import { WorkspaceWebhook } from "./Settings/Webhook.jsx";
 import { getIaCIconById, getIaCNameById, renderVCSLogo } from "./Workspaces";
 import "./Workspaces.css";
+import RunList from "@/modules/workspaces/components/RunList";
 const { Paragraph } = Typography;
 
 const include = {
@@ -731,63 +732,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                   {jobVisible ? (
                     <DetailsJob jobId={jobId!} />
                   ) : (
-                    <div>
-                      <h3>Run List</h3>
-                      <List
-                        itemLayout="horizontal"
-                        dataSource={jobs.sort((a, b) => parseInt(a.id) - parseInt(b.id)).reverse()}
-                        renderItem={(item) => (
-                          <List.Item
-                            extra={
-                              <div className="textLeft">
-                                <Tag
-                                  icon={
-                                    item.status == "completed" ? (
-                                      <CheckCircleOutlined />
-                                    ) : item.status == "noChanges" ? (
-                                      <CheckCircleOutlined />
-                                    ) : item.status == "running" ? (
-                                      <SyncOutlined spin />
-                                    ) : item.status === "waitingApproval" ? (
-                                      <ExclamationCircleOutlined />
-                                    ) : item.status === "cancelled" ? (
-                                      <StopOutlined />
-                                    ) : item.status === "failed" ? (
-                                      <StopOutlined />
-                                    ) : (
-                                      <ClockCircleOutlined />
-                                    )
-                                  }
-                                  color={item.statusColor}
-                                >
-                                  {item.status}
-                                </Tag>{" "}
-                                <br />
-                                <span className="metadata">{item.latestChange}</span>
-                              </div>
-                            }
-                          >
-                            <List.Item.Meta
-                              style={{ margin: "0px", padding: "0px" }}
-                              avatar={<Avatar shape="square" icon={<UserOutlined />} />}
-                              title={<a onClick={() => handleClick(item.id)}>{item.title}</a>}
-                              description={
-                                <span>
-                                  {" "}
-                                  #job-{item.id} |
-                                  {item.commitId !== "000000000" ? (
-                                    <> commitId {item.commitId?.substring(0, 6)} </>
-                                  ) : (
-                                    ""
-                                  )}
-                                  | <b>{item.createdBy}</b> triggered via {item.via || "UI"}
-                                </span>
-                              }
-                            />
-                          </List.Item>
-                        )}
-                      />
-                    </div>
+                    <RunList jobs={jobs} onRunClick={handleClick} />
                   )}
                 </TabPane>
                 <TabPane tab="States" key="3" disabled={!manageState}>
