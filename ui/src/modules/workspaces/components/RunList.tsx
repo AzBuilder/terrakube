@@ -92,7 +92,7 @@ export default function RunList({ jobs, onRunClick }: Props) {
               }
               description={
                 <span>
-                  #job-{item.id} | commitId {item.commitId?.substring(0, 6)} | {item.createdBy} triggered via {item.via || "UI"}
+                  #job-{item.id} &nbsp;&nbsp;|&nbsp;&nbsp; <b>{item.createdBy}</b> triggered via <b>{item.via || "UI"}</b> &nbsp;&nbsp;|&nbsp;&nbsp; <a>#{item.commitId?.substring(0, 6)}</a>
                 </span>
               }
             />
