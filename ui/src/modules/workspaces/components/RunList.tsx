@@ -8,9 +8,15 @@ import {
   SyncOutlined,
 } from "@ant-design/icons";
 import { FlatJob, JobStatus } from "../../../domain/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../../config/axiosConfig";
 import { ORGANIZATION_ARCHIVE } from "../../../config/actionTypes";
+import RunFilter from "./RunFilter";
+
+// Storage key for persisting pagination state
+const RUNS_PAGE_KEY = "runsCurrentPage";
+const RUNS_FILTER_KEY = "runsFilterValue";
+const RUNS_TEMPLATE_FILTER_KEY = "runsTemplateFilter";
 
 // Helper function to format date
 const formatDate = (dateString?: string) => {
@@ -29,10 +35,18 @@ type Props = {
 };
 
 export default function RunList({ jobs, onRunClick }: Props) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(
+    parseInt(sessionStorage.getItem(RUNS_PAGE_KEY) || "1")
+  );
   const pageSize = 10;
   const [templateNames, setTemplateNames] = useState<{[key: string]: string}>({});
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+  const [filteredJobs, setFilteredJobs] = useState<FlatJob[]>(jobs);
+
+  // Save pagination state to session storage
+  useEffect(() => {
+    sessionStorage.setItem(RUNS_PAGE_KEY, currentPage.toString());
+  }, [currentPage]);
 
   // Load all templates to map template IDs to names
   useEffect(() => {
@@ -47,6 +61,35 @@ export default function RunList({ jobs, onRunClick }: Props) {
       setTemplateNames(templateMap);
     });
   }, [organizationId]);
+
+  // Filter jobs based on the current filter
+  const applyFilter = useCallback((jobsToFilter: FlatJob[], filterValue: string) => {
+    if (filterValue !== "All") {
+      return jobsToFilter.filter(job => job.status === filterValue);
+    }
+    return jobsToFilter;
+  }, []);
+
+  // Apply all filters (status and template)
+  const applyAllFilters = useCallback((jobsToFilter: FlatJob[]) => {
+    const statusFilter = sessionStorage.getItem(RUNS_FILTER_KEY) || "All";
+    const templateFilter = sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY) || "All";
+    
+    // Apply status filter
+    let filtered = applyFilter(jobsToFilter, statusFilter);
+    
+    // Apply template filter
+    if (templateFilter !== "All") {
+      filtered = filtered.filter(job => (job as any).templateReference === templateFilter);
+    }
+    
+    return filtered;
+  }, [applyFilter]);
+
+  // Update filtered jobs when the jobs prop changes, applying all filters
+  useEffect(() => {
+    setFilteredJobs(applyAllFilters(jobs));
+  }, [jobs, applyAllFilters]);
 
   const getTemplateName = (job: FlatJob) => {
     const templateId = (job as any).templateReference;
@@ -81,15 +124,34 @@ export default function RunList({ jobs, onRunClick }: Props) {
     </Tag>
   );
 
-  const sortedJobs = jobs.sort((a, b) => parseInt(a.id) - parseInt(b.id)).reverse();
+  const sortedJobs = filteredJobs.sort((a, b) => parseInt(a.id) - parseInt(b.id)).reverse();
   const paginatedJobs = sortedJobs.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   
   // Find the job with highest ID to mark as current
   const highestId = sortedJobs.length > 0 ? sortedJobs[0].id : "-1";
 
+  // Reset to first page when filters change, but not when jobs update due to refresh
+  useEffect(() => {
+    const savedPage = parseInt(sessionStorage.getItem(RUNS_PAGE_KEY) || "1");
+    if (savedPage > 1 && Math.ceil(filteredJobs.length / pageSize) < savedPage) {
+      setCurrentPage(1);
+    }
+  }, [filteredJobs]);
+
+  // Page change handler
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div>
       <h3>Run List</h3>
+      <RunFilter 
+        jobs={jobs} 
+        onFiltered={setFilteredJobs} 
+        applyFilter={applyFilter}
+        templateNames={templateNames}
+      />
       <List
         itemLayout="horizontal"
         dataSource={paginatedJobs}
@@ -132,7 +194,7 @@ export default function RunList({ jobs, onRunClick }: Props) {
             current={currentPage}
             pageSize={pageSize}
             total={sortedJobs.length}
-            onChange={setCurrentPage}
+            onChange={handlePageChange}
             showSizeChanger={false}
           />
         </div>
