@@ -9,6 +9,7 @@ import org.terrakube.api.repository.ScheduleRepository;
 import org.terrakube.api.repository.TemplateRepository;
 import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.job.JobStatus;
+import org.terrakube.api.rs.job.JobVia;
 import org.terrakube.api.rs.template.Template;
 import org.terrakube.api.rs.workspace.schedule.Schedule;
 import org.quartz.JobExecutionContext;
@@ -59,6 +60,7 @@ public class ScheduleJobTrigger implements org.quartz.Job {
             job.setStatus(JobStatus.pending);
             job.setCreatedBy("serviceAccount");
             job.setUpdatedBy("serviceAccount");
+            job.setVia(JobVia.Schedule.name());
             Date triggerDate = new Date(System.currentTimeMillis());
             job.setCreatedDate(triggerDate);
             job.setUpdatedDate(triggerDate);
