@@ -1,5 +1,5 @@
 import { ClockCircleOutlined, CloudOutlined, CloudUploadOutlined, DownloadOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Card, Input, Layout, List, Space, Tag, Typography, theme, Row, Col } from "antd";
+import { Button, Card, Input, Layout, List, Space, Tag, Typography, Row, Col } from "antd";
 import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
@@ -34,10 +34,6 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
   const [filteredModules, setFilteredModules] = useState<FlatModule[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
 
   const onSearch = (value: string) => {
     applyFilters(value);
@@ -101,13 +97,20 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
       ]}
       fluid
       actions={
-        <Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} onClick={handlePublish}>
-          Publish module
-        </Button>
+        <Space>
+          <Button type="primary" htmlType="button" icon={<CloudUploadOutlined />} onClick={handlePublish}>
+            Publish module
+          </Button>
+        </Space>
       }
     >
-      <div className="site-layout-content">
-        <Search placeholder="Filter modules" onSearch={onSearch} allowClear style={{ marginBottom: "16px" }} />
+      <div style={{ width: "100%", marginTop: "24px" }}>
+        <Search
+          placeholder="Filter modules"
+          onSearch={onSearch}
+          allowClear
+          style={{ width: "100%", marginBottom: "16px" }}
+        />
         <List
           split={false}
           dataSource={filteredModules}
