@@ -56,7 +56,7 @@ public class InactiveJobs implements org.quartz.Job {
                             stepRepository.save(step);
                         }
                     }
-                    if (job.getVia().equals(JobVia.CLI.name()) || job.getVia().equals(JobVia.UI.name()) ) {
+                    if (job.getVia().equals(JobVia.CLI.name()) || job.getVia().equals(JobVia.UI.name()) || job.getVia().equals(JobVia.Schedule.name()) ) {
                         log.info("No information to update for job", job.getId());
                         return;
                     } else {

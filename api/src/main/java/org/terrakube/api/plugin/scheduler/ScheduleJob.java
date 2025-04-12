@@ -320,7 +320,7 @@ public class ScheduleJob implements org.quartz.Job {
     }
 
     private void updateJobStatusOnVcs(Job job, JobStatus jobStatus) {
-        if (job.getVia().equals(JobVia.UI.name()) || job.getVia().equals(JobVia.CLI.name())) {
+        if (job.getVia().equals(JobVia.UI.name()) || job.getVia().equals(JobVia.CLI.name()) || job.getVia().equals(JobVia.Schedule.name())) {
             return; 
         }
         
