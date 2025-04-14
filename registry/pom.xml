@@ -14,7 +14,7 @@
     <name>Terrakube Terraform Registry</name>
     <description>Open Source Terraform Registry for Terrakube</description>
     <properties>
-        <azure.version>5.21.0</azure.version>
+        <azure.version>5.22.0</azure.version>
         <java.version>17</java.version>
         <lombok.version>1.18.38</lombok.version>
         <terrakube-client-starter.version>0.16.0-beta.2</terrakube-client-starter.version>
