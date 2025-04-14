@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
-    <changeSet id="2-26-1-3" author="207031497+Vx-V@users.noreply.github.com">
+    <changeSet id="2-26-1-3" author="207031497+Vx-V@users.noreply.github.com" dbms="mssql">
         <modifyDataType
                 columnName="variable_value"
                 newDataType="varchar(max)"
