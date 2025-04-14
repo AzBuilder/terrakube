@@ -1,6 +1,6 @@
 import { List, Avatar, Tag, Pagination, Tooltip } from "antd";
-import { UserOutlined } from "@ant-design/icons";
 import {
+  UserOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
@@ -20,7 +20,7 @@ const RUNS_TEMPLATE_FILTER_KEY = "runsTemplateFilter";
 
 // Helper function to format date
 const formatDate = (dateString?: string) => {
-  if (!dateString) return '';
+  if (!dateString) return "";
   try {
     const date = new Date(dateString);
     return date.toLocaleString();
@@ -32,11 +32,11 @@ const formatDate = (dateString?: string) => {
 // Safely parse JSON with a fallback value
 const safeJsonParse = (jsonString: string | null, fallback: any): any => {
   if (!jsonString) return fallback;
-  
+
   try {
     return JSON.parse(jsonString);
   } catch (e) {
-    console.warn('Failed to parse JSON:', e);
+    console.warn("Failed to parse JSON:", e);
     return fallback;
   }
 };
@@ -47,11 +47,9 @@ type Props = {
 };
 
 export default function RunList({ jobs, onRunClick }: Props) {
-  const [currentPage, setCurrentPage] = useState<number>(
-    parseInt(sessionStorage.getItem(RUNS_PAGE_KEY) || "1")
-  );
+  const [currentPage, setCurrentPage] = useState<number>(parseInt(sessionStorage.getItem(RUNS_PAGE_KEY) || "1"));
   const pageSize = 10;
-  const [templateNames, setTemplateNames] = useState<{[key: string]: string}>({});
+  const [templateNames, setTemplateNames] = useState<{ [key: string]: string }>({});
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
   const [filteredJobs, setFilteredJobs] = useState<FlatJob[]>(jobs);
 
@@ -64,7 +62,7 @@ export default function RunList({ jobs, onRunClick }: Props) {
   useEffect(() => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
       const templates = response.data.data;
-      const templateMap: {[key: string]: string} = {};
+      const templateMap: { [key: string]: string } = {};
 
       templates.forEach((template: any) => {
         templateMap[template.id] = template.attributes.name;
@@ -77,30 +75,33 @@ export default function RunList({ jobs, onRunClick }: Props) {
   // Filter jobs based on the current filter
   const applyFilter = useCallback((jobsToFilter: FlatJob[], filterValue: string) => {
     if (filterValue !== "All") {
-      return jobsToFilter.filter(job => job.status === filterValue);
+      return jobsToFilter.filter((job) => job.status === filterValue);
     }
     return jobsToFilter;
   }, []);
 
   // Apply all filters (status and templates)
-  const applyAllFilters = useCallback((jobsToFilter: FlatJob[]) => {
-    const statusFilter = sessionStorage.getItem(RUNS_FILTER_KEY) || "All";
-    const templateFiltersStr = sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY) || "[]";
-    const templateFilters = safeJsonParse(templateFiltersStr, []) as string[];
-    
-    // Apply status filter
-    let filtered = applyFilter(jobsToFilter, statusFilter);
-    
-    // Apply template filters
-    if (templateFilters.length > 0) {
-      filtered = filtered.filter(job => {
-        const templateId = (job as any).templateReference;
-        return templateId && templateFilters.includes(templateId);
-      });
-    }
-    
-    return filtered;
-  }, [applyFilter]);
+  const applyAllFilters = useCallback(
+    (jobsToFilter: FlatJob[]) => {
+      const statusFilter = sessionStorage.getItem(RUNS_FILTER_KEY) || "All";
+      const templateFiltersStr = sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY) || "[]";
+      const templateFilters = safeJsonParse(templateFiltersStr, []) as string[];
+
+      // Apply status filter
+      let filtered = applyFilter(jobsToFilter, statusFilter);
+
+      // Apply template filters
+      if (templateFilters.length > 0) {
+        filtered = filtered.filter((job) => {
+          const templateId = (job as any).templateReference;
+          return templateId && templateFilters.includes(templateId);
+        });
+      }
+
+      return filtered;
+    },
+    [applyFilter]
+  );
 
   // Update filtered jobs when the jobs prop changes, applying all filters
   useEffect(() => {
@@ -142,7 +143,7 @@ export default function RunList({ jobs, onRunClick }: Props) {
 
   const sortedJobs = filteredJobs.sort((a, b) => parseInt(a.id) - parseInt(b.id)).reverse();
   const paginatedJobs = sortedJobs.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  
+
   // Find the job with highest ID to mark as current
   const highestId = sortedJobs.length > 0 ? sortedJobs[0].id : "-1";
 
@@ -162,41 +163,38 @@ export default function RunList({ jobs, onRunClick }: Props) {
   return (
     <div>
       <h3>Run List</h3>
-      <RunFilter 
-        jobs={jobs} 
-        onFiltered={setFilteredJobs} 
-        applyFilter={applyFilter}
-        templateNames={templateNames}
-      />
+      <RunFilter jobs={jobs} onFiltered={setFilteredJobs} applyFilter={applyFilter} templateNames={templateNames} />
       <List
         itemLayout="horizontal"
         dataSource={paginatedJobs}
         renderItem={(item) => (
           <List.Item
             actions={[
-              <div key="status" style={{ textAlign: 'right' }}>
+              <div key="status" style={{ textAlign: "right" }}>
                 {renderStatusTag(item.status, item.statusColor)}
                 <div>
                   <Tooltip title={formatDate((item as any).createdDate)}>
                     <span className="metadata">{item.latestChange}</span>
                   </Tooltip>
                 </div>
-              </div>
+              </div>,
             ]}
           >
             <List.Item.Meta
               avatar={<Avatar shape="square" icon={<UserOutlined />} />}
               title={
                 <span>
-                  <a onClick={() => onRunClick(item.id)} style={{ color: 'inherit' }}>{item.title}</a>
-                  {item.id === highestId && (
-                    <Tag style={{ marginLeft: 8 }}>CURRENT</Tag>
-                  )}
+                  <a onClick={() => onRunClick(item.id)} style={{ color: "inherit" }}>
+                    {item.title}
+                  </a>
+                  {item.id === highestId && <Tag style={{ marginLeft: 8 }}>CURRENT</Tag>}
                 </span>
               }
               description={
                 <span>
-                  #job-{item.id} &nbsp;&nbsp;|&nbsp;&nbsp; <b>{item.createdBy}</b> triggered via <b>{item.via || "UI"}</b> using template <b>{getTemplateName(item)}</b> &nbsp;&nbsp;|&nbsp;&nbsp; <a>#{item.commitId?.substring(0, 6)}</a>
+                  #job-{item.id} &nbsp;&nbsp;|&nbsp;&nbsp; <b>{item.createdBy}</b> triggered via{" "}
+                  <b>{item.via || "UI"}</b> using template <b>{getTemplateName(item)}</b> &nbsp;&nbsp;|&nbsp;&nbsp;{" "}
+                  <a>#{item.commitId?.substring(0, 6)}</a>
                 </span>
               }
             />
@@ -205,7 +203,7 @@ export default function RunList({ jobs, onRunClick }: Props) {
         pagination={false}
       />
       {sortedJobs.length > 0 && (
-        <div style={{ textAlign: 'right', marginTop: '16px' }}>
+        <div style={{ textAlign: "right", marginTop: "16px" }}>
           <Pagination
             current={currentPage}
             pageSize={pageSize}
@@ -217,4 +215,4 @@ export default function RunList({ jobs, onRunClick }: Props) {
       )}
     </div>
   );
-} 
+}

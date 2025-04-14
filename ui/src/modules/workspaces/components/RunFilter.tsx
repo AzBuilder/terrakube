@@ -15,7 +15,7 @@ type Props = {
   jobs: FlatJob[];
   onFiltered: (jobs: FlatJob[]) => void;
   applyFilter: (jobs: FlatJob[], filter: string) => FlatJob[];
-  templateNames: {[key: string]: string};
+  templateNames: { [key: string]: string };
 };
 
 type StatusCount = {
@@ -23,7 +23,7 @@ type StatusCount = {
 };
 
 type StatusIconMap = {
-  [key in JobStatus | 'All']: ReactNode;
+  [key in JobStatus | "All"]: ReactNode;
 };
 
 // Storage keys for persisting filter state
@@ -44,7 +44,7 @@ const statusIcons: StatusIconMap = {
   [JobStatus.Rejected]: <StopOutlined style={{ color: "#FB0136" }} />,
   [JobStatus.Unknown]: <ExclamationCircleOutlined style={{ color: "#808080" }} />,
   [JobStatus.NotExecuted]: <ClockCircleOutlined style={{ color: "#808080" }} />,
-  'All': <BarsOutlined />
+  All: <BarsOutlined />,
 };
 
 // Helper function to capitalize first letter
@@ -55,23 +55,23 @@ const capitalize = (str: string): string => {
 // Safely parse JSON with a fallback value
 const safeJsonParse = (jsonString: string | null, fallback: any): any => {
   if (!jsonString) return fallback;
-  
+
   try {
     return JSON.parse(jsonString);
   } catch (e) {
-    console.warn('Failed to parse JSON:', e);
+    console.warn("Failed to parse JSON:", e);
     return fallback;
   }
 };
 
 // Statuses to always show in the filter
 const alwaysShowStatuses = [
-  'All',
+  "All",
   JobStatus.WaitingApproval,
   JobStatus.Failed,
   JobStatus.Running,
   JobStatus.Pending,
-  JobStatus.Completed
+  JobStatus.Completed,
 ];
 
 export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames }: Props) {
@@ -79,9 +79,7 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const [statusFilter, setStatusFilter] = useState<string>(
-    sessionStorage.getItem(RUNS_FILTER_KEY) || "All"
-  );
+  const [statusFilter, setStatusFilter] = useState<string>(sessionStorage.getItem(RUNS_FILTER_KEY) || "All");
   const [templateFilters, setTemplateFilters] = useState<string[]>(
     safeJsonParse(sessionStorage.getItem(RUNS_TEMPLATE_FILTER_KEY), [])
   );
@@ -99,65 +97,65 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
   // Get template options for the dropdown
   const templateOptions = useMemo(() => {
     const uniqueTemplates = new Set<string>();
-    
-    jobs.forEach(job => {
+
+    jobs.forEach((job) => {
       const templateId = (job as any).templateReference;
       if (templateId) {
         uniqueTemplates.add(templateId);
       }
     });
-    
-    return Array.from(uniqueTemplates).map(templateId => ({
+
+    return Array.from(uniqueTemplates).map((templateId) => ({
       label: templateNames[templateId] || `Template ${templateId}`,
-      value: templateId
+      value: templateId,
     }));
   }, [jobs, templateNames]);
 
   // Count the number of jobs in each status and track available statuses
   useEffect(() => {
     const counts: StatusCount = { All: jobs.length };
-    
+
     // Initialize counts for statuses we always want to show
-    alwaysShowStatuses.forEach(status => {
-      if (status !== 'All') {
+    alwaysShowStatuses.forEach((status) => {
+      if (status !== "All") {
         counts[status] = 0;
       }
     });
-    
+
     // Count jobs by status
-    jobs.forEach(job => {
+    jobs.forEach((job) => {
       if (counts[job.status]) {
         counts[job.status]++;
       } else {
         counts[job.status] = 1;
       }
     });
-    
+
     setStatusCounts(counts);
   }, [jobs]);
 
   // Generate filter options based on status configuration
   const filterOptions = useMemo(() => {
     const options = [];
-    
+
     // Add the statuses we always want to show first, in the specified order
     for (const status of alwaysShowStatuses) {
-      const displayText = status === 'All' ? 'All' : capitalize(status);
+      const displayText = status === "All" ? "All" : capitalize(status);
       options.push({
         label: `${displayText} ${statusCounts[status] || 0}`,
         value: status,
-        icon: statusIcons[status as JobStatus]
+        icon: statusIcons[status as JobStatus],
       });
     }
 
     // Add any additional statuses that exist in the data and aren't already added
-    Object.keys(statusCounts).forEach(status => {
-      if (!alwaysShowStatuses.includes(status as JobStatus | 'All') && statusCounts[status] > 0) {
-        const displayText = status === 'All' ? 'All' : capitalize(status);
+    Object.keys(statusCounts).forEach((status) => {
+      if (!alwaysShowStatuses.includes(status as JobStatus | "All") && statusCounts[status] > 0) {
+        const displayText = status === "All" ? "All" : capitalize(status);
         options.push({
           label: `${displayText} ${statusCounts[status]}`,
           value: status,
-          icon: statusIcons[status as JobStatus]
+          icon: statusIcons[status as JobStatus],
         });
       }
     });
@@ -169,15 +167,15 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
   useEffect(() => {
     // Apply status filter
     let filteredJobs = applyFilter(jobs, statusFilter);
-    
+
     // Apply template filters
     if (templateFilters.length > 0) {
-      filteredJobs = filteredJobs.filter(job => {
+      filteredJobs = filteredJobs.filter((job) => {
         const templateId = (job as any).templateReference;
         return templateId && templateFilters.includes(templateId);
       });
     }
-    
+
     onFiltered(filteredJobs);
   }, [statusFilter, templateFilters, jobs, applyFilter, onFiltered]);
 
@@ -201,15 +199,11 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
     >
       <Row align="middle">
         <Col span={16}>
-          <Segmented
-            onChange={handleStatusFilterChange}
-            value={statusFilter}
-            options={filterOptions}
-          />
+          <Segmented onChange={handleStatusFilterChange} value={statusFilter} options={filterOptions} />
         </Col>
         <Col span={8}>
           <Flex justify="end">
-            <Select 
+            <Select
               mode="multiple"
               style={{ width: 250 }}
               value={templateFilters}
@@ -221,7 +215,7 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
               allowClear
               optionFilterProp="label"
               filterOption={(input, option) =>
-                (option?.label?.toString() || '').toLowerCase().includes(input.toLowerCase())
+                (option?.label?.toString() || "").toLowerCase().includes(input.toLowerCase())
               }
             />
           </Flex>
@@ -229,4 +223,4 @@ export default function RunFilter({ jobs, onFiltered, applyFilter, templateNames
       </Row>
     </Card>
   );
-} 
+}
