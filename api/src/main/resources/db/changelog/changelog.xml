@@ -77,5 +77,5 @@
     <include file="/db/changelog/local/changelog-2.26.0-add-workspace-column.xml" />
     <include file="/db/changelog/local/changelog-2.26.0-github-app-token-vcs.xml"/>
     <include file="/db/changelog/local/changelog-2.26.0-module-vars-size.xml"/>
-    <include file="/db/changelog/local/changelog-2.26.0-vars-size.xml"/>
+    <!--include file="/db/changelog/local/changelog-2.26.0-vars-size.xml"--/>
 </databaseChangeLog>
