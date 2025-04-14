@@ -5,5 +5,6 @@ public enum JobVia {
    CLI,
    Github,
    Gitlab,
-   Bitbucket
+   Bitbucket,
+   Schedule
 }
