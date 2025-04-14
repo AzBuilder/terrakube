@@ -1,4 +1,4 @@
-import { List, Avatar, Tag, Pagination, Tooltip } from "antd";
+import { List, Avatar, Tag, Pagination, Tooltip, Button } from "antd";
 import {
   UserOutlined,
   CheckCircleOutlined,
@@ -24,7 +24,7 @@ const formatDate = (dateString?: string) => {
   try {
     const date = new Date(dateString);
     return date.toLocaleString();
-  } catch (e) {
+  } catch {
     return dateString;
   }
 };
@@ -35,8 +35,7 @@ const safeJsonParse = (jsonString: string | null, fallback: any): any => {
 
   try {
     return JSON.parse(jsonString);
-  } catch (e) {
-    console.warn("Failed to parse JSON:", e);
+  } catch {
     return fallback;
   }
 };
@@ -184,9 +183,9 @@ export default function RunList({ jobs, onRunClick }: Props) {
               avatar={<Avatar shape="square" icon={<UserOutlined />} />}
               title={
                 <span>
-                  <a onClick={() => onRunClick(item.id)} style={{ color: "inherit" }}>
+                  <Button type="link" onClick={() => onRunClick(item.id)} style={{ color: "inherit", padding: 0 }}>
                     {item.title}
-                  </a>
+                  </Button>
                   {item.id === highestId && <Tag style={{ marginLeft: 8 }}>CURRENT</Tag>}
                 </span>
               }
@@ -194,7 +193,9 @@ export default function RunList({ jobs, onRunClick }: Props) {
                 <span>
                   #job-{item.id} &nbsp;&nbsp;|&nbsp;&nbsp; <b>{item.createdBy}</b> triggered via{" "}
                   <b>{item.via || "UI"}</b> using template <b>{getTemplateName(item)}</b> &nbsp;&nbsp;|&nbsp;&nbsp;{" "}
-                  <a>#{item.commitId?.substring(0, 6)}</a>
+                  <Button type="link" style={{ padding: 0 }}>
+                    #{item.commitId?.substring(0, 6)}
+                  </Button>
                 </span>
               }
             />
