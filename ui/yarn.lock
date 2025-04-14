@@ -6928,10 +6928,10 @@ react-motion@^0.5.2:
     prop-types "^15.5.8"
     raf "^3.1.0"
 
-react-oidc-context@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.npmjs.org/react-oidc-context/-/react-oidc-context-3.2.0.tgz"
-  integrity sha512-ZLaCRLWV84Cn9pFdsatmblqxLMv0np69GWVXq9RWGqAjppdOGXNIbIxWMByIio0oSCVUwdeqwYRnJme0tjqd8A==
+react-oidc-context@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/react-oidc-context/-/react-oidc-context-3.3.0.tgz#ccca8c25c7ba04ca4ec4e3b229b39c122100988f"
+  integrity sha512-302T/ma4AOVAxrHdYctDSKXjCq9KNHT564XEO2yOPxRfxEP58xa4nz+GQinNl8x7CnEXECSM5JEjQJk3Cr5BvA==
 
 react-property@2.0.2:
   version "2.0.2"
