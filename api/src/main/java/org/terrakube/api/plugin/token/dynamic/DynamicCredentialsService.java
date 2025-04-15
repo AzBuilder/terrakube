@@ -70,6 +70,8 @@ public class DynamicCredentialsService {
                         .setHeaderParam("kid", kid)
                         .claim("terrakube_workspace_id", workspaceId)
                         .claim("terrakube_organization_id", organizationId)
+                        .claim("terrakube_workspace_name", workspaceName)
+                        .claim("terrakube_organization_name", organizationName)
                         .claim("terrakube_job_id", String.valueOf(jobId))
                         .setIssuedAt(Date.from(now))
                         .setIssuer(String.format("https://%s", hostname))
