@@ -172,6 +172,7 @@ export type SshKeyAttributes = {
   sshType: string;
 };
 
+
 // Modules
 export type ModuleModel = {
   id: string;
@@ -362,9 +363,14 @@ export type WebhookEventAttributes = {
 };
 
 // Agent
-export type Agent = AttributeWrapped<AgentAttributes>;
+export type Agent = {
+  id: string;
+  attributes: AgentAttributes;
+}
 export type AgentAttributes = {
   name: string;
+  description: string;
+  url: string;
 };
 
 // States
