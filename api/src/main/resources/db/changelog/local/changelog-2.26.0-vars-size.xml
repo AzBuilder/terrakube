@@ -18,4 +18,18 @@
                 newDataType="varchar(max)"
                 tableName="variable"/>
     </changeSet>
+    <changeSet id="2-26-1-3-postgresql" author="207031497+Vx-V@users.noreply.github.com" dbms="postgresql">
+        <modifyDataType
+                columnName="variable_value"
+                newDataType="text"
+                tableName="globalvar"/>
+        <modifyDataType
+                columnName="item_value"
+                newDataType="text"
+                tableName="item"/>
+        <modifyDataType
+                columnName="variable_value"
+                newDataType="text"
+                tableName="variable"/>
+    </changeSet>
 </databaseChangeLog>
