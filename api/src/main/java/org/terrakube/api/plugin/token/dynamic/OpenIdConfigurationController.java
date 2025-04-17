@@ -55,6 +55,8 @@ public class OpenIdConfigurationController {
         openIdData.getClaimsSupported().add("terrakube_workspace_id");
         openIdData.getClaimsSupported().add("terrakube_organization_id");
         openIdData.getClaimsSupported().add("terrakube_job_id");
+        openIdData.getClaimsSupported().add("terrakube_workspace_name");
+        openIdData.getClaimsSupported().add("terrakube_organization_name");
 
         openIdData.setIdTokenSigningAlgValuesSupported(new ArrayList<>());
         openIdData.getIdTokenSigningAlgValuesSupported().add("RS256");

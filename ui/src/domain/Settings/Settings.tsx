@@ -6,6 +6,7 @@ import { GeneralSettings } from "./General";
 import { GlobalVariablesSettings } from "./GlobalVariables";
 import "./Settings.css";
 import { SSHKeysSettings } from "./SSHKeys";
+import { AgentSettings } from "./Agents";
 import { TagsSettings } from "./Tags";
 import { TeamSettings } from "./Teams";
 import { TemplatesSettings } from "./Templates";
@@ -84,12 +85,17 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
               children: <TagsSettings />,
             },
             {
+              label: "Agents",
+              key: "8",
+              children: <AgentSettings />,
+            },
+            {
               label: (
                 <>
                   Actions <Tag color={token.colorPrimary}>beta</Tag>
                 </>
               ),
-              key: "8",
+              key: "9",
               children: <ActionSettings />,
             },
           ]}
