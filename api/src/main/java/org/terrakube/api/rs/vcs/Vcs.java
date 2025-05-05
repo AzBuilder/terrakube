@@ -35,7 +35,7 @@ import org.terrakube.api.rs.workspace.Workspace;
 @CreatePermission(expression = "team manage vcs")
 @UpdatePermission(expression = "team manage vcs")
 @DeletePermission(expression = "team manage vcs")
-@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.DELETE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = VcsManageHook.class)
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.CREATE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = VcsManageHook.class)
 @Include(rootLevel = false)
 @Getter
 @Setter
