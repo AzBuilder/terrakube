@@ -17,10 +17,7 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,6 +37,7 @@ public class DynamicCredentialsService {
 
     @Value("${org.terrakube.dynamic.credentials.ttl}")
     int dynamicCredentialTtl;
+
 
     @Transactional
     public HashMap<String, String> generateDynamicCredentialsAzure(Job job, HashMap<String, String> workspaceEnvVariables) {

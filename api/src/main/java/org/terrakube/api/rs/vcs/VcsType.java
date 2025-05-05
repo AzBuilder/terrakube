@@ -5,5 +5,6 @@ public enum VcsType {
     GITLAB,
     BITBUCKET,
     AZURE_DEVOPS,
+    AZURE_SP_MI,
     PUBLIC
 }
