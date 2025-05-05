@@ -6,9 +6,7 @@ import com.yahoo.elide.core.security.ChangeSpec;
 import com.yahoo.elide.core.security.RequestScope;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.terrakube.api.plugin.scheduler.ScheduleVcsService;
 import org.terrakube.api.plugin.vcs.TokenService;
 import org.terrakube.api.rs.vcs.Vcs;
 import org.terrakube.api.rs.vcs.VcsType;
@@ -27,7 +25,7 @@ public class VcsManageHook implements LifeCycleHook<Vcs> {
         log.info("OrganizationManageHook {}", vcs.getId());
         switch (operation) {
             case CREATE:
-                if (vcs.getVcsType().equals(VcsType.AZURE_SP_DYNAMIC)) {
+                if (vcs.getVcsType().equals(VcsType.AZURE_SP_MI)) {
                     log.info("Create vcs schedule for AZURE_SP_DYNAMIC");
                     tokenService.generateAccessToken(vcs.getId().toString(), "n/a");
                 }

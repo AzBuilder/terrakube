@@ -65,24 +65,6 @@ public class DynamicCredentialsService {
         return workspaceEnvVariables;
     }
 
-    @Transactional
-    public String generateDynamicCredentialsAzureVcs(String vcsId) {
-        String jwtToken = "";
-        Optional<Vcs> vcs = vcsRepository.findById(UUID.fromString(vcsId));
-        if (vcs.isPresent()) {
-            Vcs vcsObj = vcs.get();
-            jwtToken = generateJwtVcs(
-                    vcsObj.getOrganization().getName(),
-                    vcsObj.getName(),
-                    "api://AzureADTokenExchange",
-                    vcsId,
-                    vcsObj.getOrganization().getId().toString()
-            );
-        }
-        log.debug("ARM_OIDC_TOKEN: {}", jwtToken);
-        return jwtToken;
-    }
-
     private String generateJwt(String organizationName, String workspaceName, String tokenAudience, String organizationId, String workspaceId, int jobId) {
         String jwtToken = "";
         if (privateKeyPath != null && !privateKeyPath.isEmpty()) {
@@ -104,36 +86,6 @@ public class DynamicCredentialsService {
                         .signWith(getPrivateKey())
                         .compact();
 
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        } else {
-            log.error("DynamicCredentialPrivateKeyPath not set, to generate Dynamic Credentials the value is need it");
-        }
-
-        return jwtToken;
-    }
-
-    private String generateJwtVcs(String organizationName, String vcsName, String tokenAudience, String vcsId, String organizationId) {
-        String jwtToken = "";
-        if (privateKeyPath != null && !privateKeyPath.isEmpty()) {
-            try {
-                Instant now = Instant.now();
-                jwtToken = Jwts.builder()
-                        .setSubject(String.format("organization:%s:vcs:%s", organizationName, vcsName))
-                        .setAudience("499b84ac-1321-427f-aa17-267ca6975798") // hard coded azure devops audience
-                        .setId(UUID.randomUUID().toString())
-                        .setHeaderParam("kid", kid)
-                        .claim("terrakube_vcs_id", vcsId)
-                        .claim("terrakube_organization_id", organizationId)
-                        .claim("terrakube_vcs_name", vcsName)
-                        .claim("terrakube_organization_name", organizationName)
-                        .setIssuedAt(Date.from(now))
-                        .setIssuer(String.format("https://%s", hostname))
-                        .setExpiration(Date.from(now.plus(dynamicCredentialTtlVcs, ChronoUnit.MINUTES)))
-                        .signWith(getPrivateKey())
-                        .compact();
-                log.info("Generated JWT for VCS: {}", jwtToken);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

@@ -98,14 +98,14 @@ public class TokenService {
                     // seconds)
                     scheduleVcsService.createTask(String.format(QUARTZ_EVERY_30_MINUTES, minutes), vcsId);
                     break;
-                case AZURE_SP_DYNAMIC:
-                    AzDevOpsToken azDevOpsTokenDynamic = azDevOpsTokenService.getAccessTokenDynamic(vcsId);
+                case AZURE_SP_MI:
+                    AzDevOpsToken azDevOpsTokenDynamic = azDevOpsTokenService.getAzureDefaultToken();
                     vcs.setAccessToken(azDevOpsTokenDynamic.getAccess_token());
                     vcs.setRefreshToken(azDevOpsTokenDynamic.getRefresh_token());
                     //AZURE DYNAMIC SERVICE PRINCIPAL TOKEN EXPIRES IN 15 MINUTES BY DEFAULT
                     vcs.setTokenExpiration(new Date(System.currentTimeMillis() + azDevOpsTokenDynamic.getExpires_in() * 1000));
-                    //TERRAKUBE WILL REFRESH THE TOKEN EVERY 10 MINUTES
-                    scheduleVcsService.createTask(600, vcsId);
+                    //TERRAKUBE WILL REFRESH THE MANAGE IDENTITY TOKEN EVERY HOUR
+                    scheduleVcsService.createTask(3600, vcsId);
                     break;
                 default:
                     break;
@@ -168,10 +168,10 @@ public class TokenService {
                     log.error(e.getMessage());
                 }
                 break;
-            case AZURE_SP_DYNAMIC:
+            case AZURE_SP_MI:
                 AzDevOpsToken azDevOpsTokenDynamic = null;
                 try {
-                    azDevOpsTokenDynamic = azDevOpsTokenService.getAccessTokenDynamic(vcsId);
+                    azDevOpsTokenDynamic = azDevOpsTokenService.getAzureDefaultToken();
                     tokenInformation.put("accessToken", azDevOpsTokenDynamic.getAccess_token());
                     tokenInformation.put("refreshToken", azDevOpsTokenDynamic.getRefresh_token());
                     //AZURE DYNAMIC SERVICE PRINCIPAL TOKEN EXPIRES IN 15 MINUTES BY DEFAULT

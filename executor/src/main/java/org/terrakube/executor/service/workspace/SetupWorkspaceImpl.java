@@ -358,7 +358,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
             case "GITLAB":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", accessToken);
                 break;
-            case "AZURE_DEVOPS", "AZURE_SP_DYNAMIC":
+            case "AZURE_DEVOPS", "AZURE_SP_MI":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("dummy", accessToken);
                 break;
             default:
