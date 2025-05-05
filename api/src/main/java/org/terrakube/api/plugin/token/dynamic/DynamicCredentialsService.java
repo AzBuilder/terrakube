@@ -6,7 +6,9 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.job.Job;
+import org.terrakube.api.rs.vcs.Vcs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,15 +19,13 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
 public class DynamicCredentialsService {
 
+    private final VcsRepository vcsRepository;
     @Value("${org.terrakube.hostname}")
     String hostname;
 
@@ -40,6 +40,13 @@ public class DynamicCredentialsService {
 
     @Value("${org.terrakube.dynamic.credentials.ttl}")
     int dynamicCredentialTtl;
+
+    @Value("${org.terrakube.dynamic.credentials.ttlVcs}")
+    int dynamicCredentialTtlVcs;
+
+    public DynamicCredentialsService(VcsRepository vcsRepository) {
+        this.vcsRepository = vcsRepository;
+    }
 
     @Transactional
     public HashMap<String, String> generateDynamicCredentialsAzure(Job job, HashMap<String, String> workspaceEnvVariables) {
@@ -56,6 +63,24 @@ public class DynamicCredentialsService {
         workspaceEnvVariables.put("ARM_OIDC_TOKEN", jwtToken);
 
         return workspaceEnvVariables;
+    }
+
+    @Transactional
+    public String generateDynamicCredentialsAzureVcs(String vcsId) {
+        String jwtToken = "";
+        Optional<Vcs> vcs = vcsRepository.findById(UUID.fromString(vcsId));
+        if (vcs.isPresent()) {
+            Vcs vcsObj = vcs.get();
+            jwtToken = generateJwtVcs(
+                    vcsObj.getOrganization().getName(),
+                    vcsObj.getName(),
+                    "api://AzureADTokenExchange",
+                    vcsId,
+                    vcsObj.getOrganization().getId().toString()
+            );
+        }
+        log.debug("ARM_OIDC_TOKEN: {}", jwtToken);
+        return jwtToken;
     }
 
     private String generateJwt(String organizationName, String workspaceName, String tokenAudience, String organizationId, String workspaceId, int jobId) {
@@ -76,6 +101,36 @@ public class DynamicCredentialsService {
                         .setIssuedAt(Date.from(now))
                         .setIssuer(String.format("https://%s", hostname))
                         .setExpiration(Date.from(now.plus(dynamicCredentialTtl, ChronoUnit.MINUTES)))
+                        .signWith(getPrivateKey())
+                        .compact();
+
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        } else {
+            log.error("DynamicCredentialPrivateKeyPath not set, to generate Dynamic Credentials the value is need it");
+        }
+
+        return jwtToken;
+    }
+
+    private String generateJwtVcs(String organizationName, String vcsName, String tokenAudience, String vcsId, String organizationId) {
+        String jwtToken = "";
+        if (privateKeyPath != null && !privateKeyPath.isEmpty()) {
+            try {
+                Instant now = Instant.now();
+                jwtToken = Jwts.builder()
+                        .setSubject(String.format("organization:%s:vcs:%s", organizationName, vcsName))
+                        .setAudience(tokenAudience)
+                        .setId(UUID.randomUUID().toString())
+                        .setHeaderParam("kid", kid)
+                        .claim("terrakube_vcs_id", vcsId)
+                        .claim("terrakube_organization_id", organizationId)
+                        .claim("terrakube_vcs_name", vcsName)
+                        .claim("terrakube_organization_name", organizationName)
+                        .setIssuedAt(Date.from(now))
+                        .setIssuer(String.format("https://%s", hostname))
+                        .setExpiration(Date.from(now.plus(dynamicCredentialTtlVcs, ChronoUnit.MINUTES)))
                         .signWith(getPrivateKey())
                         .compact();
 

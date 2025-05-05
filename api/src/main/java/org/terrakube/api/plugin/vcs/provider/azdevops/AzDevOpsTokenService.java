@@ -1,5 +1,7 @@
 package org.terrakube.api.plugin.vcs.provider.azdevops;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.terrakube.api.plugin.token.dynamic.DynamicCredentialsService;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +17,9 @@ public class AzDevOpsTokenService {
 
     @Value("${org.terrakube.hostname}")
     private String hostname;
+
+    @Autowired
+    private DynamicCredentialsService dynamicCredentialsService;
 
     private static final String DEFAULT_ENDPOINT="https://app.vssps.visualstudio.com";
 
@@ -51,6 +56,15 @@ public class AzDevOpsTokenService {
                 .bodyToMono(AzDevOpsToken.class)
                 .block();
 
+        return validateNewToken(azDevOpsToken);
+    }
+
+    public AzDevOpsToken getAccessTokenDynamic(String vcsId) throws TokenException {
+        AzDevOpsToken azDevOpsToken = new AzDevOpsToken();
+        azDevOpsToken.setAccess_token(dynamicCredentialsService.generateDynamicCredentialsAzureVcs(vcsId));
+        azDevOpsToken.setRefresh_token("n/a");
+        azDevOpsToken.setToken_type("dynamic");
+        azDevOpsToken.setExpires_in(600);
         return validateNewToken(azDevOpsToken);
     }
 

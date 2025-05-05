@@ -5,17 +5,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.yahoo.elide.annotation.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
-
-import com.yahoo.elide.annotation.CreatePermission;
-import com.yahoo.elide.annotation.DeletePermission;
-import com.yahoo.elide.annotation.Exclude;
-import com.yahoo.elide.annotation.Include;
-import com.yahoo.elide.annotation.ReadPermission;
-import com.yahoo.elide.annotation.UpdatePermission;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,12 +27,15 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
+import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
+import org.terrakube.api.rs.hooks.vcs.VcsManageHook;
 import org.terrakube.api.rs.workspace.Workspace;
 
 @ReadPermission(expression = "team view vcs")
 @CreatePermission(expression = "team manage vcs")
 @UpdatePermission(expression = "team manage vcs")
 @DeletePermission(expression = "team manage vcs")
+@LifeCycleHookBinding(operation = LifeCycleHookBinding.Operation.DELETE, phase = LifeCycleHookBinding.TransactionPhase.POSTCOMMIT, hook = VcsManageHook.class)
 @Include(rootLevel = false)
 @Getter
 @Setter
