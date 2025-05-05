@@ -87,6 +87,7 @@ public class GitServiceImpl implements GitService {
                 break;
             case "AZURE_DEVOPS", "AZURE_SP_MI":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("dummy", accessToken);
+                log.info(accessToken);
                 break;
             default:
                 credentialsProvider = null;
