@@ -7,7 +7,7 @@
     <changeSet id="2-26-0-5" author="alfespa17@gmail.com">
         <modifyDataType
                 columnName="access_token"
-                newDataType="varchar(2048)"
+                newDataType="varchar2(2048)"
                 tableName="vcs"/>
     </changeSet>
 </databaseChangeLog>
