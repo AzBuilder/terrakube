@@ -121,7 +121,7 @@ public class DynamicCredentialsService {
                 Instant now = Instant.now();
                 jwtToken = Jwts.builder()
                         .setSubject(String.format("organization:%s:vcs:%s", organizationName, vcsName))
-                        .setAudience(tokenAudience)
+                        .setAudience("499b84ac-1321-427f-aa17-267ca6975798") // hard coded azure devops audience
                         .setId(UUID.randomUUID().toString())
                         .setHeaderParam("kid", kid)
                         .claim("terrakube_vcs_id", vcsId)
