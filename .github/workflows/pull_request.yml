@@ -1,0 +1,33 @@
+name: Build Terrakube Api
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'api/**'
+
+jobs:
+  build-jammy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Get changed folders
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          dir_names: 'true'
+          dir_names_max_depth: 1
+
+      - name: List all folder changes
+        shell: bash
+        run: |
+          for folder in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$folder was changed"
+          done
+          
+          
