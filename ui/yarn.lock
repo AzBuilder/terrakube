@@ -3228,10 +3228,10 @@ core-js-compat@^3.40.0:
   dependencies:
     browserslist "^4.24.4"
 
-core-js-pure@^3.41.0:
-  version "3.41.0"
-  resolved "https://registry.npmjs.org/core-js-pure/-/core-js-pure-3.41.0.tgz"
-  integrity sha512-71Gzp96T9YPk63aUvE5Q5qP+DryB4ZloUZPSOebGM88VNw8VNfvdA7z6kGA8iGOTEzAomsRidp4jXSmUIJsL+Q==
+core-js-pure@^3.42.0:
+  version "3.42.0"
+  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.42.0.tgz#e86c45a7f3bdcb608823e872f73d1ad9ddf0531d"
+  integrity sha512-007bM04u91fF4kMgwom2I5cQxAFIy8jVulgr9eozILl/SZE53QOqnW/+vviC+wQWLv+AunBG+8Q0TLoeSsSxRQ==
 
 create-jest@^29.7.0:
   version "29.7.0"
