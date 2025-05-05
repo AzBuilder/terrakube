@@ -77,7 +77,7 @@ public class AzDevOpsTokenService {
                     .setScopes(Collections.singletonList(AZURE_DEVOPS_SCOPE));
             AccessToken accessToken = credential.getToken(requestContext).block();
             azDevOpsToken.setAccess_token(accessToken.getToken());
-            log.info("Azure Default Token: {}", azDevOpsToken.getAccess_token());
+            log.debug("Azure Default Token: {}", azDevOpsToken.getAccess_token());
         } catch (Exception ex) {
             log.error("Error getting Azure Default Token: {}", ex.getMessage());
         }

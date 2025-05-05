@@ -22,7 +22,7 @@ public class VcsManageHook implements LifeCycleHook<Vcs> {
 
     @Override
     public void execute(LifeCycleHookBinding.Operation operation, LifeCycleHookBinding.TransactionPhase phase, Vcs vcs, RequestScope requestScope, Optional<ChangeSpec> changes) {
-        log.info("OrganizationManageHook {}", vcs.getId());
+        log.info("VcsManageHook {}", vcs.getId());
         switch (operation) {
             case CREATE:
                 if (vcs.getVcsType().equals(VcsType.AZURE_SP_MI)) {

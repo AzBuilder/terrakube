@@ -6,9 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.terrakube.api.repository.VcsRepository;
 import org.terrakube.api.rs.job.Job;
-import org.terrakube.api.rs.vcs.Vcs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,7 +23,6 @@ import java.util.*;
 @Service
 public class DynamicCredentialsService {
 
-    private final VcsRepository vcsRepository;
     @Value("${org.terrakube.hostname}")
     String hostname;
 
@@ -41,12 +38,6 @@ public class DynamicCredentialsService {
     @Value("${org.terrakube.dynamic.credentials.ttl}")
     int dynamicCredentialTtl;
 
-    @Value("${org.terrakube.dynamic.credentials.ttlVcs}")
-    int dynamicCredentialTtlVcs;
-
-    public DynamicCredentialsService(VcsRepository vcsRepository) {
-        this.vcsRepository = vcsRepository;
-    }
 
     @Transactional
     public HashMap<String, String> generateDynamicCredentialsAzure(Job job, HashMap<String, String> workspaceEnvVariables) {
