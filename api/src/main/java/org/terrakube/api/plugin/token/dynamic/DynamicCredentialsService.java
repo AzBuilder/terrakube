@@ -133,7 +133,7 @@ public class DynamicCredentialsService {
                         .setExpiration(Date.from(now.plus(dynamicCredentialTtlVcs, ChronoUnit.MINUTES)))
                         .signWith(getPrivateKey())
                         .compact();
-
+                log.info("Generated JWT for VCS: {}", jwtToken);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
