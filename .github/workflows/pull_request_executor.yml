@@ -33,7 +33,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build Terrakube (push)
+      - name: Build Terrakube
         if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: |
           cd executor
@@ -43,6 +43,8 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      - name: Build Terrakube from Fork
+      - name: Build Terrakube Executor
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
-        run: mvn clean install
+        run: |
+          cd executor
+          mvn clean install
