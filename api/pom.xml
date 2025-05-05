@@ -31,7 +31,7 @@
         <aws-sdk.version>2.31.30</aws-sdk.version>
         <gcp-libraries-bom.version>26.59.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
-        <jedis.version>5.1.5</jedis.version>
+        <jedis.version>6.0.0</jedis.version>
         <commons-text.version>1.13.1</commons-text.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
