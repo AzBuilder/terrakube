@@ -85,7 +85,7 @@ public class GitServiceImpl implements GitService {
             case "GITLAB":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("oauth2", accessToken);
                 break;
-            case "AZURE_DEVOPS":
+            case "AZURE_DEVOPS", "AZURE_SP_DYNAMIC":
                 credentialsProvider = new UsernamePasswordCredentialsProvider("dummy", accessToken);
                 break;
             default:
