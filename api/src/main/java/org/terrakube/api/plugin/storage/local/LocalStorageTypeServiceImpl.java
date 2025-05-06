@@ -211,15 +211,15 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
     public boolean migrateToOrganization(String organizationId, String workspaceId, String migrateToOrganizationId) {
 
         String sourceOutputDirectory = String.format("%s/.terraform-spring-boot/local/output/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
-        String sourceOutputTarget = String.format("%s/.terraform-spring-boot/local/output/%s/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId, workspaceId);
+        String sourceOutputTarget = String.format("%s/.terraform-spring-boot/local/output/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId);
         migrateDirectory(new File(sourceOutputDirectory), new File(sourceOutputTarget));
 
         String stateDirectory = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
-        String stateTargetDirectory = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId, workspaceId);
+        String stateTargetDirectory = String.format("%s/.terraform-spring-boot/local/state/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId);
         migrateDirectory(new File(stateDirectory), new File(stateTargetDirectory));
 
         String terraformStateDirectory = String.format("%s/.terraform-spring-boot/local/backend/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
-        String terraformStateTargetDirectory = String.format("%s/.terraform-spring-boot/local/backend/%s/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId, workspaceId);
+        String terraformStateTargetDirectory = String.format("%s/.terraform-spring-boot/local/backend/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId);
         migrateDirectory(new File(terraformStateDirectory), new File(terraformStateTargetDirectory));
 
         return true;
