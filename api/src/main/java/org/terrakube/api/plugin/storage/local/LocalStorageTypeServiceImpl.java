@@ -227,7 +227,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
     public void migrateDirectory(File sourceDirectory, File targetDirectory) {
         try {
-            FileUtils.copyDirectory(sourceDirectory, targetDirectory);
+            FileUtils.moveToDirectory(sourceDirectory, targetDirectory, true);
             log.info("Moving folder {} to {} successfully!", sourceDirectory.getAbsolutePath(), targetDirectory.getAbsolutePath());
         } catch (IOException e) {
             log.info("An error occurred while copying the folder {}: {}",sourceDirectory.getAbsolutePath(), e.getMessage());
