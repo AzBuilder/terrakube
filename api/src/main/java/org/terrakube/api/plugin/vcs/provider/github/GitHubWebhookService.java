@@ -134,7 +134,7 @@ public class GitHubWebhookService extends WebhookServiceBase {
                 log.info("Received release created webhook event for repository {}", rootNode.path("repository").path("full_name"));
                 result.setValid(true);
                 result.setRelease(true);
-                result.setBranch(rootNode.path("release").path("tag_name").asText());
+                result.setBranch("refs/tags/" + rootNode.path("release").path("tag_name").asText());
             } else {
                 throw new IllegalArgumentException("No valid github event " + result.getEvent());
             }
