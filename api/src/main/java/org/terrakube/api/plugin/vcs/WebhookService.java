@@ -86,7 +86,7 @@ public class WebhookService {
             return result;
 
         try {
-            String templateId = findTemplateId(webhookResult, webhook);
+            String templateId = webhookResult.isRelease() ? findTemplateIdRelease(webhookResult, webhook) : findTemplateId(webhookResult, webhook);
             log.info("webhook event {} for workspace {}, using template with id {}", webhookResult.getEvent(),
                     webhook.getWorkspace().getName(), templateId);
             Job job = new Job();
@@ -207,6 +207,18 @@ public class WebhookService {
                 .stream()
                 .filter(webhookEvent -> checkBranch(result.getBranch(), webhookEvent)
                         && checkFileChanges(result.getFileChanges(), webhookEvent))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No valid template found for the configured webhook event " + result.getEvent()))
+                .getTemplateId();
+    }
+
+    private String findTemplateIdRelease(WebhookResult result, Webhook webhook) {
+        return webhookEventRepository
+                .findByWebhookAndEventOrderByPriorityAsc(webhook,
+                        WebhookEventType.valueOf(result.getEvent().toUpperCase()))
+                .stream()
+                .filter(webhookEvent -> checkBranch(result.getBranch(), webhookEvent))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No valid template found for the configured webhook event " + result.getEvent()))

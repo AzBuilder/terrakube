@@ -257,16 +257,17 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
         >
           <Select.Option value="push">Push</Select.Option>
           <Select.Option value="pull_request">Pull Request</Select.Option>
+          <Select.Option value="release">Release</Select.Option>
         </Select>
       ),
     },
     {
-      title: "Branch",
+      title: "Branch/release",
       dataIndex: "branch",
       key: "branch",
       render: (_: string, record: any, index: number) => (
         <Input
-          placeholder="List of regex to match aginst branch names"
+          placeholder="List of regex to match aginst branch names or release names"
           name="branch"
           status={record.branchStatus}
           value={record.branch}
