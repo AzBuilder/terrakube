@@ -248,6 +248,40 @@ public class GcpStorageTypeServiceImpl implements StorageTypeService {
         deleteFolderFromBucket(outputPath);
     }
 
+    @Override
+    public boolean migrateToOrganization(String organizationId, String workspaceId, String migrateToOrganizationId) {
+        migrateFolder(String.format("tfoutput/%s/%s", organizationId, workspaceId), bucketName, String.format("tfoutput/%s/%s", migrateToOrganizationId, workspaceId));
+        migrateFolder(String.format("tfstate/%s/%s", organizationId, workspaceId), bucketName, String.format("tfstate /%s/%s", migrateToOrganizationId, workspaceId));
+        return true;
+    }
+
+    public void migrateFolder(String sourceFolderPath, String destinationBucketName, String destinationFolderPath) {
+        log.info("Moving files from {} to {}/{}", sourceFolderPath, destinationBucketName, destinationFolderPath);
+
+        Page<Blob> blobs = storage.list(
+                bucketName,
+                Storage.BlobListOption.prefix(sourceFolderPath),
+                Storage.BlobListOption.currentDirectory()
+        );
+
+        for (Blob blob : blobs.iterateAll()) {
+            String sourceFileName = blob.getName();
+            String destinationFileName = destinationFolderPath + sourceFileName.substring(sourceFolderPath.length());
+
+            // Copy object from source to destination
+            CopyWriter copyWriter = storage.copy(
+                    Storage.CopyRequest.newBuilder()
+                            .setSource(blob.getBlobId())
+                            .setTarget(BlobId.of(destinationBucketName, destinationFileName))
+                            .build()
+            );
+            log.info("Copied file: {} to {}/{}", sourceFileName, destinationBucketName, destinationFileName);
+        }
+
+        log.info("Completed moving files from {} to {}/{}", sourceFolderPath, destinationBucketName, destinationFolderPath);
+    }
+
+
     private void deleteFolderFromBucket(String folderPath) {
         Page<Blob> blobs =
                 storage.list(

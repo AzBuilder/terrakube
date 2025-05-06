@@ -196,6 +196,46 @@ public class AzureStorageTypeServiceImpl implements StorageTypeService {
         deleteFolderFromContainer(CONTAINER_NAME_STATE, moduleFolderPath);
     }
 
+    @Override
+    public boolean migrateToOrganization(String organizationId, String workspaceId, String migrateToOrganizationId) {
+        migrateFolder(CONTAINER_NAME_STATE, organizationId, workspaceId, migrateToOrganizationId);
+        migrateFolder(CONTAINER_NAME_OUTPUT, organizationId, workspaceId, migrateToOrganizationId);
+        return true;
+    }
+
+    private void migrateFolder(String containerName, String organizationId, String workspaceId, String migrateToOrganizationId) {
+        try {
+            // Define source and target prefixes
+            String sourcePrefix = String.format("%s/%s", organizationId, workspaceId);
+            String targetPrefix = String.format("%s/%s", migrateToOrganizationId, workspaceId);
+
+            log.info("Migrating from {} to {}", sourcePrefix, targetPrefix);
+
+            // Get the container client for state blobs
+            BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
+
+            // List objects under the source prefixed path
+            ListBlobsOptions options = new ListBlobsOptions().setPrefix(sourcePrefix);
+            containerClient.listBlobs(options, null).forEach(blobItem -> {
+                String sourceBlobName = blobItem.getName();
+                String targetBlobName = sourceBlobName.replaceFirst(sourcePrefix, targetPrefix);
+
+                log.info("Copying {} to {}", sourceBlobName, targetBlobName);
+
+                // Download the blob to memory
+                byte[] blobContent = containerClient.getBlobClient(sourceBlobName).downloadContent().toBytes();
+
+                // Upload it to the target location
+                containerClient.getBlobClient(targetBlobName).upload(BinaryData.fromBytes(blobContent), true);
+            });
+
+            log.info("Migration completed successfully from {} to {}", sourcePrefix, targetPrefix);
+
+        } catch (Exception e) {
+            log.error("Migration failed: {}", e.getMessage());
+        }
+    }
+
     private void deleteFolderFromContainer(String containerName, String folderPath) {
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(folderPath)

@@ -47,7 +47,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
-        log.info("Searching: /.terraform-spring-boot/local/tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
+        log.info("Searching: /.terraform-spring-boot/local/state/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
         String outputFilePath = String.format(STATE_DIRECTORY_JSON, organizationId, workspaceId, stateFileName);
         return getOutputBytes(outputFilePath);
     }
@@ -204,6 +204,33 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             FileUtils.cleanDirectory(new File(statePath));
         } catch (IOException e) {
             log.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean migrateToOrganization(String organizationId, String workspaceId, String migrateToOrganizationId) {
+
+        String sourceOutputDirectory = String.format("%s/.terraform-spring-boot/local/output/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+        String sourceOutputTarget = String.format("%s/.terraform-spring-boot/local/output/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId);
+        migrateDirectory(new File(sourceOutputDirectory), new File(sourceOutputTarget));
+
+        String stateDirectory = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+        String stateTargetDirectory = String.format("%s/.terraform-spring-boot/local/state/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId);
+        migrateDirectory(new File(stateDirectory), new File(stateTargetDirectory));
+
+        String terraformStateDirectory = String.format("%s/.terraform-spring-boot/local/backend/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+        String terraformStateTargetDirectory = String.format("%s/.terraform-spring-boot/local/backend/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId);
+        migrateDirectory(new File(terraformStateDirectory), new File(terraformStateTargetDirectory));
+
+        return true;
+    }
+
+    public void migrateDirectory(File sourceDirectory, File targetDirectory) {
+        try {
+            FileUtils.moveToDirectory(sourceDirectory, targetDirectory, true);
+            log.info("Moving folder {} to {} successfully!", sourceDirectory.getAbsolutePath(), targetDirectory.getAbsolutePath());
+        } catch (IOException e) {
+            log.info("An error occurred while copying the folder {}: {}",sourceDirectory.getAbsolutePath(), e.getMessage());
         }
     }
 }
