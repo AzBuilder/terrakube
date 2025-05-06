@@ -105,7 +105,8 @@ public class WebhookService {
             job.setVia(webhookResult.getVia());
             job.setCommitId(webhookResult.getCommit());
             Job savedJob = jobRepository.save(job);
-            sendCommitStatus(savedJob);
+            if (!webhookResult.isRelease())
+                sendCommitStatus(savedJob);
             scheduleJobService.createJobContext(savedJob);
         } catch (Exception e) {
             log.error("Error creating the job", e);
