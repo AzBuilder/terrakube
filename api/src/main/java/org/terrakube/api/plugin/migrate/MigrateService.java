@@ -3,6 +3,7 @@ package org.terrakube.api.plugin.migrate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.terrakube.api.plugin.storage.StorageTypeService;
 import org.terrakube.api.repository.JobRepository;
 import org.terrakube.api.repository.OrganizationRepository;
 import org.terrakube.api.repository.WorkspaceRepository;
@@ -22,6 +23,7 @@ public class MigrateService {
     private WorkspaceRepository workspaceRepository;
     private OrganizationRepository organizationRepository;
     private JobRepository jobRepository;
+    private StorageTypeService storageService;
 
     public boolean migrateWorkspace(String workspaceId, String organizationId) {
         log.info("Migrating workspace {} to organization {}", workspaceId, organizationId);
@@ -69,6 +71,8 @@ public class MigrateService {
         for(History history: workspace.getHistory()){
             history.setOutput(history.getOutput().replace(originalOrg, organizationId));
         }
+
+        storageService.migrateToOrganization(originalOrg, workspaceId, organizationId);
         return true;
 
     }
