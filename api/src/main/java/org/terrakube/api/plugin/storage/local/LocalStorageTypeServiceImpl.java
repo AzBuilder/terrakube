@@ -47,7 +47,7 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
     @Override
     public byte[] getTerraformStateJson(String organizationId, String workspaceId, String stateFileName) {
-        log.info("Searching: /.terraform-spring-boot/local/tfstate/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
+        log.info("Searching: /.terraform-spring-boot/local/state/{}/{}/state/{}.json", organizationId, workspaceId, stateFileName);
         String outputFilePath = String.format(STATE_DIRECTORY_JSON, organizationId, workspaceId, stateFileName);
         return getOutputBytes(outputFilePath);
     }
