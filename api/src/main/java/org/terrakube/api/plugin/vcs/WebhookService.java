@@ -94,7 +94,7 @@ public class WebhookService {
             job.setRefresh(true);
             job.setPlanChanges(true);
             job.setRefreshOnly(false);
-            job.setOverrideBranch(webhookResult.getBranch());
+            job.setOverrideBranch(webhookResult.isRelease() ? "refs/tags/" + webhookResult.getBranch() : webhookResult.getBranch());
             job.setOrganization(workspace.getOrganization());
             job.setWorkspace(workspace);
             job.setCreatedBy(webhookResult.getCreatedBy());
