@@ -176,6 +176,51 @@ public class AwsStorageTypeServiceImpl implements StorageTypeService {
         deleteFolderFromBucket(workspaceStateFolder);
     }
 
+    @Override
+    public boolean migrateToOrganization(String organizationId, String workspaceId, String migrateToOrganizationId) {
+        String stateFolder = "tfstate/%s/%s/";
+        String outputFolder = "tfoutput/%s/%s/";
+        migrateFolder(stateFolder, organizationId, workspaceId, migrateToOrganizationId);
+        migrateFolder(outputFolder, organizationId, workspaceId, migrateToOrganizationId);
+        return true;
+    }
+
+    private void migrateFolder(String folder, String organizationId, String workspaceId, String migrateToOrganizationId) {
+        try {
+            // Define source and target prefixes
+            String sourcePrefix = String.format(folder, organizationId, workspaceId);
+            String targetPrefix = String.format(folder, migrateToOrganizationId, workspaceId);
+
+            log.info("Migrating from {} to {}", sourcePrefix, targetPrefix);
+
+            // List objects under the source prefix
+            ListObjectsV2Request listRequest = ListObjectsV2Request.builder()
+                    .bucket(bucketName)
+                    .prefix(sourcePrefix)
+                    .build();
+            ListObjectsV2Response listResponse = s3client.listObjectsV2(listRequest);
+
+            for (S3Object s3Object : listResponse.contents()) {
+                String sourceKey = s3Object.key();
+                String targetKey = sourceKey.replaceFirst(sourcePrefix, targetPrefix);
+
+                log.info("Copying {} to {}", sourceKey, targetKey);
+
+                // Copy each object to the new location
+                CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+                        .copySource(bucketName + "/" + sourceKey)
+                        .bucket(bucketName)
+                        .key(targetKey)
+                        .build();
+                s3client.copyObject(copyRequest);
+            }
+
+            log.info("Migration completed successfully from {} to {}", sourcePrefix, targetPrefix);
+        } catch (Exception e) {
+            log.error("Migration failed: {}", e.getMessage());
+        }
+    }
+
     private void deleteFolderFromBucket(String prefix) {
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(bucketName)

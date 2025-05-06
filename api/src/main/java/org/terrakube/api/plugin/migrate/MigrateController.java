@@ -1,0 +1,25 @@
+package org.terrakube.api.plugin.migrate;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@RestController
+@RequestMapping("/migrate/v1/")
+@AllArgsConstructor
+public class MigrateController {
+
+    @Autowired
+    MigrateService migrateService;
+
+    @Transactional
+    @PostMapping(produces = "application/json", path = "/workspaces/{workspaceId}/migrateTo/{organizationId}")
+    public ResponseEntity<String> migrateWorkspace(@PathVariable("workspaceId") String workspaceId, @PathVariable("organizationId") String organizationId) {
+        log.info("Migrating Workspace {} to organization {}", workspaceId, organizationId);
+        return ResponseEntity.status(200).body("");
+    }
+}

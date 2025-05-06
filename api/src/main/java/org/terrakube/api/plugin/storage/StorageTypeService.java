@@ -30,4 +30,6 @@ public interface StorageTypeService {
     void deleteWorkspaceOutputData(String organizationId, List<Integer> jobList);
 
     void deleteWorkspaceStateData(String organizationId, String workspaceId);
+
+    boolean migrateToOrganization(String organizationId, String workspaceId, String migrateToOrganizationId);
 }

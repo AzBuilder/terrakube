@@ -21,14 +21,14 @@ import java.util.List;
 @Builder
 public class LocalStorageTypeServiceImpl implements StorageTypeService {
 
-    private static final String OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";
-    private static final String CONTENT_DIRECTORY = "/.terraform-spring-boot/local/content/%s/terraformContent.tar.gz";
-    private static final String CONTEXT_DIRECTORY = "/.terraform-spring-boot/local/output/context/%s/context.json";
-    private static final String STATE_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/terraformLibrary.tfPlan";
-    private static final String STATE_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
+    private static final String OUTPUT_DIRECTORY =                "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";
+    private static final String CONTENT_DIRECTORY =               "/.terraform-spring-boot/local/content/%s/terraformContent.tar.gz";
+    private static final String CONTEXT_DIRECTORY =               "/.terraform-spring-boot/local/output/context/%s/context.json";
+    private static final String STATE_DIRECTORY =                 "/.terraform-spring-boot/local/state/%s/%s/%s/%s/terraformLibrary.tfPlan";
+    private static final String STATE_DIRECTORY_JSON =            "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
     private static final String NO_DATA_FOUND = "";
     private static final String NO_CONTEXT_FOUND = "{}";
-    private static final String LOCAL_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate";
+    private static final String LOCAL_BACKEND_DIRECTORY =         "/.terraform-spring-boot/local/backend/%s/%s/terraform.tfstate";
     private static final String LOCAL_HISTORY_BACKEND_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/state/%s.raw.json";
 
     @Override
@@ -204,6 +204,33 @@ public class LocalStorageTypeServiceImpl implements StorageTypeService {
             FileUtils.cleanDirectory(new File(statePath));
         } catch (IOException e) {
             log.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean migrateToOrganization(String organizationId, String workspaceId, String migrateToOrganizationId) {
+
+        String sourceOutputDirectory = String.format("%s/.terraform-spring-boot/local/output/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+        String sourceOutputTarget = String.format("%s/.terraform-spring-boot/local/output/%s/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId, workspaceId);
+        migrateDirectory(new File(sourceOutputDirectory), new File(sourceOutputTarget));
+
+        String stateDirectory = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+        String stateTargetDirectory = String.format("%s/.terraform-spring-boot/local/state/%s/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId, workspaceId);
+        migrateDirectory(new File(stateDirectory), new File(stateTargetDirectory));
+
+        String terraformStateDirectory = String.format("%s/.terraform-spring-boot/local/backend/%s/%s", FileUtils.getUserDirectoryPath(), organizationId, workspaceId);
+        String terraformStateTargetDirectory = String.format("%s/.terraform-spring-boot/local/backend/%s/%s", FileUtils.getUserDirectoryPath(), migrateToOrganizationId, workspaceId);
+        migrateDirectory(new File(terraformStateDirectory), new File(terraformStateTargetDirectory));
+
+        return true;
+    }
+
+    public void migrateDirectory(File sourceDirectory, File targetDirectory) {
+        try {
+            FileUtils.copyDirectory(sourceDirectory, targetDirectory);
+            log.info("Moving folder {} to {} successfully!", sourceDirectory.getAbsolutePath(), targetDirectory.getAbsolutePath());
+        } catch (IOException e) {
+            log.info("An error occurred while copying the folder {}: {}",sourceDirectory.getAbsolutePath(), e.getMessage());
         }
     }
 }
