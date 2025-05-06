@@ -86,7 +86,7 @@ public class WebhookService {
             return result;
 
         try {
-            String templateId = findTemplateId(webhookResult, webhook);
+            String templateId = webhookResult.isRelease() ? findTemplateIdRelease(webhookResult, webhook) : findTemplateId(webhookResult, webhook);
             log.info("webhook event {} for workspace {}, using template with id {}", webhookResult.getEvent(),
                     webhook.getWorkspace().getName(), templateId);
             Job job = new Job();
@@ -94,7 +94,7 @@ public class WebhookService {
             job.setRefresh(true);
             job.setPlanChanges(true);
             job.setRefreshOnly(false);
-            job.setOverrideBranch(webhookResult.getBranch());
+            job.setOverrideBranch(webhookResult.isRelease() ? "refs/tags/" + webhookResult.getBranch() : webhookResult.getBranch());
             job.setOrganization(workspace.getOrganization());
             job.setWorkspace(workspace);
             job.setCreatedBy(webhookResult.getCreatedBy());
@@ -105,7 +105,8 @@ public class WebhookService {
             job.setVia(webhookResult.getVia());
             job.setCommitId(webhookResult.getCommit());
             Job savedJob = jobRepository.save(job);
-            sendCommitStatus(savedJob);
+            if (!webhookResult.isRelease())
+                sendCommitStatus(savedJob);
             scheduleJobService.createJobContext(savedJob);
         } catch (Exception e) {
             log.error("Error creating the job", e);
@@ -207,6 +208,18 @@ public class WebhookService {
                 .stream()
                 .filter(webhookEvent -> checkBranch(result.getBranch(), webhookEvent)
                         && checkFileChanges(result.getFileChanges(), webhookEvent))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No valid template found for the configured webhook event " + result.getEvent()))
+                .getTemplateId();
+    }
+
+    private String findTemplateIdRelease(WebhookResult result, Webhook webhook) {
+        return webhookEventRepository
+                .findByWebhookAndEventOrderByPriorityAsc(webhook,
+                        WebhookEventType.valueOf(result.getEvent().toUpperCase()))
+                .stream()
+                .filter(webhookEvent -> checkBranch(result.getBranch(), webhookEvent))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No valid template found for the configured webhook event " + result.getEvent()))
