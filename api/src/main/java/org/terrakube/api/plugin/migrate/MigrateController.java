@@ -19,7 +19,7 @@ public class MigrateController {
     @Transactional
     @PostMapping(produces = "application/json", path = "/workspace/{workspaceId}/migrateTo/{organizationId}")
     public ResponseEntity<String> migrateWorkspace(@PathVariable("workspaceId") String workspaceId, @PathVariable("organizationId") String organizationId) {
-        log.info("Migrating Workspace {} to organization {}", workspaceId, organizationId);
+        migrateService.migrateWorkspace(workspaceId, organizationId);
         return ResponseEntity.status(200).body("");
     }
 }
