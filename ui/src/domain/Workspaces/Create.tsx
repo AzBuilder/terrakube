@@ -233,10 +233,10 @@ export const CreateWorkspace = () => {
     setCurrent(3);
     setStep4Hidden(false);
     setStep3Hidden(true);
-    var source = form.getFieldValue("source");
+    const source = form.getFieldValue("source");
 
     if (source != null) {
-      var nameValue = source.match("/([^/]+)/?$");
+      const nameValue = source.match("/([^/]+)/?$");
       if (nameValue != null && nameValue.length > 0) {
         form.setFieldsValue({ name: nameValue[1].replace(".git", "") });
       }
@@ -276,7 +276,7 @@ export const CreateWorkspace = () => {
 
   const onFinish = (values: CreateWorkspaceForm) => {
     const workspace_lid = uuid();
-    let body = {
+    const body = {
       "atomic:operations": [
         {
           op: "add",
@@ -336,7 +336,11 @@ export const CreateWorkspace = () => {
               <span>
                 You are not authorized to create workspaces. <br /> Please contact your administrator and request the{" "}
                 <b>Manage Workspaces</b> permission. <br /> For more information, visit the{" "}
-                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
+                <a
+                  target="_blank"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
+                  rel="noreferrer"
+                >
                   Terrakube documentation
                 </a>
                 .
@@ -371,7 +375,7 @@ export const CreateWorkspace = () => {
   };
 
   const getIacTypes = () => {
-    let iacTypes = [
+    const iacTypes = [
       {
         id: "terraform",
         name: "Terraform",

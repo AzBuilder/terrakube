@@ -211,7 +211,7 @@ export function getServiceIcon(providerType: string, resourceType: string) {
 
 const getAWSIcon = (resourceType: string) => {
   // search exact match
-  var icon = AWSIcons.find((icon) => resourceType === icon.type);
+  let icon = AWSIcons.find((icon) => resourceType === icon.type);
   if (icon) return icon.path;
 
   // search partial match
@@ -221,7 +221,7 @@ const getAWSIcon = (resourceType: string) => {
 
 const getAzureIcon = (resourceType: string) => {
   // search exact match
-  var icon = AzureIcons.find((icon) => resourceType === icon.type);
+  let icon = AzureIcons.find((icon) => resourceType === icon.type);
   if (icon) return icon.path;
 
   // search partial match

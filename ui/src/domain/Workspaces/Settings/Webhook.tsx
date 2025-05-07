@@ -48,7 +48,7 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
       axiosInstance
         .get(`organization/${organizationId}/workspace/${workspaceId}/webhook/${webhookId}/events`)
         .then((response) => {
-          var i = 1;
+          let i = 1;
           const events = response.data.data
             .sort((a: WebhookEvent, b: WebhookEvent) => b.attributes.priority - a.attributes.priority)
             .map((event: WebhookEvent) => {
@@ -139,7 +139,7 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
       return;
     }
     // Verify required fields
-    var inputError = false;
+    let inputError = false;
     webhookEvents
       .filter((_, index) => index < recordIndex - 1)
       .forEach((event) => {

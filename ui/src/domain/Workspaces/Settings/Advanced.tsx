@@ -26,8 +26,8 @@ export const WorkspaceAdvanced = ({ workspace, manageWorkspace }: Props) => {
   }
   const onDelete = (workspace: Workspace) => {
     const id = workspace.id;
-    let randomLetters = generateRandomString(4);
-    let deletedName = `${workspace.attributes.name.substring(0, 21)}_DEL_${randomLetters}`;
+    const randomLetters = generateRandomString(4);
+    const deletedName = `${workspace.attributes.name.substring(0, 21)}_DEL_${randomLetters}`;
 
     const body = {
       data: {

@@ -6,201 +6,197 @@ import axiosInstance from "../../config/axiosConfig";
 import { Agent } from "../types";
 import "./Settings.css";
 
-
-
 type Params = {
-    orgid: string;
-  };
-  
+  orgid: string;
+};
+
 type AddAgentForm = {
-name?: string;
+  name?: string;
 } & UpdateAgentForm;
 
 type UpdateAgentForm = {
-description: string;
-url: string;
+  description: string;
+  url: string;
 };
 
-
 export const AgentSettings = () => {
-    const { orgid } = useParams<Params>();
-    const [Agents, setAgents] = useState<Agent[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [visible, setVisible] = useState(false);
-    const [AgentName, setAgentName] = useState<string>();
-    const [mode, setMode] = useState("create");
-    const [AgentId] = useState([]);
-    const [form] = Form.useForm<AddAgentForm | UpdateAgentForm>();
-  
-    const onCancel = () => {
-      setVisible(false);
-    };
-  
-    const onNew = () => {
-      form.resetFields();
-      setVisible(true);
-      setAgentName("");
-      setMode("create");
-    };
-  
-    const onDelete = (id: string) => {
-      axiosInstance.delete(`organization/${orgid}/agent/${id}`).then(() => {
-        loadAgents();
-      });
-    };
-  
-    const onCreate = (values: AddAgentForm) => {
-      const body = {
-        data: {
-          type: "agent",
-          attributes: {
-            name: values.name,
-            description: values.description,
-            url: values.url,
-          },
-        },
-      };
-  
-      axiosInstance
-        .post(`organization/${orgid}/agent`, body, {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        })
-        .then((response) => {
-          loadAgents();
-          setVisible(false);
-          form.resetFields();
-        });
-    };
-  
-    const onUpdate = (values: UpdateAgentForm) => {
-      const body = {
-        data: {
-          type: "agent",
-          id: AgentId,
-          attributes: {
-            description: values.description,
-            url: values.url,
-          },
-        },
-      };
-  
-      axiosInstance
-        .patch(`organization/${orgid}/agent/${AgentId}`, body, {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        })
-        .then(() => {
-          loadAgents();
-          setVisible(false);
-          form.resetFields();
-        });
-    };
-  
-    const loadAgents = () => {
-      axiosInstance.get(`organization/${orgid}/agent`).then((response) => {
-        setAgents(response.data.data);
-        setLoading(false);
-      });
-    };
-    useEffect(() => {
-      setLoading(true);
-      loadAgents();
-    }, [orgid]);
-  
-    return (
-      <div className="setting">
-        <h1>Agent pools</h1>
-        <div>
-          <Typography.Text type="secondary" className="App-text">
-            Terrakube uses these agents to execute terraform commands.  
-            Terrakube allow to have one or multiple agents to run jobs, you can have as many agents as you want for a single organization.
-          </Typography.Text>
-        </div>
-        <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
-          Add Terrakube Agent
-        </Button>
-        <br></br>
-  
-        <h3 style={{ marginTop: "30px" }}>Terrakube Agents</h3>
-        {loading ? (
-          <p>Data loading...</p>
-        ) : (
-          <List
-            itemLayout="horizontal"
-            dataSource={Agents}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
-                  <Popconfirm
-                    onConfirm={() => {
-                      onDelete(item.id);
-                    }}
-                    style={{ width: "20px" }}
-                    title={
-                      <p>
-                        This will permanently delete this Terrakube Agent  <br />
-                        <br />
-                        Are you sure?
-                      </p>
-                    }
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    {" "}
-                    <Button icon={<DeleteOutlined />} type="link" danger>
-                      Delete
-                    </Button>
-                  </Popconfirm>,
-                ]}
-              >
-                <List.Item.Meta description={item.attributes.description} title={item.attributes.name} />
-              </List.Item>
-            )}
-          />
-        )}
-  
-        <Modal
-          width="650px"
-          open={visible}
-          title={mode === "edit" ? "Edit Terrakube Agent  " + AgentName : "Add a new Terrakube Agent"}
-          okText="Save Terrakube Agent "
-          onCancel={onCancel}
-          cancelText="Cancel"
-          onOk={() => {
-            form
-              .validateFields()
-              .then((values) => {
-                if (mode === "create") onCreate(values as AddAgentForm);
-                else onUpdate(values);
-              })
-              .catch((info) => {
-                console.log("Validate Failed:", info);
-              });
-          }}
-        >
-          <Space style={{ width: "100%" }} direction="vertical">
-            <Form name="Agent" form={form} layout="vertical">
-              {mode === "create" ? (
-                <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-                  <Input />
-                </Form.Item>
-              ) : (
-                ""
-              )}
-  
-              <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item name="url" label="Url" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Form>
-          </Space>
-        </Modal>
-      </div>
-    );
+  const { orgid } = useParams<Params>();
+  const [Agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [AgentName, setAgentName] = useState<string>();
+  const [mode, setMode] = useState("create");
+  const [AgentId] = useState([]);
+  const [form] = Form.useForm<AddAgentForm | UpdateAgentForm>();
+
+  const onCancel = () => {
+    setVisible(false);
   };
-  
+
+  const onNew = () => {
+    form.resetFields();
+    setVisible(true);
+    setAgentName("");
+    setMode("create");
+  };
+
+  const onDelete = (id: string) => {
+    axiosInstance.delete(`organization/${orgid}/agent/${id}`).then(() => {
+      loadAgents();
+    });
+  };
+
+  const onCreate = (values: AddAgentForm) => {
+    const body = {
+      data: {
+        type: "agent",
+        attributes: {
+          name: values.name,
+          description: values.description,
+          url: values.url,
+        },
+      },
+    };
+
+    axiosInstance
+      .post(`organization/${orgid}/agent`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then((response) => {
+        loadAgents();
+        setVisible(false);
+        form.resetFields();
+      });
+  };
+
+  const onUpdate = (values: UpdateAgentForm) => {
+    const body = {
+      data: {
+        type: "agent",
+        id: AgentId,
+        attributes: {
+          description: values.description,
+          url: values.url,
+        },
+      },
+    };
+
+    axiosInstance
+      .patch(`organization/${orgid}/agent/${AgentId}`, body, {
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+      })
+      .then(() => {
+        loadAgents();
+        setVisible(false);
+        form.resetFields();
+      });
+  };
+
+  const loadAgents = () => {
+    axiosInstance.get(`organization/${orgid}/agent`).then((response) => {
+      setAgents(response.data.data);
+      setLoading(false);
+    });
+  };
+  useEffect(() => {
+    setLoading(true);
+    loadAgents();
+  }, [orgid]);
+
+  return (
+    <div className="setting">
+      <h1>Agent pools</h1>
+      <div>
+        <Typography.Text type="secondary" className="App-text">
+          Terrakube uses these agents to execute terraform commands. Terrakube allow to have one or multiple agents to
+          run jobs, you can have as many agents as you want for a single organization.
+        </Typography.Text>
+      </div>
+      <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
+        Add Terrakube Agent
+      </Button>
+      <br></br>
+
+      <h3 style={{ marginTop: "30px" }}>Terrakube Agents</h3>
+      {loading ? (
+        <p>Data loading...</p>
+      ) : (
+        <List
+          itemLayout="horizontal"
+          dataSource={Agents}
+          renderItem={(item) => (
+            <List.Item
+              actions={[
+                <Popconfirm
+                  onConfirm={() => {
+                    onDelete(item.id);
+                  }}
+                  style={{ width: "20px" }}
+                  title={
+                    <p>
+                      This will permanently delete this Terrakube Agent <br />
+                      <br />
+                      Are you sure?
+                    </p>
+                  }
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  {" "}
+                  <Button icon={<DeleteOutlined />} type="link" danger>
+                    Delete
+                  </Button>
+                </Popconfirm>,
+              ]}
+            >
+              <List.Item.Meta description={item.attributes.description} title={item.attributes.name} />
+            </List.Item>
+          )}
+        />
+      )}
+
+      <Modal
+        width="650px"
+        open={visible}
+        title={mode === "edit" ? "Edit Terrakube Agent  " + AgentName : "Add a new Terrakube Agent"}
+        okText="Save Terrakube Agent "
+        onCancel={onCancel}
+        cancelText="Cancel"
+        onOk={() => {
+          form
+            .validateFields()
+            .then((values) => {
+              if (mode === "create") onCreate(values as AddAgentForm);
+              else onUpdate(values);
+            })
+            .catch((info) => {
+              console.log("Validate Failed:", info);
+            });
+        }}
+      >
+        <Space style={{ width: "100%" }} direction="vertical">
+          <Form name="Agent" form={form} layout="vertical">
+            {mode === "create" ? (
+              <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            ) : (
+              ""
+            )}
+
+            <Form.Item name="description" label="Description" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="url" label="Url" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+          </Form>
+        </Space>
+      </Modal>
+    </div>
+  );
+};

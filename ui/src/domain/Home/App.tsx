@@ -96,10 +96,7 @@ const App = () => {
         {
           path: "/organizations/:id/workspaces",
           element: (
-            <OrganizationsDetailPage
-              setOrganizationName={setOrganizationName}
-              organizationName={organizationName}
-            />
+            <OrganizationsDetailPage setOrganizationName={setOrganizationName} organizationName={organizationName} />
           ),
         },
         {

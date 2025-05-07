@@ -41,7 +41,7 @@ export const ModuleList = ({ setOrganizationName, organizationName }: Props) => 
 
   const applyFilters = (searchValue: string) => {
     if (searchValue !== "") {
-      var filteredModules = modules.filter((modules) => modules.name.includes(searchValue));
+      const filteredModules = modules.filter((modules) => modules.name.includes(searchValue));
       setFilteredModules(filteredModules);
       return;
     }
@@ -173,7 +173,7 @@ function setupOrganizationIncludes(
   setModules: React.Dispatch<React.SetStateAction<FlatModule[]>>,
   setFilteredModules: React.Dispatch<React.SetStateAction<FlatModule[]>>
 ) {
-  let modules: FlatModule[] = [];
+  const modules: FlatModule[] = [];
 
   includes.forEach((element: ModuleModel) => {
     switch (element.type) {

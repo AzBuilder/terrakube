@@ -112,4 +112,7 @@ public class Organization {
 
     @Column(name = "execution_mode")
     private String executionMode;
+
+    @Column(name = "icon")
+    private String icon;
 }

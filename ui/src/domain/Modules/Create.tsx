@@ -63,13 +63,13 @@ export const CreateModule = () => {
     setCurrent(2);
     setStep3Hidden(false);
     setStep2Hidden(true);
-    var source = form.getFieldValue("source");
+    const source = form.getFieldValue("source");
 
     if (source != null) {
-      var providerValue = source.match("terraform-(.*)-");
+      const providerValue = source.match("terraform-(.*)-");
       if (providerValue != null && providerValue.length > 0) {
         form.setFieldsValue({ provider: providerValue[1] });
-        var nameValue = source.match(providerValue[1] + "-(.*).git");
+        const nameValue = source.match(providerValue[1] + "-(.*).git");
         if (nameValue != null && nameValue.length > 0) {
           form.setFieldsValue({ name: nameValue[1] });
         }
@@ -206,7 +206,11 @@ export const CreateModule = () => {
               <span>
                 You are not authorized to create Modules. <br /> Please contact your administrator and request the{" "}
                 <b>Manage Modules</b> permission. <br /> For more information, visit the{" "}
-                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
+                <a
+                  target="_blank"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
+                  rel="noreferrer"
+                >
                   Terrakube documentation
                 </a>
                 .

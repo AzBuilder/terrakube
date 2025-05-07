@@ -51,7 +51,7 @@ export const EditTemplate = ({ setMode, templateId, loadTemplates }: Props) => {
   const loadTemplate = (templateId: string) => {
     axiosInstance.get(`organization/${orgid}/template/${templateId}`).then((response) => {
       setTemplate(response.data.data);
-      let buff = Buffer.from(response.data.data.attributes.tcl, "base64");
+      const buff = Buffer.from(response.data.data.attributes.tcl, "base64");
       setTCL(buff.toString("ascii"));
       setLoading(false);
     });

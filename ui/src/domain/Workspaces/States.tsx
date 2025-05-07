@@ -118,8 +118,8 @@ export const States = ({
   function loadData(resp: StateOutput) {
     let nodes: Node<Resource | ErrorResource>[] = [];
     let edges: Edge[] = [];
-    let x = new Map();
-    let y = 100;
+    const x = new Map();
+    const y = 100;
 
     if (resp != null && resp.values != null && resp.values.root_module != null) {
       try {
@@ -271,7 +271,7 @@ export const States = ({
       })
       .catch((error) => {
         // Extract error message from the API response
-        var errorMessage = "An unexpected error occurred.";
+        let errorMessage = "An unexpected error occurred.";
         if (error.response?.status === 403) {
           errorMessage = "You do not have permission to perform this action.";
         }

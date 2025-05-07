@@ -166,14 +166,14 @@ export const DetailsJob = ({ jobId }: Props) => {
   }, [jobId]);
 
   const loadJob = () => {
-    let jobSteps: JobStep[] = [];
+    const jobSteps: JobStep[] = [];
     axiosInstance.get(`organization/${organizationId}/job/${jobId}?include=step`).then((response) => {
       (async () => {
         setJob(response.data);
 
         if (response.data.included != null) {
           for (const element of response.data.included) {
-            let log = await outputLog(element.attributes.output, element.attributes.status);
+            const log = await outputLog(element.attributes.output, element.attributes.status);
             jobSteps.push({
               id: element.id,
               stepNumber: element.attributes.stepNumber,
