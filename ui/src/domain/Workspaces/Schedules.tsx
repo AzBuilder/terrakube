@@ -7,7 +7,7 @@ import "react-js-cron/dist/styles.css";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
 import { FlatSchedule, Template } from "../types";
-var C2Q = require("cron-to-quartz");
+const C2Q = require("cron-to-quartz");
 
 type ScheduleForm = {
   templateId: string;
@@ -116,7 +116,7 @@ export const Schedules = ({ schedules, manageWorkspace }: Props) => {
 
   const loadTemplates = () => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
-      var templatesList = response.data.data.filter(function (obj: Template) {
+      const templatesList = response.data.data.filter(function (obj: Template) {
         //exclude CLI based templates
         return (
           obj.attributes.name !== "Terraform-Plan/Apply-Cli" && obj.attributes.name !== "Terraform-Plan/Destroy-Cli"

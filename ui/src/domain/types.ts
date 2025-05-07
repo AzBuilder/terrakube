@@ -30,6 +30,7 @@ export type OrganizationAttributes = {
   description?: string;
   name: string;
   executionMode?: string;
+  icon?: string;
 };
 
 export type ApiResponse<T> = {
@@ -81,7 +82,7 @@ export enum JobVia {
   Github = "Github",
   Gitlab = "Gitlab",
   Bitbucket = "Bitbucket",
-  Schedule = "Schedule"
+  Schedule = "Schedule",
 }
 
 export type JobAttributes = {
@@ -171,7 +172,6 @@ export type SshKeyAttributes = {
   description: string;
   sshType: string;
 };
-
 
 // Modules
 export type ModuleModel = {
@@ -366,7 +366,7 @@ export type WebhookEventAttributes = {
 export type Agent = {
   id: string;
   attributes: AgentAttributes;
-}
+};
 export type AgentAttributes = {
   name: string;
   description: string;

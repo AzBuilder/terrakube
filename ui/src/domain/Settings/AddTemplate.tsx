@@ -47,7 +47,7 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
     }
   };
   const handleClick = (item: TemplateAttributes) => {
-    let buff = Buffer.from(item.tcl, "base64");
+    const buff = Buffer.from(item.tcl, "base64");
     setTCL(buff.toString("ascii"));
     setCurrent(1);
   };
@@ -58,7 +58,7 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
 
   const getTCLTemplates = () => {
     //TODO: Use github repo to get Templates
-    let templates: TemplateAttributes[] = [
+    const templates: TemplateAttributes[] = [
       {
         name: "Blank Template",
         description: "Create an empty template. So you can define your template from scratch.",
@@ -145,7 +145,11 @@ export const AddTemplate = ({ setMode, loadTemplates }: Props) => {
               <span>
                 You are not authorized to create Templates. <br /> Please contact your administrator and request the{" "}
                 <b>Manage Templates</b> permission. <br /> For more information, visit the{" "}
-                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
+                <a
+                  target="_blank"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
+                  rel="noreferrer"
+                >
                   Terrakube documentation
                 </a>
                 .

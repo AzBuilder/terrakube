@@ -16,8 +16,8 @@ export function compareVersions(a: string, b: string) {
   if (a === b) {
     return 0;
   }
-  let splitA = a.replace("v", "").split(".").map(parseInt);
-  let splitB = b.replace("v", "").split(".").map(parseInt);
+  const splitA = a.replace("v", "").split(".").map(parseInt);
+  const splitB = b.replace("v", "").split(".").map(parseInt);
   const length = Math.max(splitA.length, splitB.length);
   for (let i = 0; i < length; i++) {
     if (splitA[i] > splitB[i] || (splitA[i] === splitB[i] && isNaN(splitB[i + 1]))) {
@@ -65,7 +65,7 @@ export const atomicHeader = {
 export const deleteWebhook = (organizationId: string, workspaceId: string, webhook: any) => {
   const webhooks = Object.entries(webhook);
   if (webhooks.length == 0) return;
-  var body = {
+  const body = {
     "atomic:operations": [],
   };
   webhooks.map(([_, hook]: any) => {

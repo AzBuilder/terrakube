@@ -3,6 +3,7 @@ export type OrganizationModel = {
   description?: string;
   name: string;
   executionMode?: string;
+  icon?: string;
 };
 
 export type TagModel = {

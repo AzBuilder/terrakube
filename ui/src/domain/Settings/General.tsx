@@ -1,15 +1,20 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Popconfirm, Radio, Space, Typography, theme, Spin } from "antd";
+import { Button, Form, Input, message, Popconfirm, Radio, Space, Typography, Spin, ColorPicker } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";
 import { Organization } from "../types";
+import { IconSelector } from "../Organizations/IconSelector";
 import "./Settings.css";
+
+const DEFAULT_ICON = "FaBuilding";
+const DEFAULT_COLOR = "#000000";
 
 type GeneralSettingsForm = {
   name: string;
   description: string;
   executionMode: "remote" | "local";
+  icon?: string;
 };
 
 export const GeneralSettings = () => {
@@ -18,9 +23,12 @@ export const GeneralSettings = () => {
   const [loading, setLoading] = useState(false);
   const [waiting, setWaiting] = useState(false);
   const [form] = Form.useForm();
+  const [icon, setIcon] = useState<string>(DEFAULT_ICON);
+  const [color, setColor] = useState<string>(DEFAULT_COLOR);
 
   const onFinish = (values: GeneralSettingsForm) => {
     setWaiting(true);
+    const iconField = icon ? `${icon}:${color}` : undefined;
     const body = {
       data: {
         type: "organization",
@@ -29,6 +37,7 @@ export const GeneralSettings = () => {
           name: values.name,
           description: values.description,
           executionMode: values.executionMode,
+          icon: iconField,
         },
       },
     };
@@ -75,17 +84,21 @@ export const GeneralSettings = () => {
       });
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-    message.error("Failed to update organization settings");
-  };
-
   useEffect(() => {
     setLoading(true);
     axiosInstance
       .get(`organization/${orgid}`)
       .then((response) => {
         setOrganization(response.data.data);
+        const iconField = response.data.data.attributes.icon;
+        if (iconField) {
+          const [iconName, iconColor] = iconField.split(":");
+          setIcon(iconName || DEFAULT_ICON);
+          setColor(iconColor || DEFAULT_COLOR);
+        } else {
+          setIcon(DEFAULT_ICON);
+          setColor(DEFAULT_COLOR);
+        }
         form.setFieldsValue({
           name: response.data.data.attributes.name,
           description: response.data.data.attributes.description,
@@ -94,7 +107,6 @@ export const GeneralSettings = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
         message.error("Failed to load organization settings");
         setLoading(false);
       });
@@ -147,6 +159,21 @@ export const GeneralSettings = () => {
                   </Radio>
                 </Space>
               </Radio.Group>
+            </Form.Item>
+            <Form.Item label="Organization Icon and Color">
+              <Space align="start">
+                <IconSelector value={icon} color={color} onChange={setIcon} />
+                <ColorPicker
+                  value={color}
+                  onChange={(colorObj) => setColor(colorObj.toHexString())}
+                  presets={[
+                    {
+                      label: "Recommended",
+                      colors: ["#000000", "#1890ff", "#722ED1", "#2eb039", "#fa8f37", "#FB0136"],
+                    },
+                  ]}
+                />
+              </Space>
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">

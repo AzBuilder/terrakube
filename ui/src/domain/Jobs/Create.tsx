@@ -36,14 +36,14 @@ export const CreateJob = ({ changeJob }: Props) => {
 
   const loadBranch = () => {
     axiosInstance.get(`organization/${organizationId}/workspace/${workspaceId}`).then((response) => {
-      var branchName = response.data.data.attributes.branch;
+      const branchName = response.data.data.attributes.branch;
       setBranchName(branchName);
     });
   };
 
   const loadTemplates = () => {
     axiosInstance.get(`organization/${organizationId}/template`).then((response) => {
-      var templatesList = response.data.data.filter(function (obj: Template) {
+      const templatesList = response.data.data.filter(function (obj: Template) {
         //exclude CLI based templates
         return (
           obj.attributes.name !== "Terraform-Plan/Apply-Cli" && obj.attributes.name !== "Terraform-Plan/Destroy-Cli"

@@ -333,7 +333,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
   };
 
   const loadWorkspace = (_loadVersions: boolean, _loadWebhook = false, _loadPermissionSet = false) => {
-    var url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,reference`;
+    let url = `organization/${organizationId}/workspace/${id}?include=job,variable,history,schedule,vcs,agent,organization,reference`;
     if (_loadWebhook) url += ",webhook";
     axiosInstance.get(`organization/${organizationId}/template`).then((template) => {
       setTemplates(template.data.data);
@@ -698,7 +698,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                             <>
                               {" "}
                               {renderVCSLogo(vcsProvider)}{" "}
-                              <a href={fixSshURL(workspace.attributes.source)} target="_blank">
+                              <a href={fixSshURL(workspace.attributes.source)} target="_blank" rel="noreferrer">
                                 {new URL(fixSshURL(workspace.attributes.source))?.pathname
                                   ?.replace(".git", "")
                                   ?.substring(1)}
@@ -729,11 +729,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                 </TabPane>
 
                 <TabPane tab="Runs" key="2">
-                  {jobVisible ? (
-                    <DetailsJob jobId={jobId!} />
-                  ) : (
-                    <RunList jobs={jobs} onRunClick={handleClick} />
-                  )}
+                  {jobVisible ? <DetailsJob jobId={jobId!} /> : <RunList jobs={jobs} onRunClick={handleClick} />}
                 </TabPane>
                 <TabPane tab="States" key="3" disabled={!manageState}>
                   <States
@@ -826,22 +822,22 @@ function setupWorkspaceIncludes(
   setGlobalVariables: (val: FlatVariable[]) => void,
   setGlobalEnvVariables: (val: FlatVariable[]) => void
 ) {
-  let variables: FlatVariable[] = [];
-  let jobs: FlatJob[] = [];
-  let webhooks: any = {};
-  let envVariables: FlatVariable[] = [];
-  let history: FlatJobHistory[] = [];
-  let schedule: Schedule[] = [];
-  let collectionVariables: any[] = [];
-  let collectionEnvVariables: any[] = [];
-  let globalVariables: FlatVariable[] = [];
-  let globalEnvVariables: FlatVariable[] = [];
-  let includes = data.included;
+  const variables: FlatVariable[] = [];
+  const jobs: FlatJob[] = [];
+  const webhooks: any = {};
+  const envVariables: FlatVariable[] = [];
+  const history: FlatJobHistory[] = [];
+  const schedule: Schedule[] = [];
+  const collectionVariables: any[] = [];
+  const collectionEnvVariables: any[] = [];
+  const globalVariables: FlatVariable[] = [];
+  const globalEnvVariables: FlatVariable[] = [];
+  const includes = data.included;
   includes.forEach((element: any) => {
     switch (element.type) {
       case include.ORGANIZATION:
         axiosInstance.get(`/organization/${element.id}/globalvar`).then((response: any) => {
-          let globalVar = response.data.data;
+          const globalVar = response.data.data;
           if (globalVar != null) {
             globalVar.forEach((variableItem: any) => {
               if (variableItem.attributes.category === "ENV") {
@@ -946,9 +942,9 @@ function setupWorkspaceIncludes(
         break;
       case include.REFERENCE:
         axiosInstance.get(`/reference/${element.id}/collection?include=item`).then((response: any) => {
-          let collectionInfo = response.data.data;
+          const collectionInfo = response.data.data;
           if (response.data.included != null) {
-            let items = response.data.included;
+            const items = response.data.included;
             items.forEach((item: any) => {
               item.attributes.priority = collectionInfo.attributes.priority;
               item.attributes.collectionName = collectionInfo.attributes.name;
@@ -983,7 +979,7 @@ function setupWorkspaceIncludes(
   setGlobalEnvVariables(globalEnvVariables);
 
   // set state data
-  var lastState = history
+  const lastState = history
     .sort((a: FlatJobHistory, b: FlatJobHistory) => parseInt(a.jobReference) - parseInt(b.jobReference))
     .reverse()[0];
   // reload state only if there is a new version
@@ -1022,11 +1018,11 @@ function loadState(
     return;
   }
 
-  var currentState;
-  var organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+  let currentState;
+  const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
 
   axiosInstance.get(state.output).then((resp) => {
-    var result = parseState(resp.data);
+    let result = parseState(resp.data);
     setContextState(resp.data);
     if (result.outputs.length < 1 && result.resources.length < 1) {
       axiosInstance
@@ -1054,8 +1050,8 @@ function loadState(
 }
 
 function parseState(state: any) {
-  var resources: any[] = [];
-  var outputs: StateOutputVariableWithName[] = [];
+  let resources: any[] = [];
+  const outputs: StateOutputVariableWithName[] = [];
 
   // parse root outputs
   if (state?.values?.outputs != null) {
@@ -1122,8 +1118,8 @@ function parseState(state: any) {
 }
 
 function parseOldState(state: any) {
-  var resources: any[] = [];
-  var outputs = [];
+  const resources: any[] = [];
+  const outputs = [];
 
   if (state?.outputs != null) {
     for (const [key, value] of Object.entries(state?.outputs) as [any, any][]) {

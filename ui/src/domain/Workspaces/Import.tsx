@@ -253,7 +253,7 @@ export const ImportWorkspace = () => {
   const handleImportClick = async () => {
     setStepsHidden(true);
     setListHidden(false);
-    var workspacesImported = workspacesImport.map((workspace) => ({
+    const workspacesImported = workspacesImport.map((workspace) => ({
       id: workspace.id,
       name: workspace.attributes.name,
       status: "Importing...",
@@ -358,7 +358,7 @@ export const ImportWorkspace = () => {
   };
 
   const getPlatforms = () => {
-    let platforms: Platform[] = [
+    const platforms: Platform[] = [
       {
         id: "tfcloud",
         name: "Terraform Cloud",

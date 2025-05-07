@@ -7,6 +7,7 @@ function mapOrganization(apiData: Organization): OrganizationModel {
     name: apiData.attributes.name,
     description: apiData.attributes.description,
     executionMode: apiData.attributes.executionMode,
+    icon: apiData.attributes.icon,
   };
 }
 

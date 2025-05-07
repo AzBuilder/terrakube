@@ -1,7 +1,9 @@
-import { Breadcrumb, Button, Form, Input, Layout, message, theme, Typography } from "antd";
+import { Breadcrumb, Button, Form, Input, Layout, message, theme, Typography, Space, ColorPicker } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
+import { IconSelector } from "./IconSelector";
+import { useState } from "react";
 import "./Organizations.css";
 const { Content } = Layout;
 
@@ -9,9 +11,13 @@ const validateMessages = {
   required: "${label} is required!",
 };
 
+const DEFAULT_ICON = "FaBuilding";
+const DEFAULT_COLOR = "#000000";
+
 type CreateOrganizationForm = {
   name: string;
   description?: string;
+  icon?: string;
 };
 
 type Props = {
@@ -24,11 +30,16 @@ export const CreateOrganization = ({ setOrganizationName }: Props) => {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const [icon, setIcon] = useState<string>(DEFAULT_ICON);
+  const [color, setColor] = useState<string>(DEFAULT_COLOR);
+
   const onFinish = (values: CreateOrganizationForm) => {
+    // Store as iconName:color (color always hex)
+    const iconField = icon ? `${icon}:${color}` : undefined;
     const body = {
       data: {
         type: "organization",
-        attributes: values,
+        attributes: { ...values, icon: iconField },
       },
     };
 
@@ -106,6 +117,23 @@ export const CreateOrganization = ({ setOrganizationName }: Props) => {
             <Form.Item name="description" label="Description">
               <Input.TextArea />
             </Form.Item>
+
+            <Form.Item label="Organization Icon and Color">
+              <Space align="start">
+                <IconSelector value={icon} color={color} onChange={setIcon} />
+                <ColorPicker
+                  value={color}
+                  onChange={(colorObj) => setColor(colorObj.toHexString())}
+                  presets={[
+                    {
+                      label: "Recommended",
+                      colors: ["#000000", "#1890ff", "#722ED1", "#2eb039", "#fa8f37", "#FB0136"],
+                    },
+                  ]}
+                />
+              </Space>
+            </Form.Item>
+
             <Form.Item>
               <Button type="primary" htmlType="submit">
                 Create organization

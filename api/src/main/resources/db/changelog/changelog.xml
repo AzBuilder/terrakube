@@ -81,4 +81,5 @@
     <include file="/db/changelog/local/changelog-2.26.0-vars-size-postgresql.xml"/>
     <include file="/db/changelog/local/changelog-2.26.0-add-workspace-column-fix.xml" />
     <include file="/db/changelog/local/changelog-2.26.0-size-access-token.xml" />
+    <include file="/db/changelog/local/changelog-2.26.0-organization-icon.xml" />
 </databaseChangeLog>

@@ -86,10 +86,10 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
       currentTag = tags.find((x) => x.attributes.name === tagId)?.id;
     }
 
-    var id = currentTags.find((x) => x.attributes.tagId === currentTag)?.id;
+    const id = currentTags.find((x) => x.attributes.tagId === currentTag)?.id;
 
     axiosInstance.delete(`organization/${organizationId}/workspace/${workspaceId}/workspaceTag/${id}`).then(() => {
-      var currentTagsFilter = currentTags.filter(function (x) {
+      const currentTagsFilter = currentTags.filter(function (x) {
         return x.id !== id;
       });
       setCurrentTags(currentTagsFilter);
@@ -97,8 +97,8 @@ export const Tags = ({ organizationId, workspaceId, manageWorkspace }: Props) =>
   };
 
   function isGuid(value: string) {
-    var regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/i;
-    var match = regex.exec(value);
+    const regex = /[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/i;
+    const match = regex.exec(value);
     return match != null;
   }
   const loadTags = () => {

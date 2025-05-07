@@ -678,7 +678,11 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
               <span>
                 You are not authorized to create VCS Settings. <br /> Please contact your administrator and request the{" "}
                 <b>Manage VCS Settings</b> permission. <br /> For more information, visit the{" "}
-                <a target="_blank" href="https://docs.terrakube.io/user-guide/organizations/team-management">
+                <a
+                  target="_blank"
+                  href="https://docs.terrakube.io/user-guide/organizations/team-management"
+                  rel="noreferrer"
+                >
                   Terrakube documentation
                 </a>
                 .

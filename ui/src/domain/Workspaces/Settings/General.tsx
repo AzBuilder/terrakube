@@ -118,7 +118,7 @@ export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace 
       setWaiting(false);
     }
 
-    var bodyAgent;
+    let bodyAgent;
 
     if (values.executorAgent === "default") {
       bodyAgent = {

@@ -223,7 +223,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
     axiosClientAuth
       .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams`)
       .then((response) => {
-        var filteredTokens = response.data.filter((token: any) => token.group === tokenName);
+        const filteredTokens = response.data.filter((token: any) => token.group === tokenName);
         setTokens(filteredTokens);
         setLoadingTokens(false);
       });
