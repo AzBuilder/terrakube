@@ -66,13 +66,14 @@ export default function PageWrapper({
 
           {error && <Alert className="page-wrapper-alert" message={error.title} type="error" showIcon banner />}
 
-          {loading && (
+          {loading ? (
             <Flex align="center" className="page-wrapper-loader" vertical gap="middle">
               <Spin tip="Loading" size="large" />
               <Typography.Text>{loadingText || "Loading..."}</Typography.Text>
             </Flex>
+          ) : (
+            children
           )}
-          {children}
         </div>
       </div>
     </Content>
