@@ -126,35 +126,38 @@ x-traefik_env: &traefik_env
 x-traefik_dev_labels: &traefik_dev_labels
   traefik.enable: true
   ## Terrakube API
-  ## Terrakube API HTTPS
+  ## Terrakube API HTTP
   traefik.http.routers.terrakube-api-https.rule: Host(`terrakube-api.${DOMAIN}`)
   traefik.http.routers.terrakube-api-https.entrypoints: websecure
   traefik.http.routers.terrakube-api-https.tls: true
   traefik.http.routers.terrakube-api-https.middlewares: terrakube-dex-allow-origin
+  traefik.http.routers.terrakube-api-https.service: terrakube-api-https
   traefik.http.services.terrakube-api-https.loadbalancer.server.port: 8080
   ## Terrakube API HTTPS
   traefik.http.routers.terrakube-api-http.rule: Host(`terrakube-api.${DOMAIN}`)
   traefik.http.routers.terrakube-api-http.entrypoints: web
   traefik.http.routers.terrakube-api-http.middlewares: terrakube-api-redirect-https
   traefik.http.middlewares.terrakube-api-redirect-https.redirectscheme.scheme: https
-  ## Terrakube Executor
-  ## Terrakube executor HTTPS
-  traefik.http.routers.terrakube-executor-https.rule: Host(`terrakube-executor.${DOMAIN}`)
-  traefik.http.routers.terrakube-executor-https.entrypoints: websecure
-  traefik.http.routers.terrakube-executor-https.tls: true
-  traefik.http.routers.terrakube-executor-https.middlewares: terrakube-dex-allow-origin
-  traefik.http.services.terrakube-executor-https.loadbalancer.server.port: 8090
-  ## Redirect to HTTPS
-  traefik.http.routers.terrakube-executor-http.rule: Host(`terrakube-executor.${DOMAIN}`)
-  traefik.http.routers.terrakube-executor-http.entrypoints: web
-  traefik.http.routers.terrakube-executor-http.middlewares: terrakube-executor-redirect-https
-  traefik.http.middlewares.terrakube-executor-redirect-https.redirectscheme.scheme: https
+
+#  ## Terrakube Executor
+#  ## Terrakube executor HTTPS
+#  traefik.http.routers.terrakube-executor-https.rule: Host(`terrakube-executor.${DOMAIN}`)
+#  traefik.http.routers.terrakube-executor-https.entrypoints: websecure
+#  traefik.http.routers.terrakube-executor-https.tls: true
+#  traefik.http.routers.terrakube-executor-https.middlewares: terrakube-dex-allow-origin
+#  traefik.http.services.terrakube-executor-https.loadbalancer.server.port: 8090
+#  ## Redirect to HTTPS
+#  traefik.http.routers.terrakube-executor-http.rule: Host(`terrakube-executor.${DOMAIN}`)
+#  traefik.http.routers.terrakube-executor-http.entrypoints: web
+#  traefik.http.routers.terrakube-executor-http.middlewares: terrakube-executor-redirect-https
+#  traefik.http.middlewares.terrakube-executor-redirect-https.redirectscheme.scheme: https
   ## Terrakube UI
   ## Terrakube UI HTTPS
   traefik.http.routers.terrakube-ui-https.rule: Host(`terrakube.${DOMAIN}`)
   traefik.http.routers.terrakube-ui-https.entrypoints: websecure
   traefik.http.routers.terrakube-ui-https.middlewares: terrakube-dex-allow-origin
   traefik.http.routers.terrakube-ui-https.tls: true
+  traefik.http.routers.terrakube-ui-https.service: terrakube-ui-https
   traefik.http.services.terrakube-ui-https.loadbalancer.server.port: 3000
   ## Redirect to HTTPS
   traefik.http.routers.terrakube-ui-http.rule: Host(`terrakube.${DOMAIN}`)
@@ -167,6 +170,7 @@ x-traefik_dev_labels: &traefik_dev_labels
   traefik.http.routers.terrakube-registry-https.entrypoints: websecure
   traefik.http.routers.terrakube-registry-https.tls: true
   traefik.http.routers.terrakube-registry-https.middlewares: terrakube-dex-allow-origin
+  traefik.http.routers.terrakube-registry-https.service: terrakube-registry-https
   traefik.http.services.terrakube-registry-https.loadbalancer.server.port: 8075
   ## Redirect to HTTPS
   traefik.http.routers.terrakube-registry-http.rule: Host(`terrakube-registry.${DOMAIN}`)
@@ -232,6 +236,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - ..:/workspaces/terrakube:cached
   terrakube-dex:
     image: ghcr.io/dexidp/dex:${TK_DEX_VERSION}
     extra_hosts: *terrakube_hosts

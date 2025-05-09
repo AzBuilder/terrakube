@@ -4,7 +4,7 @@
   "name": "Terrakube Development",
   "dockerComposeFile": "docker-compose.yml",
   "service": "terrakube-dev",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "workspaceFolder": "/workspaces/terrakube",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {

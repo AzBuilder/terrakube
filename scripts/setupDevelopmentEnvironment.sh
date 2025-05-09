@@ -7,11 +7,13 @@ function generateApiVars(){
     AzBuilderExecutorUrl="$(gp url 8090)/api/v1/terraform-rs"
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
+    TerrakubeRedisHostname=localhost
   else
     TerrakubeHostname="https://terrakube-api.platform.local"
     AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
     TerrakubeUiURL="https://terrakube-ui.platform.local"
+    TerrakubeRedisHostname=terrakube-redis
   fi
 
   ApiDataSourceType="H2"
@@ -44,7 +46,7 @@ function generateApiVars(){
   echo "DexClientId=$DexClientId" >> .envApi
   echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envApi
   echo "CustomTofuReleasesUrl=\"https://api.github.com/repos/opentofu/opentofu/releases\"" >> .envApi
-  echo "TerrakubeRedisHostname=localhost" >> .envApi
+  echo "TerrakubeRedisHostname=$TerrakubeRedisHostname" >> .envApi
   echo "TerrakubeRedisPort=6379" >> .envApi
   echo "TerrakubeRedisSSL=false" >> .envApi
   echo "#TerrakubeRedisUsername=default" >> .envApi
