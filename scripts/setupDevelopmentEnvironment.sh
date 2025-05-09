@@ -8,10 +8,10 @@ function generateApiVars(){
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
   else
-    TerrakubeHostname="http://localhost:8080"
+    TerrakubeHostname="https://terrakube-api.platform.local"
     AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
-    DexIssuerUri="http://localhost:5556/dex"
-    TerrakubeUiURL="http://localhost:3000"
+    DexIssuerUri="https://terrakube-dex.platform.local/dex"
+    TerrakubeUiURL="https://terrakube-ui.platform.local"
   fi
 
   ApiDataSourceType="H2"
@@ -54,16 +54,16 @@ function generateApiVars(){
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
 
-function generateRegistryVars(){
+function generateExecutorVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderApiUrl=$(gp url 8080)
     TerrakubeRegistryDomain=$(gp url 8075 | sed "s+https://++g")
     TerrakubeApiUrl=$(gp url 8080)
   else
-    AzBuilderApiUrl="http://localhost:8080"
-    TerrakubeRegistryDomain="http://localhost:8075"
-    TerrakubeApiUrl="htp://localhost:8080"
+    AzBuilderApiUrl="https://terrakube-api.platform.local"
+    TerrakubeRegistryDomain="https://terrakube-registry.platform.local"
+    TerrakubeApiUrl="htps://terrakube-api.platform.local"
   fi
 
   TerrakubeEnableSecurity=true
@@ -100,7 +100,7 @@ function generateRegistryVars(){
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envExecutor
 }
 
-function generateExecutorVars(){
+function generateRegistryVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     AzBuilderRegistry=$(gp url 8075)
@@ -109,11 +109,11 @@ function generateExecutorVars(){
     TerrakubeUiURL=$(gp url 3000)
     AppIssuerUri="$(gp url 5556)/dex"
   else
-    AzBuilderRegistry="http://localhost:8075"
-    AzBuilderApiUrl="http://localhost:8080"
-    DexIssuerUri="http://localhost:5556/dex"
-    TerrakubeUiURL="http://localhost:3000"
-    AppIssuerUri="http://localhost:5556/dex"
+    AzBuilderRegistry="https://terrakube-registry.platform.local"
+    AzBuilderApiUrl="https://terrakube-api.platform.local"
+    DexIssuerUri="https://terrakube-dex.platform.local/dex"
+    TerrakubeUiURL="https://terrakube-ui.platform.local"
+    AppIssuerUri="https://terrakube-dex.platform.local/dex"
   fi
 
   AuthenticationValidationTypeRegistry=DEX
@@ -149,10 +149,10 @@ function generateUiVars(){
     REACT_CONFIG_REGISTRY_URI=$(gp url 8075)  
     REACT_CONFIG_AUTHORITY="$(gp url 5556)/dex"
   else
-    REACT_CONFIG_TERRAKUBE_URL="http://localhost:8080/api/v1/"
-    REACT_CONFIG_REDIRECT="http://localhost:3000"
-    REACT_CONFIG_REGISTRY_URI="http://localhost:8075"
-    REACT_CONFIG_AUTHORITY="http://localhost:5556/dex"
+    REACT_CONFIG_TERRAKUBE_URL="https://terrakube-api.platform.local/api/v1/"
+    REACT_CONFIG_REDIRECT="https://terrakube-ui.platform.local"
+    REACT_CONFIG_REGISTRY_URI="https://terrakube-registry.platform.local"
+    REACT_CONFIG_AUTHORITY="https://terrkube-dex.platform.local/dex"
   fi
 
   REACT_CONFIG_CLIENT_ID="example-app"

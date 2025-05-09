@@ -38,7 +38,7 @@ The key features of Terrakube are:
 <img src="https://github.com/AzBuilder/terrakube/assets/27365102/9e0421be-576c-4206-a29a-c1d62238681e" width="1080"/>  <br/>
 
 - **Custom Workflows:** Enhance your IaC workflow with OPA, Infracost, or any other tool of your choice. You can use Terrakube extensions to integrate them seamlessly, or create your own custom integration using the Terrakube API. This way, you can automate compliance checks, cost estimates, security scans, and more for your Terraform projects.
-  
+
 - **Access Control:** You can use [DEX](https://github.com/dexidp/dex) to authenticate in Terrakube with various identity providers, such as Azure Active Directory, Amazon Cognito, Github, SAML, and more. You can also leverage your existing groups to assign granular permissions to Workspaces, Modules, VCS, and other resources.
 
 - **Remote Backend:** Terrakube supports both `remote backend` and `cloud` block so you can run your workflow directly from the Terraform / OpenTofu CLI.
@@ -51,13 +51,14 @@ The key features of Terrakube are:
 - [Install Terrakube using Docker Compose](https://docs.terrakube.io/getting-started/docker-compose)
 - [Test Terrakube using Minikube](https://docs.terrakube.io/getting-started/deployment/minikube-+-https)
 - [Test Terrakube using Gitpod](https://docs.terrakube.io/getting-started/getting-started)
+- [Develop Terrakube using VS Code Devcontainers](.devcontainer/README.md)
 
 ### Documentation
 To learn more about Terrakube [go to the complete documentation.](https://docs.terrakube.io/) 
 
 ### Contributing 
 Terrakube welcomes any idea or feedback from the community. If you want to contribute to this project, please read our [Contribution Guide](CONTRIBUTING.md) for more details.
-  
+
 ### Sponsors
 
 | Sponsor  | Thanks |
