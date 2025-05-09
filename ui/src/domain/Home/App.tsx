@@ -1,6 +1,6 @@
 import { Layout, ConfigProvider } from "antd";
 import { useState, useEffect } from "react";
-import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
+import { RouterProvider, createBrowserRouter, Outlet, useParams } from "react-router-dom";
 import { useAuth } from "../../config/authConfig";
 import {
   getThemeConfig,
@@ -25,8 +25,16 @@ import logo from "./white_logo.png";
 import { UserSettingsPage } from "@/modules/user/UserSettingsPage";
 import OrganizationsPickerPage from "@/modules/organizations/OrganizationsPickerPage";
 import OrganizationsDetailPage from "@/modules/organizations/OrganizationDetailsPage";
+import { VariableCollectionsDetailSettings } from "../Settings/VariableCollectionsDetail";
+import { CreateEditCollection } from "../Settings/CreateEditCollection";
 
 const { Header, Footer } = Layout;
+
+// Helper component to extract URL parameters for collection routes
+const CollectionSettingsWrapper = ({ mode }: { mode: "edit" | "detail" }) => {
+  const { collectionid } = useParams();
+  return <OrganizationSettings selectedTab="9" collectionMode={mode} collectionId={collectionid} />;
+};
 
 const App = () => {
   const auth = useAuth();
@@ -213,7 +221,23 @@ const App = () => {
         },
         {
           path: "/organizations/:orgid/settings/actions",
-          element: <OrganizationSettings selectedTab="8" />,
+          element: <OrganizationSettings selectedTab="10" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/collection",
+          element: <OrganizationSettings selectedTab="9" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/collection/new",
+          element: <OrganizationSettings selectedTab="9" collectionMode="new" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/collection/edit/:collectionid",
+          element: <CollectionSettingsWrapper mode="edit" />,
+        },
+        {
+          path: "/organizations/:orgid/settings/collection/:collectionid",
+          element: <CollectionSettingsWrapper mode="detail" />,
         },
       ],
     },

@@ -106,7 +106,7 @@ export const GeneralSettings = () => {
         });
         setLoading(false);
       })
-      .catch((error) => {
+      .catch(() => {
         message.error("Failed to load organization settings");
         setLoading(false);
       });

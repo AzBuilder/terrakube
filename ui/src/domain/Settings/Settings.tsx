@@ -11,23 +11,46 @@ import { TagsSettings } from "./Tags";
 import { TeamSettings } from "./Teams";
 import { TemplatesSettings } from "./Templates";
 import { VCSSettings } from "./VCS";
-import { useNavigate, useParams } from "react-router-dom";
+import { VariableCollectionsSettings } from "./VariableCollections";
+import { CreateEditCollection } from "./CreateEditCollection";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 const { Content } = Layout;
 
 type Props = {
   selectedTab?: string;
   vcsMode?: "new" | "list";
+  collectionMode?: "list" | "new" | "edit" | "detail";
+  collectionId?: string;
 };
 
-export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
+export const OrganizationSettings = ({ selectedTab, vcsMode, collectionMode = "list", collectionId }: Props) => {
   const { orgid } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [key, setKey] = useState("");
   const { token } = theme.useToken();
 
   function callback(key: string) {
     setKey(key);
+
+    // Special case for collection tab
+    if (key === "9" && location.pathname.includes("/collection/")) {
+      navigate(`/organizations/${orgid}/settings/collection`);
+    }
   }
+
+  // Render appropriate content for Variable Collections tab
+  const renderCollectionContent = () => {
+    switch (collectionMode) {
+      case "new":
+        return <CreateEditCollection mode="create" />;
+      case "edit":
+        return <CreateEditCollection mode="edit" collectionId={collectionId} />;
+      case "list":
+      default:
+        return <VariableCollectionsSettings />;
+    }
+  };
 
   return (
     <Content style={{ padding: "0 50px", background: token.colorBgContainer }}>
@@ -90,12 +113,17 @@ export const OrganizationSettings = ({ selectedTab, vcsMode }: Props) => {
               children: <AgentSettings />,
             },
             {
+              label: "Variable Collections",
+              key: "9",
+              children: renderCollectionContent(),
+            },
+            {
               label: (
                 <>
                   Actions <Tag color={token.colorPrimary}>beta</Tag>
                 </>
               ),
-              key: "9",
+              key: "10",
               children: <ActionSettings />,
             },
           ]}
