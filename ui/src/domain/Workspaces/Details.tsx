@@ -754,7 +754,7 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                   {templates ? <Schedules schedules={schedule} manageWorkspace={manageWorkspace} /> : <p>Loading...</p>}
                 </TabPane>
                 <TabPane tab="Settings" key="6">
-                  <WorkspaceSettings 
+                  <WorkspaceSettings
                     workspace={workspace}
                     vcsProvider={vcsProvider}
                     orgTemplates={orgTemplates}

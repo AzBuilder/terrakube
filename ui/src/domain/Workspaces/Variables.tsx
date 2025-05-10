@@ -1,5 +1,19 @@
 import { DeleteOutlined, EditOutlined, InfoCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Popconfirm, Radio, Space, Switch, Table, Tag, Tooltip, Typography, Checkbox } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Radio,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+  Checkbox,
+} from "antd";
 import { useState } from "react";
 import { ORGANIZATION_ARCHIVE, WORKSPACE_ARCHIVE } from "../../config/actionTypes";
 import axiosInstance from "../../config/axiosConfig";
@@ -359,7 +373,7 @@ export const Variables = ({
       >
         Add variable
       </Button>
-      
+
       <div className="envVariables">
         <h2>Collection Variables ({collectionVariables.length})</h2>
         <div>
@@ -378,8 +392,8 @@ export const Variables = ({
         <div>
           <Typography.Text type="secondary" className="App-text">
             <p>
-              The following values are taken from the organization global variables, these values are injected inside the
-              Terrakube remote jobs.
+              The following values are taken from the organization global variables, these values are injected inside
+              the Terrakube remote jobs.
             </p>
           </Typography.Text>
         </div>
@@ -410,19 +424,16 @@ export const Variables = ({
             <Typography.Title level={5} style={{ margin: "0 0 15px 0" }}>
               Select variable category
             </Typography.Title>
-            
+
             <Form.Item name="category">
-              <Radio.Group 
-                value={category} 
-                onChange={(e) => setCategory(e.target.value)}
-              >
+              <Radio.Group value={category} onChange={(e) => setCategory(e.target.value)}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
                   <Radio value="TERRAFORM" style={{ display: "flex", alignItems: "flex-start" }}>
                     <div>
                       <div>Terraform variable</div>
                       <div style={{ color: "rgba(0,0,0,0.45)", fontSize: "14px" }}>
-                        These variables should match the declarations in your configuration. Click the HCL box
-                        to use interpolation or set a non-string value.
+                        These variables should match the declarations in your configuration. Click the HCL box to use
+                        interpolation or set a non-string value.
                       </div>
                     </div>
                   </Radio>
@@ -442,11 +453,11 @@ export const Variables = ({
             <Form.Item name="key" label="Key" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            
+
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
               <Input.TextArea rows={3} autoSize={{ minRows: 3, maxRows: 6 }} />
             </Form.Item>
-            
+
             <div style={{ display: "flex", gap: "30px", marginBottom: "15px" }}>
               <Form.Item
                 name="hcl"
@@ -460,7 +471,7 @@ export const Variables = ({
               >
                 <Checkbox>HCL</Checkbox>
               </Form.Item>
-              
+
               <Form.Item
                 name="sensitive"
                 valuePropName="checked"
@@ -474,7 +485,7 @@ export const Variables = ({
                 <Checkbox>Sensitive</Checkbox>
               </Form.Item>
             </div>
-            
+
             <Form.Item name="description" label="Description">
               <Input.TextArea placeholder="Description (optional)" style={{ width: "100%" }} rows={3} />
             </Form.Item>

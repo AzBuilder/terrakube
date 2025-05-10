@@ -348,10 +348,24 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                 <p></p>
                 <ul className="disc-list">
                   <li>
-                    <b>Name:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Typography.Paragraph>
+                    <b>Name:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                    </Typography.Paragraph>
                   </li>
                   <li>
-                    <b>Redirect URI:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>{getCallBackUrl()}</Typography.Paragraph>
+                    <b>Redirect URI:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      {getCallBackUrl()}
+                    </Typography.Paragraph>
                   </li>
                   <li>
                     <b>Scopes:</b> {getScopes(vcsType)}
@@ -375,16 +389,37 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                 <p></p>
                 <ul className="disc-list">
                   <li>
-                    <b>Name:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Typography.Paragraph>
+                    <b>Name:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                    </Typography.Paragraph>
                   </li>
                   <li>
                     <b>Description:</b> Any description of your choice
                   </li>
                   <li>
-                    <b>Callback URL:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>{getCallBackUrl()}</Typography.Paragraph>
+                    <b>Callback URL:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      {getCallBackUrl()}
+                    </Typography.Paragraph>
                   </li>
                   <li>
-                    <b>URL:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Typography.Paragraph>
+                    <b>URL:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
+                    </Typography.Paragraph>
                   </li>
                   <li>
                     <b>This is a private consumer (checkbox):</b> Checked
@@ -426,16 +461,44 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                 <p></p>
                 <ul className="disc-list">
                   <li>
-                    <b>Company Name:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>Terrakube</Typography.Paragraph>
+                    <b>Company Name:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      Terrakube
+                    </Typography.Paragraph>
                   </li>
                   <li>
-                    <b>Application name:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Typography.Paragraph>
+                    <b>Application name:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                    </Typography.Paragraph>
                   </li>
                   <li>
-                    <b>Application website:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Typography.Paragraph>
+                    <b>Application website:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
+                    </Typography.Paragraph>
                   </li>
                   <li>
-                    <b>Callback URL:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>{getCallBackUrl()}</Typography.Paragraph>
+                    <b>Callback URL:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      {getCallBackUrl()}
+                    </Typography.Paragraph>
                   </li>
                   <li>
                     <b>Authorized scopes (checkboxes):</b> Only the following should be checked:
@@ -497,13 +560,34 @@ export const AddVCS = ({ setMode, loadVCS }: Props) => {
                 <p></p>
                 <ul className="disc-list">
                   <li>
-                    <b>Application Name:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})</Typography.Paragraph>
+                    <b>Application Name:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      Terrakube ({sessionStorage.getItem(ORGANIZATION_NAME)})
+                    </Typography.Paragraph>
                   </li>
                   <li>
-                    <b>Homepage URL:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>{new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}</Typography.Paragraph>
+                    <b>Homepage URL:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      {new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}
+                    </Typography.Paragraph>
                   </li>
                   <li>
-                    <b>Authorization callback URL:</b> <Typography.Paragraph copyable type="secondary" style={{ display: 'inline', margin: 0, paddingLeft: '5px' }}>{getCallBackUrl()}</Typography.Paragraph>
+                    <b>Authorization callback URL:</b>{" "}
+                    <Typography.Paragraph
+                      copyable
+                      type="secondary"
+                      style={{ display: "inline", margin: 0, paddingLeft: "5px" }}
+                    >
+                      {getCallBackUrl()}
+                    </Typography.Paragraph>
                   </li>
                   <li>
                     <b>Webhook:</b> <b>untick</b> Active

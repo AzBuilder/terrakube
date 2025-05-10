@@ -60,7 +60,7 @@ export const CreateEditCollection = ({ mode, collectionId: propCollectionId }: C
   // Load collection data if in edit mode
   useEffect(() => {
     setLoading(true);
-    
+
     // Load workspaces
     axiosInstance.get(`organization/${orgid}/workspace`).then((response) => {
       setWorkspaces(response.data.data);
@@ -70,24 +70,24 @@ export const CreateEditCollection = ({ mode, collectionId: propCollectionId }: C
       // Load collection data
       axiosInstance.get(`organization/${orgid}/collection/${collectionid}`).then((response) => {
         const collectionData = response.data.data;
-        
+
         collectionForm.setFieldsValue({
           name: collectionData.attributes.name,
           description: collectionData.attributes.description,
-          priority: collectionData.attributes.priority || 10
+          priority: collectionData.attributes.priority || 10,
         });
-        
+
         // Load collection variables
         axiosInstance.get(`organization/${orgid}/collection/${collectionid}/item`).then((response) => {
           setVariables(response.data.data);
         });
-        
+
         // Load collection workspace references
         axiosInstance.get(`organization/${orgid}/collection/${collectionid}/reference`).then((response) => {
           const workspaceIds = response.data.data.map((ref: any) => ref.relationships.workspace.data.id);
           setSelectedWorkspaces(workspaceIds);
         });
-        
+
         setLoading(false);
       });
     } else {

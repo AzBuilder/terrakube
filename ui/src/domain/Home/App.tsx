@@ -55,30 +55,33 @@ const App = () => {
 
     // Initialize organization name from URL or session storage
     const pathname = window.location.pathname;
-    const paths = pathname.split('/');
-    const orgIdIndex = paths.indexOf('organizations') + 1;
-    
+    const paths = pathname.split("/");
+    const orgIdIndex = paths.indexOf("organizations") + 1;
+
     if (orgIdIndex > 0 && orgIdIndex < paths.length) {
       const orgId = paths[orgIdIndex];
       if (orgId) {
         // Check if we already have the org name in session storage
         const storedOrgName = sessionStorage.getItem(ORGANIZATION_NAME);
         const storedOrgId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
-        
+
         if (storedOrgName && storedOrgId === orgId) {
           setOrganizationName(storedOrgName);
         } else {
           // Fetch the organization name
-          axiosInstance.get(`organization/${orgId}`).then(response => {
-            if (response.data && response.data.data) {
-              const orgName = response.data.data.attributes.name;
-              sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgId);
-              sessionStorage.setItem(ORGANIZATION_NAME, orgName);
-              setOrganizationName(orgName);
-            }
-          }).catch(err => {
-            console.error("Failed to load organization:", err);
-          });
+          axiosInstance
+            .get(`organization/${orgId}`)
+            .then((response) => {
+              if (response.data && response.data.data) {
+                const orgName = response.data.data.attributes.name;
+                sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgId);
+                sessionStorage.setItem(ORGANIZATION_NAME, orgName);
+                setOrganizationName(orgName);
+              }
+            })
+            .catch((err) => {
+              console.error("Failed to load organization:", err);
+            });
         }
       }
     } else {

@@ -40,7 +40,7 @@ export default function OrganizationsDetailPage({ organizationName, setOrganizat
   }, []);
 
   const handleCreateWorkspace = () => {
-    navigate('/workspaces/create');
+    navigate("/workspaces/create");
   };
 
   return (
@@ -60,11 +60,7 @@ export default function OrganizationsDetailPage({ organizationName, setOrganizat
           <Button icon={<ImportOutlined />}>
             <Link to="/workspaces/import">Import workspaces</Link>
           </Button>
-          <Button 
-            icon={<PlusOutlined />} 
-            type="primary"
-            onClick={handleCreateWorkspace}
-          >
+          <Button icon={<PlusOutlined />} type="primary" onClick={handleCreateWorkspace}>
             New workspace
           </Button>
         </Space>

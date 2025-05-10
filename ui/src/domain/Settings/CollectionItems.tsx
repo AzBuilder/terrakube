@@ -1,18 +1,5 @@
 import { DeleteOutlined, EditOutlined, InfoCircleOutlined, PlusOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  Popconfirm,
-  Radio,
-  Space,
-  Spin,
-  Table,
-  Tag,
-  Typography,
-  Checkbox,
-} from "antd";
+import { Button, Form, Input, Modal, Popconfirm, Radio, Space, Spin, Table, Tag, Typography, Checkbox } from "antd";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../../config/axiosConfig";

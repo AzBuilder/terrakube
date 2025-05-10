@@ -17,7 +17,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import type { MenuProps } from "antd";
 
 const { Content, Sider } = Layout;
-type MenuItem = Required<MenuProps>['items'][number];
+type MenuItem = Required<MenuProps>["items"][number];
 
 type Props = {
   selectedTab?: string;
@@ -79,9 +79,9 @@ export const OrganizationSettings = ({ selectedTab, vcsMode, collectionMode = "l
     }
   };
 
-  const handleMenuClick: MenuProps['onClick'] = (e) => {
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
     setActiveKey(e.key);
-    
+
     // Special case for collection tab
     if (e.key === "9" && location.pathname.includes("/collection/")) {
       navigate(`/organizations/${orgid}/settings/collection`);
@@ -90,47 +90,45 @@ export const OrganizationSettings = ({ selectedTab, vcsMode, collectionMode = "l
 
   const menuItems: MenuItem[] = [
     {
-      type: 'group',
-      label: 'Organization Settings',
-      key: 'org-settings',
+      type: "group",
+      label: "Organization Settings",
+      key: "org-settings",
       children: [
-        { key: '1', label: 'General' },
-        { key: '2', label: 'Teams' },
-        { key: '7', label: 'Tags' },
-        { key: '3', label: 'Global Variables' },
-        { key: '9', label: 'Variable Collections' },
+        { key: "1", label: "General" },
+        { key: "2", label: "Teams" },
+        { key: "7", label: "Tags" },
+        { key: "3", label: "Global Variables" },
+        { key: "9", label: "Variable Collections" },
       ],
     },
     {
-      type: 'group',
-      label: 'Version Control',
-      key: 'version-control',
+      type: "group",
+      label: "Version Control",
+      key: "version-control",
       children: [
-        { key: '4', label: 'VCS Providers' },
-        { key: '6', label: 'SSH Keys' },
+        { key: "4", label: "VCS Providers" },
+        { key: "6", label: "SSH Keys" },
       ],
     },
     {
-      type: 'group',
-      label: 'Security',
-      key: 'security',
-      children: [
-        { key: '8', label: 'Agents' },
-      ],
+      type: "group",
+      label: "Security",
+      key: "security",
+      children: [{ key: "8", label: "Agents" }],
     },
     {
-      type: 'group',
-      label: 'Integrations',
-      key: 'integrations',
+      type: "group",
+      label: "Integrations",
+      key: "integrations",
       children: [
-        { key: '5', label: 'Templates' },
-        { 
-          key: '10', 
+        { key: "5", label: "Templates" },
+        {
+          key: "10",
           label: (
             <>
               Actions <Tag color={token.colorPrimary}>beta</Tag>
             </>
-          )
+          ),
         },
       ],
     },
@@ -150,28 +148,26 @@ export const OrganizationSettings = ({ selectedTab, vcsMode, collectionMode = "l
         ]}
       />
 
-      <div className="site-layout-content" style={{ background: token.colorBgContainer, paddingLeft: "0"}}>
+      <div className="site-layout-content" style={{ background: token.colorBgContainer, paddingLeft: "0" }}>
         <Layout style={{ background: token.colorBgContainer }}>
           <Sider
             width={200}
             style={{
               background: token.colorBgContainer,
               borderRight: `1px solid ${token.colorBorderSecondary}`,
-              height: '100%',
-              overflow: 'auto'
+              height: "100%",
+              overflow: "auto",
             }}
           >
             <Menu
               mode="inline"
               selectedKeys={[activeKey]}
-              style={{ height: '100%' }}
+              style={{ height: "100%" }}
               items={menuItems}
               onClick={handleMenuClick}
             />
           </Sider>
-          <Content style={{ padding: '0 24px', minHeight: 280 }}>
-            {renderContent()}
-          </Content>
+          <Content style={{ padding: "0 24px", minHeight: 280 }}>{renderContent()}</Content>
         </Layout>
       </div>
     </Content>

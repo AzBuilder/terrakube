@@ -117,7 +117,7 @@ export const AgentSettings = () => {
         </Typography.Text>
       </div>
       <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
-        Create agent pool 
+        Create agent pool
       </Button>
       <br></br>
 

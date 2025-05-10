@@ -145,7 +145,7 @@ export const WorkspaceGeneral = ({ workspaceData, orgTemplates, manageWorkspace 
   };
 
   return (
-    <div style={{width:"100%"}} className="generalSettings">
+    <div style={{ width: "100%" }} className="generalSettings">
       <h1>General Settings</h1>
       <Spin spinning={waiting}>
         <Form

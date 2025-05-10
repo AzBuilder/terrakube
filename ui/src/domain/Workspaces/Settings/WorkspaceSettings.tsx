@@ -7,7 +7,7 @@ import { Workspace, Template, VcsType } from "../../types";
 import type { MenuProps } from "antd";
 
 const { Content, Sider } = Layout;
-type MenuItem = Required<MenuProps>['items'][number];
+type MenuItem = Required<MenuProps>["items"][number];
 
 type Props = {
   workspace: Workspace;
@@ -20,7 +20,7 @@ export const WorkspaceSettings = ({ workspace, orgTemplates, manageWorkspace, vc
   const [activeKey, setActiveKey] = useState("general");
   const { token } = theme.useToken();
 
-  const handleMenuClick: MenuProps['onClick'] = (e) => {
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
     setActiveKey(e.key);
   };
 
@@ -28,11 +28,7 @@ export const WorkspaceSettings = ({ workspace, orgTemplates, manageWorkspace, vc
     switch (activeKey) {
       case "general":
         return (
-          <WorkspaceGeneral
-            workspaceData={workspace}
-            orgTemplates={orgTemplates}
-            manageWorkspace={manageWorkspace}
-          />
+          <WorkspaceGeneral workspaceData={workspace} orgTemplates={orgTemplates} manageWorkspace={manageWorkspace} />
         );
       case "webhook":
         return (
@@ -47,26 +43,22 @@ export const WorkspaceSettings = ({ workspace, orgTemplates, manageWorkspace, vc
         return <WorkspaceAdvanced workspace={workspace} manageWorkspace={manageWorkspace} />;
       default:
         return (
-          <WorkspaceGeneral
-            workspaceData={workspace}
-            orgTemplates={orgTemplates}
-            manageWorkspace={manageWorkspace}
-          />
+          <WorkspaceGeneral workspaceData={workspace} orgTemplates={orgTemplates} manageWorkspace={manageWorkspace} />
         );
     }
   };
 
   const menuItems: MenuItem[] = [
     {
-      type: 'group',
-      label: 'Workspace Settings',
-      key: 'workspace-settings',
+      type: "group",
+      label: "Workspace Settings",
+      key: "workspace-settings",
       children: [
-        { key: 'general', label: 'General' },
-        { key: 'webhook', label: 'Webhook' },
-        { key: 'advanced', label: 'Advanced' },
+        { key: "general", label: "General" },
+        { key: "webhook", label: "Webhook" },
+        { key: "advanced", label: "Advanced" },
       ],
-    }
+    },
   ];
 
   return (
@@ -76,21 +68,19 @@ export const WorkspaceSettings = ({ workspace, orgTemplates, manageWorkspace, vc
         style={{
           background: token.colorBgContainer,
           borderRight: `1px solid ${token.colorBorderSecondary}`,
-          height: '100%',
-          overflow: 'auto'
+          height: "100%",
+          overflow: "auto",
         }}
       >
         <Menu
           mode="inline"
           selectedKeys={[activeKey]}
-          style={{ height: '100%' }}
+          style={{ height: "100%" }}
           items={menuItems}
           onClick={handleMenuClick}
         />
       </Sider>
-      <Content style={{ padding: '0 24px', minHeight: 280 }}>
-        {renderContent()}
-      </Content>
+      <Content style={{ padding: "0 24px", minHeight: 280 }}>{renderContent()}</Content>
     </Layout>
   );
-}; 
+};

@@ -24,8 +24,8 @@ type Props = {
 
 // Helper function to ensure organization name is properly set
 const ensureOrganizationName = (
-  orgId: string, 
-  currentOrgName: string, 
+  orgId: string,
+  currentOrgName: string,
   setOrgName: (name: string) => void,
   onComplete: () => void
 ) => {
@@ -36,17 +36,20 @@ const ensureOrganizationName = (
     onComplete();
   } else {
     // If organization name is not set, fetch it first
-    axiosInstance.get(`organization/${orgId}`).then(response => {
-      if (response.data && response.data.data) {
-        const orgName = response.data.data.attributes.name;
-        sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgId);
-        sessionStorage.setItem(ORGANIZATION_NAME, orgName);
-        setOrgName(orgName);
-        onComplete();
-      }
-    }).catch(error => {
-      console.error("Failed to fetch organization:", error);
-    });
+    axiosInstance
+      .get(`organization/${orgId}`)
+      .then((response) => {
+        if (response.data && response.data.data) {
+          const orgName = response.data.data.attributes.name;
+          sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgId);
+          sessionStorage.setItem(ORGANIZATION_NAME, orgName);
+          setOrgName(orgName);
+          onComplete();
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch organization:", error);
+      });
   }
 };
 
@@ -55,7 +58,7 @@ export const MainMenu = ({ organizationName, setOrganizationName, themeMode }: P
   const [defaultSelected, setDefaultSelected] = useState(["registry"]);
   const location = useLocation();
   const navigate = useNavigate();
-  const params = location.pathname.split('/');
+  const params = location.pathname.split("/");
   const orgIdFromUrl = params.length > 2 && params[1] === "organizations" ? params[2] : null;
   const organizationId = sessionStorage.getItem(ORGANIZATION_ARCHIVE) || orgIdFromUrl;
 
@@ -76,11 +79,11 @@ export const MainMenu = ({ organizationName, setOrganizationName, themeMode }: P
     axiosInstance.get("organization").then((response: AxiosResponse<ApiResponse<Organization[]>>) => {
       const organizations = prepareOrgs(response.data.data);
       setOrgs(organizations);
-      
+
       // Check if we have an org ID in the URL but not in session storage
       if (orgIdFromUrl && (!sessionStorage.getItem(ORGANIZATION_NAME) || organizationName === "select organization")) {
         // Find the organization name by ID
-        const foundOrg = organizations.find(org => org.id === orgIdFromUrl);
+        const foundOrg = organizations.find((org) => org.id === orgIdFromUrl);
         if (foundOrg) {
           sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgIdFromUrl);
           sessionStorage.setItem(ORGANIZATION_NAME, foundOrg.name);
@@ -88,8 +91,8 @@ export const MainMenu = ({ organizationName, setOrganizationName, themeMode }: P
         } else {
           // If not found in the list, fetch directly
           ensureOrganizationName(
-            orgIdFromUrl, 
-            "", 
+            orgIdFromUrl,
+            "",
             setOrganizationName,
             () => {} // No additional action needed
           );
@@ -112,30 +115,20 @@ export const MainMenu = ({ organizationName, setOrganizationName, themeMode }: P
     if (e.key === "new") navigate("/organizations/create");
     else {
       // Use the helper function for organization change (with full page reload)
-      ensureOrganizationName(
-        e.key,
-        "",
-        setOrganizationName,
-        () => {
-          // Navigate after setting organization name with full page reload
-          window.location.href = `/organizations/${e.key}/workspaces`;
-        }
-      );
+      ensureOrganizationName(e.key, "", setOrganizationName, () => {
+        // Navigate after setting organization name with full page reload
+        window.location.href = `/organizations/${e.key}/workspaces`;
+      });
     }
   };
 
   const handleSectionNavigation = (section: string) => {
     // Use the helper function for section navigation
-    ensureOrganizationName(
-      organizationId!,
-      organizationName,
-      setOrganizationName,
-      () => {
-        // Navigate within the same organization
-        navigate(`/organizations/${organizationId}/${section}`);
-        setDefaultSelected([section]);
-      }
-    );
+    ensureOrganizationName(organizationId!, organizationName, setOrganizationName, () => {
+      // Navigate within the same organization
+      navigate(`/organizations/${organizationId}/${section}`);
+      setDefaultSelected([section]);
+    });
   };
 
   const items = [

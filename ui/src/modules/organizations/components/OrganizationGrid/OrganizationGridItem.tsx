@@ -32,18 +32,18 @@ type Props = {
 
 export default function OrganizationGridItem({ organization }: Props) {
   const { iconName, color } = parseIconField(organization.icon, organization.id);
-  
+
   const handleOrganizationClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // Store organization data in session storage
     sessionStorage.setItem(ORGANIZATION_ARCHIVE, organization.id);
     sessionStorage.setItem(ORGANIZATION_NAME, organization.name);
-    
+
     // Navigate with full page reload
     window.location.href = `/organizations/${organization.id}/workspaces`;
   };
-  
+
   return (
     <Card hoverable style={{ width: "100%" }} onClick={handleOrganizationClick}>
       <Flex gap="small" align="center">

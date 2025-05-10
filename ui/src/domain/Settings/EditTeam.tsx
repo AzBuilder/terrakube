@@ -205,7 +205,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
       days: values.days,
       minutes: values.minutes,
       hours: values.hours,
-      group: teamName || '',
+      group: teamName || "",
     };
 
     axiosClientAuth
@@ -271,10 +271,10 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
             ) : (
               ""
             )}
-            
+
             <TeamPermissions managePermissions={true} />
-            
-            <Space direction="horizontal" style={{ marginTop: '20px' }}>
+
+            <Space direction="horizontal" style={{ marginTop: "20px" }}>
               {mode === "create" ? (
                 <Button onClick={onCancel} type="default">
                   Cancel
