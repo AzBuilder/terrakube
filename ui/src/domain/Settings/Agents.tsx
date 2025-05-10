@@ -109,7 +109,7 @@ export const AgentSettings = () => {
 
   return (
     <div className="setting">
-      <h1>Agent pools</h1>
+      <h1>Agents</h1>
       <div>
         <Typography.Text type="secondary" className="App-text">
           Terrakube uses these agents to execute terraform commands. Terrakube allow to have one or multiple agents to
@@ -117,11 +117,11 @@ export const AgentSettings = () => {
         </Typography.Text>
       </div>
       <Button type="primary" onClick={onNew} htmlType="button" icon={<PlusOutlined />}>
-        Add Terrakube Agent
+        Create agent pool 
       </Button>
       <br></br>
 
-      <h3 style={{ marginTop: "30px" }}>Terrakube Agents</h3>
+      <h3 style={{ marginTop: "30px" }}>Agents</h3>
       {loading ? (
         <p>Data loading...</p>
       ) : (

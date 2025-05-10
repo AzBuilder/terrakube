@@ -374,7 +374,7 @@ export const WorkspaceWebhook = ({ workspace, vcsProvider, orgTemplates, manageW
             </Col>
           </Row>
           <Form.Item>
-            <Flex justify="center" align="flex-start">
+            <Flex justify="flex-start" align="flex-start">
               <Button type="primary" htmlType="submit" disabled={!manageWorkspace}>
                 Save webhooks
               </Button>

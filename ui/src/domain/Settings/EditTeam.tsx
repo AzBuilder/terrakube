@@ -25,6 +25,8 @@ import { useParams } from "react-router-dom";
 import axiosInstance, { axiosClientAuth } from "../../config/axiosConfig";
 import { TeamToken } from "../types";
 import "./Settings.css";
+import { TeamPermissions } from "./TeamPermissions";
+import "./TeamPermissions.css";
 const { Paragraph } = Typography;
 
 type Props = {
@@ -84,7 +86,8 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
 
   const loadTeam = (id: string) => {
     axiosInstance.get(`organization/${orgid}/team/${id}`).then((response) => {
-      setTeamName(response.data.data.attributes.name);
+      const name = response.data.data.attributes.name;
+      setTeamName(name);
       form.setFieldsValue({
         manageState: response.data.data.attributes.manageState,
         manageProvider: response.data.data.attributes.manageProvider,
@@ -96,8 +99,10 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         manageJob: response.data.data.attributes.manageJob,
       });
       setLoading(false);
-      loadTokens(response.data.data.attributes.name);
-      loadUserTeams(response.data.data.attributes.name);
+      loadTokens();
+      if (name) {
+        loadUserTeams(name);
+      }
     });
   };
 
@@ -200,7 +205,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
       days: values.days,
       minutes: values.minutes,
       hours: values.hours,
-      group: teamName,
+      group: teamName || '',
     };
 
     axiosClientAuth
@@ -211,7 +216,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
       })
       .then((response) => {
         setToken(response.data.token);
-        loadTokens(teamName);
+        loadTokens();
         setVisible(false);
         setVisibleToken(true);
         setCreating(false);
@@ -223,8 +228,12 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
     axiosClientAuth
       .get(`${new URL(window._env_.REACT_APP_TERRAKUBE_API_URL).origin}/access-token/v1/teams`)
       .then((response) => {
-        const filteredTokens = response.data.filter((token: any) => token.group === tokenName);
-        setTokens(filteredTokens);
+        if (tokenName) {
+          const filteredTokens = response.data.filter((token: any) => token.group === tokenName);
+          setTokens(filteredTokens);
+        } else {
+          setTokens([]);
+        }
         setLoadingTokens(false);
       });
   };
@@ -262,99 +271,10 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
             ) : (
               ""
             )}
-            <FormItem>
-              <h2 style={{ marginTop: "10px" }}>Organization Access</h2>
-            </FormItem>
-            <Form.Item
-              name="manageState"
-              valuePropName="checked"
-              label="Manage State"
-              tooltip={{
-                title:
-                  "Allow members to manage Terraform/OpenTofu state, include downloading, uploading and view state content of a workspace.",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageWorkspace"
-              valuePropName="checked"
-              label="Manage Workspaces"
-              tooltip={{
-                title: "Allow members to create and administrate all workspaces within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageModule"
-              valuePropName="checked"
-              label="Manage Modules"
-              tooltip={{
-                title: "Allow members to create and administrate all modules within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageCollection"
-              valuePropName="checked"
-              label="Manage Collections"
-              tooltip={{
-                title: "Allow members to create and manage all collections within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageJob"
-              valuePropName="checked"
-              label="Manage Job"
-              tooltip={{
-                title: "Allow members to create jobs inside the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageProvider"
-              valuePropName="checked"
-              label="Manage Providers"
-              tooltip={{
-                title: "Allow members to create and administrate all providers within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageVcs"
-              valuePropName="checked"
-              label="Manage VCS Settings"
-              tooltip={{
-                title: "Allow members to create and administrate all VCS Settings within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="manageTemplate"
-              valuePropName="checked"
-              label="Manage Templates"
-              tooltip={{
-                title: "Allow members to create and administrate all Templates within the organization",
-                icon: <InfoCircleOutlined />,
-              }}
-            >
-              <Switch />
-            </Form.Item>
-            <Space direction="horizontal">
+            
+            <TeamPermissions managePermissions={true} />
+            
+            <Space direction="horizontal" style={{ marginTop: '20px' }}>
               {mode === "create" ? (
                 <Button onClick={onCancel} type="default">
                   Cancel

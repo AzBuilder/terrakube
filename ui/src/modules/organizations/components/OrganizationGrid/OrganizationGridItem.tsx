@@ -1,9 +1,8 @@
-import { Link } from "react-router-dom";
 import { Flex, Typography, Card } from "antd";
 import stringToDeterministicColor from "@/modules/utils/stringToDeterministicColor";
 import { OrganizationModel } from "../../types";
 import * as FaIcons from "react-icons/fa6";
-
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../../../config/actionTypes";
 const DEFAULT_ICON = "FaBuilding";
 const DEFAULT_COLOR = "#000000";
 
@@ -33,21 +32,31 @@ type Props = {
 
 export default function OrganizationGridItem({ organization }: Props) {
   const { iconName, color } = parseIconField(organization.icon, organization.id);
+  
+  const handleOrganizationClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Store organization data in session storage
+    sessionStorage.setItem(ORGANIZATION_ARCHIVE, organization.id);
+    sessionStorage.setItem(ORGANIZATION_NAME, organization.name);
+    
+    // Navigate with full page reload
+    window.location.href = `/organizations/${organization.id}/workspaces`;
+  };
+  
   return (
-    <Link to={`/organizations/${organization.id}/workspaces`}>
-      <Card hoverable style={{ width: "100%" }}>
-        <Flex gap="small" align="center">
-          <div className="org-card-icon">{getOrgIcon(iconName, color)}</div>
-          <Flex vertical gap="0">
-            <Typography.Text className="org-card-title" ellipsis>
-              {organization.name}
-            </Typography.Text>
-            <Typography.Text type="secondary">
-              {organization.description || "No description set for this organization"}
-            </Typography.Text>
-          </Flex>
+    <Card hoverable style={{ width: "100%" }} onClick={handleOrganizationClick}>
+      <Flex gap="small" align="center">
+        <div className="org-card-icon">{getOrgIcon(iconName, color)}</div>
+        <Flex vertical gap="0">
+          <Typography.Text className="org-card-title" ellipsis>
+            {organization.name}
+          </Typography.Text>
+          <Typography.Text type="secondary">
+            {organization.description || "No description set for this organization"}
+          </Typography.Text>
         </Flex>
-      </Card>
-    </Link>
+      </Flex>
+    </Card>
   );
 }

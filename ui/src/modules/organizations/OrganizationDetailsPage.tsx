@@ -5,7 +5,7 @@ import { ImportOutlined, PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import WorkspaceFilter from "@/modules/workspaces/components/WorkspaceFilter";
 import { WorkspaceListItem } from "@/modules/workspaces/types";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import workspaceService from "@/modules/workspaces/workspaceService";
 import useApiRequest from "@/modules/api/useApiRequest";
 import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
@@ -19,6 +19,7 @@ type Props = {
 
 export default function OrganizationsDetailPage({ organizationName, setOrganizationName }: Props) {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [workspaces, setWorkspaces] = useState<WorkspaceListItem[]>([]);
   const [filteredWorkspaces, setFilteredWorkspaces] = useState<WorkspaceListItem[]>([]);
   const [tags, setTags] = useState<TagModel[]>([]);
@@ -38,6 +39,10 @@ export default function OrganizationsDetailPage({ organizationName, setOrganizat
     execute();
   }, []);
 
+  const handleCreateWorkspace = () => {
+    navigate('/workspaces/create');
+  };
+
   return (
     <PageWrapper
       title="Workspaces"
@@ -55,8 +60,12 @@ export default function OrganizationsDetailPage({ organizationName, setOrganizat
           <Button icon={<ImportOutlined />}>
             <Link to="/workspaces/import">Import workspaces</Link>
           </Button>
-          <Button icon={<PlusOutlined />} type="primary">
-            <Link to="/workspaces/create">New workspace</Link>
+          <Button 
+            icon={<PlusOutlined />} 
+            type="primary"
+            onClick={handleCreateWorkspace}
+          >
+            New workspace
           </Button>
         </Space>
       }

@@ -25,9 +25,8 @@ import logo from "./white_logo.png";
 import { UserSettingsPage } from "@/modules/user/UserSettingsPage";
 import OrganizationsPickerPage from "@/modules/organizations/OrganizationsPickerPage";
 import OrganizationsDetailPage from "@/modules/organizations/OrganizationDetailsPage";
-import { VariableCollectionsDetailSettings } from "../Settings/VariableCollectionsDetail";
-import { CreateEditCollection } from "../Settings/CreateEditCollection";
-
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
+import axiosInstance from "../../config/axiosConfig";
 const { Header, Footer } = Layout;
 
 // Helper component to extract URL parameters for collection routes
@@ -52,6 +51,42 @@ const App = () => {
     }
     if (savedThemeMode) {
       setThemeMode(savedThemeMode);
+    }
+
+    // Initialize organization name from URL or session storage
+    const pathname = window.location.pathname;
+    const paths = pathname.split('/');
+    const orgIdIndex = paths.indexOf('organizations') + 1;
+    
+    if (orgIdIndex > 0 && orgIdIndex < paths.length) {
+      const orgId = paths[orgIdIndex];
+      if (orgId) {
+        // Check if we already have the org name in session storage
+        const storedOrgName = sessionStorage.getItem(ORGANIZATION_NAME);
+        const storedOrgId = sessionStorage.getItem(ORGANIZATION_ARCHIVE);
+        
+        if (storedOrgName && storedOrgId === orgId) {
+          setOrganizationName(storedOrgName);
+        } else {
+          // Fetch the organization name
+          axiosInstance.get(`organization/${orgId}`).then(response => {
+            if (response.data && response.data.data) {
+              const orgName = response.data.data.attributes.name;
+              sessionStorage.setItem(ORGANIZATION_ARCHIVE, orgId);
+              sessionStorage.setItem(ORGANIZATION_NAME, orgName);
+              setOrganizationName(orgName);
+            }
+          }).catch(err => {
+            console.error("Failed to load organization:", err);
+          });
+        }
+      }
+    } else {
+      // No org ID in URL, use session storage if available
+      const storedOrgName = sessionStorage.getItem(ORGANIZATION_NAME);
+      if (storedOrgName) {
+        setOrganizationName(storedOrgName);
+      }
     }
   }, []);
 

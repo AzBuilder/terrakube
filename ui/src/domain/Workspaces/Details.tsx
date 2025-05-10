@@ -71,9 +71,7 @@ import { States } from "../Workspaces/States";
 import { Tags } from "../Workspaces/Tags";
 import { Variables } from "../Workspaces/Variables";
 import { getServiceIcon } from "./Icons.jsx";
-import { WorkspaceAdvanced } from "./Settings/Advanced.jsx";
-import { WorkspaceGeneral } from "./Settings/General";
-import { WorkspaceWebhook } from "./Settings/Webhook.jsx";
+import { WorkspaceSettings } from "./Settings/WorkspaceSettings";
 import { getIaCIconById, getIaCNameById, renderVCSLogo } from "./Workspaces";
 import "./Workspaces.css";
 import RunList from "@/modules/workspaces/components/RunList";
@@ -756,38 +754,11 @@ export const WorkspaceDetails = ({ setOrganizationName, selectedTab }: Props) =>
                   {templates ? <Schedules schedules={schedule} manageWorkspace={manageWorkspace} /> : <p>Loading...</p>}
                 </TabPane>
                 <TabPane tab="Settings" key="6">
-                  <Tabs
-                    tabPosition="left"
-                    items={[
-                      {
-                        label: "General",
-                        key: "61",
-                        children: (
-                          <WorkspaceGeneral
-                            workspaceData={workspace}
-                            orgTemplates={orgTemplates}
-                            manageWorkspace={manageWorkspace}
-                          />
-                        ),
-                      },
-                      {
-                        label: "Webhook",
-                        key: "62",
-                        children: (
-                          <WorkspaceWebhook
-                            workspace={workspace}
-                            vcsProvider={vcsProvider}
-                            orgTemplates={orgTemplates}
-                            manageWorkspace={manageWorkspace}
-                          />
-                        ),
-                      },
-                      {
-                        label: "Advanced",
-                        key: "63",
-                        children: <WorkspaceAdvanced workspace={workspace} manageWorkspace={manageWorkspace} />,
-                      },
-                    ]}
+                  <WorkspaceSettings 
+                    workspace={workspace}
+                    vcsProvider={vcsProvider}
+                    orgTemplates={orgTemplates}
+                    manageWorkspace={manageWorkspace}
                   />
                 </TabPane>
               </Tabs>
