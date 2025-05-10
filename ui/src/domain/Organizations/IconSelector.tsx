@@ -24,9 +24,7 @@ export const IconSelector = ({ value, color = "#000000", onChange }: IconSelecto
   const [selectedIcon, setSelectedIcon] = useState(value || DEFAULT_ICON);
 
   // Filter icons based on search text
-  const filteredIcons = allFa6Icons.filter((icon) =>
-    icon.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredIcons = allFa6Icons.filter((icon) => icon.toLowerCase().includes(searchText.toLowerCase()));
 
   const handleIconSelect = (icon: string) => {
     setSelectedIcon(icon);
@@ -56,7 +54,7 @@ export const IconSelector = ({ value, color = "#000000", onChange }: IconSelecto
               key={icon}
               onClick={() => handleIconSelect(icon)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (e.key === "Enter" || e.key === " ") {
                   handleIconSelect(icon);
                 }
               }}
@@ -82,7 +80,18 @@ export const IconSelector = ({ value, color = "#000000", onChange }: IconSelecto
               }}
             >
               <IconComponent style={{ fontSize: 24, color }} />
-              <div style={{ fontSize: 9, marginTop: 2, color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{icon}</div>
+              <div
+                style={{
+                  fontSize: 9,
+                  marginTop: 2,
+                  color: "#666",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  width: "100%",
+                }}
+              >
+                {icon}
+              </div>
             </div>
           );
         })}

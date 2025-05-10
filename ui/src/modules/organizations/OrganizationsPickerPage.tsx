@@ -2,7 +2,7 @@ import { Button, Empty, Flex } from "antd";
 import "antd/dist/reset.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ORGANIZATION_ARCHIVE } from "../../config/actionTypes";
+import { ORGANIZATION_ARCHIVE, ORGANIZATION_NAME } from "../../config/actionTypes";
 import organizationService from "@/modules/organizations/organizationService";
 import { mapOrganization } from "./organizationMapper";
 import useApiRequest from "@/modules/api/useApiRequest";
@@ -27,7 +27,12 @@ export default function OrganizationsPickerPage() {
     if (orgId === "" || orgId === null) {
       await execute();
     } else {
-      navigate(`/organizations/${orgId}/workspaces`, { replace: true });
+      const orgName = sessionStorage.getItem(ORGANIZATION_NAME);
+      if (orgName) {
+        window.location.href = `/organizations/${orgId}/workspaces`;
+      } else {
+        navigate(`/organizations/${orgId}/workspaces`, { replace: true });
+      }
     }
   }
 
@@ -37,9 +42,10 @@ export default function OrganizationsPickerPage() {
 
   useEffect(() => {
     if (organizations.length === 1) {
-      navigate(`/organizations/${organizations[0].id}/workspaces`, {
-        replace: true,
-      });
+      const organization = organizations[0];
+      sessionStorage.setItem(ORGANIZATION_ARCHIVE, organization.id);
+      sessionStorage.setItem(ORGANIZATION_NAME, organization.name);
+      window.location.href = `/organizations/${organization.id}/workspaces`;
     }
   }, [organizations]);
 
