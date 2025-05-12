@@ -4761,10 +4761,10 @@ hcl2-parser@^1.0.3:
   resolved "https://registry.npmjs.org/hcl2-parser/-/hcl2-parser-1.0.3.tgz"
   integrity sha512-NQUm/BFF+2nrBfeqDhhsy4DxxiLHgkeE3FywtjFiXnjSUaio3w4Tz1MQ3vGJBUhyArzOXJ24pO7JwE5LAn7Ncg==
 
-html-dom-parser@5.0.13:
-  version "5.0.13"
-  resolved "https://registry.npmjs.org/html-dom-parser/-/html-dom-parser-5.0.13.tgz"
-  integrity sha512-B7JonBuAfG32I7fDouUQEogBrz3jK9gAuN1r1AaXpED6dIhtg/JwiSRhjGL7aOJwRz3HU4efowCjQBaoXiREqg==
+html-dom-parser@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/html-dom-parser/-/html-dom-parser-5.1.1.tgz#9efb2cfa055f6a71de1bb2f07c5b019db5004f9e"
+  integrity sha512-+o4Y4Z0CLuyemeccvGN4bAO20aauB2N9tFEAep5x4OW34kV4PTarBHm6RL02afYt2BMKcr0D2Agep8S3nJPIBg==
   dependencies:
     domhandler "5.0.3"
     htmlparser2 "10.0.0"
@@ -4781,13 +4781,13 @@ html-escaper@^2.0.0:
   resolved "https://registry.npmjs.org/html-escaper/-/html-escaper-2.0.2.tgz"
   integrity sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==
 
-html-react-parser@^5.2.3:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-5.2.3.tgz#fc87fe097ff661d24d65997e4bf341ab509958a3"
-  integrity sha512-y34oKTu+9T1fKdJE1cN9QWFWu8sx8Qa5tJOafUfMUF5Niah+yF6zlEHhWh7a0iZEcLRPIMw54bY14ajQF7xP7A==
+html-react-parser@^5.2.5:
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/html-react-parser/-/html-react-parser-5.2.5.tgz#4a0d62c129d5d5c63cc49f986c946552d737190c"
+  integrity sha512-bRPdv8KTqG9CEQPMNGksDqmbiRfVQeOidry8pVetdh/1jQ1Edx4KX5m0lWvDD89Pt4CqTYjK1BLz6NoNVxN/Uw==
   dependencies:
     domhandler "5.0.3"
-    html-dom-parser "5.0.13"
+    html-dom-parser "5.1.1"
     react-property "2.0.2"
     style-to-js "1.1.16"
 
