@@ -92,7 +92,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "classnames": "^2.5.1",
     "eslint": "^9.26.0",
-    "eslint-config-prettier": "^10.1.2",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-import-resolver-typescript": "^4.3.4",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
