@@ -65,8 +65,8 @@ function generateExecutorVars(){
     TerrakubeRedisHostname=localhost
   else
     AzBuilderApiUrl="https://terrakube-api.platform.local"
-    TerrakubeRegistryDomain="https://terrakube-registry.platform.local"
-    TerrakubeApiUrl="htps://terrakube-api.platform.local"
+    TerrakubeRegistryDomain="terrakube-registry.platform.local"
+    TerrakubeApiUrl="https://terrakube-api.platform.local"
     TerrakubeRedisHostname=terrakube-redis
   fi
 
