@@ -12,7 +12,7 @@ function generateApiVars(){
     TerrakubeHostname="https://terrakube-api.platform.local"
     AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
-    TerrakubeUiURL="https://terrakube-ui.platform.local"
+    TerrakubeUiURL="https://terrakube.platform.local"
     TerrakubeRedisHostname=terrakube-redis
   fi
 
@@ -62,10 +62,12 @@ function generateExecutorVars(){
     AzBuilderApiUrl=$(gp url 8080)
     TerrakubeRegistryDomain=$(gp url 8075 | sed "s+https://++g")
     TerrakubeApiUrl=$(gp url 8080)
+    TerrakubeRedisHostname=localhost
   else
     AzBuilderApiUrl="https://terrakube-api.platform.local"
     TerrakubeRegistryDomain="https://terrakube-registry.platform.local"
     TerrakubeApiUrl="htps://terrakube-api.platform.local"
+    TerrakubeRedisHostname=terrakube-redis
   fi
 
   TerrakubeEnableSecurity=true
@@ -94,7 +96,7 @@ function generateExecutorVars(){
   echo "TerrakubeApiUrl=$TerrakubeApiUrl" >> .envExecutor
   echo "CustomTerraformReleasesUrl=\"https://releases.hashicorp.com/terraform/index.json\"" >> .envExecutor
   echo "CustomTofuReleasesUrl=\"https://api.github.com/repos/opentofu/opentofu/releases\"" >> .envExecutor
-  echo "TerrakubeRedisHostname=localhost" >> .envExecutor
+  echo "TerrakubeRedisHostname=$TerrakubeRedisHostname" >> .envExecutor
   echo "TerrakubeRedisPort=6379" >> .envExecutor
   echo "TerrakubeRedisSSL=false" >> .envExecutor
   echo "TerrakubeRedisUsername=default" >> .envExecutor
@@ -114,7 +116,7 @@ function generateRegistryVars(){
     AzBuilderRegistry="https://terrakube-registry.platform.local"
     AzBuilderApiUrl="https://terrakube-api.platform.local"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
-    TerrakubeUiURL="https://terrakube-ui.platform.local"
+    TerrakubeUiURL="https://terrakube.platform.local"
     AppIssuerUri="https://terrakube-dex.platform.local/dex"
   fi
 
@@ -152,14 +154,19 @@ function generateUiVars(){
     REACT_CONFIG_AUTHORITY="$(gp url 5556)/dex"
   else
     REACT_CONFIG_TERRAKUBE_URL="https://terrakube-api.platform.local/api/v1/"
-    REACT_CONFIG_REDIRECT="https://terrakube-ui.platform.local"
+    REACT_CONFIG_REDIRECT="https://terrakube.platform.local"
     REACT_CONFIG_REGISTRY_URI="https://terrakube-registry.platform.local"
-    REACT_CONFIG_AUTHORITY="https://terrkube-dex.platform.local/dex"
+    REACT_CONFIG_AUTHORITY="https://terrakube-dex.platform.local/dex"
   fi
 
   REACT_CONFIG_CLIENT_ID="example-app"
   REACT_CONFIG_SCOPE="email openid profile offline_access groups"
-  REACT_APP_TERRAKUBE_VERSION=v$(git describe --tags --abbrev=0)
+  if [ "$USER" = "gitpod" ]; then
+    REACT_APP_TERRAKUBE_VERSION=v$(git describe --tags --abbrev=0)
+  else
+    REACT_APP_TERRAKUBE_VERSION="devcontainer"
+  fi
+
 
   rm -f .envUi
 
@@ -172,6 +179,7 @@ function generateUiVars(){
   echo "REACT_APP_TERRAKUBE_VERSION"=$REACT_APP_TERRAKUBE_VERSION >>.envUi
   REACT_CONFIG_REDIRECT=$(echo $REACT_CONFIG_REDIRECT | sed "s+https://++g")
   echo "__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS"=$REACT_CONFIG_REDIRECT >>.envUi
+
 
   generateUiConfigFile
 }
@@ -267,6 +275,17 @@ function generateWorkspaceInformation(){
   sed -i "s+GITPOD_WORKSPACE_MINIO+$WORKSPACE_MINIO+gi" GITPOD.md
   sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
 }
+
+  if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
+    openssl x509 -outform der -in /workspaces/terrakube/.devcontainer/rootCA.pem -out /workspaces/terrakube/.devcontainer/rootCA.der
+    
+    if keytool -list -cacerts -storepass "123456" | grep -q "custom-ca"; then
+      echo "Alias $ALIAS exists. Deleting it first..."
+      keytool -delete -alias "custom-ca" -cacerts -storepass "123456" -noprompt
+    fi
+
+    keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "123456" -noprompt
+  fi
 
 generateApiVars
 generateRegistryVars

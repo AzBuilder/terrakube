@@ -17,7 +17,8 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20",
       "installYarnUsingApt": true
-    }
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {}
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.

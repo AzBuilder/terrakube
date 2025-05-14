@@ -64,7 +64,7 @@ connectors:
         nameAttr: cn
 
 staticClients:
-  - id: terrakube-app
+  - id: example-app
     redirectURIs:
       - "https://terrakube.platform.local"
       - "https://terrakube-api.platform.local"

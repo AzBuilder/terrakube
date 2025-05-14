@@ -6,7 +6,7 @@
         {
             "label": "setup-java",
             "type": "shell",
-            "command": "echo 1",
+            "command": "  if [ \"$USER\" = \"gitpod\" ]; then source \"$HOME/.sdkman/bin/sdkman-init.sh\" && sdk install java 21.0.6-tem && sdk install maven 3.9.0; else echo \"Using JDK from devcontainer setup\"; fi",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -15,7 +15,7 @@
         {
             "label": "yarn-install",
             "type": "shell",
-            "command": "cd ui && yarn install",
+            "command": "  if [ \"$USER\" = \"gitpod\" ]; then cd ui && yarn install; else echo \"Using Node from devcontainer setup\"; fi",
             "group": {
                 "kind": "build",
                 "isDefault": true
