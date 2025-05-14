@@ -26,12 +26,12 @@
   // "forwardPorts": [3000, 5432],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "mvn dependency:resolve && cd ui && yarn install",
+  "postCreateCommand": "/workspaces/terrakube/scripts/setupDevelopmentEnvironment.sh",
 
   // Configure tool-specific properties.
   // "customizations": {},
 
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
   "remoteUser": "vscode",
-  "forwardPorts": [8080, 3000, 8075, 8090]
+  "forwardPorts": [8080, 3000, 8075, 8090, 10000, 10001]
 }
