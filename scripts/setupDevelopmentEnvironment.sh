@@ -1,5 +1,23 @@
 #!/bin/bash
 
+while getopts 'd:s:' OPTION; do
+  echo $OPTION
+  case "$OPTION" in
+    d)
+      database_value="$OPTARG"
+      echo "Using database $OPTARG"
+      ;;
+    s)
+      storage_value="$OPTARG"
+      echo "Using storage $OPTARG"
+      ;;
+    ?)
+      echo "script usage: $(basename \$0) [-s storage] [-d database]" >&2
+      exit 1
+      ;;
+  esac
+done
+
 function generateApiVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
@@ -16,7 +34,6 @@ function generateApiVars(){
     TerrakubeRedisHostname=terrakube-redis
   fi
 
-  ApiDataSourceType="H2"
   GroupValidationType="DEX"
   UserValidationType="DEX"
   AuthenticationValidationType="DEX"
@@ -31,7 +48,22 @@ function generateApiVars(){
 
   rm -f .envApi
 
+  if [ "$database_value" = "POSTGRESQL" ]; then
+    ApiDataSourceType="POSTRESQL"
+    DatasourceHostname="postgresql-service"
+    DatasourceDatabase="terrakubedb"
+    DatasourceUser="terrakube"
+    DatasourcePassword="terrakube"
+  else
+    ApiDataSourceType="H2"
+  fi
+
   echo "ApiDataSourceType=$ApiDataSourceType" >> .envApi
+  echo "DatasourceHostname=$DatasourceHostname" >> .envApi
+  echo "DatasourceDatabase=$DatasourceDatabase" >> .envApi
+  echo "DatasourceUser=$DatasourceUser" >> .envApi
+  echo "DatasourcePassword=$DatasourcePassword" >> .envApi
+  
   echo "GroupValidationType=$GroupValidationType" >> .envApi
   echo "UserValidationType=$UserValidationType" >> .envApi
   echo "AuthenticationValidationType=$AuthenticationValidationType" >> .envApi

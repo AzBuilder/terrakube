@@ -46,8 +46,9 @@
     ],
     "compounds": [
         {
-            "name": "Terrakube",
-            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"]
+            "name": "Terrakube H2 - Local",
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
+            "preLaunchTask": "setup-env"
         }
     ]
 }
