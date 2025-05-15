@@ -7,7 +7,7 @@ This directory contains the configuration for a development container that provi
 
 ## Features
 
-- Java 21 (Liberica)
+- Java 17 (Liberica)
 - Maven 3.9.9
 - Node.js 20.x with Yarn
 - VS Code extensions for Java, JavaScript/TypeScript
@@ -80,6 +80,14 @@ Update the /etc/hosts file adding the following entries:
    - Type "Remote-Containers: Reopen in Container" and press Enter
 
 3. Wait for the container to build and start. This may take a few minutes the first time.
+
+4. Start all Terrakube components
+
+   ![image](https://github.com/user-attachments/assets/34a4d4c9-d1b0-443f-834e-c4d76db26187)
+
+5. Terrakube should be availabe with the following url `https://terrakube.platform.local` using `admin@example.com` with password `admin`
+
+   ![image](https://github.com/user-attachments/assets/c92b5f7a-c484-47b5-bb31-4edd4513278e)
 
 ## Ports
 
