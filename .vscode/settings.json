@@ -1,6 +1,4 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "thunder-client.workspaceRelativePath": "",
-    "thunder-client.saveToWorkspace": true,
     "java.compile.nullAnalysis.mode": "automatic"
 }

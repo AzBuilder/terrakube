@@ -1,0 +1,37 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-postgres
+{
+  "name": "Terrakube Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "terrakube-dev",
+  "workspaceFolder": "/workspaces/terrakube",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "installMaven": true,
+      "mavenVersion": "3.9.9",
+      "jdkDistro": "Liberica",
+      "version": "17.0.15-librca"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "installYarnUsingApt": true
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {}
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // This can be used to network with other containers or with the host.
+  // "forwardPorts": [3000, 5432],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "/workspaces/terrakube/scripts/setupDevelopmentEnvironment.sh",
+
+  // Configure tool-specific properties.
+  // "customizations": {},
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  "remoteUser": "vscode",
+  "forwardPorts": [8080, 3000, 8075, 8090, 10000, 10001]
+}
