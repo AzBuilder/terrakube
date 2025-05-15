@@ -49,7 +49,7 @@ Update the /etc/hosts file adding the following entries:
 git clone https://github.com/AzBuilder/terrakube.git
 cd terrakube/docker-compose
 mkcert -key-file key.pem -cert-file cert.pem platform.local *.platform.local
-
+CAROOT=$(mkcert -CAROOT)/rootCA.pem
 cp $CAROOT rootCA.pem
 docker compose up -d --force-recreate
 ```

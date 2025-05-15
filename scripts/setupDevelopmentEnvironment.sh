@@ -279,12 +279,12 @@ function generateWorkspaceInformation(){
   if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
     openssl x509 -outform der -in /workspaces/terrakube/.devcontainer/rootCA.pem -out /workspaces/terrakube/.devcontainer/rootCA.der
     
-    if keytool -list -cacerts -storepass "123456" | grep -q "custom-ca"; then
+    if keytool -list -cacerts -storepass "changeit" | grep -q "custom-ca"; then
       echo "Alias $ALIAS exists. Deleting it first..."
-      keytool -delete -alias "custom-ca" -cacerts -storepass "123456" -noprompt
+      keytool -delete -alias "custom-ca" -cacerts -storepass "changeit" -noprompt
     fi
 
-    keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "123456" -noprompt
+    keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "changeit" -noprompt
   fi
 
 generateApiVars
