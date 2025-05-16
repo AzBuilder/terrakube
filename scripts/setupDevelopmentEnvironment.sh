@@ -41,7 +41,7 @@ function generateApiVars(){
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
   TERRAKUBE_ADMIN_GROUP="CUSTOM_ADMIN_NAME"
 
-  StorageType="LOCAL"
+
   DexClientId="example-app"
 
   JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
@@ -49,13 +49,32 @@ function generateApiVars(){
   rm -f .envApi
 
   if [ "$database_value" = "POSTGRESQL" ]; then
-    ApiDataSourceType="POSTRESQL"
-    DatasourceHostname="postgresql-service"
+    ApiDataSourceType="POSTGRESQL"
     DatasourceDatabase="terrakubedb"
     DatasourceUser="terrakube"
-    DatasourcePassword="terrakube"
+    if [ "$USER" = "gitpod" ]; then
+      DatasourceHostname="localhost"
+    else
+      DatasourceHostname="postgresql-service"
+    fi
+    DatasourcePassword="terrakubepassword"
   else
     ApiDataSourceType="H2"
+  fi
+
+  if [ "$storage_value" = "MINIO" ]; then
+    StorageType="AWS"
+    AwsStorageAccessKey="minioadmin"
+    AwsStorageSecretKey="minioadmin"
+    AwsStorageBucketName="sample"
+    AwsStorageRegion="us-east-1"
+    if [ "$USER" = "gitpod" ]; then
+      AwsEndpoint="http://localhost:9000"
+    else
+      AwsEndpoint="http://minio:9000"
+    fi
+  else
+    StorageType="LOCAL"
   fi
 
   echo "ApiDataSourceType=$ApiDataSourceType" >> .envApi
@@ -63,6 +82,13 @@ function generateApiVars(){
   echo "DatasourceDatabase=$DatasourceDatabase" >> .envApi
   echo "DatasourceUser=$DatasourceUser" >> .envApi
   echo "DatasourcePassword=$DatasourcePassword" >> .envApi
+  
+  echo "StorageType=$StorageType" >> .envApi
+  echo "AwsStorageAccessKey=$AwsStorageAccessKey" >> .envApi
+  echo "AwsStorageSecretKey=$AwsStorageSecretKey" >> .envApi
+  echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envApi
+  echo "AwsStorageRegion=$AwsStorageRegion" >> .envApi
+  echo "AwsEndpoint=$AwsEndpoint" >> .envApi
   
   echo "GroupValidationType=$GroupValidationType" >> .envApi
   echo "UserValidationType=$UserValidationType" >> .envApi
@@ -72,7 +98,6 @@ function generateApiVars(){
   echo "PatSecret=$PatSecret" >> .envApi
   echo "InternalSecret=$InternalSecret" >> .envApi
   echo "DexIssuerUri=$DexIssuerUri" >> .envApi
-  echo "StorageType=$StorageType" >> .envApi
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
   echo "DexClientId=$DexClientId" >> .envApi
@@ -102,10 +127,32 @@ function generateExecutorVars(){
     TerrakubeRedisHostname=terrakube-redis
   fi
 
+  if [ "$storage_value" = "MINIO" ]; then
+    TerraformStateType=AwsTerraformStateImpl
+    AwsTerraformStateAccessKey="minioadmin"
+    AwsTerraformStateSecretKey="minioadmin"
+    AwsTerraformStateBucketName="sample"
+    AwsTerraformStateRegion="us-east-1"
+
+    TerraformOutputType=AwsTerraformOutputImpl
+    AwsTerraformOutputAccessKey="minioadmin"
+    AwsTerraformOutputSecretKey="minioadmin"
+    AwsTerraformOutputBucketName="sample"
+    AwsTerraformOutputRegion="us-east-1"
+    
+    if [ "$USER" = "gitpod" ]; then
+      AwsEndpoint="http://localhost:9000"
+    else
+      AwsEndpoint="http://minio:9000"
+    fi
+  else
+    TerraformStateType=LocalTerraformStateImpl
+    TerraformOutputType=LocalTerraformOutputImpl
+  fi
+
   TerrakubeEnableSecurity=true
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  TerraformStateType=LocalTerraformStateImpl
-  TerraformOutputType=LocalTerraformOutputImpl
+
   ExecutorFlagBatch=false
   ExecutorFlagDisableAcknowledge=false
   TerrakubeToolsRepository=https://github.com/AzBuilder/terrakube-extensions.git
@@ -117,8 +164,20 @@ function generateExecutorVars(){
 
   echo "TerrakubeEnableSecurity=$TerrakubeEnableSecurity" >> .envExecutor
   echo "InternalSecret=$InternalSecret" >> .envExecutor
+
   echo "TerraformStateType=$TerraformStateType" >> .envExecutor
+  echo "AwsTerraformStateAccessKey=$AwsTerraformStateAccessKey" >> .envExecutor
+  echo "AwsTerraformStateSecretKey=$AwsTerraformStateSecretKey" >> .envExecutor
+  echo "AwsTerraformStateBucketName=$AwsTerraformStateBucketName" >> .envExecutor
+  echo "AwsTerraformStateRegion=$AwsTerraformStateRegion" >> .envExecutor
+  echo "AwsEndpoint=$AwsEndpoint" >> .envExecutor
+  
   echo "TerraformOutputType=$TerraformOutputType" >> .envExecutor
+  echo "AwsTerraformOutputAccessKey=$AwsTerraformOutputAccessKey" >> .envExecutor
+  echo "AwsTerraformOutputSecretKey=$AwsTerraformOutputSecretKey" >> .envExecutor
+  echo "AwsTerraformOutputBucketName=$AwsTerraformOutputBucketName" >> .envExecutor
+  echo "AwsTerraformOutputRegion=$AwsTerraformOutputRegion" >> .envExecutor
+
   echo "AzBuilderApiUrl=$AzBuilderApiUrl" >> .envExecutor
   echo "ExecutorFlagBatch=$ExecutorFlagBatch" >> .envExecutor
   echo "ExecutorFlagDisableAcknowledge=$ExecutorFlagDisableAcknowledge" >> .envExecutor
@@ -152,11 +211,26 @@ function generateRegistryVars(){
     AppIssuerUri="https://terrakube-dex.platform.local/dex"
   fi
 
+  if [ "$storage_value" = "MINIO" ]; then
+    RegistryStorageType=AwsStorageImpl
+    AwsStorageAccessKey="minioadmin"
+    AwsStorageSecretKey="minioadmin"
+    AwsStorageBucketName="sample"
+    AwsStorageRegion="us-east-1"
+    
+    if [ "$USER" = "gitpod" ]; then
+      AwsEndpoint="http://localhost:9000"
+    else
+      AwsEndpoint="http://minio:9000"
+    fi
+  else
+    RegistryStorageType=Local
+  fi
+
   AuthenticationValidationTypeRegistry=DEX
   TerrakubeEnableSecurity=true
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  RegistryStorageType=Local
   AppClientId=example-app
 
   JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
@@ -174,6 +248,11 @@ function generateRegistryVars(){
   echo "RegistryStorageType=$RegistryStorageType" >> .envRegistry
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
+  echo "AwsStorageAccessKey=$AwsStorageAccessKey" >> .envRegistry
+  echo "AwsStorageSecretKey=$AwsStorageSecretKey" >> .envRegistry
+  echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envRegistry
+  echo "AwsStorageRegion=$AwsStorageRegion" >> .envRegistry
+  echo "AwsEndpoint=$AwsEndpoint" >> .envRegistry
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
 }
 

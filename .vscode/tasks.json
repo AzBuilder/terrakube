@@ -30,6 +30,16 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "setup-env2",
+            "type": "shell",
+            "command": "./scripts/setupDevelopmentEnvironment.sh",
+            "args": ["-s", "MINIO", "-d", "POSTGRESQL"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

@@ -49,6 +49,11 @@
             "name": "Terrakube H2 - Local",
             "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
             "preLaunchTask": "setup-env"
+        },
+        {
+            "name": "Terrakube Postgresql - MINIO",
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
+            "preLaunchTask": "setup-env2"
         }
     ]
 }
