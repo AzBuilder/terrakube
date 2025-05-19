@@ -21,7 +21,7 @@
         <jgit.version>7.2.1.202505142326-r</jgit.version>
         <commons-io.version>2.19.0</commons-io.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
-        <rest-assured.version>5.5.1</rest-assured.version>
+        <rest-assured.version>5.5.2</rest-assured.version>
         <!--groovy.version>3.0.8</groovy.version-->
         <aws-sdk.version>2.31.45</aws-sdk.version>
         <zt-zip.version>1.17</zt-zip.version>
