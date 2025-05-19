@@ -93,7 +93,7 @@
     "classnames": "^2.5.1",
     "eslint": "^9.26.0",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-import-resolver-typescript": "^4.3.4",
+    "eslint-import-resolver-typescript": "^4.3.5",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.4.0",
