@@ -387,6 +387,28 @@ function generateWorkspaceInformation(){
   sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
 }
 
+function generateDexConfiguration(){
+
+  if [ -e .devcontainer/.env-dex ]; then
+      echo "File exists."
+      rm -rf .devcontainer/.env-dex
+  else
+      echo "File does not exist."
+      touch .devcontainer/.env-dex
+  fi
+
+  if [ "$USER" = "gitpod" ]; then
+    TK_DEX_ISSUER="$(gp url 5556)/dex"
+    TK_DEX_API=$(gp url 8080)
+    TK_DEX_REGISTRY=$(gp url 8075)
+  elif [ "$USER" = "vscode" ]; then
+    touch .devcontainer/.env-dex
+    echo "TK_DEX_VERSION=v2.42.0" >> .devcontainer/.env-dex
+    echo "TK_DEX_ISSUER=https://terrakube-dex.platform.local/dex" >> .devcontainer/.env-dex
+    echo "TK_DEX_STATIC_CLIENT=c3RhdGljQ2xpZW50czoKICAtIGlkOiBleGFtcGxlLWFwcAogICAgcmVkaXJlY3RVUklzOgogICAgICAtICdodHRwczovL3RlcnJha3ViZS5wbGF0Zm9ybS5sb2NhbCcKICAgICAgLSAnaHR0cHM6Ly90ZXJyYWt1YmUtYXBpLnBsYXRmb3JtLmxvY2FsJwogICAgICAtICdodHRwczovL3RlcnJha3ViZS1yZWdpc3RyeS5wbGF0Zm9ybS5sb2NhbCcKICAgICAgLSAvZGV2aWNlL2NhbGxiYWNrCiAgICAgIC0gJ2h0dHA6Ly9sb2NhbGhvc3Q6MTAwMDAvbG9naW4nCiAgICAgIC0gJ2h0dHA6Ly9sb2NhbGhvc3Q6MTAwMDEvbG9naW4nCiAgICBuYW1lOiBFeGFtcGxlIEFwcAogICAgcHVibGljOiB0cnVl" >> .devcontainer/.env-dex
+  fi
+}
+
   if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
     openssl x509 -outform der -in /workspaces/terrakube/.devcontainer/rootCA.pem -out /workspaces/terrakube/.devcontainer/rootCA.der
     

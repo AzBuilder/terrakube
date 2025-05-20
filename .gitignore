@@ -32,7 +32,6 @@ hs_err_pid*
 target
 
 thunder-tests/thunderEnvironment.json
-scripts/setup/dex/config-ldap.yaml
 scripts/setup/minio/docker-compose.yaml
 .envApi
 .envExecutor
@@ -42,6 +41,7 @@ scripts/setup/minio/docker-compose.yaml
 .envGcp
 GITPOD.md
 CHE.md
+.devcontainer/.env-dex
 
 terrakubeDemo1.key
 terrakubeDemo2.key

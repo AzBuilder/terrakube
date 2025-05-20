@@ -18,7 +18,8 @@
       "version": "20",
       "installYarnUsingApt": true
     },
-    "ghcr.io/devcontainers/features/terraform:1": {}
+    "ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -26,12 +27,12 @@
   // "forwardPorts": [3000, 5432],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "/workspaces/terrakube/scripts/setupDevelopmentEnvironment.sh",
+  "postStartCommand": "/workspaces/terrakube/scripts/setupDevelopmentEnvironment.sh",
 
   // Configure tool-specific properties.
   // "customizations": {},
 
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
   "remoteUser": "vscode",
-  "forwardPorts": [8080, 3000, 8075, 8090, 10000, 10001]
+  "forwardPorts": [8080, 3000, 8075, 8090, 10000, 10001, 5556]
 }
