@@ -243,6 +243,9 @@ services:
     extra_hosts: *terrakube_hosts
     labels: *traefik_dex_labels
     container_name: terrakube-dex
+    environment:
+      - TK_DEX_ISSUER=${TK_DEX_ISSUER}
+      - TK_DEX_STATIC_CLIENT=${TK_DEX_STATIC_CLIENT}
     volumes:
       - ./config-ldap.yaml:/etc/dex/config.docker.yaml
   ldap-service:
