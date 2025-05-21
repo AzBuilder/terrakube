@@ -26,11 +26,17 @@ function generateApiVars(){
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
     TerrakubeRedisHostname=localhost
-  else
+  elif [ "$USER" = "vscode" ]; then
     TerrakubeHostname="https://terrakube-api.platform.local"
     AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
     TerrakubeUiURL="https://terrakube.platform.local"
+    TerrakubeRedisHostname=terrakube-redis
+  else
+    TerrakubeHostname="http://localhost:8080"
+    AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
+    DexIssuerUri="http://localhost:5556/dex"
+    TerrakubeUiURL="http://localhost:3000"
     TerrakubeRedisHostname=terrakube-redis
   fi
 
@@ -120,10 +126,15 @@ function generateExecutorVars(){
     TerrakubeRegistryDomain=$(gp url 8075 | sed "s+https://++g")
     TerrakubeApiUrl=$(gp url 8080)
     TerrakubeRedisHostname=localhost
-  else
+  elif [ "$USER" = "vscode" ]; then
     AzBuilderApiUrl="https://terrakube-api.platform.local"
     TerrakubeRegistryDomain="terrakube-registry.platform.local"
     TerrakubeApiUrl="https://terrakube-api.platform.local"
+    TerrakubeRedisHostname=terrakube-redis
+  else
+    AzBuilderApiUrl="http://localhost:8080"
+    TerrakubeRegistryDomain="localhost:8075"
+    TerrakubeApiUrl="http://localhost:8080"
     TerrakubeRedisHostname=terrakube-redis
   fi
 
@@ -203,12 +214,18 @@ function generateRegistryVars(){
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
     AppIssuerUri="$(gp url 5556)/dex"
-  else
+  elif [ "$USER" = "vscode" ]; then
     AzBuilderRegistry="https://terrakube-registry.platform.local"
     AzBuilderApiUrl="https://terrakube-api.platform.local"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
     TerrakubeUiURL="https://terrakube.platform.local"
     AppIssuerUri="https://terrakube-dex.platform.local/dex"
+  else
+    AzBuilderRegistry="http://localhost:8075"
+    AzBuilderApiUrl="http://localhost:8080"
+    DexIssuerUri="http://localhost:5556/dex"
+    TerrakubeUiURL="http://locahost:3000"
+    AppIssuerUri="https://localhost:5556/dex"
   fi
 
   if [ "$storage_value" = "MINIO" ]; then
@@ -337,7 +354,7 @@ function generateDexConfiguration(){
     uiRedirect=$(gp url 3000)  
   else
     jwtIssuer="http://localhost:5556"
-    uiRedirect="http://locahost:3000"
+    uiRedirect="http://localhost:3000"
   fi
   
   sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" scripts/setup/dex/config-ldap.yaml
