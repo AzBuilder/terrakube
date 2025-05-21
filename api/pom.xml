@@ -21,28 +21,28 @@
         <mssql-jdbc.version>12.10.0.jre11</mssql-jdbc.version>
         <msal4j.version>1.20.1</msal4j.version>
         <lombok.version>1.18.38</lombok.version>
-        <jgit.version>7.2.0.202503040940-r</jgit.version>
-        <rest-assured.version>5.5.1</rest-assured.version>
+        <jgit.version>7.2.1.202505142326-r</jgit.version>
+        <rest-assured.version>5.5.2</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.5</postgresql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <quartz.version>2.5.0</quartz.version>
-        <aws-sdk.version>2.31.40</aws-sdk.version>
+        <aws-sdk.version>2.31.45</aws-sdk.version>
         <gcp-libraries-bom.version>26.60.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
-        <jedis.version>5.1.5</jedis.version>
+        <jedis.version>6.0.0</jedis.version>
         <commons-text.version>1.13.1</commons-text.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <maven-artifact.version>3.9.9</maven-artifact.version>
         <commons-io.version>2.19.0</commons-io.version>
-        <kubernetes-client.version>7.2.0</kubernetes-client.version>
+        <kubernetes-client.version>7.3.0</kubernetes-client.version>
         <!--BUILDPACK DATA-->
-        <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.384</buildpack.builder>
-        <buildpack.java>gcr.io/paketo-buildpacks/java:18.1.0</buildpack.java>
-        <buildpack.telemetry>gcr.io/paketo-buildpacks/opentelemetry:2.9.0</buildpack.telemetry>
+        <buildpack.builder>paketobuildpacks/builder-jammy-base:0.4.414</buildpack.builder>
+        <buildpack.java>paketobuildpacks/java:18.7.0</buildpack.java>
+        <buildpack.telemetry>paketobuildpacks/opentelemetry:2.12.0</buildpack.telemetry>
     </properties>
     <build>
         <plugins>
