@@ -25,7 +25,7 @@
             "label": "setup-env",
             "type": "shell",
             "command": "./scripts/setupDevelopmentEnvironment.sh",
-            "args": ["-s", "local", "-d", "h2"],
+            "args": ["-s", "LOCAL", "-d", "H2"],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -36,6 +36,16 @@
             "type": "shell",
             "command": "./scripts/setupDevelopmentEnvironment.sh",
             "args": ["-s", "MINIO", "-d", "POSTGRESQL"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "setup-env3",
+            "type": "shell",
+            "command": "./scripts/setupDevelopmentEnvironment.sh",
+            "args": ["-s", "AZURITE", "-d", "MSSQL"],
             "group": {
                 "kind": "build",
                 "isDefault": true

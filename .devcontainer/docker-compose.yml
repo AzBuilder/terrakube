@@ -279,6 +279,13 @@ services:
       - POSTGRESQL_DATABASE=${TK_POSTGRESQL_DATABASE_NAME}
     volumes:
       - postgresql_data:/bitnami/postgresql
+  mssql-service:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-service
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=P@ssw0rd!
 volumes:
   minio_data:
   redis_data:

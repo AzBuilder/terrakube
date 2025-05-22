@@ -64,6 +64,13 @@ function generateApiVars(){
       DatasourceHostname="postgresql-service"
     fi
     DatasourcePassword="terrakubepassword"
+  elif [ "$database_value" = "MSSQL" ]; then
+    ApiDataSourceType="SQL_AZURE"
+    DatasourceHostname="mssql-service"
+    DatasourcePassword="P@ssw0rd!"
+    DatasourceUser="sa"
+    DatasourceDatabase=terrakube
+    DatasourceSchema=dbo
   else
     ApiDataSourceType="H2"
   fi
@@ -86,8 +93,10 @@ function generateApiVars(){
   echo "ApiDataSourceType=$ApiDataSourceType" >> .envApi
   echo "DatasourceHostname=$DatasourceHostname" >> .envApi
   echo "DatasourceDatabase=$DatasourceDatabase" >> .envApi
+  echo "DatasourceTrustCertificate=true" >> .envApi
   echo "DatasourceUser=$DatasourceUser" >> .envApi
   echo "DatasourcePassword=$DatasourcePassword" >> .envApi
+  echo "DatasourceSchema=$DatasourceSchema" >> .envApi
   
   echo "StorageType=$StorageType" >> .envApi
   echo "AwsStorageAccessKey=$AwsStorageAccessKey" >> .envApi
@@ -426,16 +435,35 @@ function generateDexConfiguration(){
   fi
 }
 
-  if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
-    openssl x509 -outform der -in /workspaces/terrakube/.devcontainer/rootCA.pem -out /workspaces/terrakube/.devcontainer/rootCA.der
-    
-    if keytool -list -cacerts -storepass "changeit" | grep -q "custom-ca"; then
-      echo "Alias $ALIAS exists. Deleting it first..."
-      keytool -delete -alias "custom-ca" -cacerts -storepass "changeit" -noprompt
-    fi
+if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
+  openssl x509 -outform der -in /workspaces/terrakube/.devcontainer/rootCA.pem -out /workspaces/terrakube/.devcontainer/rootCA.der
 
-    keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "changeit" -noprompt
+  if keytool -list -cacerts -storepass "changeit" | grep -q "custom-ca"; then
+    echo "Alias $ALIAS exists. Deleting it first..."
+    keytool -delete -alias "custom-ca" -cacerts -storepass "changeit" -noprompt
   fi
+
+  keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "changeit" -noprompt
+
+  SApassword=P@ssw0rd!
+
+  # Parameters
+  dacpath=$1
+
+  for i in {1..30};
+  do
+      sqlcmd -S mssql-service -U sa -P $SApassword -d master -C -Q "SELECT * FROM SYS.DATABASES"> /dev/null
+      if [ $? -eq 0 ]
+      then
+          sqlcmd -S mssql-service -U sa -P P@ssw0rd! -i /workspaces/terrakube/scripts/init-mssql.sql -C
+          echo "azure-sql-edge ready"
+          break
+      else
+          echo "azure-sql-edge not ready yet..."
+          sleep 1
+      fi
+  done
+fi
 
 generateApiVars
 generateRegistryVars

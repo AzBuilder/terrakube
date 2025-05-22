@@ -46,14 +46,19 @@
     ],
     "compounds": [
         {
-            "name": "Terrakube H2 - Local",
+            "name": "Terrakube",
             "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
             "preLaunchTask": "setup-env"
         },
         {
-            "name": "Terrakube Postgresql - MINIO",
+            "name": "Terrakube Postgresql",
             "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
             "preLaunchTask": "setup-env2"
+        },
+        {
+            "name": "Terrakube MSSQL",
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
+            "preLaunchTask": "setup-env3"
         }
     ]
 }
