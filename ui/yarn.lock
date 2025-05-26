@@ -15,10 +15,10 @@
     "@jridgewell/gen-mapping" "^0.3.5"
     "@jridgewell/trace-mapping" "^0.3.24"
 
-"@ant-design/colors@^7.0.0", "@ant-design/colors@^7.2.0":
-  version "7.2.0"
-  resolved "https://registry.npmjs.org/@ant-design/colors/-/colors-7.2.0.tgz"
-  integrity sha512-bjTObSnZ9C/O8MB/B4OUtd/q9COomuJAR2SYfhxLyHvCKn4EKwCN3e+fWGMo7H5InAyV0wL17jdE9ALrdOW/6A==
+"@ant-design/colors@^7.0.0", "@ant-design/colors@^7.2.1":
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/@ant-design/colors/-/colors-7.2.1.tgz#3bbc1c6c18550020d1622a0067ff03492318df98"
+  integrity sha512-lCHDcEzieu4GA3n8ELeZ5VQ8pKQAWcGGLRTQ50aQM2iqPpq2evTxER84jfdPvsPAtEcZ7m44NI45edFMo8oOYQ==
   dependencies:
     "@ant-design/fast-color" "^2.0.6"
 
@@ -2699,12 +2699,12 @@ ansi-to-react@^6.1.6:
     anser "^1.4.1"
     escape-carriage "^1.3.0"
 
-antd@^5.25.2:
-  version "5.25.2"
-  resolved "https://registry.yarnpkg.com/antd/-/antd-5.25.2.tgz#f8186a15d6823d9c411670b308742523175b0ac7"
-  integrity sha512-7R2nUvlHhey7Trx64+hCtGXOiy+DTUs1Lv5bwbV1LzEIZIhWb0at1AM6V3K108a5lyoR9n7DX3ptlLF7uYV/DQ==
+antd@^5.25.3:
+  version "5.25.3"
+  resolved "https://registry.yarnpkg.com/antd/-/antd-5.25.3.tgz#2ca1af6559f11ad107db822ffdfa73f30ab4aa54"
+  integrity sha512-tBBcAFRjmWM3sitxrL/FEbQL+MTQntYY5bGa5c1ZZZHXWCynkhS3Ch/gy25mGMUY1M/9Uw3pH029v/RGht1x3w==
   dependencies:
-    "@ant-design/colors" "^7.2.0"
+    "@ant-design/colors" "^7.2.1"
     "@ant-design/cssinjs" "^1.23.0"
     "@ant-design/cssinjs-utils" "^1.1.3"
     "@ant-design/fast-color" "^2.0.6"
