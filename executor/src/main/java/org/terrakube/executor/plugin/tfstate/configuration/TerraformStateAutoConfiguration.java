@@ -56,12 +56,21 @@ public class TerraformStateAutoConfiguration {
         if (terraformStateProperties != null)
             switch (terraformStateProperties.getType()) {
                 case AzureTerraformStateImpl:
-                    BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                            .connectionString(
-                                    String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
-                                            azureTerraformStateProperties.getStorageAccountName(),
-                                            azureTerraformStateProperties.getStorageAccessKey())
-                            ).buildClient();
+                    BlobServiceClient blobServiceClient;
+
+                    if (azureTerraformStateProperties.isCustomConnection()) {
+                        blobServiceClient = new BlobServiceClientBuilder()
+                                .connectionString(
+                                        azureTerraformStateProperties.getConnectionString()
+                                ).buildClient();
+                    } else {
+                        blobServiceClient = new BlobServiceClientBuilder()
+                                .connectionString(
+                                        String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
+                                                azureTerraformStateProperties.getStorageAccountName(),
+                                                azureTerraformStateProperties.getStorageAccessKey())
+                                ).buildClient();
+                    }
 
                     terraformState = AzureTerraformStateImpl.builder()
                             .resourceGroupName(azureTerraformStateProperties.getResourceGroupName())
@@ -70,6 +79,8 @@ public class TerraformStateAutoConfiguration {
                             .storageAccessKey(azureTerraformStateProperties.getStorageAccessKey())
                             .blobServiceClient(blobServiceClient)
                             .terrakubeClient(terrakubeClient)
+                            .useCustomEndpoint(azureTerraformStateProperties.isUseCustomEndpoint())
+                            .customEndpoint(azureTerraformStateProperties.getCustomEndpoint())
                             .terraformStatePathService(terraformStatePathService)
                             .build();
                     break;

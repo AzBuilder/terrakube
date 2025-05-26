@@ -86,6 +86,11 @@ function generateApiVars(){
     else
       AwsEndpoint="http://minio:9000"
     fi
+  elif [ "$storage_value" = "AZURITE" ]; then
+    StorageType="AZURE"
+    AzureAccountName="devstoreaccount1"
+    AzureAccountKey="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KmkZyjwDkOxg=="
+    AzureConnectionString="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
   else
     StorageType="LOCAL"
   fi
@@ -104,6 +109,11 @@ function generateApiVars(){
   echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envApi
   echo "AwsStorageRegion=$AwsStorageRegion" >> .envApi
   echo "AwsEndpoint=$AwsEndpoint" >> .envApi
+
+  echo "AzureAccountName=$AzureAccountName" >> .envApi
+  echo "AzureAccountKey=$AzureAccountKey" >> .envApi
+  echo "AzureConnectionString=$AzureConnectionString" >> .envApi
+  echo "AzureCustomConnectionString=true" >> .envApi
   
   echo "GroupValidationType=$GroupValidationType" >> .envApi
   echo "UserValidationType=$UserValidationType" >> .envApi
@@ -165,9 +175,16 @@ function generateExecutorVars(){
     else
       AwsEndpoint="http://minio:9000"
     fi
-  else
-    TerraformStateType=LocalTerraformStateImpl
-    TerraformOutputType=LocalTerraformOutputImpl
+    elif [ "$storage_value" = "AZURITE" ]; then
+      StorageType="AZURE"
+      TerraformOutputType=AzureTerraformOutputImpl
+      TerraformStateType=AzureTerraformStateImpl
+      AzureAccountName="devstoreaccount1"
+      AzureAccountKey="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KmkZyjwDkOxg=="
+      AzureConnectionString="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
+    else
+      TerraformStateType=LocalTerraformStateImpl
+      TerraformOutputType=LocalTerraformOutputImpl
   fi
 
   TerrakubeEnableSecurity=true
@@ -197,6 +214,18 @@ function generateExecutorVars(){
   echo "AwsTerraformOutputSecretKey=$AwsTerraformOutputSecretKey" >> .envExecutor
   echo "AwsTerraformOutputBucketName=$AwsTerraformOutputBucketName" >> .envExecutor
   echo "AwsTerraformOutputRegion=$AwsTerraformOutputRegion" >> .envExecutor
+
+  echo "AzureAccountName=$AzureAccountName" >> .envExecutor
+  echo "AzureAccountKey=$AzureAccountKey" >> .envExecutor
+  echo "AzureConnectionString=$AzureConnectionString" >> .envExecutor
+  echo "AzureCustomConnectionString=true" >> .envExecutor
+  echo "AzureUseStorageEndpoint=true" >> .envExecutor
+  echo "AzureStorageEndpoint=http://azurite-service:10000/devstoreaccount1" >> .envExecutor
+  echo "AzureTerraformStateResourceGroup=fake-rg" >> .envExecutor
+  echo "AzureTerraformStateStorageAccountName=devstoreaccount1" >> .envExecutor
+  echo "AzureTerraformStateStorageContainerName=tfstate" >> .envExecutor
+  echo "AzureTerraformStateResourceGroup=fake-rg" >> .envExecutor
+  echo "AzureTerraformStateStorageAccessKey=$AzureAccountKey" >> .envExecutor
 
   echo "AzBuilderApiUrl=$AzBuilderApiUrl" >> .envExecutor
   echo "ExecutorFlagBatch=$ExecutorFlagBatch" >> .envExecutor
@@ -244,11 +273,16 @@ function generateRegistryVars(){
     AwsStorageBucketName="sample"
     AwsStorageRegion="us-east-1"
     
-    if [ "$USER" = "gitpod" ]; then
-      AwsEndpoint="http://localhost:9000"
-    else
-      AwsEndpoint="http://minio:9000"
-    fi
+      if [ "$USER" = "gitpod" ]; then
+        AwsEndpoint="http://localhost:9000"
+      else
+        AwsEndpoint="http://minio:9000"
+      fi
+  elif [ "$storage_value" = "AZURITE" ]; then
+    RegistryStorageType="AzureStorageImpl"
+    AzureAccountName="devstoreaccount1"
+    AzureAccountKey="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KmkZyjwDkOxg=="
+    AzureConnectionString="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
   else
     RegistryStorageType=Local
   fi
@@ -279,6 +313,10 @@ function generateRegistryVars(){
   echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envRegistry
   echo "AwsStorageRegion=$AwsStorageRegion" >> .envRegistry
   echo "AwsEndpoint=$AwsEndpoint" >> .envRegistry
+  echo "AzureAccountName=$AzureAccountName" >> .envRegistry
+  echo "AzureAccountKey=$AzureAccountKey" >> .envRegistry
+  echo "AzureConnectionString=$AzureConnectionString" >> .envRegistry
+  echo "AzureCustomConnectionString=true" >> .envRegistry
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
 }
 
@@ -444,6 +482,12 @@ if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
   fi
 
   keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "changeit" -noprompt
+
+  export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
+
+  az storage container create --name registry
+  az storage container create --name tfstate
+  az storage container create --name tfoutput
 
   SApassword=P@ssw0rd!
 

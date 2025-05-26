@@ -52,12 +52,20 @@ public class TerraformOutputAutoConfiguration {
         if (terraformOutputProperties != null)
             switch (terraformOutputProperties.getType()) {
                 case AzureTerraformOutputImpl:
-                    BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                            .connectionString(
-                                    String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
-                                            azureTerraformOutputProperties.getAccountName(),
-                                            azureTerraformOutputProperties.getAccountKey())
-                            ).buildClient();
+                    BlobServiceClient blobServiceClient;
+                    if (azureTerraformOutputProperties.isCustomConnection()) {
+                        blobServiceClient = new BlobServiceClientBuilder()
+                                .connectionString(
+                                        azureTerraformOutputProperties.getConnectionString()
+                                ).buildClient();
+                    } else {
+                        blobServiceClient = new BlobServiceClientBuilder()
+                                .connectionString(
+                                        String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
+                                                azureTerraformOutputProperties.getAccountName(),
+                                                azureTerraformOutputProperties.getAccountKey())
+                                ).buildClient();
+                    }
 
                     terraformOutput = AzureTerraformOutputImpl.builder()
                             .blobServiceClient(blobServiceClient)

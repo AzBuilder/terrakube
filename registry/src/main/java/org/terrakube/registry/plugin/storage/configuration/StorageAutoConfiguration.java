@@ -57,12 +57,20 @@ public class StorageAutoConfiguration {
         log.info("StorageType={}", storageProperties.getType());
         switch (storageProperties.getType()) {
             case AzureStorageImpl:
-                BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                        .connectionString(
-                                String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
-                                        azureStorageServiceProperties.getAccountName(),
-                                        azureStorageServiceProperties.getAccountKey())
-                        ).buildClient();
+                BlobServiceClient blobServiceClient;
+                if (azureStorageServiceProperties.isCustomConnection()){
+                    blobServiceClient = new BlobServiceClientBuilder()
+                            .connectionString(
+                                    azureStorageServiceProperties.getConnectionString()
+                            ).buildClient();
+                } else {
+                    blobServiceClient = new BlobServiceClientBuilder()
+                            .connectionString(
+                                    String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
+                                            azureStorageServiceProperties.getAccountName(),
+                                            azureStorageServiceProperties.getAccountKey())
+                            ).buildClient();
+                }
 
                 storageService = AzureStorageServiceImpl.builder()
                         .blobServiceClient(blobServiceClient)
