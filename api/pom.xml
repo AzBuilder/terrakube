@@ -22,7 +22,7 @@
         <msal4j.version>1.20.1</msal4j.version>
         <lombok.version>1.18.38</lombok.version>
         <jgit.version>7.2.1.202505142326-r</jgit.version>
-        <rest-assured.version>5.5.2</rest-assured.version>
+        <rest-assured.version>5.5.5</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.5</postgresql.version>
         <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
