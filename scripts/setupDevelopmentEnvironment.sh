@@ -9,7 +9,7 @@ function generateApiVars(){
     TerrakubeUiURL=$(gp url 3000)
     TerrakubeRedisHostname=localhost
   else
-    TerrakubeHostname="https://terrakube-api.platform.local"
+    TerrakubeHostname="terrakube-api.platform.local"
     AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
     TerrakubeUiURL="https://terrakube.platform.local"
