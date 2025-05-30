@@ -176,6 +176,7 @@ public class EphemeralExecutorService {
                 .withNewSpec()
                 .withNewTemplate()
                 .withNewSpec()
+                .withSecurityContext(new PodSecurityContextBuilder().withFsGroup(1000L).build())
                 .withNodeSelector(nodeSelectorInfo)
                 .withServiceAccountName(serviceAccount)
                 .withTolerations(tolerations)
