@@ -58,6 +58,7 @@ function generateApiVars(){
     ApiDataSourceType="POSTGRESQL"
     DatasourceDatabase="terrakubedb"
     DatasourceUser="terrakube"
+    DatasourceSchema="public"
     if [ "$USER" = "gitpod" ]; then
       DatasourceHostname="localhost"
     else
