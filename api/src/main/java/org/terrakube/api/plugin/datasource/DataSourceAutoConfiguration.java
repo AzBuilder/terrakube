@@ -62,13 +62,20 @@ public class DataSourceAutoConfiguration {
                 config.setPassword("sa");
                 config.setDriverClassName("org.h2.Driver");
 
-                // Connection pool settings
-                config.setMinimumIdle(5);
-                config.setMaximumPoolSize(15);
+// Pool configuration
+                config.setPoolName("H2ConnectionPool");
+                config.setMinimumIdle(2);
+                config.setMaximumPoolSize(10);
                 config.setAutoCommit(true);
                 config.setIdleTimeout(30000);
-                config.setMaxLifetime(2000000);
+                config.setMaxLifetime(1800000);
                 config.setConnectionTimeout(30000);
+                config.setLeakDetectionThreshold(60000);
+
+// Performance optimizations
+                config.addDataSourceProperty("cachePrepStmts", "true");
+                config.addDataSourceProperty("prepStmtCacheSize", "250");
+                config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
                 dataSource = new HikariDataSource(config);
 
