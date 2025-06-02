@@ -1,6 +1,8 @@
 package org.terrakube.api.plugin.datasource;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -54,12 +56,22 @@ public class DataSourceAutoConfiguration {
                 dataSource = ds;
                 break;
             default:
-                DriverManagerDataSource h2DataSource = new DriverManagerDataSource();
-                h2DataSource.setDriverClassName("org.h2.Driver");
-                h2DataSource.setUrl("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1");
-                h2DataSource.setUsername("sa");
-                h2DataSource.setPassword("sa");
-                dataSource = h2DataSource;
+                HikariConfig config = new HikariConfig();
+                config.setJdbcUrl("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1");
+                config.setUsername("sa");
+                config.setPassword("sa");
+                config.setDriverClassName("org.h2.Driver");
+
+                // Connection pool settings
+                config.setMinimumIdle(5);
+                config.setMaximumPoolSize(15);
+                config.setAutoCommit(true);
+                config.setIdleTimeout(30000);
+                config.setMaxLifetime(2000000);
+                config.setConnectionTimeout(30000);
+
+                dataSource = new HikariDataSource(config);
+
                 break;
         }
         return dataSource;
