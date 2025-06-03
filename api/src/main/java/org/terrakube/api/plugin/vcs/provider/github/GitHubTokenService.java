@@ -140,7 +140,7 @@ public class GitHubTokenService implements GetAccessToken<GitHubToken> {
         if (tokenResponse.getStatusCode().value() == 200) {
             JsonNode rootNode = objectMapper.readTree(tokenResponse.getBody());
             String installationId = rootNode.path("id").asText();
-            gitHubAppToken.setId(UUID.randomUUID());
+            //gitHubAppToken.setId(UUID.randomUUID());
             gitHubAppToken.setInstallationId(installationId);
             gitHubAppToken.setOwner(ownerAndRepo[0]);
             gitHubAppToken.setAppId(vcs.getClientId());

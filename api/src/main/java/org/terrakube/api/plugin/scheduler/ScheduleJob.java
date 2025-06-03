@@ -246,7 +246,7 @@ public class ScheduleJob implements org.quartz.Job {
             if (template != null) {
                 Schedule schedule = new Schedule();
                 schedule.setWorkspace(job.getWorkspace());
-                schedule.setId(UUID.randomUUID());
+//                schedule.setId(UUID.randomUUID());
                 schedule.setCron(scheduleTemplate.getSchedule());
                 schedule.setEnabled(true);
                 schedule.setCreatedBy(job.getCreatedBy());
