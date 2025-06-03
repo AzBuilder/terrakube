@@ -9,7 +9,6 @@ import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
 import org.terrakube.api.rs.workspace.Workspace;
-import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
 

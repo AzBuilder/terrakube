@@ -476,7 +476,7 @@ public class RemoteTfeService {
                 log.info("Tag {} does not exist in workspace {}, adding new tag to workspace...",
                         tagModel.getAttributes().get("name"), workspace.getName());
                 WorkspaceTag newWorkspaceTag = new WorkspaceTag();
-                newWorkspaceTag.setId(UUID.randomUUID());
+                //newWorkspaceTag.setId(UUID.randomUUID());
                 newWorkspaceTag.setTagId(tag.getId().toString());
                 newWorkspaceTag.setWorkspace(workspace);
                 workspaceTagRepository.save(newWorkspaceTag);
@@ -497,7 +497,7 @@ public class RemoteTfeService {
             log.info("Creating new tag {} in Org {}", tagName, workspace.getOrganization().getName());
             tag = new Tag();
             try {
-                tag.setId(UUID.randomUUID());
+                //tag.setId(UUID.randomUUID());
                 tag.setName(tagName);
                 tag.setOrganization(workspace.getOrganization());
                 tag = tagRepository.save(tag);
@@ -541,7 +541,7 @@ public class RemoteTfeService {
 
             Organization organization = organizationRepository.getOrganizationByName(organizationName);
             Workspace newWorkspace = new Workspace();
-            newWorkspace.setId(UUID.randomUUID());
+            //newWorkspace.setId(UUID.randomUUID());
             newWorkspace.setName(workspaceData.getData().getAttributes().get("name").toString());
             String terraformVersion = "";
             if (workspaceData.getData().getAttributes().get("terraform-version") != null) {

@@ -3,7 +3,6 @@ package org.terrakube.api.plugin.token.team;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import lombok.ToString;
@@ -27,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.terrakube.api.rs.workspace.access.Access;
 
 @Slf4j
 @RestController

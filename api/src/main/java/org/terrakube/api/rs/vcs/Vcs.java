@@ -11,7 +11,6 @@ import org.terrakube.api.plugin.security.audit.GenericAuditFields;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.Organization;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -20,14 +19,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
-import org.terrakube.api.rs.hooks.schedule.ScheduleManageHook;
 import org.terrakube.api.rs.hooks.vcs.VcsManageHook;
 import org.terrakube.api.rs.workspace.Workspace;
 

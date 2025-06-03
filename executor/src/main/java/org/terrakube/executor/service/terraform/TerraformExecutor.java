@@ -4,7 +4,6 @@ import org.terrakube.executor.service.executor.ExecutorJobResult;
 import org.terrakube.executor.service.mode.TerraformJob;
 
 import java.io.File;
-import java.io.IOException;
 
 public interface TerraformExecutor {
 

@@ -14,8 +14,6 @@ import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
 import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
 import org.terrakube.executor.service.mode.TerraformJob;
 
-import java.io.IOException;
-
 @Slf4j
 @Service
 @AllArgsConstructor
