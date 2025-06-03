@@ -1,21 +1,14 @@
 package org.terrakube.api;
 
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.core.IsEqual;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.terrakube.api.repository.TeamRepository;
-import org.terrakube.api.rs.team.Team;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Optional;
-import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.mockito.Mockito.when;

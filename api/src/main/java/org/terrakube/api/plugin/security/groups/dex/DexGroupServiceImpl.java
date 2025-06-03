@@ -13,7 +13,6 @@ import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.access.Access;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

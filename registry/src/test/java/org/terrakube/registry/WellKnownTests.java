@@ -4,7 +4,6 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.when;
-import static org.hamcrest.Matchers.containsString;
 
 public class WellKnownTests extends OpenRegistryApplicationTests{
 

@@ -25,7 +25,6 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.terrakube.api.plugin.importer.tfcloud.WorkspaceImport.WorkspaceData.VcsRepo;
 import org.terrakube.api.plugin.scheduler.ScheduleGitHubAppTokenService;
 import org.terrakube.api.plugin.vcs.provider.GetAccessToken;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;

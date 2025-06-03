@@ -3,7 +3,6 @@ package org.terrakube.api.rs.workspace.content;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.workspace.Workspace;
 

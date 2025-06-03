@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.terrakube.api.plugin.security.groups.GroupService;
 import org.terrakube.api.plugin.security.user.AuthenticatedUser;
 import org.terrakube.api.rs.checks.membership.MembershipService;
-import org.terrakube.api.rs.team.Team;
 import org.terrakube.api.rs.workspace.Workspace;
 import org.terrakube.api.rs.workspace.access.Access;
 

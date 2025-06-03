@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.terrakube.api.rs.IdConverter;
 import org.terrakube.api.rs.workspace.Workspace;
-import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
 

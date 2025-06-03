@@ -27,7 +27,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.endpoints.Endpoint;
-import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.endpoints.S3EndpointParams;
@@ -114,7 +113,7 @@ public class StorageAutoConfiguration {
             case GcpStorageImpl:
                 Credentials gcpCredentials = null;
                 try {
-                    log.info("Credentials Lenght: {}", gcpStorageServiceProperties.getCredentials().length());
+                    log.info("Credentials Length: {}", gcpStorageServiceProperties.getCredentials().length());
                     log.info("GCP Project: {}", gcpStorageServiceProperties.getProjectId());
                     log.info("GCP Bucket: {}", gcpStorageServiceProperties.getBucketName());
 
@@ -155,7 +154,6 @@ public class StorageAutoConfiguration {
 
     private static @NotNull AwsBasicCredentials getAwsBasicCredentials(AwsStorageServiceProperties
                                                                                awsStorageServiceProperties) {
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(awsStorageServiceProperties.getAccessKey(), awsStorageServiceProperties.getSecretKey());
-        return awsCreds;
+        return AwsBasicCredentials.create(awsStorageServiceProperties.getAccessKey(), awsStorageServiceProperties.getSecretKey());
     }
 }

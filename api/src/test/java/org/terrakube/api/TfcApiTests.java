@@ -4,10 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.http.HttpStatus;
-import org.terrakube.api.repository.TeamRepository;
 import org.terrakube.api.rs.team.Team;
 
 import java.util.UUID;
