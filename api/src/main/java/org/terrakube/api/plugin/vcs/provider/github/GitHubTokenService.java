@@ -25,7 +25,6 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.terrakube.api.plugin.importer.tfcloud.WorkspaceImport.WorkspaceData.VcsRepo;
 import org.terrakube.api.plugin.scheduler.ScheduleGitHubAppTokenService;
 import org.terrakube.api.plugin.vcs.provider.GetAccessToken;
 import org.terrakube.api.plugin.vcs.provider.exception.TokenException;
@@ -141,7 +140,7 @@ public class GitHubTokenService implements GetAccessToken<GitHubToken> {
         if (tokenResponse.getStatusCode().value() == 200) {
             JsonNode rootNode = objectMapper.readTree(tokenResponse.getBody());
             String installationId = rootNode.path("id").asText();
-            gitHubAppToken.setId(UUID.randomUUID());
+            //gitHubAppToken.setId(UUID.randomUUID());
             gitHubAppToken.setInstallationId(installationId);
             gitHubAppToken.setOwner(ownerAndRepo[0]);
             gitHubAppToken.setAppId(vcs.getClientId());

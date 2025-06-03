@@ -4,17 +4,10 @@ import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.terrakube.api.repository.TeamRepository;
-import org.terrakube.api.rs.job.Job;
 import org.terrakube.api.rs.team.Team;
-import org.terrakube.api.rs.workspace.Workspace;
 
-import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;

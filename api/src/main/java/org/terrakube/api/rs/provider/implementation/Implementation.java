@@ -4,7 +4,6 @@ import com.yahoo.elide.annotation.Include;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
 import org.terrakube.api.rs.IdConverter;

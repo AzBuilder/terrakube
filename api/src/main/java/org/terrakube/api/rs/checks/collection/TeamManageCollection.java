@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.terrakube.api.plugin.security.groups.GroupService;
 import org.terrakube.api.plugin.security.user.AuthenticatedUser;
-import org.terrakube.api.rs.checks.module.TeamManageModule;
 import org.terrakube.api.rs.collection.Collection;
 import org.terrakube.api.rs.team.Team;
 

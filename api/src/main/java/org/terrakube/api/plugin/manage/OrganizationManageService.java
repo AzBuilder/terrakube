@@ -8,7 +8,6 @@ import org.terrakube.api.rs.Organization;
 import org.terrakube.api.rs.template.Template;
 
 import java.util.Base64;
-import java.util.UUID;
 
 @AllArgsConstructor
 @Service
@@ -79,7 +78,7 @@ public class OrganizationManageService {
 
         private Template generateTemplate(String name, String description, String tcl, Organization organization) {
                 Template template = new Template();
-                template.setId(UUID.randomUUID());
+                //template.setId(UUID.randomUUID());
                 template.setName(name);
                 template.setDescription(description);
                 template.setVersion("1.0.0");
