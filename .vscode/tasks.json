@@ -45,7 +45,7 @@
             "label": "setup-env3",
             "type": "shell",
             "command": "./scripts/setupDevelopmentEnvironment.sh",
-            "args": ["-s", "AZURITE", "-d", "MSSQL"],
+            "args": ["-s", "MINIO", "-d", "MSSQL"],
             "group": {
                 "kind": "build",
                 "isDefault": true
