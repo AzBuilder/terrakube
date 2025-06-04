@@ -33,6 +33,7 @@ target
 
 thunder-tests/thunderEnvironment.json
 scripts/setup/minio/docker-compose.yaml
+scripts/setup/dex/config-ldap.yaml
 .envApi
 .envExecutor
 .envRegistry
