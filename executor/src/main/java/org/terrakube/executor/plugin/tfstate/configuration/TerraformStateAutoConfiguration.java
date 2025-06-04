@@ -79,7 +79,6 @@ public class TerraformStateAutoConfiguration {
                             .storageAccessKey(azureTerraformStateProperties.getStorageAccessKey())
                             .blobServiceClient(blobServiceClient)
                             .terrakubeClient(terrakubeClient)
-                            .useCustomEndpoint(azureTerraformStateProperties.isUseCustomEndpoint())
                             .customEndpoint(azureTerraformStateProperties.getCustomEndpoint())
                             .terraformStatePathService(terraformStatePathService)
                             .build();

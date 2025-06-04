@@ -46,7 +46,6 @@ public class AzureTerraformStateImpl implements TerraformState {
     private String storageAccountName;
     private String storageContainerName;
     private String storageAccessKey;
-    private boolean useCustomEndpoint;
     private String customEndpoint;
 
     @NonNull
@@ -71,18 +70,8 @@ public class AzureTerraformStateImpl implements TerraformState {
             azureBackendHcl.appendln("      container_name       = \"" + storageContainerName + "\"");
             azureBackendHcl.appendln("      key                  = \"" + organizationId + "/" + workspaceId + "/terraform.tfstate" + "\"");
             azureBackendHcl.appendln("      access_key           = \"" + storageAccessKey + "\"");
-            if (useCustomEndpoint){
-                azureBackendHcl.appendln("      endpoint           = \"" + customEndpoint + "\"");
-                azureBackendHcl.appendln("      use_azuread_auth      =  false ");
-                azureBackendHcl.appendln("      use_microsoft_graph   =  false ");
-                azureBackendHcl.appendln("      use_msi               =  false ");
-                azureBackendHcl.appendln("      sas_token             =  \"\" ");
-
-            }
             azureBackendHcl.appendln("  }");
             azureBackendHcl.appendln("}");
-
-            log.info("azureBackendHcl: {}", azureBackendHcl.toString());
 
             File azureBackendFile = new File(
                     FilenameUtils.separatorsToSystem(
