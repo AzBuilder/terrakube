@@ -35,5 +35,5 @@
 
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
   "remoteUser": "vscode",
-  "forwardPorts": [8080, 3000, 8075, 8090, 10000, 10001, 5556]
+  "forwardPorts": [8080, 3000, 8075, 8090, 5556]
 }
