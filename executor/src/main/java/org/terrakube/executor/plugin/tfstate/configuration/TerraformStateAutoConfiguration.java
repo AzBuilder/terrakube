@@ -119,7 +119,7 @@ public class TerraformStateAutoConfiguration {
 
                     terraformState = AwsTerraformStateImpl.builder()
                             .s3client(s3client)
-                            .endpoint(awsTerraformStateProperties.getEndpoint() != "" ? awsTerraformStateProperties.getEndpoint(): null)
+                            .endpoint(!awsTerraformStateProperties.getEndpoint().equals("") ? awsTerraformStateProperties.getEndpoint(): null)
                             .bucketName(awsTerraformStateProperties.getBucketName())
                             .accessKey(awsTerraformStateProperties.getAccessKey())
                             .secretKey(awsTerraformStateProperties.getSecretKey())
