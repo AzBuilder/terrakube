@@ -16,6 +16,4 @@ public class AzureStorageServiceProperties {
 
     private String accountName;
     private String accountKey;
-    private boolean customConnection;
-    private String connectionString;
 }

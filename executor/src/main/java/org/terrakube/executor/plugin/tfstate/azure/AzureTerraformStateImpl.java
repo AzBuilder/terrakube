@@ -46,7 +46,6 @@ public class AzureTerraformStateImpl implements TerraformState {
     private String storageAccountName;
     private String storageContainerName;
     private String storageAccessKey;
-    private String customEndpoint;
 
     @NonNull
     BlobServiceClient blobServiceClient;

@@ -19,8 +19,4 @@ public class AzureTerraformStateProperties {
     private String storageAccountName;
     private String storageContainerName;
     private String storageAccessKey;
-    private boolean customConnection;
-    private String connectionString;
-    private boolean useCustomEndpoint;
-    private String customEndpoint;
 }

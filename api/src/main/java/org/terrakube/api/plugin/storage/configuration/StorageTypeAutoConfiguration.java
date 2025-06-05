@@ -51,21 +51,12 @@ public class StorageTypeAutoConfiguration {
         log.info("StorageType={}", storageTypeProperties.getType());
         switch (storageTypeProperties.getType()) {
             case AZURE:
-                BlobServiceClient blobServiceClient;
-                if(azureStorageTypeProperties.isCustomConnection()){
-                    blobServiceClient = new BlobServiceClientBuilder()
-                            .connectionString(
-                                    azureStorageTypeProperties.getConnectionString()
-                            ).buildClient();
-                } else {
-                    log.info("Creating Azure SDK with default credentials");
-                    blobServiceClient = new BlobServiceClientBuilder()
-                            .connectionString(
-                                    String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
-                                            azureStorageTypeProperties.getAccountName(),
-                                            azureStorageTypeProperties.getAccountKey())
-                            ).buildClient();
-                }
+                BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                        .connectionString(
+                                String.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
+                                        azureStorageTypeProperties.getAccountName(),
+                                        azureStorageTypeProperties.getAccountKey())
+                        ).buildClient();
 
                 storageTypeService = AzureStorageTypeServiceImpl.builder()
                         .blobServiceClient(blobServiceClient)
