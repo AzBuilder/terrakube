@@ -1,6 +1,4 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
         {
@@ -15,7 +13,37 @@
         {
             "label": "yarn-install",
             "type": "shell",
-            "command": "  if [ \"$USER\" = \"gitpod\" ]; then cd ui && yarn install; else echo \"Using Node from devcontainer setup\"; fi",
+            "command": "  if [ \"$USER\" = \"gitpod\" ]; then cd ui && yarn install; else echo \"Using Node from devcontainer setup\"; fi ",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "setup-env",
+            "type": "shell",
+            "command": "./scripts/setupDevelopmentEnvironment.sh",
+            "args": ["-s", "LOCAL", "-d", "H2"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "setup-env2",
+            "type": "shell",
+            "command": "./scripts/setupDevelopmentEnvironment.sh",
+            "args": ["-s", "MINIO", "-d", "POSTGRESQL"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "setup-env3",
+            "type": "shell",
+            "command": "./scripts/setupDevelopmentEnvironment.sh",
+            "args": ["-s", "MINIO", "-d", "MSSQL"],
             "group": {
                 "kind": "build",
                 "isDefault": true

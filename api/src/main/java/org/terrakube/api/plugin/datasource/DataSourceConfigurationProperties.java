@@ -22,5 +22,6 @@ public class DataSourceConfigurationProperties {
     private String databasePort;
     private String databaseSchema;
     private boolean awsIamAuth;
+    private boolean trustCertificate;
     private String awsRegion;
 }

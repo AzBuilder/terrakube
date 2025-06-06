@@ -32,6 +32,8 @@ public class DataSourceAutoConfiguration {
                 sqlServerDataSource.setUser(dataSourceConfigurationProperties.getDatabaseUser());
                 sqlServerDataSource.setPassword(dataSourceConfigurationProperties.getDatabasePassword());
                 sqlServerDataSource.setLoginTimeout(30);
+                sqlServerDataSource.setTrustServerCertificate(dataSourceConfigurationProperties.isTrustCertificate());
+
                 dataSource = sqlServerDataSource;
                 break;
             case POSTGRESQL:
