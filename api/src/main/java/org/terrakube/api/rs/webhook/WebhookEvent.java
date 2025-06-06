@@ -40,7 +40,7 @@ public class WebhookEvent extends GenericAuditFields {
     @Enumerated(EnumType.STRING)
     private WebhookEventType event;
     
-    private int priority;
+    private int priority = 0;
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Webhook webhook;
