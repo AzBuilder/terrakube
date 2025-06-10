@@ -14,7 +14,7 @@
     "antd": "^5.25.4",
     "axios": "^1.9.0",
     "buffer": "^6.0.3",
-    "core-js-pure": "^3.42.0",
+    "core-js-pure": "^3.43.0",
     "cron-to-quartz": "^1.4.7",
     "cronstrue": "^2.61.0",
     "dotenv": "^16.5.0",
