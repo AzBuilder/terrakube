@@ -16,5 +16,4 @@ public class AzureTerraformOutputProperties {
 
     private String accountName;
     private String accountKey;
-
 }
