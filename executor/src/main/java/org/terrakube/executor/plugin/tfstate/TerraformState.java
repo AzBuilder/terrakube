@@ -13,4 +13,6 @@ public interface TerraformState {
     boolean downloadTerraformPlan(String organizationId, String workspaceId, String jobId, String stepId, File workingDirectory);
 
     void saveStateJson(TerraformJob terraformJob, String applyJSON, String rawState);
+
+    String saveOutput(String organizationId, String jobId, String stepId, String output, String outputError);
 }

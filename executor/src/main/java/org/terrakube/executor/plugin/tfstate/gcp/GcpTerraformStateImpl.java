@@ -15,6 +15,7 @@ import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.workspace.history.History;
 import org.terrakube.client.model.organization.workspace.history.HistoryAttributes;
 import org.terrakube.client.model.organization.workspace.history.HistoryRequest;
+import org.terrakube.executor.plugin.tfstate.TerraformOutputPathService;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.service.mode.TerraformJob;
@@ -36,6 +37,9 @@ public class GcpTerraformStateImpl implements TerraformState {
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
     private static final String GCP_CREDENTIALS_FILE = "GCP_CREDENTIALS_FILE.json";
     private static final String BACKEND_FILE_NAME = "gcp_backend_override.tf";
+
+    @NonNull
+    TerraformOutputPathService terraformOutputPathService;
 
     @NonNull
     private Storage storage;
@@ -176,5 +180,20 @@ public class GcpTerraformStateImpl implements TerraformState {
 
             terrakubeClient.createHistory(historyRequest, terraformJob.getOrganizationId(), terraformJob.getWorkspaceId());
         }
+    }
+
+    @Override
+    public String saveOutput(String organizationId, String jobId, String stepId, String output, String outputError) {
+        String blobKey = String.format("tfoutput/%s/%s/%s.tfoutput",organizationId, jobId, stepId);
+        log.info("blobKey: {}", blobKey);
+
+        byte[] bytes = StringUtils.getBytesUtf8(output + outputError);
+        String utf8EncodedString = StringUtils.newStringUtf8(bytes);
+        BlobId blobId = BlobId.of(bucketName, blobKey);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+        storage.create(blobInfo, utf8EncodedString.getBytes());
+        log.info("File uploaded to bucket {} as {}", bucketName, blobKey);
+
+        return terraformOutputPathService.getOutputPath(organizationId, jobId, stepId);
     }
 }

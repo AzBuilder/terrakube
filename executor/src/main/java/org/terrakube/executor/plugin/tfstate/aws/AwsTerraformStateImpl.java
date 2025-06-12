@@ -14,6 +14,7 @@ import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.workspace.history.History;
 import org.terrakube.client.model.organization.workspace.history.HistoryAttributes;
 import org.terrakube.client.model.organization.workspace.history.HistoryRequest;
+import org.terrakube.executor.plugin.tfstate.TerraformOutputPathService;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.service.mode.TerraformJob;
@@ -57,6 +58,9 @@ public class AwsTerraformStateImpl implements TerraformState {
     private String endpoint;
 
     private boolean includeBackendKeys;
+
+    @NonNull
+    TerraformOutputPathService terraformOutputPathService;
 
     @NonNull
     TerrakubeClient terrakubeClient;
@@ -235,6 +239,25 @@ public class AwsTerraformStateImpl implements TerraformState {
             data = new byte[0];
         }
         return data;
+    }
+
+    @Override
+    public String saveOutput(String organizationId, String jobId, String stepId, String output, String outputError) {
+        String blobKey = "tfoutput/" + organizationId + "/" + jobId + "/" + stepId + ".tfoutput";
+        log.info("blobKey: {}", blobKey);
+
+        byte[] bytes = StringUtils.getBytesUtf8(output + outputError);
+        String utf8EncodedString = StringUtils.newStringUtf8(bytes);
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(blobKey)
+                .build();
+
+        s3client.putObject(putObjectRequest, RequestBody.fromString(utf8EncodedString));
+        log.info("Upload Object {} completed", blobKey);
+
+        return terraformOutputPathService.getOutputPath(organizationId, jobId, stepId);
     }
 
 }

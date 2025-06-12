@@ -10,8 +10,8 @@ import org.terrakube.client.model.organization.job.step.Step;
 import org.terrakube.client.model.organization.job.step.StepAttributes;
 import org.terrakube.client.model.organization.job.step.StepRequest;
 import org.terrakube.executor.configuration.ExecutorFlagsProperties;
-import org.terrakube.executor.plugin.tfoutput.TerraformOutput;
-import org.terrakube.executor.plugin.tfoutput.TerraformOutputPathService;
+import org.terrakube.executor.plugin.tfstate.TerraformOutputPathService;
+import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.service.mode.TerraformJob;
 
 @Slf4j
@@ -22,7 +22,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
 
     private TerrakubeClient terrakubeClient;
 
-    private TerraformOutput terraformOutput;
+    private TerraformState terraformOutput;
 
     private ExecutorFlagsProperties executorFlagsProperties;
 
@@ -122,7 +122,7 @@ public class UpdateJobStatusImpl implements UpdateJobStatus {
 
     private void updateStepStatus(boolean status, String organizationId, String jobId, String stepId, String jobOutput, String jobErrorOutput) {
         StepAttributes stepAttributes = new StepAttributes();
-        stepAttributes.setOutput(this.terraformOutput.save(organizationId, jobId, stepId, jobOutput, jobErrorOutput));
+        stepAttributes.setOutput(this.terraformOutput.saveOutput(organizationId, jobId, stepId, jobOutput, jobErrorOutput));
         stepAttributes.setStatus(status ? "completed": "failed");
 
         Step step = new Step();

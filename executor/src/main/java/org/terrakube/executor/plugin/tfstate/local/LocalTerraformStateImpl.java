@@ -20,6 +20,7 @@ import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.workspace.history.History;
 import org.terrakube.client.model.organization.workspace.history.HistoryAttributes;
 import org.terrakube.client.model.organization.workspace.history.HistoryRequest;
+import org.terrakube.executor.plugin.tfstate.TerraformOutputPathService;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.service.mode.TerraformJob;
@@ -36,6 +37,10 @@ public class LocalTerraformStateImpl implements TerraformState {
     private static final String LOCAL_PLAN_DIRECTORY = "/.terraform-spring-boot/local/state/%s/%s/%s/%s/" + TERRAFORM_PLAN_FILE;
     private static final String LOCAL_PLAN_DIRECTORY_JSON = "/.terraform-spring-boot/local/state/%s/%s/state/%s.json";
     private static final String BACKEND_FILE_NAME = "terrakube_override.tf";
+    private static final String LOCAL_OUTPUT_DIRECTORY = "/.terraform-spring-boot/local/output/%s/%s/%s.tfoutput";
+
+    @NonNull
+    TerraformOutputPathService terraformOutputPathService;
 
     @NonNull
     TerrakubeClient terrakubeClient;
@@ -168,5 +173,26 @@ public class LocalTerraformStateImpl implements TerraformState {
                 log.error(e.getMessage());
             }
         }
+    }
+
+    @Override
+    public String saveOutput(String organizationId, String jobId, String stepId, String output, String outputError) {
+        String outputFilePath = String.format(LOCAL_OUTPUT_DIRECTORY, organizationId, jobId , stepId);
+        log.info("blobName: {}", outputFilePath);
+
+        File localOutputDirectory = new File(FileUtils.getUserDirectoryPath().concat(
+                FilenameUtils.separatorsToSystem(
+                        outputFilePath
+                )));
+
+        log.info("Creating Output File: {}", localOutputDirectory.getAbsolutePath());
+        try {
+            FileUtils.writeStringToFile(localOutputDirectory, output + outputError, Charset.defaultCharset());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+
+        return terraformOutputPathService.getOutputPath(organizationId, jobId, stepId);
+
     }
 }
