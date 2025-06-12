@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.terrakube.client.TerrakubeClient;
+import org.terrakube.executor.plugin.tfstate.TerraformOutputPathService;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.plugin.tfstate.aws.AwsTerraformStateImpl;
@@ -50,7 +51,7 @@ import java.util.concurrent.CompletableFuture;
 public class TerraformStateAutoConfiguration {
 
     @Bean
-    public TerraformState terraformState(TerrakubeClient terrakubeClient, TerraformStateProperties terraformStateProperties, AzureTerraformStateProperties azureTerraformStateProperties, AwsTerraformStateProperties awsTerraformStateProperties, GcpTerraformStateProperties gcpTerraformStateProperties, TerraformStatePathService terraformStatePathService) {
+    public TerraformState terraformState(TerrakubeClient terrakubeClient, TerraformStateProperties terraformStateProperties, AzureTerraformStateProperties azureTerraformStateProperties, AwsTerraformStateProperties awsTerraformStateProperties, GcpTerraformStateProperties gcpTerraformStateProperties, TerraformStatePathService terraformStatePathService, TerraformOutputPathService terraformOutputPathService) {
         TerraformState terraformState = null;
 
         if (terraformStateProperties != null)
@@ -70,6 +71,7 @@ public class TerraformStateAutoConfiguration {
                             .storageAccessKey(azureTerraformStateProperties.getStorageAccessKey())
                             .blobServiceClient(blobServiceClient)
                             .terrakubeClient(terrakubeClient)
+                            .terraformOutputPathService(terraformOutputPathService)
                             .terraformStatePathService(terraformStatePathService)
                             .build();
                     break;
@@ -117,6 +119,7 @@ public class TerraformStateAutoConfiguration {
                             .includeBackendKeys(awsTerraformStateProperties.isIncludeBackendKeys())
                             .terrakubeClient(terrakubeClient)
                             .terraformStatePathService(terraformStatePathService)
+                            .terraformOutputPathService(terraformOutputPathService)
                             .build();
                     break;
                 case GcpTerraformStateImpl:
@@ -135,6 +138,7 @@ public class TerraformStateAutoConfiguration {
 
                         terraformState = GcpTerraformStateImpl.builder().storage(gcpStorage)
                                 .terraformStatePathService(terraformStatePathService)
+                                .terraformOutputPathService(terraformOutputPathService)
                                 .bucketName(gcpTerraformStateProperties.getBucketName())
                                 .credentials(gcpTerraformStateProperties.getCredentials())
                                 .terrakubeClient(terrakubeClient)
@@ -147,6 +151,7 @@ public class TerraformStateAutoConfiguration {
                     terraformState = LocalTerraformStateImpl.builder()
                             .terrakubeClient(terrakubeClient)
                             .terraformStatePathService(terraformStatePathService)
+                            .terraformOutputPathService(terraformOutputPathService)
                             .build();
             }
         else

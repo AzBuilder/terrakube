@@ -20,6 +20,7 @@ import org.terrakube.client.TerrakubeClient;
 import org.terrakube.client.model.organization.workspace.history.History;
 import org.terrakube.client.model.organization.workspace.history.HistoryAttributes;
 import org.terrakube.client.model.organization.workspace.history.HistoryRequest;
+import org.terrakube.executor.plugin.tfstate.TerraformOutputPathService;
 import org.terrakube.executor.plugin.tfstate.TerraformState;
 import org.terrakube.executor.plugin.tfstate.TerraformStatePathService;
 import org.terrakube.executor.service.mode.TerraformJob;
@@ -42,10 +43,13 @@ public class AzureTerraformStateImpl implements TerraformState {
     private static final String CONTAINER_NAME = "tfstate";
     private static final String TERRAFORM_PLAN_FILE = "terraformLibrary.tfPlan";
     private static final String BACKEND_FILE_NAME = "azure_backend_override.tf";
+    private static final String CONTAINER_OUTPUT_NAME = "tfoutput";
     private String resourceGroupName;
     private String storageAccountName;
     private String storageContainerName;
     private String storageAccessKey;
+    @NonNull
+    TerraformOutputPathService terraformOutputPathService;
 
     @NonNull
     BlobServiceClient blobServiceClient;
@@ -181,5 +185,23 @@ public class AzureTerraformStateImpl implements TerraformState {
                     }
                 });
         return planExists.get();
+    }
+
+    public String saveOutput(String organizationId, String jobId, String stepId, String output, String outputError) {
+        BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient(CONTAINER_OUTPUT_NAME);
+
+        log.info("blobContainerClient.exists {}", blobContainerClient.exists());
+        if (!blobContainerClient.exists()) {
+            blobContainerClient.create();
+        }
+        String blobName = organizationId + "/" + jobId + "/" +stepId + ".tfoutput";
+        log.info("blobName: {}", blobName);
+        BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
+
+        byte[] bytes = StringUtils.getBytesUtf8(output + outputError);
+        String utf8EncodedString = StringUtils.newStringUtf8(bytes);
+        blobClient.upload(BinaryData.fromString(utf8EncodedString));
+
+        return terraformOutputPathService.getOutputPath(organizationId, jobId, stepId);
     }
 }
