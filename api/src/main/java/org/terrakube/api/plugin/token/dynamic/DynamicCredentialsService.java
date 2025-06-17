@@ -56,6 +56,23 @@ public class DynamicCredentialsService {
         return workspaceEnvVariables;
     }
 
+    @Transactional
+    public HashMap<String, String> generateDynamicCredentialsVault(Job job, HashMap<String, String> workspaceEnvVariables) {
+        String jwtToken = generateJwt(
+                job.getOrganization().getName(),
+                job.getWorkspace().getName(),
+                workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_VAULT"),
+                job.getOrganization().getId().toString(),
+                job.getWorkspace().getId().toString(),
+                job.getId()
+        );
+
+        log.info("VAULT_TOKEN: {}", jwtToken);
+        workspaceEnvVariables.put("VAULT_TOKEN", jwtToken);
+
+        return workspaceEnvVariables;
+    }
+
     private String generateJwt(String organizationName, String workspaceName, String tokenAudience, String organizationId, String workspaceId, int jobId) {
         String jwtToken = "";
         if (privateKeyPath != null && !privateKeyPath.isEmpty()) {

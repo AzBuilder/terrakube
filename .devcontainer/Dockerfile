@@ -25,6 +25,12 @@ RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
     apt-get install -y mssql-tools18 unixodbc-dev && \
     ln -s /opt/mssql-tools18/bin/* /usr/local/bin/
 
+RUN wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list && \
+    apt update && \
+    apt install vault && \
+    setcap -r /usr/bin/vault
+
 COPY rootCA.pem /usr/local/share/ca-certificates/root.crt
 
 RUN update-ca-certificates
