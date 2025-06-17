@@ -12,7 +12,7 @@
     "@monaco-editor/react": "^4.7.0",
     "ansi-to-react": "^6.1.6",
     "antd": "^5.25.4",
-    "axios": "^1.9.0",
+    "axios": "^1.10.0",
     "buffer": "^6.0.3",
     "core-js-pure": "^3.43.0",
     "cron-to-quartz": "^1.4.7",
