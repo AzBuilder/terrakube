@@ -95,7 +95,7 @@ public class ModuleServiceImpl implements ModuleService {
         String token = vcs.getAttributes().getAccessToken();
         if(token == null && vcs.getAttributes().getConnectionType().equals("STANDALONE")) {
             log.info("The VCS connection is on a standalone app, getting the GitHub App token");
-            GitHubAppToken gitHubAppToken = getGitHubAppTokenInformation(repository_source, vcs.getAttributes().getClientId());
+            GitHubAppToken gitHubAppToken = getGitHubAppTokenInformation(vcs.getAttributes().getClientId(), repository_source);
             token = gitHubAppToken.getAttributes().getToken();
         }
         return token;
