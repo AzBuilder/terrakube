@@ -1,12 +1,11 @@
 {
   "policies": ["tfc-policy"],
+  "role_type": "jwt",
   "bound_audiences": ["vault.workload.identity"],
   "bound_claims_type": "glob",
+  "user_claim": "terrakube_workspace_name",
   "bound_claims": {
-    "sub":
-    "organization:simple:workspace:vault"
+    "sub":"organization:simple:workspace:vault"
   },
-  "user_claim": "terraform_full_workspace",
-  "role_type": "jwt",
   "token_ttl": "20m"
 }
