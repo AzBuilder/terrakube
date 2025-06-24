@@ -54,7 +54,7 @@ public class JwksController {
 
             RSAPublicKey rsa = (RSAPublicKey) keyFactory.generatePublic(keySpec);
             String exponent = Base64.getUrlEncoder().encodeToString(rsa.getPublicExponent().toByteArray());
-            String modulus = Base64.getUrlEncoder().encodeToString(rsa.getModulus().toByteArray());
+            String modulus = Base64.getUrlEncoder().withoutPadding().encodeToString(rsa.getModulus().toByteArray());
             log.info("RSA Exponent: {}", exponent);
             log.info("RSA Modulus: {}", modulus);
 
