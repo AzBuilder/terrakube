@@ -90,7 +90,7 @@ public class DynamicCredentialsService {
             String url = String.format("%s/v1/auth/jwt/login",vaultAddress);
             String vaultResponse = restTemplate.postForObject(url, request, String.class);
 
-            log.info("Vault Response: {}", vaultResponse);
+            log.debug("Vault Response: {}", vaultResponse);
             JsonNode rootNode = objectMapper.readTree(vaultResponse);
             vaultToken = rootNode.get("auth").get("client_token").asText();
         } catch (Exception e) {
