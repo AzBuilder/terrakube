@@ -1,11 +1,18 @@
 package org.terrakube.api.plugin.token.dynamic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.terrakube.api.rs.job.Job;
 
 import java.io.BufferedReader;
@@ -38,6 +45,9 @@ public class DynamicCredentialsService {
     @Value("${org.terrakube.dynamic.credentials.ttl}")
     int dynamicCredentialTtl;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
 
     @Transactional
     public HashMap<String, String> generateDynamicCredentialsAzure(Job job, HashMap<String, String> workspaceEnvVariables) {
@@ -61,14 +71,35 @@ public class DynamicCredentialsService {
         String jwtToken = generateJwt(
                 job.getOrganization().getName(),
                 job.getWorkspace().getName(),
-                workspaceEnvVariables.get("WORKLOAD_IDENTITY_AUDIENCE_VAULT"),
+                workspaceEnvVariables.get("WORKLOAD_IDENTITY_VAULT_AUDIENCE"),
                 job.getOrganization().getId().toString(),
                 job.getWorkspace().getId().toString(),
                 job.getId()
         );
 
-        log.info("VAULT_TOKEN: {}", jwtToken);
-        workspaceEnvVariables.put("VAULT_TOKEN", jwtToken);
+        String vaultAddress = workspaceEnvVariables.get("VAULT_ADDR");
+        String vaultRole = workspaceEnvVariables.get("WORKLOAD_IDENTITY_VAULT_ROLE");
+        String vaultToken = "";
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            String jsonPayload = String.format("{\"role\":\"%s\",\"jwt\":\"%s\"}", vaultRole, jwtToken);
+
+            HttpEntity<String> request = new HttpEntity<>(jsonPayload, headers);
+            String url = String.format("%s/v1/auth/jwt/login",vaultAddress);
+            String vaultResponse = restTemplate.postForObject(url, request, String.class);
+
+            log.info("Vault Response: {}", vaultResponse);
+            JsonNode rootNode = objectMapper.readTree(vaultResponse);
+            vaultToken = rootNode.get("auth").get("client_token").asText();
+        } catch (Exception e) {
+            log.error("Error processing vault token", e);
+        }
+
+        log.info("TERRAKUBE_VAULT_TOKEN: {}", jwtToken);
+        log.info("VAULT_TOKEN: {}", vaultToken);
+        workspaceEnvVariables.put("VAULT_TOKEN", vaultToken);
 
         return workspaceEnvVariables;
     }
