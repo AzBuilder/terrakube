@@ -97,8 +97,8 @@ public class DynamicCredentialsService {
             log.error("Error processing vault token", e);
         }
 
-        log.info("TERRAKUBE_VAULT_TOKEN: {}", jwtToken);
-        log.info("VAULT_TOKEN: {}", vaultToken);
+        log.debug("TERRAKUBE_VAULT_TOKEN: {}", jwtToken);
+        log.debug("VAULT_TOKEN: {}", vaultToken);
         workspaceEnvVariables.put("VAULT_TOKEN", vaultToken);
 
         return workspaceEnvVariables;
