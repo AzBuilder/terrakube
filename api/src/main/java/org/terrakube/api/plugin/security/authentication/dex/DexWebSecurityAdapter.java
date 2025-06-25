@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.config.Customizer;
@@ -28,6 +29,18 @@ import java.util.List;
 public class DexWebSecurityAdapter {
 
         @Bean
+        @Order(0)
+        public SecurityFilterChain filterChainTerraformLogin(HttpSecurity http) throws Exception {
+                return http.securityMatchers(
+                                requestMatcherConfigurer ->
+                                        requestMatcherConfigurer
+                                                .requestMatchers(HttpMethod.GET, "/.well-known/terraform.json")
+                        ).authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                        .build();
+        }
+
+        @Bean
+        @Order(1)
         public SecurityFilterChain filterChain(HttpSecurity http,
                         @Value("${org.terrakube.token.issuer-uri}") String issuerUri,
                         @Value("${org.terrakube.token.pat}") String patJwtSecret,
