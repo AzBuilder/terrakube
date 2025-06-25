@@ -133,8 +133,8 @@ function generateApiVars(){
   echo "TerrakubeRedisPort=6379" >> .envApi
   echo "TerrakubeRedisSSL=false" >> .envApi
   echo "#TerrakubeRedisUsername=default" >> .envApi
-  echo "DynamicCredentialPublicKeyPath=/workspace/terrakube/public.pem" >> .envApi
-  echo "DynamicCredentialPrivateKeyPath=/workspace/terrakube/private.pem" >> .envApi
+  echo "DynamicCredentialPublicKeyPath=/workspaces/terrakube/public.pem" >> .envApi
+  echo "DynamicCredentialPrivateKeyPath=/workspaces/terrakube/private.pem" >> .envApi
   echo "TerrakubeRedisPassword=password123456" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }

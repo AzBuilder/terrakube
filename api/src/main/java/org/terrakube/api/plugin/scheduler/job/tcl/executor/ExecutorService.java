@@ -272,6 +272,11 @@ public class ExecutorService {
                     workspaceEnvVariables);
         }
 
+        if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_VAULT")) {
+            workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsVault(job,
+                    workspaceEnvVariables);
+        }
+
         if (workspaceEnvVariables.containsKey("ENABLE_DYNAMIC_CREDENTIALS_AWS")) {
             workspaceEnvVariables = dynamicCredentialsService.generateDynamicCredentialsAws(job, workspaceEnvVariables);
         }
