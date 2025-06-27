@@ -25,7 +25,8 @@ public class EphemeralExecutorService {
     private static final String CONFIG_MAP_PATH = "EPHEMERAL_CONFIG_MAP_MOUNT_PATH";
     private static final String TF_CACHE_DIR = "TF_PLUGIN_CACHE_DIR";
     private static final String PVC_CLAIM_NAME = "PVC_CLAIM_NAME";
-
+    private static final String POD_SECURITY_CONTEXT = "EPHEMERAL_CONFIG_POD_SECURITY_CONTEXT";
+    private static final String SECURITY_CONTEXT = "EPHEMERAL_CONFIG_SECURITY_CONTEXT";
 
     KubernetesClient kubernetesClient;
     EphemeralConfiguration ephemeralConfiguration;
@@ -163,6 +164,44 @@ public class EphemeralExecutorService {
             }
         }
 
+        Optional<String> configPodSecurityContext = Optional
+                .ofNullable(executorContext.getEnvironmentVariables().getOrDefault(POD_SECURITY_CONTEXT, null));
+        PodSecurityContext podSecurityContext = new PodSecurityContextBuilder().withFsGroup(1000L).build();
+        if (configPodSecurityContext.isPresent()) {
+            log.info("Using custom pod security context");
+            String[] podSecurityContextData = configPodSecurityContext.get().split(";");
+            for (String data : podSecurityContextData) {
+                String[] securitySetting = data.split("=");
+                switch (securitySetting[0]) {
+                    case "fsGroup":
+                        podSecurityContext.setFsGroup(Long.parseLong(securitySetting[1]));
+                        break;
+                    case "runAsNonRoot":
+                        podSecurityContext.setRunAsNonRoot(Boolean.parseBoolean(securitySetting[1]));
+                        break;
+                    case "runAsUser":
+                        podSecurityContext.setRunAsUser(Long.parseLong(securitySetting[1]));
+                        break;
+                }
+            }
+        }
+
+        Optional<String> configSecurityContext = Optional
+                .ofNullable(executorContext.getEnvironmentVariables().getOrDefault(SECURITY_CONTEXT, null));
+        SecurityContext securityContext = new SecurityContext();
+        if (configSecurityContext.isPresent()) {
+            log.info("Using custom security context");
+            String[] securityContextData = configSecurityContext.get().split(";");
+            for (String data : securityContextData) {
+                String[] securitySetting = data.split("=");
+                switch (securitySetting[0]) {
+                    case "allowPrivilegeEscalation":
+                        securityContext.setAllowPrivilegeEscalation(Boolean.parseBoolean(securitySetting[1]));
+                        break;
+                }
+            }
+        }
+
         io.fabric8.kubernetes.api.model.batch.v1.Job k8sJob = new JobBuilder()
                 .withApiVersion("batch/v1")
                 .withNewMetadata()
@@ -176,7 +215,7 @@ public class EphemeralExecutorService {
                 .withNewSpec()
                 .withNewTemplate()
                 .withNewSpec()
-                .withSecurityContext(new PodSecurityContextBuilder().withFsGroup(1000L).build())
+                .withSecurityContext(podSecurityContext)
                 .withNodeSelector(nodeSelectorInfo)
                 .withServiceAccountName(serviceAccount)
                 .withTolerations(tolerations)
@@ -187,6 +226,7 @@ public class EphemeralExecutorService {
                 .withImage(ephemeralConfiguration.getImage())
                 .withEnv(executorEnvVarFlags)
                 .withVolumeMounts(volumeMounts)
+                .withSecurityContext(securityContext)
                 .endContainer()
                 .withRestartPolicy("Never")
                 .endSpec()
