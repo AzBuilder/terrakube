@@ -11,10 +11,10 @@ import org.terrakube.executor.service.executor.ExecutorJobResult;
 import org.terrakube.executor.service.mode.TerraformJob;
 import org.terrakube.executor.service.scripts.ScriptEngineService;
 import org.jetbrains.annotations.NotNull;
-import org.terrakube.terraform.TerraformClient;
+import io.terrakube.terraform.TerraformClient;
 import org.springframework.stereotype.Service;
 import org.terrakube.executor.service.logs.*;
-import org.terrakube.terraform.TerraformProcessData;
+import io.terrakube.terraform.TerraformProcessData;
 
 import java.io.File;
 import java.nio.file.Path;

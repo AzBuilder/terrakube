@@ -46,7 +46,7 @@ public class SetupWorkspaceImpl implements SetupWorkspace {
     TerraformExecutor terraformExecutor;
 
     public SetupWorkspaceImpl(WorkspaceSecurity workspaceSecurity,
-            @Value("${org.terrakube.client.enableSecurity}") boolean enableRegistrySecurity,
+            @Value("${io.terrakube.client.enableSecurity}") boolean enableRegistrySecurity,
             TerraformExecutor terraformExecutor) {
         this.workspaceSecurity = workspaceSecurity;
         this.enableRegistrySecurity = enableRegistrySecurity;

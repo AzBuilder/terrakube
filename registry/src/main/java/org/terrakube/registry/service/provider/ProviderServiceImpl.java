@@ -1,12 +1,12 @@
 package org.terrakube.registry.service.provider;
 
 import lombok.extern.slf4j.Slf4j;
-import org.terrakube.client.TerrakubeClient;
-import org.terrakube.client.model.organization.Organization;
-import org.terrakube.client.model.organization.provider.version.Version;
-import org.terrakube.client.model.organization.provider.version.implementation.Implementation;
-import org.terrakube.client.model.response.Response;
-import org.terrakube.client.model.response.ResponseWithInclude;
+import io.terrakube.client.TerrakubeClient;
+import io.terrakube.client.model.organization.Organization;
+import io.terrakube.client.model.organization.provider.version.Version;
+import io.terrakube.client.model.organization.provider.version.implementation.Implementation;
+import io.terrakube.client.model.response.Response;
+import io.terrakube.client.model.response.ResponseWithInclude;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.terrakube.registry.controller.model.provider.*;

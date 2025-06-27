@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.terrakube.client.spring.autoconfigure.RestClientProperties;
+import io.terrakube.client.spring.autoconfigure.RestClientProperties;
 
 import javax.crypto.SecretKey;
 import java.io.File;
@@ -40,7 +40,7 @@ public class WorkspaceSecurityImpl implements WorkspaceSecurity {
 
     String internalSecret;
 
-    public WorkspaceSecurityImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.api.url}") String apiUrl,  @Value("${org.terrakube.client.secretKey}") String internalSecret) {
+    public WorkspaceSecurityImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.api.url}") String apiUrl,  @Value("${io.terrakube.client.secretKey}") String internalSecret) {
         this.clientProperties = restClientProperties;
         this.registryDomain = registryDomain;
         this.apiUrl = apiUrl;
