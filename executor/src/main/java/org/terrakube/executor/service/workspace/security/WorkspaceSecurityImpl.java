@@ -40,7 +40,7 @@ public class WorkspaceSecurityImpl implements WorkspaceSecurity {
 
     String internalSecret;
 
-    public WorkspaceSecurityImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.api.url}") String apiUrl,  @Value("${org.terrakube.client.secretKey}") String internalSecret) {
+    public WorkspaceSecurityImpl(RestClientProperties restClientProperties, @Value("${org.terrakube.registry.domain}") String registryDomain, @Value("${org.terrakube.api.url}") String apiUrl,  @Value("${io.terrakube.client.secretKey}") String internalSecret) {
         this.clientProperties = restClientProperties;
         this.registryDomain = registryDomain;
         this.apiUrl = apiUrl;
