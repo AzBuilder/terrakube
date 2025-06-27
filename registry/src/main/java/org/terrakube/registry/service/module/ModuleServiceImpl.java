@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.terrakube.client.TerrakubeClient;
-import org.terrakube.client.model.organization.module.Module;
-import org.terrakube.client.model.organization.module.ModuleAttributes;
-import org.terrakube.client.model.organization.module.ModuleRequest;
-import org.terrakube.client.model.organization.ssh.Ssh;
-import org.terrakube.client.model.organization.vcs.Vcs;
-import org.terrakube.client.model.organization.vcs.github_app_token.GitHubAppToken;
+import io.terrakube.client.TerrakubeClient;
+import io.terrakube.client.model.organization.module.Module;
+import io.terrakube.client.model.organization.module.ModuleAttributes;
+import io.terrakube.client.model.organization.module.ModuleRequest;
+import io.terrakube.client.model.organization.ssh.Ssh;
+import io.terrakube.client.model.organization.vcs.Vcs;
+import io.terrakube.client.model.organization.vcs.github_app_token.GitHubAppToken;
 import org.terrakube.registry.plugin.storage.StorageService;
 
 import lombok.AllArgsConstructor;

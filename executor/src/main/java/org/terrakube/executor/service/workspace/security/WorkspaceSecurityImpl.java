@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.terrakube.client.spring.autoconfigure.RestClientProperties;
+import io.terrakube.client.spring.autoconfigure.RestClientProperties;
 
 import javax.crypto.SecretKey;
 import java.io.File;
