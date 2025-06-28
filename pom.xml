@@ -9,7 +9,7 @@
         <version>3.5.3</version>
     </parent>
 
-    <groupId>org.terrakube</groupId>
+    <groupId>io.terrakube</groupId>
     <artifactId>terrakube-platform</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -106,7 +106,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${project.parent.version}</version>
                         <configuration>
-                            <mainClass>org.terrakube.api.ServerApplication</mainClass>
+                            <mainClass>io.terrakube.api.ServerApplication</mainClass>
                             <excludes>
                                 <exclude>
                                     <groupId>org.projectlombok</groupId>
