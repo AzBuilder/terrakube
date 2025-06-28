@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.terrakube</groupId>
+        <groupId>io.terrakube</groupId>
         <artifactId>terrakube-platform</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>org.terrakube.coverage</groupId>
+    <groupId>io.terrakube.coverage</groupId>
     <artifactId>coverage</artifactId>
     <version>${revision}</version>
     <name>Terrakube Code Coverage</name>
@@ -20,17 +20,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.terrakube.api</groupId>
+            <groupId>io.terrakube.api</groupId>
             <artifactId>api-server</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>org.terrakube.registry</groupId>
+            <groupId>io.terrakube.registry</groupId>
             <artifactId>open-registry</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>org.terrakube.executor</groupId>
+            <groupId>io.terrakube.executor</groupId>
             <artifactId>executor</artifactId>
             <version>${revision}</version>
         </dependency>
