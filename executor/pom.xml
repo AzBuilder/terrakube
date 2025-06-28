@@ -3,12 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.terrakube</groupId>
+		<groupId>io.terrakube</groupId>
 		<artifactId>terrakube-platform</artifactId>
 		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>org.terrakube.executor</groupId>
+	<groupId>io.terrakube.executor</groupId>
 	<artifactId>executor</artifactId>
 	<version>${revision}</version>
 	<name>Terrakube Executor</name>
@@ -200,7 +200,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>org.terrakube.executor.ExecutorApplication</mainClass>
+					<mainClass>io.terrakube.executor.ExecutorApplication</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
