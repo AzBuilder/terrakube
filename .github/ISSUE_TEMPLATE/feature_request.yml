@@ -4,7 +4,7 @@ labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
-      value: Before raising an issue, please search for [existing issues](https://github.com/AzBuilder/terrakube/labels/enhancement) to avoid creating duplicates. For questions, please use [Gitter](https://gitter.im/AzBuilder/community).
+      value: Before raising an issue, please search for [existing issues](https://github.com/terrakube-io/terrakube/labels/enhancement) to avoid creating duplicates. For questions, please use [Slack](https://join.slack.com/t/terrakubeworkspace/shared_invite/zt-2cx6yn95t-2CTBGvsQhBQJ5bfbG4peFg).
   - type: textarea
     id: feature-description
     attributes:
