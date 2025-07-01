@@ -22,6 +22,7 @@
         <msal4j.version>1.21.0</msal4j.version>
         <lombok.version>1.18.38</lombok.version>
         <jgit.version>7.3.0.202506031305-r</jgit.version>
+        <bouncy.castle>1.81</bouncy.castle>
         <rest-assured.version>5.5.5</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.7</postgresql.version>
@@ -176,6 +177,11 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>${jgit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncy.castle}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
