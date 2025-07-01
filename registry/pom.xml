@@ -19,6 +19,7 @@
         <lombok.version>1.18.38</lombok.version>
         <terrakube-client-starter.version>0.16.0-beta.2</terrakube-client-starter.version>
         <jgit.version>7.2.1.202505142326-r</jgit.version>
+        <bouncy.castle>1.81</bouncy.castle>
         <commons-io.version>2.19.0</commons-io.version>
         <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
         <rest-assured.version>5.5.5</rest-assured.version>
@@ -92,6 +93,11 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>${jgit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncy.castle}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
