@@ -1,15 +1,24 @@
 package io.terrakube.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.terrakube.api.plugin.vcs.provider.gitlab.GitLabWebhookService;
 import org.hamcrest.core.IsEqual;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.util.Assert;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+
+
+import java.io.IOException;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.when;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 class VcsTests extends ServerApplicationTests{
 
@@ -193,5 +202,66 @@ class VcsTests extends ServerApplicationTests{
                 .log()
                 .all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void gitlabGetIdProject() throws IOException, InterruptedException {
+        String simpleSearch="[\n" +
+                "    {\n" +
+                "        \"id\": 5397249,\n" +
+                "        \"path_with_namespace\": \"alfespa17/simple-terraform\"\n" +
+                "    }\n" +
+                "]";
+        mockServer.reset();
+        mockServer.when(
+                request()
+                        .withMethod(HttpMethod.GET.name())
+                        .withPath("/search")
+                        .withQueryStringParameter("scope","projects")
+                        .withQueryStringParameter("search", "alfespa17/simple-terraform")
+        ).respond(
+                response().withStatusCode(HttpStatus.OK.value()).withBody(simpleSearch)
+        );
+        GitLabWebhookService gitLabWebhookService = new GitLabWebhookService(new ObjectMapper());
+
+        Assert.equals("5397249", gitLabWebhookService.getGitlabProjectId("alfespa17/simple-terraform", "12345", "http://localhost:9999"));
+
+        String projectSearch="[\n" +
+                "    {\n" +
+                "        \"id\": 7138024,\n" +
+                "        \"path\": \"simple-terraform\",\n" +
+                "        \"path_with_namespace\": \"terraform2745926/simple-terraform\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"id\": 7107040,\n" +
+                "        \"path_with_namespace\": \"terraform2745926/test/simple-terraform\"\n" +
+                "    }\n" +
+                "]";
+        mockServer.reset();
+        mockServer.when(
+                request()
+                        .withMethod(HttpMethod.GET.name())
+                        .withPath("/search")
+                        .withQueryStringParameter("scope","projects")
+                        .withQueryStringParameter("search", "terraform2745926/test/simple-terraform")
+        ).respond(
+                response().withStatusCode(HttpStatus.OK.value()).withBody(projectSearch)
+        );
+
+        Assert.equals("7107040", gitLabWebhookService.getGitlabProjectId("terraform2745926/test/simple-terraform", "12345", "http://localhost:9999"));
+
+        mockServer.reset();
+        mockServer.when(
+                request()
+                        .withMethod(HttpMethod.GET.name())
+                        .withPath("/search")
+                        .withQueryStringParameter("scope","projects")
+                        .withQueryStringParameter("search", "terraform2745926/simple-terraform")
+        ).respond(
+                response().withStatusCode(HttpStatus.OK.value()).withBody(projectSearch)
+        );
+
+        Assert.equals("7138024", gitLabWebhookService.getGitlabProjectId("terraform2745926/simple-terraform", "12345", "http://localhost:9999"));
+
     }
 }

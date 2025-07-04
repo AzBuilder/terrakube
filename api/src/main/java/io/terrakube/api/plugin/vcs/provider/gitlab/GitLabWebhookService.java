@@ -111,7 +111,8 @@ public class GitLabWebhookService extends WebhookServiceBase {
         String id = "";
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-        String ownerAndRepo = String.join("/", extractOwnerAndRepo(workspace.getSource()));
+
+        String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
         String token = workspace.getVcs().getAccessToken();
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
         RestTemplate restTemplate = new RestTemplate();
@@ -160,7 +161,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
         return id;
     }
 
-    private String getGitlabProjectId(String ownerAndRepo, String accessToken, String gitlabBaseUrl) throws IOException, InterruptedException {
+    public String getGitlabProjectId(String ownerAndRepo, String accessToken, String gitlabBaseUrl) throws IOException, InterruptedException {
         String projectId = "";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -181,7 +182,13 @@ public class GitLabWebhookService extends WebhookServiceBase {
             // Parse the JSON string into a JsonNode
             JsonNode jsonNode = objectMapper.readTree(response.body());
 
-            projectId = jsonNode.get(0).get("id").asText();
+            for (JsonNode element : jsonNode) {
+                if (element.get("path_with_namespace").asText().equals(ownerAndRepo)) {
+                    projectId = element.get("id").asText();
+                    break;
+                }
+            }
+
             log.info("Parsed Project ID: {}", projectId);
         } else {
             log.error("Failed to retrieve project ID. HTTP Status: {}", response.statusCode());
@@ -191,7 +198,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
     }
     
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
-        String ownerAndRepo = String.join("/", extractOwnerAndRepo(workspace.getSource()));
+        String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
         String apiUrl = workspace.getVcs().getApiUrl() + "/projects/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
         
         ResponseEntity<String> response = callGitlabApi(workspace.getVcs().getAccessToken(), "", apiUrl, HttpMethod.DELETE);
