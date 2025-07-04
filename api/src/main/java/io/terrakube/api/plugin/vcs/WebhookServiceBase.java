@@ -33,7 +33,23 @@ public class WebhookServiceBase {
             URI uri = new URI(repoUrl);
             return Arrays.copyOfRange(uri.getPath().replaceAll("\\.git$", "").split("/"), 1, 3);
         } catch (Exception e) {
-            log.error("error extracing the repo", e);
+            log.error("error extracting the repo", e);
+            return null;
+        }
+    }
+
+    /*
+    Gitlab is a special case, the repos URL could be
+    https://gitlab.com/myuser/simple-terraform -> Normal repo
+    https://gitlab.com/terraform2745926/simple-terraform -> Repo inside project
+    https://gitlab.com/terraform2745926/test/simple-terraform -> Repo inside project and subgroup
+     */
+    protected String extractOwnerAndRepoGitlab(String repoUrl) {
+        try {
+            URI uri = new URI(repoUrl);
+            return uri.getPath().replaceAll("\\.git$", "").substring(1);
+        } catch (Exception e) {
+            log.error("error extracting the gitlab repo", e);
             return null;
         }
     }
