@@ -21,8 +21,8 @@
         <jgit.version>7.3.0.202506031305-r</jgit.version>
         <bouncy.castle>1.81</bouncy.castle>
         <commons-io.version>2.19.0</commons-io.version>
-        <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
         <rest-assured.version>5.5.5</rest-assured.version>
+        <wiremock.version>3.10.0</wiremock.version>
         <!--groovy.version>3.0.8</groovy.version-->
         <aws-sdk.version>2.31.73</aws-sdk.version>
         <zt-zip.version>1.17</zt-zip.version>
@@ -136,10 +136,10 @@
             <artifactId>sts</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-spring-test-listener</artifactId>
-            <version>${mockserver-spring-test-listener.version}</version>
-	    <scope>test</scope>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>

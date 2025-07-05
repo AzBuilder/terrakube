@@ -2,13 +2,11 @@ package io.terrakube.registry;
 
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpMethod;
 
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class ProviderTests extends OpenRegistryApplicationTests{
 
@@ -164,26 +162,20 @@ public class ProviderTests extends OpenRegistryApplicationTests{
 
     @Test
     void providerApiGetTestStep1() {
-        mockServer.reset();
-       mockServer.when(
-               request()
-                       .withMethod(HttpMethod.GET.name())
-                       .withPath(PATH_SEARCH)
-                       .withQueryStringParameter("filter[organization]","name==sampleOrganization")
-                       .withQueryStringParameter("filter[provider]","name==sampleProvider")
-       ).respond(
-         response().withStatusCode(HttpStatus.SC_OK).withBody(PATH_SEARCH_BODY)
-       );
+        wireMockServer.resetAll();
+        
+        stubFor(get(urlPathEqualTo(PATH_SEARCH))
+                .withQueryParam("filter[organization]", containing("name==sampleOrganization"))
+                .withQueryParam("filter[provider]", containing("name==sampleProvider"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(PATH_SEARCH_BODY)));
 
-
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath(PATH_SEARCH_IMPLEMENTATION)
-                        .withQueryStringParameter("include","implementation")
-        ).respond(
-                response().withStatusCode(HttpStatus.SC_OK).withBody(PATH_SEARCH_IMPLEMENTATION_BODY)
-        );
+        stubFor(get(urlPathEqualTo(PATH_SEARCH_IMPLEMENTATION))
+                .withQueryParam("include", containing("implementation"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(PATH_SEARCH_IMPLEMENTATION_BODY)));
 
         when()
                 .get("/terraform/providers/v1/sampleOrganization/sampleProvider/versions")
@@ -202,43 +194,32 @@ public class ProviderTests extends OpenRegistryApplicationTests{
 
     @Test
     void providerApiGetTestStep2() {
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath(PATH_SEARCH)
-                        .withQueryStringParameter("filter[organization]","name==sampleOrganization")
-                        .withQueryStringParameter("filter[provider]","name==sampleProvider")
-        ).respond(
-                response().withStatusCode(HttpStatus.SC_OK).withBody(PATH_SEARCH_BODY)
-        );
+        wireMockServer.resetAll();
+        
+        stubFor(get(urlPathEqualTo(PATH_SEARCH))
+                .withQueryParam("filter[organization]", containing("name==sampleOrganization"))
+                .withQueryParam("filter[provider]", containing("name==sampleProvider"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(PATH_SEARCH_BODY)));
 
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath(PATH_SEARCH_IMPLEMENTATION)
-                        .withQueryStringParameter("include","implementation")
-        ).respond(
-                response().withStatusCode(HttpStatus.SC_OK).withBody(PATH_SEARCH_IMPLEMENTATION_BODY)
-        );
+        stubFor(get(urlPathEqualTo(PATH_SEARCH_IMPLEMENTATION))
+                .withQueryParam("include", containing("implementation"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(PATH_SEARCH_IMPLEMENTATION_BODY)));
 
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath(PATH_SEARCH_IMPLEMENTATION)
-                        .withQueryStringParameter("filter[version]","versionNumber==2.0.0")
-        ).respond(
-                response().withStatusCode(HttpStatus.SC_OK).withBody(PATH_SEARCH_IMPLEMENTATION_VERSION_BODY)
-        );
+        stubFor(get(urlPathEqualTo(PATH_SEARCH_IMPLEMENTATION))
+                .withQueryParam("filter[version]", containing("versionNumber==2.0.0"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(PATH_SEARCH_IMPLEMENTATION_VERSION_BODY)));
 
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath(PATH_SEARCH_IMPLEMENTATION_FILE)
-                        .withQueryStringParameter("filter[implementation]","os==darwin;arch==amd64")
-        ).respond(
-                response().withStatusCode(HttpStatus.SC_OK).withBody(PATH_SEARCH_IMPLEMENTATION_FILE_BODY)
-        );
+        stubFor(get(urlPathEqualTo(PATH_SEARCH_IMPLEMENTATION_FILE))
+                .withQueryParam("filter[implementation]", containing("os==darwin;arch==amd64"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(PATH_SEARCH_IMPLEMENTATION_FILE_BODY)));
 
         when()
                 .get("/terraform/providers/v1/sampleOrganization/sampleProvider/versions")
