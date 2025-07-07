@@ -16,17 +16,18 @@
     <properties>
         <java.version>17</java.version>
         <elide.version>7.1.11</elide.version>
+        <handlebars.version>4.3.1</handlebars.version>
         <liquibase-core.version>4.32.0</liquibase-core.version>
         <azure.version>5.22.0</azure.version>
         <mssql-jdbc.version>12.10.1.jre11</mssql-jdbc.version>
         <msal4j.version>1.21.0</msal4j.version>
         <lombok.version>1.18.38</lombok.version>
+        <wiremock.version>3.10.0</wiremock.version>
         <jgit.version>7.3.0.202506031305-r</jgit.version>
         <bouncy.castle>1.81</bouncy.castle>
         <rest-assured.version>5.5.5</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
         <postgresql.version>42.7.7</postgresql.version>
-        <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <quartz.version>2.5.0</quartz.version>
         <aws-sdk.version>2.31.77</aws-sdk.version>
@@ -217,9 +218,27 @@
             <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-spring-test-listener</artifactId>
-            <version>${mockserver-spring-test-listener.version}</version>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.jknack</groupId>
+                    <artifactId>handlebars</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars-helpers</artifactId>
+            <version>${handlebars.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>${handlebars.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

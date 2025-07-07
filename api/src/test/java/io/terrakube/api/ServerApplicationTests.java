@@ -1,5 +1,7 @@
 package io.terrakube.api;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -14,7 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import io.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorService;
-import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,13 +24,13 @@ import org.springframework.test.context.ActiveProfiles;
 import io.terrakube.api.plugin.security.encryption.EncryptionService;
 import io.terrakube.api.plugin.token.pat.PatService;
 import io.terrakube.api.plugin.scheduler.job.tcl.TclService;
+import com.github.tomakehurst.wiremock.WireMockServer;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,7 +43,7 @@ class ServerApplicationTests {
     @Mock
     protected ValueOperations<String, Object> valueOperations;
 
-    ClientAndServer mockServer;
+    protected WireMockServer wireMockServer;
 
     @LocalServerPort
     int port;
@@ -92,13 +93,15 @@ class ServerApplicationTests {
     @BeforeAll
     public void setUp() {
         RestAssured.port = port;
-        mockServer = mockServer.startClientAndServer(9999);
+        wireMockServer = new WireMockServer(WireMockConfiguration.options().port(9999).bindAddress("localhost"));
+        wireMockServer.start();
+        WireMock.configureFor("localhost", 9999);
     }
+
 
     @AfterAll
     public void stopServer() {
-        mockServer.stop();
-        while (!mockServer.hasStopped(10,100L, TimeUnit.MILLISECONDS)){}
+        wireMockServer.stop();
     }
 
     public String generatePAT(String... activeGroups) {

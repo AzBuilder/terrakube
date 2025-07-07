@@ -2,13 +2,11 @@ package io.terrakube.registry;
 
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpMethod;
 
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class ModuleTests extends OpenRegistryApplicationTests{
     private static final String ORGANIZATION_SEARCH="/api/v1/organization";
@@ -78,24 +76,19 @@ public class ModuleTests extends OpenRegistryApplicationTests{
 
     @Test
     void providerApiGetTestStep1() {
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath(ORGANIZATION_SEARCH)
-                        .withQueryStringParameter("filter[organization]","name==moduleOrganization")
-        ).respond(
-                response().withStatusCode(HttpStatus.SC_OK).withBody(ORGANIZATION_SEARCH_BODY)
-        );
+        wireMockServer.resetAll();
+        
+        stubFor(get(urlPathEqualTo(ORGANIZATION_SEARCH))
+                .withQueryParam("filter[organization]", containing("name==moduleOrganization"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(ORGANIZATION_SEARCH_BODY)));
 
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath(MODULE_SEARCH)
-                        .withQueryStringParameter("filter[module]","name==sampleModule;provider==sampleProvider")
-        ).respond(
-                response().withStatusCode(HttpStatus.SC_OK).withBody(MODULE_SEARCH_BODY)
-        );
+        stubFor(get(urlPathEqualTo(MODULE_SEARCH))
+                .withQueryParam("filter[module]", containing("name==sampleModule;provider==sampleProvider"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(MODULE_SEARCH_BODY)));
 
         when()
                 .get("/terraform/modules/v1/moduleOrganization/sampleModule/sampleProvider/versions")

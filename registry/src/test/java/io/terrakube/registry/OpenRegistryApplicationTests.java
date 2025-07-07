@@ -4,19 +4,19 @@ import io.restassured.RestAssured;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
-import org.mockserver.integration.ClientAndServer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.concurrent.TimeUnit;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.client.WireMock;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 class OpenRegistryApplicationTests {
 
-	ClientAndServer mockServer;
+	WireMockServer wireMockServer;
 
 	@LocalServerPort
 	int port;
@@ -24,13 +24,14 @@ class OpenRegistryApplicationTests {
 	@BeforeAll
 	public void setUp() {
 		RestAssured.port = port;
-		mockServer = mockServer.startClientAndServer(9999);
+		wireMockServer = new WireMockServer(WireMockConfiguration.options().port(9999).bindAddress("localhost"));
+		wireMockServer.start();
+		WireMock.configureFor("localhost", 9999);
 	}
 
 	@AfterAll
 	public void stopServer() {
-		mockServer.stop();
-		while (!mockServer.hasStopped(10,100L, TimeUnit.MILLISECONDS)){}
+		wireMockServer.stop();
 	}
 
 }
