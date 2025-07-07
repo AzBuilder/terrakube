@@ -12,8 +12,9 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.mockito.Mockito.when;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class JobTests extends ServerApplicationTests {
 
@@ -21,18 +22,15 @@ class JobTests extends ServerApplicationTests {
     public void setup() {
         MockitoAnnotations.openMocks(this);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        wireMockServer.resetAll();
     }
 
     @Test
     void createJobAsOrgMember() {
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.POST.name())
-                        .withPath("/api/v1/terraform-rs")
-        ).respond(
-                response().withStatusCode(HttpStatus.ACCEPTED.value()).withBody("")
-        );
+        stubFor(post(urlPathEqualTo("/api/v1/terraform-rs"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.ACCEPTED.value())
+                        .withBody("")));
 
         Team team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
         team.setManageJob(true);
@@ -72,14 +70,10 @@ class JobTests extends ServerApplicationTests {
 
     @Test
     void createJobLockedWorkspace() {
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.POST.name())
-                        .withPath("/api/v1/terraform-rs")
-        ).respond(
-                response().withStatusCode(HttpStatus.ACCEPTED.value()).withBody("")
-        );
+        stubFor(post(urlPathEqualTo("/api/v1/terraform-rs"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.ACCEPTED.value())
+                        .withBody("")));
 
         Team team = teamRepository.findById(UUID.fromString("58529721-425e-44d7-8b0d-1d515043c2f7")).get();
         team.setManageJob(true);

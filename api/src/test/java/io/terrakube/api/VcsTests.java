@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.util.Assert;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
@@ -17,8 +18,8 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.when;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import com.github.tomakehurst.wiremock.WireMockServer;
 
 class VcsTests extends ServerApplicationTests{
 
@@ -26,6 +27,7 @@ class VcsTests extends ServerApplicationTests{
     public void setup() {
         MockitoAnnotations.openMocks(this);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        wireMockServer.resetAll();
     }
 
     @Test
@@ -212,16 +214,14 @@ class VcsTests extends ServerApplicationTests{
                 "        \"path_with_namespace\": \"alfespa17/simple-terraform\"\n" +
                 "    }\n" +
                 "]";
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath("/search")
-                        .withQueryStringParameter("scope","projects")
-                        .withQueryStringParameter("search", "alfespa17/simple-terraform")
-        ).respond(
-                response().withStatusCode(HttpStatus.OK.value()).withBody(simpleSearch)
-        );
+
+        stubFor(get(urlPathEqualTo("/search"))
+                .withQueryParam("scope", equalTo("projects"))
+                .withQueryParam("search", equalTo("alfespa17/simple-terraform"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        .withBody(simpleSearch)));
+
         GitLabWebhookService gitLabWebhookService = new GitLabWebhookService(new ObjectMapper());
 
         Assert.equals("5397249", gitLabWebhookService.getGitlabProjectId("alfespa17/simple-terraform", "12345", "http://localhost:9999"));
@@ -237,29 +237,21 @@ class VcsTests extends ServerApplicationTests{
                 "        \"path_with_namespace\": \"terraform2745926/test/simple-terraform\"\n" +
                 "    }\n" +
                 "]";
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath("/search")
-                        .withQueryStringParameter("scope","projects")
-                        .withQueryStringParameter("search", "terraform2745926/test/simple-terraform")
-        ).respond(
-                response().withStatusCode(HttpStatus.OK.value()).withBody(projectSearch)
-        );
+        stubFor(get(urlPathEqualTo("/search"))
+                .withQueryParam("scope", equalTo("projects"))
+                .withQueryParam("search", equalTo("terraform2745926/test/simple-terraform"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        .withBody(projectSearch)));
 
         Assert.equals("7107040", gitLabWebhookService.getGitlabProjectId("terraform2745926/test/simple-terraform", "12345", "http://localhost:9999"));
 
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.GET.name())
-                        .withPath("/search")
-                        .withQueryStringParameter("scope","projects")
-                        .withQueryStringParameter("search", "terraform2745926/simple-terraform")
-        ).respond(
-                response().withStatusCode(HttpStatus.OK.value()).withBody(projectSearch)
-        );
+        stubFor(get(urlPathEqualTo("/search"))
+                .withQueryParam("scope", equalTo("projects"))
+                .withQueryParam("search", equalTo("terraform2745926/simple-terraform"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        .withBody(projectSearch)));
 
         Assert.equals("7138024", gitLabWebhookService.getGitlabProjectId("terraform2745926/simple-terraform", "12345", "http://localhost:9999"));
 

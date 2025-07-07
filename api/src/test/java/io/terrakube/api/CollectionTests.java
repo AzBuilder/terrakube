@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import io.terrakube.api.plugin.scheduler.job.tcl.executor.ExecutorContext;
 import io.terrakube.api.plugin.scheduler.job.tcl.model.Flow;
@@ -17,12 +16,12 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.mockito.Mockito.when;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class CollectionTests extends ServerApplicationTests {
 
     private static final String EXECUTOR_ENDPOINT="http://localhost:9999/fake/executor";
+
 
     @BeforeEach
     public void setup() {
@@ -230,14 +229,11 @@ public class CollectionTests extends ServerApplicationTests {
     @Test
     void testCollectionPriorityAsOrgMember() {
 
-        mockServer.reset();
-        mockServer.when(
-                request()
-                        .withMethod(HttpMethod.POST.name())
-                        .withPath("/fake/executor/api/v1/terraform-rs")
-        ).respond(
-                response().withStatusCode(org.apache.http.HttpStatus.SC_ACCEPTED)
-        );
+        wireMockServer.resetAll();
+
+        stubFor(post(urlPathEqualTo("/fake/executor/api/v1/terraform-rs"))
+                .willReturn(aResponse()
+                        .withStatus(org.apache.http.HttpStatus.SC_ACCEPTED)));
 
         given()
                 .headers("Authorization", "Bearer " + generatePAT("TERRAKUBE_ADMIN"), "Content-Type", "application/vnd.api+json")
