@@ -99,8 +99,8 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
         manageJob: response.data.data.attributes.manageJob,
       });
       setLoading(false);
-      loadTokens();
       if (name) {
+        loadTokens(name);
         loadUserTeams(name);
       }
     });
@@ -216,7 +216,7 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
       })
       .then((response) => {
         setToken(response.data.token);
-        loadTokens();
+        loadTokens(teamName);
         setVisible(false);
         setVisibleToken(true);
         setCreating(false);
@@ -230,6 +230,8 @@ export const EditTeam = ({ mode, setMode, teamId, loadTeams }: Props) => {
       .then((response) => {
         if (tokenName) {
           const filteredTokens = response.data.filter((token: any) => token.group === tokenName);
+          console.log("access-tokens filtered.....")
+          console.log(filteredTokens)
           setTokens(filteredTokens);
         } else {
           setTokens([]);

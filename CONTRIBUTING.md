@@ -3,11 +3,11 @@ First, thanks for taking the time to contribute to our project! There are many w
 
 ### Questions
 
-If you have a question that needs an answer, [create an issue](https://github.com/AzBuilder/terrakube/issues/new), and label it as a question.
+If you have a question that needs an answer, [create an issue](https://github.com/terrakube-io/terrakube/issues/new), and label it as a question.
 
 ### Issues for bugs or feature requests
 
-If you encounter any bugs in the code, or want to request a new feature or enhancement, please [create an issue](https://github.com/AzBuilder/terrakube/issues/new) to report it. Kindly add a label to indicate what type of issue it is.
+If you encounter any bugs in the code, or want to request a new feature or enhancement, please [create an issue](https://github.com/terrakube-io/terrakube/issues/new) to report it. Kindly add a label to indicate what type of issue it is.
 
 ### Contribute Code
 We welcome your pull requests for bug fixes. To implement something new, please create an issue first, so we can discuss it together.

@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.terrakube</groupId>
+        <groupId>io.terrakube</groupId>
         <artifactId>terrakube-platform</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>org.terrakube.registry</groupId>
+    <groupId>io.terrakube.registry</groupId>
     <artifactId>open-registry</artifactId>
     <version>${revision}</version>
     <name>Terrakube Terraform Registry</name>
@@ -17,15 +17,16 @@
         <azure.version>5.22.0</azure.version>
         <java.version>17</java.version>
         <lombok.version>1.18.38</lombok.version>
-        <terrakube-client-starter.version>0.16.0-beta.2</terrakube-client-starter.version>
-        <jgit.version>7.2.1.202505142326-r</jgit.version>
+        <terrakube-client-starter.version>1.0.0</terrakube-client-starter.version>
+        <jgit.version>7.3.0.202506031305-r</jgit.version>
+        <bouncy.castle>1.81</bouncy.castle>
         <commons-io.version>2.19.0</commons-io.version>
-        <mockserver-spring-test-listener.version>5.13.2</mockserver-spring-test-listener.version>
         <rest-assured.version>5.5.5</rest-assured.version>
+        <wiremock.version>3.10.0</wiremock.version>
         <!--groovy.version>3.0.8</groovy.version-->
-        <aws-sdk.version>2.31.50</aws-sdk.version>
+        <aws-sdk.version>2.31.77</aws-sdk.version>
         <zt-zip.version>1.17</zt-zip.version>
-        <gcp-libraries-bom.version>26.61.0</gcp-libraries-bom.version>
+        <gcp-libraries-bom.version>26.63.0</gcp-libraries-bom.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
         <!--BUILDPACK DATA-->
@@ -84,7 +85,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.terrakube.client</groupId>
+            <groupId>io.terrakube.client</groupId>
             <artifactId>terrakube-spring-boot-starter</artifactId>
             <version>${terrakube-client-starter.version}</version>
         </dependency>
@@ -92,6 +93,11 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>${jgit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncy.castle}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
@@ -130,10 +136,10 @@
             <artifactId>sts</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-spring-test-listener</artifactId>
-            <version>${mockserver-spring-test-listener.version}</version>
-	    <scope>test</scope>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>

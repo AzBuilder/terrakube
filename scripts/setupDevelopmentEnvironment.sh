@@ -1,5 +1,23 @@
 #!/bin/bash
 
+while getopts 'd:s:' OPTION; do
+  echo $OPTION
+  case "$OPTION" in
+    d)
+      database_value="$OPTARG"
+      echo "Using database $OPTARG"
+      ;;
+    s)
+      storage_value="$OPTARG"
+      echo "Using storage $OPTARG"
+      ;;
+    ?)
+      echo "script usage: $(basename \$0) [-s storage] [-d database]" >&2
+      exit 1
+      ;;
+  esac
+done
+
 function generateApiVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
@@ -8,15 +26,20 @@ function generateApiVars(){
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
     TerrakubeRedisHostname=localhost
-  else
+  elif [ "$USER" = "vscode" ]; then
     TerrakubeHostname="terrakube-api.platform.local"
     AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
     TerrakubeUiURL="https://terrakube.platform.local"
     TerrakubeRedisHostname=terrakube-redis
+  else
+    TerrakubeHostname="localhost:8080"
+    AzBuilderExecutorUrl="http://localhost:8090/api/v1/terraform-rs"
+    DexIssuerUri="http://localhost:5556/dex"
+    TerrakubeUiURL="http://localhost:3000"
+    TerrakubeRedisHostname=terrakube-redis
   fi
 
-  ApiDataSourceType="H2"
   GroupValidationType="DEX"
   UserValidationType="DEX"
   AuthenticationValidationType="DEX"
@@ -24,23 +47,83 @@ function generateApiVars(){
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
   TERRAKUBE_ADMIN_GROUP="CUSTOM_ADMIN_NAME"
 
-  StorageType="LOCAL"
+
   DexClientId="example-app"
 
   JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
 
   rm -f .envApi
 
+  if [ "$database_value" = "POSTGRESQL" ]; then
+    ApiDataSourceType="POSTGRESQL"
+    DatasourceDatabase="terrakubedb"
+    DatasourceUser="terrakube"
+    DatasourceSchema="public"
+    if [ "$USER" = "gitpod" ]; then
+      DatasourceHostname="localhost"
+    else
+      DatasourceHostname="postgresql-service"
+    fi
+    DatasourcePassword="terrakubepassword"
+  elif [ "$database_value" = "MSSQL" ]; then
+    ApiDataSourceType="SQL_AZURE"
+    DatasourceHostname="mssql-service"
+    DatasourcePassword="P@ssw0rd!"
+    DatasourceUser="sa"
+    DatasourceDatabase=terrakube
+    DatasourceSchema=dbo
+  else
+    ApiDataSourceType="H2"
+  fi
+
+  if [ "$storage_value" = "MINIO" ]; then
+    StorageType="AWS"
+    AwsStorageAccessKey="minioadmin"
+    AwsStorageSecretKey="minioadmin"
+    AwsStorageBucketName="sample"
+    AwsStorageRegion="us-east-1"
+    if [ "$USER" = "gitpod" ]; then
+      AwsEndpoint="http://localhost:9000"
+    else
+      AwsEndpoint="http://minio:9000"
+    fi
+  elif [ "$storage_value" = "AZURITE" ]; then
+    StorageType="AZURE"
+    AzureAccountName="devstoreaccount1"
+    AzureAccountKey="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KmkZyjwDkOxg=="
+    AzureConnectionString="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
+  else
+    StorageType="LOCAL"
+  fi
+
   echo "ApiDataSourceType=$ApiDataSourceType" >> .envApi
+  echo "DatasourceHostname=$DatasourceHostname" >> .envApi
+  echo "DatasourceDatabase=$DatasourceDatabase" >> .envApi
+  echo "DatasourceTrustCertificate=true" >> .envApi
+  echo "DatasourceUser=$DatasourceUser" >> .envApi
+  echo "DatasourcePassword=$DatasourcePassword" >> .envApi
+  echo "DatasourceSchema=$DatasourceSchema" >> .envApi
+
+  echo "StorageType=$StorageType" >> .envApi
+  echo "AwsStorageAccessKey=$AwsStorageAccessKey" >> .envApi
+  echo "AwsStorageSecretKey=$AwsStorageSecretKey" >> .envApi
+  echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envApi
+  echo "AwsStorageRegion=$AwsStorageRegion" >> .envApi
+  echo "AwsEndpoint=$AwsEndpoint" >> .envApi
+
+  echo "AzureAccountName=$AzureAccountName" >> .envApi
+  echo "AzureAccountKey=$AzureAccountKey" >> .envApi
+  echo "AzureConnectionString=$AzureConnectionString" >> .envApi
+  echo "AzureCustomConnectionString=true" >> .envApi
+
   echo "GroupValidationType=$GroupValidationType" >> .envApi
   echo "UserValidationType=$UserValidationType" >> .envApi
   echo "AuthenticationValidationType=$AuthenticationValidationType" >> .envApi
   echo "TerrakubeHostname=$TerrakubeHostname" >> .envApi
-  echo "AzBuilderExecutorUrl=$AzBuilderExecutorUrl" >> .envApi 
+  echo "AzBuilderExecutorUrl=$AzBuilderExecutorUrl" >> .envApi
   echo "PatSecret=$PatSecret" >> .envApi
   echo "InternalSecret=$InternalSecret" >> .envApi
   echo "DexIssuerUri=$DexIssuerUri" >> .envApi
-  echo "StorageType=$StorageType" >> .envApi
   echo "TerrakubeUiURL=$TerrakubeUiURL" >> .envApi
   echo "spring_profiles_active=demo" >> .envApi
   echo "DexClientId=$DexClientId" >> .envApi
@@ -50,8 +133,8 @@ function generateApiVars(){
   echo "TerrakubeRedisPort=6379" >> .envApi
   echo "TerrakubeRedisSSL=false" >> .envApi
   echo "#TerrakubeRedisUsername=default" >> .envApi
-  echo "DynamicCredentialPublicKeyPath=/workspace/terrakube/public.pem" >> .envApi
-  echo "DynamicCredentialPrivateKeyPath=/workspace/terrakube/private.pem" >> .envApi
+  echo "DynamicCredentialPublicKeyPath=/workspaces/terrakube/public.pem" >> .envApi
+  echo "DynamicCredentialPrivateKeyPath=/workspaces/terrakube/private.pem" >> .envApi
   echo "TerrakubeRedisPassword=password123456" >> .envApi
   echo "#TERRAKUBE_ADMIN_GROUP=$TERRAKUBE_ADMIN_GROUP" >> .envApi
 }
@@ -63,30 +146,88 @@ function generateExecutorVars(){
     TerrakubeRegistryDomain=$(gp url 8075 | sed "s+https://++g")
     TerrakubeApiUrl=$(gp url 8080)
     TerrakubeRedisHostname=localhost
-  else
+  elif [ "$USER" = "vscode" ]; then
     AzBuilderApiUrl="https://terrakube-api.platform.local"
     TerrakubeRegistryDomain="terrakube-registry.platform.local"
     TerrakubeApiUrl="https://terrakube-api.platform.local"
     TerrakubeRedisHostname=terrakube-redis
+  else
+    AzBuilderApiUrl="http://localhost:8080"
+    TerrakubeRegistryDomain="localhost:8075"
+    TerrakubeApiUrl="http://localhost:8080"
+    TerrakubeRedisHostname=terrakube-redis
+  fi
+
+  if [ "$storage_value" = "MINIO" ]; then
+    TerraformStateType=AwsTerraformStateImpl
+    AwsTerraformStateAccessKey="minioadmin"
+    AwsTerraformStateSecretKey="minioadmin"
+    AwsTerraformStateBucketName="sample"
+    AwsTerraformStateRegion="us-east-1"
+
+    TerraformOutputType=AwsTerraformOutputImpl
+    AwsTerraformOutputAccessKey="minioadmin"
+    AwsTerraformOutputSecretKey="minioadmin"
+    AwsTerraformOutputBucketName="sample"
+    AwsTerraformOutputRegion="us-east-1"
+
+    if [ "$USER" = "gitpod" ]; then
+      AwsEndpoint="http://localhost:9000"
+    else
+      AwsEndpoint="http://minio:9000"
+    fi
+    elif [ "$storage_value" = "AZURITE" ]; then
+      StorageType="AZURE"
+      TerraformOutputType=AzureTerraformOutputImpl
+      TerraformStateType=AzureTerraformStateImpl
+      AzureAccountName="devstoreaccount1"
+      AzureAccountKey="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KmkZyjwDkOxg=="
+      AzureConnectionString="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
+    else
+      TerraformStateType=LocalTerraformStateImpl
+      TerraformOutputType=LocalTerraformOutputImpl
   fi
 
   TerrakubeEnableSecurity=true
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  TerraformStateType=LocalTerraformStateImpl
-  TerraformOutputType=LocalTerraformOutputImpl
+
   ExecutorFlagBatch=false
   ExecutorFlagDisableAcknowledge=false
   TerrakubeToolsRepository=https://github.com/AzBuilder/terrakube-extensions.git
   TerrakubeToolsBranch=main
-  
+
   JAVA_TOOL_OPTIONS="-Xmx512m -Xms256m"
 
   rm -f  .envExecutor
 
   echo "TerrakubeEnableSecurity=$TerrakubeEnableSecurity" >> .envExecutor
   echo "InternalSecret=$InternalSecret" >> .envExecutor
+
   echo "TerraformStateType=$TerraformStateType" >> .envExecutor
+  echo "AwsTerraformStateAccessKey=$AwsTerraformStateAccessKey" >> .envExecutor
+  echo "AwsTerraformStateSecretKey=$AwsTerraformStateSecretKey" >> .envExecutor
+  echo "AwsTerraformStateBucketName=$AwsTerraformStateBucketName" >> .envExecutor
+  echo "AwsTerraformStateRegion=$AwsTerraformStateRegion" >> .envExecutor
+  echo "AwsEndpoint=$AwsEndpoint" >> .envExecutor
+
   echo "TerraformOutputType=$TerraformOutputType" >> .envExecutor
+  echo "AwsTerraformOutputAccessKey=$AwsTerraformOutputAccessKey" >> .envExecutor
+  echo "AwsTerraformOutputSecretKey=$AwsTerraformOutputSecretKey" >> .envExecutor
+  echo "AwsTerraformOutputBucketName=$AwsTerraformOutputBucketName" >> .envExecutor
+  echo "AwsTerraformOutputRegion=$AwsTerraformOutputRegion" >> .envExecutor
+
+  echo "AzureAccountName=$AzureAccountName" >> .envExecutor
+  echo "AzureAccountKey=$AzureAccountKey" >> .envExecutor
+  echo "AzureConnectionString=$AzureConnectionString" >> .envExecutor
+  echo "AzureCustomConnectionString=true" >> .envExecutor
+  echo "AzureUseStorageEndpoint=true" >> .envExecutor
+  echo "AzureStorageEndpoint=http://azurite-service:10000/devstoreaccount1" >> .envExecutor
+  echo "AzureTerraformStateResourceGroup=fake-rg" >> .envExecutor
+  echo "AzureTerraformStateStorageAccountName=devstoreaccount1" >> .envExecutor
+  echo "AzureTerraformStateStorageContainerName=tfstate" >> .envExecutor
+  echo "AzureTerraformStateResourceGroup=fake-rg" >> .envExecutor
+  echo "AzureTerraformStateStorageAccessKey=$AzureAccountKey" >> .envExecutor
+
   echo "AzBuilderApiUrl=$AzBuilderApiUrl" >> .envExecutor
   echo "ExecutorFlagBatch=$ExecutorFlagBatch" >> .envExecutor
   echo "ExecutorFlagDisableAcknowledge=$ExecutorFlagDisableAcknowledge" >> .envExecutor
@@ -112,19 +253,45 @@ function generateRegistryVars(){
     DexIssuerUri="$(gp url 5556)/dex"
     TerrakubeUiURL=$(gp url 3000)
     AppIssuerUri="$(gp url 5556)/dex"
-  else
+  elif [ "$USER" = "vscode" ]; then
     AzBuilderRegistry="https://terrakube-registry.platform.local"
     AzBuilderApiUrl="https://terrakube-api.platform.local"
     DexIssuerUri="https://terrakube-dex.platform.local/dex"
     TerrakubeUiURL="https://terrakube.platform.local"
     AppIssuerUri="https://terrakube-dex.platform.local/dex"
+  else
+    AzBuilderRegistry="http://localhost:8075"
+    AzBuilderApiUrl="http://localhost:8080"
+    DexIssuerUri="http://localhost:5556/dex"
+    TerrakubeUiURL="http://locahost:3000"
+    AppIssuerUri="https://localhost:5556/dex"
+  fi
+
+  if [ "$storage_value" = "MINIO" ]; then
+    RegistryStorageType=AwsStorageImpl
+    AwsStorageAccessKey="minioadmin"
+    AwsStorageSecretKey="minioadmin"
+    AwsStorageBucketName="sample"
+    AwsStorageRegion="us-east-1"
+
+      if [ "$USER" = "gitpod" ]; then
+        AwsEndpoint="http://localhost:9000"
+      else
+        AwsEndpoint="http://minio:9000"
+      fi
+  elif [ "$storage_value" = "AZURITE" ]; then
+    RegistryStorageType="AzureStorageImpl"
+    AzureAccountName="devstoreaccount1"
+    AzureAccountKey="Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KmkZyjwDkOxg=="
+    AzureConnectionString="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
+  else
+    RegistryStorageType=Local
   fi
 
   AuthenticationValidationTypeRegistry=DEX
   TerrakubeEnableSecurity=true
   PatSecret=ejZRSFgheUBOZXAyUURUITUzdmdINDNeUGpSWHlDM1g=
   InternalSecret=S2JeOGNNZXJQTlpWNmhTITkha2NEKkt1VVBVQmFeQjM=
-  RegistryStorageType=Local
   AppClientId=example-app
 
   JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
@@ -142,15 +309,24 @@ function generateRegistryVars(){
   echo "RegistryStorageType=$RegistryStorageType" >> .envRegistry
   echo "AppClientId=$AppClientId" >> .envRegistry
   echo "AppIssuerUri=$AppIssuerUri" >> .envRegistry
+  echo "AwsStorageAccessKey=$AwsStorageAccessKey" >> .envRegistry
+  echo "AwsStorageSecretKey=$AwsStorageSecretKey" >> .envRegistry
+  echo "AwsStorageBucketName=$AwsStorageBucketName" >> .envRegistry
+  echo "AwsStorageRegion=$AwsStorageRegion" >> .envRegistry
+  echo "AwsEndpoint=$AwsEndpoint" >> .envRegistry
+  echo "AzureAccountName=$AzureAccountName" >> .envRegistry
+  echo "AzureAccountKey=$AzureAccountKey" >> .envRegistry
+  echo "AzureConnectionString=$AzureConnectionString" >> .envRegistry
+  echo "AzureCustomConnectionString=true" >> .envRegistry
   echo "JAVA_TOOL_OPTIONS=$JAVA_TOOL_OPTIONS" >> .envRegistry
 }
 
 function generateUiVars(){
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
-    REACT_CONFIG_TERRAKUBE_URL="$(gp url 8080)/api/v1/" 
+    REACT_CONFIG_TERRAKUBE_URL="$(gp url 8080)/api/v1/"
     REACT_CONFIG_REDIRECT=$(gp url 3000)
-    REACT_CONFIG_REGISTRY_URI=$(gp url 8075)  
+    REACT_CONFIG_REGISTRY_URI=$(gp url 8075)
     REACT_CONFIG_AUTHORITY="$(gp url 5556)/dex"
   else
     REACT_CONFIG_TERRAKUBE_URL="https://terrakube-api.platform.local/api/v1/"
@@ -213,22 +389,22 @@ function generateUiConfigFile(){
 
   echo "}" >> ui/env-config.js
 
-  cp ui/env-config.js ui/public/ 
+  cp ui/env-config.js ui/public/
 
 }
 
 function generateDexConfiguration(){
   cp scripts/template/dex/template-config-ldap.yaml scripts/setup/dex/config-ldap.yaml
-  
+
   USER=$(whoami)
   if [ "$USER" = "gitpod" ]; then
     jwtIssuer=$(gp url 5556)
-    uiRedirect=$(gp url 3000)  
+    uiRedirect=$(gp url 3000)
   else
     jwtIssuer="http://localhost:5556"
-    uiRedirect="http://locahost:3000"
+    uiRedirect="http://localhost:3000"
   fi
-  
+
   sed -i "s+TEMPLATE_GITPOD_JWT_ISSUER+$jwtIssuer+gi" scripts/setup/dex/config-ldap.yaml
   sed -i "s+TEMPLATE_GITPOD_REDIRECT+$uiRedirect+gi" scripts/setup/dex/config-ldap.yaml
 
@@ -276,16 +452,63 @@ function generateWorkspaceInformation(){
   sed -i "s+GITPOD_WORKSPACE_CONSOLE_MINIO+$WORKSPACE_CONSOLE_MINIO+gi" GITPOD.md
 }
 
-  if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
-    openssl x509 -outform der -in /workspaces/terrakube/.devcontainer/rootCA.pem -out /workspaces/terrakube/.devcontainer/rootCA.der
-    
-    if keytool -list -cacerts -storepass "changeit" | grep -q "custom-ca"; then
-      echo "Alias $ALIAS exists. Deleting it first..."
-      keytool -delete -alias "custom-ca" -cacerts -storepass "changeit" -noprompt
-    fi
+function generateDexConfiguration(){
 
-    keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "changeit" -noprompt
+  if [ -e .devcontainer/.env-dex ]; then
+      echo "File exists."
+      rm -rf .devcontainer/.env-dex
+  else
+      echo "File does not exist."
+      touch .devcontainer/.env-dex
   fi
+
+  if [ "$USER" = "gitpod" ]; then
+    TK_DEX_ISSUER="$(gp url 5556)/dex"
+    TK_DEX_API=$(gp url 8080)
+    TK_DEX_REGISTRY=$(gp url 8075)
+  elif [ "$USER" = "vscode" ]; then
+    touch .devcontainer/.env-dex
+    echo "TK_DEX_VERSION=v2.42.0" >> .devcontainer/.env-dex
+    echo "TK_DEX_ISSUER=https://terrakube-dex.platform.local/dex" >> .devcontainer/.env-dex
+    echo "TK_DEX_STATIC_CLIENT=c3RhdGljQ2xpZW50czoKICAtIGlkOiBleGFtcGxlLWFwcAogICAgcmVkaXJlY3RVUklzOgogICAgICAtICdodHRwczovL3RlcnJha3ViZS5wbGF0Zm9ybS5sb2NhbCcKICAgICAgLSAnaHR0cHM6Ly90ZXJyYWt1YmUtYXBpLnBsYXRmb3JtLmxvY2FsJwogICAgICAtICdodHRwczovL3RlcnJha3ViZS1yZWdpc3RyeS5wbGF0Zm9ybS5sb2NhbCcKICAgICAgLSAvZGV2aWNlL2NhbGxiYWNrCiAgICAgIC0gJ2h0dHA6Ly9sb2NhbGhvc3Q6MTAwMDAvbG9naW4nCiAgICAgIC0gJ2h0dHA6Ly9sb2NhbGhvc3Q6MTAwMDEvbG9naW4nCiAgICBuYW1lOiBFeGFtcGxlIEFwcAogICAgcHVibGljOiB0cnVl" >> .devcontainer/.env-dex
+  fi
+}
+
+if [ "$USER" != "gitpod" ] && [ "$USER" == "vscode" ]; then
+  openssl x509 -outform der -in /workspaces/terrakube/.devcontainer/rootCA.pem -out /workspaces/terrakube/.devcontainer/rootCA.der
+
+  if keytool -list -cacerts -storepass "changeit" | grep -q "custom-ca"; then
+    echo "Alias $ALIAS exists. Deleting it first..."
+    keytool -delete -alias "custom-ca" -cacerts -storepass "changeit" -noprompt
+  fi
+
+  keytool -import -alias custom-ca -cacerts -file /workspaces/terrakube/.devcontainer/rootCA.der -storepass "changeit" -noprompt
+
+#  export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite-service:10000/devstoreaccount1;"
+#
+#  az storage container create --name registry
+#  az storage container create --name tfstate
+#  az storage container create --name tfoutput
+
+  SApassword=P@ssw0rd!
+
+  # Parameters
+  dacpath=$1
+
+  for i in {1..30};
+  do
+      sqlcmd -S mssql-service -U sa -P $SApassword -d master -C -Q "SELECT * FROM SYS.DATABASES"> /dev/null
+      if [ $? -eq 0 ]
+      then
+          sqlcmd -S mssql-service -U sa -P P@ssw0rd! -i /workspaces/terrakube/scripts/init-mssql.sql -C
+          echo "mssql ready"
+          break
+      else
+          echo "mssql not ready yet..."
+          sleep 1
+      fi
+  done
+fi
 
 generateApiVars
 generateRegistryVars

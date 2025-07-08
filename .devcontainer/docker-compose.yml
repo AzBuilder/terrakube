@@ -243,6 +243,9 @@ services:
     extra_hosts: *terrakube_hosts
     labels: *traefik_dex_labels
     container_name: terrakube-dex
+    environment:
+      - TK_DEX_ISSUER=${TK_DEX_ISSUER}
+      - TK_DEX_STATIC_CLIENT=${TK_DEX_STATIC_CLIENT}
     volumes:
       - ./config-ldap.yaml:/etc/dex/config.docker.yaml
   ldap-service:
@@ -251,6 +254,12 @@ services:
     environment: *ldap_env
     volumes:
       - ./config-ldap.ldif:/ldifs/config-ldap.ldif
+  vault-service:
+    image: hashicorp/vault:latest
+    extra_hosts: *terrakube_hosts
+    container_name: terrakube-vault-service
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=dev-only-token
   minio:
     container_name: terrakube-minio
     image: docker.io/bitnami/minio:${TK_MINIO_VERSION}
@@ -276,6 +285,13 @@ services:
       - POSTGRESQL_DATABASE=${TK_POSTGRESQL_DATABASE_NAME}
     volumes:
       - postgresql_data:/bitnami/postgresql
+  mssql-service:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-service
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=P@ssw0rd!
 volumes:
   minio_data:
   redis_data:

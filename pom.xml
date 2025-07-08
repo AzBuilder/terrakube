@@ -6,16 +6,16 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.12</version>
+        <version>3.5.3</version>
     </parent>
 
-    <groupId>org.terrakube</groupId>
+    <groupId>io.terrakube</groupId>
     <artifactId>terrakube-platform</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
     <properties>
-        <revision>2.26.0</revision>
+        <revision>2.27.0</revision>
         <sonar.organization>azbuilder</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.project.key>AzBuilder_azb-server</sonar.project.key>
@@ -106,7 +106,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${project.parent.version}</version>
                         <configuration>
-                            <mainClass>org.terrakube.api.ServerApplication</mainClass>
+                            <mainClass>io.terrakube.api.ServerApplication</mainClass>
                             <excludes>
                                 <exclude>
                                     <groupId>org.projectlombok</groupId>

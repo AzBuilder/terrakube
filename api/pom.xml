@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.terrakube</groupId>
+        <groupId>io.terrakube</groupId>
         <artifactId>terrakube-platform</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>org.terrakube.api</groupId>
+    <groupId>io.terrakube.api</groupId>
     <artifactId>api-server</artifactId>
     <version>${revision}</version>
     <name>Terrakube API</name>
@@ -16,27 +16,29 @@
     <properties>
         <java.version>17</java.version>
         <elide.version>7.1.11</elide.version>
+        <handlebars.version>4.3.1</handlebars.version>
         <liquibase-core.version>4.32.0</liquibase-core.version>
         <azure.version>5.22.0</azure.version>
-        <mssql-jdbc.version>12.10.0.jre11</mssql-jdbc.version>
-        <msal4j.version>1.20.1</msal4j.version>
+        <mssql-jdbc.version>12.10.1.jre11</mssql-jdbc.version>
+        <msal4j.version>1.21.0</msal4j.version>
         <lombok.version>1.18.38</lombok.version>
-        <jgit.version>7.2.1.202505142326-r</jgit.version>
+        <wiremock.version>3.10.0</wiremock.version>
+        <jgit.version>7.3.0.202506031305-r</jgit.version>
+        <bouncy.castle>1.81</bouncy.castle>
         <rest-assured.version>5.5.5</rest-assured.version>
         <!--groovy.version>4.0.20</groovy.version-->
-        <postgresql.version>42.7.5</postgresql.version>
-        <mockserver-spring-test-listener.version>5.15.0</mockserver-spring-test-listener.version>
+        <postgresql.version>42.7.7</postgresql.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <quartz.version>2.5.0</quartz.version>
-        <aws-sdk.version>2.31.50</aws-sdk.version>
-        <gcp-libraries-bom.version>26.61.0</gcp-libraries-bom.version>
+        <aws-sdk.version>2.31.77</aws-sdk.version>
+        <gcp-libraries-bom.version>26.63.0</gcp-libraries-bom.version>
         <jjwt.version>0.11.5</jjwt.version>
         <jedis.version>6.0.0</jedis.version>
         <commons-text.version>1.13.1</commons-text.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
         </sonar.coverage.jacoco.xmlReportPaths>
-        <maven-artifact.version>3.9.9</maven-artifact.version>
+        <maven-artifact.version>3.9.10</maven-artifact.version>
         <commons-io.version>2.19.0</commons-io.version>
         <kubernetes-client.version>7.3.1</kubernetes-client.version>
         <!--BUILDPACK DATA-->
@@ -178,6 +180,11 @@
             <version>${jgit.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncy.castle}</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit.ssh.apache</artifactId>
             <version>${jgit.version}</version>
@@ -211,9 +218,27 @@
             <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-spring-test-listener</artifactId>
-            <version>${mockserver-spring-test-listener.version}</version>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.jknack</groupId>
+                    <artifactId>handlebars</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars-helpers</artifactId>
+            <version>${handlebars.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>${handlebars.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -283,7 +308,7 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>10.3</version>
+            <version>10.3.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

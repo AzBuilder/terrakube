@@ -5,7 +5,7 @@
             "name": "Run API",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "mainClass": "org.terrakube.api.ServerApplication",
+            "mainClass": "io.terrakube.api.ServerApplication",
             "projectName": "api-server",
             "args": "-Xmx512m -Xms256m -Dcom.sun.net.ssl.checkRevocation=false",
             "envFile": "${workspaceFolder}/.envApi",
@@ -16,7 +16,7 @@
             "name": "Run Registry",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "mainClass": "org.terrakube.registry.OpenRegistryApplication",
+            "mainClass": "io.terrakube.registry.OpenRegistryApplication",
             "projectName": "open-registry",
             "args": "-Xmx512m -Xms256m",
             "envFile": "${workspaceFolder}/.envRegistry",
@@ -27,7 +27,7 @@
             "name": "Run Executor",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "mainClass": "org.terrakube.executor.ExecutorApplication",
+            "mainClass": "io.terrakube.executor.ExecutorApplication",
             "projectName": "executor",
             "args": "-Xmx512m -Xms256m",
             "envFile": "${workspaceFolder}/.envExecutor",
@@ -47,7 +47,18 @@
     "compounds": [
         {
             "name": "Terrakube",
-            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"]
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
+            "preLaunchTask": "setup-env"
+        },
+        {
+            "name": "Terrakube Postgresql",
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
+            "preLaunchTask": "setup-env2"
+        },
+        {
+            "name": "Terrakube MSSQL",
+            "configurations": ["Run API", "Run Registry", "Run Executor", "Run UI"],
+            "preLaunchTask": "setup-env3"
         }
     ]
 }
