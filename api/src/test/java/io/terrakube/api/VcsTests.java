@@ -10,6 +10,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClient;
+
 
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.when;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import org.springframework.web.reactive.function.client.WebClient;
 
 class VcsTests extends ServerApplicationTests{
 
@@ -221,7 +224,7 @@ class VcsTests extends ServerApplicationTests{
                         .withStatus(HttpStatus.OK.value())
                         .withBody(simpleSearch)));
 
-        GitLabWebhookService gitLabWebhookService = new GitLabWebhookService(new ObjectMapper());
+        GitLabWebhookService gitLabWebhookService = new GitLabWebhookService(new ObjectMapper(), "localhost", WebClient.builder());
 
         Assert.equals("5397249", gitLabWebhookService.getGitlabProjectId("alfespa17/simple-terraform", "12345", "http://localhost:9999"));
 
