@@ -215,9 +215,8 @@ class VcsTests extends ServerApplicationTests{
                 "    }\n" +
                 "]";
 
-        stubFor(get(urlPathEqualTo("/search"))
-                .withQueryParam("scope", equalTo("projects"))
-                .withQueryParam("search", equalTo("alfespa17/simple-terraform"))
+        stubFor(get(urlPathEqualTo("/projects"))
+                .withQueryParam("membership", equalTo("true"))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withBody(simpleSearch)));
@@ -237,18 +236,16 @@ class VcsTests extends ServerApplicationTests{
                 "        \"path_with_namespace\": \"terraform2745926/test/simple-terraform\"\n" +
                 "    }\n" +
                 "]";
-        stubFor(get(urlPathEqualTo("/search"))
-                .withQueryParam("scope", equalTo("projects"))
-                .withQueryParam("search", equalTo("terraform2745926/test/simple-terraform"))
+        stubFor(get(urlPathEqualTo("/projects"))
+                .withQueryParam("membership", equalTo("true"))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withBody(projectSearch)));
 
         Assert.equals("7107040", gitLabWebhookService.getGitlabProjectId("terraform2745926/test/simple-terraform", "12345", "http://localhost:9999"));
 
-        stubFor(get(urlPathEqualTo("/search"))
-                .withQueryParam("scope", equalTo("projects"))
-                .withQueryParam("search", equalTo("terraform2745926/simple-terraform"))
+        stubFor(get(urlPathEqualTo("/projects"))
+                .withQueryParam("membership", equalTo("true"))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withBody(projectSearch)));
