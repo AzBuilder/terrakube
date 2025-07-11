@@ -231,6 +231,9 @@ public class WebhookService {
             case GITHUB:
                 gitHubWebhookService.sendCommitStatus(job, JobStatus.pending);
                 break;
+            case GITLAB:
+                gitLabWebhookService.sendCommitStatus(job, JobStatus.pending);
+                break;
             default:
                 break;
         }
