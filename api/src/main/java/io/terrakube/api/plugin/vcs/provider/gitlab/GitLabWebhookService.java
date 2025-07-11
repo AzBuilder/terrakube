@@ -8,9 +8,9 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import io.terrakube.api.plugin.vcs.provider.github.GithubCommitStatus;
 import io.terrakube.api.rs.job.Job;
 import io.terrakube.api.rs.job.JobStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -42,6 +42,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
     @Value("${io.terrakube.ui.url}")
     private String uiUrl;
 
+    @Autowired
     private WebClient.Builder webClientBuilder;
 
     public GitLabWebhookService(ObjectMapper objectMapper) {
