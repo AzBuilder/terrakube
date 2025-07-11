@@ -2,12 +2,11 @@ package io.terrakube.api.plugin.vcs.provider.gitlab;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import io.terrakube.api.rs.job.Job;
 import io.terrakube.api.rs.job.JobStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +28,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
 public class GitLabWebhookService extends WebhookServiceBase {
 
-    private final ObjectMapper objectMapper;
-
-    @Value("${io.terrakube.hostname}")
+    private ObjectMapper objectMapper;
     private String hostname;
-
-    @Value("${io.terrakube.ui.url}")
-    private String uiUrl;
-
-    @Autowired
     private WebClient.Builder webClientBuilder;
 
-    public GitLabWebhookService(ObjectMapper objectMapper) {
+    public GitLabWebhookService(ObjectMapper objectMapper, @Value("${io.terrakube.hostname}") String hostname, WebClient.Builder webClientBuilder) {
         this.objectMapper = objectMapper;
+        this.hostname = hostname;
+        this.webClientBuilder = webClientBuilder;
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
@@ -169,39 +165,79 @@ public class GitLabWebhookService extends WebhookServiceBase {
     }
 
     public String getGitlabProjectId(String ownerAndRepo, String accessToken, String gitlabBaseUrl) throws IOException, InterruptedException {
-        String projectId = "";
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(gitlabBaseUrl + "/projects?membership=true"))
-                .header("Authorization", "Bearer " + accessToken)
-                .header("Content-Type", "application/json")
-                .GET()
+        AtomicReference<String> projectId = new AtomicReference<>("");
+
+        WebClient webClient = webClientBuilder
+                .baseUrl(gitlabBaseUrl)
+                .defaultHeader("Authorization", "Bearer " + accessToken)
+                .defaultHeader("Content-Type", "application/json")
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        AtomicInteger currentPage = new AtomicInteger(1);
+        AtomicBoolean projectFound = new AtomicBoolean(false);
+        AtomicBoolean hasMorePages = new AtomicBoolean(true);
+        
+        while (hasMorePages.get() && !projectFound.get()) {
+            try {
+                webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/projects")
+                                .queryParam("membership", "true")
+                                .queryParam("per_page", "1")
+                                .queryParam("page", currentPage)
+                                .build())
+                        .exchangeToMono(response -> {
+                            if (response.statusCode().is2xxSuccessful()) {
 
-        // Check for successful response
-        if (response.statusCode() == 200) {
-            log.info("Response from Gitlab: {}", response.body());
-            // Initialize Jackson ObjectMapper
-            ObjectMapper objectMapper = new ObjectMapper();
+                                List<String> nextPageHeaders = response.headers().header("x-next-page");
+                                String nextPageHeader = nextPageHeaders.isEmpty() ? null : nextPageHeaders.get(0);
 
-            // Parse the JSON string into a JsonNode
-            JsonNode jsonNode = objectMapper.readTree(response.body());
+                                return response.bodyToMono(String.class)
+                                        .doOnNext(responseBody -> {
+                                            try {
 
-            for (JsonNode element : jsonNode) {
-                if (element.get("path_with_namespace").asText().equals(ownerAndRepo)) {
-                    projectId = element.get("id").asText();
-                    break;
-                }
+                                                JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+                                                for (JsonNode element : jsonNode) {
+                                                    if (element.get("path_with_namespace").asText().equals(ownerAndRepo)) {
+                                                        projectId.set(element.get("id").asText());
+                                                        projectFound.set(true);
+                                                        break;
+                                                    }
+                                                }
+
+                                                if (nextPageHeader == null || nextPageHeader.isEmpty()) {
+                                                    hasMorePages.set(false);
+                                                } else {
+                                                    currentPage.set(Integer.parseInt(nextPageHeader));
+                                                }
+                                                
+                                                log.debug("Processed page {}, hasMorePages={}, projectFound={}", currentPage.get() -1, hasMorePages, projectFound);
+                                            } catch (Exception e) {
+                                                log.error("Error parsing response: {}", e.getMessage());
+                                            }
+                                        });
+                            } else {
+                                log.error("Failed to retrieve project ID. HTTP Status: {}", response.statusCode());
+                                hasMorePages.set(false);
+                                return Mono.empty();
+                            }
+                        })
+                        .block();
+            
+            } catch (Exception e) {
+                log.error("Failed to retrieve project ID. Error: {}", e.getMessage());
+                hasMorePages.set(false);
             }
-
+        }
+        
+        if (projectFound.get()) {
             log.info("Parsed Project ID: {}", projectId);
         } else {
-            log.error("Failed to retrieve project ID. HTTP Status: {}", response.statusCode());
-            log.error("Response: {}", response.body());
+            log.warn("Project with path {} not found after checking all pages", ownerAndRepo);
         }
-        return projectId;
+        
+        return projectId.get();
     }
 
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
