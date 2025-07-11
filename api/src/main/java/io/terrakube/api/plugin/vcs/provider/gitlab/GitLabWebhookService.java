@@ -165,7 +165,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
         String projectId = "";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(gitlabBaseUrl + "/search?scope=projects&search=" + ownerAndRepo))
+                .uri(URI.create(gitlabBaseUrl + "/projects?membership=true"))
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", "application/json")
                 .GET()
