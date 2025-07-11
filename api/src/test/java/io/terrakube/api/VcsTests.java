@@ -224,7 +224,7 @@ class VcsTests extends ServerApplicationTests{
                         .withStatus(HttpStatus.OK.value())
                         .withBody(simpleSearch)));
 
-        GitLabWebhookService gitLabWebhookService = new GitLabWebhookService(new ObjectMapper(), "localhost", WebClient.builder());
+        GitLabWebhookService gitLabWebhookService = new GitLabWebhookService(new ObjectMapper(), "localhost", "http://localhost", WebClient.builder());
 
         Assert.equals("5397249", gitLabWebhookService.getGitlabProjectId("alfespa17/simple-terraform", "12345", "http://localhost:9999"));
 
