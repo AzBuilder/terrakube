@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import io.terrakube.api.rs.job.Job;
 import io.terrakube.api.rs.job.JobStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -38,11 +36,13 @@ public class GitLabWebhookService extends WebhookServiceBase {
     private ObjectMapper objectMapper;
     private String hostname;
     private WebClient.Builder webClientBuilder;
+    private String uiUrl;
 
-    public GitLabWebhookService(ObjectMapper objectMapper, @Value("${io.terrakube.hostname}") String hostname, WebClient.Builder webClientBuilder) {
+    public GitLabWebhookService(ObjectMapper objectMapper, @Value("${io.terrakube.hostname}") String hostname, @Value("${io.terrakube.ui.url}") String uiUrl, WebClient.Builder webClientBuilder) {
         this.objectMapper = objectMapper;
         this.hostname = hostname;
         this.webClientBuilder = webClientBuilder;
+        this.uiUrl = uiUrl;
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
