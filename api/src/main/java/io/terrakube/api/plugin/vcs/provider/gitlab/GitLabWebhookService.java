@@ -287,7 +287,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
         } catch (Exception e) {
             log.error("Error sending commit status to GitLab", e);
-
+            Thread.currentThread().interrupt();
         }
 
     }
