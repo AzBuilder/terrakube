@@ -7,7 +7,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
+import io.terrakube.api.rs.job.Job;
+import io.terrakube.api.rs.job.JobStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import io.terrakube.api.plugin.vcs.WebhookResult;
 import io.terrakube.api.plugin.vcs.WebhookServiceBase;
@@ -25,7 +27,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -35,11 +36,13 @@ public class GitLabWebhookService extends WebhookServiceBase {
     private ObjectMapper objectMapper;
     private String hostname;
     private WebClient.Builder webClientBuilder;
+    private String uiUrl;
 
-    public GitLabWebhookService(ObjectMapper objectMapper, @Value("${io.terrakube.hostname}") String hostname, WebClient.Builder webClientBuilder) {
+    public GitLabWebhookService(ObjectMapper objectMapper, @Value("${io.terrakube.hostname}") String hostname, @Value("${io.terrakube.ui.url}") String uiUrl, WebClient.Builder webClientBuilder) {
         this.objectMapper = objectMapper;
         this.hostname = hostname;
         this.webClientBuilder = webClientBuilder;
+        this.uiUrl = uiUrl;
     }
 
     public WebhookResult processWebhook(String jsonPayload, Map<String, String> headers, String token) {
@@ -142,7 +145,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
         // Make the request using the GitLab API
         ResponseEntity<String> response = restTemplate.exchange(
-               gitlabUri, HttpMethod.POST, entity, String.class);
+                gitlabUri, HttpMethod.POST, entity, String.class);
 
         // Extract the id from the response
         if (response.getStatusCode().value() == 201) {
@@ -236,11 +239,11 @@ public class GitLabWebhookService extends WebhookServiceBase {
         
         return projectId.get();
     }
-    
+
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
         String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
         String apiUrl = workspace.getVcs().getApiUrl() + "/projects/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
-        
+
         ResponseEntity<String> response = callGitlabApi(workspace.getVcs().getAccessToken(), "", apiUrl, HttpMethod.DELETE);
         if (response.getStatusCode().value() == 204) {
             log.info("Webhook with remote hook id {} on repository {} deleted successfully", webhookRemoteId, ownerAndRepo);
@@ -254,9 +257,74 @@ public class GitLabWebhookService extends WebhookServiceBase {
         headers.set("Accept", "application/json");
         headers.set("Authorization", "Bearer " + token);
         headers.set("Content-Type", "application/json");
-        
+
         ResponseEntity<String> response = makeApiRequest(headers, body, apiUrl, httpMethod);
-        
+
         return response;
+    }
+
+    public void sendCommitStatus(Job job, JobStatus jobStatus) {
+        Workspace workspace = job.getWorkspace();
+        String jobUrl = String.format("%s/organizations/%s/workspaces/%s/runs/%s", uiUrl,
+                workspace.getOrganization().getId(), workspace.getId(), job.getId());
+        String ownerAndRepos = extractOwnerAndRepoGitlab(workspace.getSource());
+
+        try {
+            String projectId = getGitlabProjectId(ownerAndRepos, job.getWorkspace().getVcs().getAccessToken(), job.getWorkspace().getVcs().getApiUrl());
+            GitlabCommitStatus commitStatus = GitlabCommitStatus.pending;
+            String commitStatusContext = "Terrakube - " + workspace.getOrganization().getName() + " - "
+                    + workspace.getName();
+            String commitStatusDescription = "Your task is in Terrakube queue.";
+
+            // Determine the commit status based on jobStatus
+            switch (jobStatus) {
+                case completed:
+                    commitStatus = GitlabCommitStatus.success;
+                    commitStatusDescription = "Your task has been completed successfully.";
+                    break;
+                case failed:
+                case rejected:
+                case cancelled:
+                    commitStatus = GitlabCommitStatus.failed;
+                    commitStatusDescription = "Your task has failed.";
+                    break;
+                case unknown:
+                    commitStatus = GitlabCommitStatus.failed;
+                    commitStatusDescription = "Your task ran into errors.";
+                    break;
+                default:
+                    break;
+            }
+
+            // Create WebClient instance
+            WebClient webClient = webClientBuilder
+                    .baseUrl(job.getWorkspace().getVcs().getApiUrl())
+                    .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                    .defaultHeader(HttpHeaders.ACCEPT, "application/json")
+                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + job.getWorkspace().getVcs().getAccessToken())
+                    .build();
+
+            // Create request body
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("state", commitStatus.toString());
+            requestBody.put("name", commitStatusContext);
+            requestBody.put("target_url", jobUrl);
+            requestBody.put("description", commitStatusDescription);
+
+            // Send POST request
+            String response = webClient.post()
+                    .uri("/projects/{id}/statuses/{sha}", projectId, job.getCommitId())
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            log.info("Commit status sent to GitLab: {}", response);
+
+        } catch (Exception e) {
+            log.error("Error sending commit status to GitLab", e);
+            Thread.currentThread().interrupt();
+        }
+
     }
 }
