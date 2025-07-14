@@ -125,7 +125,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
     private WebhookResult handleMergeRequestEvent(WebhookResult result, String jsonPayload, Workspace workspace) throws IOException, InterruptedException {
         String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
-
+        result.setEvent("pull_request");
         try {
             GitlabMergeRequestModel mrModel = objectMapper.readValue(jsonPayload, GitlabMergeRequestModel.class);
 
