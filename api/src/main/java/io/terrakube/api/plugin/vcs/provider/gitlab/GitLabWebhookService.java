@@ -4,16 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import io.terrakube.api.rs.job.Job;
 import io.terrakube.api.rs.job.JobStatus;
-import io.terrakube.api.rs.vcs.Vcs;
+import io.terrakube.api.rs.webhook.Webhook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -206,14 +204,14 @@ public class GitLabWebhookService extends WebhookServiceBase {
         return fileChanges;
     }
 
-    public String createWebhook(Workspace workspace, String webhookId) {
-        String id = "";
+    public String createOrUpdateWebhook(Workspace workspace, Webhook webhook) {
+        String remoteHookId = webhook.getRemoteHookId();
         String secret = Base64.getEncoder()
                 .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
 
         String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
         String token = workspace.getVcs().getAccessToken();
-        String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
+        String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhook.getId());
         RestTemplate restTemplate = new RestTemplate();
 
         // Create the headers
@@ -237,27 +235,35 @@ public class GitLabWebhookService extends WebhookServiceBase {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
         }
-        URI gitlabUri = UriComponentsBuilder.fromHttpUrl(workspace.getVcs().getApiUrl() + "/projects/" + projectId + "/hooks").build(true).toUri();
 
-        // Make the request using the GitLab API
-        ResponseEntity<String> response = restTemplate.exchange(
-                gitlabUri, HttpMethod.POST, entity, String.class);
 
-        // Extract the id from the response
-        if (response.getStatusCode().value() == 201) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                JsonNode rootNode = objectMapper.readTree(response.getBody());
-                id = rootNode.path("id").asText();
-            } catch (Exception e) {
-                log.error("Error parsing JSON response", e);
+        ResponseEntity<String> response;
+        if (remoteHookId == null) {
+            URI gitlabUri = UriComponentsBuilder.fromHttpUrl(workspace.getVcs().getApiUrl() + "/projects/" + projectId + "/hooks").build(true).toUri();
+            // Make the request using the GitLab API only when the entity is saved
+            response = restTemplate.exchange(
+                    gitlabUri, HttpMethod.POST, entity, String.class);
+
+            // Extract the id from the response
+            if (response.getStatusCode().value() == 201) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    JsonNode rootNode = objectMapper.readTree(response.getBody());
+                    remoteHookId = rootNode.path("id").asText();
+                } catch (Exception e) {
+                    log.error("Error parsing JSON response", e);
+                }
+
+                log.info("Gitlab Hook created successfully for workspace {}/{} with id {}", workspace.getOrganization().getName(), workspace.getName(), remoteHookId);
             }
-
-            log.info("GitHub Hook created successfully for workspace {}/{} with id {}",
-                    workspace.getOrganization().getName(), workspace.getName(), id);
+        } else {
+            URI gitlabUri = UriComponentsBuilder.fromHttpUrl(workspace.getVcs().getApiUrl() + "/projects/" + projectId + "/hooks/" + webhook.getRemoteHookId()).build(true).toUri();
+            response = restTemplate.exchange(
+                    gitlabUri, HttpMethod.PUT, entity, String.class);
+            log.info("Gitlab Hook updating Status {} for workspace {}/{} with id {}", response.getStatusCode(), workspace.getOrganization().getName(), workspace.getName(), remoteHookId);
         }
 
-        return id;
+        return remoteHookId;
     }
 
     public String getGitlabProjectId(String ownerAndRepo, String accessToken, String gitlabBaseUrl) throws IOException, InterruptedException {
