@@ -69,7 +69,7 @@ public class WebhookService {
                 break;
             case GITLAB:
                 webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,
-                        base64WorkspaceId);
+                        base64WorkspaceId, workspace);
                 break;
             case BITBUCKET:
                 webhookResult = bitBucketWebhookService.processWebhook(jsonPayload, headers,
