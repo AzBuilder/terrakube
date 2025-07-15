@@ -173,9 +173,9 @@ public class GitLabWebhookService extends WebhookServiceBase {
         try {
             GitlabReleaseModel releaseModel = objectMapper.readValue(jsonPayload, GitlabReleaseModel.class);
 
-            String action = releaseModel.getObjectAttributes().getAction();
-            String tagName = releaseModel.getObjectAttributes().getTag();
-            String releaseName = releaseModel.getObjectAttributes().getName();
+            String action = releaseModel.getAction();
+            String tagName = releaseModel.getTag();
+            String releaseName = releaseModel.getName();
 
             log.info("Processing GitLab release event: {} - {} (tag: {})", action, releaseName, tagName);
 
@@ -188,7 +188,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
                     result.setEvent("release");
                     result.setValid(true);
                     result.setRelease(true);
-                    result.setBranch(tagName);
+                    result.setBranch(releaseName);
                     break;
                 default:
                     log.info("Release action '{}' for: {} not specifically handled", action, releaseName);
