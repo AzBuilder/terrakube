@@ -259,7 +259,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
         // Create the body
         String body = "{\"url\":\"" + webhookUrl
-                + "\",\"push_events\":\"true\", \"merge_requests_events\": \"true\", \"enable_ssl_verification\":\"false\",\"token\":\"" + secret + "\"}";
+                + "\",\"push_events\":\"true\", \"merge_requests_events\": \"true\", \"releases_events\": true, \"enable_ssl_verification\":\"false\",\"token\":\"" + secret + "\"}";
 
         log.info(body);
         // Create the entity
