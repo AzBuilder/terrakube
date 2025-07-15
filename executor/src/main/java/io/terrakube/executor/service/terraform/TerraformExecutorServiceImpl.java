@@ -4,6 +4,7 @@ import com.diogonunes.jcolor.AnsiFormat;
 import io.terrakube.executor.service.logs.LogsConsumer;
 import io.terrakube.executor.service.logs.LogsService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.TextStringBuilder;
@@ -31,7 +32,6 @@ import static com.diogonunes.jcolor.Ansi.colorize;
 import static com.diogonunes.jcolor.Attribute.*;
 import static io.terrakube.executor.service.workspace.SetupWorkspaceImpl.SSH_DIRECTORY;
 
-@AllArgsConstructor
 @Slf4j
 @Service
 public class TerraformExecutorServiceImpl implements TerraformExecutor {
@@ -42,8 +42,17 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     TerraformState terraformState;
     ScriptEngineService scriptEngineService;
     RedisTemplate redisTemplate;
-
+    boolean enableColorOutput;
     LogsService logsService;
+
+    public TerraformExecutorServiceImpl(TerraformClient terraformClient, TerraformState terraformState, ScriptEngineService scriptEngineService, LogsService logsService, @Value("${io.terrakube.terraform.flags.enableColor}") boolean enableColorOutput) {
+        this.terraformClient = terraformClient;
+        this.terraformState = terraformState;
+        this.scriptEngineService = scriptEngineService;
+        this.redisTemplate = redisTemplate;
+        this.logsService = logsService;
+        this.enableColorOutput = enableColorOutput;
+    }
 
     private void setupConsumerGroups(String jobId) {
         try {
@@ -403,7 +412,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     }
 
     private void initBanner(TerraformJob terraformJob, Consumer<String> output) {
-        AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
+        AnsiFormat colorMessage = enableColorOutput ? new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD()) : new AnsiFormat(WHITE_TEXT(), BLACK_BACK(), BOLD());
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
         output.accept(
                 colorize("Initializing Terrakube Job " + terraformJob.getJobId() + " Step " + terraformJob.getStepId(),
@@ -418,7 +427,7 @@ public class TerraformExecutorServiceImpl implements TerraformExecutor {
     }
 
     private void showTerraformMessage(TerraformJob terraformJob, String operation, Consumer<String> output) throws InterruptedException {
-        AnsiFormat colorMessage = new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD());
+        AnsiFormat colorMessage = enableColorOutput ? new AnsiFormat(GREEN_TEXT(), BLACK_BACK(), BOLD()) : new AnsiFormat(WHITE_TEXT(), BLACK_BACK(), BOLD());
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
         output.accept(colorize(String.format("Running %s ",getIaCType(terraformJob)) + operation, colorMessage));
         output.accept(colorize(STEP_SEPARATOR, colorMessage));
