@@ -69,7 +69,7 @@ public class WebhookService {
                 break;
             case GITLAB:
                 webhookResult = gitLabWebhookService.processWebhook(jsonPayload, headers,
-                        base64WorkspaceId);
+                        base64WorkspaceId, workspace);
                 break;
             case BITBUCKET:
                 webhookResult = bitBucketWebhookService.processWebhook(jsonPayload, headers,
@@ -130,7 +130,7 @@ public class WebhookService {
                 webhookRemoteId = gitHubWebhookService.createOrUpdateWebhook(workspace, webhook);
                 break;
             case GITLAB:
-                webhookRemoteId = gitLabWebhookService.createWebhook(workspace, webhook.getId().toString());
+                webhookRemoteId = gitLabWebhookService.createOrUpdateWebhook(workspace, webhook);
                 break;
             case BITBUCKET:
                 webhookRemoteId = bitBucketWebhookService.createWebhook(workspace, webhook.getId().toString());
