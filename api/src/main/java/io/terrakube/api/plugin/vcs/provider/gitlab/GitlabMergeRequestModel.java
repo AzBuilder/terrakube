@@ -22,6 +22,7 @@ public class GitlabMergeRequestModel {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ObjectAttributes {
         private Long id;
+        private Long iid;
         private String title;
         private String description;
         private String state;

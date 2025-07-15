@@ -125,7 +125,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
     private WebhookResult handleMergeRequestEvent(WebhookResult result, String jsonPayload, Workspace workspace) throws IOException, InterruptedException {
         String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
-        result.setEvent("pull_request");
+        result.setEvent("pull_request"); // hard coded pull_request to change the type from gitlab that is merge_request
         try {
             GitlabMergeRequestModel mrModel = objectMapper.readValue(jsonPayload, GitlabMergeRequestModel.class);
 
@@ -144,7 +144,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
                     result.setFileChanges(
                             getFileChanges(
-                                mrModel.getObjectAttributes().getId().toString(),
+                                mrModel.getObjectAttributes().getIid().toString(),
                                 getGitlabProjectId(ownerAndRepo, workspace.getVcs().getAccessToken(), workspace.getVcs().getApiUrl()),
                                 workspace.getVcs().getAccessToken(),
                                 workspace.getVcs().getApiUrl()
@@ -176,6 +176,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
                     .defaultHeader("Content-Type", "application/json")
                     .build();
 
+            log.info("Fetching MR changes for merge request {} in project {}", mergeRequestId, projectId);
             String diffContentGitlab = webClient.get()
                     .uri("/projects/{id}/merge_requests/{mergeRequestId}/raw_diffs", projectId, mergeRequestId)
                     .retrieve()
