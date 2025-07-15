@@ -111,7 +111,10 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
             } else if (event.equals("merge_request")) {
                 return handleMergeRequestEvent(result, jsonPayload, workspace);
+            } else if (event.equals("release")) {
+                return handleReleaseEvent(result, jsonPayload);
             }
+
 
         } catch (JsonProcessingException e) {
             log.error("Error parsing JSON payload", e);
@@ -136,7 +139,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
                 case "update":
                     log.info("New merge request {}: {}", action, mrModel.getObjectAttributes().getTitle());
                     result.setBranch(mrModel.getObjectAttributes().getSourceBranch());
-                    result.setCreatedBy(mrModel.getUser().getEmail());
+                    result.setCreatedBy("system");
 
                     if (mrModel.getObjectAttributes().getLastCommit() != null) {
                         result.setCommit(mrModel.getObjectAttributes().getLastCommit().getId());
@@ -165,6 +168,39 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
         return result;
     }
+
+    private WebhookResult handleReleaseEvent(WebhookResult result, String jsonPayload) {
+        try {
+            GitlabReleaseModel releaseModel = objectMapper.readValue(jsonPayload, GitlabReleaseModel.class);
+
+            String action = releaseModel.getAction();
+            String tagName = releaseModel.getTag();
+            String releaseName = releaseModel.getName();
+
+            log.info("Processing GitLab release event: {} - {} (tag: {})", action, releaseName, tagName);
+
+            result.setBranch(tagName);
+            result.setCreatedBy("system");
+
+            switch (action) {
+                case "create":
+                    log.info("New release created: {} with tag {}", releaseName, tagName);
+                    result.setEvent("release");
+                    result.setValid(true);
+                    result.setRelease(true);
+                    result.setBranch(releaseName);
+                    break;
+                default:
+                    log.info("Release action '{}' for: {} not specifically handled", action, releaseName);
+            }
+
+        } catch (JsonProcessingException e) {
+            log.error("Error parsing release event payload: {}", e.getMessage());
+        }
+
+        return result;
+    }
+
 
     private List<String> getFileChanges(String mergeRequestId, String projectId, String accessToken, String apiUrl) {
         List<String> fileChanges = new ArrayList<>();
@@ -223,7 +259,7 @@ public class GitLabWebhookService extends WebhookServiceBase {
 
         // Create the body
         String body = "{\"url\":\"" + webhookUrl
-                + "\",\"push_events\":\"true\", \"merge_requests_events\": \"true\", \"enable_ssl_verification\":\"false\",\"token\":\"" + secret + "\"}";
+                + "\",\"push_events\":\"true\", \"merge_requests_events\": \"true\", \"releases_events\": true, \"enable_ssl_verification\":\"false\",\"token\":\"" + secret + "\"}";
 
         log.info(body);
         // Create the entity
