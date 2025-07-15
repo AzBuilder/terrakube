@@ -355,8 +355,11 @@ public class GitLabWebhookService extends WebhookServiceBase {
             } else {
                 log.warn("Failed to delete webhook with remote hook id {} on repository {}, message {}", webhookRemoteId, ownerAndRepo, response.getBody());
             }
-        } catch (Exception e) {
-            log.error("Failed to delete webhook with remote hook id {} on repository {}: {}", webhookRemoteId, workspace.getSource(), e.getMessage());
+        } catch (IOException e) {
+            log.error("Failed to delete webhook IOException with remote hook id {} on repository {}: {}", webhookRemoteId, workspace.getSource(), e.getMessage());
+        } catch (InterruptedException ex) {
+            log.error("Failed to delete webhook InterruptedException with remote hook id {} on repository {}: {}", webhookRemoteId, workspace.getSource(), ex.getMessage());
+            Thread.currentThread().interrupt();
         }
     }
 
