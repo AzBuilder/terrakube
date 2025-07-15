@@ -344,14 +344,19 @@ public class GitLabWebhookService extends WebhookServiceBase {
     }
 
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
-        String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
-        String apiUrl = workspace.getVcs().getApiUrl() + "/projects/" + ownerAndRepo + "/hooks/" + webhookRemoteId;
+        try {
+            String ownerAndRepo = extractOwnerAndRepoGitlab(workspace.getSource());
+            String projectId = getGitlabProjectId(ownerAndRepo, workspace.getVcs().getAccessToken(), workspace.getVcs().getApiUrl());
+            String apiUrl = workspace.getVcs().getApiUrl() + "/projects/" + projectId + "/hooks/" + webhookRemoteId;
 
-        ResponseEntity<String> response = callGitlabApi(workspace.getVcs().getAccessToken(), "", apiUrl, HttpMethod.DELETE);
-        if (response.getStatusCode().value() == 204) {
-            log.info("Webhook with remote hook id {} on repository {} deleted successfully", webhookRemoteId, ownerAndRepo);
-        } else {
-            log.warn("Failed to delete webhook with remote hook id {} on repository {}, message {}", webhookRemoteId, ownerAndRepo, response.getBody());
+            ResponseEntity<String> response = callGitlabApi(workspace.getVcs().getAccessToken(), "", apiUrl, HttpMethod.DELETE);
+            if (response.getStatusCode().value() == 204) {
+                log.info("Webhook with remote hook id {} on repository {} deleted successfully", webhookRemoteId, ownerAndRepo);
+            } else {
+                log.warn("Failed to delete webhook with remote hook id {} on repository {}, message {}", webhookRemoteId, ownerAndRepo, response.getBody());
+            }
+        } catch (Exception e) {
+            log.error("Failed to delete webhook with remote hook id {} on repository {}: {}", webhookRemoteId, workspace.getSource(), e.getMessage());
         }
     }
 
