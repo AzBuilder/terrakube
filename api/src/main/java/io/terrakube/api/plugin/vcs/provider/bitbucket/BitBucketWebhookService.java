@@ -151,6 +151,9 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             // Extract commit information if available
             String commit = releaseNode.path("target").path("hash").asText();
             result.setCommit(commit);
+
+            result.setValid(true);
+            result.setRelease(true);
             
             log.info("Bitbucket release event processed for tag: {}", tagName);
         } catch (Exception e) {
