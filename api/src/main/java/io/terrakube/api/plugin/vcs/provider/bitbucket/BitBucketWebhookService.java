@@ -59,8 +59,6 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             handlePushEvent(jsonPayload, result);
         } else if (result.getEvent().equals("pullrequest")) {
             handlePullRequestEvent(jsonPayload, result);
-        } else if (result.getEvent().equals("release")) {
-            handleReleaseEvent(jsonPayload, result);
         }
 
         return result;
@@ -72,6 +70,14 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             // Extract branch from the changes
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
             JsonNode changesNode = rootNode.path("push").path("changes").get(0);
+
+            // Check if this is a tag creation event
+            String changeType = changesNode.path("new").path("type").asText();
+            if ("tag".equals(changeType)) {
+                handleTagCreationEvent(jsonPayload, result);
+                return;
+            }
+
             String ref = changesNode.path("new").path("name").asText();
             result.setBranch(ref);
 
@@ -133,33 +139,43 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         }
     }
 
-    private void handleReleaseEvent(String jsonPayload, WebhookResult result) {
+    private void handleTagCreationEvent(String jsonPayload, WebhookResult result) {
         result.setEvent("release");
         try {
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
-            JsonNode releaseNode = rootNode.path("release");
-            
+            JsonNode changesNode = rootNode.path("push").path("changes").get(0);
+            JsonNode newNode = changesNode.path("new");
+
             // Extract tag name
-            String tagName = releaseNode.path("tag_name").asText();
+            String tagName = newNode.path("name").asText();
             result.setBranch(tagName);
             result.setRelease(true);
-            
-            // Extract the user who created the release
-            String author = releaseNode.path("author").path("display_name").asText();
-            result.setCreatedBy(author);
-            
-            // Extract commit information if available
-            String commit = releaseNode.path("target").path("hash").asText();
-            result.setCommit(commit);
+
+            // Extract the commit information from the target
+            JsonNode targetNode = newNode.path("target");
+            if (targetNode.has("hash")) {
+                String commit = targetNode.path("hash").asText();
+                result.setCommit(commit);
+            }
+
+            // Extract author information from the target
+            JsonNode authorNode = targetNode.path("author");
+            if (authorNode.has("raw")) {
+                String author = authorNode.path("raw").asText();
+                result.setCreatedBy(author);
+            } else if (authorNode.has("display_name")) {
+                String author = authorNode.path("display_name").asText();
+                result.setCreatedBy(author);
+            }
 
             result.setValid(true);
-            result.setRelease(true);
-            
-            log.info("Bitbucket release event processed for tag: {}", tagName);
+
+            log.info("Bitbucket tag creation event processed for tag: {}", tagName);
         } catch (Exception e) {
-            log.error("Error parsing release event JSON response", e);
+            log.error("Error parsing tag creation event JSON response", e);
             result.setBranch("");
         }
+
     }
 
     private List<String> getFileChanges(String diffFile, String workspaceId) {
@@ -210,7 +226,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
         // Create the body with support for push, pull request, and release events
         String body = "{\"description\":\"Terrakube\",\"url\":\"" + webhookUrl
-                + "\",\"active\":true,\"events\":[\"repo:push\",\"pullrequest:created\",\"pullrequest:updated\",\"repo:release\"],\"secret\":\"" + secret + "\"}";
+                + "\",\"active\":true,\"events\":[\"repo:push\",\"pullrequest:created\",\"pullrequest:updated\"],\"secret\":\"" + secret + "\"}";
 
         String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + String.join("/", ownerAndRepo) + "/hooks";
 
