@@ -56,40 +56,107 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         }
 
         if (result.getEvent().equals("push")) {
-            try {
-                // Extract branch from the changes
-                JsonNode rootNode = objectMapper.readTree(jsonPayload);
-                JsonNode changesNode = rootNode.path("push").path("changes").get(0);
-                String ref = changesNode.path("new").path("name").asText();
-                result.setBranch(ref);
-
-                // Extract the user who triggered the webhook
-                JsonNode authorNode = changesNode.path("new").path("target").path("author").path("raw");
-                String author = authorNode.asText();
-                result.setCreatedBy(author);
-
-                BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload,
-                        BitbucketTokenModel.class);
-                if (bitbucketTokenModel.getPush().getChanges().size() == 1) {
-                    log.info("Bitbucket commit: {}",
-                            bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
-                    log.info("Bitbucket diff file: {}",
-                            bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
-                    result.setCommit(
-                            bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
-                    result.setFileChanges(getFileChanges(
-                            bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(),
-                            result.getWorkspaceId()));
-                } else {
-                    log.error("Bitbucket webhook with more than 1 changes is not supported");
-                }
-            } catch (Exception e) {
-                log.error("Error parsing JSON response", e);
-                result.setBranch("");
-            }
+            handlePushEvent(jsonPayload, result);
+        } else if (result.getEvent().equals("pullrequest")) {
+            handlePullRequestEvent(jsonPayload, result);
+        } else if (result.getEvent().equals("release")) {
+            handleReleaseEvent(jsonPayload, result);
         }
 
         return result;
+    }
+
+    private void handlePushEvent(String jsonPayload, WebhookResult result) {
+        result.setEvent("push");
+        try {
+            // Extract branch from the changes
+            JsonNode rootNode = objectMapper.readTree(jsonPayload);
+            JsonNode changesNode = rootNode.path("push").path("changes").get(0);
+            String ref = changesNode.path("new").path("name").asText();
+            result.setBranch(ref);
+
+            // Extract the user who triggered the webhook
+            JsonNode authorNode = changesNode.path("new").path("target").path("author").path("raw");
+            String author = authorNode.asText();
+            result.setCreatedBy(author);
+
+            BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload,
+                    BitbucketTokenModel.class);
+            if (bitbucketTokenModel.getPush().getChanges().size() == 1) {
+                log.info("Bitbucket commit: {}",
+                        bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
+                log.info("Bitbucket diff file: {}",
+                        bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
+                result.setCommit(
+                        bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
+                result.setFileChanges(getFileChanges(
+                        bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(),
+                        result.getWorkspaceId()));
+            } else {
+                log.error("Bitbucket webhook with more than 1 changes is not supported");
+            }
+        } catch (Exception e) {
+            log.error("Error parsing push event JSON response", e);
+            result.setBranch("");
+        }
+    }
+
+    private void handlePullRequestEvent(String jsonPayload, WebhookResult result) {
+        result.setEvent("pull_request");
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonPayload);
+            JsonNode pullRequestNode = rootNode.path("pullrequest");
+            
+            // Extract source branch
+            String sourceBranch = pullRequestNode.path("source").path("branch").path("name").asText();
+            result.setBranch(sourceBranch);
+            
+            // Extract the user who created the pull request
+            String author = pullRequestNode.path("author").path("display_name").asText();
+            result.setCreatedBy(author);
+            
+            // Extract commit information
+            String commit = pullRequestNode.path("source").path("commit").path("hash").asText();
+            result.setCommit(commit);
+            
+            // For pull requests, we can try to get the diff URL if available
+            JsonNode linksNode = pullRequestNode.path("links");
+            if (linksNode.has("diff")) {
+                String diffUrl = linksNode.path("diff").path("href").asText();
+                result.setFileChanges(getFileChanges(diffUrl, result.getWorkspaceId()));
+            }
+            
+            log.info("Bitbucket pull request event processed for branch: {}", sourceBranch);
+        } catch (Exception e) {
+            log.error("Error parsing pull request event JSON response", e);
+            result.setBranch("");
+        }
+    }
+
+    private void handleReleaseEvent(String jsonPayload, WebhookResult result) {
+        result.setEvent("release");
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonPayload);
+            JsonNode releaseNode = rootNode.path("release");
+            
+            // Extract tag name
+            String tagName = releaseNode.path("tag_name").asText();
+            result.setBranch(tagName);
+            result.setRelease(true);
+            
+            // Extract the user who created the release
+            String author = releaseNode.path("author").path("display_name").asText();
+            result.setCreatedBy(author);
+            
+            // Extract commit information if available
+            String commit = releaseNode.path("target").path("hash").asText();
+            result.setCommit(commit);
+            
+            log.info("Bitbucket release event processed for tag: {}", tagName);
+        } catch (Exception e) {
+            log.error("Error parsing release event JSON response", e);
+            result.setBranch("");
+        }
     }
 
     private List<String> getFileChanges(String diffFile, String workspaceId) {
@@ -138,10 +205,9 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
         String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
 
-        // Create the body, in this version we only support push event but in future we
-        // can make this more dynamic
+        // Create the body with support for push, pull request, and release events
         String body = "{\"description\":\"Terrakube\",\"url\":\"" + webhookUrl
-                + "\",\"active\":true,\"events\":[\"repo:push\"],\"secret\":\"" + secret + "\"}";
+                + "\",\"active\":true,\"events\":[\"repo:push\",\"pullrequest:created\",\"pullrequest:updated\",\"repo:release\"],\"secret\":\"" + secret + "\"}";
 
         String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + String.join("/", ownerAndRepo) + "/hooks";
 
@@ -158,7 +224,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                 log.error("Error parsing JSON response", e);
             }
 
-            log.info("GitHub Hook created successfully for workspace {}/{} with id {}",
+            log.info("Bitbucket Hook created successfully for workspace {}/{} with id {}",
                     workspace.getOrganization().getName(), workspace.getName(), id);
         } else {
             log.error("Error creating the webhook" + response.getBody());
