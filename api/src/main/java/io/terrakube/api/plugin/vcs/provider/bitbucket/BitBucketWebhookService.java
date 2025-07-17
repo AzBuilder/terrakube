@@ -46,6 +46,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
     private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers) {
         // Extract event
         String event = headers.get("x-event-key");
+        log.info("Bitbucket event: {}", event);
         if (event != null) {
             String[] parts = event.split(":");
             if (parts.length > 1) {
@@ -56,15 +57,18 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         }
 
         if (result.getEvent().equals("push")) {
-            handlePushEvent(jsonPayload, result);
+            return handlePushEvent(jsonPayload, result);
         } else if (result.getEvent().equals("pullrequest")) {
-            handlePullRequestEvent(jsonPayload, result);
+            return handlePullRequestEvent(jsonPayload, result);
+        } else {
+            log.error("Unsupported Bitbucket event: {}", result.getEvent());
+            result.setValid(false);
         }
 
         return result;
     }
 
-    private void handlePushEvent(String jsonPayload, WebhookResult result) {
+    private WebhookResult handlePushEvent(String jsonPayload, WebhookResult result) {
         result.setEvent("push");
         try {
             // Extract branch from the changes
@@ -73,17 +77,17 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
             // Check if this is a tag creation event
             String changeType = changesNode.path("new").path("type").asText();
+            log.info("Bitbucket change type is empty: {}", changeType.isEmpty());
             if ("tag".equals(changeType)) {
-                handleTagCreationEvent(jsonPayload, result);
-                return;
+                return handleTagCreationEvent(jsonPayload, result);
             }
 
             String ref = changesNode.path("new").path("name").asText();
             result.setBranch(ref);
 
-            // Extract the user who triggered the webhook
             JsonNode authorNode = changesNode.path("new").path("target").path("author").path("raw");
             String author = authorNode.asText();
+            author = author.substring(author.indexOf("<") + 1, author.indexOf(">"));
             result.setCreatedBy(author);
 
             BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload,
@@ -105,9 +109,11 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             log.error("Error parsing push event JSON response", e);
             result.setBranch("");
         }
+
+        return result;
     }
 
-    private void handlePullRequestEvent(String jsonPayload, WebhookResult result) {
+    private WebhookResult handlePullRequestEvent(String jsonPayload, WebhookResult result) {
         result.setEvent("pull_request");
         try {
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
@@ -116,16 +122,12 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             // Extract source branch
             String sourceBranch = pullRequestNode.path("source").path("branch").path("name").asText();
             result.setBranch(sourceBranch);
-            
-            // Extract the user who created the pull request
-            String author = pullRequestNode.path("author").path("display_name").asText();
-            result.setCreatedBy(author);
-            
-            // Extract commit information
+
+            result.setCreatedBy("no-reply@terrakube.io");
+
             String commit = pullRequestNode.path("source").path("commit").path("hash").asText();
             result.setCommit(commit);
-            
-            // For pull requests, we can try to get the diff URL if available
+
             JsonNode linksNode = pullRequestNode.path("links");
             if (linksNode.has("diff")) {
                 String diffUrl = linksNode.path("diff").path("href").asText();
@@ -137,35 +139,34 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             log.error("Error parsing pull request event JSON response", e);
             result.setBranch("");
         }
+
+        return result;
     }
 
-    private void handleTagCreationEvent(String jsonPayload, WebhookResult result) {
+    private WebhookResult handleTagCreationEvent(String jsonPayload, WebhookResult result) {
         result.setEvent("release");
         try {
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
             JsonNode changesNode = rootNode.path("push").path("changes").get(0);
             JsonNode newNode = changesNode.path("new");
 
-            // Extract tag name
             String tagName = newNode.path("name").asText();
             result.setBranch(tagName);
             result.setRelease(true);
 
-            // Extract the commit information from the target
             JsonNode targetNode = newNode.path("target");
             if (targetNode.has("hash")) {
                 String commit = targetNode.path("hash").asText();
                 result.setCommit(commit);
             }
 
-            // Extract author information from the target
             JsonNode authorNode = targetNode.path("author");
             if (authorNode.has("raw")) {
                 String author = authorNode.path("raw").asText();
+                author = author.substring(author.indexOf("<") + 1, author.indexOf(">")); //extract email only
                 result.setCreatedBy(author);
-            } else if (authorNode.has("display_name")) {
-                String author = authorNode.path("display_name").asText();
-                result.setCreatedBy(author);
+            } else {
+                result.setCreatedBy("Unknown");
             }
 
             result.setValid(true);
@@ -175,7 +176,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             log.error("Error parsing tag creation event JSON response", e);
             result.setBranch("");
         }
-
+        return result;
     }
 
     private List<String> getFileChanges(String diffFile, String workspaceId) {
