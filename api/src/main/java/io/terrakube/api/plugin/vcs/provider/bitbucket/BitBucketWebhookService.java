@@ -47,18 +47,10 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         // Extract event
         String event = headers.get("x-event-key");
         log.info("Bitbucket event: {}", event);
-        if (event != null) {
-            String[] parts = event.split(":");
-            if (parts.length > 1) {
-                result.setEvent(parts[1]); // Set the second part of the split string
-            } else {
-                result.setEvent(event); // If there's no ":", set the whole event
-            }
-        }
 
-        if (result.getEvent().equals("push")) {
+        if (event.equals("push")) {
             return handlePushEvent(jsonPayload, result);
-        } else if (result.getEvent().equals("pullrequest:created")) {
+        } else if (event.equals("pullrequest:created")) {
             return handlePullRequestEvent(jsonPayload, result);
         } else {
             log.error("Unsupported Bitbucket event: {}", result.getEvent());
