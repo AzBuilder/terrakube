@@ -1,6 +1,7 @@
 package io.terrakube.api.plugin.vcs.provider.bitbucket;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.terrakube.api.rs.webhook.Webhook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,8 +21,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
@@ -230,39 +229,44 @@ public class BitBucketWebhookService extends WebhookServiceBase {
     }
 
 
-    public String createWebhook(Workspace workspace, String webhookId) {
-        String id = "";
-        String secret = Base64.getEncoder()
-                .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
-        String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
-        String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhookId);
+    public String createOrUpdateWebhook(Workspace workspace, Webhook webhook) {
+        String remoteHookId = webhook.getRemoteHookId();
+        if (remoteHookId == null || remoteHookId.isEmpty()) {
+            String secret = Base64.getEncoder()
+                    .encodeToString(workspace.getId().toString().getBytes(StandardCharsets.UTF_8));
+            String[] ownerAndRepo = extractOwnerAndRepo(workspace.getSource());
+            String webhookUrl = String.format("https://%s/webhook/v1/%s", hostname, webhook.getId().toString());
 
-        // Create the body with support for push, pull request, and release events
-        String body = "{\"description\":\"Terrakube\",\"url\":\"" + webhookUrl
-                + "\",\"active\":true,\"events\":[\"repo:push\",\"pullrequest:created\",\"pullrequest:updated\"],\"secret\":\"" + secret + "\"}";
+            // Create the body with support for push, pull request, and release events
+            String body = "{\"description\":\"Terrakube\",\"url\":\"" + webhookUrl
+                    + "\",\"active\":true,\"events\":[\"repo:push\",\"pullrequest:created\",\"pullrequest:updated\"],\"secret\":\"" + secret + "\"}";
 
-        String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + String.join("/", ownerAndRepo) + "/hooks";
+            String apiUrl = workspace.getVcs().getApiUrl() + "/repositories/" + String.join("/", ownerAndRepo) + "/hooks";
 
-        ResponseEntity<String> response = callBitBucketApi(workspace.getVcs().getAccessToken(), body, apiUrl,
-                HttpMethod.POST);
+            ResponseEntity<String> response = callBitBucketApi(workspace.getVcs().getAccessToken(), body, apiUrl,
+                    HttpMethod.POST);
 
-        // Extract the id from the response
-        if (response.getStatusCode().value() == 201) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                JsonNode rootNode = objectMapper.readTree(response.getBody());
-                id = rootNode.path("uuid").asText();
-            } catch (Exception e) {
-                log.error("Error parsing JSON response", e);
+            // Extract the id from the response
+            if (response.getStatusCode().value() == 201) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    JsonNode rootNode = objectMapper.readTree(response.getBody());
+                    remoteHookId = rootNode.path("uuid").asText();
+                } catch (Exception e) {
+                    log.error("Error parsing JSON response", e);
+                }
+
+                log.info("Bitbucket Hook created successfully for workspace {}/{} with id {}",
+                        workspace.getOrganization().getName(), workspace.getName(), remoteHookId);
+            } else {
+                log.error("Error creating the webhook" + response.getBody());
             }
-
-            log.info("Bitbucket Hook created successfully for workspace {}/{} with id {}",
-                    workspace.getOrganization().getName(), workspace.getName(), id);
         } else {
-            log.error("Error creating the webhook" + response.getBody());
+            log.info("webhook already created. Updating webhook with remote hook id {}", remoteHookId);
         }
 
-        return id;
+
+        return remoteHookId;
     }
 
     public void deleteWebhook(Workspace workspace, String webhookRemoteId) {
