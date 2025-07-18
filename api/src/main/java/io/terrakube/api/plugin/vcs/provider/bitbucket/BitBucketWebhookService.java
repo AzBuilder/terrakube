@@ -178,6 +178,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             String accessToken = "Bearer "
                     + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
             URL urlBitbucketApi = new URL(diffFile);
+            //https://api.bitbucket.org/2.0/repositories/alfespa17/simple-terraform/diff/alfespa17/simple-terraform:383254320963%0Df7647c752c7e?from_pullrequest_id=6&topic=true
             log.info("Base URL: {}",
                     String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()));
             log.info("URI: {}", urlBitbucketApi.getPath());
@@ -186,8 +187,14 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                     .defaultHeader(HttpHeaders.AUTHORIZATION, accessToken)
                     .build();
 
+            // Build the complete URI with path and query parameters
+            String completeUri = urlBitbucketApi.getPath();
+            if (urlBitbucketApi.getQuery() != null && !urlBitbucketApi.getQuery().isEmpty()) {
+                completeUri += "?" + urlBitbucketApi.getQuery();
+            }
+
             String diffContent = webClient.get()
-                    .uri(urlBitbucketApi.getPath())
+                    .uri(completeUri)
                     .retrieve()
                     .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(10))
