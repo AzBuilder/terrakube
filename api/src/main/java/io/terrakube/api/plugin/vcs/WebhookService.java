@@ -133,7 +133,7 @@ public class WebhookService {
                 webhookRemoteId = gitLabWebhookService.createOrUpdateWebhook(workspace, webhook);
                 break;
             case BITBUCKET:
-                webhookRemoteId = bitBucketWebhookService.createWebhook(workspace, webhook.getId().toString());
+                webhookRemoteId = bitBucketWebhookService.createOrUpdateWebhook(workspace, webhook);
                 break;
             default:
                 break;
