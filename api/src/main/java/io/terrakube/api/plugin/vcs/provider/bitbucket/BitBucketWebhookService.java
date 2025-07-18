@@ -193,6 +193,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
                 completeUri += "?" + urlBitbucketApi.getQuery();
             }
 
+            log.info("Complete URI: {}", completeUri);
             String diffContent = webClient.get()
                     .uri(completeUri)
                     .retrieve()
