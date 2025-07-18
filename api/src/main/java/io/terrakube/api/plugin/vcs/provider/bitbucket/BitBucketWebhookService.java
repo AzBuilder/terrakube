@@ -1,5 +1,6 @@
 package io.terrakube.api.plugin.vcs.provider.bitbucket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,9 +16,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -43,14 +46,14 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         return handleWebhook(jsonPayload, headers, token, "x-hub-signature", "Bitbucket", this::handleEvent);
     }
 
-    private WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers) {
+    public WebhookResult handleEvent(String jsonPayload, WebhookResult result, Map<String, String> headers) {
         // Extract event
         String event = headers.get("x-event-key");
         log.info("Bitbucket event: {}", event);
 
         if (event.equals("repo:push")) {
             return handlePushEvent(jsonPayload, result);
-        } else if (event.equals("pullrequest:created")) {
+        } else if (event.equals("pullrequest:created") || event.equals("pullrequest:updated")) {
             return handlePullRequestEvent(jsonPayload, result);
         } else {
             log.error("Unsupported Bitbucket event: {}", result.getEvent());
@@ -69,37 +72,48 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
             // Check if this is a tag creation event
             String changeType = changesNode.path("new").path("type").asText();
+
             log.info("Bitbucket change type is empty: {}", changeType.isEmpty());
             if ("tag".equals(changeType)) {
                 return handleTagCreationEvent(jsonPayload, result);
-            }
-
-            String ref = changesNode.path("new").path("name").asText();
-            result.setBranch(ref);
-
-            JsonNode authorNode = changesNode.path("new").path("target").path("author").path("raw");
-            String author = authorNode.asText();
-            author = author.substring(author.indexOf("<") + 1, author.indexOf(">"));
-            result.setCreatedBy(author);
-
-            BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload,
-                    BitbucketTokenModel.class);
-            if (bitbucketTokenModel.getPush().getChanges().size() == 1) {
-                log.info("Bitbucket commit: {}",
-                        bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
-                log.info("Bitbucket diff file: {}",
-                        bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
-                result.setCommit(
-                        bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
-                result.setFileChanges(getFileChanges(
-                        bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(),
-                        result.getWorkspaceId()));
+            } else if ("commit".equals(changeType)) {
+                return handlePushCommit(jsonPayload, result, changesNode);
             } else {
-                log.error("Bitbucket webhook with more than 1 changes is not supported");
+                log.error("Unsupported Bitbucket change type: {}", changeType);
+                result.setBranch("");
             }
+
         } catch (Exception e) {
             log.error("Error parsing push event JSON response", e);
             result.setBranch("");
+        }
+
+        return result;
+    }
+
+    private WebhookResult handlePushCommit(String jsonPayload, WebhookResult result, JsonNode changesNode) throws JsonProcessingException {
+        String ref = changesNode.path("new").path("name").asText();
+        result.setBranch(ref);
+
+        JsonNode authorNode = changesNode.path("new").path("target").path("author").path("raw");
+        String author = authorNode.asText();
+        author = author.substring(author.indexOf("<") + 1, author.indexOf(">"));
+        result.setCreatedBy(author);
+
+        BitbucketTokenModel bitbucketTokenModel = new ObjectMapper().readValue(jsonPayload,
+                BitbucketTokenModel.class);
+        if (bitbucketTokenModel.getPush().getChanges().size() == 1) {
+            log.info("Bitbucket commit: {}",
+                    bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
+            log.info("Bitbucket diff file: {}",
+                    bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref());
+            result.setCommit(
+                    bitbucketTokenModel.getPush().getChanges().get(0).getNewCommit().getTarget().getHash());
+            result.setFileChanges(getFileChanges(
+                    bitbucketTokenModel.getPush().getChanges().get(0).getLinks().getDiff().getHref(),
+                    result.getWorkspaceId()));
+        } else {
+            log.error("Bitbucket webhook with more than 1 changes is not supported");
         }
 
         return result;
@@ -110,8 +124,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         try {
             JsonNode rootNode = objectMapper.readTree(jsonPayload);
             JsonNode pullRequestNode = rootNode.path("pullrequest");
-            
-            // Extract source branch
+
             String sourceBranch = pullRequestNode.path("source").path("branch").path("name").asText();
             result.setBranch(sourceBranch);
 
@@ -177,26 +190,16 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         try {
             String accessToken = "Bearer "
                     + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
-            URL urlBitbucketApi = new URL(diffFile);
-            log.info("Bitbucket diff file: {}", diffFile);
-            //https://api.bitbucket.org/2.0/repositories/alfespa17/simple-terraform/diff/alfespa17/simple-terraform:383254320963%0Df7647c752c7e?from_pullrequest_id=6&topic=true
-            log.info("Base URL: {}",
-                    String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()));
-            log.info("URI: {}", urlBitbucketApi.getPath());
+
             WebClient webClient = WebClient.builder()
-                    .baseUrl(String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()))
+                    .uriBuilderFactory(createNoEncodingUriBuilderFactory())
                     .defaultHeader(HttpHeaders.AUTHORIZATION, accessToken)
                     .build();
 
-            // Build the complete URI with path and query parameters
-            String completeUri = urlBitbucketApi.getPath();
-            if (urlBitbucketApi.getQuery() != null && !urlBitbucketApi.getQuery().isEmpty()) {
-                completeUri += "?" + urlBitbucketApi.getQuery();
-            }
+            log.info("Bitbucket diff: {}", diffFile);
 
-            log.info("Complete URI: {}", completeUri);
             String diffContent = webClient.get()
-                    .uri(completeUri)
+                    .uri(diffFile)
                     .retrieve()
                     .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(10))
@@ -218,6 +221,13 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
         return fileChanges;
     }
+
+    private DefaultUriBuilderFactory createNoEncodingUriBuilderFactory() {
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
+        return factory;
+    }
+
 
     public String createWebhook(Workspace workspace, String webhookId) {
         String id = "";
