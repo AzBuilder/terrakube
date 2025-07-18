@@ -48,7 +48,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
         String event = headers.get("x-event-key");
         log.info("Bitbucket event: {}", event);
 
-        if (event.equals("push")) {
+        if (event.equals("repo:push")) {
             return handlePushEvent(jsonPayload, result);
         } else if (event.equals("pullrequest:created")) {
             return handlePullRequestEvent(jsonPayload, result);
@@ -178,6 +178,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
             String accessToken = "Bearer "
                     + workspaceRepository.findById(UUID.fromString(workspaceId)).get().getVcs().getAccessToken();
             URL urlBitbucketApi = new URL(diffFile);
+            log.info("Bitbucket diff file: {}", diffFile);
             //https://api.bitbucket.org/2.0/repositories/alfespa17/simple-terraform/diff/alfespa17/simple-terraform:383254320963%0Df7647c752c7e?from_pullrequest_id=6&topic=true
             log.info("Base URL: {}",
                     String.format("%s://%s", urlBitbucketApi.getProtocol(), urlBitbucketApi.getHost()));
