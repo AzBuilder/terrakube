@@ -58,7 +58,7 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
         if (result.getEvent().equals("push")) {
             return handlePushEvent(jsonPayload, result);
-        } else if (result.getEvent().equals("pullrequest")) {
+        } else if (result.getEvent().equals("pullrequest:created")) {
             return handlePullRequestEvent(jsonPayload, result);
         } else {
             log.error("Unsupported Bitbucket event: {}", result.getEvent());
