@@ -816,13 +816,12 @@ class VcsTests extends ServerApplicationTests{
                 "   \"push\":{\n" +
                 "      \"changes\":[\n" +
                 "         {\n" +
-                "            \"old\":null,\n" +
-                "            \"new\":{\n" +
-                "               \"name\":\"dummyuser/maintf-edited-online-with-bitbucket-1752695846323\",\n" +
+                "            \"old\":{\n" +
+                "               \"name\":\"main\",\n" +
                 "               \"target\":{\n" +
                 "                  \"type\":\"commit\",\n" +
-                "                  \"hash\":\"53580d154140650af84b438d6d7b99f33740441b\",\n" +
-                "                  \"date\":\"2025-07-16T19:57:29+00:00\",\n" +
+                "                  \"hash\":\"71085ceb4314ac77d1a36ab687b3e067814c9395\",\n" +
+                "                  \"date\":\"2025-07-18T21:09:50+00:00\",\n" +
                 "                  \"author\":{\n" +
                 "                     \"type\":\"author\",\n" +
                 "                     \"raw\":\"dummyuser <dummyuser@gmail.com>\",\n" +
@@ -857,21 +856,21 @@ class VcsTests extends ServerApplicationTests{
                 "                  },\n" +
                 "                  \"links\":{\n" +
                 "                     \"self\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/53580d154140650af84b438d6d7b99f33740441b\"\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
                 "                     },\n" +
                 "                     \"html\":{\n" +
-                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/53580d154140650af84b438d6d7b99f33740441b\"\n" +
+                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
                 "                     }\n" +
                 "                  },\n" +
                 "                  \"parents\":[\n" +
                 "                     {\n" +
-                "                        \"hash\":\"f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\",\n" +
+                "                        \"hash\":\"fc3154e151fea0ca3ae2c4e6f8fbffe54a5a8568\",\n" +
                 "                        \"links\":{\n" +
                 "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
+                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/fc3154e151fea0ca3ae2c4e6f8fbffe54a5a8568\"\n" +
                 "                           },\n" +
                 "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
+                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/fc3154e151fea0ca3ae2c4e6f8fbffe54a5a8568\"\n" +
                 "                           }\n" +
                 "                        },\n" +
                 "                        \"type\":\"commit\"\n" +
@@ -886,16 +885,16 @@ class VcsTests extends ServerApplicationTests{
                 "               },\n" +
                 "               \"links\":{\n" +
                 "                  \"self\":{\n" +
-                "                     \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/refs/branches/dummyuser/maintf-edited-online-with-bitbucket-1752695846323\"\n" +
+                "                     \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/refs/branches/main\"\n" +
                 "                  },\n" +
                 "                  \"commits\":{\n" +
-                "                     \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commits/dummyuser/maintf-edited-online-with-bitbucket-1752695846323\"\n" +
+                "                     \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commits/main\"\n" +
                 "                  },\n" +
                 "                  \"html\":{\n" +
-                "                     \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/branch/dummyuser/maintf-edited-online-with-bitbucket-1752695846323\"\n" +
+                "                     \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/branch/main\"\n" +
                 "                  },\n" +
                 "                  \"pullrequest_create\":{\n" +
-                "                     \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/pull-requests/new?source=dummyuser/maintf-edited-online-with-bitbucket-1752695846323&t=1\"\n" +
+                "                     \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/pull-requests/new?source=main&t=1\"\n" +
                 "                  }\n" +
                 "               },\n" +
                 "               \"type\":\"branch\",\n" +
@@ -913,23 +912,122 @@ class VcsTests extends ServerApplicationTests{
                 "               ],\n" +
                 "               \"default_merge_strategy\":\"merge_commit\"\n" +
                 "            },\n" +
-                "            \"truncated\":true,\n" +
-                "            \"created\":true,\n" +
+                "            \"new\":{\n" +
+                "               \"name\":\"main\",\n" +
+                "               \"target\":{\n" +
+                "                  \"type\":\"commit\",\n" +
+                "                  \"hash\":\"c7eae9b0c5450123c943a4baf7c357fc2564c316\",\n" +
+                "                  \"date\":\"2025-07-18T21:20:52+00:00\",\n" +
+                "                  \"author\":{\n" +
+                "                     \"type\":\"author\",\n" +
+                "                     \"raw\":\"dummyuser <dummyuser@gmail.com>\",\n" +
+                "                     \"user\":{\n" +
+                "                        \"display_name\":\"dummyuser\",\n" +
+                "                        \"links\":{\n" +
+                "                           \"self\":{\n" +
+                "                              \"href\":\"http://localhost:9999/2.0/users/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D\"\n" +
+                "                           },\n" +
+                "                           \"avatar\":{\n" +
+                "                              \"href\":\"https://secure.gravatar.com/avatar/629e77d25d888fc2115bd7626ae004f2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAE-4.png\"\n" +
+                "                           },\n" +
+                "                           \"html\":{\n" +
+                "                              \"href\":\"https://bitbucket.org/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D/\"\n" +
+                "                           }\n" +
+                "                        },\n" +
+                "                        \"type\":\"user\",\n" +
+                "                        \"uuid\":\"{ed8beedc-3d28-4a7d-9ff3-de5dccead5f1}\",\n" +
+                "                        \"account_id\":\"557058:807b67c7-225d-4ed1-b3e0-1e044e0c07af\",\n" +
+                "                        \"nickname\":\"dummyuser\"\n" +
+                "                     }\n" +
+                "                  },\n" +
+                "                  \"committer\":{\n" +
+                "                     \n" +
+                "                  },\n" +
+                "                  \"message\":\"main.tf edited online with Bitbucket\",\n" +
+                "                  \"summary\":{\n" +
+                "                     \"type\":\"rendered\",\n" +
+                "                     \"raw\":\"main.tf edited online with Bitbucket\",\n" +
+                "                     \"markup\":\"markdown\",\n" +
+                "                     \"html\":\"<p>main.tf edited online with Bitbucket</p>\"\n" +
+                "                  },\n" +
+                "                  \"links\":{\n" +
+                "                     \"self\":{\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/c7eae9b0c5450123c943a4baf7c357fc2564c316\"\n" +
+                "                     },\n" +
+                "                     \"html\":{\n" +
+                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/c7eae9b0c5450123c943a4baf7c357fc2564c316\"\n" +
+                "                     }\n" +
+                "                  },\n" +
+                "                  \"parents\":[\n" +
+                "                     {\n" +
+                "                        \"hash\":\"71085ceb4314ac77d1a36ab687b3e067814c9395\",\n" +
+                "                        \"links\":{\n" +
+                "                           \"self\":{\n" +
+                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
+                "                           },\n" +
+                "                           \"html\":{\n" +
+                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
+                "                           }\n" +
+                "                        },\n" +
+                "                        \"type\":\"commit\"\n" +
+                "                     }\n" +
+                "                  ],\n" +
+                "                  \"rendered\":{\n" +
+                "                     \n" +
+                "                  },\n" +
+                "                  \"properties\":{\n" +
+                "                     \n" +
+                "                  }\n" +
+                "               },\n" +
+                "               \"links\":{\n" +
+                "                  \"self\":{\n" +
+                "                     \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/refs/branches/main\"\n" +
+                "                  },\n" +
+                "                  \"commits\":{\n" +
+                "                     \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commits/main\"\n" +
+                "                  },\n" +
+                "                  \"html\":{\n" +
+                "                     \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/branch/main\"\n" +
+                "                  },\n" +
+                "                  \"pullrequest_create\":{\n" +
+                "                     \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/pull-requests/new?source=main&t=1\"\n" +
+                "                  }\n" +
+                "               },\n" +
+                "               \"type\":\"branch\",\n" +
+                "               \"merge_strategies\":[\n" +
+                "                  \"merge_commit\",\n" +
+                "                  \"squash\",\n" +
+                "                  \"fast_forward\",\n" +
+                "                  \"squash_fast_forward\",\n" +
+                "                  \"rebase_fast_forward\",\n" +
+                "                  \"rebase_merge\"\n" +
+                "               ],\n" +
+                "               \"sync_strategies\":[\n" +
+                "                  \"merge_commit\",\n" +
+                "                  \"rebase\"\n" +
+                "               ],\n" +
+                "               \"default_merge_strategy\":\"merge_commit\"\n" +
+                "            },\n" +
+                "            \"truncated\":false,\n" +
+                "            \"created\":false,\n" +
                 "            \"forced\":false,\n" +
                 "            \"closed\":false,\n" +
                 "            \"links\":{\n" +
                 "               \"commits\":{\n" +
-                "                  \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commits?include=53580d154140650af84b438d6d7b99f33740441b\"\n" +
+                "                  \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commits?include=c7eae9b0c5450123c943a4baf7c357fc2564c316&exclude=71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
+                "               },\n" +
+                "               \"diff\":{\n" +
+                "                  \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/diff/c7eae9b0c5450123c943a4baf7c357fc2564c316..71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
                 "               },\n" +
                 "               \"html\":{\n" +
-                "                  \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/branch/dummyuser/maintf-edited-online-with-bitbucket-1752695846323\"\n" +
+                "                  \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/branches/compare/c7eae9b0c5450123c943a4baf7c357fc2564c316..71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
                 "               }\n" +
                 "            },\n" +
                 "            \"commits\":[\n" +
                 "               {\n" +
                 "                  \"type\":\"commit\",\n" +
-                "                  \"hash\":\"53580d154140650af84b438d6d7b99f33740441b\",\n" +
-                "                  \"date\":\"2025-07-16T19:57:29+00:00\",\n" +
+                "                  \"hash\":\"c7eae9b0c5450123c943a4baf7c357fc2564c316\",\n" +
+                "                  \"date\":\"2025-07-18T21:20:52+00:00\",\n" +
                 "                  \"author\":{\n" +
                 "                     \"type\":\"author\",\n" +
                 "                     \"raw\":\"dummyuser <dummyuser@gmail.com>\",\n" +
@@ -964,356 +1062,36 @@ class VcsTests extends ServerApplicationTests{
                 "                  },\n" +
                 "                  \"links\":{\n" +
                 "                     \"self\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/53580d154140650af84b438d6d7b99f33740441b\"\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/c7eae9b0c5450123c943a4baf7c357fc2564c316\"\n" +
                 "                     },\n" +
                 "                     \"html\":{\n" +
-                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/53580d154140650af84b438d6d7b99f33740441b\"\n" +
+                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/c7eae9b0c5450123c943a4baf7c357fc2564c316\"\n" +
                 "                     },\n" +
                 "                     \"diff\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/diff/53580d154140650af84b438d6d7b99f33740441b\"\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/diff/c7eae9b0c5450123c943a4baf7c357fc2564c316\"\n" +
                 "                     },\n" +
                 "                     \"approve\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/53580d154140650af84b438d6d7b99f33740441b/approve\"\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/c7eae9b0c5450123c943a4baf7c357fc2564c316/approve\"\n" +
                 "                     },\n" +
                 "                     \"comments\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/53580d154140650af84b438d6d7b99f33740441b/comments\"\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/c7eae9b0c5450123c943a4baf7c357fc2564c316/comments\"\n" +
                 "                     },\n" +
                 "                     \"statuses\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/53580d154140650af84b438d6d7b99f33740441b/statuses\"\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/c7eae9b0c5450123c943a4baf7c357fc2564c316/statuses\"\n" +
                 "                     },\n" +
                 "                     \"patch\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/patch/53580d154140650af84b438d6d7b99f33740441b\"\n" +
+                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/patch/c7eae9b0c5450123c943a4baf7c357fc2564c316\"\n" +
                 "                     }\n" +
                 "                  },\n" +
                 "                  \"parents\":[\n" +
                 "                     {\n" +
-                "                        \"hash\":\"f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\",\n" +
+                "                        \"hash\":\"71085ceb4314ac77d1a36ab687b3e067814c9395\",\n" +
                 "                        \"links\":{\n" +
                 "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
+                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
                 "                           },\n" +
                 "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"commit\"\n" +
-                "                     }\n" +
-                "                  ],\n" +
-                "                  \"rendered\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"properties\":{\n" +
-                "                     \n" +
-                "                  }\n" +
-                "               },\n" +
-                "               {\n" +
-                "                  \"type\":\"commit\",\n" +
-                "                  \"hash\":\"f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\",\n" +
-                "                  \"date\":\"2024-01-19T17:25:41+00:00\",\n" +
-                "                  \"author\":{\n" +
-                "                     \"type\":\"author\",\n" +
-                "                     \"raw\":\"dummyuser <dummyuser@gmail.com>\",\n" +
-                "                     \"user\":{\n" +
-                "                        \"display_name\":\"dummyuser\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/users/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D\"\n" +
-                "                           },\n" +
-                "                           \"avatar\":{\n" +
-                "                              \"href\":\"https://secure.gravatar.com/avatar/629e77d25d888fc2115bd7626ae004f2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAE-4.png\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D/\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"user\",\n" +
-                "                        \"uuid\":\"{ed8beedc-3d28-4a7d-9ff3-de5dccead5f1}\",\n" +
-                "                        \"account_id\":\"557058:807b67c7-225d-4ed1-b3e0-1e044e0c07af\",\n" +
-                "                        \"nickname\":\"dummyuser\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"committer\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"message\":\"main.tf edited online with Bitbucket\",\n" +
-                "                  \"summary\":{\n" +
-                "                     \"type\":\"rendered\",\n" +
-                "                     \"raw\":\"main.tf edited online with Bitbucket\",\n" +
-                "                     \"markup\":\"markdown\",\n" +
-                "                     \"html\":\"<p>main.tf edited online with Bitbucket</p>\"\n" +
-                "                  },\n" +
-                "                  \"links\":{\n" +
-                "                     \"self\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
-                "                     },\n" +
-                "                     \"html\":{\n" +
-                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
-                "                     },\n" +
-                "                     \"diff\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/diff/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
-                "                     },\n" +
-                "                     \"approve\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c/approve\"\n" +
-                "                     },\n" +
-                "                     \"comments\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c/comments\"\n" +
-                "                     },\n" +
-                "                     \"statuses\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c/statuses\"\n" +
-                "                     },\n" +
-                "                     \"patch\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/patch/f7647c752c7e7191b49ed4fcf832f8f1ea60cc5c\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"parents\":[\n" +
-                "                     {\n" +
-                "                        \"hash\":\"ee99ab866b3151b10f817ea1ff127fe8b51cb57c\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/ee99ab866b3151b10f817ea1ff127fe8b51cb57c\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/ee99ab866b3151b10f817ea1ff127fe8b51cb57c\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"commit\"\n" +
-                "                     }\n" +
-                "                  ],\n" +
-                "                  \"rendered\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"properties\":{\n" +
-                "                     \n" +
-                "                  }\n" +
-                "               },\n" +
-                "               {\n" +
-                "                  \"type\":\"commit\",\n" +
-                "                  \"hash\":\"ee99ab866b3151b10f817ea1ff127fe8b51cb57c\",\n" +
-                "                  \"date\":\"2024-01-19T17:18:29+00:00\",\n" +
-                "                  \"author\":{\n" +
-                "                     \"type\":\"author\",\n" +
-                "                     \"raw\":\"dummyuser <dummyuser@gmail.com>\",\n" +
-                "                     \"user\":{\n" +
-                "                        \"display_name\":\"dummyuser\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/users/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D\"\n" +
-                "                           },\n" +
-                "                           \"avatar\":{\n" +
-                "                              \"href\":\"https://secure.gravatar.com/avatar/629e77d25d888fc2115bd7626ae004f2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAE-4.png\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D/\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"user\",\n" +
-                "                        \"uuid\":\"{ed8beedc-3d28-4a7d-9ff3-de5dccead5f1}\",\n" +
-                "                        \"account_id\":\"557058:807b67c7-225d-4ed1-b3e0-1e044e0c07af\",\n" +
-                "                        \"nickname\":\"dummyuser\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"committer\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"message\":\"main.tf edited online with Bitbucket\",\n" +
-                "                  \"summary\":{\n" +
-                "                     \"type\":\"rendered\",\n" +
-                "                     \"raw\":\"main.tf edited online with Bitbucket\",\n" +
-                "                     \"markup\":\"markdown\",\n" +
-                "                     \"html\":\"<p>main.tf edited online with Bitbucket</p>\"\n" +
-                "                  },\n" +
-                "                  \"links\":{\n" +
-                "                     \"self\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/ee99ab866b3151b10f817ea1ff127fe8b51cb57c\"\n" +
-                "                     },\n" +
-                "                     \"html\":{\n" +
-                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/ee99ab866b3151b10f817ea1ff127fe8b51cb57c\"\n" +
-                "                     },\n" +
-                "                     \"diff\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/diff/ee99ab866b3151b10f817ea1ff127fe8b51cb57c\"\n" +
-                "                     },\n" +
-                "                     \"approve\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/ee99ab866b3151b10f817ea1ff127fe8b51cb57c/approve\"\n" +
-                "                     },\n" +
-                "                     \"comments\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/ee99ab866b3151b10f817ea1ff127fe8b51cb57c/comments\"\n" +
-                "                     },\n" +
-                "                     \"statuses\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/ee99ab866b3151b10f817ea1ff127fe8b51cb57c/statuses\"\n" +
-                "                     },\n" +
-                "                     \"patch\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/patch/ee99ab866b3151b10f817ea1ff127fe8b51cb57c\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"parents\":[\n" +
-                "                     {\n" +
-                "                        \"hash\":\"d28224b45f7def76c8b399a15391bc4676581bc7\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/d28224b45f7def76c8b399a15391bc4676581bc7\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/d28224b45f7def76c8b399a15391bc4676581bc7\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"commit\"\n" +
-                "                     }\n" +
-                "                  ],\n" +
-                "                  \"rendered\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"properties\":{\n" +
-                "                     \n" +
-                "                  }\n" +
-                "               },\n" +
-                "               {\n" +
-                "                  \"type\":\"commit\",\n" +
-                "                  \"hash\":\"d28224b45f7def76c8b399a15391bc4676581bc7\",\n" +
-                "                  \"date\":\"2024-01-19T17:15:07+00:00\",\n" +
-                "                  \"author\":{\n" +
-                "                     \"type\":\"author\",\n" +
-                "                     \"raw\":\"dummyuser <dummyuser@gmail.com>\",\n" +
-                "                     \"user\":{\n" +
-                "                        \"display_name\":\"dummyuser\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/users/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D\"\n" +
-                "                           },\n" +
-                "                           \"avatar\":{\n" +
-                "                              \"href\":\"https://secure.gravatar.com/avatar/629e77d25d888fc2115bd7626ae004f2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAE-4.png\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D/\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"user\",\n" +
-                "                        \"uuid\":\"{ed8beedc-3d28-4a7d-9ff3-de5dccead5f1}\",\n" +
-                "                        \"account_id\":\"557058:807b67c7-225d-4ed1-b3e0-1e044e0c07af\",\n" +
-                "                        \"nickname\":\"dummyuser\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"committer\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"message\":\"main.tf edited online with Bitbucket\",\n" +
-                "                  \"summary\":{\n" +
-                "                     \"type\":\"rendered\",\n" +
-                "                     \"raw\":\"main.tf edited online with Bitbucket\",\n" +
-                "                     \"markup\":\"markdown\",\n" +
-                "                     \"html\":\"<p>main.tf edited online with Bitbucket</p>\"\n" +
-                "                  },\n" +
-                "                  \"links\":{\n" +
-                "                     \"self\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/d28224b45f7def76c8b399a15391bc4676581bc7\"\n" +
-                "                     },\n" +
-                "                     \"html\":{\n" +
-                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/d28224b45f7def76c8b399a15391bc4676581bc7\"\n" +
-                "                     },\n" +
-                "                     \"diff\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/diff/d28224b45f7def76c8b399a15391bc4676581bc7\"\n" +
-                "                     },\n" +
-                "                     \"approve\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/d28224b45f7def76c8b399a15391bc4676581bc7/approve\"\n" +
-                "                     },\n" +
-                "                     \"comments\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/d28224b45f7def76c8b399a15391bc4676581bc7/comments\"\n" +
-                "                     },\n" +
-                "                     \"statuses\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/d28224b45f7def76c8b399a15391bc4676581bc7/statuses\"\n" +
-                "                     },\n" +
-                "                     \"patch\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/patch/d28224b45f7def76c8b399a15391bc4676581bc7\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"parents\":[\n" +
-                "                     {\n" +
-                "                        \"hash\":\"091b43c903ff41245b3d48887237738225857134\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/091b43c903ff41245b3d48887237738225857134\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/091b43c903ff41245b3d48887237738225857134\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"commit\"\n" +
-                "                     }\n" +
-                "                  ],\n" +
-                "                  \"rendered\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"properties\":{\n" +
-                "                     \n" +
-                "                  }\n" +
-                "               },\n" +
-                "               {\n" +
-                "                  \"type\":\"commit\",\n" +
-                "                  \"hash\":\"091b43c903ff41245b3d48887237738225857134\",\n" +
-                "                  \"date\":\"2024-01-19T17:11:10+00:00\",\n" +
-                "                  \"author\":{\n" +
-                "                     \"type\":\"author\",\n" +
-                "                     \"raw\":\"dummyuser <dummyuser@gmail.com>\",\n" +
-                "                     \"user\":{\n" +
-                "                        \"display_name\":\"dummyuser\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/users/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D\"\n" +
-                "                           },\n" +
-                "                           \"avatar\":{\n" +
-                "                              \"href\":\"https://secure.gravatar.com/avatar/629e77d25d888fc2115bd7626ae004f2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAE-4.png\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/%7Bed8beedc-3d28-4a7d-9ff3-de5dccead5f1%7D/\"\n" +
-                "                           }\n" +
-                "                        },\n" +
-                "                        \"type\":\"user\",\n" +
-                "                        \"uuid\":\"{ed8beedc-3d28-4a7d-9ff3-de5dccead5f1}\",\n" +
-                "                        \"account_id\":\"557058:807b67c7-225d-4ed1-b3e0-1e044e0c07af\",\n" +
-                "                        \"nickname\":\"dummyuser\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"committer\":{\n" +
-                "                     \n" +
-                "                  },\n" +
-                "                  \"message\":\"main.tf edited online with Bitbucket\",\n" +
-                "                  \"summary\":{\n" +
-                "                     \"type\":\"rendered\",\n" +
-                "                     \"raw\":\"main.tf edited online with Bitbucket\",\n" +
-                "                     \"markup\":\"markdown\",\n" +
-                "                     \"html\":\"<p>main.tf edited online with Bitbucket</p>\"\n" +
-                "                  },\n" +
-                "                  \"links\":{\n" +
-                "                     \"self\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/091b43c903ff41245b3d48887237738225857134\"\n" +
-                "                     },\n" +
-                "                     \"html\":{\n" +
-                "                        \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/091b43c903ff41245b3d48887237738225857134\"\n" +
-                "                     },\n" +
-                "                     \"diff\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/diff/091b43c903ff41245b3d48887237738225857134\"\n" +
-                "                     },\n" +
-                "                     \"approve\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/091b43c903ff41245b3d48887237738225857134/approve\"\n" +
-                "                     },\n" +
-                "                     \"comments\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/091b43c903ff41245b3d48887237738225857134/comments\"\n" +
-                "                     },\n" +
-                "                     \"statuses\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/091b43c903ff41245b3d48887237738225857134/statuses\"\n" +
-                "                     },\n" +
-                "                     \"patch\":{\n" +
-                "                        \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/patch/091b43c903ff41245b3d48887237738225857134\"\n" +
-                "                     }\n" +
-                "                  },\n" +
-                "                  \"parents\":[\n" +
-                "                     {\n" +
-                "                        \"hash\":\"655558d16be7034c312593d303f05d7ced7d436f\",\n" +
-                "                        \"links\":{\n" +
-                "                           \"self\":{\n" +
-                "                              \"href\":\"http://localhost:9999/2.0/repositories/dummyuser/simple-terraform/commit/655558d16be7034c312593d303f05d7ced7d436f\"\n" +
-                "                           },\n" +
-                "                           \"html\":{\n" +
-                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/655558d16be7034c312593d303f05d7ced7d436f\"\n" +
+                "                              \"href\":\"https://bitbucket.org/dummyuser/simple-terraform/commits/71085ceb4314ac77d1a36ab687b3e067814c9395\"\n" +
                 "                           }\n" +
                 "                        },\n" +
                 "                        \"type\":\"commit\"\n" +
@@ -1437,7 +1215,7 @@ class VcsTests extends ServerApplicationTests{
                 "     value = local.fake\n" +
                 " }\n";
 
-        stubFor(get(urlPathEqualTo("/2.0/repositories/dummyuser/simple-terraform/diff/53580d154140650af84b438d6d7b99f33740441b"))
+        stubFor(get(urlPathEqualTo("/2.0/repositories/dummyuser/simple-terraform/diff/c7eae9b0c5450123c943a4baf7c357fc2564c316..71085ceb4314ac77d1a36ab687b3e067814c9395"))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withBody(diffResponse)));

@@ -72,11 +72,12 @@ public class BitBucketWebhookService extends WebhookServiceBase {
 
             // Check if this is a tag creation event
             String changeType = changesNode.path("new").path("type").asText();
+            String targetType = changesNode.path("new").path("target").path("type").asText();
 
             log.info("Bitbucket change type is empty: {}", changeType.isEmpty());
-            if ("tag".equals(changeType)) {
+            if (changeType.equals("tag")) {
                 return handleTagCreationEvent(jsonPayload, result);
-            } else if ("commit".equals(changeType)) {
+            } else if (changeType.equals("branch") && targetType.equals("commit")) {
                 return handlePushCommit(jsonPayload, result, changesNode);
             } else {
                 log.error("Unsupported Bitbucket change type: {}", changeType);
